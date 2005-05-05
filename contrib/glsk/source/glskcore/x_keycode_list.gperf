@@ -1,0 +1,191 @@
+%language=ANSI-C
+%7bit
+%global-table
+%ignore-case
+%readonly-tables
+%null-strings
+%enum
+%define lookup-function-name _glsk_keycode_list_lookup
+%{
+#include <X11/X.h>
+#include <X11/Xatom.h>
+#include <X11/Xdefs.h>
+#include <X11/keysym.h>
+#include <glsk/glsk.h>
+#include "x_input.h"
+%}
+%struct-type
+struct keystring_entry { const char* name; unsigned char code; };
+%%
+# $Id$
+Escape, KEY_ESCAPE 
+1, KEY_1 
+2, KEY_2 
+3, KEY_3 
+4, KEY_4 
+5, KEY_5 
+6, KEY_6 
+7, KEY_7 
+8, KEY_8 
+9, KEY_9 
+0, KEY_0 
+-, KEY_MINUS 
+=, KEY_EQUALS 
+Backspace, KEY_BACK 
+Tab, KEY_TAB 
+q, KEY_Q 
+w, KEY_W 
+e, KEY_E 
+r, KEY_R 
+t, KEY_T 
+y, KEY_Y 
+u, KEY_U 
+i, KEY_I 
+o, KEY_O 
+p, KEY_P 
+[, KEY_LBRACKET 
+], KEY_RBRACKET 
+Return, KEY_RETURN 
+LCtrl, KEY_LCONTROL 
+a, KEY_A 
+s, KEY_S 
+d, KEY_D 
+f, KEY_F 
+g, KEY_G 
+h, KEY_H 
+j, KEY_J 
+k, KEY_K 
+l, KEY_L 
+;, KEY_SEMICOLON 
+', KEY_APOSTROPHE 
+Grave, KEY_GRAVE 
+LShift, KEY_LSHIFT 
+\, KEY_BACKSLASH 
+z, KEY_Z 
+x, KEY_X 
+c, KEY_C 
+v, KEY_V 
+b, KEY_B 
+n, KEY_N 
+m, KEY_M 
+Comma, KEY_COMMA 
+Period, KEY_PERIOD 
+/, KEY_SLASH 
+RShift, KEY_RSHIFT 
+Num*, KEY_MULTIPLY 
+LAlt, KEY_ALT 
+Space, KEY_SPACE 
+Capital, KEY_CAPITAL 
+F1, KEY_F1 
+F2, KEY_F2 
+F3, KEY_F3 
+F4, KEY_F4 
+F5, KEY_F5 
+F6, KEY_F6 
+F7, KEY_F7 
+F8, KEY_F8 
+F9, KEY_F9 
+F10, KEY_F10 
+NumLock, KEY_NUMLOCK 
+Scroll, KEY_SCROLL 
+Num7, KEY_NUMPAD7 
+Num8, KEY_NUMPAD8 
+Num9, KEY_NUMPAD9 
+Num-, KEY_SUBTRACT 
+Num4, KEY_NUMPAD4 
+Num5, KEY_NUMPAD5 
+Num6, KEY_NUMPAD6 
+Num+, KEY_ADD 
+Num1, KEY_NUMPAD1 
+Num2, KEY_NUMPAD2 
+Num3, KEY_NUMPAD3 
+Num0, KEY_NUMPAD0 
+Num., KEY_DECIMAL 
+OEM, KEY_OEM_102 
+F11, KEY_F11 
+F12, KEY_F12 
+F13, KEY_F13 
+F14, KEY_F14 
+F15, KEY_F15 
+Kana, KEY_KANA 
+Abnt_C1, KEY_ABNT_C1 
+Convert, KEY_CONVERT 
+NoConvert, KEY_NOCONVERT 
+Yen, KEY_YEN 
+Abnt_C2, KEY_ABNT_C2 
+Num=, KEY_NUMPADEQUALS 
+PrevTrack, KEY_PREVTRACK 
+# ^, KEY_CIRCUMFLEX 
+@, KEY_AT 
+:, KEY_COLON 
+UnderLine, KEY_UNDERLINE 
+Kanji, KEY_KANJI 
+Stop, KEY_STOP 
+AX, KEY_AX 
+UnLabeled, KEY_UNLABELED 
+NextTrack, KEY_NEXTTRACK 
+NumReturn, KEY_NUMPADENTER 
+RCtl, KEY_RCONTROL 
+Mute, KEY_MUTE 
+Calculator, KEY_CALCULATOR 
+PlayPause, KEY_PLAYPAUSE 
+MediaStop, KEY_MEDIASTOP 
+VolumeDown, KEY_VOLUMEDOWN 
+VolumeUp, KEY_VOLUMEUP 
+WebHome, KEY_WEBHOME 
+NumpadComma, KEY_NUMPADCOMMA 
+Num/, KEY_DIVIDE 
+SysRq, KEY_SYSRQ 
+RAlt, KEY_ALT_GR 
+Pause, KEY_PAUSE 
+Home, KEY_HOME 
+Up, KEY_UP 
+PgUp, KEY_PRIOR 
+Left, KEY_LEFT 
+Right, KEY_RIGHT 
+End, KEY_END 
+Down, KEY_DOWN 
+PgDn, KEY_NEXT 
+Ins, KEY_INSERT 
+Del, KEY_DELETE 
+LWin, KEY_LWIN 
+RWin, KEY_RWIN 
+Apps, KEY_APPS 
+Power, KEY_POWER 
+Sleep, KEY_SLEEP 
+Wake, KEY_WAKE 
+WebSearch, KEY_WEBSEARCH 
+WebFavorites, KEY_WEBFAVORITES 
+WebRefresh, KEY_WEBREFRESH 
+WebStop, KEY_WEBSTOP 
+WebForward, KEY_WEBFORWARD 
+WebBack, KEY_WEBBACK 
+MyComputer, KEY_MYCOMPUTER
+Mail, KEY_MAIL
+MediaSelect, KEY_MEDIASELECT
+%%
+int glsk_keyboard_get_keycode( const char *str )
+{
+	const struct keystring_entry* result = 0;
+	
+	if ( str == 0 )
+		return 0;
+
+	result = _glsk_keycode_list_lookup( str, (unsigned int)strlen( str ) );
+
+	return (result) ? result->code : 0;
+}
+
+const char* glsk_keyboard_get_keyname( int keycode )
+{
+	int n = sizeof( wordlist ) / sizeof( struct keystring_entry );
+	int i;
+
+	for ( i = 0; i < n; ++i )
+	{
+		if ( wordlist[ i ].name && ( wordlist[ i ].code == keycode ) )
+			return wordlist[ i ].name;
+	}
+
+	return "";
+}

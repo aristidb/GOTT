@@ -1,0 +1,72 @@
+Schemas are parsed almost like usual grammars. There are matcher objects and 
+they are passed the tokens that are encountered. As long as no more than one
+token is rejected by any rule-object, the procedure is as follows (for a
+single token):
+  1. The token is read (by simple::parse).
+  2. The token is shown to the current rule.
+  3. The current rule either accepts or rejects the token.
+    3a. If the rule accepted and needs more input, we are done.
+    3b. If the rule accepted and needs no more input, we remove it and tell its
+        parent that it succeeded (via the child_succeed pseudo-token).
+    3c. If the rule rejected and needs no more input, we remove it and tell its
+        parent that it succeeded AND go back to step 2
+    3d. Otherwise, we issue a parse error.
+
+This model brings object-orientism to parsing. I'll now show you the list of
+tokens:
+  begin_parse:  The first token issued
+  end_parse:    The last token issued
+  node:         Guess... a string has been seen in the input
+  down:         Go down one level (the following is the child of the last
+                node)
+  up:           Go up one level (the following are now siblings of the current
+                parent)
+  comment:      -- unused
+
+Quite probably (really: certainly), more than one token will be rejected. I
+will think about this now. (Again, but the old code did not really work.)
+
+Let's somehow split up the above steps. Oh well, I'll just take the method 
+names from parse.cpp!
+
+- handle_token:
+  Generate an event from the token and emit it via handle_event.
+
+- handle_event:
+  Call handle_rule with the current event and retry until it succeeds.
+
+- handle_rule:
+  Send the current rule the event and call consume_event and return true if it
+  accepted, else call pass_event and return false. 
+
+- consume_event:
+  If the rule needs no more input and will not accept any, let it succeed.
+
+- pass_event:
+  If the rule needs input, call fail_rule. Else call succeed_rule.
+
+- succeed_rule:
+  Remove the current rule and emit a child_succeed event (via handle_event).
+
+- fail_rule:
+  Remove the current rule and emit a child_fail event.
+
+Now, after so many small changes, it's time to lay out a scheme for back-
+tracking.
+
+1. Only accepted tokens should be replayed.
+2. They should not be replayed twice - at least not to the same target.
+3. Either we change the simple parser so that something like cin.putback('X')
+   is possible or we directly replay in our routines. Decisions, decisions..
+4. More things to come.
+
+I currently think of the following model: The rule which accepts the
+child_fail event has to replay its last child's contents. I'll think more
+about it - later...
+
+Now done:
+All read tokens are stored in a vector. Each rule somehow is a range in this
+vector. And as soon as a rule fails and its parent accepts that, all the
+tokens in its range are replayed.
+
+I hope this model is able to do the job. We will see, we will see.

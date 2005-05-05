@@ -1,0 +1,2 @@
+SUBDIRS=glsk glskcore glskmm
+

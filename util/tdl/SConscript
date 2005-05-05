@@ -1,0 +1,25 @@
+import os
+import glob
+
+Import('env')
+
+source_files = []
+for root, dirs, _ in os.walk('.'):
+	if '.svn' in dirs:
+		dirs.remove('.svn')
+	if 'test' in dirs:
+		dirs.remove('test')
+	source_files += glob.glob(root + '/*.cpp')
+
+env.SharedLibrary('tdl', source_files)
+env.Program('test/test.cpp', LIBS=['tdl', 'xany'], LIBPATH=['.','#/util/xany'])
+
+tut_obj = [
+    'test/test_tut.cpp', 
+    'test/simple_parse.cpp', 
+    'test/simple_parse_meta.cpp',
+    'test/structure.cpp',
+    'test/query.cpp'
+  ] + glob.glob('test/schema/*.cpp')
+env.Program('ut', tut_obj, LIBS=['tdl', 'xany'], LIBPATH=['.','#/util/xany'])
+

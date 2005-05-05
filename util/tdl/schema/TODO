@@ -1,0 +1,1 @@
+Make all types slot compatible (at least those which need special optional<> support)

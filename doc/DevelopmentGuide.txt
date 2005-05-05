@@ -1,0 +1,163 @@
+= Project Guidelines and Coding Style for GOTT (http://gott.sf.net) =
+
+As any project around there, we need to have some coding conventions. People
+might not like them, but they are necessary. I'll now draft the most important
+guidelines:
+
+= Project Guideline =
+
+== Path/Namespaces ==
+The Namespace and Path are the same. The root path is `gott'. 
+
+-Examples
+{{{
+Path: gott/utils/debug/foo.hpp
+Namespace: gott::utils::debug
+}}}
+
+== Filenames ==
+C++ Code Filenames end with an ".cpp". C++ Header Filenames end with an ".hpp".
+They should be all Lower-Case.
+
+== Include Guards ==
+Include Guards have to start with the namespace used in this file in uppercase
+letters and the name sperator ("::") replaced by an underscore ("_"). Seperated
+by an Underscore the Filename in uppercase letters should follow. Characters
+that cannot be used in a C++ Macro should be replaced by an underscore ("_")
+
+
+-Example:
+{{{
+File: gott/foo/foo.hpp
+Namespace: gott::foo
+}}}
+{{{
+#!cpp
+#ifndef GOTT_FOO_FOO_HPP
+#define GOTT_FOO_FOO_HPP
+...
+#endif
+}}}
+
+== Use the Boost and Standard C++ Libraries ==
+If possible you should use the Boost Library (http://www.boost.org) or the
+Standard C++ Library. 
+
+== Exception Safety/Self Cleaning Code ==
+Please write exception safe code. That implies that you write self cleaning
+code. This is not only useful in the sense of exception safety. It makes the
+live easy if somebody wants to extend the code and doesn't now all its quirks.
+
+
+== Licensing Information ==
+Each source file should start with the following (license) information:
+{{{
+#!cpp
+/*
+   Copyright (C) $YEAR by $NAME <$EMAIL>
+   Content: $DESCRIPTION
+   Authors: $LIST-OF-AUTHORS
+
+   This File is part of the Gott Project (http://gott.sf.net)
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+}}}
+
+Each documentation file should end with the following license information:
+<...>
+
+
+
+== Documentation ==
+'''Work to do on this section!'''
+
+We use [http://www.stack.nl/~dimitri/doxygen/ Doxygen] for documentation. Please document classes and functions.
+
+Use /// for C++-Style-Doxygen-Comments and /** */ for C-Style-Doxygen-Comments. Please do not use the !-Comment Style.
+
+Do not stop commenting your Code because Doxygen is used. Prefer code that is self explaining.
+
+<...>
+
+= Coding Style =
+
+== Macros ==
+If you can not avoid them you should use GOTT_ as Prefix. The Name should be all Uppercase. 
+
+== Naming ==
+All identifiers are lower-case. Template arguments are CamelCase. Macros are
+UPPER-CASE. Choose meaningful names! Readability is extremly important. 
+
+== Characters per Line of Code ==
+Limit line lengths to 80 characters. 
+
+== Include ==
+Files should alway be included by its absolute project path and not relative to the file directory! 
+
+-Example:
+{{{
+#!cpp
+//Wrong Way:
+#include "debug.hpp"
+//Right Way:
+#include <gott/utils/debug.hpp>
+}}}
+
+== Comma "," ==
+There is no space before the comma and _always_ a space after the comma. 
+
+== Parentheses "()" ==
+In function calls and variable initializers, there is no space between
+identifier and opening parenthesis. In statements like if, a space is
+preferred in front of the (. 
+
+== Indentation ==
+Indent with two spaces. No tabs are allowed (Emacs Users please use (setq indent-tabs-mode nil)). 
+
+=== Namespaces ===
+Do not indent the inner parts of namespaces. Use using directives in your
+source files, you may use a non-hierarchical namespace without using directive
+though.
+You may indent the inner parts of 'local' namespaces (like namespace '' or
+'detail').
+
+
+
+=== Braces "{}" ===
+The opening brace is never put on a line on its own. The closing brace shares
+the indentation of the matching super-block. 
+Complex example:
+{{{
+#!cpp
+for (i = 0;
+     i < 44; ++i) {
+  foo;
+}
+}}}
+(Avoid such constructs.)
+
+=== Access specifiers ===
+Do not indent the public: and private: and protected. 
+
+=== Labels ===
+Do not indent switch labels. 
+
+= Editor Instructions =
+Some Editors support inline instructions about code formatting in code files. We should optionaly support them. <...>
+
+= Books and Texts you may have studied =
+ * Effective C++ - Scott Meyers - 0201924889
+ * Exceptional C++ - Herb Sutter - 0201615622 - http://www.gotw.ca/gotw/index.html
