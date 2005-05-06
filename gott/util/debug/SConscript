@@ -1,0 +1,3 @@
+import glob
+Import('env')
+env.Program('test', glob.glob('*.cpp'))
