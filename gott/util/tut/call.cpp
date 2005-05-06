@@ -63,5 +63,5 @@ int main(int argc,const char* argv[])
     std::cerr << "tut raised ex: " << ex.what() << std::endl;
   }
 
-  return 0;
+  return !visi.all_ok();
 }

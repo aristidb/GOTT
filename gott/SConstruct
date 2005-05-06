@@ -1,6 +1,6 @@
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
 cflags = ARGUMENTS.get('cflags', '-Wall -W')
-release = int(ARGUMENTS.get('release', 0))
+release = int(ARGUMENTS.get('release', 1))
 if release:
 	debug = 0
 	opt = '-O3'
