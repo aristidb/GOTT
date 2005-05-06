@@ -20,7 +20,7 @@ TEST     :=./testcase
 LIBTARG  :=
 CXXFLAGS :=-g -W -Wall
 CXX      :=g++
-INCLUDES :=-I../include
+INCLUDES :=-I../include -I../../..
 LIBS     :=
 EXT      :=cpp
 
