@@ -41,10 +41,10 @@ namespace cf = tdl::structure::cf;
 
 namespace tut {
 struct query_basic {
-  tree t, xp;
+  tree tree_obj, xp;
 
   query_basic() {
-    writable_structure &tr = t;
+    writable_structure &tr = tree_obj;
     tr.begin();
       tr.data(Xany(L"root"));
       tr.begin();
@@ -76,28 +76,35 @@ tut::tf stru("query");
 namespace tut {
 template<> template<>
 void object::test<1>() {
-  selection<tree::iterator> sel(t.get_root());
-  wcout << const_range(sel);
+  selection<tree::iterator> sel(tree_obj.get_root());
+  tree_obj.copy_to(xp);
+  ensure_equals("root", sel, selection<tree::iterator>(xp.get_root()));
 }
 
 template<> template<>
 void object::test<2>() {
-  selection<tree::iterator> x1(t.get_root());
+  selection<tree::iterator> x1(tree_obj.get_root());
   selection<tree::iterator> sel(x1.find(1));
-  wcout << const_range(sel);
+  cf::S(Xany(L"qoo")).write_to(xp);
+  ensure_equals("root[1]", sel, selection<tree::iterator>(xp.get_root()));
 }
 
 void object::test<3>() {
-  selection<tree::iterator> x1(t.get_root());
+  selection<tree::iterator> x1(tree_obj.get_root());
   selection<tree::iterator> sel(x1.find(0));
-  wcout << const_range(sel);
+  cf::nd_list v;
+  v.push_back(cf::S(Xany(L"foo"), L"foo"));
+  v.push_back(cf::S(Xany(L"bar"), L"bar"));
+  cf::MD(Xany(L"first"), v).write_to(xp);
+  ensure_equals("root[0]", sel, selection<tree::iterator>(xp.get_root()));
 }
 
 void object::test<4>() {
-  selection<tree::iterator> x1(t.get_root());
+  selection<tree::iterator> x1(tree_obj.get_root());
   selection<tree::iterator> x2(x1.find(0));
   selection<tree::iterator> sel(x2.find_tag(L"bar"));
-  wcout << const_range(sel);
+  cf::S(Xany(L"bar"), L"bar").write_to(xp);
+  ensure_equals("root[0][bar]", sel, selection<tree::iterator>(xp.get_root()));
 }
 
 //further tests

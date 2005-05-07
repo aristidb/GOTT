@@ -46,11 +46,13 @@ private:
 public:
   typedef typename container::iterator iterator;
   typedef typename container::const_iterator const_iterator;
+  typedef typename container::size_type size_type;
 
   const_iterator begin() const { return impl.begin(); }
   const_iterator end() const { return impl.end(); }
+  size_type size() const { return impl.size(); }
 
-  bool operator==(selection const &);
+  bool operator==(selection const &) const EXPORT;
 
 private:
   container impl;
@@ -64,6 +66,12 @@ private:
 template<class I>
 bool operator!=(selection<I> const &a, selection<I> const &b) {
   return !(a == b);
+}
+
+template<class Ch, class ChT, class I>
+std::basic_ostream<Ch, ChT> &operator<<(std::basic_ostream<Ch, ChT> &s,
+                                        selection<I> const &x) {
+  return s << range(x);
 }
 
 }}}}

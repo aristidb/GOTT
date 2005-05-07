@@ -91,7 +91,7 @@ selection<I> selection<I>::find_tag(wstring const &s) const {
 }
 
 template<class I>
-bool selection<I>::operator==(selection<I> const &b) {
+bool selection<I>::operator==(selection<I> const &b) const {
   const_iterator i = begin(), j = b.begin();
   for (; i != end() && j != b.end(); ++i, ++j) 
     if (!i->contents_equal(*j))
