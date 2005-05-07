@@ -61,9 +61,8 @@ template<class Ch, class CT, class T>
 basic_ostream<Ch,CT> &operator<<(basic_ostream<Ch,CT> &s, 
                                  gott::util::range_t<T> const &x) {
   typedef typename iterator_traits<T>::value_type value_type;
-  copy(x.begin, x.end, 
-       ostream_iterator<value_type>(s, 
-                                    element_separator<value_type, Ch>::sep()));
+  for (T i = x.begin; i != x.end; ++i)
+    s << *i << element_separator<value_type, Ch>::sep();
   return s;
 }
 

@@ -22,6 +22,7 @@
 #include <gott/util/tdl/structure/structure.hpp>
 #include <gott/util/tdl/structure/tree.hpp>
 #include <gott/util/tdl/structure/print.hpp>
+#include <gott/util/tdl/structure/comfort.hpp>
 #include <gott/util/tut/tut.h>
 
 using std::wcout;
@@ -35,6 +36,8 @@ using tdl::structure::writable_structure;
 using tdl::query::selection;
 using gott::util::xany::Xany;
 using gott::util::range;
+using gott::util::const_range;
+namespace cf = tdl::structure::cf;
 
 namespace tut {
 struct query_basic {
@@ -74,24 +77,27 @@ namespace tut {
 template<> template<>
 void object::test<1>() {
   selection<tree::iterator> sel(t.get_root());
+  wcout << const_range(sel);
 }
 
 template<> template<>
 void object::test<2>() {
   selection<tree::iterator> x1(t.get_root());
   selection<tree::iterator> sel(x1.find(1));
+  wcout << const_range(sel);
 }
 
 void object::test<3>() {
   selection<tree::iterator> x1(t.get_root());
   selection<tree::iterator> sel(x1.find(0));
+  wcout << const_range(sel);
 }
 
 void object::test<4>() {
   selection<tree::iterator> x1(t.get_root());
   selection<tree::iterator> x2(x1.find(0));
   selection<tree::iterator> sel(x2.find_tag(L"bar"));
-
+  wcout << const_range(sel);
 }
 
 //further tests
