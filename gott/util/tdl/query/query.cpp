@@ -90,4 +90,14 @@ selection<I> selection<I>::find_tag(wstring const &s) const {
   return tmp;
 }
 
+template<class I>
+bool selection<I>::operator==(selection<I> const &b) {
+  const_iterator i = begin(), j = b.begin();
+  for (; i != end() && j != b.end(); ++i, ++j) 
+    if (!i->contents_equal(*j))
+      return false;
+  return i == end() && j == b.end();
+}
+
+
 #include "spec.tpp"

@@ -43,6 +43,30 @@ inline wostream &operator<<(wostream &o, string const &x) {
   return o << x.c_str();
 }
 
+template<class T, class C>
+struct element_separator {
+};
+
+template<class T>
+struct element_separator<T, char> {
+  static char const *sep() { return " "; }
+};
+
+template<class T>
+struct element_separator<T, wchar_t> {
+  static wchar_t const *sep() { return L" "; }
+};
+
+template<class Ch, class CT, class T>
+basic_ostream<Ch,CT> &operator<<(basic_ostream<Ch,CT> &s, 
+                                 gott::util::range_t<T> const &x) {
+  typedef typename iterator_traits<T>::value_type value_type;
+  copy(x.begin, x.end, 
+       ostream_iterator<value_type>(s, 
+                                    element_separator<value_type, Ch>::sep()));
+  return s;
+}
+
 }
 
 #endif

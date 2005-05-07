@@ -20,6 +20,7 @@
 
 #include "structure.hpp"
 #include "tree.hpp"
+#include "print.hpp"
 
 using std::list;
 using std::wstring;
@@ -29,10 +30,12 @@ using boost::intrusive_ptr;
 using boost::scoped_ptr;
 using gott::util::xany::Xany;
 
-using gott::util::tdl::structure::writable_structure;
-using gott::util::tdl::structure::revocable_structure;
-using gott::util::tdl::structure::copyable_structure;
-using gott::util::tdl::structure::tree;
+namespace stru = gott::util::tdl::structure;
+using stru::writable_structure;
+using stru::revocable_structure;
+using stru::copyable_structure;
+using stru::tree;
+using stru::direct_print;
 
 writable_structure::~writable_structure() {}
 revocable_structure::~revocable_structure() {}
@@ -94,11 +97,11 @@ struct tree::node {
   bool equals(node const &) const;
 };
 
-void gott::util::tdl::structure::intrusive_ptr_add_ref(tree::node *p) {
+void stru::intrusive_ptr_add_ref(tree::node *p) {
   ++p->use_count;
 }
 
-void gott::util::tdl::structure::intrusive_ptr_release(tree::node *p) {
+void stru::intrusive_ptr_release(tree::node *p) {
   if (!--p->use_count)
     delete p;
 }
@@ -213,7 +216,7 @@ list<wstring> const &tree::iterator::get_tags() const { return n->tags; }
 
 tree::iterator tree::get_root() const { return root; }
 
-bool tree::iterator::contents_equal(iterator const &o) {
+bool tree::iterator::contents_equal(iterator const &o) const {
   return n->equals(*o.n);
 }
 
@@ -290,6 +293,23 @@ bool tree::node::equals(node const &o) const {
     q = q->sibling;
   }
   return !(p || q);
+}
+
+std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
+  direct_print p(s);
+  struct printer {
+    writable_structure &p;
+    void operator() (tree::iterator const &x) {
+      p.begin();
+        p.data(x.get_data());
+        p.set_tags(x.get_tags());
+        for (tree::iterator i = x.first_child(); i; i = i.next())
+          this->operator()(i);
+      p.end();
+    }
+  } x = {p};
+  x(i);
+  return s;
 }
 
 #ifdef DEBUG

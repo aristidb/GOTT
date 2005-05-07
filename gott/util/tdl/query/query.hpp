@@ -50,6 +50,8 @@ public:
   const_iterator begin() const { return impl.begin(); }
   const_iterator end() const { return impl.end(); }
 
+  bool operator==(selection const &);
+
 private:
   container impl;
 
@@ -58,6 +60,11 @@ private:
   void add_wrange(Iterator const &, std::size_t, std::size_t);
   void add_wtag(Iterator const &, std::wstring const &);
 };
+
+template<class I>
+bool operator!=(selection<I> const &a, selection<I> const &b) {
+  return !(a == b);
+}
 
 }}}}
 
