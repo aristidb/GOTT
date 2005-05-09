@@ -28,6 +28,7 @@ using u::xany::Xany;
 using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
+using stru::cf::M;
 
 typedef schema::rule::attributes RA;
 
@@ -125,6 +126,19 @@ void object::test<6>() {
     ensure_equals("correct error", 
         std::string(mm.what()), "1:5 : mismatch at token y");
   }
+}
+
+template<> template<>
+void object::test<7>() {
+  run_test(L"4\n\n5\n6,7\n(zzz doink)");
+  stru::cf::nd_list ll;
+  for (int i = 4; i <= 7; ++i)
+    ll.push_back(S(Xany(i), L"int"));
+  stru::cf::nd_list c;
+  c.push_back(M(ll, L"list"));
+  c.push_back(S(Xany(L"(zzz doink)"), L"string"));
+  C(M(c, L"ord"), L"doc").write_to(xp);
+  ensure_equals("many thingies", tree, xp);
 }
 
 // further tests
