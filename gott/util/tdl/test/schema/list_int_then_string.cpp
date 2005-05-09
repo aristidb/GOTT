@@ -32,14 +32,17 @@ using stru::cf::C;
 typedef schema::rule::attributes RA;
 
 namespace {
-struct schema_ordered_integer_string : tut::schema_basic {
-  schema_ordered_integer_string() {
+struct schema_list_int_then_string : tut::schema_basic {
+  schema_list_int_then_string() {
     context.begin(schema::match_document::factory::index(), 
                   RA(wstring(L"doc")));
       context.begin(schema::match_ordered::factory::index(),
                     RA(wstring(L"ord")));
-        context.begin(schema::match_integer::factory::index(),
-                    RA(wstring(L"int")));
+        context.begin(schema::match_list::factory::index(),
+                      RA(wstring(L"list")));
+          context.begin(schema::match_integer::factory::index(),
+                        RA(wstring(L"int")));
+          context.end();
         context.end();
         context.begin(schema::match_string::factory::index(),
                     RA(wstring(L"string")));
@@ -51,12 +54,12 @@ struct schema_ordered_integer_string : tut::schema_basic {
 }
 
 namespace tut {
-typedef test_group<schema_ordered_integer_string> tf;
+typedef test_group<schema_list_int_then_string> tf;
 typedef tf::object object;
 }
 
 namespace {
-  tut::tf ordered_integer_string_test("schema::ordered_integer_string");
+  tut::tf list_int_then_string_test("schema::list_int_then_string");
 }
 
 namespace tut {
@@ -64,21 +67,20 @@ template<> template<>
 void object::test<1>() {
   run_test(L"4\nx");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(4), L"int"));
+  c.push_back(C(S(Xany(4), L"int"), L"list"));
   c.push_back(S(Xany(L"x"), L"string"));
   C(M(c, L"ord"), L"doc").write_to(xp);
-  ensure_equals("single ordered_integer_string entity", tree, xp);
+  ensure_equals("single integer, then string", tree, xp);
 }
 
 template<> template<>
 void object::test<2>() {
-  try {
-    run_test(L"d7");
-    fail("just string");
-  } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token d7");
-  }
+  run_test(L"d7");
+  stru::cf::nd_list c;
+  c.push_back(S(Xany(), L"list"));
+  c.push_back(S(Xany(L"d7"), L"string"));
+  C(M(c, L"ord"), L"doc").write_to(xp);
+  ensure_equals("just string", tree, xp);
 }
 
 template<> template<>
@@ -96,10 +98,10 @@ template<> template<>
 void object::test<4>() {
   try {
     run_test(L"foo bar");
-    fail("string following string");
+    fail("following");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token foo");
+        std::string(mm.what()), "1:1 : mismatch after token foo");
   }
 }
 
@@ -118,20 +120,10 @@ template<> template<>
 void object::test<6>() {
   try {
     run_test(L"4,x,y");
+    fail("too many strings");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
         std::string(mm.what()), "1:5 : mismatch at token y");
-  }
-}
-
-template<> template<>
-void object::test<7>() {
-  try {
-    run_test(L"732 bar");
-    fail("string following integer");
-  } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 732");
   }
 }
 
