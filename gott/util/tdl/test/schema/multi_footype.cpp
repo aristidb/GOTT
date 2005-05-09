@@ -82,5 +82,9 @@ namespace {
 }
 
 namespace tut {
+template<> template<>
+void object::test<1>() {
+}
+
 // ACTUALLY TEST (TODO)
 }
