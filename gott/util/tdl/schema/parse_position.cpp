@@ -40,7 +40,8 @@ public:
   size_t unconsumed, consumed;
   bool replay;
 
-  IMPL(revocable_structure &s) : struc(s), unconsumed(0), consumed(0), replay(false) {}
+  IMPL(revocable_structure &s) 
+    : struc(s), unconsumed(0), consumed(0), replay(false) {}
 };
 
 positioning::positioning(revocable_structure &s) : p(new IMPL(s)) {}

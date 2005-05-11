@@ -226,8 +226,10 @@ type multi\n\
       N(L"multi");
       N(L"unordered");
       D();
-        N(L"$"); D(); N(L"list"); D(); N(L"named"); D(); N(L"plugin"); N(L"list"); D(); N(L"string"); U(); U(); U(); U();
-        N(L"named"); D(); N(L"sum"); D(); N(L"integer"); D(); N(L"(> 0)"); U(); U(); U();
+        N(L"$"); D(); N(L"list"); D(); N(L"named"); D(); N(L"plugin"); \
+            N(L"list"); D(); N(L"string"); U(); U(); U(); U();
+        N(L"named"); D(); N(L"sum"); D(); N(L"integer"); D(); N(L"(> 0)"); \
+            U(); U(); U();
         N(L"$"); D(); N(L"list"); D(); N(L"integer"); U(); U();
       U();
     U();

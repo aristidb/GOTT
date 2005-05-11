@@ -79,7 +79,7 @@ struct tree::node {
     }
 
     void add_entry(intrusive_ptr<node> const &x) {
-      for (list<wstring>::iterator i = x->tags.begin(); i != x->tags.end(); ++i)
+      for (list<wstring>::iterator i =x->tags.begin(); i != x->tags.end(); ++i)
         by_name.insert(hmm_spn::value_type(*i, x));
     }
 
@@ -226,7 +226,8 @@ public:
   tree::node::index::tag_position pos;
   bool valid;
 
-  IMPL(tree::node::index::tag_range_type const &r) : range(r), pos(r.first), valid(true) {}
+  IMPL(tree::node::index::tag_range_type const &r) 
+    : range(r), pos(r.first), valid(true) {}
 };
 
 tree::tagged_iterator tree::iterator::with_tag(wstring const &s) const {
@@ -262,7 +263,7 @@ void tree::copy_to(writable_structure &target) const {
     void operator()(intrusive_ptr<node> p) {
       target.begin();
       target.data(p->data);
-      for_each(range(p->tags), bind(&writable_structure::add_tag, &target, _1));
+      for_each(range(p->tags), bind(&writable_structure::add_tag, &target,_1));
 
       for (p = p->child0; p; p = p->sibling)
         operator()(p);
@@ -338,7 +339,8 @@ void tree::dump(wostream &stream) {
 
       out << L'(' << p->ttag << L')';
       out << L" : ";
-      for (list<wstring>::iterator it = p->tags.begin(); it != p->tags.end(); ++it)
+      for (list<wstring>::iterator it = p->tags.begin(); 
+           it != p->tags.end(); ++it)
         out << *it << L' ';
       out << L"{\n";
       level += 2;

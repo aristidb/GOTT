@@ -61,15 +61,17 @@ struct line_logger {
 };
 
 // Class meta_parser
-// This is an interface where you can specify meta-data call-backs and that you can pass the
-// meta-data parser.
-// Meta-data is seen in the start of the file as '#?...' lines. The first non-empty line
-// ends the meta-data section.
-// If a command handler fails, the default command handler is called. The default handler
-// should always succeed (currently failure is ignored).
+// This is an interface where you can specify meta-data call-backs and that you
+// can pass the meta-data parser.
+// Meta-data is seen in the start of the file as '#?...' lines. The first 
+// non-empty line ends the meta-data section.
+// If a command handler fails, the default command handler is called. 
+// The default handler should always succeed (currently failure is ignored).
 class meta_parser {
 public:
-  typedef boost::function<bool (std::wstring const &, std::wstring const &)> callback;
+  typedef 
+    boost::function<bool (std::wstring const &, std::wstring const &)> 
+    callback;
     // The function type for a command handler
     // First parameter: command name
     // Second parameter: rest of the command
@@ -105,7 +107,7 @@ private:
 };
 
 EXPORT void parse(std::wistream &s, parser &p, line_logger * = 0);
-  // Parses the data section of a file/stream - s - (follows the meta-data section) 
+  // Parses the data section of a stream s (follows the meta-data section) 
   // and puts the results in p.
 
 EXPORT void parse_meta(std::wistream &, meta_parser &, line_logger * = 0);

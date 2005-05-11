@@ -76,13 +76,20 @@ template<bool ll> class exec_parse {
   
   void get_indent();
   void restore_indent(unsigned);
-  void skip_whitespace(wstring::const_iterator &, wstring::const_iterator const &);
+  void skip_whitespace(wstring::const_iterator &, 
+                       wstring::const_iterator const &);
   static bool border(wchar_t);
-  wstring read_quoted(wstring::const_iterator &, wstring::const_iterator const &); 
-  wstring read_paren(wstring::const_iterator &, wstring::const_iterator const &);
-  wstring read_string(wstring::const_iterator &, wstring::const_iterator const &);
+  wstring read_quoted(wstring::const_iterator &, 
+                      wstring::const_iterator const &); 
+  wstring read_paren(wstring::const_iterator &, 
+                     wstring::const_iterator const &);
+  wstring read_string(wstring::const_iterator &, 
+                      wstring::const_iterator const &);
+
 public:
-  exec_parse(wistream &s, parser &p, line_logger *l) : stream(s), parse(p), up(false), started_document(false), buff_indent(0), ln(l) {}
+  exec_parse(wistream &s, parser &p, line_logger *l) 
+    : stream(s), parse(p), up(false), 
+      started_document(false), buff_indent(0), ln(l) {}
   void run_parse();
 };
 
@@ -256,7 +263,8 @@ void exec_parse<ll>::block() {
 }
 
 template<bool ll>
-void exec_parse<ll>::skip_whitespace(wstring::const_iterator &it, wstring::const_iterator const &end) {
+void exec_parse<ll>::skip_whitespace(wstring::const_iterator &it, 
+                                     wstring::const_iterator const &end) {
   while (it != end && *it == L' ') {
     ln.new_char();
     ++it;
@@ -269,7 +277,8 @@ bool exec_parse<ll>::border(wchar_t c) {
 }
 
 template<bool ll>
-wstring exec_parse<ll>::read_quoted(wstring::const_iterator &it, wstring::const_iterator const &end) {
+wstring exec_parse<ll>::read_quoted(wstring::const_iterator &it, 
+                                    wstring::const_iterator const &end) {
   wstring::const_iterator start = it;
   bool double_dquote = true;
   do {
@@ -279,7 +288,7 @@ wstring exec_parse<ll>::read_quoted(wstring::const_iterator &it, wstring::const_
       break;
     double_dquote = *it++ == L'"';
   } while (double_dquote);
-  it -= 1 + !double_dquote; // double_dquote is still set if the break was executed
+  it -= 1 + !double_dquote; // double_dquote still set if break was executed
 
   ln.add_char(it - start + 1);
 
@@ -292,7 +301,8 @@ wstring exec_parse<ll>::read_quoted(wstring::const_iterator &it, wstring::const_
 }
 
 template<bool ll>
-wstring exec_parse<ll>::read_paren(wstring::const_iterator &it, wstring::const_iterator const &end) {
+wstring exec_parse<ll>::read_paren(wstring::const_iterator &it, 
+                                   wstring::const_iterator const &end) {
   wstring::const_iterator start = it++;
   struct balancer {
     unsigned long bal;
@@ -325,7 +335,8 @@ wstring exec_parse<ll>::read_paren(wstring::const_iterator &it, wstring::const_i
 }
 
 template<bool ll>
-wstring exec_parse<ll>::read_string(wstring::const_iterator &it, wstring::const_iterator const &end) {
+wstring exec_parse<ll>::read_string(wstring::const_iterator &it, 
+                                    wstring::const_iterator const &end) {
   ln.start_token();
   
   if (*it == L'"')

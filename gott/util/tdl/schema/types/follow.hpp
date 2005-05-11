@@ -32,7 +32,6 @@ namespace schema {
 
 class match_follow : public rule {
 public:
-//  typedef factory_template::slotcfg_somechildren<match_follow, 2, slotcfg::one, slotcfg::single> factory;
   typedef factory_template::somechildren<match_follow, 2> factory;
   match_follow(rule::factory const * const a[2], rule::attributes const &a, 
                match &m) EXPORT;

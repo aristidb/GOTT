@@ -26,8 +26,10 @@ namespace util {
 namespace tdl {
 namespace simple {
 
-writer::writer(wostream &os, unsigned i) : stream(os), level(0), indentation_width(i), newline(false), last_block(false) {
-}
+writer::writer(wostream &os, unsigned i) 
+  : stream(os), level(0), indentation_width(i), 
+  newline(false), last_block(false) 
+{}
 
 void writer::indent() {
   for (unsigned i = 2; i < level; ++i)
@@ -63,7 +65,8 @@ void writer::node(wstring const &s, bool quote, bool block) {
   level_change = false;
 }
 
-static wstring::const_iterator pos_to_it(wstring const &s, wstring::size_type p) {
+static wstring::const_iterator pos_to_it(wstring const &s, 
+                                         wstring::size_type p) {
   if (p == wstring::npos)
     return s.end();
   return s.begin() + p;
