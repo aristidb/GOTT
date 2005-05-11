@@ -147,13 +147,6 @@ using namespace gott::util::tdl;
 using namespace gott::util::xany;
 using namespace schema;
 
-static void printx(Xany const &a) {
-  if (!a.empty()) 
-    wcout << a;
-  else
-    wcout << L'-';
-}
-
 #define YY wcout << L'$';
 
 #if DEBUG

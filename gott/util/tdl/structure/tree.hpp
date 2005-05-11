@@ -67,12 +67,12 @@ public: // Iterators
     EXPORT std::list<std::wstring> const &get_tags() const;
       // reads all the node's tags
 
-    operator bool() { return n; }
+    operator bool() const { return n; }
       // is the iterator valid?
 
     typedef tagged_iterator tagged;
 
-    EXPORT bool contents_equal(iterator const &);
+    EXPORT bool contents_equal(iterator const &) const;
 
   private:  
     iterator();
@@ -151,6 +151,14 @@ private:
 
 inline bool operator!=(tree const &lhs, tree const &rhs) {
   return !(lhs == rhs);
+}
+
+EXPORT std::wostream &operator<<(std::wostream &s, tree::iterator const &i);
+
+inline std::ostream &operator<<(std::ostream &s, tree::iterator const &i) {
+  std::wostringstream w;
+  w << i;
+  return s << w.str();
 }
 
 }}}}

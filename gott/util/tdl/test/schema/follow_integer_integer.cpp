@@ -32,17 +32,17 @@ using stru::cf::C;
 typedef schema::rule::attributes RA;
 
 namespace {
-struct schema_ordered_integer_string : tut::schema_basic {
-  schema_ordered_integer_string() {
+struct schema_follow_integer_integer : tut::schema_basic {
+  schema_follow_integer_integer() {
     context.begin(schema::match_document::factory::index(), 
                   RA(wstring(L"doc")));
-      context.begin(schema::match_ordered::factory::index(),
-                    RA(wstring(L"ord")));
+      context.begin(schema::match_follow::factory::index(),
+                    RA(wstring(L"foll")));
         context.begin(schema::match_integer::factory::index(),
-                    RA(wstring(L"int")));
+                    RA(wstring(L"int1")));
         context.end();
-        context.begin(schema::match_string::factory::index(),
-                    RA(wstring(L"string")));
+        context.begin(schema::match_integer::factory::index(),
+                    RA(wstring(L"int2")));
         context.end();
       context.end();
     context.end();
@@ -51,23 +51,23 @@ struct schema_ordered_integer_string : tut::schema_basic {
 }
 
 namespace tut {
-typedef test_group<schema_ordered_integer_string> tf;
+typedef test_group<schema_follow_integer_integer> tf;
 typedef tf::object object;
 }
 
 namespace {
-  tut::tf ordered_integer_string_test("schema::ordered_integer_string");
+  tut::tf follow_integer_integer_test("schema::follow_integer_integer");
 }
 
 namespace tut {
 template<> template<>
 void object::test<1>() {
-  run_test(L"4\nx");
+  run_test(L"4\n 5");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(4), L"int"));
-  c.push_back(S(Xany(L"x"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
-  ensure_equals("single ordered_integer_string entity", tree, xp);
+  c.push_back(S(Xany(4), L"int1"));
+  c.push_back(S(Xany(5), L"int2"));
+  C(M(c, L"foll"), L"doc").write_to(xp);
+  ensure_equals("single follow_integer_integer entity", tree, xp);
 }
 
 template<> template<>
@@ -95,11 +95,11 @@ void object::test<3>() {
 template<> template<>
 void object::test<4>() {
   try {
-    run_test(L"foo bar");
-    fail("string following string");
+    run_test(L"-77 foo");
+    fail("followed string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token foo");
+        std::string(mm.what()), "1:5 : mismatch at token foo");
   }
 }
 
@@ -107,7 +107,7 @@ template<> template<>
 void object::test<5>() {
   try {
     run_test(L"4");
-    fail("just integer");
+    fail("just one integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
         std::string(mm.what()), "1:1 : mismatch after token 4");
@@ -117,21 +117,10 @@ void object::test<5>() {
 template<> template<>
 void object::test<6>() {
   try {
-    run_test(L"4,x,y");
+    run_test(L"4 99,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch at token y");
-  }
-}
-
-template<> template<>
-void object::test<7>() {
-  try {
-    run_test(L"732 bar");
-    fail("string following integer");
-  } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 732");
+        std::string(mm.what()), "1:6 : mismatch at token y");
   }
 }
 

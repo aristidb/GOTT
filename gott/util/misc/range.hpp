@@ -63,6 +63,11 @@ range_t<typename T::iterator> range(T &c) {
   return range(c.begin(), c.end());
 }
 
+template<class T>
+range_t<typename T::const_iterator> const_range(T const &c) {
+  return range(c.begin(), c.end());
+}
+
 template<class T, class S>
 range_t<T> offset(range_t<T> const &o, S a, S b = S()) {
   return range(advanced(o.begin, a), advanced(o.end, b));
