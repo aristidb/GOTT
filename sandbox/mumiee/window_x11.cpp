@@ -134,7 +134,7 @@ GLXFBConfig	get_fbconfig( pixelformat const& format )
 
 #undef set_pf_value
 
-window::window( gl_context const& c, pixelformat const& format, window::Flags fl )
+window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
   : os(new os_specific)
   , context(c)
   , flags(Clear)
@@ -269,6 +269,9 @@ window::window( gl_context const& c, pixelformat const& format, window::Flags fl
   application::get_instance().add_window( this );
   
   create( width, height );
+
+  if( fl & Visible )
+    set_visible();
 }
 
 void window::set_title(std::string const & t)
@@ -289,6 +292,21 @@ void window::set_title(std::string const & t)
 
     XFree( property.value );
   }
+}
+
+void window::set_visible( bool vis )
+{
+  if( os->handle )
+    if( vis )
+    {
+      flags |= Visible;
+      XMapWindow( global_data.connection, os->handle );
+    }
+    else 
+    {
+      flags &= ~Visible;
+      XUnmapWindow( global_data.connection, os->handle );
+    }
 }
 
 void window::set_decoration( bool st )
@@ -411,10 +429,12 @@ window::~window()
 
 void globals::process_event( window * win, XEvent const& event )
 {
+  std::cout << "process_event" << std::endl;
   switch( event.type )
   {
     case ReparentNotify:
       {
+        std::cout << "ReparentNotify" << std::endl;
         if( (win->flags & window::Decoration) == 0 )
         {
           XSetWindowAttributes  attributes;
@@ -425,10 +445,13 @@ void globals::process_event( window * win, XEvent const& event )
           XChangeWindowAttributes( connection, win->os->handle, CWOverrideRedirect, &attributes );
         }
 
+        break;
       };
+      
 
     case MotionNotify:
       {
+        std::cout << "MotionNotify" << std::endl;
         /*if ( _glsk_input_update_pointer_move( event.xmotion.x, event.xmotion.y, win) == 0 )
           _glsk_send_mouse_event( window, event.xmotion.x, window->height-event.xmotion.y,
           GLSK_ME_TYPE_MOVE, 0 );*/
@@ -436,34 +459,43 @@ void globals::process_event( window * win, XEvent const& event )
 
     case ButtonPress:
       {
+        std::cout << "ButtonPress" << std::endl;
         XSetInputFocus( global_data.connection, win->os->handle, RevertToPointerRoot, CurrentTime );
 
         /*if ( _glsk_input_update_pointer_button( event.xbutton.button, 1 ) == 0 )
           _glsk_send_mouse_event( win, event.xbutton.x, win->height-event.xbutton.y,
               GLSK_ME_TYPE_BUTTONPRESSED, event.xbutton.button );*/
 
+        break;
       };
 
     case ButtonRelease:
       {
+        std::cout << "ButtonRelease" << std::endl;
         /*if ( _glsk_input_update_pointer_button( event.xbutton.button, 0 ) == 0 )
           _glsk_send_mouse_event( win, event.xbutton.x, win->height-event.xbutton.y,
               GLSK_ME_TYPE_BUTTONRELEASED, event.xbutton.button );
 */
+        break;
       };
 
     case MapNotify:
       {
+        std::cout << "MapNotify" << std::endl;
         XSetInputFocus( global_data.connection, win->os->handle, RevertToPointerRoot, CurrentTime );
+        break;
       };
 
     case DestroyNotify:
       {
+        std::cout << "DestroyNotify" << std::endl;
         win->os->handle = None;
+        break;
       };
 
     case KeyPress:
       {
+        std::cout << "KeyPress" << std::endl;
     /*    if ( win&& win->callback.char_event )
         {
           KeySym      key_symbol;
@@ -479,18 +511,22 @@ void globals::process_event( window * win, XEvent const& event )
               win->callback.char_event( win, buffer );
           }
         }*/
+        break;
       }
 
     case KeyRelease:
       {
+        std::cout << "KeyRelease" << std::endl;
         KeySym key_symbol = XKeycodeToKeysym( connection, event.xkey.keycode, 0 );
 
 /*        if ( key_symbol )
           _glsk_input_key_event( key_symbol, 0 );
 */
+        break;
       }
     case ConfigureNotify:
       {
+        std::cout << "ConfigureNotify" << std::endl;
         XWindowAttributes root_attribs;
         Window root_window = RootWindow( connection, screen );
 
@@ -512,19 +548,23 @@ void globals::process_event( window * win, XEvent const& event )
 
         
         win->configure( win->width, win->height );
+        break;
 
       }
 
     case Expose:
       {
+        std::cout << "Expose" << std::endl;
         if( win== 0 )
           return;
 
         win->redraw();
+        break;
       }
 
     case ClientMessage:
       {
+        std::cout << "ClientMessage" << std::endl;
         if( event.xclient.message_type == protocols_atom )
         {
           // the close event
@@ -540,32 +580,39 @@ void globals::process_event( window * win, XEvent const& event )
         {
           std::cout << "unrecognized client-message type:" <<    XGetAtomName( connection, event.xclient.message_type ) << '\n';
         }
+        break;
 
       };
 
     case UnmapNotify:
       {
+        std::cout << "UnmapNotify" << std::endl;
+        break;
       };
 
     case FocusIn:
       {
+        std::cout << "FocusIn" << std::endl;
         if( (focus_window != 0) && (focus_window != win) )
           std::cout << "(gott-gui) Warning: another window is still focused.\n";
 
         focus_window = win;
 
         //_glsk_input_update_pointer_owner();
+        break;
 
       };
 
     case FocusOut:
       {
+        std::cout << "FocusOut" << std::endl;
         if( focus_window && (focus_window != win) )
           std::cout << "(gott-gui) Warning: losing focus without having focus.\n";
 
         focus_window = 0;
 
 //        _glsk_input_update_pointer_owner();
+        break;
 
       };
 

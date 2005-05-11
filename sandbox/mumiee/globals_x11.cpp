@@ -1,4 +1,6 @@
 #include <sys/time.h>
+#include <iostream>
+#include <stdexcept>
 #include <boost/cstdint.hpp>
 #include "globals_x11.hpp"
 #include "pixelformat.hpp"
@@ -64,17 +66,25 @@ globals::globals( )
 	// free those modes
 	XFree( video_modes );
 	
+  std::cout << "intit_input" << std::endl;
 	init_input();
 
 	//init_gl_extensions( &gl );
 
+  try
   {
     gl_context con;
     pixelformat format;
-    window win( con, format, window::Decoration );
+    window win( con, format, std::size_t(window::Decoration) );
+    std::cout << "window openend" << std::endl;
     // FIXME!
     //_glsk_init_extensions_string();
     application::get_instance().handle_pending_messages();
+    std::cout << "closing test window" << std::endl;
+  }
+  catch( std::runtime_error & e)
+  {
+    std::cout << e.what() << std::endl;
   }
 
   init_timer();

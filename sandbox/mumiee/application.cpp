@@ -1,4 +1,4 @@
-
+#include <iostream>
 #include "application.hpp"
 
 namespace gott{ namespace gui{
@@ -10,7 +10,10 @@ application::application()
 void application::run()
 {
   while( handle_pending_messages() == Continue )
+  {
+    std::cout << "handling pending" << std::endl;
     handle_idle();
+  }
 }
 
 void application::handle_idle()

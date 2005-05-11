@@ -51,10 +51,11 @@ class window
     window( window const& );
     window& operator=( window const& );
   public:
-    window( gl_context const& con, pixelformat const& format, window::Flags fl );
+    window( gl_context const& con, pixelformat const& format, std::size_t flags );
     virtual ~window();
 
-    void set_decoration( bool st = true );
+    void set_decoration( bool decor = true );
+    void set_visible( bool visible = true );
     void set_title( std::string const& title );
     void set_position( int x, int y );
     void set_size( std::size_t w, std::size_t h );

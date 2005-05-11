@@ -18,7 +18,6 @@ struct pixelformat
   buffer_bit_type color, depth, stencil, samples;
 
   pixelformat();
-
 };
 
 }}
