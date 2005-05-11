@@ -68,5 +68,29 @@ void object::test<1>() {
   ensure_equals("alphabet", tree, xp);
 }
 
+template<> template<>
+void object::test<2>() {
+  run_test(L"");
+  C(S(Xany())).write_to(xp);
+  ensure_equals("empty", tree, xp);
+}
+
+template<> template<>
+void object::test<3>() {
+  run_test(L"\"nene ich geh dann mal\"");
+  C(C(S(Xany(L"nene ich geh dann mal")))).write_to(xp);
+}
+
+template<> template<>
+void object::test<4>() {
+  try {
+    run_test(L"a b");
+    fail("following");
+  } catch (schema::mismatch const &mm) {
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch after token a");
+  }
+}
+
 // further tests
 }

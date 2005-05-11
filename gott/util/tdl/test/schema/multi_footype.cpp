@@ -84,6 +84,7 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>() {
+  std::cout << "\nFAKE" << std::flush;
 }
 
 // ACTUALLY TEST (TODO)
