@@ -19,47 +19,42 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/schema/slot.hpp>
 
 namespace u = gott::util;
-using namespace u::tdl::schema;
+namespace schema = u::tdl::schema;
 namespace stru = u::tdl::structure;
 namespace simple = u::tdl::simple;
 using u::xany::Xany;
 using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
+using stru::cf::M;
+using schema::slotcfg;
+
+typedef schema::rule::attributes RA;
 
 namespace {
-struct schema_multi_footype : tut::schema_basic {
-  schema_multi_footype() {
-    context.begin(match_document::factory::index(), 
-                  rule::attributes(wstring(L"d")));
-      context.begin(match_ordered::factory::index(), 
-                    rule::attributes(wstring(L"o")));
-        context.begin(match_list::factory::index(), 
-                      rule::attributes(wstring(L"s")));
-          context.begin(match_list::factory::index(), 
-                        rule::attributes(wstring(L"t")));
-            context.begin(match_integer::factory::index(), 
-                          rule::attributes(wstring(L"ii")));
-            ;context.end();
-          ;context.end();
-        ;context.end();
-        context.begin(match_string::factory::index(), 
-                      rule::attributes(wstring(L"xx")));
-      ;context.end();
-    ;context.end();
+struct schema_3int : tut::schema_basic {
+  schema_3int() {
+    context.begin(schema::match_document::factory::index());
+      context.begin(schema::match_list::factory::index());
+        context.begin(schema::match_integer::factory::index(), 
+                      RA(wstring(L"el")), slotcfg(slotcfg::minimum, 3));
+        context.end();
+      context.end();
+    context.end();
   }
 };
 }
 
 namespace tut {
-typedef test_group<schema_multi_footype> tf;
+typedef test_group<schema_3int> tf;
 typedef tf::object object;
 }
 
 namespace {
-  tut::tf multi_footype_test("schema::list_list");
+  tut::tf list_int_then_string_test("schema::3int");
 }
 
 namespace tut {
@@ -68,5 +63,5 @@ void object::test<1>() {
   std::cout << "\nFAKE" << std::flush;
 }
 
-// ACTUALLY TEST (TODO)
+// further tests
 }

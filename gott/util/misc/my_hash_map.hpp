@@ -23,15 +23,15 @@ namespace hashd = HH_HASHD;
 
 #ifdef  NEED_HASH_FOR_STRING
 namespace HH_HASHD {
-template<class Ch, class ChTr, class A> struct hash<std::basic_string<Ch, ChTr, A> > {
-    typedef std::basic_string<Ch, ChTr, A> string_t;
+template<class C,class CT,class A> struct hash<std::basic_string<C,CT,A> > {
+  typedef std::basic_string<C,CT,A> string_t;
 
-    std::size_t operator() (string_t const &a) const {
-        size_t x = 0;
-        for (typename string_t::const_iterator it = a.begin(); it != a.end(); ++it)
-            x = 5*x + *it;
-        return x;
-    }
+  std::size_t operator() (string_t const &a) const {
+    size_t x = 0;
+    for (typename string_t::const_iterator it = a.begin(); it != a.end(); ++it)
+      x = 5*x + *it;
+    return x;
+  }
 };
 }
 #endif

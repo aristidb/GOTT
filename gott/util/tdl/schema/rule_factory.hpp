@@ -82,7 +82,7 @@ template<class T> struct enreg;
  *  static unsigned index();
  *    // return an index for this factory (parameter to get_factory)
  *
- *  static rule::factory *build(rule::attributes const &attr, unsigned nochild);
+ *  static rule::factory *build(rule::attributes const&attr, unsigned nochild);
  *    // rule_factory_builder: build an instance of this type with
  *    // given parameters
  *
@@ -163,7 +163,8 @@ private:
   rule::attributes attrib;
 };
 
-// A rule::factory will want to enregister itself (add_factory) and be assigned an index.
+// A rule::factory will want to enregister itself (add_factory) 
+// and be assigned an index.
 // This little class eases that.
 template<class T> struct enreg {
   unsigned val;
@@ -175,7 +176,8 @@ template<class T> struct enreg {
 unsigned add_factory(factory_template::rule_factory_builder x) EXPORT;
   // add a rule::factory type to the database and return its assigned index
 
-rule::factory *get_factory(unsigned x, rule::attributes const &a, unsigned length);
+rule::factory *get_factory(unsigned x, rule::attributes const &a, 
+                           unsigned length);
   // get a rule::factory instance by its type's index
 
 }}}}

@@ -40,24 +40,32 @@ struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() {
     schema::context_template document, footype, multi;
 
-    document.begin(schema::match_document::factory::index(), RA(wstring(L"--doc--")));
+    document.begin(schema::match_document::factory::index(),
+                    RA(wstring(L"--doc--")));
       document.param(0);
     document.end();
 
-    footype.begin(schema::match_named::factory::index(), schema::match_named::attributes(L"a"));
+    footype.begin(schema::match_named::factory::index(), 
+                  schema::match_named::attributes(L"a"));
       footype.param(1);
     footype.end();
 
-    multi.begin(schema::match_unordered::factory::index(), RA(wstring(L"--unordered--")));
-      multi.begin(schema::match_named::factory::index(), schema::match_named::attributes(L"plugin"));
-        multi.begin(schema::match_string::factory::index(), RA(wstring(L"plugin-data")), slotcfg(slotcfg::list));
+    multi.begin(schema::match_unordered::factory::index(), 
+                RA(wstring(L"--unordered--")));
+      multi.begin(schema::match_named::factory::index(), 
+                  schema::match_named::attributes(L"plugin"));
+        multi.begin(schema::match_string::factory::index(), 
+                    RA(wstring(L"plugin-data")), slotcfg(slotcfg::list));
         multi.end();
       multi.end();
-      multi.begin(schema::match_named::factory::index(), schema::match_named::attributes(L"sum"));
-        multi.begin(schema::match_integer::factory::index(), RA(wstring(L"sum-data"))); // > 0
+      multi.begin(schema::match_named::factory::index(), 
+                  schema::match_named::attributes(L"sum"));
+        multi.begin(schema::match_integer::factory::index(), 
+                    RA(wstring(L"sum-data"))); // > 0
         multi.end();
       multi.end();
-      multi.begin(schema::match_integer::factory::index(), RA(wstring(L"--other--")) );//, slotcfg(slotcfg::some));
+      multi.begin(schema::match_integer::factory::index(), 
+                  RA(wstring(L"--other--")) );//, slotcfg(slotcfg::some));
       multi.end();
     multi.end();
 
@@ -84,6 +92,7 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>() {
+  std::cout << "\nFAKE" << std::flush;
 }
 
 // ACTUALLY TEST (TODO)

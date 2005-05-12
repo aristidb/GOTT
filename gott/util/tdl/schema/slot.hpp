@@ -114,7 +114,8 @@ public:
   slotcfg_onechild(rule::attributes const &a) : attrib(a) {}
   
   void add(rule::factory const &rf) { sub = &rf; scfg = slotcfg(Def); }
-  void add(rule::factory const &rf, slotcfg const &cfg) { sub = &rf; scfg = cfg; }
+  void add(rule::factory const &rf, slotcfg const &cfg) 
+  { sub = &rf; scfg = cfg; }
   
   rule *get(match &m) const { return new T(*sub, scfg, attrib, m); }
 

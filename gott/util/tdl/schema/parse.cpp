@@ -120,7 +120,8 @@ void match::comment(wstring const &, bool) {}
 
 // Implementation
 
-match::IMPL::IMPL(structure::revocable_structure &p, match &r) : struc(p), pos(struc), ref(r) {}
+match::IMPL::IMPL(structure::revocable_structure &p, match &r) 
+  : struc(p), pos(struc), ref(r) {}
 
 void match::IMPL::add(rule::factory const &f) {
   Stack::iterator it = --parse.end();
