@@ -17,7 +17,7 @@ class window
 
     typedef boost::signal<void(std::string const&)> key_signal_type; 
     typedef boost::signal<void()> simple_event_type;
-    typedef boost::signal<bool(int, int)> size_signal_type;
+    typedef boost::signal<void(int, int)> size_signal_type;
     typedef boost::signal<void(gott::gui::mouse_event const&)> mouse_signal_type;
     // boost::signal<void,glsk::pixelformat& >&    signal_pixelformat_select();
 
@@ -59,6 +59,7 @@ class window
     void set_title( std::string const& title );
     void set_position( int x, int y );
     void set_size( std::size_t w, std::size_t h );
+    void set_rendercontext();
 
     void set_on_key( key_signal_type::slot_type const& slot );
     void set_on_redraw( simple_event_type::slot_type const& slot );
@@ -72,8 +73,8 @@ class window
   private:
     virtual void on_key( std::string const& );
     virtual void on_redraw();
-    virtual bool on_configure( int,int);
-    virtual bool on_create( int,int);
+    virtual void on_configure( int,int);
+    virtual void on_create( int,int);
     virtual void on_close();
     virtual void on_destroy();
     virtual void on_idle();
@@ -81,8 +82,8 @@ class window
     
     void key( std::string const& );
     void redraw();
-    bool configure( int,int);
-    bool create( int,int);
+    void configure( int,int);
+    void create( int,int);
     void close();
     void destroy();
     void idle();

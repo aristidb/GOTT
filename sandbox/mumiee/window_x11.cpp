@@ -13,6 +13,11 @@
 
 namespace gott{ namespace gui{
 
+window::os_specific::os_specific()
+  : handle(None), drawable(None)
+{
+}
+
 #define set_pf_value( a, b, v, c ) { (v)[ (c)++ ] = (a); (v)[ (c)++ ] = (b); }
 
 XVisualInfo* get_visualinfo( pixelformat const& format )
@@ -199,10 +204,10 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 	if( os->handle == None )
     throw std::runtime_error("no window handle");
 	
-	//XSync( global.connection, 0 );
-	//_glsk_wait_for_map_notify( window->handle );
+	XSync( global_data.connection, 0 );
+	// _glsk_wait_for_map_notify( window->handle );
 	
-	//global_data.set_position( this );<-
+	//set_position(  );
 	
 	// flag this window as open
 	flags |= window::Open;
@@ -225,8 +230,8 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 			if( context.os->handle == None )
         throw std::runtime_error("glXCreateNewContext did not yield a context");
 			
-/*			if( !glXIsDirect( global.connection, context.os->handle ) )
-        throw std::runtime_error("glX is not direct - screw you!" );*/
+			if( !glXIsDirect( global_data.connection, context.os->handle ) )
+        throw std::runtime_error("glX is not direct - screw you!" );
 		}
 		
 		os->drawable = glXCreateWindow( global_data.connection, fb_config, os->handle, 0 );
@@ -244,10 +249,10 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 			context.os->handle = glXCreateContext( global_data.connection, visual_info, 0, true );
 			
 			if ( context.os->handle == None )
-        throw std::runtime_error("glXCreateNewContext did not yield a context");
+        throw std::runtime_error("glXCreateContext did not yield a context");
 	
-/*			if ( !glXIsDirect( global_data.connection, context.os->handle ) )
-        throw std::runtime_error("glX is not direct - screw you!" );*/
+			if ( !glXIsDirect( global_data.connection, context.os->handle ) )
+        throw std::runtime_error("glX is not direct - screw you!" );
 		}
 	}
 	
@@ -429,7 +434,7 @@ window::~window()
 
 void globals::process_event( window * win, XEvent const& event )
 {
-  std::cout << "process_event" << std::endl;
+  std::cout << "process_event of window " << win << std::endl;
   switch( event.type )
   {
     case ReparentNotify:
@@ -554,11 +559,13 @@ void globals::process_event( window * win, XEvent const& event )
 
     case Expose:
       {
+
         std::cout << "Expose" << std::endl;
         if( win== 0 )
           return;
 
         win->redraw();
+        std::cout << "Expose done " << std::endl;
         break;
       }
 
@@ -622,4 +629,14 @@ void globals::process_event( window * win, XEvent const& event )
   };
 
 }
+
+void window::set_rendercontext()
+{
+  if( ( global_data.glx_fallback_mode == 0 
+        && !glXMakeContextCurrent( global_data.connection, os->drawable, os->drawable, context.os->handle) )
+      || ( global_data.glx_fallback_mode == 1
+        && !glXMakeCurrent( global_data.connection, os->drawable, context.os->handle ) ) )
+    throw std::runtime_error("Error while setting context");
+}
+
 }}

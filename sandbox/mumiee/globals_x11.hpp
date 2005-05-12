@@ -1,12 +1,14 @@
 
-#ifndef GOTT_GUI_GLOBALS_X11_INCLUDED
-#define GOTT_GUI_GLOBALS_X11_INCLUDED
+#ifndef GOTT_GUI_GLOBALS_X11_HPP_INCLUDED
+#define GOTT_GUI_GLOBALS_X11_HPP_INCLUDED
 
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <GL/glx.h>
 #include <X11/extensions/xf86vmode.h>
+#include <set>
+#include <string>
 #include "gl_context.hpp"
 #include "window.hpp"
 
@@ -37,9 +39,7 @@ struct globals
 	int	glx_fallback_mode;
 	
   bool is_extension_supported( std::string const& ext );
-	char*	extensions_buffer;
-	int extensions_count;
-	char** extensions;
+  std::set<std::string> extensions;
 	
 	struct timeval timer_start;
 	
@@ -49,10 +49,11 @@ struct globals
   ~globals();
 
 
-  bool init_timer();
-  bool init_input();
-  bool init_cursor();
-  bool init_extensions();
+  void init_timer();
+  void init_input();
+  void init_cursor();
+  void init_extensions();
+  void init_gl_interface();
   void reset_videomode();
   window * decode_window_object( Window handle );
 
@@ -63,11 +64,14 @@ extern globals global_data;
 // other special structures:
 struct gl_context::os_specific
 {
+  os_specific();
+  ~os_specific();
   GLXContext handle;
 };
 
 struct window::os_specific
 {
+  os_specific();
   Window			handle;	
 	GLXWindow		drawable;
 };

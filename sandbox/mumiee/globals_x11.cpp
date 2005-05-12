@@ -1,25 +1,32 @@
 #include <sys/time.h>
 #include <iostream>
+#include <sstream>
+#include <iterator>
+#include <algorithm>
 #include <stdexcept>
 #include <boost/cstdint.hpp>
 #include "globals_x11.hpp"
 #include "pixelformat.hpp"
 #include "window.hpp"
 
+using namespace std;
+
 namespace gott{namespace gui{
 globals global_data;
 
 bool globals::is_extension_supported( std::string const& str )
 {
-  return true;
+  return extensions.find(str) != extensions.end();
 }
 
-bool globals::init_cursor()
+void globals::init_cursor()
 {
 	char 		data = 0;
 	XColor 		dummy;
 	Pixmap 		blank_pixmap = XCreateBitmapFromData( connection,
 		RootWindow( connection, screen ), &data, 1, 1);
+  if( blank_pixmap == None )
+    throw std::runtime_error("Could not create Bitmap from data");
 
 	blank_cursor = XCreatePixmapCursor( connection, blank_pixmap,
 								blank_pixmap, &dummy, &dummy, 0, 0);
@@ -28,12 +35,15 @@ bool globals::init_cursor()
 }
 
 globals::globals( )
+  : connection(None), screen(0), flags(Clear), focus_window(0)
 {
   XF86VidModeModeInfo** 	video_modes = 0;
 	int						video_mode_count = 0;
 	
 	// grab our current connection to the server
 	connection = XOpenDisplay( 0 );
+  if( connection == 0 )
+    throw std::runtime_error("Could not open connection");
 	
 	// grab the default screen for this workstation
   screen = DefaultScreen( connection );
@@ -43,22 +53,25 @@ globals::globals( )
 	delete_atom = XInternAtom( connection, "GOTT_GUI_DELETE_WINDOW", false );
 	
 	protocols_atom = XInternAtom( connection, "WM_PROTOCOLS", false );
+  if( object_atom == None || delete_atom == None || protocols_atom == None )
+    throw std::runtime_error("Could not create atoms");
 
-	flags = Clear;
-
-	glXQueryVersion( connection, &(glx_version[ 0 ]), &(glx_version[ 1 ]) );
+	if( false == glXQueryVersion( connection, &(glx_version[ 0 ]), &(glx_version[ 1 ]) ) )
+    throw std::runtime_error("Could not query glXVersion");
 	
 	if ( ( glx_version[ 0 ] <= 1 ) && ( glx_version[ 1 ] < 3 ) )
 		glx_fallback_mode = 1;
 	else
 		glx_fallback_mode = 0;
+
+  std::cout << "GLX-Version " << glx_version[0] << "."<< glx_version[1] << std::endl;
 	
-	focus_window = 0;
 
 	init_cursor();
 	
 	// get all available modes
-	XF86VidModeGetAllModeLines( connection, screen, &video_mode_count, &video_modes );
+	if( false == XF86VidModeGetAllModeLines( connection, screen, &video_mode_count, &video_modes ) )
+    throw std::runtime_error("Could not query available Video Modes");
 
 	// save desktop-resolution
 	desktop_video_mode = *(video_modes[ 0 ]);
@@ -69,16 +82,17 @@ globals::globals( )
   std::cout << "intit_input" << std::endl;
 	init_input();
 
-	//init_gl_extensions( &gl );
+	init_gl_interface();
 
   try
   {
     gl_context con;
     pixelformat format;
-    window win( con, format, std::size_t(window::Decoration) );
+    window win( con, format, std::size_t(window::Decoration| window::Open | window::Visible) );
+    win.set_rendercontext();
     std::cout << "window openend" << std::endl;
     // FIXME!
-    //_glsk_init_extensions_string();
+    init_extensions();
     application::get_instance().handle_pending_messages();
     std::cout << "closing test window" << std::endl;
   }
@@ -90,22 +104,37 @@ globals::globals( )
   init_timer();
 }
 
+void globals::init_gl_interface()
+{
+  
+}
 
-bool globals::init_timer()
+void globals::init_extensions()
+{
+  {
+    if( glGetString( GL_EXTENSIONS ) == 0 )
+      throw runtime_error("screew you"); 
+    istringstream in( reinterpret_cast<const char*>(glGetString( GL_EXTENSIONS ) ) );
+    copy( istream_iterator<string>(in), istream_iterator<string>(), 
+        insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
+  }{
+    istringstream in( glXQueryExtensionsString( connection, screen ) );
+    copy( istream_iterator<string>(in), istream_iterator<string>(), 
+        insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
+  }
+  std::cout << "Printing extensions:" << std::endl;
+  copy( extensions.begin(), extensions.end(), ostream_iterator<string>( cout , "\n" ) );
+}
+
+
+void globals::init_timer()
 {
 	gettimeofday( &timer_start, 0 );
-  return true;
 }
 
-bool globals::init_input()
+void globals::init_input()
 {
 }
-
-bool globals::init_extensions()
-{
-}
-
-
 
 globals::~globals()
 {
@@ -158,7 +187,8 @@ window * globals::decode_window_object( Window handle )
 				&return_rest, &data ) == Success )
 	{
 		// decode the object pointer
-    result = *(reinterpret_cast<window**>(&data));
+    result = *(reinterpret_cast<window**>(data));
+    std::cout << "result: "  << result << std::endl;
 		XFree( data );			
 	}
 	else
@@ -175,7 +205,10 @@ window * globals::decode_window_object( Window handle )
     for( application::window_iterator it = application::get_instance().begin(), e = application::get_instance().end() ;
         it != e; ++it )
 			if ( (*it)->os->handle == handle )
+      {
+        std::cout << "Searching for handle" << std::endl;
 				return *it;
+      }
 	}
 	
 	return result;

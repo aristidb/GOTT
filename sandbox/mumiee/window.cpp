@@ -1,4 +1,7 @@
+#include <iostream>
 #include "window.hpp"
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 namespace gott{namespace gui{
   
@@ -36,9 +39,27 @@ void window::set_on_mouse( mouse_signal_type::slot_type const& slot )
 }
 
 void window::on_key( std::string const& ){}
-void window::on_redraw(){}
-bool window::on_configure( int,int){}
-bool window::on_create( int,int){}
+void window::on_redraw()
+{
+
+  std::cout << "on_redraw" << std::endl;
+  glClear( GL_COLOR_BUFFER_BIT |   GL_DEPTH_BUFFER_BIT );
+
+}
+
+void window::on_configure( int w,int h)
+{
+  std::cout << "Configure event" << std::endl;
+  glViewport(0,0,w,h);
+  glMatrixMode(GL_PROJECTION);
+  gluOrtho2D(0,w,0,h);
+  glClearColor( 0.8, 0.8,0.8,1.0);
+}
+
+void window::on_create( int,int)
+{
+  std::cout << "Createevent" << std::endl;
+}
 void window::on_close(){}
 void window::on_destroy(){}
 void window::on_idle(){}
@@ -52,17 +73,18 @@ void window::key( std::string const& k )
 
 void window::redraw()
 {
+  std::cout << "redraw" << std::endl;
   on_redraw();
   redraw_event();
 }
 
-bool window::configure( int x,int y)
+void window::configure( int x,int y)
 {
   on_configure(x,y);
   configure_event(x,y);
 }
 
-bool window::create( int x ,int y)
+void window::create( int x ,int y)
 {
   on_create(x,y);
 }
