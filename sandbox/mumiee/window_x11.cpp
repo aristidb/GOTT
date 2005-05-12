@@ -434,7 +434,6 @@ window::~window()
 
 void globals::process_event( window * win, XEvent const& event )
 {
-  std::cout << "process_event of window " << win << std::endl;
   switch( event.type )
   {
     case ReparentNotify:
@@ -460,6 +459,7 @@ void globals::process_event( window * win, XEvent const& event )
         /*if ( _glsk_input_update_pointer_move( event.xmotion.x, event.xmotion.y, win) == 0 )
           _glsk_send_mouse_event( window, event.xmotion.x, window->height-event.xmotion.y,
           GLSK_ME_TYPE_MOVE, 0 );*/
+        break;
       };
 
     case ButtonPress:
@@ -637,6 +637,11 @@ void window::set_rendercontext()
       || ( global_data.glx_fallback_mode == 1
         && !glXMakeCurrent( global_data.connection, os->drawable, context.os->handle ) ) )
     throw std::runtime_error("Error while setting context");
+}
+
+void window::swap_buffers()
+{
+  glXSwapBuffers( global_data.connection, os->drawable );
 }
 
 }}

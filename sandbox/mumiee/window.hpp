@@ -60,6 +60,7 @@ class window
     void set_position( int x, int y );
     void set_size( std::size_t w, std::size_t h );
     void set_rendercontext();
+    void swap_buffers();
 
     void set_on_key( key_signal_type::slot_type const& slot );
     void set_on_redraw( simple_event_type::slot_type const& slot );

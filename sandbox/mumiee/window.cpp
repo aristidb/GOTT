@@ -42,9 +42,12 @@ void window::on_key( std::string const& ){}
 void window::on_redraw()
 {
 
+  set_rendercontext();
   std::cout << "on_redraw" << std::endl;
+  glClearColor( 0.8, 0.8,0.8,1.0);
   glClear( GL_COLOR_BUFFER_BIT |   GL_DEPTH_BUFFER_BIT );
 
+  swap_buffers();
 }
 
 void window::on_configure( int w,int h)
