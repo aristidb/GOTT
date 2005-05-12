@@ -216,8 +216,8 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 
 	// set the object pointer -TODO: make this 64-bit compatible
 	//printf( "Created window with address: %p\n", window );
-	XChangeProperty( global_data.connection, os->handle, global_data.object_atom, global_data.object_atom,
-		32, PropModeReplace, reinterpret_cast<unsigned char*>(this), sizeof( window* )/sizeof(boost::int32_t) );
+/*	XChangeProperty( global_data.connection, os->handle, global_data.object_atom, global_data.object_atom,
+		32, PropModeReplace, reinterpret_cast<unsigned char*>(this), sizeof( window* )/sizeof(boost::int32_t) );*/
 
 	// fallback if we are below GLX version 1.3 (damn ATI drivers)
 	if( global_data.glx_fallback_mode == 0 ) // GLX >= 1.3

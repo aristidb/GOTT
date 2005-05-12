@@ -79,7 +79,6 @@ globals::globals( )
 	// free those modes
 	XFree( video_modes );
 	
-  std::cout << "intit_input" << std::endl;
 	init_input();
 
 	init_gl_interface();
@@ -122,8 +121,6 @@ void globals::init_extensions()
     copy( istream_iterator<string>(in), istream_iterator<string>(), 
         insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
   }
-  std::cout << "Printing extensions:" << std::endl;
-  copy( extensions.begin(), extensions.end(), ostream_iterator<string>( cout , "\n" ) );
 }
 
 
@@ -169,6 +166,7 @@ int decode_error_handler(Display* display, XErrorEvent* event)
 
 window * globals::decode_window_object( Window handle )
 {
+  /*
 	window* result = 0;
 	Atom return_type;
 	int	return_format;
@@ -176,8 +174,6 @@ window * globals::decode_window_object( Window handle )
 	unsigned long return_rest;
 	unsigned char* data = 0;
 	
-	if ( handle == None )
-		return 0;
 	
 	XSetErrorHandler( decode_error_handler );
 	
@@ -186,9 +182,7 @@ window * globals::decode_window_object( Window handle )
 				object_atom, &return_type, &return_format, &return_count,
 				&return_rest, &data ) == Success )
 	{
-		// decode the object pointer
     result = *(reinterpret_cast<window**>(data));
-    std::cout << "result: "  << result << std::endl;
 		XFree( data );			
 	}
 	else
@@ -197,21 +191,17 @@ window * globals::decode_window_object( Window handle )
 	}
 	
 	XSetErrorHandler( 0 );
-	
-	if( flags & globals::DecodeError )
-	{
-		flags &= ~DecodeError;
-	
-    for( application::window_iterator it = application::get_instance().begin(), e = application::get_instance().end() ;
-        it != e; ++it )
-			if ( (*it)->os->handle == handle )
-      {
-        std::cout << "Searching for handle" << std::endl;
-				return *it;
-      }
-	}
-	
-	return result;
+	*/
+
+	if ( handle == None )
+		return 0;
+
+  for( application::window_iterator it = application::get_instance().begin(), e = application::get_instance().end() ;
+      it != e; ++it )
+    if ( (*it)->os->handle == handle )
+      return *it;
+
+	return 0;
 }
 
 }}
