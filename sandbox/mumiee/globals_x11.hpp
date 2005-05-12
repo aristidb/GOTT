@@ -20,9 +20,7 @@ struct globals
   Display* connection;
 	int	screen;
 	Cursor blank_cursor;
-	Atom object_atom;
-	Atom protocols_atom;
-	Atom delete_atom;
+	Atom protocols_atom, delete_atom;
 
   enum Flags{
     Clear = 0
@@ -58,6 +56,12 @@ struct globals
   window * decode_window_object( Window handle );
 
   void process_event( window * win, XEvent const& event );
+
+  inline Atom get_atom( const char * prop ) { return XInternAtom(connection, prop, false ); }
+
+  void set_property( window const& w, Atom a, std::string const& utf8string );
+  void get_property( window const& w, Atom a, std::string& utf8string );
+
 };
 extern globals global_data;
 
@@ -74,6 +78,7 @@ struct window::os_specific
   os_specific();
   Window			handle;	
 	GLXWindow		drawable;
+  Atom wm_name, wm_icon_name;
 };
 
 

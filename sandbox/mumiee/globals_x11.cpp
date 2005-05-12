@@ -34,6 +34,10 @@ void globals::init_cursor()
 	XFreePixmap ( connection, blank_pixmap );
 }
 
+void globals::set_property( window const& w, Atom a, std::string const& utf8string)
+{
+}
+
 globals::globals( )
   : connection(None), screen(0), flags(Clear), focus_window(0)
 {
@@ -49,11 +53,10 @@ globals::globals( )
   screen = DefaultScreen( connection );
 
 	// create an atom for windows to store the glsk_window_t pointer
-	object_atom = XInternAtom( connection, "GOTT_GUI_OBJECT", false );
 	delete_atom = XInternAtom( connection, "GOTT_GUI_DELETE_WINDOW", false );
 	
 	protocols_atom = XInternAtom( connection, "WM_PROTOCOLS", false );
-  if( object_atom == None || delete_atom == None || protocols_atom == None )
+  if( protocols_atom == None )
     throw std::runtime_error("Could not create atoms");
 
 	if( false == glXQueryVersion( connection, &(glx_version[ 0 ]), &(glx_version[ 1 ]) ) )

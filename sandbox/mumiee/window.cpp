@@ -44,7 +44,7 @@ void window::on_redraw()
 
   set_rendercontext();
   std::cout << "on_redraw" << std::endl;
-  glClearColor( 0.8, 0.8,0.8,1.0);
+//  glClearColor( 0.8, 0.8,0.8,1.0);
   glClear( GL_COLOR_BUFFER_BIT |   GL_DEPTH_BUFFER_BIT );
 
   swap_buffers();
@@ -52,6 +52,7 @@ void window::on_redraw()
 
 void window::on_configure( int w,int h)
 {
+  set_rendercontext();
   std::cout << "Configure event" << std::endl;
   glViewport(0,0,w,h);
   glMatrixMode(GL_PROJECTION);
@@ -59,9 +60,10 @@ void window::on_configure( int w,int h)
   glClearColor( 0.8, 0.8,0.8,1.0);
 }
 
-void window::on_create( int,int)
+void window::on_create( int w,int h )
 {
   std::cout << "Createevent" << std::endl;
+  on_configure(w,h);
 }
 void window::on_close(){}
 void window::on_destroy(){}

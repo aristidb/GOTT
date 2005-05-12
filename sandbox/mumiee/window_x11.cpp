@@ -314,12 +314,15 @@ void window::set_visible( bool vis )
     }
 }
 
+
+
 void window::set_decoration( bool st )
 {
   flags |= st * Decoration;
 
 /*  if( os->handle )
   {
+    boost::tuple<unsigned long, unsigned long
     glsk_motif_wm_hints_t   hints_object;
     glsk_motif_wm_hints_t*  hints_pointer  = 0;
     Atom          hints_atom = None;
