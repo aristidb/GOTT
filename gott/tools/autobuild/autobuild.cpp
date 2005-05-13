@@ -11,7 +11,7 @@ int main() {
   signal(SIGTERM, finish);
 
   while (running) {
-    system("scons -u -Q 2>&1 >/dev/null");
-    sleep(2);
+    system("nice -n 12 scons -u -Q 2>&1 >/dev/null");
+    sleep(4);
   }
 }
