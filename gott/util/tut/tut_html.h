@@ -62,7 +62,7 @@ namespace tut {
         os << (boost::format("<td class=\"group\">%1%</td>\n<td>\n") % current_group);
       }
 
-      char const *res = "<span class=\"test_ok\">.</span>\n";
+      char const *res = "<span class=\"test_ok\">*</span>\n";
       if (tr.result == test_result::ok) {
         ok_count++;
       } else if (tr.result == test_result::ex) {
@@ -76,7 +76,7 @@ namespace tut {
       }
 
       if (tr.result != test_result::ok) {
-        res = "<span class=\"test_fail\">!</span>\n";
+        res = "<span class=\"test_fail\">#</span>\n";
         not_passed.push_back(tr);
       }
       
@@ -147,7 +147,11 @@ namespace tut {
 
   private:
     void start_html() {
-      os << "<html><head><title>Test results</title></head>\n";
+      os << "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
+      os << "<head>\n";
+      os << "<title>Test results</title>\n";
+      os << "<style>.test_ok { font-size:1.1em } .test_fail { color:blue;background-color:red;font-size:1.3em }</style>\n";
+      os << "</head>\n";
       os << "<body><h1>Test results</h1>\n";
     }
 

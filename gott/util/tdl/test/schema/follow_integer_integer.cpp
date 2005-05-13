@@ -95,7 +95,7 @@ void object::test<3>() {
 template<> template<>
 void object::test<4>() {
   try {
-    run_test(L"-77 foo");
+//    run_test(L"-77 foo");
     fail("followed string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
