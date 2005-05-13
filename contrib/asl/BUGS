@@ -1,0 +1,4 @@
+Socketlib
+
+  * socket.readable(); returns if a socket is readable() but does not take buffering into account, so a socket may be !readable() but a sock>>foo; could succeed
+  
