@@ -99,9 +99,22 @@ void object::test<4>() {
 }
 
 template<> template<>
-void object::test<5>() {
+void object::test<5>(int t) {
+  int n = t - 3; // minimum: 2 elements
+  std::wostringstream w;
+  for (int i = 0; i < n; ++i)
+    w << wchar_t(L'A' + i) << '\n';
+  run_test(w.str());
+  stru::cf::nd_list c;
+  for (int i = 0; i < n; ++i)
+    c.push_back(S(Xany(wstring(1, L'A'+i)), L"el"));
+  C(M(c)).write_to(xp);
+  ensure_equals("many", tree, xp);
+}
+
+template<> template<>
+void object::test<30>() {
   no_test();
 }
 
-// further tests
 }
