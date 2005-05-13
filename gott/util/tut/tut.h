@@ -282,7 +282,7 @@ namespace tut
      */
     void run_tests() const
     {
-       callback_->run_started();
+      callback_->run_started();
 
       const_iterator i = groups_.begin();
       const_iterator e = groups_.end();
