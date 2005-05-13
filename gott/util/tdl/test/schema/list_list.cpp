@@ -24,6 +24,7 @@ namespace u = gott::util;
 using namespace u::tdl::schema;
 namespace stru = u::tdl::structure;
 namespace simple = u::tdl::simple;
+namespace schema = u::tdl::schema;
 using u::xany::Xany;
 using std::wstring;
 using stru::cf::S;
@@ -65,8 +66,58 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>() {
-  std::cout << "\nFAKE" << std::flush;
+  run_test(L"a_string");
+  stru::cf::nd_list c;
+  c.push_back(S(Xany(), L"s"));
+  c.push_back(S(Xany(L"a_string"), L"xx"));
+  C(M(c,L"o"),L"d").write_to(xp);
+  ensure_equals("string only", tree, xp);
 }
 
-// ACTUALLY TEST (TODO)
+template<> template<>
+void object::test<2>() {
+  run_test(L"1,2,a");
+  stru::cf::nd_list i;
+  i.push_back(S(Xany(1), L"ii"));
+  i.push_back(S(Xany(2), L"ii"));
+  stru::cf::nd_list c;
+  c.push_back(C(M(i, L"t"), L"s"));
+  c.push_back(S(Xany(L"a"), L"xx"));
+  C(M(c,L"o"),L"d").write_to(xp);
+  ensure_equals("ints+string", tree, xp);
+}
+
+template<> template<>
+void object::test<3>() {
+  run_test(L"7000\n(4)");
+  stru::cf::nd_list c;
+  c.push_back(C(C(S(Xany(7000),L"ii"),L"t"),L"s"));
+  c.push_back(S(Xany(L"(4)"), L"xx"));
+  C(M(c,L"o"),L"d").write_to(xp);
+  ensure_equals("int+string", tree, xp);
+}
+
+template<> template<>
+void object::test<4>() {
+  try {
+    run_test(L"");
+    fail("empty");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()),
+                  "0:1 : mismatch after token ");
+  }
+}
+
+template<> template<>
+void object::test<5>() {
+  try {
+    run_test(L"44");
+    fail("should be greedy");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()),
+                  "1:1 : mismatch after token 44");
+  }
+}
+
+// further tests
 }
