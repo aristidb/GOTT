@@ -27,4 +27,5 @@ Export('env')
 conf = SConscript('configure/SConscript')
 env = conf.Finish()
 
-SConscript(dirs = ['util', 'tools/autobuild'])
+SConscript(dirs = ['util', 
+		   'tools/autobuild'])
