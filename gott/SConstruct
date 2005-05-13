@@ -21,7 +21,11 @@ cflagsoverride = ARGUMENTS.get('cfoverride', 0)
 if cflagsoverride:
 	cflags = cflagsoverride
 
-env = Environment(CXX = cxx, CCFLAGS = cflags, CPPPATH='#/..', CPPDEFINES=cppdef)
+env = Environment(
+		  CXX = cxx, 
+		  CCFLAGS = cflags, 
+		  CPPPATH=['#/..'], 
+		  CPPDEFINES=cppdef)
 
 Export('env')
 conf = SConscript('configure/SConscript')

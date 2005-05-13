@@ -91,5 +91,16 @@ void object::test<3>() {
   }
 }
 
+template<> template<>
+void object::test<4>() {
+  try {
+    run_test(L"1 2 3");
+    fail("too many");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()),
+                  "1:1 : mismatch after token 1");
+  }
+}
+
 // further tests
 }
