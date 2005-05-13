@@ -107,5 +107,10 @@ void object::test<4>() {
   ensure_equals("root[0][bar]", sel, selection<tree::iterator>(xp.get_root()));
 }
 
+template<> template<>
+void object::test<5>() {
+  no_test();
+}
+
 //further tests
 }

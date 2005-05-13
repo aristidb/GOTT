@@ -412,13 +412,15 @@ namespace tut
      */
     bool called_method_was_a_dummy_test_;
 
-    /**
-     * Default do-nothing test.
-     */
+    void no_test() { called_method_was_a_dummy_test_ = true; }
+
     template <int n>
     void test()
     {
-      called_method_was_a_dummy_test_ = true;
+      if (n)
+        test<n-1>();
+      else
+        no_test();
     }
   };
 

@@ -95,5 +95,10 @@ void object::test<1>() {
   std::cout << "\nFAKE" << std::flush;
 }
 
+template<> template<>
+void object::test<2>() {
+  no_test();
+}
+
 // ACTUALLY TEST (TODO)
 }

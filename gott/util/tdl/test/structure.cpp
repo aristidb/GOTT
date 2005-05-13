@@ -118,5 +118,10 @@ void object::test<5>() {
       L"-\n    8899.2\n        77 : --!");
 }
 
+template<> template<>
+void object::test<6>() {
+  no_test();
+}
+
 // further tests
 }

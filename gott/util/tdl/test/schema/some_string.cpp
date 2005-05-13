@@ -98,5 +98,10 @@ void object::test<4>() {
   ensure_equals("one string", tree, xp);
 }
 
+template<> template<>
+void object::test<5>() {
+  no_test();
+}
+
 // further tests
 }
