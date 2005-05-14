@@ -35,11 +35,11 @@ using schema::slotcfg;
 typedef schema::rule::attributes RA;
 
 namespace {
-struct schema_some_string : tut::schema_basic {
-  schema_some_string() {
+struct schema_one_int : tut::schema_basic {
+  schema_one_int() {
     context.begin(schema::match_document::factory::index());
       context.begin(schema::match_list::factory::index());
-        context.begin(schema::match_string::factory::index(), 
+        context.begin(schema::match_integer::factory::index(), 
                       RA(wstring(L"el")), slotcfg(slotcfg::some));
         context.end();
       context.end();
@@ -49,24 +49,20 @@ struct schema_some_string : tut::schema_basic {
 }
 
 namespace tut {
-typedef test_group<schema_some_string> tf;
+typedef test_group<schema_one_int> tf;
 typedef tf::object object;
 }
 
 namespace {
-  tut::tf list_int_then_string_test("schema::some_string");
+  tut::tf list_int_then_string_test("schema::one_int");
 }
 
 namespace tut {
 template<> template<>
 void object::test<1>() {
-  run_test(L"aa\nbb\ncc");
-  stru::cf::nd_list c;
-  c.push_back(S(Xany(L"aa"), L"el"));
-  c.push_back(S(Xany(L"bb"), L"el"));
-  c.push_back(S(Xany(L"cc"), L"el"));
-  C(M(c)).write_to(xp);
-  ensure_equals("three strings", tree, xp);
+  run_test(L"1\n");
+  C(C(S(Xany(1), L"el"))).write_to(xp);
+  ensure_equals("one int", tree, xp);
 }
 
 template<> template<>
@@ -93,11 +89,16 @@ void object::test<3>() {
 
 template<> template<>
 void object::test<4>() {
-  run_test(L"zzzz");
-  C(C(S(Xany(L"zzzz"), L"el"))).write_to(xp);
-  ensure_equals("one string", tree, xp);
+  try {
+    run_test(L"zzzz");
+    fail("string");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()),
+                  "1:1 : mismatch at token zzzz");
+  }
 }
 
+#if 0
 template<> template<>
 void object::test<5>(int t) {
   int n = t - 3; // minimum: 2 elements
@@ -111,9 +112,10 @@ void object::test<5>(int t) {
   C(M(c)).write_to(xp);
   ensure_equals("many", tree, xp);
 }
+#endif
 
 template<> template<>
-void object::test<15>() {
+void object::test<5>() {
   no_test();
 }
 
