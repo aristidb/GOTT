@@ -331,5 +331,10 @@ a `\n\
   ensure_equals("simple block", ev, xp);
 }
 
+template<> template<>
+void object::test<15>() {
+  no_test();
+}
+
 // further tests
 }

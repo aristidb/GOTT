@@ -158,7 +158,7 @@ namespace tut
 
     // execute tests iteratively
     virtual void rewind() = 0;
-    virtual test_result run_next() = 0;
+    virtual test_result run_next(int n) = 0;
 
     // execute one test
     virtual test_result run_test(int n) = 0;
@@ -292,9 +292,9 @@ namespace tut
         {
           // iterate all tests
           i->second->rewind();
-          for( ;; )
+          for(int n = 1;;++n)
           {
-            test_result tr = i->second->run_next();
+            test_result tr = i->second->run_next(n);
             callback_->test_completed(tr);
           }
         }
@@ -326,9 +326,9 @@ namespace tut
       {
         // iterate all tests
         i->second->rewind();
-        for(;;)
+        for(int n=1;;++n)
         {
-          test_result tr = i->second->run_next();
+          test_result tr = i->second->run_next(n);
           callback_->test_completed(tr);
         }
       }
@@ -412,13 +412,20 @@ namespace tut
      */
     bool called_method_was_a_dummy_test_;
 
-    /**
-     * Default do-nothing test.
-     */
+    void no_test() { called_method_was_a_dummy_test_ = true; }
+
     template <int n>
-    void test()
+    void test(int)
     {
-      called_method_was_a_dummy_test_ = true;
+      test<n>();
+    }
+
+    template<int n>
+    void test() {
+      if (n)
+        test<n-1>();
+      else
+        no_test();
     }
   };
 
@@ -533,7 +540,7 @@ namespace tut
   {
     const char* name_;
 
-    typedef void (test_object<Data>::*testmethod)();
+    typedef void (test_object<Data>::*testmethod)(int);
     typedef std::map<int,testmethod> tests;
     typedef typename tests::iterator tests_iterator;
     typedef typename tests::const_iterator tests_const_iterator;
@@ -691,7 +698,7 @@ namespace tut
     /**
      * Runs next test.
      */
-    test_result run_next()
+    test_result run_next(int i)
     {
       if( current_test_ == tests_.end() )
       {
@@ -704,7 +711,7 @@ namespace tut
       {
         try
         {
-          return run_test_(current_test_++,obj);
+          return run_test_(current_test_++,obj,i);
         }
         catch( const no_such_test& )
         {
@@ -729,7 +736,7 @@ namespace tut
       if( ti == tests_.end() ) throw no_such_test();
 
       safe_holder<object> obj;
-      return run_test_(ti,obj);
+      return run_test_(ti,obj,n);
     }
 
   private:
@@ -737,11 +744,11 @@ namespace tut
      * VC allows only one exception handling type per function,
      * so I have to split the method
      */
-    test_result run_test_(const tests_iterator& ti,safe_holder<object>& obj)
+    test_result run_test_(const tests_iterator& ti,safe_holder<object>& obj,int i)
     {
       try
       {
-        if( run_test_seh_(ti->second,obj) == false )
+        if( run_test_seh_(ti->second,obj,i) == false )
           throw seh("seh");
       }
       catch(const no_such_test&)
@@ -787,7 +794,7 @@ namespace tut
     /**
      * Runs one under SEH if platform supports it.
      */
-    bool run_test_seh_(testmethod tm,safe_holder<object>& obj)
+    bool run_test_seh_(testmethod tm,safe_holder<object>& obj,int i)
     {
 #if defined(TUT_USE_SEH)
       __try
@@ -800,7 +807,7 @@ namespace tut
         __try
         {
 #endif
-          (obj.get()->*tm)();
+          (obj.get()->*tm)(i);
 #if defined(TUT_USE_SEH)
         }
         __except(handle_seh_(::GetExceptionCode()))

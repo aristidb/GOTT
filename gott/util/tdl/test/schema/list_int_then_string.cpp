@@ -141,5 +141,10 @@ void object::test<7>() {
   ensure_equals("many thingies", tree, xp);
 }
 
+template<> template<>
+void object::test<8>() {
+  no_test();
+}
+
 // further tests
 }

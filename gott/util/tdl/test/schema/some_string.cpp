@@ -35,12 +35,12 @@ using schema::slotcfg;
 typedef schema::rule::attributes RA;
 
 namespace {
-struct schema_list_string : tut::schema_basic {
-  schema_list_string() {
+struct schema_some_string : tut::schema_basic {
+  schema_some_string() {
     context.begin(schema::match_document::factory::index());
       context.begin(schema::match_list::factory::index());
         context.begin(schema::match_string::factory::index(), 
-                      RA(wstring(L"el")), slotcfg(slotcfg::list));
+                      RA(wstring(L"el")), slotcfg(slotcfg::some));
         context.end();
       context.end();
     context.end();
@@ -49,53 +49,72 @@ struct schema_list_string : tut::schema_basic {
 }
 
 namespace tut {
-typedef test_group<schema_list_string> tf;
+typedef test_group<schema_some_string> tf;
 typedef tf::object object;
 }
 
 namespace {
-  tut::tf list_int_then_string_test("schema::list_string");
+  tut::tf list_int_then_string_test("schema::some_string");
 }
 
 namespace tut {
 template<> template<>
 void object::test<1>() {
-  run_test(L"a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z");
+  run_test(L"aa\nbb\ncc");
   stru::cf::nd_list c;
-  for (wchar_t ch = 'a'; ch <= 'z'; ++ch)
-    c.push_back(S(Xany(wstring(1,ch)), L"el"));
+  c.push_back(S(Xany(L"aa"), L"el"));
+  c.push_back(S(Xany(L"bb"), L"el"));
+  c.push_back(S(Xany(L"cc"), L"el"));
   C(M(c)).write_to(xp);
-  ensure_equals("alphabet", tree, xp);
+  ensure_equals("three strings", tree, xp);
 }
 
 template<> template<>
 void object::test<2>() {
-  run_test(L"");
-  C(S(Xany())).write_to(xp);
-  ensure_equals("empty", tree, xp);
-}
-
-template<> template<>
-void object::test<3>() {
-  run_test(L"\"nene ich geh dann mal\"");
-  C(C(S(Xany(L"nene ich geh dann mal")))).write_to(xp);
-}
-
-template<> template<>
-void object::test<4>() {
   try {
-    run_test(L"a b");
-    fail("following");
-  } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch after token a");
+    run_test(L"");
+    fail("empty");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()), 
+                  "0:1 : mismatch after token ");
   }
 }
 
 template<> template<>
-void object::test<5>() {
+void object::test<3>() {
+  try {
+    run_test(L"1 2 3");
+    fail("going down");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()),
+                  "1:1 : mismatch after token 1");
+  }
+}
+
+template<> template<>
+void object::test<4>() {
+  run_test(L"zzzz");
+  C(C(S(Xany(L"zzzz"), L"el"))).write_to(xp);
+  ensure_equals("one string", tree, xp);
+}
+
+template<> template<>
+void object::test<5>(int t) {
+  int n = t - 3; // minimum: 2 elements
+  std::wostringstream w;
+  for (int i = 0; i < n; ++i)
+    w << wchar_t(L'A' + i) << '\n';
+  run_test(w.str());
+  stru::cf::nd_list c;
+  for (int i = 0; i < n; ++i)
+    c.push_back(S(Xany(wstring(1, L'A'+i)), L"el"));
+  C(M(c)).write_to(xp);
+  ensure_equals("many", tree, xp);
+}
+
+template<> template<>
+void object::test<30>() {
   no_test();
 }
 
-// further tests
 }

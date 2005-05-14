@@ -121,5 +121,10 @@ void object::test<7>() {
   }
 }
 
+template<> template<>
+void object::test<8>() {
+  no_test();
+}
+
 // further tests
 }

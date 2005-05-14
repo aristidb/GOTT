@@ -96,5 +96,10 @@ void object::test<3>() {
   ensure_equals("multi-line #2 rest", rest, L"#\n#?c");
 }
 
+template<> template<>
+void object::test<4>() {
+  no_test();
+}
+
 // further tests
 }

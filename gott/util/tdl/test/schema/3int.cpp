@@ -40,7 +40,7 @@ struct schema_3int : tut::schema_basic {
     context.begin(schema::match_document::factory::index());
       context.begin(schema::match_list::factory::index());
         context.begin(schema::match_integer::factory::index(), 
-                      RA(wstring(L"el")), slotcfg(slotcfg::minimum, 3));
+                      RA(wstring(L"el")), slotcfg(slotcfg::exact, 3));
         context.end();
       context.end();
     context.end();
@@ -60,7 +60,51 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>() {
-  std::cout << "\nFAKE" << std::flush;
+  run_test(L"77\n102342\n9");
+  stru::cf::nd_list c;
+  c.push_back(S(Xany(77), L"el"));
+  c.push_back(S(Xany(102342), L"el"));
+  c.push_back(S(Xany(9), L"el"));
+  C(M(c)).write_to(xp);
+  ensure_equals("three integers", tree, xp);
+}
+
+template<> template<>
+void object::test<2>() {
+  try {
+    run_test(L"");
+    fail("empty");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()), 
+                  "0:1 : mismatch after token ");
+  }
+}
+
+template<> template<>
+void object::test<3>() {
+  try {
+    run_test(L"1,2,3,4");
+    fail("too many");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()),
+                  "1:7 : mismatch at token 4");
+  }
+}
+
+template<> template<>
+void object::test<4>() {
+  try {
+    run_test(L"1 2 3");
+    fail("going down");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()),
+                  "1:1 : mismatch after token 1");
+  }
+}
+
+template<> template<>
+void object::test<5>() {
+  no_test();
 }
 
 // further tests
