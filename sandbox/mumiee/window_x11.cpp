@@ -203,7 +203,8 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 
 	if( os->handle == None )
     throw std::runtime_error("no window handle");
-		if( fl & Decoration )
+
+  if( fl & Decoration )
     set_decoration();
 
   set_title( "no title" );
@@ -628,6 +629,7 @@ void globals::process_event( window * win, XEvent const& event )
 
 window::os_specific::~os_specific()
 {
+  std::cout << "DEstroying something" << std::endl;
   XDestroyWindow( global_data.connection, handle );
 }
 
