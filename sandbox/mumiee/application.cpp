@@ -6,6 +6,11 @@ namespace gott{ namespace gui{
 application::application()
 {
 }
+
+key_state & application::get_key_state()
+{
+  return keys;
+}
   
 void application::run()
 {

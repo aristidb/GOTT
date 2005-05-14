@@ -1,5 +1,6 @@
 #include <iostream>
 #include "window.hpp"
+#include "input.hpp"
 #include <GL/gl.h>
 #include <GL/glu.h>
 
@@ -7,7 +8,7 @@ namespace gott{namespace gui{
   
 void window::set_on_key( key_signal_type::slot_type const& slot )
 {
-  key_event.connect( slot );
+  key_ev.connect( slot );
 }
 
 void window::set_on_redraw( simple_event_type::slot_type const& slot )
@@ -38,7 +39,14 @@ void window::set_on_mouse( mouse_signal_type::slot_type const& slot )
   mouse_ev.connect( slot );
 }
 
-void window::on_key( std::string const& ){}
+void window::on_key_event( gott::gui::key_event const& k)
+{
+  if( k.type == key_event::Press && k.code == KeyQ )
+  {
+    application::get_instance().remove_window( this );
+  }
+}
+
 void window::on_redraw()
 {
 
@@ -70,10 +78,10 @@ void window::on_destroy(){}
 void window::on_idle(){}
 void window::on_mouse_event(gott::gui::mouse_event const&){}
 
-void window::key( std::string const& k )
+void window::key( gott::gui::key_event const& k )
 {
-  on_key(k);
-  key_event(k);
+  on_key_event(k);
+  key_ev(k);
 }
 
 void window::redraw()

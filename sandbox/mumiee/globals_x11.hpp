@@ -15,12 +15,24 @@
 namespace gott{namespace gui{
 
 class window;
+
+namespace impl{
+struct key_table
+{
+  unsigned char t[2][256];
+  key_table();
+  key_code translate_key( KeySym const& sym ) const;
+};
+}
+
+
 struct globals
 {
   Display* connection;
 	int	screen;
 	Cursor blank_cursor;
 	Atom protocols_atom, delete_atom;
+  impl::key_table keys;
 
   enum Flags{
     Clear = 0
@@ -78,10 +90,8 @@ struct window::os_specific
   os_specific();
   Window			handle;	
 	GLXWindow		drawable;
-  Atom wm_name, wm_icon_name;
+  Atom wm_name, wm_icon_name, wm_type;
 };
-
-
 
 }}
 

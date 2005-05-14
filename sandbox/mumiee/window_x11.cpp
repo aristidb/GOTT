@@ -150,12 +150,12 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 	GLXFBConfig fb_config;
 	Window root_window = RootWindow( global_data.connection, global_data.screen );
 	Atom wm_delete_atom = XInternAtom( global_data.connection, "WM_DELETE_WINDOW", true );
-	
+
+  std::cout << " glx:version " << global_data.glx_version[ 0 ] << " . " << global_data.glx_version[ 1 ] << std::endl;
 	if( global_data.glx_version[ 0 ] < 1 )
 		throw std::runtime_error("glx version");
 
-  
-	// init the pixelformat and get the associated visual info
+ 	// init the pixelformat and get the associated visual info
 
 	// run the user-handler
 
@@ -203,7 +203,10 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 
 	if( os->handle == None )
     throw std::runtime_error("no window handle");
-	
+		if( fl & Decoration )
+    set_decoration();
+
+  set_title( "no title" );
 	XSync( global_data.connection, 0 );
 	// _glsk_wait_for_map_notify( window->handle );
 	
@@ -256,11 +259,6 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 		}
 	}
 	
-	if( fl & Decoration )
-    set_decoration();
-
-  set_title( "no title" );
-  
   // Get the current attributes .. lets hope the window manager already reset the window sizes:
   XWindowAttributes attr;
   XGetWindowAttributes( global_data.connection, os->handle, & attr );
@@ -319,7 +317,10 @@ void window::set_visible( bool vis )
 void window::set_decoration( bool st )
 {
   flags |= st * Decoration;
-
+ os->wm_type = XInternAtom( global_data.connection, "_NET_WM_WINDOW_TYPE", true );
+  Atom hint = XInternAtom(global_data.connection,"_NET_WM_WINDOW_TYPE_NORMAL", true );
+  XChangeProperty(global_data.connection, os->handle,os->wm_type, XA_ATOM, 32, PropModeReplace,reinterpret_cast<unsigned char*>(&hint),1);
+  
 /*  if( os->handle )
   {
     boost::tuple<unsigned long, unsigned long
@@ -504,32 +505,24 @@ void globals::process_event( window * win, XEvent const& event )
     case KeyPress:
       {
         std::cout << "KeyPress" << std::endl;
-    /*    if ( win&& win->callback.char_event )
-        {
-          KeySym      key_symbol;
-          char      buffer[ 5 ] = { '\0', '\0', '\0', '\0', '\0' };
+        XKeyEvent sym = event.xkey;
+        key_code c = keys.translate_key( XLookupKeysym( &sym, 0) );
 
-          XLookupString( &event.xkey, buffer, 4, &key_symbol, NULL );
-
-          if ( key_symbol )
-          {
-            _glsk_input_key_event( key_symbol, 1 );
-
-            if ( (key_symbol>>8) == 0 )
-              win->callback.char_event( win, buffer );
-          }
-        }*/
+        application::get_instance().get_key_state().set(c);
+        if ( win && win->flags & window::KeyEvents )
+          win->key( key_event( c, key_event::Press ) );
         break;
       }
 
     case KeyRelease:
       {
         std::cout << "KeyRelease" << std::endl;
-        KeySym key_symbol = XKeycodeToKeysym( connection, event.xkey.keycode, 0 );
+        XKeyEvent sym = event.xkey;
+        key_code c = keys.translate_key( XLookupKeysym( &sym, 0) );
 
-/*        if ( key_symbol )
-          _glsk_input_key_event( key_symbol, 0 );
-*/
+        application::get_instance().get_key_state().unset(c);
+        if ( win && win->flags & window::KeyEvents )
+          win->key( key_event( c, key_event::Press ) );
         break;
       }
     case ConfigureNotify:
