@@ -88,6 +88,7 @@ struct gl_context::os_specific
 struct window::os_specific
 {
   os_specific();
+  ~os_specific();
   Window			handle;	
 	GLXWindow		drawable;
   Atom wm_name, wm_icon_name, wm_type;

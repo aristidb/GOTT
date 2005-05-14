@@ -626,6 +626,12 @@ void globals::process_event( window * win, XEvent const& event )
 
 }
 
+window::os_specific::~os_specific()
+{
+  glXDestroyContext( global_data.connection, drawable );
+  XDestroyWindow( global_data.connection, handle );
+}
+
 void window::set_rendercontext()
 {
   if( ( global_data.glx_fallback_mode == 0 

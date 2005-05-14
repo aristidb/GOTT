@@ -90,18 +90,10 @@ globals::globals( )
   {
     gl_context con;
     pixelformat format;
-  std::cout << "GLX-Version " << glx_version[0] << "."<< glx_version[1] << std::endl;
     window win( con, format, std::size_t(window::Decoration| window::Open | window::Visible) );
-  std::cout << "GLX-Version " << glx_version[0] << "."<< glx_version[1] << std::endl;
     win.set_rendercontext();
-  std::cout << "GLX-Version " << glx_version[0] << "."<< glx_version[1] << std::endl;
-    std::cout << "window openend" << std::endl;
-  std::cout << "GLX-Version " << glx_version[0] << "."<< glx_version[1] << std::endl;
-    // FIXME!
     init_extensions();
     application::get_instance().handle_pending_messages();
-  std::cout << "GLX-Version " << glx_version[0] << "."<< glx_version[1] << std::endl;
-    std::cout << "closing test window" << std::endl;
   }
   catch( std::runtime_error & e)
   {
