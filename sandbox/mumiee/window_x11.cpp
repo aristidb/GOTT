@@ -628,7 +628,6 @@ void globals::process_event( window * win, XEvent const& event )
 
 window::os_specific::~os_specific()
 {
-  glXDestroyContext( global_data.connection, drawable );
   XDestroyWindow( global_data.connection, handle );
 }
 
