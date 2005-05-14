@@ -12,7 +12,6 @@ for root, dirs, _ in os.walk('.'):
 	source_files += glob.glob(root + '/*.cpp')
 
 env.SharedLibrary('tdl', source_files)
-env.Program('test/test.cpp', LIBS=['tdl', 'xany'], LIBPATH=['.','#/util/xany'])
 
 tut_obj = [
     'test/test_tut.cpp', 

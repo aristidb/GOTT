@@ -10,7 +10,11 @@ namespace tut
 
 int main(int argc,const char* argv[])
 {
+#ifdef HTML_REPORT
   tut::html_reporter visi;
+#else
+  tut::reporter visi;
+#endif
 
   if( (argc == 2 && (
           std::string(argv[1]) == "help"
