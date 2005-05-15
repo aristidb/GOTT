@@ -69,7 +69,7 @@ tut::tf spmeta("simple::parse_meta");
 namespace tut {
 
 template<> template<>
-void object::test<1>() {
+void object::test<1>(int) {
   data = L"#?foobar qulux-dei zql";
   run_test();
   expect(L"foobar", L"qulux-dei zql");
@@ -77,7 +77,7 @@ void object::test<1>() {
 }
 
 template<> template<>
-void object::test<2>() {
+void object::test<2>(int) {
   data = L"\n\n\n\n#?real     kluft\n\n\n\n\n   \n       \n\n#?delta_x yz";
   run_test();
   expect(L"real", L"kluft");
@@ -87,7 +87,7 @@ void object::test<2>() {
 }
 
 template<> template<>
-void object::test<3>() {
+void object::test<3>(int) {
   data = L"#?a\n#? b\n#\n#?c";
   run_test();
   expect(L"a");
@@ -97,7 +97,7 @@ void object::test<3>() {
 }
 
 template<> template<>
-void object::test<4>() {
+void object::test<4>(int) {
   no_test();
 }
 

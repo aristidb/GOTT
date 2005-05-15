@@ -59,21 +59,21 @@ namespace {
 
 namespace tut {
 template<> template<>
-void object::test<1>() {
+void object::test<1>(int) {
   run_test(L"1\n");
   C(C(S(Xany(1), L"el"))).write_to(xp);
   ensure_equals("optional int", tree, xp);
 }
 
 template<> template<>
-void object::test<2>() {
+void object::test<2>(int) {
   run_test(L"");
   C(S(Xany())).write_to(xp);
   ensure_equals("optional int", tree, xp);
 }
 
 template<> template<>
-void object::test<3>() {
+void object::test<3>(int) {
   try {
     run_test(L"1 2 3");
     fail("going down");
@@ -84,7 +84,7 @@ void object::test<3>() {
 }
 
 template<> template<>
-void object::test<4>() {
+void object::test<4>(int) {
   try {
     run_test(L"zzzz");
     fail("string");
@@ -110,7 +110,7 @@ void object::test<5>(int t) {
 }
 
 template<> template<>
-void object::test<9>() {
+void object::test<9>(int) {
   no_test();
 }
 

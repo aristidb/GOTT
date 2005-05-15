@@ -75,21 +75,21 @@ tut::tf stru("query");
 
 namespace tut {
 template<> template<>
-void object::test<1>() {
+void object::test<1>(int) {
   selection<tree::iterator> sel(tree_obj.get_root());
   tree_obj.copy_to(xp);
   ensure_equals("root", sel, selection<tree::iterator>(xp.get_root()));
 }
 
 template<> template<>
-void object::test<2>() {
+void object::test<2>(int) {
   selection<tree::iterator> x1(tree_obj.get_root());
   selection<tree::iterator> sel(x1.find(1));
   cf::S(Xany(L"qoo")).write_to(xp);
   ensure_equals("root[1]", sel, selection<tree::iterator>(xp.get_root()));
 }
 
-void object::test<3>() {
+void object::test<3>(int) {
   selection<tree::iterator> x1(tree_obj.get_root());
   selection<tree::iterator> sel(x1.find(0));
   cf::nd_list v;
@@ -99,7 +99,7 @@ void object::test<3>() {
   ensure_equals("root[0]", sel, selection<tree::iterator>(xp.get_root()));
 }
 
-void object::test<4>() {
+void object::test<4>(int) {
   selection<tree::iterator> x1(tree_obj.get_root());
   selection<tree::iterator> x2(x1.find(0));
   selection<tree::iterator> sel(x2.find_tag(L"bar"));
@@ -108,7 +108,7 @@ void object::test<4>() {
 }
 
 template<> template<>
-void object::test<5>() {
+void object::test<5>(int) {
   no_test();
 }
 

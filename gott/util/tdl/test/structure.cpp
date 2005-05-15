@@ -44,7 +44,7 @@ tut::tf stru("structure");
 
 namespace tut {
 template<> template<>
-void object::test<1>() {
+void object::test<1>(int) {
   stru::tree p1, p2;
   stru::writable_structure &w = p1;
   w.begin();
@@ -55,7 +55,7 @@ void object::test<1>() {
 }
 
 template<> template<>
-void object::test<2>() {
+void object::test<2>(int) {
   stru::tree p1, p2;
   stru::writable_structure &w = p2;
   cf::S(Xany("hallo")).write_to(p1);
@@ -66,7 +66,7 @@ void object::test<2>() {
 }
 
 template<> template<>
-void object::test<3>() {
+void object::test<3>(int) {
   stru::tree p1, p2;
   stru::revocable_structure &w = p1;
   w.begin();
@@ -84,7 +84,7 @@ void object::test<3>() {
 }
 
 template<> template<>
-void object::test<4>() {
+void object::test<4>(int) {
   stru::tree p1, p2;
   stru::writable_structure &w = p1;
   w.begin();
@@ -101,7 +101,7 @@ void object::test<4>() {
 }
 
 template<> template<>
-void object::test<5>() {
+void object::test<5>(int) {
   stru::tree p1;
   stru::writable_structure &w = p1;
   w.begin();
@@ -119,7 +119,7 @@ void object::test<5>() {
 }
 
 template<> template<>
-void object::test<6>() {
+void object::test<6>(int) {
   no_test();
 }
 

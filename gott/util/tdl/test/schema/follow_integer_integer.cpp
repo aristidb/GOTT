@@ -61,7 +61,7 @@ namespace {
 
 namespace tut {
 template<> template<>
-void object::test<1>() {
+void object::test<1>(int) {
   run_test(L"4\n 5");
   stru::cf::nd_list c;
   c.push_back(S(Xany(4), L"int1"));
@@ -71,7 +71,7 @@ void object::test<1>() {
 }
 
 template<> template<>
-void object::test<2>() {
+void object::test<2>(int) {
   try {
     run_test(L"d7");
     fail("just string");
@@ -82,7 +82,7 @@ void object::test<2>() {
 }
 
 template<> template<>
-void object::test<3>() {
+void object::test<3>(int) {
   try {
     run_test(L"");
     fail("empty");
@@ -93,7 +93,7 @@ void object::test<3>() {
 }
 
 template<> template<>
-void object::test<4>() {
+void object::test<4>(int) {
   try {
     run_test(L"-77 foo");
     fail("followed string");
@@ -104,7 +104,7 @@ void object::test<4>() {
 }
 
 template<> template<>
-void object::test<5>() {
+void object::test<5>(int) {
   try {
     run_test(L"4");
     fail("just one integer");
@@ -115,7 +115,7 @@ void object::test<5>() {
 }
 
 template<> template<>
-void object::test<6>() {
+void object::test<6>(int) {
   try {
     run_test(L"4 99,y");
   } catch (schema::mismatch const &mm) {
@@ -125,7 +125,7 @@ void object::test<6>() {
 }
 
 template<> template<>
-void object::test<7>() {
+void object::test<7>(int) {
   no_test();
 }
 

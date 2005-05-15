@@ -65,7 +65,7 @@ namespace {
 
 namespace tut {
 template<> template<>
-void object::test<1>() {
+void object::test<1>(int) {
   run_test(L"a_string");
   stru::cf::nd_list c;
   c.push_back(S(Xany(), L"s"));
@@ -75,7 +75,7 @@ void object::test<1>() {
 }
 
 template<> template<>
-void object::test<2>() {
+void object::test<2>(int) {
   run_test(L"1,2,a");
   stru::cf::nd_list i;
   i.push_back(S(Xany(1), L"ii"));
@@ -88,7 +88,7 @@ void object::test<2>() {
 }
 
 template<> template<>
-void object::test<3>() {
+void object::test<3>(int) {
   run_test(L"7000\n(4)");
   stru::cf::nd_list c;
   c.push_back(C(C(S(Xany(7000),L"ii"),L"t"),L"s"));
@@ -98,7 +98,7 @@ void object::test<3>() {
 }
 
 template<> template<>
-void object::test<4>() {
+void object::test<4>(int) {
   try {
     run_test(L"");
     fail("empty");
@@ -109,7 +109,7 @@ void object::test<4>() {
 }
 
 template<> template<>
-void object::test<5>() {
+void object::test<5>(int) {
   try {
     run_test(L"44");
     fail("should be greedy");
@@ -120,7 +120,7 @@ void object::test<5>() {
 }
 
 template<> template<>
-void object::test<6>() {
+void object::test<6>(int) {
   no_test();
 }
 

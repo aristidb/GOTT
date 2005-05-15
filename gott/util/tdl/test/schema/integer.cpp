@@ -53,14 +53,14 @@ namespace {
 
 namespace tut {
 template<> template<>
-void object::test<1>() {
+void object::test<1>(int) {
   run_test(L"4");
   C(S(Xany(4)), L"doc").write_to(xp);
   ensure_equals("single integer entity", tree, xp);
 }
 
 template<> template<>
-void object::test<2>() {
+void object::test<2>(int) {
   try {
     run_test(L"d7");
     fail("non-integral");
@@ -71,7 +71,7 @@ void object::test<2>() {
 }
 
 template<> template<>
-void object::test<3>() {
+void object::test<3>(int) {
   try {
     run_test(L"");
     fail("empty");
@@ -82,7 +82,7 @@ void object::test<3>() {
 }
 
 template<> template<>
-void object::test<4>() {
+void object::test<4>(int) {
   try {
     run_test(L"4 bar");
     fail("overfilled #1");
@@ -93,7 +93,7 @@ void object::test<4>() {
 }
 
 template<> template<>
-void object::test<5>() {
+void object::test<5>(int) {
   try {
     run_test(L"4\nbar");
     fail("overfilled #2");
@@ -104,14 +104,14 @@ void object::test<5>() {
 }
 
 template<> template<>
-void object::test<6>() {
+void object::test<6>(int) {
   run_test(L"-777777");
   C(S(Xany(-777777)), L"doc").write_to(xp);
   ensure_equals("negative", tree, xp);
 }
 
 template<> template<>
-void object::test<7>() {
+void object::test<7>(int) {
   try {
     run_test(L"foo bar");
     fail("overfilled #1");
@@ -122,7 +122,7 @@ void object::test<7>() {
 }
 
 template<> template<>
-void object::test<8>() {
+void object::test<8>(int) {
   no_test();
 }
 

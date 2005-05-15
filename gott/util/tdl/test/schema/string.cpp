@@ -53,14 +53,14 @@ namespace {
 
 namespace tut {
 template<> template<>
-void object::test<1>() {
+void object::test<1>(int) {
   run_test(L"data");
   C(S(Xany(L"data")), L"doc").write_to(xp);
   ensure_equals("single entity", tree, xp);
 }
 
 template<> template<>
-void object::test<2>() {
+void object::test<2>(int) {
   try {
     run_test(L"");
     fail("empty");
@@ -68,7 +68,7 @@ void object::test<2>() {
 }
 
 template<> template<>
-void object::test<3>() {
+void object::test<3>(int) {
   try {
     run_test(L"foo bar");
     fail("overfilled #1");
@@ -79,7 +79,7 @@ void object::test<3>() {
 }
 
 template<> template<>
-void object::test<4>() {
+void object::test<4>(int) {
   try {
     run_test(L"foo\nbar");
     fail("overfilled #2");
@@ -90,7 +90,7 @@ void object::test<4>() {
 }
 
 template<> template<>
-void object::test<5>() {
+void object::test<5>(int) {
   no_test();
 }
 

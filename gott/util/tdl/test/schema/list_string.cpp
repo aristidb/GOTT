@@ -59,7 +59,7 @@ namespace {
 
 namespace tut {
 template<> template<>
-void object::test<1>() {
+void object::test<1>(int) {
   run_test(L"a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z");
   stru::cf::nd_list c;
   for (wchar_t ch = 'a'; ch <= 'z'; ++ch)
@@ -69,20 +69,20 @@ void object::test<1>() {
 }
 
 template<> template<>
-void object::test<2>() {
+void object::test<2>(int) {
   run_test(L"");
   C(S(Xany())).write_to(xp);
   ensure_equals("empty", tree, xp);
 }
 
 template<> template<>
-void object::test<3>() {
+void object::test<3>(int) {
   run_test(L"\"nene ich geh dann mal\"");
   C(C(S(Xany(L"nene ich geh dann mal")))).write_to(xp);
 }
 
 template<> template<>
-void object::test<4>() {
+void object::test<4>(int) {
   try {
     run_test(L"a b");
     fail("following");
@@ -93,7 +93,7 @@ void object::test<4>() {
 }
 
 template<> template<>
-void object::test<5>() {
+void object::test<5>(int) {
   no_test();
 }
 

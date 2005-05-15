@@ -414,19 +414,15 @@ namespace tut
 
     void no_test() { called_method_was_a_dummy_test_ = true; }
 
-    template <int n>
-    void test(int)
-    {
-      test<n>();
-    }
-
     template<int n>
-    void test() {
-      if (n)
-        test<n-1>(n);
+    void test(int v)
+    {
+      if (n > 0)
+        test<n-1>(v);
       else
         no_test();
     }
+
   };
 
   namespace 
