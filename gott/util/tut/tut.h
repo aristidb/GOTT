@@ -423,7 +423,7 @@ namespace tut
     template<int n>
     void test() {
       if (n)
-        test<n-1>();
+        test<n-1>(n);
       else
         no_test();
     }
