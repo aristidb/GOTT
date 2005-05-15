@@ -4,15 +4,13 @@
 #ifdef HAVE_VISIBILITY
 #pragma GCC visibility push(default)
 #endif
+
 #include <string>
 #include <vector>
 #include <list>
 #include <deque>
 #include <map>
 #include <exception>
-#ifdef HAVE_VISIBILITY
-#pragma GCC visibility pop
-#endif
 
 #include <sstream>
 #include <istream>
@@ -24,6 +22,10 @@
 #include <utility>
 #include <typeinfo>
 #include <memory>
+
+#ifdef HAVE_VISIBILITY
+#pragma GCC visibility pop
+#endif
 
 #include <algorithm>
 #include <functional>

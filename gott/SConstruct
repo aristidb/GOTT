@@ -11,7 +11,7 @@ debug = int(ARGUMENTS.get('debug', debug))
 opt = ARGUMENTS.get('opt', opt)
 cflags += ' ' + opt
 if debug:
-	cflags += ' -g -ggdb'
+	cflags += ' -g -ggdb3'
 	cppdef = ['DEBUG']
 else:
 	cppdef = ['NDEBUG']

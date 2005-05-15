@@ -40,7 +40,7 @@ struct schema_one_int : tut::schema_basic {
     context.begin(schema::match_document::factory::index());
       context.begin(schema::match_list::factory::index());
         context.begin(schema::match_integer::factory::index(), 
-                      RA(wstring(L"el")), slotcfg(slotcfg::some));
+                      RA(wstring(L"el")), slotcfg(slotcfg::one));
         context.end();
       context.end();
     context.end();
@@ -98,24 +98,23 @@ void object::test<4>() {
   }
 }
 
-#if 0
 template<> template<>
 void object::test<5>(int t) {
   int n = t - 3; // minimum: 2 elements
   std::wostringstream w;
-  for (int i = 0; i < n; ++i)
-    w << wchar_t(L'A' + i) << '\n';
-  run_test(w.str());
-  stru::cf::nd_list c;
-  for (int i = 0; i < n; ++i)
-    c.push_back(S(Xany(wstring(1, L'A'+i)), L"el"));
-  C(M(c)).write_to(xp);
-  ensure_equals("many", tree, xp);
+  for (int i = 1; i <= n; ++i)
+    w << i << '\n';
+  try {
+    run_test(w.str());
+    fail("many");
+  } catch(schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()),
+                  "2:1 : mismatch at token 2");
+  }
 }
-#endif
 
 template<> template<>
-void object::test<5>() {
+void object::test<9>() {
   no_test();
 }
 

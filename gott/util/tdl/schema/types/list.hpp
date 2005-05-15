@@ -36,7 +36,7 @@ public:
   typedef factory_template::slotcfg_onechild<
                                               match_list, 
                                               slotcfg::list, 
-                                              slotcfg::multiple> 
+                                              slotcfg::all> 
           factory;
 
   match_list(rule::factory const &, slotcfg const &, rule::attributes const &, 
