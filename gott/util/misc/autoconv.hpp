@@ -23,6 +23,20 @@
 
 namespace std {
 
+// "Fix" basic_ostream::operator<<(void*)
+template<class C, class CT>
+void operator<<(basic_ostream<C, CT> &, void *) {}
+
+struct print_ptr {
+  void *data;
+  print_ptr(void *p) : data(p) {}
+};
+
+template<class C, class CT>
+ostream &operator<<(basic_ostream<C, CT> &s, print_ptr const &p) {
+  return s.operator<<(p.data);
+}
+
 inline ostream &operator<<(ostream &o, wchar_t const *in) {
   typedef codecvt<wchar_t, char, mbstate_t> CCV;
   CCV const &c = use_facet<CCV>(std::locale());

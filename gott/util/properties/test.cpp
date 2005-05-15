@@ -9,7 +9,8 @@ int add(int x) { return x + i; }
 struct test_observe {
   template<class T>
   void notify(T *p) {
-    cout << "Changed: " << p << " -> " << p->get() << endl;
+    cout << "Changed: " << print_ptr(p);
+    cout << " -> " << p->get() << endl;
   }
 };
 
@@ -19,7 +20,8 @@ public:
   vobserve() {}
   template<class T>
   void notify(T *p) {
-    cout << "Changed(ref): " << p << " -> " << p->get() << endl;
+    cout << "Changed(ref): " << print_ptr(p);
+    cout << " -> " << p->get() << endl;
   }
 };
 
