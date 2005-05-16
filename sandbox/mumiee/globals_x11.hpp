@@ -67,7 +67,7 @@ struct globals
   void reset_videomode();
   window * decode_window_object( Window handle );
 
-  void process_event( window * win, XEvent const& event );
+  void process_event( window * win, XEvent & event );
 
   inline Atom get_atom( const char * prop ) { return XInternAtom(connection, prop, false ); }
 
@@ -87,10 +87,13 @@ struct gl_context::os_specific
 
 struct window::os_specific
 {
+  enum Protocols { DeleteWindow, Focus, Ping, ContextHelp };
   os_specific();
   ~os_specific();
+
   Window			handle;	
 	GLXWindow		drawable;
+  Atom protocols[4];
   Atom wm_name, wm_icon_name, wm_type;
 };
 

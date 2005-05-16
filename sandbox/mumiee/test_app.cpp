@@ -12,7 +12,7 @@ int main()
   cout << "a window" << endl;
   gl_context con;
   pixelformat format;
-  window a_window( con, format, window::Decoration | window::Visible ) ;
+  window a_window( con, format, window::Decoration | window::Defaults | window::KeyEvents | window::MouseEvents | window::Visible ) ;
   cout << "a window created" << endl;
   
   application::get_instance().run();
