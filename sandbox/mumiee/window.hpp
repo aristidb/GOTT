@@ -25,9 +25,17 @@ class window
         , Decoration
         , Fullscreen
         , Visible = 4
-        , Open = 8
-        , KeyEvents
-        , MouseEvents
+        , Open = (1<<3)
+        , KeyEvents = (1<<4)
+        , MouseEvents = (1<<5)
+        , Menu = (1<<6)
+        , Toolbar = (1<<7)
+        , Utility = (1<<8)
+        , Dialog = (1<<9)
+        , Splash = (1<<10)
+        , Defaults = (1<<11)
+        , Dock = (1<<12)
+        , ToolTip = (1<<13)
     };
   private:
     struct os_specific;
@@ -44,6 +52,7 @@ class window
     gl_context context;
 
     std::string title; 
+    window *parent;
     simple_event_type redraw_event, idle_event, destroy_event, close_event;
     size_signal_type configure_event;
     mouse_signal_type mouse_ev;
@@ -52,7 +61,11 @@ class window
     window( window const& );
     window& operator=( window const& );
   public:
-    window( gl_context const& con, pixelformat const& format, std::size_t flags );
+    window( gl_context const& con
+        , pixelformat const& format
+        , std::size_t flags
+        , std::string const& title = "no title"
+        , window *parent = 0);
     virtual ~window();
 
     void set_decoration( bool decor = true );

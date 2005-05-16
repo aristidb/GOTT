@@ -12,8 +12,10 @@ int main()
   cout << "a window" << endl;
   gl_context con;
   pixelformat format;
-  window a_window( con, format, window::Decoration | window::Visible ) ;
+  window a_window( con, format, window::Decoration | window::Defaults | window::KeyEvents | window::MouseEvents | window::Visible, "The Main Window") ;
   cout << "a window created" << endl;
+  window second_window( con, format, window::Decoration | window::Defaults | window::KeyEvents | window::MouseEvents | window::Visible, "A broken window with shared context \\o/" );
+  //window third_window( con, format, window::Splash | window::KeyEvents | window::MouseEvents | window::Visible, "Splashscreen", &a_window) ;
   
   application::get_instance().run();
   cout << "run done!" << endl;

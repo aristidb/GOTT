@@ -52,7 +52,6 @@ globals::globals( )
 	// grab the default screen for this workstation
   screen = DefaultScreen( connection );
 
-	// create an atom for windows to store the glsk_window_t pointer
 	delete_atom = XInternAtom( connection, "GOTT_GUI_DELETE_WINDOW", false );
 	
 	protocols_atom = XInternAtom( connection, "WM_PROTOCOLS", false );

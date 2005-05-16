@@ -1,10 +1,10 @@
-
-
 #include <iostream>
 #include <stdexcept>
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <GL/glx.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <boost/cstdint.hpp>
 #include <X11/extensions/xf86vmode.h>
 #include "window.hpp"
@@ -12,6 +12,16 @@
 #include "application.hpp"
 
 namespace gott{ namespace gui{
+
+namespace {
+  // TODO define motif flags here
+  struct WMHints
+  {
+    boost::int32_t flags, functions, decorations, input_mode, status;
+    WMHints() : flags(0), functions(1), decorations(1), input_mode(0), status(0) {}
+  };
+
+}
 
 window::os_specific::os_specific()
   : handle(None), drawable(None)
@@ -139,13 +149,17 @@ GLXFBConfig	get_fbconfig( pixelformat const& format )
 
 #undef set_pf_value
 
-window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
+window::window( gl_context const& c
+    , pixelformat const& format
+    , std::size_t fl
+    , std::string const& t
+    , window * p ) 
   : os(new os_specific)
   , context(c)
-  , flags(Clear)
+  , flags(fl)
+  , title(t)
+  , parent(p)
 {
-	XSetWindowAttributes	attributes;
-	unsigned int attributes_mask = 0;
 	XVisualInfo* visual_info = 0;
 	GLXFBConfig fb_config;
 	Window root_window = RootWindow( global_data.connection, global_data.screen );
@@ -178,50 +192,144 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 	// did we find a matching visual info too?
 	if ( visual_info == 0 )
 		throw std::runtime_error( "unable to find requested visual." );
-	
-	// init the colormap
-	attributes.colormap = XCreateColormap( global_data.connection, root_window,
-					visual_info->visual, AllocNone );
 
-	attributes.border_pixel = 0;
+  {
+    XSetWindowAttributes	attributes;
+    unsigned int attributes_mask = 0;
+    // init the colormap
+    attributes.colormap = XCreateColormap( global_data.connection, root_window,
+        visual_info->visual, AllocNone );
 
-	attributes.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
-		StructureNotifyMask | PointerMotionMask | FocusChangeMask;
+    attributes.border_pixel = 0;
 
-	attributes.override_redirect = true;
+    attributes.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
+      StructureNotifyMask | PointerMotionMask | FocusChangeMask;
 
-	attributes_mask = CWBorderPixel | CWColormap | CWEventMask | CWOverrideRedirect;
+    if( ! flags & Decoration )     {
+      attributes_mask |= CWOverrideRedirect;
+      attributes.override_redirect = true;
+    }
 
-	// create the physical window
-	os->handle = XCreateWindow( global_data.connection, root_window
-      , 100
-      , 100
-      , 100  //FIXME!
-      , 100 
-      , 0, visual_info->depth, InputOutput, visual_info->visual, 
-		attributes_mask, &attributes );
+    if( flags & ToolTip || flags & Splash  ) {
+      attributes.save_under = true ;
+      attributes_mask |= CWSaveUnder;
+    }
+
+    attributes_mask = CWBorderPixel | CWColormap | CWEventMask ;
+
+    // create the physical window
+    os->handle = XCreateWindow( global_data.connection, root_window
+        , 100
+        , 100
+        , 100  //FIXME!
+        , 100 
+        , 0, visual_info->depth, InputOutput, visual_info->visual, 
+        attributes_mask, &attributes );
+  }
 
 	if( os->handle == None )
     throw std::runtime_error("no window handle");
+///////////////
 
-  if( fl & Decoration )
-    set_decoration();
+  std::vector<Atom> net_wintypes;
 
-  set_title( "no title" );
+
+  WMHints hints; 
+  if( !( flags & Decoration ) )
+    hints.decorations = 0;
+
+  Atom wm_hints = global_data.get_atom("_MOTIF_WM_HINTS");
+  XChangeProperty(global_data.connection, os->handle, wm_hints, wm_hints, 32, PropModeReplace, 
+      reinterpret_cast<unsigned char*>(&hints), 5);
+
+  if( flags & Defaults )
+    net_wintypes.push_back( global_data.get_atom("_NET_WM_WINDOW_TYPE_NORMAL") );
+  if( flags & Menu ) 
+    net_wintypes.push_back( global_data.get_atom("_NET_WM_WINDOW_TYPE_MENU") );
+  if( flags & Toolbar ) 
+    net_wintypes.push_back( global_data.get_atom("_NET_WM_WINDOW_TYPE_TOOLBAR") );
+  if( flags & Utility ) 
+    net_wintypes.push_back( global_data.get_atom("_NET_WM_WINDOW_TYPE_UTILITY") );
+  if( flags & Dialog ) 
+    net_wintypes.push_back( global_data.get_atom("_NET_WM_WINDOW_TYPE_DIALOG") );
+  if( flags & Splash ) 
+    net_wintypes.push_back( global_data.get_atom("_NET_WM_WINDOW_TYPE_SPLASH") );
+  if( flags & Dock ) 
+    net_wintypes.push_back( global_data.get_atom("_NET_WM_WINDOW_TYPE_DOCK") );
+
+
+  if( net_wintypes.size() )
+    XChangeProperty(global_data.connection, os->handle
+        , global_data.get_atom( "_NET_WM_WINDOW_TYPE" ), XA_ATOM, 32
+        , PropModeReplace, reinterpret_cast<unsigned char *>(&(net_wintypes[0])), net_wintypes.size());
+  else 
+    XDeleteProperty( global_data.connection, os->handle
+        , global_data.get_atom( "_NET_WM_WINDOW_TYPE"));
+ 
+  if( flags & ( Toolbar || ToolTip || Dialog  ) &&  parent )
+      XSetTransientForHint( global_data.connection, os->handle, p->os->handle );
+
+/*        XSizeHints size_hints;
+        size_hints.flags = USSize | PSize | PWinGravity;
+        size_hints.x = data.crect.left();
+        size_hints.y = data.crect.top();
+        size_hints.width = data.crect.width();
+        size_hints.height = data.crect.height();
+        size_hints.win_gravity =
+            QApplication::isRightToLeft() ? NorthEastGravity : NorthWestGravity;
+
+        XWMHints wm_hints;                        // window manager hints
+        wm_hints.flags = InputHint | StateHint | WindowGroupHint;
+        wm_hints.input = True;
+        wm_hints.initial_state = NormalState;
+        wm_hints.window_group = X11->wm_client_leader;
+
+        XClassHint class_hint;
+        QByteArray appName = qAppName().toLatin1();
+        class_hint.res_name = appName.data(); // application name
+        class_hint.res_class = const_cast<char *>(QX11Info::appClass());   // application class
+
+        XSetWMProperties(dpy, id, 0, 0, 0, 0, &size_hints, &wm_hints, &class_hint);
+
+        XResizeWindow(dpy, id, data.crect.width(), data.crect.height());
+        XStoreName(dpy, id, appName.data());*/
+  
+  os->protocols[0] = global_data.get_atom("WM_DELETE_WINDOW");
+  os->protocols[1] = global_data.get_atom("WM_TAKE_FOCUS");
+  os->protocols[2] = global_data.get_atom("_NET_WM_PING");
+  os->protocols[3] = global_data.get_atom("_NET_WM_CONTEXT_HELP");
+  XSetWMProtocols( global_data.connection, os->handle, os->protocols, 4);
+
+  // set _NET_WM_PID
+  long curr_pid = getpid();
+  XChangeProperty(global_data.connection, os->handle
+      , global_data.get_atom("_NET_WM_PID")
+      , XA_CARDINAL, 32, PropModeReplace,
+      reinterpret_cast<unsigned char *>(&curr_pid), 1
+      );
+
+ /* if( parent == 0 )
+    XChangeProperty( global_data.connection, os->handle
+        , global_data.get_atom("WM_CLIENT_LEADER")
+        , XA_WINDOW, 32, PropModeReplace
+        , reinterpret_cast<unsigned char *>(&X11->wm_client_leader), 1);*/
+//////////////////
+  
+  //if( fl & Decoration )
+  //  set_decoration();
+
+  set_title( t );
 	XSync( global_data.connection, 0 );
-	// _glsk_wait_for_map_notify( window->handle );
+
+  // Wait for Map events? 
 	
 	//set_position(  );
 	
 	// flag this window as open
 	flags |= window::Open;
 	
-	XSetWMProtocols( global_data.connection, os->handle, &wm_delete_atom, 1 );
-
-	// set the object pointer -TODO: make this 64-bit compatible
-	//printf( "Created window with address: %p\n", window );
-/*	XChangeProperty( global_data.connection, os->handle, global_data.object_atom, global_data.object_atom,
-		32, PropModeReplace, reinterpret_cast<unsigned char*>(this), sizeof( window* )/sizeof(boost::int32_t) );*/
+	//XSetWMProtocols( global_data.connection, os->handle, &wm_delete_atom, 1 );
+  
 
 	// fallback if we are below GLX version 1.3 (damn ATI drivers)
 	if( global_data.glx_fallback_mode == 0 ) // GLX >= 1.3
@@ -245,8 +353,8 @@ window::window( gl_context const& c, pixelformat const& format, std::size_t fl )
 	}
 	else // GLX <= 1.2
 	{
+    std::cout << "Using glX Fallback mode for glX-1.2" << std::endl;
 		
-		printf( "(glsk) warning: using glx version < 1.3 fallback\n" );
 		
 		if( context.os->handle == None )
 		{
@@ -295,6 +403,7 @@ void window::set_title(std::string const & t)
     XSetWMName( global_data.connection, os->handle, &property );
 
     XFree( property.value );
+    // _NET_WM_NAME
   }
 }
 
@@ -317,69 +426,18 @@ void window::set_visible( bool vis )
 
 void window::set_decoration( bool st )
 {
-  flags |= st * Decoration;
- os->wm_type = XInternAtom( global_data.connection, "_NET_WM_WINDOW_TYPE", true );
-  Atom hint = XInternAtom(global_data.connection,"_NET_WM_WINDOW_TYPE_NORMAL", true );
-  XChangeProperty(global_data.connection, os->handle,os->wm_type, XA_ATOM, 32, PropModeReplace,reinterpret_cast<unsigned char*>(&hint),1);
-  
-/*  if( os->handle )
-  {
-    boost::tuple<unsigned long, unsigned long
-    glsk_motif_wm_hints_t   hints_object;
-    glsk_motif_wm_hints_t*  hints_pointer  = 0;
-    Atom          hints_atom = None;
-    int           return_format = 0;
-    Atom          return_type = None;
-    unsigned long     return_count = 0;
-    unsigned long     return_rest = 0;
-    XSetWindowAttributes  attributes;
+  if( st )
+    flags |= Decoration;
+  else 
+    flags &= ~Decoration;
+      
+  WMHints hints; 
+  if( !(flags & Decoration) )
+    hints.decorations = 0;
 
-    attributes.override_redirect = FALSE;
-
-    XChangeWindowAttributes( global_data.connection, os->handle, CWOverrideRedirect, &attributes );
-
-    if( st )
-    {
-
-      //XMapRaised( global.connection, window->handle );
-      XUnmapWindow( global_data.connection, os->handle );
-      XMapWindow( global_data.connection, os->handle );
-    }
-    XFlush( global_data.connection );
-
-
-    //printf( "changing decoration %i\n", has_decoration );
-
-    hints_object.flags = MWM_HINTS_DECORATIONS;
-    hints_object.decorations = st;
-
-    // try getting the window-decoration(hints) extension atom    
-    hints_atom = XInternAtom( global_data.connection, _XA_MOTIF_WM_HINTS, FALSE );
-    XGetWindowProperty ( global_data.connection, os->handle,
-        hints_atom, 0, sizeof(glsk_motif_wm_hints_t)/sizeof(int),
-        FALSE, AnyPropertyType, &return_type, &return_format, &return_count,
-        &return_rest, (unsigned char **)&hints_pointer);
-
-    if ( return_type != None )
-    {
-      hints_pointer->flags |= MWM_HINTS_DECORATIONS;
-      hints_pointer->decorations = hints_object.decorations;
-    }
-    else
-    {
-      hints_pointer = &hints_object;
-    }
-
-    XChangeProperty( global_data.connection, window->handle, hints_atom,
-        hints_atom, 32, PropModeReplace, (unsigned char *)hints_pointer,
-        sizeof (glsk_motif_wm_hints_t)/sizeof (int));
-
-    if( hints_pointer != &hints_object )
-      XFree( hints_pointer );
-
-    XFlush( global_data.connection );
-    //;
-    }*/
+  Atom wm_hints = global_data.get_atom("_MOTIF_WM_HINTS");
+  XChangeProperty(global_data.connection, os->handle, wm_hints, wm_hints, 32, PropModeReplace, 
+      reinterpret_cast<unsigned char*>(&hints), 5);
 }
 
 void window::set_position( int x, int y)
@@ -437,7 +495,7 @@ window::~window()
   delete os;
 }
 
-void globals::process_event( window * win, XEvent const& event )
+void globals::process_event( window * win, XEvent & event )
 {
   switch( event.type )
   {
@@ -571,14 +629,20 @@ void globals::process_event( window * win, XEvent const& event )
         std::cout << "ClientMessage" << std::endl;
         if( event.xclient.message_type == protocols_atom )
         {
+          if( event.xclient.data.l[0] = win->os->protocols[window::os_specific::Ping] )
+          {
+            event.xclient.window = RootWindow(connection, screen);
+            XSendEvent(connection, event.xclient.window, false
+                , SubstructureNotifyMask|SubstructureRedirectMask, &event );
+          }
+          if( event.xclient.data.l[0] = win->os->protocols[window::os_specific::DeleteWindow] )
+            win->close();
           // the close event
 
-          win->close();
         }
         else if( event.xclient.message_type == delete_atom )
         {
           std::cout << "DELETE ATOM" << std::endl;
-//          _glsk_window_destroy( win);
         }
         else
         {
