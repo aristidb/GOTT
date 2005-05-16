@@ -342,8 +342,8 @@ window::window( gl_context const& c
 			if( context.os->handle == None )
         throw std::runtime_error("glXCreateNewContext did not yield a context");
 			
-			if( !glXIsDirect( global_data.connection, context.os->handle ) )
-        throw std::runtime_error("glX is not direct - screw you!" );
+//			if( !glXIsDirect( global_data.connection, context.os->handle ) )
+  //      throw std::runtime_error("glX is not direct - screw you!" );
 		}
 		
 		os->drawable = glXCreateWindow( global_data.connection, fb_config, os->handle, 0 );
@@ -363,8 +363,8 @@ window::window( gl_context const& c
 			if ( context.os->handle == None )
         throw std::runtime_error("glXCreateContext did not yield a context");
 	
-			if ( !glXIsDirect( global_data.connection, context.os->handle ) )
-        throw std::runtime_error("glX is not direct - screw you!" );
+//			if ( !glXIsDirect( global_data.connection, context.os->handle ) )
+  //      throw std::runtime_error("glX is not direct - screw you!" );
 		}
 	}
 	
