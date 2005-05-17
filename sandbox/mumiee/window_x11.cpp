@@ -155,7 +155,6 @@ window::window( gl_context const& c
     , std::string const& t
     , window * p ) 
   : os(new os_specific)
-  , context(c)
   , flags(fl)
   , title(t)
   , parent(p)
@@ -332,37 +331,34 @@ window::window( gl_context const& c
   
 
 	// fallback if we are below GLX version 1.3 (damn ATI drivers)
-	if( global_data.glx_fallback_mode == 0 ) // GLX >= 1.3
-	{
-		if( context.os->handle == None )
-		{
-			// create the GL context
-			context.os->handle = glXCreateNewContext( global_data.connection, fb_config, GLX_RGBA_TYPE, 0, true);
-		
-			if( context.os->handle == None )
-        throw std::runtime_error("glXCreateNewContext did not yield a context");
-			
-		}
-		
-		os->drawable = glXCreateWindow( global_data.connection, fb_config, os->handle, 0 );
-		
-		if( os->drawable == None )
+  if( global_data.glx_fallback_mode == 0 ) // GLX >= 1.3
+  {
+    // create the GL context
+    if( c.os->handle == None )
+      context.os->handle = glXCreateNewContext( global_data.connection, fb_config, GLX_RGBA_TYPE, 0, true);
+    else 
+      context.os->handle = glXCreateNewContext( global_data.connection, fb_config, GLX_RGBA_TYPE, c.os->handle, true);
+
+    if( context.os->handle == None )
+      throw std::runtime_error("glXCreateNewContext did not yield a context");
+
+    os->drawable = glXCreateWindow( global_data.connection, fb_config, os->handle, 0 );
+
+    if( os->drawable == None )
       throw std::runtime_error("no drawable" );
-	}
-	else // GLX <= 1.2
-	{
+  }
+  else // GLX <= 1.2
+  {
     std::cout << "Using glX Fallback mode for glX-1.2" << std::endl;
-		
-		
-		if( context.os->handle == None )
-		{
-			context.os->handle = glXCreateContext( global_data.connection, visual_info, 0, true );
-			
-			if ( context.os->handle == None )
-        throw std::runtime_error("glXCreateContext did not yield a context");
-	
-		}
-	}
+
+
+    if( c.os->handle == None )
+      context.os->handle = glXCreateContext( global_data.connection, visual_info, 0, true );
+    else 
+      context.os->handle = glXCreateContext( global_data.connection, visual_info, c.os->handle, true );
+    if ( context.os->handle == None )
+      throw std::runtime_error("glXCreateContext did not yield a context");
+  }
 	
   // Get the current attributes .. lets hope the window manager already reset the window sizes:
   XWindowAttributes attr;

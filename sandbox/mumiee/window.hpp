@@ -53,7 +53,7 @@ class window
 
     std::string title; 
     window *parent;
-    simple_event_type redraw_event, idle_event, destroy_event, close_event;
+    simple_event_type redraw_event, destroy_event, close_event;
     size_signal_type configure_event;
     mouse_signal_type mouse_ev;
     key_signal_type key_ev;
@@ -79,7 +79,6 @@ class window
     void set_on_redraw( simple_event_type::slot_type const& slot );
     void set_on_close( simple_event_type::slot_type const& slot );
     void set_on_destroy( simple_event_type::slot_type const& slot );
-    void set_on_idle( simple_event_type::slot_type const& slot );
     void set_on_configure( size_signal_type::slot_type const& slot );
   //  void set_on_create( size_signal_type::slot_type const& slot );
     void set_on_mouse( mouse_signal_type::slot_type const& slot );
@@ -91,7 +90,6 @@ class window
     virtual void on_create( int,int);
     virtual void on_close();
     virtual void on_destroy();
-    virtual void on_idle();
     virtual void on_mouse_event(gott::gui::mouse_event const&);
     virtual void on_key_event(gott::gui::key_event const& );
     
@@ -100,7 +98,6 @@ class window
     void create( int,int);
     void close();
     void destroy();
-    void idle();
     void mouse(gott::gui::mouse_event const&);
     void key(gott::gui::key_event const&);
 

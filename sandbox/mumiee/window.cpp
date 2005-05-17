@@ -26,10 +26,6 @@ void window::set_on_destroy( simple_event_type::slot_type const& slot )
   destroy_event.connect( slot );
 }
 
-void window::set_on_idle( simple_event_type::slot_type const& slot )
-{
-  idle_event.connect( slot );
-}
 void window::set_on_configure( size_signal_type::slot_type const& slot )
 {
   configure_event.connect( slot );
@@ -75,7 +71,6 @@ void window::on_create( int w,int h )
 }
 void window::on_close(){}
 void window::on_destroy(){}
-void window::on_idle(){}
 void window::on_mouse_event(gott::gui::mouse_event const&){}
 
 void window::key( gott::gui::key_event const& k )
@@ -111,11 +106,6 @@ void window::destroy()
 {
   on_destroy();
   destroy_event();
-}
-void window::idle()
-{
-  on_idle();
-  idle_event();
 }
 
 void window::mouse(gott::gui::mouse_event const& m)
