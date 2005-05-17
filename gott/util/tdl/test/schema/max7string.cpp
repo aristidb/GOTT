@@ -35,7 +35,7 @@ struct schema_max7string : tut::schema_basic {
   schema_max7string() {
     context.begin(schema::match_document::factory::index());
       context.begin(schema::match_list::factory::index());
-        context.begin(schema::match_integer::factory::index(), 
+        context.begin(schema::match_string::factory::index(), 
                       RA(wstring(L"el")), slotcfg(slotcfg::maximum, 7));
         context.end();
       context.end();
@@ -67,8 +67,10 @@ void object::test<1>(int t) {
   run_test(w.str());
 
   stru::cf::nd_list c;
-  for (int i = 0; i < n; ++i)
-    c.push_back(S(Xany(i), L"el"));
+  for (int i = 0; i < n; ++i) {
+    wchar_t ch[2] = {'0'+i,0};
+    c.push_back(S(Xany(ch), L"el"));
+  }
   C(M(c)).write_to(xp);
 
   ensure_equals("enough", tree, xp);
@@ -104,13 +106,9 @@ void object::test<15>(int) {
 
 template<> template<>
 void object::test<16>(int) {
-  try {
-    run_test(L"zzzz");
-    fail("string");
-  } catch (schema::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch at token zzzz");
-  }
+  run_test(L"zzzz");
+  C(C(S(Xany(L"zzzz"),L"el"))).write_to(xp);
+  ensure_equals("string", tree, xp);
 }
 
 template<> template<>
