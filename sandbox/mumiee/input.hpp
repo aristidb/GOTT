@@ -14,6 +14,14 @@ struct mouse_event
     ButtonRelease };*/
 };
 
+struct mouse_state
+{
+  private:
+    std::size_t x,y;
+  public:
+    
+};
+
 enum key_code {
   KeyEscape          = 0x00,
   Key1               = 0x02,

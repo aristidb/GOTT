@@ -372,11 +372,12 @@ window::window( gl_context const& c
   
   application::get_instance().add_window( this );
   
-  create( width, height );
+  //XSync( global_data.connection, 1 );
 
   if( fl & Visible )
     set_visible();
-  XSync( global_data.connection, 1 );
+
+  create( width, height );
 }
 
 void window::set_title(std::string const & t)
@@ -490,6 +491,11 @@ window::~window()
 
 void globals::process_event( window * win, XEvent & event )
 {
+  std::cout << "Event on: " << win->os->handle << " ";
+  if( focus_window )
+  std::cout << "  Focus on: " << win->os->handle<< " ";
+  else 
+    std::cout << "  No Focus ";
   switch( event.type )
   {
     case ReparentNotify:
