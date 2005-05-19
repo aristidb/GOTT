@@ -31,7 +31,8 @@ match_list::match_list(rule::factory const &r, slotcfg const &c,
 : rule(need, a, m), sub(r), cfg(c) {
   last = m.pos().current();
   expectation = cfg.expectation();
-  matcher().add(sub);
+  if (expectation == rule::need || expectation == rule::maybe)
+    matcher().add(sub);
 }
 
 match_list::~match_list() {
