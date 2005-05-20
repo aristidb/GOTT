@@ -92,8 +92,30 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
+  try {
+    run_test(L"");
+    fail("empty");
+  } catch (schema::mismatch const &m) {
+    ensure_equals("correct error", std::string(m.what()),
+                  "0:1 : mismatch after token ");
+  }
+}
+
+template<> template<>
+void object::test<2>(int) {
+  run_test(L"a\n plugin x\n sum 7\n 77");
+  stru::cf::nd_list c;
+  c.push_back(C(S(Xany(L"x"), L"plugin-data"), L"plugin"));
+  c.push_back(C(S(Xany(7), L"sum-data"), L"sum"));
+  c.push_back(S(Xany(77), L"--other--"));
+  C(C(M(c, L"--unordered--"), L"a"), L"--doc--").write_to(xp);
+  ensure_equals("simple", tree, xp);
+}
+
+template<> template<>
+void object::test<3>(int) {
   no_test();
 }
 
-// ACTUALLY TEST (TODO)
+// further tests
 }
