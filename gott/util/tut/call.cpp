@@ -8,6 +8,8 @@ namespace tut
   test_runner_singleton runner;
 }
 
+//#define HTML_REPORT
+
 int main(int argc,const char* argv[])
 {
 #ifdef HTML_REPORT
