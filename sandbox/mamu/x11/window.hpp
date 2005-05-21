@@ -21,7 +21,8 @@ class Window : public gott::gui::SignalPack, public gott::gui::WindowFlags
     rect window_rect;
     //gl_context context;
     Application *app;
-    ::Window			handle;	
+    ::Window		handle;	
+    GLXContext  context;
     GLXWindow		drawable;
     std::size_t flags;
     Atom protocols[4];
@@ -29,8 +30,8 @@ class Window : public gott::gui::SignalPack, public gott::gui::WindowFlags
 
     // Implementation specific functions:
 
-    GLXFBConfig get_fbconfig( pixelformat const& p );
-    XVisualInfo* get_visualinfo( pixelformat const& p );
+    GLXFBConfig get_fbconfig( pixelformat const& p ) const;
+    XVisualInfo* get_visualinfo( pixelformat const& p ) const;
   public:
     Window( Application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
     Window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
@@ -53,8 +54,6 @@ class Window : public gott::gui::SignalPack, public gott::gui::WindowFlags
     void set_visible( bool vis );
     void set_title( std::string const& title );
     void set_region( rect const& region );
-
-    
 };
 
 }}}

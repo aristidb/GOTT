@@ -29,4 +29,33 @@ Application::Application()
 	old_glx = ( major <= 1 ) && ( minor < 3 );
 }
 
+int Application::get_screen() const
+{ 
+  return screen;
+}
+
+void Application::register_window( Window * ref )
+{
+}
+
+void Application::remove_window( Window *ref )
+{
+}
+
+Display* Application::get_display()
+{
+  return display;
+}
+
+bool Application::use_fallback()const
+{
+  return old_glx;
+}
+
+Atom Application::get_atom( char const * atom_name )
+{
+  return XInternAtom( display, atom_name, 0 );
+}
+
+
 }}}

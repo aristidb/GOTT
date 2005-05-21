@@ -23,6 +23,7 @@ class Application
 
     // implementation dependent methods:
     Display* get_display();
+    int get_screen() const;
     bool use_fallback()const;
     Atom get_atom( char const * atom_name );
     
