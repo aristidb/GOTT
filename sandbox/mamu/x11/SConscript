@@ -1,0 +1,16 @@
+import os
+import glob
+
+Import('env')
+
+source_files = []
+for root, dirs, _ in os.walk('.'):
+	if '.svn' in dirs:
+		dirs.remove('.svn')
+	if 'test' in dirs:
+		dirs.remove('test')
+	source_files += glob.glob(root + '/*.cpp')
+
+env.SharedLibrary('gottx11', source_files)
+
+
