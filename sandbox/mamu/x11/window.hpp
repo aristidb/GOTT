@@ -9,12 +9,12 @@
 #include <X11/extensions/xf86vmode.h>
 #include <set>
 #include <string>
-#include "utility.hpp"
+#include "../utility.hpp"
 
 namespace gott{ namespace gui{ namespace x11{
 
 class Application;
-class Window : public gott::gui::SignalPack, public gott::gui::WindowFlags
+class Window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
 {
   public:
   private:
@@ -27,6 +27,7 @@ class Window : public gott::gui::SignalPack, public gott::gui::WindowFlags
     std::size_t flags;
     Atom protocols[4];
     Atom wm_name, wm_icon_name, wm_type;
+    Window * parent;
 
     // Implementation specific functions:
 
@@ -54,6 +55,16 @@ class Window : public gott::gui::SignalPack, public gott::gui::WindowFlags
     void set_visible( bool vis );
     void set_title( std::string const& title );
     void set_region( rect const& region );
+
+    // event handlers:
+    virtual void on_redraw();
+    virtual void on_focus_enter();
+    virtual void on_focus_leave();
+    virtual void on_close();
+    virtual void on_configure( gott::gui::rect const&);
+    virtual void on_mouse(gott::gui::mouse_event const&);
+    virtual void on_key(gott::gui::key_event const&);
+
 };
 
 }}}

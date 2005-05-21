@@ -1,3 +1,7 @@
+
+import os
+import glob 
+
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
 cflags = ARGUMENTS.get('cflags', '-Wall -W')
 release = int(ARGUMENTS.get('release', 1))
@@ -32,3 +36,15 @@ conf = SConscript('../../gott/configure/SConscript')
 env = conf.Finish()
 
 SConscript(dirs = ['x11'])
+
+source_files = []
+for root, dirs, _ in os.walk('.'):
+	if '.svn' in dirs:
+		dirs.remove('.svn')
+	if 'test' in dirs:
+		dirs.remove('test')
+	source_files += glob.glob(root + '/*.cpp')
+
+env.SharedLibrary('gottbase', source_files)
+
+

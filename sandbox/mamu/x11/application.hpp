@@ -21,6 +21,8 @@ class Application
     void register_window( Window * ref );
     void remove_window( Window *ref );
 
+    bool is_extension_supported( const char* ext ) const;
+
     // implementation dependent methods:
     Display* get_display();
     int get_screen() const;
