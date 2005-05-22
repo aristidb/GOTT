@@ -17,6 +17,7 @@ class Application;
 class Window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
 {
   public:
+    friend class gott::gui::x11::Application;
   private:
     rect window_rect;
     //gl_context context;
@@ -25,6 +26,7 @@ class Window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
     GLXContext  context;
     GLXWindow		drawable;
     std::size_t flags;
+    enum Protocols { DeleteWindow, Focus, Ping, ContextHelp };
     Atom protocols[4];
     Atom wm_name, wm_icon_name, wm_type;
     Window * parent;
@@ -48,6 +50,8 @@ class Window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
     void hide();
 
     bool is_open() const;
+    bool has_decoration() const;
+    ::Window get_handle() const;
 
     void close();
     
@@ -56,6 +60,7 @@ class Window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
     void set_title( std::string const& title );
     void set_region( rect const& region );
     void set_render_context();
+
 
     // event handlers:
     virtual void on_redraw();

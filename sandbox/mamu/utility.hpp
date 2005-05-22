@@ -2,6 +2,7 @@
 #define GOTT_GUI_UTILITY_HPP_INCLUDED
 #include <boost/signals.hpp>
 #include <utility>
+#include "input.hpp"
 
 namespace gott{ namespace gui{ 
 
@@ -39,12 +40,6 @@ struct WindowFlags
   };
 };
 
-struct mouse_event
-{
-};
-struct key_event
-{
-};
 struct pixelformat
 {
   enum Flags{
