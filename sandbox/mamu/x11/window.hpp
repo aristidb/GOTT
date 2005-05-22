@@ -55,6 +55,7 @@ class Window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
     void set_visible( bool vis );
     void set_title( std::string const& title );
     void set_region( rect const& region );
+    void set_render_context();
 
     // event handlers:
     virtual void on_redraw();

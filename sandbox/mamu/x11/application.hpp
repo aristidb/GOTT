@@ -2,7 +2,11 @@
 #ifndef GOTT_GUI_X11_APPLICATION_HPP_INLCUDED
 #define GOTT_GUI_X11_APPLICATION_HPP_INLCUDED
 
+#include <string>
+#include <set>
+#include <list>
 #include "window.hpp"
+
 namespace gott{ namespace gui{ namespace x11{
   
 class Application
@@ -13,13 +17,18 @@ class Application
     bool old_glx;
     Atom protocols_atom;
     std::list<Window*> windows;
+    std::set<std::string> extensions;
     // actions?
+    void init_extensions();
+    void init_cursor();
   public:
     Application();
     Application( const char* connection );
 
     void register_window( Window * ref );
     void remove_window( Window *ref );
+
+    void handle_pending_messages();
 
     bool is_extension_supported( const char* ext ) const;
 

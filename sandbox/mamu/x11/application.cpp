@@ -5,6 +5,7 @@
 #include <X11/extensions/xf86vmode.h>
 
 #include "application.hpp"
+#include "window.hpp"
 
 
 namespace gott{ namespace gui{ namespace x11{
@@ -27,11 +28,48 @@ Application::Application()
     throw std::runtime_error("Could not query glXVersion");
 	
 	old_glx = ( major <= 1 ) && ( minor < 3 );
+
+  init_cursor();
+
+  try
+  {
+    pixelformat format;
+    rect region(0,0,1,1);
+    Window win( *this, region, "glx-test-window", format, std::size_t(WindowFlags::Defaults) );
+    win.set_render_context();
+    init_extensions();
+    handle_pending_messages();
+  }
+  catch( std::runtime_error & e)
+  {
+    std::cout << e.what() << std::endl;
+  }
+
+}
+
+void Application::handle_pending_messages()
+{
 }
 
 int Application::get_screen() const
 { 
   return screen;
+}
+
+void Application::init_extensions() 
+{
+{
+    if( glGetString( GL_EXTENSIONS ) == 0 )
+      throw runtime_error("screew you"); 
+    istringstream in( reinterpret_cast<const char*>(glGetString( GL_EXTENSIONS ) ) );
+    copy( istream_iterator<string>(in), istream_iterator<string>(), 
+        insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
+  }{
+    istringstream in( glXQueryExtensionsString( display, screen ) );
+    copy( istream_iterator<string>(in), istream_iterator<string>(), 
+        insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
+  }
+
 }
 
 void Application::register_window( Window * ref )
@@ -55,6 +93,26 @@ bool Application::use_fallback()const
 Atom Application::get_atom( char const * atom_name )
 {
   return XInternAtom( display, atom_name, 0 );
+}
+
+bool Application::is_extension_supported( std::string const& str ) const
+{
+  return extensions.find(str) != extensions.end();
+}
+
+void Application::init_cursor()
+{
+	char 		data = 0;
+	XColor 		dummy;
+	Pixmap 		blank_pixmap = XCreateBitmapFromData( display,
+		RootWindow( display, screen ), &data, 1, 1);
+  if( blank_pixmap == None )
+    throw std::runtime_error("Could not create Bitmap from data");
+
+	blank_cursor = XCreatePixmapCursor( display, blank_pixmap,
+								blank_pixmap, &dummy, &dummy, 0, 0);
+	
+	XFreePixmap( display, blank_pixmap );
 }
 
 
