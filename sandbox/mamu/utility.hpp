@@ -13,7 +13,7 @@ struct rect
 {
   long left, top; 
   std::size_t width, height;
-  rect( long l, long r, std::size_t width, std::size_t height);
+  rect( long l, long t , std::size_t width, std::size_t height);
   rect();
 };
 

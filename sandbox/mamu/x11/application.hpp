@@ -33,7 +33,7 @@ class Application
     void process_event( gott::gui::x11::Window* win, XEvent& event );
     gott::gui::x11::Window* find_window( ::Window handle );
   public:
-    Application( const char* connection = 0 );
+    Application( char const* connection = 0 );
 
     void register_window( Window * ref );
     void remove_window( Window *ref );

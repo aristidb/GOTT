@@ -1,6 +1,21 @@
 #include "utility.hpp"
 
 namespace gott{ namespace gui{ 
+
+
+rect::rect( long l, long t, std::size_t w, std::size_t h)
+  : left(l), top(t), width(w), height(h)
+{
+}
+rect::rect()
+  : left(0), top(0), width(1), height(1)
+{}
+  
+pixelformat::pixelformat()
+  : flags( Clear ), color(false,32), depth(false,8), stencil(false,8), samples(false,0)
+{
+}
+
 void WidgetEvents::set_on_redraw( simple_event_type::slot_type const& slot )
 {
   redraw_event.connect( slot );

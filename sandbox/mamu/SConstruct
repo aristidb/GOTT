@@ -32,19 +32,16 @@ env = Environment(
 		  CPPDEFINES=cppdef)
 
 Export('env')
-conf = SConscript('../../gott/configure/SConscript')
-env = conf.Finish()
 
 SConscript(dirs = ['x11'])
 
-source_files = []
-for root, dirs, _ in os.walk('.'):
-	if '.svn' in dirs:
-		dirs.remove('.svn')
-	if 'test' in dirs:
-		dirs.remove('test')
-	source_files += glob.glob(root + '/*.cpp')
+source_files = ['input.cpp', 'utility.cpp']
 
 env.SharedLibrary('gottbase', source_files)
+
+x11_example_files= ['test_x11.cpp']
+libs=['gottx11', 'gottbase' ,'GL', 'GLU', 'X11', 'boost_signals', 'Xxf86vm']
+
+env.Program('test_x11', x11_example_files, LIBS=libs, LIBPATH=['.', 'x11/'])
 
 

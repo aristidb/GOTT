@@ -16,7 +16,7 @@ using namespace std;
 
 namespace gott{ namespace gui{ namespace x11{
 
-Application::Application( const char* connection )
+Application::Application( char const* connection )
   : display( XOpenDisplay(connection) ), focus_window(0)
 {
   if( display == 0 )
@@ -91,6 +91,19 @@ Application::status Application::handle_pending_messages()
   
   return windows.empty() ? End : Continue; 
 
+}
+
+void Application::run()
+{
+  while( handle_pending_messages() == Continue )
+  {
+    handle_idle();
+  }
+}
+
+void Application::handle_idle()
+{
+  process_idle();
 }
 
 gott::gui::x11::Window* Application::find_window( ::Window handle )
