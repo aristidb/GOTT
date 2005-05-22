@@ -1,3 +1,6 @@
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -6,6 +9,8 @@
 
 #include "application.hpp"
 #include "window.hpp"
+
+using namespace std;
 
 
 namespace gott{ namespace gui{ namespace x11{

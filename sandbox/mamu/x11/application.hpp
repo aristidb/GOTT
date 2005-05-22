@@ -18,6 +18,7 @@ class Application
     Atom protocols_atom;
     std::list<Window*> windows;
     std::set<std::string> extensions;
+    Cursor blank_cursor;
     // actions?
     void init_extensions();
     void init_cursor();
@@ -30,7 +31,7 @@ class Application
 
     void handle_pending_messages();
 
-    bool is_extension_supported( const char* ext ) const;
+    bool is_extension_supported( std::string const& ext ) const;
 
     // implementation dependent methods:
     Display* get_display();
