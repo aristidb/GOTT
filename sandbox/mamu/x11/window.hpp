@@ -42,6 +42,7 @@ class Window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
     ~Window();
    
     gl_interface get_gl();
+    void swap_buffer();
     
     void open( Application& app, rect const&r, std::string const& title, pixelformat const& p, std::size_t flags );
     void open( rect const&r, std::string const& title, pixelformat const& p, std::size_t flags );
@@ -52,6 +53,7 @@ class Window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
     bool is_open() const;
     bool has_decoration() const;
     ::Window get_handle() const;
+    rect const& get_rect() const;
 
     void close();
     

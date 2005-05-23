@@ -1,5 +1,7 @@
 #include <iostream>
 #include <sstream>
+#include <iterator>
+#include <algorithm>
 #include <stdexcept>
 #include <X11/X.h>
 #include <X11/Xatom.h>
@@ -19,6 +21,7 @@ namespace gott{ namespace gui{ namespace x11{
 Application::Application( char const* connection )
   : display( XOpenDisplay(connection) ), focus_window(0)
 {
+  std::cout << "TEST" << std::endl;
   if( display == 0 )
     throw std::runtime_error("Could not open default x11 connection");
 
@@ -39,12 +42,36 @@ Application::Application( char const* connection )
 
   try
   {
+    std::cout << "TEST" << std::endl;
     pixelformat format;
     rect region(0,0,1,1);
     Window win( *this, region, "glx-test-window", format, std::size_t(WindowFlags::Defaults) );
+    std::cout << "TEST " <<  win.is_open() << std::endl;
+    
+    XSync( display, 0 );
+    std::size_t num_events;
+    int break_counter = 10;
+    while( (num_events = XPending( display )) != 0 && --break_counter )
+      XSync( display, 0 );
+
+    for( std::size_t i = 0; i < num_events; ++i )
+      handle_pending_messages();
+    std::cout << "set_render_context:" << std::endl;
     win.set_render_context();
+    std::cout << "init_extensions:" << std::endl;
     init_extensions();
-    handle_pending_messages();
+
+    copy(extensions.begin(), extensions.end(), ostream_iterator<std::string>(cout) ); 
+
+    std::cout << "closeing:" << std::endl;
+    win.close();
+    std::cout << "Synching again ... window has been closed!"  << std::endl;
+    XSync( display, 0 );
+    num_events = XPending( display );
+    std::cout << "Handling " <<  num_events << " Events." << std::endl;
+    for( std::size_t i = 0; i < num_events; ++i )
+      handle_pending_messages();
+
   }
   catch( std::runtime_error & e)
   {
@@ -66,7 +93,7 @@ Application::status Application::handle_pending_messages()
 
       if( win== 0 )
       {
-        std::cerr << "Unable to decode window" << std::endl;
+        std::cout << "Unable to decode window " << event.xany.window << " RootWindow: " << RootWindow( display, screen ) << std::endl;
         break;
       }
 
@@ -85,7 +112,7 @@ Application::status Application::handle_pending_messages()
     if( win )
       process_event( win, event ); 
     else 
-      std::cerr << "Unable to decode window" << std::endl;
+      std::cout << "Unable to decode window " << event.xany.window << " RootWindow: " << RootWindow( display, screen ) << std::endl;
   }
 
   
@@ -110,8 +137,11 @@ gott::gui::x11::Window* Application::find_window( ::Window handle )
 {
   for( std::list<Window*>::const_iterator it = windows.begin(),
       e= windows.end(); it!=e; ++it )
+  {
+    std::cout << "find_window " << (*it)->get_handle()<< " == " <<  handle << std::endl;
     if( (*it)->get_handle() == handle )
       return *it;
+  }
   return 0;
 }
 
@@ -225,7 +255,7 @@ void Application::process_event( gott::gui::x11::Window* win, XEvent& event )
     case ButtonPress:
       {
         std::cout << "ButtonPress" << std::endl;
-        XSetInputFocus( display, win->get_handle(), RevertToPointerRoot, CurrentTime );
+        //XSetInputFocus( display, win->get_handle(), RevertToPointerRoot, CurrentTime );
 
         /*if ( _glsk_input_update_pointer_button( event.xbutton.button, 1 ) == 0 )
           _glsk_send_mouse_event( win, event.xbutton.x, win->height-event.xbutton.y,
@@ -247,7 +277,7 @@ void Application::process_event( gott::gui::x11::Window* win, XEvent& event )
     case MapNotify:
       {
         std::cout << "MapNotify" << std::endl;
-        XSetInputFocus( display, win->get_handle(), RevertToPointerRoot, CurrentTime );
+        //XSetInputFocus( display, win->get_handle(), RevertToPointerRoot, CurrentTime );
         win->exec_on_redraw();
         break;
       };
@@ -320,13 +350,13 @@ void Application::process_event( gott::gui::x11::Window* win, XEvent& event )
         std::cout << "ClientMessage" << std::endl;
         if( event.xclient.message_type == protocols_atom )
         {
-          if( event.xclient.data.l[0] = win->protocols[Window::Ping] )
+          if( event.xclient.data.l[0] == win->protocols[Window::Ping] )
           {
             event.xclient.window = RootWindow(display, screen);
             XSendEvent(display, event.xclient.window, false
                 , SubstructureNotifyMask|SubstructureRedirectMask, &event );
           }
-          if( event.xclient.data.l[0] = win->protocols[Window::DeleteWindow] )
+          else if( event.xclient.data.l[0] == win->protocols[Window::DeleteWindow] )
             win->close();
           // the close event
 
