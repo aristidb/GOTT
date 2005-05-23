@@ -39,12 +39,12 @@ class MyWindow : public gott::gui::x11::Window
 int main()
 {
   try {
-  Application app;
-/*  pixelformat format;
-  MyWindow a_window( app, rect(0,0,200,100),"Mein Titel", format ); 
-  MyWindow b_window( app, rect(300,50,200,100),"Ein anderer Titel", format); */
+    Application app;
+    pixelformat format;
+    MyWindow a_window( app, rect(0,0,200,100),"Mein Titel", format ); 
+    MyWindow b_window( app, rect(300,50,200,100),"Ein anderer Titel", format); 
 
-//  app.run();
+    app.run();
   } catch( std:: runtime_error &e ){
     std::cout << e.what()<< std::endl;
   }

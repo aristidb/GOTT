@@ -7,6 +7,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <GL/glx.h>
+#include <GL/glu.h>
 #include <X11/extensions/xf86vmode.h>
 
 #include "application.hpp"
@@ -152,18 +153,25 @@ int Application::get_screen() const
 
 void Application::init_extensions() 
 {
-{
-    if( glGetString( GL_EXTENSIONS ) == 0 )
-      throw runtime_error("screew you"); 
-    istringstream in( reinterpret_cast<const char*>(glGetString( GL_EXTENSIONS ) ) );
-    copy( istream_iterator<string>(in), istream_iterator<string>(), 
-        insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
-  }{
-    istringstream in( glXQueryExtensionsString( display, screen ) );
+  if( glXQueryExtensionsString( display, screen ) != 0 )
+  {
+    istringstream in(glXQueryExtensionsString(display,screen) );
     copy( istream_iterator<string>(in), istream_iterator<string>(), 
         insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
   }
+  else 
+    throw runtime_error("glx bad");
 
+  {
+
+    if( glGetString( GL_EXTENSIONS ) == 0 )
+    {
+      throw runtime_error( reinterpret_cast<const char* >(gluErrorString ( glGetError())));
+    }
+    istringstream in( reinterpret_cast<const char*>(glGetString( GL_EXTENSIONS ) ) );
+    copy( istream_iterator<string>(in), istream_iterator<string>(), 
+        insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
+  }
 }
 
 void Application::register_window( Window * ref )
@@ -350,14 +358,21 @@ void Application::process_event( gott::gui::x11::Window* win, XEvent& event )
         std::cout << "ClientMessage" << std::endl;
         if( event.xclient.message_type == protocols_atom )
         {
+          std::cout << "Protocols " << std::endl;
           if( event.xclient.data.l[0] == win->protocols[Window::Ping] )
           {
+            std::cout << "Ping " << std::endl;
             event.xclient.window = RootWindow(display, screen);
             XSendEvent(display, event.xclient.window, false
                 , SubstructureNotifyMask|SubstructureRedirectMask, &event );
           }
           else if( event.xclient.data.l[0] == win->protocols[Window::DeleteWindow] )
+          {
+
+            std::cout << "Close " << std::endl;
             win->close();
+          }
+          std::cout << "unrecognized client-message type:" <<    XGetAtomName( display, event.xclient.data.l[0]) << '\n';
           // the close event
 
         }
