@@ -6,8 +6,8 @@ cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
 cflags = ARGUMENTS.get('cflags', '-Wall -W')
 release = int(ARGUMENTS.get('release', 1))
 if release:
-	debug = 0
-	opt = '-O3'
+	debug = 1
+	opt = '-O0'
 else:
 	debug = 1
 	opt = '-O0'
@@ -15,7 +15,7 @@ debug = int(ARGUMENTS.get('debug', debug))
 opt = ARGUMENTS.get('opt', opt)
 cflags += ' ' + opt
 if debug:
-	cflags += ' -g -ggdb3'
+	cflags += ' -ggdb3'
 	cppdef = ['DEBUG']
 else:
 	cppdef = ['NDEBUG']
@@ -26,6 +26,7 @@ if cflagsoverride:
 	cflags = cflagsoverride
 
 env = Environment(
+      LINKFLAGSFLAGS =['-ggdb3','-O0','-static'],
 		  CXX = cxx, 
 		  CCFLAGS = cflags, 
 		  CPPPATH=['#/..'], 
@@ -37,7 +38,8 @@ SConscript(dirs = ['x11'])
 
 source_files = ['input.cpp', 'utility.cpp']
 
-env.SharedLibrary('gottbase', source_files)
+# env.SharedLibrary('gottbase', source_files)
+env.StaticLibrary('gottbase', source_files)
 
 x11_example_files= ['test_x11.cpp']
 libs=['gottx11', 'gottbase' ,'GL', 'GLU', 'X11', 'boost_signals', 'Xxf86vm']

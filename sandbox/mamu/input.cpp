@@ -6,6 +6,7 @@ key_event::key_event( key_code c, event_type t)
 {}
 
 key_state::key_state()
+  : keyboard( std::size_t(gott::gui::NoKey), static_cast<unsigned char>(0) )
 {}
 
 

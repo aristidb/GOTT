@@ -11,6 +11,7 @@ for root, dirs, _ in os.walk('.'):
 		dirs.remove('test')
 	source_files += glob.glob(root + '/*.cpp')
 
-env.SharedLibrary('gottx11', source_files)
+# env.SharedLibrary('gottx11', source_files)
+env.StaticLibrary('gottx11', source_files)
 
 
