@@ -289,9 +289,29 @@ XVisualInfo* Window::get_visualinfo( pixelformat const& format ) const
         values.push_back( 5 );
         break;
       default:
-        break;
+                break;
     }
   }
+  else{
+    values.push_back(GLX_RED_SIZE);
+    values.push_back( 1 );
+    values.push_back(GLX_GREEN_SIZE);
+    values.push_back( 1 );
+    values.push_back(GLX_BLUE_SIZE);
+    values.push_back( 1 );
+  }
+  
+  if( format.depth.first )
+	{
+    values.push_back(GLX_DEPTH_SIZE);
+    values.push_back(format.depth.second);
+  }
+  else
+  {
+    values.push_back(GLX_DEPTH_SIZE);
+    values.push_back(1);
+  }
+
 	
   values.push_back( None );
 	

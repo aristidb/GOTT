@@ -12,7 +12,7 @@ rect::rect()
 {}
   
 pixelformat::pixelformat()
-  : flags( Clear ), color(false,32), depth(false,8), stencil(false,8), samples(false,0)
+  : flags( DoubleBuffer ), color(false,32), depth(false,8), stencil(false,8), samples(false,0)
 {
 }
 
