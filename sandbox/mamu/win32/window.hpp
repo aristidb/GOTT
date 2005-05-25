@@ -2,11 +2,6 @@
 #ifndef GOTT_GUI_X11_WINDOW_HPP_INLCUDED
 #define GOTT_GUI_X11_WINDOW_HPP_INLCUDED
 
-#include <X11/X.h>
-#include <X11/Xatom.h>
-#include <X11/Xlib.h>
-#include <GL/glx.h>
-#include <X11/extensions/xf86vmode.h>
 #include <set>
 #include <string>
 #include "../utility.hpp"
@@ -22,19 +17,15 @@ class window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
     rect window_rect;
     //gl_context context;
     application *app;
-    ::Window		handle;	
-    ::GLXContext  context;
-    ::GLXWindow		drawable;
+    HWND			handle;			// handle to the physical window
+    HDC				dc;				// the client device context
+    HGLRC			context;
+
     std::size_t flags;
-    enum Protocols { DeleteWindow, Focus, Ping, ContextHelp };
-    ::Atom protocols[4];
-    ::Atom wm_name, wm_icon_name, wm_type;
     window * parent;
 
     // Implementation specific functions:
 
-    GLXFBConfig get_fbconfig( pixelformat const& p ) const;
-    XVisualInfo* get_visualinfo( pixelformat const& p ) const;
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
     window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
@@ -52,7 +43,7 @@ class window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
 
     bool is_open() const;
     bool has_decoration() const;
-    ::Window get_handle() const;
+    HWND get_handle() const;
     rect const& get_rect() const;
 
     void close();

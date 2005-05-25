@@ -19,7 +19,7 @@ using namespace std;
 
 namespace gott{ namespace gui{ namespace x11{
 
-Application::Application( char const* connection )
+application::application( char const* connection )
   : display( XOpenDisplay(connection) ), focus_window(0)
 {
   std::cout << "TEST" << std::endl;
@@ -46,7 +46,7 @@ Application::Application( char const* connection )
     std::cout << "TEST" << std::endl;
     pixelformat format;
     rect region(0,0,1,1);
-    Window win( *this, region, "glx-test-window", format, std::size_t(WindowFlags::Defaults) );
+    window win( *this, region, "glx-test-window", format, std::size_t(WindowFlags::Defaults) );
     std::cout << "TEST " <<  win.is_open() << std::endl;
     
     XSync( display, 0 );
@@ -81,7 +81,7 @@ Application::Application( char const* connection )
 
 }
 
-Application::status Application::handle_pending_messages()
+application::status application::handle_pending_messages()
 {
   if( process_idle.num_slots() )
   {
@@ -90,7 +90,7 @@ Application::status Application::handle_pending_messages()
       XEvent					event;
       XNextEvent( display, &event );
 
-      Window * win = find_window( event.xany.window );
+      window * win = find_window( event.xany.window );
 
       if( win== 0 )
       {
@@ -108,7 +108,7 @@ Application::status Application::handle_pending_messages()
     XEvent event;
     XNextEvent( display, &event );
 
-    Window * win = find_window( event.xany.window );
+    window * win = find_window( event.xany.window );
 
     if( win )
       process_event( win, event ); 
@@ -121,7 +121,7 @@ Application::status Application::handle_pending_messages()
 
 }
 
-void Application::run()
+void application::run()
 {
   while( handle_pending_messages() == Continue )
   {
@@ -129,14 +129,14 @@ void Application::run()
   }
 }
 
-void Application::handle_idle()
+void application::handle_idle()
 {
   process_idle();
 }
 
-gott::gui::x11::Window* Application::find_window( ::Window handle )
+gott::gui::x11::window* application::find_window( ::Window handle )
 {
-  for( std::list<Window*>::const_iterator it = windows.begin(),
+  for( std::list<window*>::const_iterator it = windows.begin(),
       e= windows.end(); it!=e; ++it )
   {
     std::cout << "find_window " << (*it)->get_handle()<< " == " <<  handle << std::endl;
@@ -146,12 +146,12 @@ gott::gui::x11::Window* Application::find_window( ::Window handle )
   return 0;
 }
 
-int Application::get_screen() const
+int application::get_screen() const
 { 
   return screen;
 }
 
-void Application::init_extensions() 
+void application::init_extensions() 
 {
   if( glXQueryExtensionsString( display, screen ) != 0 )
   {
@@ -174,43 +174,43 @@ void Application::init_extensions()
   }
 }
 
-void Application::register_window( Window * ref )
+void application::register_window( window * ref )
 {
   if( ! focus_window && windows.empty() )
     focus_window = ref;
   windows.push_back( ref );
 }
 
-void Application::remove_window( Window *ref )
+void application::remove_window( window *ref )
 {
   
-  for( std::list<Window*>::iterator it = windows.begin(),
+  for( std::list<window*>::iterator it = windows.begin(),
       e= windows.end(); it!=e; ++it )
     if( *it == ref )
       it=windows.erase(it);
 }
 
-Display* Application::get_display()
+Display* application::get_display()
 {
   return display;
 }
 
-bool Application::use_fallback()const
+bool application::use_fallback()const
 {
   return old_glx;
 }
 
-Atom Application::get_atom( char const * atom_name )
+Atom application::get_atom( char const * atom_name )
 {
   return XInternAtom( display, atom_name, 0 );
 }
 
-bool Application::is_extension_supported( std::string const& str ) const
+bool application::is_extension_supported( std::string const& str ) const
 {
   return extensions.find(str) != extensions.end();
 }
 
-void Application::init_cursor()
+void application::init_cursor()
 {
 	char 		data = 0;
 	XColor 		dummy;
@@ -225,7 +225,7 @@ void Application::init_cursor()
 	XFreePixmap( display, blank_pixmap );
 }
 
-void Application::process_event( gott::gui::x11::Window* win, XEvent& event )
+void application::process_event( gott::gui::x11::window* win, XEvent& event )
 {
   std::cout << "Event on: " << win->get_handle() << " ";
   if( focus_window )
@@ -359,14 +359,14 @@ void Application::process_event( gott::gui::x11::Window* win, XEvent& event )
         if( event.xclient.message_type == protocols_atom )
         {
           std::cout << "Protocols " << std::endl;
-          if( event.xclient.data.l[0] == win->protocols[Window::Ping] )
+          if( event.xclient.data.l[0] == win->protocols[window::Ping] )
           {
             std::cout << "Ping " << std::endl;
             event.xclient.window = RootWindow(display, screen);
             XSendEvent(display, event.xclient.window, false
                 , SubstructureNotifyMask|SubstructureRedirectMask, &event );
           }
-          else if( event.xclient.data.l[0] == win->protocols[Window::DeleteWindow] )
+          else if( event.xclient.data.l[0] == win->protocols[window::DeleteWindow] )
           {
 
             std::cout << "Close " << std::endl;
@@ -427,12 +427,12 @@ void Application::process_event( gott::gui::x11::Window* win, XEvent& event )
 
 }
 
-key_state const& Application::get_key_state() const
+key_state const& application::get_key_state() const
 {
   return key_info;
 }
 
-mouse_state const& Application::get_mouse_state() const
+mouse_state const& application::get_mouse_state() const
 {
   return mouse_info;
 }

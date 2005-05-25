@@ -5,7 +5,7 @@
 
 namespace gott{ namespace gui{ namespace x11{
 
-Application *get_default_app(){ static Application instance; return &instance;}
+application *get_default_app(){ static application instance; return &instance;}
 
 namespace {
   // TODO define motif flags here
@@ -17,30 +17,30 @@ namespace {
 
 }
 
-Window::~Window()
+window::~window()
 {
    if( is_open() )
     close();
 }
 
-Window::Window( Application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
+window::window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
   : app( &app ), handle(0), context(0), drawable(0), flags(Clear), parent(0)
 {
   open(r,title,p,flags);
 }
 
-Window::Window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
+window::window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
   : app( get_default_app() ), handle(0), drawable(0), flags(Clear), parent(0)
 {
   open(r,title,p,flags);
 }
 
-bool Window::is_open() const
+bool window::is_open() const
 {
   return flags & WindowFlags::Open;
 }
 
-void Window::open( Application& a, rect const&r, std::string const& title, pixelformat const& p, std::size_t flags)
+void window::open( application& a, rect const&r, std::string const& title, pixelformat const& p, std::size_t flags)
 {
   if( is_open() )
     close();
@@ -49,7 +49,7 @@ void Window::open( Application& a, rect const&r, std::string const& title, pixel
   open(r,title,p,flags);
 }
 
-void Window::open(rect const&r, std::string const& t, pixelformat const& p, std::size_t fl )
+void window::open(rect const&r, std::string const& t, pixelformat const& p, std::size_t fl )
 {
   if( is_open() )
     close();
@@ -202,7 +202,7 @@ protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
   exec_on_configure( window_rect );
 }
 
-void Window::set_window_type( std::size_t fl )
+void window::set_window_type( std::size_t fl )
 {
 
   fl &= (Menu|Normal|Toolbar|Utility|Splash|Dock|ToolTip|Decoration);
@@ -246,19 +246,19 @@ void Window::set_window_type( std::size_t fl )
   flags |= fl;
 }
 
-void Window::show()
+void window::show()
 {
   if( is_open() )
   XMapWindow( app->get_display(), handle );
 }
 
-void Window::hide()
+void window::hide()
 {
   if( is_open() )
   XUnmapWindow( app->get_display(), handle );
 }
 
-XVisualInfo* Window::get_visualinfo( pixelformat const& format ) const
+XVisualInfo* window::get_visualinfo( pixelformat const& format ) const
 {
   std::vector<boost::int32_t> values(24);
   values.push_back( GLX_RGBA );
@@ -318,7 +318,7 @@ XVisualInfo* Window::get_visualinfo( pixelformat const& format ) const
 	return glXChooseVisual( app->get_display(), app->get_screen(), &(values[0]) );
 }
 
-GLXFBConfig	Window::get_fbconfig( pixelformat const& format ) const
+GLXFBConfig	window::get_fbconfig( pixelformat const& format ) const
 {
   std::vector<boost::int32_t> values(24);
 	GLXFBConfig*			Array = 0;
@@ -414,7 +414,7 @@ GLXFBConfig	Window::get_fbconfig( pixelformat const& format ) const
 	return None;
 }
 
-void Window::set_title( std::string const& t )
+void window::set_title( std::string const& t )
 {
   if( handle )
   {
@@ -435,7 +435,7 @@ void Window::set_title( std::string const& t )
 
 
 
-void Window::close()
+void window::close()
 {
   if( ! is_open() )
     return;
@@ -461,36 +461,36 @@ void Window::close()
 }
 
 
-void Window::on_redraw()
+void window::on_redraw()
 {
 }
 
-void Window::on_focus_enter()
+void window::on_focus_enter()
 {
 }
 
-void Window::on_focus_leave()
+void window::on_focus_leave()
 {
 }
 
-void Window::on_close()
+void window::on_close()
 {
 }
 
-void Window::on_configure( gott::gui::rect const& r)
+void window::on_configure( gott::gui::rect const& r)
 {
   window_rect = r;
 }
 
-void Window::on_mouse(gott::gui::mouse_event const&)
+void window::on_mouse(gott::gui::mouse_event const&)
 {
 }
 
-void Window::on_key(gott::gui::key_event const&)
+void window::on_key(gott::gui::key_event const&)
 {
 }
 
-void Window::swap_buffer() 
+void window::swap_buffer() 
 {
   if( is_open() )
     if( !app->use_fallback() )
@@ -499,7 +499,7 @@ void Window::swap_buffer()
       glXSwapBuffers( app->get_display(), handle );
 }
 
-void Window::set_render_context()
+void window::set_render_context()
 {
   if( !is_open() )
     return;
@@ -516,18 +516,18 @@ void Window::set_render_context()
   throw std::runtime_error("Error while setting context");
 }
 
-::Window Window::get_handle() const
+::Window window::get_handle() const
 {
   return handle;
 }
 
-gott::gui::rect const& Window::get_rect() const
+gott::gui::rect const& window::get_rect() const
 {
   return window_rect;
 }
 
 
-bool Window::has_decoration() const
+bool window::has_decoration() const
 {
   return flags&WindowFlags::Decoration;
 }

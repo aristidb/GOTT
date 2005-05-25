@@ -9,34 +9,31 @@
 
 namespace gott{ namespace gui{ namespace x11{
   
-class application
+class Application
 {
   public:
     enum status { Continue, End };
     typedef boost::signal<void ()> idle_signal;
 
   private:
-    Display * display;
-    int screen;
-    bool old_glx;
-    Atom protocols_atom;
-    std::list<gott::gui::x11::window*> windows;
-    window* focus_window;
+    HINSTANCE	hinstance;
+    DEVMODE		desktop_mode;
+    TCHAR*	cls_name;
+    Window* focus_window;
     std::set<std::string> extensions;
-    Cursor blank_cursor;
+    
     idle_signal process_idle;
     mouse_state mouse_info;
     key_state key_info;
     // actions?
     void init_extensions();
     void init_cursor();
-    void process_event( gott::gui::x11::window* win, XEvent& event );
-    gott::gui::x11::window* find_window( ::Window handle );
+    gott::gui::x11::Window* find_window( ::Window handle );
   public:
-    application( char const* connection = 0 );
+    Application( char const* connection = 0 );
 
-    void register_window( window * ref );
-    void remove_window( window *ref );
+    void register_window( Window * ref );
+    void remove_window( Window *ref );
 
     status handle_pending_messages();
     void handle_idle();
@@ -50,12 +47,9 @@ class application
     key_state const& get_key_state() const;
     mouse_state const& get_mouse_state() const;
 
-    // implementation dependent methods:
-    Display* get_display();
-    int get_screen() const;
-    bool use_fallback()const;
-    Atom get_atom( char const * atom_name );
-    
+    // system specific interface:
+    HINSTANCE get_instance() const;
+    TCHAR const* get_appname() const;
 };
 
 }}}
