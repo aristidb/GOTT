@@ -12,9 +12,9 @@ class MyWindow : public gott::gui::x11::window
 {
   public:
     MyWindow( application& app, rect const& r, std::string const& title, pixelformat const& p )
-      : gott::gui::x11::window( app, r, title, p, WindowFlags::Defaults ) {}
+      : gott::gui::x11::window( app, r, title, p, window_flags::Defaults ) {}
     MyWindow( rect const& r, std::string const& title, pixelformat const& p )
-      : gott::gui::x11::window( r, title, p, WindowFlags::Defaults ) {}
+      : gott::gui::x11::window( r, title, p, window_flags::Defaults ) {}
 
     void on_redraw() 
     {

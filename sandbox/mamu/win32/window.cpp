@@ -29,7 +29,7 @@ window::window( rect const& r, std::string const& title, pixelformat const& p, s
 
 bool window::is_open() const
 {
-  return flags & WindowFlags::Open;
+  return flags & window_flags::Open;
 }
 
 void window::open( Application& a, rect const&r, std::string const& title, pixelformat const& p, std::size_t flags)
@@ -52,7 +52,7 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
   if( ! handle )
     throw runtime_error( "failed to create window"  );
 
-  flags |= WindowFlags::Open;
+  flags |= window_flags::Open;
  
   set_region( r );
   set_window_type( fl );
@@ -170,7 +170,7 @@ void window::close()
   dc = 0;
   handle = 0;
   context = 0;
-  flags &= ~WindowFlags::Open;
+  flags &= ~window_flags::Open;
   app->remove_window( this );
 }
 
@@ -183,7 +183,7 @@ void window::set_region( gott::gui::rect const& r )
     area.top = r.top; 
     area.bottom = r.top + r.height; 
     area.= r.top + r.height; 
-    if( flags & WindowFlags::Visible )
+    if( flags & window_flags::Visible )
       AdjustWindowRectEx( &area, WS_OVERLAPPEDWINDOW, FALSE, WS_EX_APPWINDOW | WS_EX_WINDOWEDGE );
     else
       AdjustWindowRectEx( &area, WS_POPUP, FALSE, WS_EX_APPWINDOW );
@@ -246,7 +246,7 @@ gott::gui::rect const& window::get_rect() const
 
 bool window::has_decoration() const
 {
-  return flags&WindowFlags::Decoration;
+  return flags&window_flags::Decoration;
 }
 
 }}}

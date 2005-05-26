@@ -14,7 +14,7 @@
 namespace gott{ namespace gui{ namespace x11{
 
 class application;
-class window : public gott::gui::WidgetEvents, public gott::gui::WindowFlags
+class window : public gott::gui::widget_events, public gott::gui::window_flags
 {
   public:
     friend class gott::gui::x11::application;

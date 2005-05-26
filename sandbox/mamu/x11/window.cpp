@@ -37,7 +37,7 @@ window::window( rect const& r, std::string const& title, pixelformat const& p, s
 
 bool window::is_open() const
 {
-  return flags & WindowFlags::Open;
+  return flags & window_flags::Open;
 }
 
 void window::open( application& a, rect const&r, std::string const& title, pixelformat const& p, std::size_t flags)
@@ -154,7 +154,7 @@ protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
   // Wait for Map events? 
 	
 	// flag this window as open
-	flags |= WindowFlags::Open;
+	flags |= window_flags::Open;
 	
 	// fallback if we are below GLX version 1.3 (damn ATI drivers)
   if( app->use_fallback() == 0 ) // GLX >= 1.3
@@ -189,7 +189,7 @@ protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
   window_rect.width = attr.y;
   window_rect.height = attr.y;
 
-  flags |= WindowFlags::Open;
+  flags |= window_flags::Open;
 
 
   app->register_window( this );
@@ -456,7 +456,7 @@ void window::close()
     XDestroyWindow( app->get_display(), handle );
     handle = 0;
   }
-  flags &= ~WindowFlags::Open;
+  flags &= ~window_flags::Open;
   app->remove_window( this );
 }
 
@@ -529,7 +529,7 @@ gott::gui::rect const& window::get_rect() const
 
 bool window::has_decoration() const
 {
-  return flags&WindowFlags::Decoration;
+  return flags&window_flags::Decoration;
 }
 
 }}}

@@ -6,9 +6,10 @@
 
 namespace gott{ namespace gui{ 
 
-  struct gl_interface
-  {
-  };
+struct gl_interface
+{
+};
+
 struct rect 
 {
   long left, top; 
@@ -17,7 +18,7 @@ struct rect
   rect();
 };
 
-struct WindowFlags
+struct window_flags
 {
   enum {
     Clear = 0
@@ -55,7 +56,7 @@ struct pixelformat
   pixelformat();
 };
 
-struct  WidgetEvents
+struct  widget_events
 {
   public:
     typedef boost::signal<void()> simple_event_type;
@@ -84,7 +85,7 @@ struct  WidgetEvents
     void set_on_configure( size_signal_type::slot_type const& slot );
     void set_on_mouse( mouse_signal_type::slot_type const& slot );
     void set_on_key( key_signal_type::slot_type const& slot );
-    virtual ~WidgetEvents();
+    virtual ~widget_events();
   protected:
     void exec_on_redraw();
     void exec_on_focus_enter();

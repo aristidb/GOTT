@@ -46,7 +46,7 @@ application::application( char const* connection )
     std::cout << "TEST" << std::endl;
     pixelformat format;
     rect region(0,0,1,1);
-    window win( *this, region, "glx-test-window", format, std::size_t(WindowFlags::Defaults) );
+    window win( *this, region, "glx-test-window", format, std::size_t(window_flags::Defaults) );
     std::cout << "TEST " <<  win.is_open() << std::endl;
     
     XSync( display, 0 );
@@ -304,7 +304,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
         key_code c = key_table::get_instance().translate_key( XLookupKeysym( &sym, 0) );
 
         key_info.set(c);
-        if ( win && win->flags & WindowFlags::KeyEvents )
+        if ( win && win->flags & window_flags::KeyEvents )
           win->exec_on_key( key_event( c, key_event::Press ) );
         break;
       }
@@ -316,7 +316,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
         key_code c = key_table::get_instance().translate_key( XLookupKeysym( &sym, 0) );
 
         key_info.unset(c);
-        if ( win && win->flags & WindowFlags::KeyEvents )
+        if ( win && win->flags & window_flags::KeyEvents )
           win->exec_on_key( key_event( c, key_event::Press ) );
         break;
       }
