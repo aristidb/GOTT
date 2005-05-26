@@ -46,6 +46,8 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
   if( is_open() )
     close();
 
+  format = p;
+
   handle = CreateWindowEx( WS_EX_APPWINDOW | WS_EX_WINDOWEDGE, app->get_appname(), "",
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,	NULL, NULL,	get_instance(), this);
 
@@ -63,7 +65,68 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
   if( fl & Visible )
     show();
 
+  SetwindowLongPtr( handle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this) );
+
+  dc = GetDC( handle );
+  if( dc == 0 )
+    throw runtime_error("context could not be aquired");
+
 }
+
+void window::create_context()
+{
+  context = wglCreateContext( dc );
+  if( context == 0 ) 
+    throw runtime_error("Error creating context");
+}
+
+void window::set_pixel_format()
+{
+  std::vector<boost::int32_t> values(24);
+
+  values.push_back( WGL_ACCELERATION_ARB );     values.push_back( WGL_FULL_ACCELERATION_ARB );
+  values.push_back( WGL_PIXEL_TYPE_ARB );       values.push_back( WGL_TYPE_RGBA_ARB );       
+  values.push_back( WGL_SUPPORT_OPENGL_ARB );   values.push_back( GL_TRUE );
+  values.push_back( WGL_DRAW_TO_WINDOW_ARB );   values.push_back( GL_TRUE );
+
+  if( format.flags & pixelformat::DoubleBuffer )  {
+    values.push_back( WGL_DOUBLE_BUFFER_ARB );  values.push_back( GL_TRUE );
+  }
+
+  if( format.samples.first && app->is_extension_supported( "GL_ARB_multisample" ) )
+  {
+    values.push_back( WGL_SAMPLES_BUFFERS_ARB );  values.push_back( GL_TRUE );
+    if( format.samples.second )  {
+      values.push_back( WGL_SAMPLES_ARB );  values.push_back( format.samples.second );
+    }
+  }
+  
+  if( format.color.first  ) {
+    values.push_back( WGL_COLOR_BITS_ARB ); values.push_back( format.color.second ); 
+  }
+  if( format.depth.first  ) {
+    values.push_back( WGL_DEPTH_BITS_ARB ); values.push_back( format.depth.second ); 
+  }
+  if( format.stencil.first  ) {
+    values.push_back( WGL_STENCIL_BITS_ARB ); values.push_back( format.stencil.second ); 
+  }
+
+  values.push_back( 0 );
+
+  PIXELFORMATDESCRIPTOR	pfd;
+  ZeroMemory( &pfd, sizeof( pfd ) );
+  unsigned int			result_count = 0;
+  int * descriptor;
+
+  app->get_os_support().choose_pixelformat( dc, &(values[0]), 0,  1, descriptor, &result_count );
+  if( result_count == 0 )
+    throw runtime_error("Failure finding pixelformat");
+
+  if( SetPixelFormat( dc, descriptor, &pfd  ) == 0 )
+    throw runtime_error("Failure setting pixelformat");
+  // try fallback?
+}
+
 
 void window::set_window_type( std::size_t fl )
 {

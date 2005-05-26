@@ -14,7 +14,7 @@
 using namespace std;
 
 
-namespace gott{ namespace gui{ namespace x11{
+namespace gott{ namespace gui{ namespace win32{
 
 application::application( HINSTANCE hi )
   : hinstance( hi ), focus_window( 0 )
@@ -38,24 +38,24 @@ void application::init_extensions()
 
   //create window 
   // get extensions
+  // wgl_functions.init();
   // end 
 }
 
-namespace {
-  
+os_gl const& application::get_os_support() const
+{
+  return wgl_functions;
+}
+
 LRESULT CALLBACK
-window_proc( HWND hwindow, UINT message, WPARAM wparam, LPARAM lparam )
+application::window_proc( HWND hwindow, UINT message, WPARAM wparam, LPARAM lparam )
 {
   if( message == WM_NCCREATE )
   {
-    CREATESTRUCT*	Data = reinterpret_cast<CREATESTRUCT*>(lparam);
-    window*	win = reinterpret_cast<window*>(Data->lpCreateParams);
+   // CREATESTRUCT*	Data = reinterpret_cast<CREATESTRUCT*>(lparam);
+   // window*	win = reinterpret_cast<window*>(Data->lpCreateParams);
 
-    SetwindowLongPtr( hwindow, GWLP_USERDATA, (LONG_PTR)window );
-
-    win->handle = hwindow;
-    win->dc = GetDC( hwindow );
-
+   // ?? 
     return DefwindowProc( hwindow, message, wparam, lparam );
   }
   else
@@ -68,27 +68,10 @@ window_proc( HWND hwindow, UINT message, WPARAM wparam, LPARAM lparam )
         {
           CREATESTRUCT*	Data = (CREATESTRUCT*)lparam;
 
-          // get pixel format from window 
-          // set pixel format
-          // create context
-          // 
+          win->set_pixel_format();
+          win->create_context();
 
-          if ( !_glsk_pixelformat_set_on_window( window, &pixelformat ) )
-            return -1;
-
-          if ( window->context->handle == NULL ) // create a physical context?
-            window->context->handle = wglCreateContext( window->dc );
-
-          if ( window->context->handle == NULL )
-            return -1;
-
-          window->context->refcount++;				
-
-          if ( window->callback.create_event )
-          {
-            if ( window->callback.create_event( window, Data->x, Data->y ) == 0 )
-              return -1;
-          }
+          win->exec_on_configure( rect( Data->x, Data->y, Data->cx, Data->cy ) );          
         }
         return 0;
 
@@ -298,7 +281,7 @@ void application::register_class( HINSTANCE hi, TCHAR* appname )
 
 	// init the wnd class
 	c.style =			/*CS_HREDRAW | CS_VREDRAW |*/ CS_OWNDC;
-	c.lpfnWndProc =		&window_proc;
+	c.lpfnWndProc =		&application::window_proc;
 	c.cbClsExtra =		0;
 	c.cbWndExtra =		0;
 	c.hInstance =		hi;

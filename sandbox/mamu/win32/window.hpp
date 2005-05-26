@@ -6,7 +6,7 @@
 #include <string>
 #include "../utility.hpp"
 
-namespace gott{ namespace gui{ namespace x11{
+namespace gott{ namespace gui{ namespace win32{
 
 class application;
 class window : public gott::gui::widget_events, public gott::gui::window_flags
@@ -23,8 +23,11 @@ class window : public gott::gui::widget_events, public gott::gui::window_flags
 
     std::size_t flags;
     window * parent;
+    pixelformat format;
 
     // Implementation specific functions:
+    void set_pixel_format();
+    void create_context();
 
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
@@ -43,7 +46,6 @@ class window : public gott::gui::widget_events, public gott::gui::window_flags
 
     bool is_open() const;
     bool has_decoration() const;
-    HWND get_handle() const;
     rect const& get_rect() const;
 
     void close();
@@ -64,6 +66,10 @@ class window : public gott::gui::widget_events, public gott::gui::window_flags
     virtual void on_mouse(gott::gui::mouse_event const&);
     virtual void on_key(gott::gui::key_event const&);
 
+
+    // implementation dependent ..
+    HWND get_handle() const;
+    
 };
 
 }}}
