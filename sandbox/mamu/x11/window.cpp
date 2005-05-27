@@ -75,7 +75,9 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
 	}
 	else
 	{
+    std::cout << "Using fallback " << std::endl;
 		visual_info = get_visualinfo( p );
+    std::cout << "visual info is" << visual_info << std::endl;
 	}
 		
 	// did we find a matching visual info too?
@@ -260,12 +262,9 @@ void window::hide()
 
 XVisualInfo* window::get_visualinfo( pixelformat const& format ) const
 {
-  std::vector<boost::int32_t> values(24);
+  std::vector<boost::int32_t> values;
   values.push_back( GLX_RGBA );
-	
-	if( format.flags & pixelformat::DoubleBuffer )
-		values.push_back( GLX_DOUBLEBUFFER );
-		
+    		
 	if( format.color.first )
 	{
     switch( format.color.second )
@@ -288,8 +287,15 @@ XVisualInfo* window::get_visualinfo( pixelformat const& format ) const
         values.push_back(GLX_BLUE_SIZE);
         values.push_back( 5 );
         break;
+      case 1:
+        values.push_back(GLX_RED_SIZE);
+        values.push_back( 1 );
+        values.push_back(GLX_GREEN_SIZE);
+        values.push_back( 1 );
+        values.push_back(GLX_BLUE_SIZE);
+        values.push_back( 1 );
       default:
-                break;
+        break;
     }
   }
   else{
@@ -300,6 +306,10 @@ XVisualInfo* window::get_visualinfo( pixelformat const& format ) const
     values.push_back(GLX_BLUE_SIZE);
     values.push_back( 1 );
   }
+
+if( format.flags & pixelformat::DoubleBuffer )
+		values.push_back( GLX_DOUBLEBUFFER );
+
   
   if( format.depth.first )
 	{
@@ -311,16 +321,15 @@ XVisualInfo* window::get_visualinfo( pixelformat const& format ) const
     values.push_back(GLX_DEPTH_SIZE);
     values.push_back(1);
   }
-
 	
   values.push_back( None );
-	
+ 	
 	return glXChooseVisual( app->get_display(), app->get_screen(), &(values[0]) );
 }
 
 GLXFBConfig	window::get_fbconfig( pixelformat const& format ) const
 {
-  std::vector<boost::int32_t> values(24);
+  std::vector<boost::int32_t> values;
 	GLXFBConfig*			Array = 0;
 	GLXFBConfig				Result = 0;
 	int						bits = 0;

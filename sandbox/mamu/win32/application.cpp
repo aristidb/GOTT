@@ -160,18 +160,16 @@ application::window_proc( HWND hwindow, UINT message, WPARAM wparam, LPARAM lpar
         {
           PAINTSTRUCT ps;
 
-          BeginPaint( window->handle, &ps );
+          BeginPaint( win->get_handle(), &ps );
+          win->exec_on_redraw();
 
-          if ( window->callback.redraw_event )
-            window->callback.redraw_event( window, 0 );
-
-          EndPaint( window->handle, &ps );	
+          EndPaint( win->get_handle(), &ps );	
         }
         return 0;
 
       case WM_MOVE:
         {
-          if ( (window->flags & GLSK_WINDOW_FULLSCREEN ) == 0 )
+          if( (window->flags & GLSK_WINDOW_FULLSCREEN ) == 0 )
           {
             RECT rectangle, workarea;
 
@@ -205,10 +203,7 @@ application::window_proc( HWND hwindow, UINT message, WPARAM wparam, LPARAM lpar
 
       case WM_CLOSE:
         {
-          if ( window->callback.close_event )
-            window->callback.close_event( window, 0 );
-          else
-            glsk_window_destroy( window );
+          win->close();
         }
         return 0;
 
