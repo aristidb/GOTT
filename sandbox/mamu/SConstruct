@@ -36,7 +36,7 @@ Export('env')
 
 SConscript(dirs = ['x11'])
 
-source_files = ['input.cpp', 'utility.cpp']
+source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp' ]
 
 # env.SharedLibrary('gottbase', source_files)
 env.StaticLibrary('gottbase', source_files)

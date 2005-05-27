@@ -254,9 +254,9 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
     case MotionNotify:
       {
         std::cout << "MotionNotify" << std::endl;
-        /*if ( _glsk_input_update_pointer_move( event.xmotion.x, event.xmotion.y, win) == 0 )
-          _glsk_send_mouse_event( window, event.xmotion.x, window->height-event.xmotion.y,
-          GLSK_ME_TYPE_MOVE, 0 );*/
+        mouse_info.update_primary_position( coord( event.xmotion.x, event.xmotion.y ) );
+        mouse_event ev( coord(event.xmotion.x, event.xmotion.y), coord(0,0) );
+        win->exec_on_mouse( ev );
         break;
       };
 
@@ -265,20 +265,18 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
         std::cout << "ButtonPress" << std::endl;
         //XSetInputFocus( display, win->get_handle(), RevertToPointerRoot, CurrentTime );
 
-        /*if ( _glsk_input_update_pointer_button( event.xbutton.button, 1 ) == 0 )
-          _glsk_send_mouse_event( win, event.xbutton.x, win->height-event.xbutton.y,
-          GLSK_ME_TYPE_BUTTONPRESSED, event.xbutton.button );*/
-
+        mouse_info.set_button( event.xbutton.button, true );
+        mouse_event ev( mouse_event::Press, event.xbutton.button );
+        win->exec_on_mouse( ev );
         break;
       };
 
     case ButtonRelease:
       {
         std::cout << "ButtonRelease" << std::endl;
-        /*if ( _glsk_input_update_pointer_button( event.xbutton.button, 0 ) == 0 )
-          _glsk_send_mouse_event( win, event.xbutton.x, win->height-event.xbutton.y,
-          GLSK_ME_TYPE_BUTTONRELEASED, event.xbutton.button );
-          */
+        mouse_info.set_button( event.xbutton.button, false );
+        mouse_event ev( mouse_event::Release, event.xbutton.button );
+        win->exec_on_mouse( ev );
         break;
       };
 

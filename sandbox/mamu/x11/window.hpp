@@ -9,7 +9,7 @@
 #include <X11/extensions/xf86vmode.h>
 #include <set>
 #include <string>
-#include "../utility.hpp"
+#include "../widget_events.hpp"
 
 namespace gott{ namespace gui{ namespace x11{
 
