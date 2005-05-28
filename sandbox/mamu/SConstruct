@@ -44,6 +44,6 @@ env.StaticLibrary('gottbase', source_files)
 x11_example_files= ['test_x11.cpp']
 libs=['gottx11', 'gottbase' ,'GL', 'GLU', 'X11', 'boost_signals', 'Xxf86vm']
 
-env.Program('test_x11', x11_example_files, LIBS=libs, LIBPATH=['.', 'x11/'])
+env.Program('test_x11', x11_example_files, LIBS=libs, LIBPATH=['.', 'x11/','/usr/X11R6/lib'])
 
 
