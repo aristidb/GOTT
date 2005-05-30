@@ -9,6 +9,7 @@ struct ft_manager{
     FT_Init_FreeType( &library );
   }
   ~ft_manager() {
+    FT_Done_FreeType(library);
   }
 };
 }

@@ -139,7 +139,6 @@ gott::gui::x11::window* application::find_window( ::Window handle )
   for( std::list<window*>::const_iterator it = windows.begin(),
       e= windows.end(); it!=e; ++it )
   {
-    std::cout << "find_window " << (*it)->get_handle()<< " == " <<  handle << std::endl;
     if( (*it)->get_handle() == handle )
       return *it;
   }
@@ -253,7 +252,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     case MotionNotify:
       {
-        std::cout << "MotionNotify" << std::endl;
+//        std::cout << "MotionNotify" << std::endl;
         mouse_info.update_primary_position( coord( event.xmotion.x, event.xmotion.y ) );
         mouse_event ev( coord(event.xmotion.x, event.xmotion.y), coord(0,0) );
         win->exec_on_mouse( ev );

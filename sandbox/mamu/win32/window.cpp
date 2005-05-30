@@ -82,7 +82,7 @@ void window::create_context()
 
 void window::set_pixel_format()
 {
-  std::vector<boost::int32_t> values(24);
+  std::vector<boost::int32_t> values;
 
   values.push_back( WGL_ACCELERATION_ARB );     values.push_back( WGL_FULL_ACCELERATION_ARB );
   values.push_back( WGL_PIXEL_TYPE_ARB );       values.push_back( WGL_TYPE_RGBA_ARB );       
