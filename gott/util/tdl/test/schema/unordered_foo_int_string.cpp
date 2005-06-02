@@ -142,11 +142,27 @@ void object::test<7>(int) {
 template<> template<>
 void object::test<8>(int) {
   run_test(L"77,foo,foo");
-  // TEST
+  stru::cf::nd_list c;
+  c.push_back(S(Xany(77), L"int"));
+  c.push_back(S(Xany(L"foo")));
+  c.push_back(S(Xany(L"foo"), L"string"));
+  C(M(c, L"ord"), L"doc").write_to(xp);
+  ensure_equals("reordered #1", tree, xp);
 }
 
 template<> template<>
 void object::test<9>(int) {
+  run_test(L"hallo\n4,foo");
+  stru::cf::nd_list c;
+  c.push_back(S(Xany(L"hallo"), L"string"));
+  c.push_back(S(Xany(-4), L"int"));
+  c.push_back(S(Xany(L"foo")));
+  C(M(c, L"ord"), L"doc").write_to(xp);
+  ensure_equals("reordered #2", tree, xp);
+}
+
+template<> template<>
+void object::test<10>(int) {
   no_test();
 }
 
