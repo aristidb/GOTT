@@ -37,7 +37,7 @@ public:
   revocable_structure &struc;
 
   buffer_t buffer;
-  size_t unconsumed, consumed;
+  size_t unconsumed, consumed, seeked;
   bool replay;
 
   IMPL(revocable_structure &s) 
@@ -72,7 +72,7 @@ positioning::id positioning::current() {
 }
 
 void positioning::seek(id const &x) {
-  p->unconsumed = x.first;
+  p->seeked = x.first;
   p->struc.revert(x.second);
   p->replay = true;
 }
@@ -89,7 +89,9 @@ void positioning::seek_and_forget(id const &x) {
 void positioning::replay(acceptor &acc) {
   if (p->replay) {
     p->replay = false;
-    for (; p->unconsumed < p->buffer.size(); ++p->unconsumed) {
+    for (p->unconsumed = p->seeked;
+         p->unconsumed < p->buffer.size();
+         ++p->unconsumed) {
       acc(get(p->buffer[p->unconsumed]));
       if (p->replay)
         break;
