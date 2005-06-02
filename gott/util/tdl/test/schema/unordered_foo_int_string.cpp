@@ -152,7 +152,7 @@ void object::test<8>(int) {
 
 template<> template<>
 void object::test<9>(int) {
-  run_test(L"hallo\n4,foo");
+  run_test(L"hallo\n-4,foo");
   stru::cf::nd_list c;
   c.push_back(S(Xany(L"hallo"), L"string"));
   c.push_back(S(Xany(-4), L"int"));
