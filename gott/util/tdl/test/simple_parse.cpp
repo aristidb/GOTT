@@ -258,9 +258,9 @@ RATING:   7\n\
 RIPPED:   T");
   parse(data, *this);
   std::wstring dataset[3][4] = {
-    L"Home",  L"Dixie Chicks", L"9", L"T",
-    L"Fly",   L"Dixie Chicks", L"8", L"T",
-    L"Roses", L"Kathy Mattea", L"7", L"T"
+    {L"Home",  L"Dixie Chicks", L"9", L"T"},
+    {L"Fly",   L"Dixie Chicks", L"8", L"T"},
+    {L"Roses", L"Kathy Mattea", L"7", L"T"}
   };
   B(); D();
     C(L"?schema songDB", true);
