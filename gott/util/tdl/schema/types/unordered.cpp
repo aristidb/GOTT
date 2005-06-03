@@ -47,7 +47,7 @@ match_unordered::~match_unordered() {
 
 bool match_unordered::play(ev::child_succeed const &) {
   pos->second.add();
-  if (pos->second.expectation() == rule::nothing)
+  if (pos->second.expectation() == rule::nothing) 
     children.erase(pos);
 
   if (children.empty())

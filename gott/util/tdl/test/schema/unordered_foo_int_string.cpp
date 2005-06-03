@@ -124,7 +124,7 @@ void object::test<6>(int) {
     run_test(L"4,x,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:3 : mismatch at token x");
+        std::string(mm.what()), "1:5 : mismatch at token y");
   }
 }
 
