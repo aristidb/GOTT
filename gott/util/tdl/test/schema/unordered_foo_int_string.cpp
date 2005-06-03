@@ -103,7 +103,7 @@ void object::test<4>(int) {
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token foo");
+        std::string(mm.what()), "1:5 : mismatch after token bar");
   }
 }
 

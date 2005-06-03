@@ -71,8 +71,12 @@ positioning::id positioning::current() {
   return std::make_pair(p->unconsumed, p->struc.point());
 }
 
+positioning::id positioning::next() {
+  return std::make_pair(p->unconsumed + 1, p->struc.point());
+}
+
 void positioning::seek(id const &x) {
-  p->seeked = x.first;
+  p->consumed = p->seeked = x.first;
   p->struc.revert(x.second);
   p->replay = true;
 }
@@ -92,13 +96,10 @@ void positioning::replay(acceptor &acc) {
     for (p->unconsumed = p->seeked;
          p->unconsumed < p->buffer.size();
          ) {
-      std::wcout << L'_';
-      acc(get(p->buffer[++p->unconsumed - 1]));
-      std::wcout << L"\tunconsumed:" << p->unconsumed << L" consumed:" << p->consumed << std::endl;
-      if (p->replay) {
-        std::wcout << L"interfering replay\n";
+      acc(get(p->buffer[p->unconsumed ]));
+      ++p->unconsumed;
+      if (p->replay) 
         break;
-      }
     }
   }
 }

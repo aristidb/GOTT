@@ -55,7 +55,7 @@ bool match_unordered::play(ev::child_succeed const &) {
   else {
     pos = children.begin();
     matcher().pos().forget(last);
-    last = matcher().pos().current();
+    last = matcher().pos().next();
     matcher().add(*pos->first);
   }
 
