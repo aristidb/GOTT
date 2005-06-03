@@ -9,7 +9,12 @@ struct gl_interface
 {
 };
 
-
+struct vert 
+{
+  vert() : x(0), y(0), z(0) {}
+  vert( double x_, double y_, double z_) : x(x_), y(y_), z(z_){}
+  double x, y, z;
+};
 struct coord
 {
   coord() : x(0), y(0) {}
