@@ -7,7 +7,6 @@
 #include "x11/window.hpp"
 #include "font.hpp"
 #include "font/vector_glyph.hpp"
-#include "ftgl/FTGLPolygonFont.h"
 
 using namespace std;
 using namespace gott::gui;
