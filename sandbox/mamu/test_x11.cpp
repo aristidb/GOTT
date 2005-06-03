@@ -116,7 +116,7 @@ class MyWindow : public gott::gui::x11::window
       
       glColor4f(1.0,1.0,1.0,1.0);
       char text[] = "Hallo Welt";
-      glTranslatef(0,0,0.25);
+      //glTranslatef(0,0,0.25);
       for ( std::size_t n = 0; n < sizeof(text); n++ )
       {
         GLenum e = glGetError();
@@ -124,7 +124,7 @@ class MyWindow : public gott::gui::x11::window
           std::cout << gluErrorString( e ) << std::endl;
         vector_glyph g( face, FT_Get_Char_Index( face, text[n] ) );
         g.render();
-        glTranslatef( (face->glyph->advance.x << 6 ), -(face->glyph->advance.y << 6 ), 0 );
+        glTranslatef( (face->glyph->advance.x/64.0f ), (face->glyph->advance.y/64.0f), 0 );
       }
  
       swap_buffer();
