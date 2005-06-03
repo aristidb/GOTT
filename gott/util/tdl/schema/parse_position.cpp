@@ -95,9 +95,8 @@ void positioning::replay(acceptor &acc) {
     p->replay = false;
     for (p->unconsumed = p->seeked;
          p->unconsumed < p->buffer.size();
-         ) {
-      acc(get(p->buffer[p->unconsumed ]));
-      ++p->unconsumed;
+         ++p->unconsumed) {
+      acc(get(p->buffer[p->unconsumed]));
       if (p->replay) 
         break;
     }
