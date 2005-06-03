@@ -42,10 +42,11 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
 
     for( int index = start; index != end; ++index )
     {
-      dat.contours.push_back( std::pair<size_t,size_t>( dat.verts.size() - 1, 0 ) );
+      dat.contours.push_back( std::pair<size_t,size_t>( dat.verts.size(), 0 ) );
       char tag = outline.tags[index];
 
-      if( tag == FT_Curve_Tag_On || (index + 1) == end )
+      //if( tag == FT_Curve_Tag_On || (index + 1) == end )
+      if( tag & 1 || (index + 1) == end )
       {
         dat.verts.push_back( v3_type(outline.points[index].x, outline.points[index].y, 0 ) );
       }
@@ -60,13 +61,15 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
           ? dat.verts[dat.contours.back().first]
           : v3_type(outline.points[index+1].x, outline.points[index+1].y, 0 );
 
-        if( tag == FT_Curve_Tag_Conic )
+        // if( tag == FT_Curve_Tag_Conic )
+         if( ! tag & 2 )
         {
           char next_tag = ( index == end - 1 )
             ? outline.tags[start]
             : outline.tags[index + 1];
 
-          while( next_tag == FT_Curve_Tag_Conic )
+          //while( next_tag == FT_Curve_Tag_Conic )
+          while( ! next_tag & 2 )
           {
             next = ( control_point + next ) * 0.5;
             conic( dat.verts, previous, control_point, next );
@@ -84,7 +87,7 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
           }
           conic( dat.verts, previous, control_point, next );
         }
-        else if( tag == FT_Curve_Tag_Cubic )
+        else if( tag & 2 )
         {
           v3_type control_point_2 = next;
           next = ( index == end - 2 )
@@ -207,8 +210,8 @@ void vector_glyph::render() const
   glPushMatrix();
 
   glScalef(1.0f/64.0f, 1.0f/64.0f, 1.0f/64.0f );
- // glDrawArrays( GL_LINE_LOOP, 0, orig_data.size() );
   glColor3f(0,0,1);
+//  glDrawArrays( GL_LINE_LOOP, 0, orig_data.size() );
   glDrawArrays( GL_POINTS, 0, orig_data.size() );
   //glTranslatef(0,20,0);
 
@@ -220,6 +223,8 @@ void vector_glyph::render() const
     glDrawArrays( GL_POINTS, it->first, it->count );
     glColor3f(1,0,0);
     glDrawArrays( GL_LINE_LOOP, it->first, it->count );
+    glColor3f(1,0,1);
+    glDrawArrays( it->mode, it->first, it->count );
 /*    glBegin( it->mode );
     for( std::size_t i = it->first, e = it->first + it->count; 
         i != e; ++i ) {
