@@ -150,6 +150,7 @@ void match::IMPL::replay_buffer() {
 
 template<bool tok>
 void match::IMPL::handle_event(ev::event const &e) {
+  std::wcout << e << std::endl;
   while (!parse.empty()) 
     if (handle_rule<tok>(e)) 
       break;

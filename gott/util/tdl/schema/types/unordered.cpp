@@ -46,12 +46,9 @@ match_unordered::~match_unordered() {
 }
 
 bool match_unordered::play(ev::child_succeed const &) {
-  std::wcout << L"success:" << std::distance(children.begin(), pos) << L'/' << children.size() << std::endl;
   pos->second.add();
-  if (pos->second.expectation() == rule::nothing) {
-    std::wcout << L"\terased" << std::endl;
+  if (pos->second.expectation() == rule::nothing) 
     children.erase(pos);
-  }
 
   if (children.empty())
     expectation = nothing;
@@ -66,7 +63,6 @@ bool match_unordered::play(ev::child_succeed const &) {
 }
 
 bool match_unordered::play(ev::child_fail const &) {
-  std::wcout << L"failure:" << std::distance(children.begin(), pos) << L'/' << children.size() << std::endl;
   matcher().pos().seek(last);
 
   if (++pos == children.end())

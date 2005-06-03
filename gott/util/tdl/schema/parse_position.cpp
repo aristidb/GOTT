@@ -49,7 +49,6 @@ positioning::~positioning() {}
 
 template<class T>
 void positioning::add(T const &t) {
-  std::wcout << L"adding:" << t << std::endl;
   p->buffer.push_back(t);
   p->unconsumed = p->buffer.size();
 }
@@ -69,7 +68,6 @@ bool positioning::proceeded(id const &x) const {
 }
 
 positioning::id positioning::current() {
-  std::wcout << L"reading:" << p->unconsumed << std::endl;
   return std::make_pair(p->unconsumed, p->struc.point());
 }
 
@@ -90,17 +88,18 @@ void positioning::seek_and_forget(id const &x) {
 
 void positioning::replay(acceptor &acc) {
   if (p->replay) {
-    std::wcout << L"starting replay:" << p->seeked << std::endl;
     p->replay = false;
     for (p->unconsumed = p->seeked;
          p->unconsumed < p->buffer.size();
          ) {
-      std::wcout << L"\treplaying:" << p->unconsumed << L'=' << get(p->buffer[p->unconsumed]) << std::endl;
-      acc(get(p->buffer[p->unconsumed++])); // NEW!! TODO: fix regressions
-      if (p->replay)
+      std::wcout << L'_';
+      acc(get(p->buffer[++p->unconsumed - 1]));
+      std::wcout << L"\tunconsumed:" << p->unconsumed << L" consumed:" << p->consumed << std::endl;
+      if (p->replay) {
+        std::wcout << L"interfering replay\n";
         break;
+      }
     }
-    std::wcout << L"done with replay" << std::endl;
   }
 }
 
