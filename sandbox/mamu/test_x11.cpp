@@ -65,7 +65,7 @@ class MyWindow : public gott::gui::x11::window
     {
       set_render_context();
       window::on_redraw();
-      glClearColor( 0.8, 0.3, 0.2, 1.0);
+      glClearColor( 0.4, 0.15, 0.1, 1.0);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       glLoadIdentity();
@@ -148,6 +148,8 @@ class MyWindow : public gott::gui::x11::window
       glDisable(GL_BLEND);
       glDisable(GL_ALPHA_TEST);
       glDisable(GL_STENCIL_TEST);
+      glEnable(GL_POINT_SMOOTH);
+      glPointSize( 2.0f );
 
     }
 };

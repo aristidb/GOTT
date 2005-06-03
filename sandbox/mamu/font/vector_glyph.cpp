@@ -97,9 +97,12 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
       }
     }
 
-    //dat.verts.push_back( v3_type( outline.points[  dat.contours.back().first ].x, outline.points[ dat.contours.back().first ].y, 0 ) );
-    dat.contours.back().second = dat.verts.size() - dat.contours.back().first + 1;
+    dat.verts.push_back( v3_type( outline.points[  dat.contours.back().first ].x, outline.points[ dat.contours.back().first ].y, 0 ) );
+    dat.contours.back().second = dat.verts.size() - dat.contours.back().first;
   }
+
+  orig_data = dat.verts;
+
   GLUtesselator *tessel  = gluNewTess();
   gluTessProperty(tessel, GLU_TESS_WINDING_RULE, outline.flags & ft_outline_even_odd_fill ? GLU_TESS_WINDING_ODD : GLU_TESS_WINDING_NONZERO );
   gluTessCallback( tessel, GLU_TESS_BEGIN_DATA, reinterpret_cast<GLvoid (*)()>(&vector_glyph::begin) );
@@ -182,7 +185,7 @@ void vector_glyph::end( vector_glyph * p )
 }
 void vector_glyph::vertex( v3_type * data, vector_glyph * p )
 {
-  p->va.push_back( *data /64.0 );
+  p->va.push_back( *data );
 }
 
 void vector_glyph::combine( double coords[3], void *d[4], GLfloat w[4], void **dataOut, vector_glyph * ptr ) 
@@ -200,11 +203,23 @@ void vector_glyph::render() const
   glDisableClientState( GL_INDEX_ARRAY );
   glDisableClientState( GL_NORMAL_ARRAY );
   glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-  glVertexPointer( 3, GL_DOUBLE, 0, &(va[0]) );
+  glVertexPointer( 3, GL_DOUBLE, 0, &(orig_data[0]) );
+  glPushMatrix();
 
+  glScalef(1.0f/64.0f, 1.0f/64.0f, 1.0f/64.0f );
+ // glDrawArrays( GL_LINE_LOOP, 0, orig_data.size() );
+  glColor3f(0,0,1);
+  glDrawArrays( GL_POINTS, 0, orig_data.size() );
+  //glTranslatef(0,20,0);
+
+
+  glVertexPointer( 3, GL_DOUBLE, 0, &(va[0]) );
   for( info_list::const_iterator it = ranges.begin(), e = ranges.end(); 
       it != e; ++it ) {
-    glDrawArrays( it->mode, it->first, it->count );
+    glColor3f(0,1,0);
+    glDrawArrays( GL_POINTS, it->first, it->count );
+    glColor3f(1,0,0);
+    glDrawArrays( GL_LINE_LOOP, it->first, it->count );
 /*    glBegin( it->mode );
     for( std::size_t i = it->first, e = it->first + it->count; 
         i != e; ++i ) {
@@ -213,6 +228,7 @@ void vector_glyph::render() const
     }
     glEnd();*/
   }
+  glPopMatrix();
   glPopClientAttrib();
 }
 

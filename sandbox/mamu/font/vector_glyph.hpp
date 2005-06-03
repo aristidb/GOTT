@@ -23,7 +23,7 @@ struct vector_glyph
     typedef std::list<mesh_info> info_list;
     
   private:
-    mesh_type va;
+    mesh_type va, orig_data;
     info_list ranges;
 
     void conic( std::vector<v3_type>& verts, v3_type const& begin, v3_type const& mid, v3_type const& end ) const;  
