@@ -45,7 +45,6 @@ vector_glyph::contour_point::contour_point( float x, float y, contour_point * pr
     next->previous = this;
   if( previous)
     previous->next= this;
-  std::cout << "Constructed with " << this << ", " << previous << ", " << next << std::endl;
 }
 
 
@@ -56,7 +55,6 @@ vector_glyph::contour_point::contour_point( vector_glyph::v2_type const &p, cont
     next->previous = this;
   if( previous)
     previous->next= this;
-  std::cout << "Constructed with " << this << ", " << previous << ", " << next << std::endl;
 }
 
 vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
@@ -82,8 +80,8 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
       char tag = outline.tags[index];
 
       //if( tag == FT_Curve_Tag_On || (index + 1) == end )
-/*      if( tag & 1 || (index + 1) == end )
-      {*/
+      //if( tag & 1 || (index + 1) == end )
+      //{
         if( first_point == 0 ) {
           first_point = new contour_point( outline.points[index].x, outline.points[index].y  );
           last_point = first_point->next = first_point->previous = first_point;
@@ -175,44 +173,86 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
   open_points_type open_points;
 
   vertex_array.reserve( points.size() );
- // index_array.reserve( points.size() );
-  
+
   for( std::list<contour_point*>::const_iterator it = points.begin(), e = points.end(); 
       it != e; ++ it ) {
-    // we need to first integrate a new point
-    // for all open_lines
-    //  1. Get all lines with positive distance greater than a epsilon to new point 
-    //    and more ifs 
-    //
-    // handle lines found:
-    //  reorder lines
-    //   lines with contour neighbours of new points get higher priority.
-    //   Idea: to make ugly triangles less likely:
-    //    * belohne adjacent pairs of open lines
-    //    * punish big projections on open line / distance to open line
-    //  create triangles from the first two lines or more
-    //   for each triangle to be created
-    //    remove line from open_lines 
-    //    if neighbour one is no contour
-    //     add new_point n_one to open_lines
-    //    if neighbour two is no contour
-    //     add new_point n_two to open_lines
-    //    addtrianges to storage
-    //   
-    //
-    // if none found 
-    //  for all open points
-    //    if new point is neighbour 
-    //      erase current point 
-    //      add a new line to open_lines
-    //
-    // if none found add point to open_point
+    /* This Slope implements a scanline algorithm  
+    
+     First problem knowing where in and out is: 
+     
+     y /|\ 
+        |  1 3    7 11
+        |     
+        |    4    8   
+        |     
+        |    5    9   
+        |        
+        |  2 6   10 12
+        |
+        +-------------------> x
+        a possible ordering of vertices when tesselateting the glyph H
+        the vertical ordering is abitrary!
+    
+     The first contour parts / lines / adjacent points, that will be found in points 
+     mark the left border(s) of a glyph. Thus the right side of the line is 'in' the 
+     glyph. Contour lines and inner lines of the glyph are called open lines, lines which
+     need triangles to reach the other 'side' of a contour, or another contour to end the
+     'in' region 
+    
+        Point_x                                Point_x     point_x+m 
+          *_________    some time later we       *__________* 
+       out *__in____    might find  =>        out *__in____*  'out'
+            *_______                               *______*
+           Point_x+n                              Point_x+n  
+    
+     The Line between Point_x+m and Point_x+n closes the open line between point_x and point_x+n. 
+     It is possible to calculate the normal and projection value of a hyper plane which will then 
+     describe the in and out region of that open line. 
+    
+     The list open_lines keeps all 'open' lines. 
+     Open points stores all points which could not yet be used to construct a triangle or opening and 
+     closeing line. These points need other points to create lines.
+    
+     Second Problem: Creating Triangles:
+      This is handled in the open_line-for_loop. tbc
+         
+    
+     some uncomplete outline of the algorithm:
+     we need to first integrate a new point
+     for all open_lines
+      1. Get all lines with positive distance greater than a epsilon to new point 
+        and more ifs 
+    
+     handle lines found:
+      reorder lines
+       lines with contour neighbours of new points get higher priority.
+       Idea: to make ugly triangles less likely:
+        * belohne adjacent pairs of open lines
+        * punish big projections on open line / distance to open line
+      create triangles from the first two lines or more
+       for each triangle to be created
+        remove line from open_lines 
+        if neighbour one is no contour
+         add new_point n_one to open_lines
+        if neighbour two is no contour
+         add new_point n_two to open_lines
+        addtrianges to storage
+       
+    
+     if none found 
+      for all open points
+        if new point is neighbour 
+          erase current point 
+          add a new line to open_lines
+    
+     if none found add point to open_point
+     */
     
     std::list<open_lines_type::iterator> possible_lines;
 
     for( std::list<line>::iterator l_it = open_lines.begin(), l_e = open_lines.end(); 
         l_it != l_e; ++l_it ){
-      
+
       if( l_it->border.distance( (*it)->point ) > 0.01f ){
         if( (*it)->next == l_it->a || (*it)->next == l_it->b ){
           possible_lines.push_front( l_it ); 
@@ -250,7 +290,7 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
         }
         else 
         {
-        //  std::cout << "*it:" << *it << " (*p_it)->previous:" << (*p_it)->previous << " (*p_it)->next" << (*p_it)->next << std::endl;
+          //  std::cout << "*it:" << *it << " (*p_it)->previous:" << (*p_it)->previous << " (*p_it)->next" << (*p_it)->next << std::endl;
           ++p_it;
         }
       }
@@ -260,7 +300,7 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
     }
     else
     {
-      
+
       for( std::list<open_lines_type::iterator>::const_iterator l_it = possible_lines.begin(), l_e = possible_lines.end();
           l_it != l_e; ++l_it ) {
         //(*it)->array_index = vertex_array.size();
@@ -288,14 +328,13 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
       }
     }
   } 
-    
-  
 
-/*  while( ! points.empty() )
-  {
-    delete points.back();
-    points.pop_back();
-  }*/
+
+  /*  while( ! points.empty() )
+      {
+      delete points.back();
+      points.pop_back();
+      }*/
 }
 
 void vector_glyph::conic( std::list<contour_point*>& points, contour_point * begin, v2_type const& mid, contour_point * end ) const
@@ -316,7 +355,7 @@ void vector_glyph::conic( std::list<contour_point*>& points, contour_point * beg
   }
   end->previous = previous;
   previous->next = end;
-  
+
 }
 
 void vector_glyph::cubic( std::list<contour_point*>& points, contour_point * begin, v2_type const& mid_1, v2_type const& mid_2, contour_point * end ) const
@@ -378,7 +417,7 @@ void vector_glyph::render() const
 
   glPopMatrix();
   glPopClientAttrib();
-  
+
 }
 
 
