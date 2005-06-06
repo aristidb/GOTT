@@ -115,7 +115,7 @@ class MyWindow : public gott::gui::x11::window
       glEnd();
       
       glColor4f(1.0,1.0,1.0,1.0);
-      char text[] = "H"; //allo Welt";
+      char text[] = "H";
       //glTranslatef(0,0,0.25);
       for ( std::size_t n = 0; n < sizeof(text) - 1; n++ )
       {
