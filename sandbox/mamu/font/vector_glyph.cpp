@@ -90,17 +90,9 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
           points.push_back( first_point );
         }
         else {
-          contour_point * n_p = new contour_point( outline.points[index].x, outline.points[index].y ); 
-          n_p->previous = last_point;
-          n_p->next= first_point;
-
-          last_point->next = n_p;
-          first_point->previous=n_p;
-
-          last_point = n_p;
-
-          points.push_back( n_p );
-          //      points.back()->next = first_point;
+          points.push_back( new contour_point( outline.points[index].x, outline.points[index].y, last_point, first_point ) ); 
+          last_point->next = points.back();
+          last_point = points.back();
         }/*
       }
       else
@@ -299,11 +291,11 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
     
   
 
-  while( ! points.empty() )
+/*  while( ! points.empty() )
   {
     delete points.back();
     points.pop_back();
-  }
+  }*/
 }
 
 void vector_glyph::conic( std::list<contour_point*>& points, contour_point * begin, v2_type const& mid, contour_point * end ) const
@@ -368,9 +360,21 @@ void vector_glyph::render() const
   glVertexPointer( 2, GL_FLOAT, 0, &(vertex_array[0]) );
 
 
-  glColor4f(1,0,1,0.125);
-  
-  glDrawArrays( GL_TRIANGLES, 0, vertex_array.size() );
+  glColor4f(1,0,1,0.5);
+  for(std::list<contour_point*>::const_iterator it = contours.begin(), e = contours.end(); it != e; ++it )
+  {
+    glBegin( GL_LINE_LOOP );
+    contour_point * p = *it;
+    do {
+      std::cout << p << std::endl;
+      glVertex2fv(reinterpret_cast<float*>(&(p->point)));
+      p=p->next;
+    }
+    while( *it != p );
+    glEnd();
+  }
+
+  //glDrawArrays( GL_TRIANGLES, 0, vertex_array.size() );
 
   glPopMatrix();
   glPopClientAttrib();
