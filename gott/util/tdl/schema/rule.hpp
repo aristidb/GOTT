@@ -77,7 +77,7 @@ public:
   attributes const &get_attributes() const EXPORT;
     // get the attributes associated with this rule
 
-  //virtual wchar_t const *name() const EXPORT = 0;
+  virtual wchar_t const *name() const EXPORT = 0;
     // well, mangled typeid() names are hard to read!
 
 protected:

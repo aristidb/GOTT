@@ -32,20 +32,14 @@ using stru::cf::C;
 typedef schema::rule::attributes RA;
 
 namespace {
-struct schema_unordered_foo_integer_string : tut::schema_basic {
-  schema_unordered_foo_integer_string() {
+struct schema_named_string : tut::schema_basic {
+  schema_named_string() {
     context.begin(schema::match_document::factory::index(), 
                   RA(wstring(L"doc")));
-      context.begin(schema::match_unordered::factory::index(),
-                    RA(wstring(L"ord")));
-        context.begin(schema::match_literal::factory::index(),
-                      schema::match_literal::attributes(wstring(L"foo")));
-        context.end();
-        context.begin(schema::match_integer::factory::index(),
-                      RA(wstring(L"int")));
-        context.end();
+      context.begin(schema::match_named::factory::index(),
+                    schema::match_named::attributes(L"ND"));
         context.begin(schema::match_string::factory::index(),
-                      RA(wstring(L"string")));
+                    RA(wstring(L"S")));
         context.end();
       context.end();
     context.end();
@@ -54,24 +48,21 @@ struct schema_unordered_foo_integer_string : tut::schema_basic {
 }
 
 namespace tut {
-typedef test_group<schema_unordered_foo_integer_string> tf;
+typedef test_group<schema_named_string> tf;
 typedef tf::object object;
 }
 
 namespace {
-  tut::tf ordered_integer_string_test("schema::unordered_foo_integer_string");
+  tut::tf named_string_test("schema::named_string");
 }
 
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"foo\n4\nx");
+  run_test(L"ND\n zz");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"foo")));
-  c.push_back(S(Xany(4), L"int"));
-  c.push_back(S(Xany(L"x"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
-  ensure_equals("single ordered_integer_string entity", tree, xp);
+  C(C(S(Xany(L"zz"), L"S"), L"ND"), L"doc").write_to(xp);
+  ensure_equals("single follow_integer_integer entity", tree, xp);
 }
 
 template<> template<>
@@ -81,7 +72,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token d7");
+        std::string(mm.what()), "1:1 : mismatch at token d7");
   }
 }
 
@@ -99,70 +90,49 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"foo bar");
-    fail("string following string");
+    run_test(L"ND,foo");
+    fail("non-followed string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch after token bar");
+        std::string(mm.what()), "1:4 : mismatch at token foo");
   }
 }
 
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"foo");
-    fail("just foo");
+    run_test(L"4");
+    fail("just one integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token foo");
+        std::string(mm.what()), "1:1 : mismatch at token 4");
   }
 }
 
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"4,x,y");
+    run_test(L"4 99,y");
+    fail("nonsense");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch at token y");
+        std::string(mm.what()), "1:1 : mismatch at token 4");
   }
 }
 
 template<> template<>
 void object::test<7>(int) {
   try {
-    run_test(L"732 bar");
-    fail("string following integer");
+    run_test(L"ND");
+    fail("just label");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 732");
+        std::string(mm.what()), "1:1 : mismatch after token ND");
   }
 }
 
 template<> template<>
 void object::test<8>(int) {
-  run_test(L"77,foo,foo");
-  stru::cf::nd_list c;
-  c.push_back(S(Xany(77), L"int"));
-  c.push_back(S(Xany(L"foo")));
-  c.push_back(S(Xany(L"foo"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
-  ensure_equals("reordered #1", tree, xp);
-}
-
-template<> template<>
-void object::test<9>(int) {
-  run_test(L"hallo\n-4,foo");
-  stru::cf::nd_list c;
-  c.push_back(S(Xany(L"hallo"), L"string"));
-  c.push_back(S(Xany(-4), L"int"));
-  c.push_back(S(Xany(L"foo")));
-  C(M(c, L"ord"), L"doc").write_to(xp);
-  ensure_equals("reordered #2", tree, xp);
-}
-
-template<> template<>
-void object::test<10>(int) {
   no_test();
 }
 

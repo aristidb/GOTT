@@ -35,6 +35,8 @@ public:
   typedef factory_template::somechildren<match_follow, 2> factory;
   match_follow(rule::factory const * const a[2], rule::attributes const &a, 
                match &m) EXPORT;
+
+  wchar_t const *name() const { return L"follow"; }
   
 private:
   rule::factory const &pre, &post;

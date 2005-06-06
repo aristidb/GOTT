@@ -32,20 +32,26 @@ using stru::cf::C;
 typedef schema::rule::attributes RA;
 
 namespace {
-struct schema_unordered_foo_integer_string : tut::schema_basic {
-  schema_unordered_foo_integer_string() {
+struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {
+   schema_any_ordered_integer_string__integer_string() {
     context.begin(schema::match_document::factory::index(), 
                   RA(wstring(L"doc")));
-      context.begin(schema::match_unordered::factory::index(),
-                    RA(wstring(L"ord")));
-        context.begin(schema::match_literal::factory::index(),
-                      schema::match_literal::attributes(wstring(L"foo")));
+      context.begin(schema::match_any::factory::index(),
+                    RA(wstring(L"any")));
+        context.begin(schema::match_ordered::factory::index(),
+                      RA(wstring(L"ord")));
+          context.begin(schema::match_integer::factory::index(),
+                      RA(wstring(L"int")));
+          context.end();
+          context.begin(schema::match_string::factory::index(),
+                      RA(wstring(L"string")));
+          context.end();
         context.end();
         context.begin(schema::match_integer::factory::index(),
-                      RA(wstring(L"int")));
+                      RA(wstring(L"int2")));
         context.end();
         context.begin(schema::match_string::factory::index(),
-                      RA(wstring(L"string")));
+                      RA(wstring(L"string2")));
         context.end();
       context.end();
     context.end();
@@ -54,35 +60,30 @@ struct schema_unordered_foo_integer_string : tut::schema_basic {
 }
 
 namespace tut {
-typedef test_group<schema_unordered_foo_integer_string> tf;
+typedef test_group<schema_any_ordered_integer_string__integer_string> tf;
 typedef tf::object object;
 }
 
 namespace {
-  tut::tf ordered_integer_string_test("schema::unordered_foo_integer_string");
+  tut::tf test_any_ordered_integer_string__integer_string("schema::any(ordered(integer,string),integer,string)");
 }
 
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"foo\n4\nx");
+  run_test(L"4\nx");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"foo")));
   c.push_back(S(Xany(4), L"int"));
   c.push_back(S(Xany(L"x"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  C(C(M(c, L"ord"), L"any"), L"doc").write_to(xp);
   ensure_equals("single ordered_integer_string entity", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
-  try {
-    run_test(L"d7");
-    fail("just string");
-  } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token d7");
-  }
+  run_test(L"d7");
+  C(C(S(Xany(L"d7"), L"string2"), L"any"), L"doc").write_to(xp);
+  ensure_equals("just string", tree, xp);
 }
 
 template<> template<>
@@ -103,19 +104,15 @@ void object::test<4>(int) {
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch after token bar");
+        std::string(mm.what()), "1:1 : mismatch after token foo");
   }
 }
 
 template<> template<>
 void object::test<5>(int) {
-  try {
-    run_test(L"foo");
-    fail("just foo");
-  } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token foo");
-  }
+  run_test(L"4");
+  C(C(S(Xany(4), L"int2"), L"any"), L"doc").write_to(xp);
+  ensure_equals("just integer", tree, xp);
 }
 
 template<> template<>
@@ -141,28 +138,6 @@ void object::test<7>(int) {
 
 template<> template<>
 void object::test<8>(int) {
-  run_test(L"77,foo,foo");
-  stru::cf::nd_list c;
-  c.push_back(S(Xany(77), L"int"));
-  c.push_back(S(Xany(L"foo")));
-  c.push_back(S(Xany(L"foo"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
-  ensure_equals("reordered #1", tree, xp);
-}
-
-template<> template<>
-void object::test<9>(int) {
-  run_test(L"hallo\n-4,foo");
-  stru::cf::nd_list c;
-  c.push_back(S(Xany(L"hallo"), L"string"));
-  c.push_back(S(Xany(-4), L"int"));
-  c.push_back(S(Xany(L"foo")));
-  C(M(c, L"ord"), L"doc").write_to(xp);
-  ensure_equals("reordered #2", tree, xp);
-}
-
-template<> template<>
-void object::test<10>(int) {
   no_test();
 }
 

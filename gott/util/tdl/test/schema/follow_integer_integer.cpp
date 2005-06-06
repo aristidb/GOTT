@@ -118,6 +118,7 @@ template<> template<>
 void object::test<6>(int) {
   try {
     run_test(L"4 99,y");
+    fail("follows");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
         std::string(mm.what()), "1:6 : mismatch at token y");

@@ -37,6 +37,8 @@ public:
   
   typedef factory_template::nochild<match_enumeration> factory;
   match_enumeration(rule::attributes const &, match &) EXPORT;
+
+  wchar_t const *name() const { return L"enumeration"; }
   
 private:
   bool play(ev::node const &);
