@@ -185,6 +185,12 @@ vector2<TypeL> operator+( vector2<TypeL> const& l, vector2<TypeR> const& r )
 	return vector2<TypeL>( l[0] + r[0], l[1] + r[1] );
 }
 
+template <typename Type>
+Type operator|( vector2<Type> const& l, vector2<Type> const& r )
+{
+	return l[0]*r[0]+l[1]*r[1];
+}
+
 template <typename TypeL,typename TypeR>
 vector2<TypeL> operator-( vector2<TypeL> const& l, vector2<TypeR> const& r )
 {

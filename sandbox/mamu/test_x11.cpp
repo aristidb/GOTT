@@ -65,7 +65,7 @@ class MyWindow : public gott::gui::x11::window
     {
       set_render_context();
       window::on_redraw();
-      glClearColor( 0.4, 0.15, 0.1, 1.0);
+      glClearColor( 0.8, 0.8, 0.8, 1.0);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       glLoadIdentity();
@@ -107,17 +107,17 @@ class MyWindow : public gott::gui::x11::window
       
       glBegin(GL_TRIANGLES);
       glColor3f(1.0,0,0);
-      glVertex2i( 200,250);
+      glVertex2i( 400,450);
       glColor3f(0,1,0);
-      glVertex2i( 50,50);
+      glVertex2i( 250,250);
       glColor3f(0,0,1);
-      glVertex2i( 500,30);
+      glVertex2i( 700,230);
       glEnd();
       
       glColor4f(1.0,1.0,1.0,1.0);
-      char text[] = "Hallo Welt";
+      char text[] = "H"; //allo Welt";
       //glTranslatef(0,0,0.25);
-      for ( std::size_t n = 0; n < sizeof(text); n++ )
+      for ( std::size_t n = 0; n < sizeof(text) - 1; n++ )
       {
         GLenum e = glGetError();
         if( e != GL_NO_ERROR )
@@ -145,11 +145,12 @@ class MyWindow : public gott::gui::x11::window
       glDisable(GL_LIGHTING );
       glDisable(GL_DEPTH_TEST);
       glDisable(GL_TEXTURE_2D);
-      glDisable(GL_BLEND);
       glDisable(GL_ALPHA_TEST);
+      glEnable(GL_BLEND);
       glDisable(GL_STENCIL_TEST);
       glEnable(GL_POINT_SMOOTH);
       glPointSize( 2.0f );
+      glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
     }
 };

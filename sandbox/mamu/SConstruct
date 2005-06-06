@@ -3,24 +3,23 @@ import os
 import glob 
 
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
-cflags = ARGUMENTS.get('cflags', '-Wall -W')
+cflags = ARGUMENTS.get('cflags', ['-Wall','-W'])
 release = int(ARGUMENTS.get('release', 1))
 if release:
-	debug = 1
-	opt = '-O0'
+	debug = 0
+	opt = ['-O3']
 else:
 	debug = 1
-	opt = '-O0'
 debug = int(ARGUMENTS.get('debug', debug))
 opt = ARGUMENTS.get('opt', opt)
-cflags += ' ' + opt
+cflags = [cflags, opt]
 if debug:
-	cflags += ' -ggdb3'
+	cflags += ['-ggdb3','-O0']
 	cppdef = ['DEBUG']
 else:
 	cppdef = ['NDEBUG']
 caux = ARGUMENTS.get('aux', '')
-cflags += ' ' + caux
+cflags += [caux]
 cflagsoverride = ARGUMENTS.get('cfoverride', 0)
 if cflagsoverride:
 	cflags = cflagsoverride

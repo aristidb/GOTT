@@ -1,13 +1,63 @@
 
+#include <algorithm>
 #include <stdexcept>
 #include <iostream>
 #include <GL/glu.h>
 #include <freetype/ftoutln.h>
 #include "vector_glyph.hpp"
+#include "../math/hyper_plane.hpp"
 
 using namespace std;
 
 namespace gott{namespace gui{namespace font{
+
+struct line {
+  vector_glyph::contour_point *a, *b;
+  gott::math::hyper_plane2<float> border; 
+  bool is_contour; 
+  line( vector_glyph::contour_point *first, vector_glyph::contour_point *second, vector_glyph::contour_point *test_point, bool is_contour = false );
+  /**
+   *
+   */
+  vector_glyph::contour_point * get_neighbour_point_of_a() const;
+  vector_glyph::contour_point * get_neighbour_point_of_b() const;
+};
+
+line::line(vector_glyph::contour_point *f, vector_glyph::contour_point *s, vector_glyph::contour_point *t, bool is_c )
+  : a(f), b(s), border(f->point, s->point, t->point ), is_contour(is_c)
+{
+}
+
+vector_glyph::contour_point * line::get_neighbour_point_of_a() const
+{
+  return ( a->next ==  b )?a->previous:a->next;
+}
+vector_glyph::contour_point * line::get_neighbour_point_of_b() const
+{
+  return ( b->next ==  a )?b->previous:b->next;
+}
+
+
+vector_glyph::contour_point::contour_point( float x, float y, contour_point * prev, contour_point* ne )
+  : point(x,y), previous(prev), next(ne), array_index(-1)
+{
+  if( next )
+    next->previous = this;
+  if( previous)
+    previous->next= this;
+  std::cout << "Constructed with " << this << ", " << previous << ", " << next << std::endl;
+}
+
+
+vector_glyph::contour_point::contour_point( vector_glyph::v2_type const &p, contour_point * prev, contour_point* ne )
+  : point(p), previous(prev), next(ne), array_index(-1)
+{
+  if( next )
+    next->previous = this;
+  if( previous)
+    previous->next= this;
+  std::cout << "Constructed with " << this << ", " << previous << ", " << next << std::endl;
+}
 
 vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
 {
@@ -16,295 +66,317 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
     throw runtime_error("Fehler bei FT_Set_Char_Size");
 
   FT_Outline & outline =  face->glyph->outline;
-  ft_info dat;
-#if 0 
-  FT_Outline_Funcs funcs;
-  funcs.move_to = (FT_Outline_MoveToFunc)&vector_glyph::move_to;
-  funcs.line_to = (FT_Outline_LineToFunc)&vector_glyph::line_to;
-  funcs.conic_to = (FT_Outline_ConicToFunc)&vector_glyph::conic_to;
-  funcs.cubic_to = (FT_Outline_CubicToFunc)&vector_glyph::cubic_to;
-  funcs.shift = 0;
-  funcs.delta = 0;
-
-  FT_Outline_Decompose( &outline, &funcs, &dat);
-  error = FT_Outline_Decompose( &outline, &funcs, &dat);
-  if(error)
-    throw runtime_error("Fehler bei FT_Outline_Decompose");
-#endif 
-//if 0
   
+
   int start = 0, end = 0;
-  for( std::size_t  i = 0; i < outline.n_contours; ++i )
+  for( int  i = 0; i < outline.n_contours; ++i )
   {
     start = end;
     end = outline.contours[i] + 1;
 
 
-    for( int index = start; index != end; ++index )
+    int my_end = end;
+    contour_point *first_point = 0, *last_point = 0;
+    for( int index = start; index < my_end; ++index )
     {
-      dat.contours.push_back( std::pair<size_t,size_t>( dat.verts.size(), 0 ) );
       char tag = outline.tags[index];
 
       //if( tag == FT_Curve_Tag_On || (index + 1) == end )
-      if( tag & 1 || (index + 1) == end )
-      {
-        dat.verts.push_back( v3_type(outline.points[index].x, outline.points[index].y, 0 ) );
+/*      if( tag & 1 || (index + 1) == end )
+      {*/
+        if( first_point == 0 ) {
+          first_point = new contour_point( outline.points[index].x, outline.points[index].y  );
+          last_point = first_point->next = first_point->previous = first_point;
+          points.push_back( first_point );
+        }
+        else {
+          contour_point * n_p = new contour_point( outline.points[index].x, outline.points[index].y ); 
+          n_p->previous = last_point;
+          n_p->next= first_point;
+
+          last_point->next = n_p;
+          first_point->previous=n_p;
+
+          last_point = n_p;
+
+          points.push_back( n_p );
+          //      points.back()->next = first_point;
+        }/*
       }
       else
       {
-        v3_type control_point( outline.points[index].x, outline.points[index].y, 0 );
-        v3_type previous = ( start == index )
-          ? v3_type( outline.points[ end - 1].x , outline.points[ end - 1].y , 0 )
-          : v3_type( outline.points[ index - 1].x , outline.points[ index - 1].y , 0 ); // hopfefully correct 
-           // originally : dat.verts.back();
-        v3_type next = ( index == end - 1 )
-          ? dat.verts[dat.contours.back().first]
-          : v3_type(outline.points[index+1].x, outline.points[index+1].y, 0 );
-
-        // if( tag == FT_Curve_Tag_Conic )
-         if( ! tag & 2 )
+        if( first_point == 0 ) // assume that the last point in contour is an in point ... hopefully correct!
         {
-          char next_tag = ( index == end - 1 )
+          first_point = new contour_point( outline.points[my_end - 1].x, outline.points[my_end -1].y  );
+          last_point = first_point->next = first_point->previous = first_point;
+          points.push_back( first_point );
+          --my_end; // reduce my_end
+        }
+        
+        v2_type control_point( outline.points[index].x, outline.points[index].y );
+        contour_point * previous = points.back();
+
+        if( ! tag & 2 )
+        {
+          char next_tag = ( index == my_end - 1 )
             ? outline.tags[start]
             : outline.tags[index + 1];
 
           //while( next_tag == FT_Curve_Tag_Conic )
-          while( ! next_tag & 2 )
-          {
-            next = ( control_point + next ) * 0.5;
-            conic( dat.verts, previous, control_point, next );
-            ++index;
+          contour_point * next;
 
-            previous = next;
-            control_point = v3_type(outline.points[index].x, outline.points[index].y, 0 );
-            next = ( index == end - 1 )
-              ? dat.verts[dat.contours.back().first]
-              : v3_type(outline.points[index+1].x, outline.points[index+1].y, 0 );
+          v2_type data;
+          if( index == my_end - 1 )  data = first_point->point;
+          else data = v2_type(outline.points[index+1].x, outline.points[index+1].y);
 
-            next_tag = ( index == end - 1 )
-              ? outline.tags[start]
-              : outline.tags[index + 1];
+          if( next_tag & 2 ) // further conic segments follow => median of two control points defines contour point
+            data =  ( data + control_point ) * 0.5f;
+          
+          if( index == my_end - 1 ){
+            first_point->point = data;
+            next = first_point;
           }
-          conic( dat.verts, previous, control_point, next );
+          else  {
+            next = new contour_point( data, 0, first_point ); 
+            points.push_back( next );
+            last_point = next;
+          }
+
+          conic( points, previous, control_point, next );
         }
         else if( tag & 2 )
         {
-          v3_type control_point_2 = next;
-          next = ( index == end - 2 )
-              ? dat.verts[dat.contours.back().first]
-              : v3_type(outline.points[index+2].x, outline.points[index+2].y, 0 );
+          contour_point *next;
+          v2_type control_point_2;
+          if( index == my_end - 1 ){
+            control_point_2  = first_point->point;
+            next = first_point->next;
+          }
+          else if( index == my_end -2 ) {
+            control_point_2 = v2_type ( outline.points[index+1].x, outline.points[index+1].y );
+            next = first_point;
+          }
+          else {
+            control_point_2 = v2_type ( outline.points[index+1].x, outline.points[index+1].y );
+            next = new contour_point(outline.points[index+2].x, outline.points[index+2].y, 0, first_point );
+            points.push_back( next );
+            last_point = next;
+          }
 
-          cubic( dat.verts, previous, control_point, control_point_2, next );
+          cubic( points, previous, control_point, control_point_2, next );
           ++index;
+        }
+      }*/
+    }
+    //  dat.verts.push_back( v2_type( outline.points[  dat.contours.back().first ].x, outline.points[ dat.contours.back().first ].y  ) );
+  
+    contours.push_back( first_point );
+  }
+
+  points.sort( scanline_ordering() );
+
+
+
+  typedef std::list<line> open_lines_type;
+  open_lines_type open_lines;
+  typedef std::list<contour_point*> open_points_type;
+  open_points_type open_points;
+
+  vertex_array.reserve( points.size() );
+ // index_array.reserve( points.size() );
+  
+  for( std::list<contour_point*>::const_iterator it = points.begin(), e = points.end(); 
+      it != e; ++ it ) {
+    // we need to first integrate a new point
+    // for all open_lines
+    //  1. Get all lines with positive distance greater than a epsilon to new point 
+    //    and more ifs 
+    //
+    // handle lines found:
+    //  reorder lines
+    //   lines with contour neighbours of new points get higher priority.
+    //   Idea: to make ugly triangles less likely:
+    //    * belohne adjacent pairs of open lines
+    //    * punish big projections on open line / distance to open line
+    //  create triangles from the first two lines or more
+    //   for each triangle to be created
+    //    remove line from open_lines 
+    //    if neighbour one is no contour
+    //     add new_point n_one to open_lines
+    //    if neighbour two is no contour
+    //     add new_point n_two to open_lines
+    //    addtrianges to storage
+    //   
+    //
+    // if none found 
+    //  for all open points
+    //    if new point is neighbour 
+    //      erase current point 
+    //      add a new line to open_lines
+    //
+    // if none found add point to open_point
+    
+    std::list<open_lines_type::iterator> possible_lines;
+
+    for( std::list<line>::iterator l_it = open_lines.begin(), l_e = open_lines.end(); 
+        l_it != l_e; ++l_it ){
+      
+      if( l_it->border.distance( (*it)->point ) > 0.01f ){
+        if( (*it)->next == l_it->a || (*it)->next == l_it->b ){
+          possible_lines.push_front( l_it ); 
+        }
+        else { 
+          contour_point * n_a = l_it->get_neighbour_point_of_a();
+          contour_point * n_b = l_it->get_neighbour_point_of_b();
+          math::hyper_plane2<float> p_a, p_b;
+          if( n_a )
+            p_a = math::hyper_plane2<float>( l_it->a->point, n_a->point, l_it->b->point ); 
+          if( n_b )
+            p_b = math::hyper_plane2<float>( l_it->b->point, n_b->point, l_it->a->point ); 
+
+          if( n_a && n_b && p_a.distance( (*it)->point ) > 0 &&  p_b.distance( (*it)->point ) > 0 )  // this test suffices because points are ordered
+            possible_lines.push_back( l_it );
         }
       }
     }
 
-    dat.verts.push_back( v3_type( outline.points[  dat.contours.back().first ].x, outline.points[ dat.contours.back().first ].y, 0 ) );
-    dat.contours.back().second = dat.verts.size() - dat.contours.back().first;
-  }
 
-  orig_data = dat.verts;
+    if( possible_lines.empty() )  {
+      bool something_found = false;
 
-  GLUtesselator *tessel  = gluNewTess();
-  gluTessProperty(tessel, GLU_TESS_WINDING_RULE, outline.flags & ft_outline_even_odd_fill ? GLU_TESS_WINDING_ODD : GLU_TESS_WINDING_NONZERO );
-  gluTessCallback( tessel, GLU_TESS_BEGIN_DATA, reinterpret_cast<GLvoid (*)()>(&vector_glyph::begin) );
-  gluTessCallback( tessel, GLU_TESS_VERTEX_DATA, reinterpret_cast<GLvoid (*)()>(&vector_glyph::vertex ));
-  gluTessCallback( tessel, GLU_TESS_END_DATA, reinterpret_cast<GLvoid (*)()>(&vector_glyph::end ));
-  gluTessCallback( tessel, GLU_TESS_COMBINE_DATA, reinterpret_cast<GLvoid (*)()>(&vector_glyph::combine ));
-  gluTessCallback( tessel, GLU_TESS_ERROR_DATA, reinterpret_cast<GLvoid (*)()>(&vector_glyph::error ));
+      for( open_points_type::iterator p_it = open_points.begin(), p_e = open_points.end();
+          p_it != p_e;  ){
+        if( *it == (*p_it)->next ){ // which next and previous is looked at is decisive!! <- derives from the fact that the points are looked through ordered 
+          open_lines.push_back( line( *it, *p_it, (*p_it)->previous , true ) );
+          p_it = open_points.erase( p_it );
+          something_found = true;
+        }
+        else if( *it == (*p_it)->previous ){
+          open_lines.push_back( line( *it, *p_it, (*p_it)->next , true) );
+          p_it = open_points.erase( p_it );
+          something_found = true;
+        }
+        else 
+        {
+        //  std::cout << "*it:" << *it << " (*p_it)->previous:" << (*p_it)->previous << " (*p_it)->next" << (*p_it)->next << std::endl;
+          ++p_it;
+        }
+      }
 
-  gluTessProperty( tessel, GLU_TESS_TOLERANCE, 0);
-  gluTessNormal( tessel, 0.0f, 0.0f, 1.0f);
-
-  gluTessBeginPolygon( tessel, this );
-
-  for( ft_info::contour_list::const_iterator it = dat.contours.begin(), e = dat.contours.end(); it != e; ++it )
-  {
-    gluTessBeginContour( tessel );
-    for( std::size_t index = it->first, end = it->second + it->first; index != end ; ++index )
-    {
-      gluTessVertex(tessel, (double*)&(dat.verts[index]), (double*)&(dat.verts[index]));
+      if( ! something_found )
+        open_points.push_back( *it );
     }
-    gluTessEndContour(tessel);
+    else
+    {
+      
+      for( std::list<open_lines_type::iterator>::const_iterator l_it = possible_lines.begin(), l_e = possible_lines.end();
+          l_it != l_e; ++l_it ) {
+        //(*it)->array_index = vertex_array.size();
+        vertex_array.push_back( (*it)->point );
 
+        //if( l_it->a->array_index == -1 ) {
+        // l_it->a->array_index = vertex_array.size();
+        vertex_array.push_back( (*l_it)->a->point);
+        //        }
+        //       if( l_it->b->array_index == -1 ) {
+        //       l_it->b->array_index = vertex_array.size();
+        vertex_array.push_back( (*l_it)->b->point);
+        //   }
+
+        /* index_array.push_back( l_it->a->array_index );
+           index_array.push_back( l_it->b->array_index );
+           index_array.push_back( (*it)->array_index );*/
+        open_lines.erase( *l_it );
+        if( !( (*it)->next == (*l_it)->a || (*it)->previous == (*l_it)->a) )
+        {
+          open_lines.push_back( line( (*it), (*l_it)->a, (*l_it)->b, false) );
+        }
+        if( !( (*it)->next == (*l_it)->b || (*it)->previous == (*l_it)->b) )
+          open_lines.push_back( line( (*it), (*l_it)->b, (*l_it)->a, false ) );
+      }
+    }
+  } 
+    
+  
+
+  while( ! points.empty() )
+  {
+    delete points.back();
+    points.pop_back();
   }
-
-  gluTessEndPolygon(tessel);
-  gluDeleteTess( tessel );
 }
 
-void vector_glyph::conic( std::vector<v3_type>& verts, v3_type const& begin, v3_type const& mid, v3_type const& end ) const
+void vector_glyph::conic( std::list<contour_point*>& points, contour_point * begin, v2_type const& mid, contour_point * end ) const
 {
+  contour_point *previous = begin;
   for( unsigned int i = 1; i < 5; i++) 
   {
-    v3_type bez1,bez2;
+    v2_type bez1,bez2;
 
-    double t = static_cast<double>(i) * 0.2;
+    float t = float(i) * 0.2;
 
-    bez1 = (1.0 - t) * begin + t * mid;
-    bez2 = (1.0 - t) * mid + t * end;
-    bez1 = (1.0 - t) * bez1 + t * bez2;
-    verts.push_back( bez1 );
-  }       
+    bez1 = (1.0f - t) * begin->point + t * mid;
+    bez2 = (1.0f - t) * mid + t * end->point;
+    bez1 = (1.0f - t) * bez1 + t * bez2;
 
-  verts.push_back( end );
+    previous = new contour_point( bez1, previous, 0 );
+    points.push_back( previous );
+  }
+  end->previous = previous;
+  previous->next = end;
+  
 }
 
-void vector_glyph::cubic( std::vector<v3_type>& verts, v3_type const& begin, v3_type const& mid_1, v3_type const& mid_2, v3_type const& end ) const
+void vector_glyph::cubic( std::list<contour_point*>& points, contour_point * begin, v2_type const& mid_1, v2_type const& mid_2, contour_point * end ) const
 {
+  contour_point *previous = begin;
   for( unsigned int i = 1; i < 5; i++) 
   {
-    v3_type bez1,bez2, bez3;
+    v2_type bez1,bez2, bez3;
 
-    double t = static_cast<double>(i) * 0.2;
+    float t = float(i) * 0.2f;
 
-    bez1 = (1.0 - t) * begin + t * mid_1;
-    bez2 = (1.0 - t) * mid_1 + t * mid_2;
-    bez3 = (1.0 - t) * mid_2 + t * end;
-    bez1 = (1.0 - t) * bez1 + t * bez2;
-    bez2 = (1.0 - t) * bez2 + t * bez3;
-    bez1 = (1.0 - t) * bez1 + t * bez2;
-    verts.push_back( bez1 );
+    bez1 = (1.0f - t) * begin->point + t * mid_1;
+    bez2 = (1.0f - t) * mid_1 + t * mid_2;
+    bez3 = (1.0f - t) * mid_2 + t * end->point;
+    bez1 = (1.0f - t) * bez1 + t * bez2;
+    bez2 = (1.0f - t) * bez2 + t * bez3;
+    bez1 = (1.0f - t) * bez1 + t * bez2;
+
+    previous = new contour_point( bez1, previous, 0 );
+    points.push_back( previous );
   }       
 
-  verts.push_back( end );
+  end->previous = previous;
+  previous->next = end;
 }
 
-void vector_glyph::error( GLenum type, vector_glyph * p )
-{
-  std::cout << "glu :" << gluErrorString( type ) << std::endl;
-}
-
-
-void vector_glyph::begin( GLenum type, vector_glyph * p )
-{
-  p->ranges.push_back( vector_glyph::mesh_info( type, 0, p->va.size() ) );
-}
-
-void vector_glyph::end( vector_glyph * p )
-{
-  p->ranges.back().count = p->va.size() - p->ranges.back().first;
-}
-void vector_glyph::vertex( v3_type * data, vector_glyph * p )
-{
-  p->va.push_back( *data );
-}
-
-void vector_glyph::combine( double coords[3], void *d[4], GLfloat w[4], void **dataOut, vector_glyph * ptr ) 
-{
-  ptr->va.push_back( v3_type(coords[0],coords[1], coords[2] ) );
-  *dataOut = &ptr->va.back();
-}
 
 void vector_glyph::render() const
 {
+  float shrink = 1/16.0f;
+  glPushMatrix();
+  glScalef(shrink, shrink, shrink );
+
   glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT );
   glEnableClientState( GL_VERTEX_ARRAY );
+  glDisableClientState( GL_INDEX_ARRAY );
   glDisableClientState( GL_COLOR_ARRAY );
   glDisableClientState( GL_EDGE_FLAG_ARRAY );
-  glDisableClientState( GL_INDEX_ARRAY );
   glDisableClientState( GL_NORMAL_ARRAY );
   glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-  glVertexPointer( 3, GL_DOUBLE, 0, &(orig_data[0]) );
-  glPushMatrix();
-
-  glScalef(1.0f/64.0f, 1.0f/64.0f, 1.0f/64.0f );
-  glColor3f(0,0,1);
-//  glDrawArrays( GL_LINE_LOOP, 0, orig_data.size() );
-  glDrawArrays( GL_POINTS, 0, orig_data.size() );
-  //glTranslatef(0,20,0);
+  glVertexPointer( 2, GL_FLOAT, 0, &(vertex_array[0]) );
 
 
-  glVertexPointer( 3, GL_DOUBLE, 0, &(va[0]) );
-  for( info_list::const_iterator it = ranges.begin(), e = ranges.end(); 
-      it != e; ++it ) {
-    glColor3f(0,1,0);
-    glDrawArrays( GL_POINTS, it->first, it->count );
-    glColor3f(1,0,0);
-    glDrawArrays( GL_LINE_LOOP, it->first, it->count );
-    glColor3f(1,0,1);
-    glDrawArrays( it->mode, it->first, it->count );
-/*    glBegin( it->mode );
-    for( std::size_t i = it->first, e = it->first + it->count; 
-        i != e; ++i ) {
-      std::cout << "glVertex3d(" << va[i][0] << ", " << va[i][1] << ", " << va[i][2] << ");" << std::endl;
-      glVertex3dv( reinterpret_cast<double const*>(&(va[i])) );
-    }
-    glEnd();*/
-  }
+  glColor4f(1,0,1,0.125);
+  
+  glDrawArrays( GL_TRIANGLES, 0, vertex_array.size() );
+
   glPopMatrix();
   glPopClientAttrib();
-}
-
-void vector_glyph::move_to( FT_Vector * to, ft_info * p )
-{
-  v3_type vec( to->x, to->y, 0 );
-  p->contours.push_back( std::pair<size_t,size_t>( p->verts.size(), 1 ) );
-  p->verts.push_back( vec );
-}
-
-void vector_glyph::line_to( FT_Vector * to, ft_info * p )
-{
-  v3_type vec( to->x, to->y, 0 );
-  p->verts.push_back( vec );
-  p->contours.back().second++;
-}
-
-void vector_glyph::conic_to( FT_Vector * control, FT_Vector * to, ft_info * p )
-{
-  v3_type begin = p->verts.back(), mid( control->x, control->y, 0), end( to->x, to->y, 0 );
   
-  for( unsigned int i = 1; i < 5; i++) 
-  {
-    v3_type bez1,bez2;
-
-    double t = static_cast<double>(i) * 0.2;
-
-    bez1 = (1.0 - t) * begin + t * mid;
-    bez2 = (1.0 - t) * mid + t * end;
-    bez1 = (1.0 - t) * bez1 + t * bez2;
-    p->verts.push_back( bez1 );
-    p->contours.back().second++;
-  }       
-
-  p->verts.push_back( end );
-  p->contours.back().second++;
 }
 
-void vector_glyph::cubic_to( FT_Vector * control1, FT_Vector * control2, FT_Vector * to, ft_info * p )
-{
-  v3_type begin = p->verts.back()
-    , mid_1( control1->x, control1->y, 0)
-    , mid_2( control2->x, control2->y, 0)
-    , end( to->x, to->y, 0 );
-
-  for( unsigned int i = 1; i < 5; i++) 
-  {
-    v3_type bez1,bez2, bez3;
-
-    double t = static_cast<double>(i) * 0.2;
-
-    bez1 = (1.0 - t) * begin + t * mid_1;
-    bez2 = (1.0 - t) * mid_1 + t * mid_2;
-    bez3 = (1.0 - t) * mid_2 + t * end;
-    bez1 = (1.0 - t) * bez1 + t * bez2;
-    bez2 = (1.0 - t) * bez2 + t * bez3;
-    bez1 = (1.0 - t) * bez1 + t * bez2;
-    p->verts.push_back( bez1 );
-    p->contours.back().second++;
-  }       
-
-  p->verts.push_back( end );
-  p->contours.back().second++;
-
-}
-
-
-vector_glyph::mesh_info::mesh_info( GLenum m_, std::size_t c_, std::size_t f_ ) 
-: mode(m_), count(c_), first(f_) 
-{
-}
 
 
 }}}
