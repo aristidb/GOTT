@@ -66,6 +66,11 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
   FT_Outline & outline =  face->glyph->outline;
   
 
+  /*
+   * The following for loop creates the final contours from the contours found 
+   * in the freetype outline structure. conic and cubic parts get transfered into
+   * discrete line segments. 
+   */
   int start = 0, end = 0;
   for( int  i = 0; i < outline.n_contours; ++i )
   {
@@ -163,9 +168,12 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
     contours.push_back( first_point );
   }
 
+
+  // All points of ALL contours get reorderd by the x-coordinate 
   points.sort( scanline_ordering() );
 
 
+#if 0 
 
   typedef std::list<line> open_lines_type;
   open_lines_type open_lines;
@@ -214,7 +222,10 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
      closeing line. These points need other points to create lines.
     
      Second Problem: Creating Triangles:
-      This is handled in the open_line-for_loop. tbc
+      This is handled in the open_line-for_loop. To find possible triangles, the algorithm searches for 
+      possible base lines, in the open_line list. For a given point a possible base line of a triangle is
+      a line whith a hyper_plane stateing the given point to be on the "in" side.
+      Q: Is that enough, to gurantee corectness? 
          
     
      some uncomplete outline of the algorithm:
@@ -247,88 +258,86 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
     
      if none found add point to open_point
      */
-    
-    std::list<open_lines_type::iterator> possible_lines;
+   
+       bool point_integrated = false;
 
-    for( std::list<line>::iterator l_it = open_lines.begin(), l_e = open_lines.end(); 
-        l_it != l_e; ++l_it ){
+     for( open_points_type::iterator p_it = open_points.begin(), p_e = open_points.end();
+         p_it != p_e;  ){
+       if( *it == (*p_it)->next ){ // which next and previous is looked at is decisive!! <- derives from the fact that the points are looked through ordered 
+         open_lines.push_back( line( *it, *p_it, (*p_it)->previous , true ) );
+         p_it = open_points.erase( p_it );
+         point_integrated = true;
+       }
+       else if( *it == (*p_it)->previous ){
+         open_lines.push_back( line( *it, *p_it, (*p_it)->next , true) );
+         p_it = open_points.erase( p_it );
+         point_integrated = true;
+       }
+       else 
+       {
+         //  std::cout << "*it:" << *it << " (*p_it)->previous:" << (*p_it)->previous << " (*p_it)->next" << (*p_it)->next << std::endl;
+         ++p_it;
+       }
+     }
+     std::list<open_lines_type::iterator> possible_lines;
 
-      if( l_it->border.distance( (*it)->point ) > 0.01f ){
-        if( (*it)->next == l_it->a || (*it)->next == l_it->b ){
-          possible_lines.push_front( l_it ); 
-        }
-        else { 
-          contour_point * n_a = l_it->get_neighbour_point_of_a();
-          contour_point * n_b = l_it->get_neighbour_point_of_b();
-          math::hyper_plane2<float> p_a, p_b;
-          if( n_a )
-            p_a = math::hyper_plane2<float>( l_it->a->point, n_a->point, l_it->b->point ); 
-          if( n_b )
-            p_b = math::hyper_plane2<float>( l_it->b->point, n_b->point, l_it->a->point ); 
+     for( std::list<line>::iterator l_it = open_lines.begin(), l_e = open_lines.end(); 
+         l_it != l_e; ++l_it ){
+       if( l_it->a != *it && l_it->b != *it ) {
+         if( l_it->border.distance( (*it)->point ) > 0.01f ){
+           possible_lines.push_front( l_it ); 
+           if( (*it)->next == l_it->a || (*it)->next == l_it->b ){
+             possible_lines.push_front( l_it ); 
+           }
+           else { 
+             contour_point * n_a = l_it->get_neighbour_point_of_a();
+             contour_point * n_b = l_it->get_neighbour_point_of_b();
+             math::hyper_plane2<float> p_a, p_b;
+             if( n_a )
+               p_a = math::hyper_plane2<float>( l_it->a->point, n_a->point, l_it->b->point ); 
+             if( n_b )
+               p_b = math::hyper_plane2<float>( l_it->b->point, n_b->point, l_it->a->point ); 
 
-          if( n_a && n_b && p_a.distance( (*it)->point ) > 0 &&  p_b.distance( (*it)->point ) > 0 )  // this test suffices because points are ordered
-            possible_lines.push_back( l_it );
+             if( n_a && n_b && p_a.distance( (*it)->point ) > 0 &&  p_b.distance( (*it)->point ) > 0 )  // this test suffices because points are ordered
+               possible_lines.push_back( l_it );
+           }
         }
       }
     }
 
 
-    if( possible_lines.empty() )  {
-      bool something_found = false;
+   
 
-      for( open_points_type::iterator p_it = open_points.begin(), p_e = open_points.end();
-          p_it != p_e;  ){
-        if( *it == (*p_it)->next ){ // which next and previous is looked at is decisive!! <- derives from the fact that the points are looked through ordered 
-          open_lines.push_back( line( *it, *p_it, (*p_it)->previous , true ) );
-          p_it = open_points.erase( p_it );
-          something_found = true;
-        }
-        else if( *it == (*p_it)->previous ){
-          open_lines.push_back( line( *it, *p_it, (*p_it)->next , true) );
-          p_it = open_points.erase( p_it );
-          something_found = true;
-        }
-        else 
-        {
-          //  std::cout << "*it:" << *it << " (*p_it)->previous:" << (*p_it)->previous << " (*p_it)->next" << (*p_it)->next << std::endl;
-          ++p_it;
-        }
+    if( ! point_integrated &&  possible_lines.empty() ) 
+      open_points.push_back( *it );
+
+    for( std::list<open_lines_type::iterator>::const_iterator l_it = possible_lines.begin(), l_e = possible_lines.end();
+        l_it != l_e; ++l_it ) {
+      //(*it)->array_index = vertex_array.size();
+      vertex_array.push_back( (*it)->point );
+
+      //if( l_it->a->array_index == -1 ) {
+      // l_it->a->array_index = vertex_array.size();
+      vertex_array.push_back( (*l_it)->a->point);
+      //        }
+      //       if( l_it->b->array_index == -1 ) {
+      //       l_it->b->array_index = vertex_array.size();
+      vertex_array.push_back( (*l_it)->b->point);
+      //   }
+
+      /* index_array.push_back( l_it->a->array_index );
+         index_array.push_back( l_it->b->array_index );
+         index_array.push_back( (*it)->array_index );*/
+      open_lines.erase( *l_it );
+      if( !( (*it)->next == (*l_it)->a || (*it)->previous == (*l_it)->a) )
+      {
+        open_lines.push_back( line( (*it), (*l_it)->a, (*l_it)->b, false) );
       }
-
-      if( ! something_found )
-        open_points.push_back( *it );
-    }
-    else
-    {
-
-      for( std::list<open_lines_type::iterator>::const_iterator l_it = possible_lines.begin(), l_e = possible_lines.end();
-          l_it != l_e; ++l_it ) {
-        //(*it)->array_index = vertex_array.size();
-        vertex_array.push_back( (*it)->point );
-
-        //if( l_it->a->array_index == -1 ) {
-        // l_it->a->array_index = vertex_array.size();
-        vertex_array.push_back( (*l_it)->a->point);
-        //        }
-        //       if( l_it->b->array_index == -1 ) {
-        //       l_it->b->array_index = vertex_array.size();
-        vertex_array.push_back( (*l_it)->b->point);
-        //   }
-
-        /* index_array.push_back( l_it->a->array_index );
-           index_array.push_back( l_it->b->array_index );
-           index_array.push_back( (*it)->array_index );*/
-        open_lines.erase( *l_it );
-        if( !( (*it)->next == (*l_it)->a || (*it)->previous == (*l_it)->a) )
-        {
-          open_lines.push_back( line( (*it), (*l_it)->a, (*l_it)->b, false) );
-        }
-        if( !( (*it)->next == (*l_it)->b || (*it)->previous == (*l_it)->b) )
-          open_lines.push_back( line( (*it), (*l_it)->b, (*l_it)->a, false ) );
-      }
+      if( !( (*it)->next == (*l_it)->b || (*it)->previous == (*l_it)->b) )
+        open_lines.push_back( line( (*it), (*l_it)->b, (*l_it)->a, false ) );
     }
   } 
-
+#endif
 
   /*  while( ! points.empty() )
       {
@@ -413,7 +422,15 @@ void vector_glyph::render() const
     glEnd();
   }
 
-  //glDrawArrays( GL_TRIANGLES, 0, vertex_array.size() );
+  for( size_t i = 0; i < vertex_array.size(); i += 3 )
+  {
+    glBegin( GL_TRIANGLES );
+    glColor4f(1.0,0.0,0.0,0.25);glVertex2fv( reinterpret_cast<float const*>(&vertex_array[i]));
+    glColor4f(0.0,1.0,0.0,0.25);glVertex2fv( reinterpret_cast<float const*>(&vertex_array[i+1]));
+    glColor4f(0.0,0.0,1.0,0.25);glVertex2fv( reinterpret_cast<float const*>(&vertex_array[i+2]));
+    glEnd();
+  }
+//  glDrawArrays( GL_TRIANGLES, 0, vertex_array.size() );
 
   glPopMatrix();
   glPopClientAttrib();
