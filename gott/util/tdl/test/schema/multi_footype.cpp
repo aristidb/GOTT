@@ -65,7 +65,7 @@ struct schema_multi_footype : tut::schema_basic {
         multi.end();
       multi.end();
       multi.begin(schema::match_integer::factory::index(), 
-                  RA(wstring(L"--other--")) );//, slotcfg(slotcfg::some));
+                  RA(wstring(L"--other--")), slotcfg(slotcfg::some));
       multi.end();
     multi.end();
 
@@ -114,6 +114,28 @@ void object::test<2>(int) {
 
 template<> template<>
 void object::test<3>(int) {
+  run_test(
+      L"a\n"
+      " 4\n"
+      " sum\n"
+      "     -1220\n"
+      " plugin\n"
+      "                     x,y,z\n"
+  );
+  stru::cf::nd_list c, p;
+  p.push_back(S(Xany(L"x"), L"plugin-data"));
+  p.push_back(S(Xany(L"y"), L"plugin-data"));
+  p.push_back(S(Xany(L"z"), L"plugin-data"));
+
+  c.push_back(S(Xany(4), L"--other--"));
+  c.push_back(C(S(Xany(-1220), L"sum-data"), L"sum"));
+  c.push_back(M(p, L"plugin"));
+  C(C(M(c, L"--unordered--"), L"a"), L"--doc--").write_to(xp);
+  ensure_equals("reordered #1", tree, xp);
+}
+
+template<> template<>
+void object::test<4>(int) {
   no_test();
 }
 
