@@ -160,7 +160,7 @@ bool match::IMPL::handle_rule(ev::event const &event) {
   if (event.play(*parse.back())) {
     if (tok) pos.consume();
     return consume_event();
-  } else 
+  } else
     return pass_event();
 }
 

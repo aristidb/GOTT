@@ -38,7 +38,7 @@ public:
 
   buffer_t buffer;
   size_t unconsumed, consumed, seeked;
-  bool replay;
+  bool replay, in_replay;
 
   IMPL(revocable_structure &s) 
     : struc(s), unconsumed(0), consumed(0), replay(false) {}
@@ -60,11 +60,15 @@ template void positioning::add(ev::up const &);
 template void positioning::add(ev::node const &);
 
 void positioning::consume() {
-  p->consumed = p->unconsumed;
+  p->consumed = p->unconsumed + p->in_replay;
 }
 
 bool positioning::proceeded(id const &x) const {
   return x.first < p->consumed;
+}
+
+unsigned positioning::debug_current() const {
+  return p->unconsumed;
 }
 
 positioning::id positioning::current() {
@@ -93,13 +97,15 @@ void positioning::seek_and_forget(id const &x) {
 void positioning::replay(acceptor &acc) {
   if (p->replay) {
     p->replay = false;
+    p->in_replay = true;
     for (p->unconsumed = p->seeked;
          p->unconsumed < p->buffer.size();
          ++p->unconsumed) {
       acc(get(p->buffer[p->unconsumed]));
-      if (p->replay) 
+      if (p->replay)
         break;
     }
+    p->in_replay = false;
   }
 }
 
