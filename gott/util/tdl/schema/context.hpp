@@ -35,17 +35,17 @@ public:
   context() EXPORT;
   ~context() EXPORT;
 
-  void EXPORT begin(unsigned rule_id, 
+  void EXPORT begin(unsigned rule_id,
                     rule::attributes const &attr = rule::attributes(),
                     boost::optional<slotcfg> const & = boost::none,
                     unsigned = 0);
   void end() EXPORT;
-  
+
   template<class T> 
   void begin_t(rule::attributes const &attr, unsigned c = 0) {
     begin(T::factory::index(), attr, c);
   }
-  
+
   void ref(context const &other) EXPORT;
   rule::factory const &get() const EXPORT;
 
@@ -57,7 +57,7 @@ private:
 
   void add_child(rule::factory const *, boost::optional<slotcfg> const &);
   void add_slotted(rule::factory const *, slotcfg const &);
-  void add_enc_slotted(rule::factory const *, slotcfg const &, 
+  void add_enc_slotted(rule::factory const *, slotcfg const &,
                        boost::optional<slotcfg> const & = boost::none);
   void add_owned(rule::factory *, boost::optional<slotcfg> const &);
 };
@@ -67,13 +67,13 @@ public:
   multi_context(boost::shared_ptr<context> cc, boost::shared_ptr<multi_context>
                 nn = boost::shared_ptr<multi_context>())
   : c(cc), n(nn) {}
-  
+
   context &get() const { return *c; }
   boost::shared_ptr<multi_context> next() const { return n; }
 
   template<class I> 
   friend boost::shared_ptr<multi_context> build_multi_context(I,I);
-  
+
 private:
   boost::shared_ptr<context> c;
   boost::shared_ptr<multi_context> n;
@@ -93,7 +93,7 @@ multi_context_handle build_multi_context(I start, I stop) {
   return res;
 }
 
-inline multi_context_handle binary_combine(boost::shared_ptr<context> a, 
+inline multi_context_handle binary_combine(boost::shared_ptr<context> a,
                                            boost::shared_ptr<context> b) {
   multi_context_handle rhs(new multi_context(b));
   return multi_context_handle(new multi_context(a, rhs));

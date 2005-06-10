@@ -27,7 +27,7 @@ line_pos::line_pos()
 
 void line_pos::start_line() { ++line_new; }
 
-void line_pos::token(unsigned p, unsigned e, std::wstring const &w) { 
+void line_pos::token(unsigned p, unsigned e, std::wstring const &w) {
   pos = p;
   native_end = e;
   tok = w;

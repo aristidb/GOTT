@@ -44,7 +44,7 @@ namespace gott {
 namespace util {
 namespace tdl {
 namespace schema {
-  
+
 unsigned add_factory(factory_template::rule_factory_builder x) {
   builders.push_back(x);
   return builders.size() - 1;

@@ -34,7 +34,7 @@ namespace detail { struct line_pos; }
 // Thrown when a rule failed to match and could not be backtracked
 class EXPORT mismatch : public std::exception {
   std::string w;
-public:  
+public:
   mismatch(detail::line_pos const &p);
   ~mismatch() throw();
   char const *what() const throw();

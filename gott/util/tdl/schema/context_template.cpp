@@ -47,10 +47,10 @@ void context_template::param(eID x) {
 
 struct context_template::visitor : public static_visitor<>  {
   visitor(vector<context*> const &vv, context &oo) : v(vv), o(oo) {}
-  
+
   vector<context*> const &v;
   context &o;
-  
+
   void operator() (context_template::entry_begin const &b) {
     o.begin(b.id, b.att, b.scfg);
   }

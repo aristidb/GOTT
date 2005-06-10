@@ -41,7 +41,7 @@ public:
 
   virtual void print(std::wostream &s) const = 0;
     // print to stream
-  
+
   virtual ~event() = 0;
 };
 
@@ -70,7 +70,7 @@ class node : public token {
 public:
   node(std::wstring const &);
     // construct a node with the given data
-  
+
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 

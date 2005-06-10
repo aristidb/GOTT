@@ -75,7 +75,7 @@ public:
 private:
 
   mode m;
-  
+
   typedef
     boost::variant<
       std::size_t,
@@ -137,7 +137,7 @@ public:
   void add(rule::factory const &f) { add(f, slotcfg(Def)); }
   void add(rule::factory const &f, unsigned i) { add(f, i, slotcfg(Def)); }
 
-  void add(rule::factory const &f, slotcfg const &c) { 
+  void add(rule::factory const &f, slotcfg const &c) {
     sub[pos] = f;
     scfg[pos] = c;
     ++pos;
@@ -150,11 +150,13 @@ public:
 
   rule *get(match &m) const { return new T(sub, scfg, attrib, m); }
 
-  static unsigned index() { 
-    static enreg<slotcfg_somechildren> e; return e.val; 
+  static unsigned index() {
+    static enreg<slotcfg_somechildren> e; 
+    return e.val;
   }
-  static rule::factory *build(rule::attributes const &a, unsigned) { 
-    return new slotcfg_somechildren(a); 
+
+  static rule::factory *build(rule::attributes const &a, unsigned) {
+    return new slotcfg_somechildren(a);
   }
 
 private:
@@ -165,13 +167,13 @@ private:
 };
 
 #if 0 // not done yet
-template<class T, slotcfg::simple_mode Def, slotcfg::mode Accepted> 
+template<class T, slotcfg::simple_mode Def, slotcfg::mode Accepted>
 class slotcfg_manychildren : public detail::factory_with_slotcfg<Accepted> {
 public:
-  slotcfg_manychildren(rule::attributes const &a, unsigned n) : attrib(a) { 
-    sub.reserve(n); 
+  slotcfg_manychildren(rule::attributes const &a, unsigned n) : attrib(a) {
+    sub.reserve(n);
   }
- 
+
   void add(rule::factory const &f) { sub.push_back(&f); }
   void add(rule::factory const &f, unsigned i) {
     if (sub.size() <= i)
@@ -180,11 +182,11 @@ public:
   }
   rule *get(match &m) const { return new T(sub, attrib, m); }
 
-  static unsigned index() { 
-    static enreg<slotcfg_manychildren> e; return e.val; 
+  static unsigned index() {
+    static enreg<slotcfg_manychildren> e; return e.val;
   }
-  static rule::factory *build(rule::attributes const &a, unsigned n) { 
-    return new slotcfg_manychildren(a, n); 
+  static rule::factory *build(rule::attributes const &a, unsigned n) {
+    return new slotcfg_manychildren(a, n);
   }
   
 private:

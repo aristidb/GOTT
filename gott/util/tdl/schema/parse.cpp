@@ -69,7 +69,7 @@ public:
 
 match::match(structure::revocable_structure &p) : pIMPL(new IMPL(p, *this)) {}
 
-match::match(rule::factory const &f, structure::revocable_structure &p) 
+match::match(rule::factory const &f, structure::revocable_structure &p)
 : pIMPL(new IMPL(p, *this)) {
   pIMPL->add(f);
 }
@@ -79,15 +79,15 @@ match::~match() { delete pIMPL; }
 // Forwarding
 
 void match::add(rule::factory const &rf) { 
-  pIMPL->add(rf); 
+  pIMPL->add(rf);
 }
 
 structure::revocable_structure &match::structure() { 
-  return pIMPL->struc; 
+  return pIMPL->struc;
 }
 
 simple::line_logger *match::get_debug() {
-  return &pIMPL->ln; 
+  return &pIMPL->ln;
 }
 
 positioning &match::pos() {
@@ -97,15 +97,15 @@ positioning &match::pos() {
 // Parser forwarding
 
 void match::begin_parse() {
-  pIMPL->handle_token(ev::begin_parse()); 
+  pIMPL->handle_token(ev::begin_parse());
 }
 
 void match::down() {
-  pIMPL->handle_token(ev::down()); 
+  pIMPL->handle_token(ev::down());
 }
 
-void match::node(wstring const &s) { 
-  pIMPL->handle_token(ev::node(s)); 
+void match::node(wstring const &s) {
+  pIMPL->handle_token(ev::node(s));
 }
 
 void match::up() {
@@ -120,7 +120,7 @@ void match::comment(wstring const &, bool) {}
 
 // Implementation
 
-match::IMPL::IMPL(structure::revocable_structure &p, match &r) 
+match::IMPL::IMPL(structure::revocable_structure &p, match &r)
   : struc(p), pos(struc), ref(r) {}
 
 void match::IMPL::add(rule::factory const &f) {
@@ -171,7 +171,7 @@ bool match::IMPL::consume_event() {
 }
 
 bool match::IMPL::pass_event() {
-  if (parse.back()->expects() == rule::need) { 
+  if (parse.back()->expects() == rule::need) {
     fail_rule();
     return true;
   } else {
@@ -193,6 +193,6 @@ void match::IMPL::fail_rule() {
 
   if (!parse.empty())
     handle_event<false>(ev::child_fail());
-  else 
+  else
     throw mismatch(ln);
 }

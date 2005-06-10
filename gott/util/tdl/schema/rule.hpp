@@ -45,7 +45,7 @@ public:
     // <maybe> accept something (when there is optional input it can be feeded)
     // <need> input
     // be <over_filled> (should not happen - it usually can ignore input)
-  
+
   expect expects() const { return expectation; }
     // what do we expect?
 
@@ -58,7 +58,7 @@ public:
 
     // implemented as: visitor pattern -->
     // default implementation: do nothing
-  
+
   // Tokens
   virtual bool play(ev::begin_parse const &) EXPORT;
   virtual bool play(ev::down const &) EXPORT;
@@ -70,7 +70,7 @@ public:
   virtual bool play(ev::child_fail const &) EXPORT;
 
   void finish();
-  
+
   virtual ~rule() EXPORT = 0;
 
   // Properties

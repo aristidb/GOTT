@@ -41,7 +41,7 @@ class match : public simple::parser {
 
 public:
   match(structure::revocable_structure &tree) EXPORT;
-  
+
   match(rule::factory const &rf, structure::revocable_structure &tree) EXPORT;
     // initialize a match-object that writes to tree and tries to
     // match rf
@@ -54,13 +54,13 @@ public:
 
   structure::revocable_structure &structure() EXPORT;
     // return a reference to tree (defined in constructor)
-  
+
 public:
   positioning &pos() EXPORT;
- 
+
 public:
   simple::line_logger *get_debug() EXPORT;
-  
+
 private:
   void begin_parse();
   void down();

@@ -36,19 +36,19 @@ class slotcfg;
 // For rule-producers
 struct EXPORT rule::factory {
   struct with_slotcfg;
-  
+
   virtual rule *get(match &) const = 0;
     // produce a rule for the given match object
 
   virtual void add(factory const &child) = 0;
     // add a child to the rules that will be produced (in
     // the default location)
-  
+
   virtual void add(factory const &child, unsigned slot);
     // add a child - in the given location (where a slot
     // does not make sense, it defaults to add() without
     // slot)
-  
+
   with_slotcfg *get_with_slotcfg();
 
   static const unsigned no_slot = unsigned(-1);
@@ -56,7 +56,7 @@ struct EXPORT rule::factory {
     // IMPORTANT: add(factory const &, unsigned) NEED NOT and
     //      SHALL NOT accept this slot-number: behaviour when
     //      passed this is undefined!
-  
+
   virtual ~factory() = 0;
 };
 
@@ -64,7 +64,7 @@ namespace factory_template {
 
 typedef std::vector<rule::factory const *> container;
 
-typedef 
+typedef
   rule::factory *(*rule_factory_builder)(rule::attributes const &, unsigned);
 
 template<class T> struct enreg;
@@ -93,12 +93,22 @@ template<class T> struct enreg;
 template<class T> class nochild : public rule::factory {
 public:
   nochild(rule::attributes const &a) : attrib(a) {}
-  void add(rule::factory const &) { throw ::std::bad_exception(); }
-  rule *get(match &m) const { return new T(attrib, m); }
 
-  static unsigned index() { static enreg<nochild> e; return e.val; }
-  static rule::factory *build(rule::attributes const &a, unsigned) { 
-    return new nochild(a); 
+  void add(rule::factory const &) {
+    throw ::std::bad_exception();
+  }
+
+  rule *get(match &m) const {
+    return new T(attrib, m);
+  }
+
+  static unsigned index() {
+    static enreg<nochild> e;
+    return e.val;
+  }
+
+  static rule::factory *build(rule::attributes const &a, unsigned) {
+    return new nochild(a);
   }
 
 private:
@@ -108,10 +118,20 @@ private:
 template<class T> class onechild : public rule::factory {
 public:
   onechild(rule::attributes const &a) : attrib(a) {}
-  void add(rule::factory const &f) { sub = &f; }
-  rule *get(match &m) const { return new T(*sub, attrib, m); }
 
-  static unsigned index() { static enreg<onechild> e; return e.val; }
+  void add(rule::factory const &f) {
+    sub = &f;
+  }
+
+  rule *get(match &m) const {
+    return new T(*sub, attrib, m);
+  }
+
+  static unsigned index() {
+    static enreg<onechild> e;
+    return e.val;
+  }
+
   static rule::factory *build(rule::attributes const &a, unsigned) {
     return new onechild(a);
   }
@@ -124,13 +144,27 @@ private:
 template<class T, unsigned N> class somechildren : public rule::factory {
 public:
   somechildren(rule::attributes const &a) : pos(0), attrib(a) {}
-  void add(rule::factory const &f) { sub[pos++] = &f; }
-  void add(rule::factory const &f, unsigned i) { sub[i] = &f; pos = i + 1; }
-  rule *get(match &m) const { return new T(sub, attrib, m); }
 
-  static unsigned index() { static enreg<somechildren> e; return e.val; }
-  static rule::factory *build(rule::attributes const &a, unsigned) { 
-    return new somechildren(a); 
+  void add(rule::factory const &f) {
+    sub[pos++] = &f;
+  }
+
+  void add(rule::factory const &f, unsigned i) {
+    sub[i] = &f;
+    pos = i + 1;
+  }
+
+  rule *get(match &m) const {
+    return new T(sub, attrib, m);
+  }
+
+  static unsigned index() {
+    static enreg<somechildren> e;
+    return e.val;
+  }
+
+  static rule::factory *build(rule::attributes const &a, unsigned) {
+    return new somechildren(a);
   }
 
 private:
@@ -141,23 +175,33 @@ private:
 
 template<class T> class manychildren : public rule::factory {
 public:
-  manychildren(rule::attributes const &a, unsigned n) : attrib(a) { 
-    sub.reserve(n); 
+  manychildren(rule::attributes const &a, unsigned n) : attrib(a) {
+    sub.reserve(n);
   }
- 
-  void add(rule::factory const &f) { sub.push_back(&f); }
+
+  void add(rule::factory const &f) {
+    sub.push_back(&f);
+  }
+
   void add(rule::factory const &f, unsigned i) {
     if (sub.size() <= i)
       sub.resize(i + 1);
     sub[i] = &f;
   }
-  rule *get(match &m) const { return new T(sub, attrib, m); }
 
-  static unsigned index() { static enreg<manychildren> e; return e.val; }
-  static rule::factory *build(rule::attributes const &a, unsigned n) { 
-    return new manychildren(a, n); 
+  rule *get(match &m) const {
+    return new T(sub, attrib, m);
   }
-  
+
+  static unsigned index() {
+    static enreg<manychildren> e;
+    return e.val;
+  }
+
+  static rule::factory *build(rule::attributes const &a, unsigned n) {
+    return new manychildren(a, n);
+  }
+
 private:
   container sub;
   rule::attributes attrib;
@@ -176,7 +220,7 @@ template<class T> struct enreg {
 unsigned add_factory(factory_template::rule_factory_builder x) EXPORT;
   // add a rule::factory type to the database and return its assigned index
 
-rule::factory *get_factory(unsigned x, rule::attributes const &a, 
+rule::factory *get_factory(unsigned x, rule::attributes const &a,
                            unsigned length);
   // get a rule::factory instance by its type's index
 
