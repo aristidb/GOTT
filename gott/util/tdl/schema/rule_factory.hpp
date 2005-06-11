@@ -32,23 +32,38 @@ namespace schema {
 class match;
 class slotcfg;
 
-// Interface rule::factory
-// For rule-producers
+/**
+ * Rule-factory interface.
+ * Classes implementing this can produce rule objects and are the standardized
+ * way to do so.
+ */
 struct EXPORT rule::factory {
   struct with_slotcfg;
 
-  virtual rule *get(match &) const = 0;
-    // produce a rule for the given match object
+  /**
+   * Produce a rule object.
+   * \param m The engine to work inside.
+   */
+  virtual rule *get(match &m) const = 0;
 
+  /**
+   * Let the produced rule have a/another child.
+   * Adds in the default location.
+   * \param child The rule-factory producing the child.
+   */
   virtual void add(factory const &child) = 0;
-    // add a child to the rules that will be produced (in
-    // the default location)
 
+  /**
+   * Lets the produced rule have a child in a specific slot.
+   * Slots semantics are optional.
+   * \param child The rule-factory producing the child.
+   * \param slot The slot to put the child into.
+   */
   virtual void add(factory const &child, unsigned slot);
-    // add a child - in the given location (where a slot
-    // does not make sense, it defaults to add() without
-    // slot)
 
+  /**
+   * Try to cast to a slotcfg-enabled rule-factory.
+   */
   with_slotcfg *get_with_slotcfg();
 
   static const unsigned no_slot = unsigned(-1);
@@ -217,12 +232,21 @@ template<class T> struct enreg {
 
 }
 
+/**
+ * Add a rule::factory type to the database and return its assigned index.
+ * \param x The builder of the type to be added.
+ * \return The type's index.
+ */
 unsigned add_factory(factory_template::rule_factory_builder x) EXPORT;
-  // add a rule::factory type to the database and return its assigned index
 
+/**
+ * Get a rule::factory instance by its type's index.
+ * \param x The type's index.
+ * \param a The additional attributes.
+ * \param length The expected number of children (optional depending on type).
+ */
 rule::factory *get_factory(unsigned x, rule::attributes const &a,
                            unsigned length);
-  // get a rule::factory instance by its type's index
 
 }}}}
 

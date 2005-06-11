@@ -60,27 +60,52 @@ public:
    */
   expect expects() const { return expectation; }
 
-
   // Event handlers
-#ifdef NO_DEFINE_IMPLICIT_PLAYER_GUIDELINE
+  // Tokens
   /**
-   * Tries to accept a token or notification. Adjusts expectation.
+   * Tries to accept an ev:begin_parse token. Adjusts expectation.
    * Default implementation: Do nothing.
    * \return
-   *   true on success
-   *   false on failure
+   *   - true on success
+   *   - false on failure
    */
-  bool play(ev::event const &ev)
-#endif
-
-  // Tokens
   virtual bool play(ev::begin_parse const &) EXPORT;
+
+  /**
+   * Tries to accept an ev::down token.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::down const &) EXPORT;
+
+  /**
+   * Tries to accept an ev::node token.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::node const &) EXPORT;
+
+  /**
+   * Tries to accept an ev::up token.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::up const &) EXPORT;
+
+  /**
+   * Tries to accept an ev::end_parse token.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::end_parse const &) EXPORT;
+
   // Notifications
+  /**
+   * Tries to accept an ev::child_succeed event.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::child_succeed const &) EXPORT;
+  
+  /**
+   * Tries to accept an ev::child_fail event.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::child_fail const &) EXPORT;
 
   /// @internal
@@ -89,8 +114,10 @@ public:
   virtual ~rule() EXPORT = 0;
 
   // Properties
+  /**
+   * Get the attributes associated with this rule.
+   */
   attributes const &get_attributes() const EXPORT;
-    // get the attributes associated with this rule
 
   virtual wchar_t const *name() const EXPORT = 0;
     // well, mangled typeid() names are hard to read!

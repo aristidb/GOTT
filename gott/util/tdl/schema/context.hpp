@@ -38,18 +38,44 @@ public:
   context() EXPORT;
   ~context() EXPORT;
 
+  /**
+   * Begin the declaration of a "rule".
+   * The context class owns its memory.
+   * \param rule_id The rule-factory builder's index.
+   * \param attr The rule-factory's and later rule's attributes.
+   * \param slt (optional) Repetition definition.
+   * \param length The expected number of children. 0 or the nearest value
+   *               if unsure.
+   */
   void EXPORT begin(unsigned rule_id,
                     rule::attributes const &attr = rule::attributes(),
-                    boost::optional<slotcfg> const & = boost::none,
-                    unsigned = 0);
+                    boost::optional<slotcfg> const &slt = boost::none,
+                    unsigned length = 0);
+
+  /**
+   * End the declaration of a "rule".
+   * @see begin
+   */
   void end() EXPORT;
 
+  /**
+   * A little convenience wrapper around begin.
+   */
   template<class T>
   void begin_t(rule::attributes const &attr, unsigned c = 0) {
     begin(T::factory::index(), attr, c);
   }
 
+  /**
+   * Add a reference to another context as a "rule".
+   * The added context is not owned.
+   * \param other The context to refer to.
+   */
   void ref(context const &other) EXPORT;
+
+  /**
+   * Instantiate the context.
+   */
   rule::factory const &get() const EXPORT;
 
 private:
@@ -65,6 +91,10 @@ private:
   void add_owned(rule::factory *, boost::optional<slotcfg> const &);
 };
 
+/**
+ * A class for combining context objects.
+ * Pretty much untested yet.
+ */
 class multi_context {
 public:
   multi_context(boost::shared_ptr<context> cc, boost::shared_ptr<multi_context>
@@ -84,8 +114,13 @@ private:
 
 typedef boost::shared_ptr<multi_context> multi_context_handle;
 
-// Build a multi_context from a range of contexts given by two iterators
-// Requirement: start > stop
+/**
+ * Build a multi_context from a range of contexts given by two iterators
+ * \param start The start of the range.
+ * \param stop The end of the range.
+ * \return A smart pointer (handle) to the multi_context.
+ * @invariant start < stop
+ */
 template<class I>
 multi_context_handle build_multi_context(I start, I stop) {
   multi_context_handle res;
@@ -96,21 +131,44 @@ multi_context_handle build_multi_context(I start, I stop) {
   return res;
 }
 
+/**
+ * Combine two contexts to form a multi_context.
+ * \param a One context smart-pointer.
+ * \param b Another context smart-pointer.
+ * \return A smart pointer (handle) to the multi_context.
+ */
 inline multi_context_handle binary_combine(boost::shared_ptr<context> a,
                                            boost::shared_ptr<context> b) {
   multi_context_handle rhs(new multi_context(b));
   return multi_context_handle(new multi_context(a, rhs));
 }
 
+/**
+ * Combine a context with a multi_context.
+ * \param a A context smart-pointer.
+ * \param b A multi-context-handle.
+ * \return A smart pointer (handle) to the multi_context.
+ */
 inline multi_context_handle cons(boost::shared_ptr<context> a,
                                  multi_context_handle b) {
   return multi_context_handle(new multi_context(a, b));
 }
 
+/**
+ * Return the first context of a multi_context.
+ * \param x A handle to a multi_context.
+ * \return The first context in the multi_context.
+ */
 inline context &car(multi_context_handle x) {
   return x->get();
 }
 
+/**
+ * Return the "rest" of a multi_context. 
+ * The rest is everything but the first context.
+ * \param x A handle to a multi_context.
+ * \return The "rest" of the multi_context.
+ */
 inline multi_context_handle cdr(multi_context_handle x) {
   return x->next();
 }

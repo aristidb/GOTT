@@ -30,8 +30,10 @@ namespace schema {
 
 namespace detail { struct line_pos; }
 
-// Exception mismatch
-// Thrown when a rule failed to match and could not be backtracked
+/**
+ * Schema mismatch exception.
+ * Thrown when a rule failed to match and could not be backtracked.
+ */
 class EXPORT mismatch : public std::exception {
   std::string w;
 public:

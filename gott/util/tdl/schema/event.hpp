@@ -46,6 +46,7 @@ public:
   virtual bool play(rule &r) const = 0;
 
   /**
+   * @internal
    * Print the event to a stream.
    * Meant for debugging purposes.
    * \param s The stream to write to.
@@ -55,32 +56,33 @@ public:
   virtual ~event() = 0;
 };
 
+/**
+ * Print an event to a stream.
+ */
 inline std::wostream &operator<<(std::wostream &s, event const &e) {
   e.print(s);
   return s;
 }
 
-/**
- * The base class for token events.
- */
+/// The base class for token events.
 class token : public event {
 };
 
-/**
- * The event class for the simple::parser::begin_parse token.
- */
+/// The event class for the simple::parser::begin_parse token.
 class begin_parse : public token {
 public:
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 };
 
+/// The event class for the simple::parser::down token.
 class down : public token {
 public:
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 };
 
+/// The event class for the simple::parser::node token.
 class node : public token {
   std::wstring data;
 public:
@@ -94,12 +96,14 @@ public:
     // get the data of this node-event
 };
 
+/// The event class for the simple::parser::up token.
 class up : public token {
 public:
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 };
 
+/// The event class for the simple::parser::end_parse token.
 class end_parse : public token {
 public:
   bool play(rule &r) const;
@@ -110,15 +114,18 @@ typedef boost::variant<begin_parse, down, node, up, end_parse> token_t;
 
 token const &get(token_t const &);
 
+/// The base class for notification events.
 class notification : public event {
 };
 
+/// The event class for a succeeded child.
 class child_succeed : public notification {
 public:
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 };
 
+/// The event class for a failed child.
 class child_fail : public notification {
 public:
   bool play(rule &r) const;
