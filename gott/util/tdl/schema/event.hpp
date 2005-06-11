@@ -32,15 +32,25 @@ class rule;
 
 namespace ev {
 
-// Interface event
+/**
+ * Interface event for TDL tokens and schema notifications.
+ */
 // A "storable" method invocation.
 class event {
 public:
+  /**
+   * Notify a rule of this event.
+   * Calls rule::play with a reference to *this.
+   * \param r The rule to notify.
+   */
   virtual bool play(rule &r) const = 0;
-    // play this event on the given rule via r.play(*this)
 
+  /**
+   * Print the event to a stream.
+   * Meant for debugging purposes.
+   * \param s The stream to write to.
+   */
   virtual void print(std::wostream &s) const = 0;
-    // print to stream
 
   virtual ~event() = 0;
 };
@@ -50,9 +60,15 @@ inline std::wostream &operator<<(std::wostream &s, event const &e) {
   return s;
 }
 
+/**
+ * The base class for token events.
+ */
 class token : public event {
 };
 
+/**
+ * The event class for the simple::parser::begin_parse token.
+ */
 class begin_parse : public token {
 public:
   bool play(rule &r) const;

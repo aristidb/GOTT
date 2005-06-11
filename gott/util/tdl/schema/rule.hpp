@@ -31,33 +31,47 @@ namespace schema {
 
 class match;
 
-// Abstract rule
-// defines a rule object that can be matched
-// "match" feeds us with events and other notifications
+/**
+ * The base class of the implementation of a rule-matcher object.
+ * Used via match::add or via match's constructor. Attention: Those methods
+ * require a rule-factory, which in turn will create a rule object.
+ */
 class EXPORT rule {
 public:
   struct factory;
   class attributes;
 
-  enum expect { nothing = 1, maybe = 2, need = -3, over_filled = -4 };
-    // a rule may:
-    // expect <nothing> (when it's finished or empty)
-    // <maybe> accept something (when there is optional input it can be feeded)
-    // <need> input
-    // be <over_filled> (should not happen - it usually can ignore input)
+  /**
+   * The possible expectations of a living rule object.
+   */
+  enum expect {
+    /// Expect nothing (when finished or empty).
+    nothing = 1,
+    /// Maybe accept something (when optionally accepting more).
+    maybe = 2,
+    /// Need input.
+    need = -3,
+    /// Never occurs (I hope). 
+    over_filled = -4
+  };
 
+  /**
+   * Returns the current expectation.
+   */
   expect expects() const { return expectation; }
-    // what do we expect?
 
 
   // Event handlers
-  //  bool play(ev::event const &ev)
-    // try to match a token (or "event")
-    // return value: true on success
-    // side effects: adjust the expectation as necessary
-
-    // implemented as: visitor pattern -->
-    // default implementation: do nothing
+#ifdef NO_DEFINE_IMPLICIT_PLAYER_GUIDELINE
+  /**
+   * Tries to accept a token or notification. Adjusts expectation.
+   * Default implementation: Do nothing.
+   * \return
+   *   true on success
+   *   false on failure
+   */
+  bool play(ev::event const &ev)
+#endif
 
   // Tokens
   virtual bool play(ev::begin_parse const &) EXPORT;
@@ -69,6 +83,7 @@ public:
   virtual bool play(ev::child_succeed const &) EXPORT;
   virtual bool play(ev::child_fail const &) EXPORT;
 
+  /// @internal
   void finish();
 
   virtual ~rule() EXPORT = 0;

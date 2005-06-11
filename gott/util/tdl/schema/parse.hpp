@@ -34,10 +34,24 @@ namespace schema {
 
 class positioning;
 
-// Class match
-// Tries to fit a given tdl document (by simple::parse) into a schema
 /**
  * TDL schema matching engine.
+ * Use this as the first parameter to simple::parse in order to match a schema.
+ * If you use the result of match::get_debug as the second parameter, better
+ * errors can be produced.
+ *
+ * Example usage:
+ * @code
+ * try {
+ *   schema::context cont;
+ *   // ...fill cont...
+ *   structure::tree tr;
+ *   schema::match m(cont.get());
+ *   simple::parse(m, m.get_debug());
+ * } catch (schema::mismatch &m) {
+ *   std::wcout << m.what() << std::endl;
+ * }
+ * @endcode
  */
 class match : public simple::parser {
   class IMPL;
