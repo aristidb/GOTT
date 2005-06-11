@@ -36,30 +36,52 @@ class positioning;
 
 // Class match
 // Tries to fit a given tdl document (by simple::parse) into a schema
+/**
+ * TDL schema matching engine.
+ */
 class match : public simple::parser {
   class IMPL;
 
 public:
+  /**
+   * Constructs a new match object writing to a tree/something.
+   * \param tree The tree to write to.
+   */
   match(structure::revocable_structure &tree) EXPORT;
 
+  /**
+   * Constructs a new match object writing to a tree/something matching a 
+   * document specified by a rule-factory.
+   * \param rf The rule-factory specifying the document type.
+   * \param tree The tree to write to.
+   */
   match(rule::factory const &rf, structure::revocable_structure &tree) EXPORT;
-    // initialize a match-object that writes to tree and tries to
-    // match rf
 
   ~match() EXPORT;
 
-  void add(rule::factory const &) EXPORT;
-    // parse the new rule (instanciated from the given factory) before
-    // continueing with the current rule
+  /**
+   * Tells the engine to match next a rule specified by a rule-factory.
+   * \param rf The rule-factory specifying the to-be-added rule.
+   */
+  void add(rule::factory const &rf) EXPORT;
 
-  structure::revocable_structure &structure() EXPORT;
-    // return a reference to tree (defined in constructor)
+  /**
+   * Return a reference to the tree the engine writes to.
+   */
+  structure::revocable_structure &structure() const EXPORT;
 
 public:
-  positioning &pos() EXPORT;
+  /**
+   * Return a reference to the back-tracking and book-keeping sub-engine.
+   */
+  positioning &pos() const EXPORT;
 
 public:
-  simple::line_logger *get_debug() EXPORT;
+  /**
+   * Return a pointer to the internal line-logger.
+   * If this is passed to simple::parse, we can better report errors.
+   */
+  simple::line_logger *get_debug() const EXPORT;
 
 private:
   void begin_parse();

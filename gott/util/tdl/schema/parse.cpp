@@ -78,19 +78,19 @@ match::~match() { delete pIMPL; }
 
 // Forwarding
 
-void match::add(rule::factory const &rf) { 
+void match::add(rule::factory const &rf) {
   pIMPL->add(rf);
 }
 
-structure::revocable_structure &match::structure() { 
+structure::revocable_structure &match::structure() const {
   return pIMPL->struc;
 }
 
-simple::line_logger *match::get_debug() {
+simple::line_logger *match::get_debug() const {
   return &pIMPL->ln;
 }
 
-positioning &match::pos() {
+positioning &match::pos() const {
   return pIMPL->pos;
 }
 
@@ -112,7 +112,7 @@ void match::up() {
   pIMPL->handle_token(ev::up());
 }
 
-void match::end_parse() { 
+void match::end_parse() {
   pIMPL->handle_token(ev::end_parse());
 }
 

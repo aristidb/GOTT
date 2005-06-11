@@ -30,6 +30,9 @@ namespace util {
 namespace tdl {
 namespace schema {
 
+/**
+ * Memory-owning context class.
+ */
 class context : public boost::noncopyable {
 public:
   context() EXPORT;
@@ -41,7 +44,7 @@ public:
                     unsigned = 0);
   void end() EXPORT;
 
-  template<class T> 
+  template<class T>
   void begin_t(rule::attributes const &attr, unsigned c = 0) {
     begin(T::factory::index(), attr, c);
   }
