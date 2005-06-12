@@ -75,6 +75,9 @@ struct EXPORT rule::factory {
   virtual ~factory() = 0;
 };
 
+/**
+ * Some templates for providing the most accurate rule-factory builder.
+ */
 namespace factory_template {
 
 typedef std::vector<rule::factory const *> container;

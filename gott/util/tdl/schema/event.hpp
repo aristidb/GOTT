@@ -30,12 +30,14 @@ namespace schema {
 
 class rule;
 
+/**
+ * Schema events. Interesting for rule-writers.
+ */
 namespace ev {
 
 /**
  * Interface event for TDL tokens and schema notifications.
  */
-// A "storable" method invocation.
 class event {
 public:
   /**

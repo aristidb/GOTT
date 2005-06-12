@@ -1,0 +1,5 @@
+/**
+\namespace gott::util::debug
+Debugging utilities. For usage in debugging sessions or for writing more robust
+code.
+*/
