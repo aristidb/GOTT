@@ -112,7 +112,7 @@ template<class T> class nochild : public rule::factory {
 public:
   nochild(rule::attributes const &a) : attrib(a) {}
 
-  void add(rule::factory const &) {
+  void add(rule::factory const &child) { (void) child;
     throw ::std::bad_exception();
   }
 
@@ -137,8 +137,8 @@ template<class T> class onechild : public rule::factory {
 public:
   onechild(rule::attributes const &a) : attrib(a) {}
 
-  void add(rule::factory const &f) {
-    sub = &f;
+  void add(rule::factory const &child) {
+    sub = &child;
   }
 
   rule *get(match &m) const {
@@ -163,13 +163,13 @@ template<class T, unsigned N> class somechildren : public rule::factory {
 public:
   somechildren(rule::attributes const &a) : pos(0), attrib(a) {}
 
-  void add(rule::factory const &f) {
-    sub[pos++] = &f;
+  void add(rule::factory const &child) {
+    sub[pos++] = &child;
   }
 
-  void add(rule::factory const &f, unsigned i) {
-    sub[i] = &f;
-    pos = i + 1;
+  void add(rule::factory const &child, unsigned slot) {
+    sub[slot] = &child;
+    pos = slot + 1;
   }
 
   rule *get(match &m) const {
@@ -197,14 +197,14 @@ public:
     sub.reserve(n);
   }
 
-  void add(rule::factory const &f) {
-    sub.push_back(&f);
+  void add(rule::factory const &child) {
+    sub.push_back(&child);
   }
 
-  void add(rule::factory const &f, unsigned i) {
-    if (sub.size() <= i)
-      sub.resize(i + 1);
-    sub[i] = &f;
+  void add(rule::factory const &child, unsigned slot) {
+    if (sub.size() <= slot)
+      sub.resize(slot + 1);
+    sub[slot] = &child;
   }
 
   rule *get(match &m) const {

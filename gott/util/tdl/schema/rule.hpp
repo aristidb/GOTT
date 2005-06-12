@@ -66,8 +66,8 @@ public:
    * Tries to accept an ev:begin_parse token. Adjusts expectation.
    * Default implementation: Do nothing.
    * \return
-   *   - true on success
-   *   - false on failure
+   *   - \c true on success
+   *   - \c false on failure
    */
   virtual bool play(ev::begin_parse const &) EXPORT;
 

@@ -28,76 +28,112 @@ namespace util {
 namespace tdl {
 namespace simple {
 
-// Interface parser
-// This is a callback interface to the simple tdl parser.
+/**
+ * The callback interface to parse.
+ */
 struct EXPORT parser {
   // callbacks
   virtual void begin_parse() = 0;
-    // called as soon as the parse has begun
+    ///< Called as soon as the parse has begun.
 
   virtual void down() = 0;
-    // called when we open a new sub-layer
+    ///< Called when we open a new sub-layer.
  
   virtual void node(std::wstring const &content) = 0;
-    // called when a node has been read
+    ///< Called when a node has been read.
 
   virtual void comment(std::wstring const &content, bool on_new_line) = 0;
-    // called when a comment has been read
+    ///< Called when a comment has been read.
 
   virtual void up() = 0;
-    // called as we close a sub-layer
+    ///< Called as we close a sub-layer.
 
   virtual void end_parse() = 0;
-    // final call
+    ///< Final call.
 
   virtual ~parser() = 0;
 };
 
+/**
+ * The callback interface notified by parse() of line and cursor changes.
+ */
 struct line_logger {
   virtual void start_line() = 0;
+    ///< A new line was started.
+
+  /**
+   * A new token has appeared.
+   * \param start The starting line position of the token.
+   * \param end The first line position after the token.
+   * \param nd The token itself.
+   */
   virtual void token(unsigned start, unsigned end, std::wstring const &nd) = 0;
+
+  /**
+   * Called whenever a different line position is reached.
+   * \param line_pos The line position.
+   */
   virtual void line_position(unsigned line_pos) = 0;
+
   EXPORT virtual ~line_logger() = 0;
 };
 
-// Class meta_parser
-// This is an interface where you can specify meta-data call-backs and that you
-// can pass the meta-data parser.
-// Meta-data is seen in the start of the file as '#?...' lines. The first 
-// non-empty line ends the meta-data section.
-// If a command handler fails, the default command handler is called. 
-// The default handler should always succeed (currently failure is ignored).
+/**
+ * TDL Meta-data callback.
+ * This is an interface where you can specify meta-data call-backs and that you
+ * can pass to parse_meta.
+ * Meta-data is the section of the file containing '#?...' (and empty) lines
+ * only. A non-empty line ends this section.
+ * If a specified handler fails, the default handler is called.
+ * The default handler should always succeed (currently failure is ignored).
+ */
 class meta_parser {
 public:
+  /**
+   * The function type for a command handler.
+   * \param cmd The command name.
+   * \param param The rest of the command.
+   * \return The success of the handler.
+   */
   typedef 
-    boost::function<bool (std::wstring const &, std::wstring const &)> 
+    boost::function<bool (std::wstring const &cmd, std::wstring const &param)> 
     callback;
-    // The function type for a command handler
-    // First parameter: command name
-    // Second parameter: rest of the command
-    // Return: success
 
   EXPORT meta_parser();
 
+  /**
+   * Example handler. Stores the parameters of the latest invocation.
+   */
   class store_one_param {
   public:
+    /// The "function content".
     bool operator() (std::wstring const &, std::wstring const &p) { 
       x = p; 
       return true;
     }
+
+    /// The stored parameters.
     std::wstring const &data() const { return x; }
 
   private:
     std::wstring x;
   };
   
+  /**
+   * Set the default command handler.
+   * \param f The handler to add.
+   */
   void set_default(callback const &f) EXPORT;
-    // set the default command handler to f
   
+  /**
+   * Set a specific command handler.
+   * \param s The command to invocate this handler on.
+   * \param f The handler to add.
+   */
   void set_specific(std::wstring const &s, callback const &f) EXPORT;
-    // set the command handler for the command s to f
 
 public:
+  /// @internal
   void exec(std::wstring const &line);
 
 private:
@@ -106,12 +142,21 @@ private:
   cb_t cb;
 };
 
-EXPORT void parse(std::wistream &s, parser &p, line_logger * = 0);
-  // Parses the data section of a stream s (follows the meta-data section) 
-  // and puts the results in p.
+/**
+ * Parse a TDL document. Does not treat the meta-data section specifically.
+ * \param s The stream to read a document from.
+ * \param p The parser callback to notify of tokens.
+ * \param l (optional) The line-logger callback.
+ */
+EXPORT void parse(std::wistream &s, parser &p, line_logger *l = 0);
 
-EXPORT void parse_meta(std::wistream &, meta_parser &, line_logger * = 0);
-  // Parses the meta-data section of a stream to a meta_parser object.
+/**
+ * Parses the meta-data section of a TDL document to a special parser.
+ * \param s The stream to read from.
+ * \param p The meta-data callback to notify.
+ * \param l (optional) The line-logger callback.
+ */
+EXPORT void parse_meta(std::wistream &s, meta_parser &p, line_logger *l = 0);
 
 }}}}
 #endif

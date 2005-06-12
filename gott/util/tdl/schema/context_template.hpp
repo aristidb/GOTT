@@ -32,19 +32,52 @@ namespace util {
 namespace tdl {
 namespace schema {
 
+/**
+ * Chainable context producer. Stores the data necessary to construct a context
+ * and can take contexts as "arguments", hence context_<b>template</b>.
+ */
 class context_template {
 public:
   context_template() EXPORT;
   ~context_template() EXPORT;
 
-  void begin(unsigned id, rule::attributes const& = rule::attributes()) EXPORT;
-  void begin(unsigned id, rule::attributes const &, slotcfg const &) EXPORT;
+  /**
+   * Begins the declaration of a "rule".
+   * @see context::begin
+   * \param id The rule-factory builder's index.
+   * \param ra The rule-factory's and later rule's attributes.
+   */
+  void begin(unsigned id, 
+             rule::attributes const &ra = rule::attributes()) EXPORT;
+
+  /**
+   * Begins the declaration of a "rule".
+   * @see context::begin
+   * \param id The rule-factory builder's index.
+   * \param ra The rule-factory's and later rule's attributes.
+   * \param s Repetition definition.
+   */
+  void begin(unsigned id, rule::attributes const &ra, slotcfg const &s) EXPORT;
+
+  /**
+   * End the declaration of a "rule".
+   */
   void end() EXPORT;
 
-  typedef unsigned eID;
+  typedef unsigned eID; ///< A parameter's ID.
+
+  /**
+   * Add a parameter to the template.
+   * \param id The index of the parameter to add.
+   */
   void param(eID id) EXPORT;
 
-  void instantiate(std::vector<context*> const &, context &) EXPORT;
+  /**
+   * Instantiate to a context object.
+   * \param params The parameters in a vector, position equals eID.
+   * \param cont The context to fill.
+   */
+  void instantiate(std::vector<context*> const &params, context &cont) EXPORT;
 
 private:
   struct entry_begin {

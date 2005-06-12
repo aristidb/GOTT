@@ -14,12 +14,6 @@
 #include <winbase.h>
 #endif
 
-/**
- * Template Unit Tests Framework for C++.
- * http://tut.dozen.ru
- *
- * @author dozen, tut@dozen.ru
- */
 namespace tut
 {
   /**
@@ -187,7 +181,7 @@ namespace tut
      * Called when a test finished.
      * @param tr Test results.
      */
-    virtual void test_completed(const test_result& /*tr*/){};
+    virtual void test_completed(const test_result& tr){(void)tr;};
 
     /**
      * Called when all tests in run completed.
@@ -278,7 +272,6 @@ namespace tut
 
     /**
      * Runs all tests in all groups.
-     * @param callback Callback object if exists; null otherwise
      */
     void run_tests() const
     {

@@ -5,17 +5,6 @@
 #include <fstream>
 #include <iostream>
 
-/**
- * Template Unit Tests Framework for C++.
- * http://tut.dozen.ru
- *
- * Optional restartable wrapper for test_runner.
- * Allows to restart test runs finished due to
- * abnormal test application termination (such as
- * segmentation fault or math error).
- *
- * @author dozen, tut@dozen.ru
- */
 namespace tut
 {
   namespace util
@@ -132,6 +121,11 @@ namespace tut
 
   /**
    * Restartable test runner wrapper.
+   * 
+   * Optional restartable wrapper for test_runner.
+   * Allows to restart test runs finished due to
+   * abnormal test application termination (such as
+   * segmentation fault or math error).
    */
   class restartable_wrapper
   {

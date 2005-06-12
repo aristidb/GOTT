@@ -31,6 +31,9 @@ namespace tdl {
 
 namespace schema {
 
+/**
+ * Used for backtracking.
+ */
 class positioning {
 public:
   positioning(structure::revocable_structure &);
