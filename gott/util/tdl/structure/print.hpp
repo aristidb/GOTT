@@ -28,8 +28,17 @@ namespace util {
 namespace tdl {
 namespace structure {
 
+/**
+ * A structure writer callback directly writing to a stream. Does not support
+ * backtracking, of course.
+ */
 class direct_print : public writable_structure {
 public:
+  /**
+   * Constructor.
+   * \param out The stream to write to.
+   * \param step The indentation width.
+   */
   EXPORT direct_print(std::wostream &out, unsigned step = 4);
   EXPORT ~direct_print();
 
@@ -46,6 +55,11 @@ private:
   bool line_ended, tag_printed;
 };
 
+/**
+ * Print a (copyable) structure object to a (wide) stream.
+ * \param o The stream to write to.
+ * \param s The structure to print.
+ */
 inline 
 std::wostream &operator<<(std::wostream &o, copyable_structure const &s) {
   direct_print p(o);
@@ -53,6 +67,10 @@ std::wostream &operator<<(std::wostream &o, copyable_structure const &s) {
   return o;
 }
 
+/**
+ * Print a (copyable) structure object to a (normal) stream.
+ * @copydoc operator<<(std::wostream &, copyable_structure const &)
+ */
 inline 
 std::ostream &operator<<(std::ostream &o, copyable_structure const &s) {
   std::wostringstream wo;
@@ -60,6 +78,10 @@ std::ostream &operator<<(std::ostream &o, copyable_structure const &s) {
   return o << wo.str();
 }
 
+/**
+ * Convert a (copyable) structure to a string (wide or narrow).
+ * \param s The structure to convert.
+ */
 template<class Ch>
 std::basic_string<Ch> to_string(copyable_structure const &s) {
   std::basic_ostringstream<Ch> o;

@@ -28,51 +28,81 @@ namespace util {
 namespace tdl {
 namespace structure {
 
-// Class tree
-// The default implementation of the tdl data structure
+/**
+ * The default implementation of the (whole) structure concept.
+ */
 class tree : public revocable_structure, public copyable_structure {
   struct node;
 
 public: // Iterators
   class tagged_iterator;
 
-  // Class iterator
-  // The default iterator
-  // Corresponds to a node in the tree
+  /**
+   * The default iterator.
+   * Corresponds to a node in the tree.
+   */
   class iterator {
   public:
     typedef size_t size_type;
     
+    /**
+     * The number of children.
+     */
     EXPORT size_type size() const;
-      // the number of children
     
+    /**
+     * Gets a child by index. Creates the index table as necessary.
+     * \param n The index to get an element at.
+     */
     EXPORT iterator operator[](size_type n) const;
-      // the n-th child
 
-    EXPORT tagged_iterator with_tag(std::wstring const &) const;
-      // all children with the given tag
+    /**
+     * Gets children by tag.
+     * \param tag The tag to search for.
+     */
+    EXPORT tagged_iterator with_tag(std::wstring const &tag) const;
     
+    /**
+     * Gets the first child.
+     */
     EXPORT iterator first_child() const;
-      // the first child of the node
 
+    /**
+     * Gets the iterator with the next-higher position. This is: the right 
+     * sibling.
+     */
     EXPORT iterator next() const;
-      // the right sibling of the node
 
+    /**
+     * Gets the parental node.
+     */
     EXPORT iterator up() const;
-      // the parental node
     
+    /**
+     * Gets the data.
+     */
     EXPORT xany::Xany const &get_data() const;
-      // reads the node's data
 
+    /**
+     * Gets all tags.
+     */
     EXPORT std::list<std::wstring> const &get_tags() const;
-      // reads all the node's tags
 
+    /**
+     * Checks whether the iterator is valid.
+     */
     operator bool() const { return n; }
-      // is the iterator valid?
 
+    /**
+     * Checks whether two iterators are equal by structure and content.
+     * \param other The structure to compare with.
+     */
+    EXPORT bool contents_equal(iterator const &other) const;
+
+    /**
+     * @see query::selection
+     */
     typedef tagged_iterator tagged;
-
-    EXPORT bool contents_equal(iterator const &) const;
 
   private:  
     iterator();
@@ -83,21 +113,28 @@ public: // Iterators
     boost::intrusive_ptr<node> n;
   };
 
-  // Class tagged_iterator
-  // Corresponds to a node in a set of nodes with a common tag
+  /**
+   * Iterates through a set of nodes with a common tag.
+   */
   EXPORT class tagged_iterator {
   public:
     EXPORT tagged_iterator(tagged_iterator const &);
     EXPORT ~tagged_iterator();
     
+    /**
+     * Go to the next node with the same tag.
+     */
     EXPORT void operator++();
-      // go to the next node
 
+    /**
+     * Checks whether the iterator is still valid.
+     */
     EXPORT operator bool() const;
-      // is the iterator valid?
 
+    /**
+     * Get a normal iterator.
+     */
     EXPORT iterator get() const;
-      // get a normal iterator
   
   private:
     class IMPL;
@@ -107,8 +144,10 @@ public: // Iterators
     friend class iterator;
   };
 
+  /**
+   * Get an iterator for the root node.
+   */
   EXPORT iterator get_root() const;
-    // get an iterator for the root node
 
 private: // Inherited interface
   // Don't call these directly (exported symbols for no use is nothing I like)
@@ -123,7 +162,12 @@ private: // Inherited interface
   void get_rid_of(pth const &);
 
 public:
-  EXPORT void copy_to(writable_structure &) const;
+  EXPORT void copy_to(writable_structure &ws) const;
+
+  /**
+   * Checks whether the tree is equal to another tree.
+   * \param o The tree to check against.
+   */
   EXPORT bool operator==(tree const &o) const;
 
 public:
@@ -149,12 +193,26 @@ private:
   void foo();
 };
 
+/**
+ * Checks whether two trees differ.
+ * \param lhs The one tree to check against the other.
+ * \param rhs The other tree.
+ */
 inline bool operator!=(tree const &lhs, tree const &rhs) {
   return !(lhs == rhs);
 }
 
+/**
+ * Print a tree::iterator to a (wide) stream.
+ * \param s The stream to print to.
+ * \param i The iterator to print.
+ */
 EXPORT std::wostream &operator<<(std::wostream &s, tree::iterator const &i);
 
+/**
+ * Print a tree::iterator to a (normal) stream.
+ * @copydoc operator<<(std::wostream &, tree::iterator const &)
+ */
 inline std::ostream &operator<<(std::ostream &s, tree::iterator const &i) {
   std::wostringstream w;
   w << i;
