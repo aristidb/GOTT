@@ -33,12 +33,15 @@ env = Environment(
 
 Export('env')
 
+env.Program('test_point_in_contour', 'math/point_in_contour.cpp')
+
 SConscript(dirs = ['x11'])
 
 source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp', 'font.cpp', 'font/vector_glyph.cpp']
 
 # env.SharedLibrary('gottbase', source_files)
 env.StaticLibrary('gottbase', source_files)
+
 
 x11_example_files= ['test_x11.cpp']
 libs=['gottx11', 'gottbase' ,'GL', 'GLU', 'X11', 'boost_signals', 'Xxf86vm', 'freetype', 'z']
