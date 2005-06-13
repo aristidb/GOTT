@@ -14,7 +14,13 @@ struct vector_glyph
 {
   public:
     typedef gott::math::vector2<float> v2_type;
-    
+   
+    struct mesh_info {
+      GLenum mode; 
+      size_t first;
+      size_t count;
+      mesh_info( GLenum e, std::size_t f, std::size_t c ) : mode(e), first(f), count(c) {}
+    };
     struct contour_point 
     {
       explicit contour_point( v2_type const& pos,  contour_point * p = 0, contour_point * n = 0 );
@@ -36,6 +42,7 @@ struct vector_glyph
     std::list<contour_point*> points;
     std::list<contour_point*> contours;
     std::vector<v2_type> vertex_array;
+    //std::vector<mesh_info> vertex_array;
   //  std::vector<unsigned short> index_array;
 
 

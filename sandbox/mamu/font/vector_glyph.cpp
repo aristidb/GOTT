@@ -64,7 +64,6 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
     throw runtime_error("Fehler bei FT_Set_Char_Size");
 
   FT_Outline & outline =  face->glyph->outline;
-  
 
   /*
    * The following for loop creates the final contours from the contours found 
@@ -84,9 +83,8 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
     {
       char tag = outline.tags[index];
 
-      //if( tag == FT_Curve_Tag_On || (index + 1) == end )
-      //if( tag & 1 || (index + 1) == end )
-      //{
+      if( tag & 1 || (index + 1) == end )
+      {
         if( first_point == 0 ) {
           first_point = new contour_point( outline.points[index].x, outline.points[index].y  );
           last_point = first_point->next = first_point->previous = first_point;
@@ -96,7 +94,7 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
           points.push_back( new contour_point( outline.points[index].x, outline.points[index].y, last_point, first_point ) ); 
           last_point->next = points.back();
           last_point = points.back();
-        }/*
+        }
       }
       else
       {
@@ -161,9 +159,8 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
           cubic( points, previous, control_point, control_point_2, next );
           ++index;
         }
-      }*/
+      }
     }
-    //  dat.verts.push_back( v2_type( outline.points[  dat.contours.back().first ].x, outline.points[ dat.contours.back().first ].y  ) );
   
     contours.push_back( first_point );
   }
@@ -172,8 +169,6 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
   // All points of ALL contours get reorderd by the x-coordinate 
   points.sort( scanline_ordering() );
 
-
-#if 0 
 
   typedef std::list<line> open_lines_type;
   open_lines_type open_lines;
@@ -337,7 +332,6 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
         open_lines.push_back( line( (*it), (*l_it)->b, (*l_it)->a, false ) );
     }
   } 
-#endif
 
   /*  while( ! points.empty() )
       {
