@@ -1,0 +1,4 @@
+/**
+\namespace gott::util::tdl::query
+Utilities for querying data out of structures. Inspired by XPath/XQuery.
+*/

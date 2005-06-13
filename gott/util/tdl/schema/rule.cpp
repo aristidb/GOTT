@@ -48,7 +48,7 @@ public:
 
 private:
   void add_tags() {
-    void (writable_structure::*add)(wstring const &) = 
+    void (writable_structure::*add)(wstring const &) =
       &writable_structure::add_tag;
     for_each(range(attrib.tags()), bind(add, &cont->structure(), _1));
   }

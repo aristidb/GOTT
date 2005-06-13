@@ -34,12 +34,12 @@ namespace schema {
 class match_list : public rule {
 public:
   typedef factory_template::slotcfg_onechild<
-                                              match_list, 
-                                              slotcfg::list, 
-                                              slotcfg::all> 
+                                              match_list,
+                                              slotcfg::list,
+                                              slotcfg::all>
           factory;
 
-  match_list(rule::factory const &, slotcfg const &, rule::attributes const &, 
+  match_list(rule::factory const &, slotcfg const &, rule::attributes const &,
                   match &) EXPORT;
   ~match_list();
 

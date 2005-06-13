@@ -33,8 +33,8 @@ namespace detail {
 struct line_pos : public simple::line_logger {
   line_pos();
   void start_line();
-  void token(unsigned start, unsigned end, std::wstring const &w);
-  void line_position(unsigned pos);
+  void token(unsigned start, unsigned end, std::wstring const &nd);
+  void line_position(unsigned line_pos);
 
   unsigned line_new, line, pos;
   unsigned native_end, current;

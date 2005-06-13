@@ -31,11 +31,14 @@ namespace tdl {
 
 namespace schema {
 
+/**
+ * Used for backtracking.
+ */
 class positioning {
 public:
   positioning(structure::revocable_structure &);
   ~positioning();
-  
+
   typedef std::pair<std::size_t, structure::revocable_structure::pth> id;
 
   id current() EXPORT;
@@ -57,6 +60,8 @@ public:
   void consume(); // consume the current token
 
   bool proceeded(id const &) const EXPORT; // from the unconsumed token
+
+  unsigned debug_current() const;
 
 private:
   class IMPL;

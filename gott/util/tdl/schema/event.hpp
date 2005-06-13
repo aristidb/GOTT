@@ -30,47 +30,67 @@ namespace schema {
 
 class rule;
 
+/**
+ * Schema events. Interesting for rule-writers.
+ */
 namespace ev {
 
-// Interface event
-// A "storable" method invocation.
+/**
+ * Interface event for TDL tokens and schema notifications.
+ */
 class event {
 public:
+  /**
+   * Notify a rule of this event.
+   * Calls rule::play with a reference to *this.
+   * \param r The rule to notify.
+   */
   virtual bool play(rule &r) const = 0;
-    // play this event on the given rule via r.play(*this)
 
+  /**
+   * @internal
+   * Print the event to a stream.
+   * Meant for debugging purposes.
+   * \param s The stream to write to.
+   */
   virtual void print(std::wostream &s) const = 0;
-    // print to stream
-  
+
   virtual ~event() = 0;
 };
 
+/**
+ * Print an event to a stream.
+ */
 inline std::wostream &operator<<(std::wostream &s, event const &e) {
   e.print(s);
   return s;
 }
 
+/// The base class for token events.
 class token : public event {
 };
 
+/// The event class for the simple::parser::begin_parse token.
 class begin_parse : public token {
 public:
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 };
 
+/// The event class for the simple::parser::down token.
 class down : public token {
 public:
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 };
 
+/// The event class for the simple::parser::node token.
 class node : public token {
   std::wstring data;
 public:
   node(std::wstring const &);
     // construct a node with the given data
-  
+
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 
@@ -78,12 +98,14 @@ public:
     // get the data of this node-event
 };
 
+/// The event class for the simple::parser::up token.
 class up : public token {
 public:
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 };
 
+/// The event class for the simple::parser::end_parse token.
 class end_parse : public token {
 public:
   bool play(rule &r) const;
@@ -94,15 +116,18 @@ typedef boost::variant<begin_parse, down, node, up, end_parse> token_t;
 
 token const &get(token_t const &);
 
+/// The base class for notification events.
 class notification : public event {
 };
 
+/// The event class for a succeeded child.
 class child_succeed : public notification {
 public:
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 };
 
+/// The event class for a failed child.
 class child_fail : public notification {
 public:
   bool play(rule &r) const;

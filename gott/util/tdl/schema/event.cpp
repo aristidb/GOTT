@@ -57,31 +57,31 @@ bool ev::child_fail::play(rule &r) const {
 }
 
 void ev::begin_parse::print(wostream &s) const {
-  s << L"event:begin_parse";
+  s << L"token:begin_parse";
 }
 
 void ev::node::print(wostream &s) const {
-  s << L"event:node{" << data << L"}";
+  s << L"token:node{" << data << L"}";
 }
 
 void ev::down::print(wostream &s) const {
-  s << L"event:down";
+  s << L"token:down";
 }
 
 void ev::up::print(wostream &s) const {
-  s << L"event:up";
+  s << L"token:up";
 }
 
 void ev::end_parse::print(wostream &s) const {
-  s << L"event:end_parse";
+  s << L"token:end_parse";
 }
 
 void ev::child_succeed::print(wostream &s) const {
-  s << L"event:notify:child_succeed";
+  s << L"notify:child_succeed";
 }
 
 void ev::child_fail::print(wostream &s) const {
-  s << L"event:notify:child_fail";
+  s << L"notify:child_fail";
 }
 
 ev::node::node(std::wstring const &s) : data(s) {}

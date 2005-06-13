@@ -3,12 +3,6 @@
 
 #include <gott/util/tut/tut.h>
 
-/**
- * Template Unit Tests Framework for C++.
- * http://tut.dozen.ru
- *
- * @author dozen, tut@dozen.ru
- */
 namespace
 {
   std::ostream& operator << (std::ostream& os,const tut::test_result& tr)

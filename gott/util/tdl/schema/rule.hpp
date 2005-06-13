@@ -31,51 +31,93 @@ namespace schema {
 
 class match;
 
-// Abstract rule
-// defines a rule object that can be matched
-// "match" feeds us with events and other notifications
+/**
+ * The base class of the implementation of a rule-matcher object.
+ * Used via match::add or via match's constructor. Attention: Those methods
+ * require a rule-factory, which in turn will create a rule object.
+ */
 class EXPORT rule {
 public:
   struct factory;
   class attributes;
 
-  enum expect { nothing = 1, maybe = 2, need = -3, over_filled = -4 };
-    // a rule may:
-    // expect <nothing> (when it's finished or empty)
-    // <maybe> accept something (when there is optional input it can be feeded)
-    // <need> input
-    // be <over_filled> (should not happen - it usually can ignore input)
-  
-  expect expects() const { return expectation; }
-    // what do we expect?
+  /**
+   * The possible expectations of a living rule object.
+   */
+  enum expect {
+    /// Expect nothing (when finished or empty).
+    nothing = 1,
+    /// Maybe accept something (when optionally accepting more).
+    maybe = 2,
+    /// Need input.
+    need = -3,
+    /// Never occurs (I hope). 
+    over_filled = -4
+  };
 
+  /**
+   * Returns the current expectation.
+   */
+  expect expects() const { return expectation; }
 
   // Event handlers
-  //  bool play(ev::event const &ev)
-    // try to match a token (or "event")
-    // return value: true on success
-    // side effects: adjust the expectation as necessary
-
-    // implemented as: visitor pattern -->
-    // default implementation: do nothing
-  
   // Tokens
+  /**
+   * Tries to accept an ev:begin_parse token. Adjusts expectation.
+   * Default implementation: Do nothing.
+   * \return
+   *   - \c true on success
+   *   - \c false on failure
+   */
   virtual bool play(ev::begin_parse const &) EXPORT;
+
+  /**
+   * Tries to accept an ev::down token.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::down const &) EXPORT;
+
+  /**
+   * Tries to accept an ev::node token.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::node const &) EXPORT;
+
+  /**
+   * Tries to accept an ev::up token.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::up const &) EXPORT;
+
+  /**
+   * Tries to accept an ev::end_parse token.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::end_parse const &) EXPORT;
+
   // Notifications
+  /**
+   * Tries to accept an ev::child_succeed event.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::child_succeed const &) EXPORT;
+  
+  /**
+   * Tries to accept an ev::child_fail event.
+   * @copydoc play(ev::begin_parse const &)
+   */
   virtual bool play(ev::child_fail const &) EXPORT;
 
+  /// @internal
   void finish();
-  
+
   virtual ~rule() EXPORT = 0;
 
   // Properties
+  /**
+   * Get the attributes associated with this rule.
+   */
   attributes const &get_attributes() const EXPORT;
-    // get the attributes associated with this rule
 
   virtual wchar_t const *name() const EXPORT = 0;
     // well, mangled typeid() names are hard to read!

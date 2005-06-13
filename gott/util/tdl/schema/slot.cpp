@@ -58,7 +58,7 @@ rule::expect slotcfg::expectation() const {
       return rule::need;
     else
       return rule::over_filled;
-    
+
   case optional:
     if (count == 0)
       return rule::maybe;
@@ -66,16 +66,16 @@ rule::expect slotcfg::expectation() const {
       return rule::nothing;
     else
       return rule::over_filled;
-    
+
   case list:
     return rule::maybe;
-    
+
   case some:
     if (count > 0)
       return rule::maybe;
     else
       return rule::need;
-    
+
   case exact:
     if (count < get<size_t>(type))
       return rule::need;
@@ -83,7 +83,7 @@ rule::expect slotcfg::expectation() const {
       return rule::nothing;
     else
       return rule::over_filled;
-    
+
   case minimum:
     if (count >= get<size_t>(type))
       return rule::maybe;
@@ -128,7 +128,7 @@ bool slotcfg::prefix_optional() const {
 
   case range:
     return get<pair<size_t, size_t> >(type).first == 0;
-    
+
   case function:
     return get<callback>(type)(0) > 0;
   }
@@ -157,7 +157,7 @@ slotcfg slotcfg::no_optional() const {
     return slotcfg(some);
   case maximum:
     return slotcfg(range, 1, get<size_t>(type));
-    
+
   case minimum:
     return slotcfg(minimum, !get<size_t>(type) ? 1 : get<size_t>(type));
 
@@ -173,7 +173,7 @@ slotcfg slotcfg::no_optional() const {
 }
 
 
-void rule::factory::with_slotcfg::add(rule::factory const &child, 
+void rule::factory::with_slotcfg::add(rule::factory const &child,
                                       unsigned, slotcfg const &cfg) {
   add(child, cfg);
 }

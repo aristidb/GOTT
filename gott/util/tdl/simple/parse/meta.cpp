@@ -24,7 +24,7 @@ using std::wistream;
 using std::wstring;
 using gott::util::tdl::simple::meta_parser;
 
-void gott::util::tdl::simple::parse_meta(wistream &in, meta_parser &p, 
+void gott::util::tdl::simple::parse_meta(std::wistream &in, meta_parser &p, 
                                          line_logger *) {
   while (in) {
     if (in.peek() != L'#') {

@@ -29,7 +29,10 @@ namespace tdl {
 namespace structure {
 class writable_structure;
 
-namespace cf { // cf=comfort
+/**
+ * More comfortable structure generators.
+ */
+namespace cf {
 
 typedef std::list<std::wstring> tag_list;
 class node_inserter_t;

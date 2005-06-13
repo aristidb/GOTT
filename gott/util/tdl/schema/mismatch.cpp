@@ -23,7 +23,7 @@
 
 using gott::util::tdl::schema::mismatch;
 
-mismatch::mismatch(detail::line_pos const &p) {  
+mismatch::mismatch(detail::line_pos const &p) {
   std::ostringstream o;
   o << p.line << ':' << p.pos+1 << " : mismatch ";
   if (p.line_new > p.line || p.current > p.native_end)

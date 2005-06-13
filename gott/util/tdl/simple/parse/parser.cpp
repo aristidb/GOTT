@@ -98,7 +98,8 @@ class cancellor {};
 
 line_logger::~line_logger() {}
 
-void gott::util::tdl::simple::parse(wistream &s, parser &p, line_logger *l) {
+void gott::util::tdl::simple::parse(std::wistream &s, 
+                                    parser &p, line_logger *l) {
   if (l) {
     exec_parse<true> x(s, p, l);
     x.run_parse();

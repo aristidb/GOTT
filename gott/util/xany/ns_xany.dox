@@ -1,0 +1,5 @@
+/**
+\namespace gott::util::xany
+Extensible "any"-class. Makes up for a good replacement for boost::any.
+Features the promote concept and common operations.
+*/

@@ -27,30 +27,30 @@ namespace gott {
 namespace util {
 namespace tdl {
 namespace schema {
-  
+
 // Class rule::attributes
 // Defines the user-supplyable attributes for a rule
 class rule::attributes {
 public:
   explicit attributes(bool cc = true) : c(cc) {}
 
-  explicit attributes(std::list<std::wstring> const &l, bool cc = true) 
+  explicit attributes(std::list<std::wstring> const &l, bool cc = true)
   : c(cc), t(l) {}
-  
-  explicit attributes(std::wstring const &s, bool cc = true) 
+
+  explicit attributes(std::wstring const &s, bool cc = true)
   : c(cc), t(1, s) {}
-  
+
   template<class T> 
   explicit attributes(std::list<std::wstring> const &l, bool cc, T const &x)
   : c(cc), t(l), u(x) {}
-  
+
   bool coat() const { return c; }
   void set_coat(bool x) { c = x; }
 
   std::list<std::wstring> const &tags() const { return t; }
   void add_tag(std::wstring const &x) { t.push_back(x); }
 
-  xany::Xany const &user() const { return u; }  
+  xany::Xany const &user() const { return u; }
 
 private:
   bool c;

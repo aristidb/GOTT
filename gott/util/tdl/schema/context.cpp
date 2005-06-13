@@ -33,12 +33,12 @@ context::~context() {
     delete *it;
 }
 
-void context::begin(unsigned i, rule::attributes const &a, 
+void context::begin(unsigned i, rule::attributes const &a,
                     optional<slotcfg> const &c, unsigned l) {
   rule::factory *f = get_factory(i, a, l);
-  
+
   pool.push_back(f);
-  
+
   add_owned(f, c);
 }
 
@@ -83,7 +83,7 @@ void context::add_slotted(rule::factory const *f, slotcfg const &c) {
     add_enc_slotted(f, c);
 }
 
-void context::add_enc_slotted(rule::factory const *f, slotcfg const &c, 
+void context::add_enc_slotted(rule::factory const *f, slotcfg const &c,
                               optional<slotcfg> const &e) {
   if (c.get_mode() == slotcfg::one)
     return org.back()->add(*f);

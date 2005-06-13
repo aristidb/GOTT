@@ -430,7 +430,7 @@ void vector_glyph::render() const
     glColor4f(0.0,0.0,1.0,0.25);glVertex2fv( reinterpret_cast<float const*>(&vertex_array[i+2]));
     glEnd();
   }
-//  glDrawArrays( GL_TRIANGLES, 0, vertex_array.size() );
+  //glDrawArrays( GL_TRIANGLES, 0, vertex_array.size() );
 
   glPopMatrix();
   glPopClientAttrib();
@@ -440,4 +440,5 @@ void vector_glyph::render() const
 
 
 }}}
+
 
