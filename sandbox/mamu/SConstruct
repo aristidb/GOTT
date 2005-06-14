@@ -34,6 +34,7 @@ env = Environment(
 Export('env')
 
 env.Program('test_point_in_contour', 'math/point_in_contour.cpp')
+env.Program('test_clockwise', 'math/clockwise.cpp')
 
 SConscript(dirs = ['x11'])
 

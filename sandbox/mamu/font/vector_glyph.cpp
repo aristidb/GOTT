@@ -24,7 +24,7 @@ struct line {
 };
 
 line::line(vector_glyph::contour_point *f, vector_glyph::contour_point *s, vector_glyph::contour_point *t, bool is_c )
-  : a(f), b(s), border(f->point, s->point, t->point ), is_contour(is_c)
+  : a(f), b(s), border( create_oriented_hesse_line( f->point, s->point, t->point ) ), is_contour(is_c)
 {
 }
 
@@ -289,9 +289,9 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
              contour_point * n_b = l_it->get_neighbour_point_of_b();
              math::hyper_plane2<float> p_a, p_b;
              if( n_a )
-               p_a = math::hyper_plane2<float>( l_it->a->point, n_a->point, l_it->b->point ); 
+               p_a = math::hyper_plane2<float>( create_oriented_hesse_line( l_it->a->point, n_a->point, l_it->b->point ) ); 
              if( n_b )
-               p_b = math::hyper_plane2<float>( l_it->b->point, n_b->point, l_it->a->point ); 
+               p_b = math::hyper_plane2<float>( create_oriented_hesse_line( l_it->b->point, n_b->point, l_it->a->point ) ); 
 
              if( n_a && n_b && p_a.distance( (*it)->point ) > 0 &&  p_b.distance( (*it)->point ) > 0 )  // this test suffices because points are ordered
                possible_lines.push_back( l_it );
