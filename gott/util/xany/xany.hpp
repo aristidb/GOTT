@@ -33,34 +33,99 @@ namespace gott {
 namespace util {
 namespace xany {
 
+/**
+ * Dummy basetype for "typeless operations".
+ *
+ * Example usage:
+ * @code
+ * Xany v(4);
+ * std::cout << v;
+ * @endcode
+ * Which is behind the scenes:
+ * @code
+ * dynamic_cast<printable&>(v.get_operations()).print(std::cout, v);
+ * @endcode
+ */
 struct operations_base {
   EXPORT virtual ~operations_base() = 0;
 };
 
 template<class T> struct operations;
 
+/**
+ * Typeless objects.
+ * Has two special features:
+ *   - Type promotion (see xany::promote).
+ *   - Runtime-typed operations (see xany::operations_base).
+ */
 class Xany {
   template<class T> class holder;
 public:
+  /// Construct an empty typeless object.
   Xany() : place(0) {}
+
+  /**
+   * Constructs a typeless object from data.
+   * \param v The data to save.
+   */
   template<class T> explicit Xany(T const &v)
     : place(new holder<typename promote<T>::type>(promote<T>::get(v))) {}
-  ~Xany() { delete place; }
 
+  ~Xany() { 
+    delete place; 
+  }
+
+  /// Copy constructor.
   Xany(Xany const &o)
     : place(o.place ? o.place->clone() : 0) {}
 
-  Xany &swap(Xany &o) { std::swap(place, o.place); return *this; }
-  Xany &operator=(Xany const &o) { Xany(o).swap(*this); return *this; }
-  template<class T>
-  Xany &operator=(T const &o) { Xany(o).swap(*this); return *this; }
+  /**
+   * Swaps the object's contents with another object.
+   * \param o The object to swap with.
+   */
+  Xany &swap(Xany &o) { 
+    std::swap(place, o.place); 
+    return *this; 
+  }
 
+  /**
+   * (Over-)Write another object's data to the object.
+   * \param o The object to copy from.
+   */
+  Xany &operator=(Xany const &o) { 
+    Xany(o).swap(*this); 
+    return *this; 
+  }
+
+  /**
+   * (Over-)Write data to the object.
+   * \param o The data to write.
+   */
+  template<class T>
+  Xany &operator=(T const &o) {
+    Xany(o).swap(*this); 
+    return *this; 
+  }
+
+  /**
+   * Gets the operations supported by the object's data.
+   * Cast to the actually needed operations.
+   * \return A basetype reference to the operations.
+   */
   operations_base const &get_operations() const { 
     return place->get_operations();
   }
 
-  bool empty() const { return !place; }
+  /**
+   * Checks whether the object is empty.
+   */
+  bool empty() const { 
+    return !place; 
+  }
 
+  /**
+   * Returns the object's data' type.
+   */
   std::type_info const &type() const {
     return place ? place->type() : typeid(void);
   }
@@ -75,8 +140,12 @@ private:
 
   template<class T> struct holder : public placeholder {
     holder(T const &v) : value(v) {}
-    std::type_info const &type() const { return typeid(T); }
-    placeholder *clone() const { return new holder(value); }
+    std::type_info const &type() const { 
+      return typeid(T); 
+    }
+    placeholder *clone() const { 
+      return new holder(value); 
+    }
     operations_base &get_operations() const {
       static operations<T> o;
       return o;
@@ -88,10 +157,13 @@ private:
   template<class T> 
   friend typename promote<T>::reference Xany_cast_ref(Xany &);
 
-public:
   placeholder *place;
 };
 
+/**
+ * Get the data out of a typeless object for modification.
+ * \param p The typeless object to get data out of.
+ */
 template<class T>
 typename promote<T>::reference
 Xany_cast_ref(Xany &p) {
@@ -101,11 +173,19 @@ Xany_cast_ref(Xany &p) {
    Xany::template holder<typename promote<T>::type>*>(p.place)->value);
 }
 
+/**
+ * Get the data out of a typeless object for reading.
+ * \param p The typeless object to get data out of.
+ */
 template<class T>
 T Xany_cast(Xany const &p) {
   return Xany_cast_ref<T>(const_cast<Xany &>(p));
 }
 
+/**
+ * Any equality-comparable Xany-compatible type has this interface in its
+ * operations.
+ */
 struct EXPORT equality_comparable : virtual operations_base {
   virtual bool equals(Xany const &, Xany const &) const = 0;
   virtual ~equality_comparable() = 0;
@@ -117,13 +197,24 @@ template<class T> struct equality_comparer : equality_comparable {
   }
 };
 
+/**
+ * The default operations implementation.
+ */
 template<class T> struct operations : equality_comparer<T> {};
 
-template<class T, class U> struct compose : T, U {};
-
+/**
+ * Checks whether two typeless objects are equal.
+ */
 EXPORT bool operator==(Xany const &lhs, Xany const &rhs);
+
+/**
+ * Checks whether two typeless objects differ.
+ */
 EXPORT bool operator!=(Xany const &lhs, Xany const &rhs);
 
+/**
+ * Any printable Xany-compatible type has this interface in its operations.
+ */
 struct EXPORT printable : virtual operations_base {
   virtual void print(std::ostream &, Xany const &) const = 0;
   virtual void print(std::wostream &, Xany const &) const = 0;
@@ -140,6 +231,12 @@ template<class T> struct printer : printable {
   }
 };
 
+/**
+ * Print a typeless object to a stream.
+ * \param s The stream to write to.
+ * \param v The object to print.
+ * \return A reference to s.
+ */
 template<class Ch, class ChT>
 std::basic_ostream<Ch, ChT> &
 operator<<(std::basic_ostream<Ch, ChT> &s, Xany const &v) {

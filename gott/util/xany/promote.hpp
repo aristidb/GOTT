@@ -25,6 +25,16 @@ namespace gott {
 namespace util {
 namespace xany {
 
+/**
+ * Allows for less rigid and more efficient typing in xany::Xany.
+ * The concept is easy: With template specialization any type can be mapped
+ * to another type - but transparently. 
+ *
+ * Example: you save an int with value 4 to a typeless object. Then you extract
+ * a short out of it. The whole thing works because both short and int are 
+ * mapped to long. Because of advanced mapping techniques such as proxying, you
+ * don't notice though.
+ */
 template<class T> 
 struct promote {
   typedef T type;
