@@ -2,6 +2,8 @@
 #include "fixed_vector.hpp"
 
 namespace gott{ namespace math{
+  
+enum order { Undefined, Clockwise, CounterClockwise };
 
 template<typename T>
 inline T get_normal( vector2<T> const& prev, vector2<T> const& current, vector2<T> const&  next )
@@ -18,7 +20,6 @@ inline T get_normal( vector2<T> const& prev, vector2<T> const& current, vector2<
 
 template<typename T>
 struct clock_order {
-  enum order { Undefined, Clockwise, CounterClockwise };
   std::list<vector2<T> > points;
   vector2<T> first, second;
   int counter;
@@ -64,7 +65,7 @@ struct clock_order_frontend {
   clock_order<T> & d;
   clock_order_frontend( clock_order<float> & data ) : d(data) { d.init(); }
   inline void operator()( vector2<T> const& p ) { d(p); }
-  inline typename clock_order<T>::order get_ordering() const { return d.get_ordering(); }
+  inline order get_ordering() const { return d.get_ordering(); }
 };
 
 }}

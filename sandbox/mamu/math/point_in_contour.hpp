@@ -44,12 +44,10 @@ bool point_in_contour( InputPointIterator begin_contour, InputPointIterator end_
   , { 2, 1,-1, 0}
   };
 
-  std::cout << "start position " << prev_pos[0] << "," << prev_pos[1] << " in quadrant " << int(quadrant) << std::endl;
   while( ++it != end_contour )
   {
     vector2<T> pos = *it - point;
     unsigned char next_quadrant(detail::get_quadrant_number(pos));
-    std::cout << "next position " << pos[0] << "," << pos[1] << " in quadrant "<< int(next_quadrant) << std::endl;
 
     switch( array[quadrant][next_quadrant] ) {
       case 1:  ++winding_counter; break;
@@ -62,14 +60,12 @@ bool point_in_contour( InputPointIterator begin_contour, InputPointIterator end_
     prev_it = it;
     prev_pos = pos;
 
-    std::cout << "winding_counter: " << winding_counter << std::endl;
     
   }
 
   // handle final edge to start point:
   vector2<T> pos = *begin_contour - point;
   unsigned char next_quadrant(detail::get_quadrant_number(pos));
-  std::cout << "next position " << pos[0] << "," << pos[1]<< " in quadrant " << int(next_quadrant) << std::endl;
   switch( array[quadrant][next_quadrant] ) {
     case 1:  ++winding_counter; break;
     case -1: --winding_counter; break;
@@ -77,7 +73,6 @@ bool point_in_contour( InputPointIterator begin_contour, InputPointIterator end_
     default: break;
   }
 
-  std::cout << "winding_counter: " << winding_counter << std::endl;
   return winding_counter == 4 || winding_counter == -4;
 }
  

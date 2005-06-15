@@ -7,6 +7,7 @@
 #include <ft2build.h>
 #include  FT_FREETYPE_H 
 #include "../math/fixed_vector.hpp"
+#include "../math/clockwise.hpp"
 
 namespace gott{namespace gui{namespace font {
 
@@ -21,33 +22,20 @@ struct vector_glyph
       size_t count;
       mesh_info( GLenum e, std::size_t f, std::size_t c ) : mode(e), first(f), count(c) {}
     };
-    struct contour_point 
-    {
-      explicit contour_point( v2_type const& pos,  contour_point * p = 0, contour_point * n = 0 );
-      contour_point( float x, float y,  contour_point * p = 0, contour_point * n = 0 );
-      v2_type point;
-      contour_point *previous;
-      contour_point *next;
-      int array_index;
-    };
+
   private:
-
-    struct scanline_ordering 
-    {
-      bool operator()(contour_point const& a, contour_point const& b )
-      { return a.point[0] < b.point[0];}
-      bool operator()(contour_point const* a, contour_point const* b )
-      { return a->point[0] < b->point[0];}
-    };
-    std::list<contour_point*> points;
-    std::list<contour_point*> contours;
     std::vector<v2_type> vertex_array;
-    //std::vector<mesh_info> vertex_array;
-  //  std::vector<unsigned short> index_array;
+    std::vector<mesh_info> array_info;
 
+    static void begin_array(GLenum mode, vector_glyph *glyph);
+    static void end_array(vector_glyph *glyph );
+    static void combine(  GLdouble coords[3], void *vertex_data[4],
+                                    GLfloat weight[4], void **outData,
+                                    vector_glyph *glyph);
+    static void add_vertex( gott::math::vector3<double>* vertex_data, vector_glyph * glyph );
 
-    void conic( std::list<contour_point*>& points, contour_point * begin, v2_type const& mid, contour_point * end ) const;  
-    void cubic( std::list<contour_point*>& points, contour_point * begin, v2_type const& mid_1, v2_type const& mid_2, contour_point * end ) const; 
+    void conic( GLUtesselator *t, std::vector<gott::math::vector3<double>*> & data, v2_type const& begin, v2_type const& mid, v2_type const& end ) const;  
+    void cubic( GLUtesselator *t, std::vector<gott::math::vector3<double>*> & data, v2_type const& begin, v2_type const& mid_1, v2_type const& mid_2, v2_type const& end ) const;  
 
   public:
     vector_glyph( FT_Face & face, std::size_t glyph_index );
