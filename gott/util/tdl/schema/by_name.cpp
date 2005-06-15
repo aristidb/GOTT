@@ -18,20 +18,33 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_TDL_SCHEMA_BUILTIN_TYPES_HPP
-#define GOTT_UTIL_TDL_SCHEMA_BUILTIN_TYPES_HPP
+#include "by_name.hpp"
 
-#include <gott/util/tdl/schema/types/any.hpp>
-#include <gott/util/tdl/schema/types/document.hpp>
-#include <gott/util/tdl/schema/types/enumeration.hpp>
-#include <gott/util/tdl/schema/types/follow.hpp>
-#include <gott/util/tdl/schema/types/integer.hpp>
-#include <gott/util/tdl/schema/types/list.hpp>
-#include <gott/util/tdl/schema/types/literal.hpp>
-#include <gott/util/tdl/schema/types/named.hpp>
-#include <gott/util/tdl/schema/types/optional.hpp>
-#include <gott/util/tdl/schema/types/ordered.hpp>
-#include <gott/util/tdl/schema/types/string.hpp>
-#include <gott/util/tdl/schema/types/unordered.hpp>
+using std::wstring;
+namespace tdl = gott::util::tdl;
+namespace schema = tdl::schema;
+using schema::name_manager_t;
 
-#endif
+name_manager_t schema::name_manager;
+
+class name_manager_t::IMPL {
+public:
+  hashd::hash_map<wstring, unsigned> items;
+};
+
+name_manager_t::name_manager_t() : p(new IMPL) {
+}
+
+name_manager_t::~name_manager_t() {
+}
+
+void name_manager_t::add(wstring const &name, unsigned id) {
+  p->items.insert(std::make_pair(name, id));
+}
+
+unsigned name_manager_t::get(wstring const &name) const {
+  hashd::hash_map<wstring, unsigned>::const_iterator it = p->items.find(name);
+  if (it == p->items.end())
+    throw std::bad_exception();
+  return it->second;
+}

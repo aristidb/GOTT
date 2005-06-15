@@ -18,20 +18,44 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_TDL_SCHEMA_BUILTIN_TYPES_HPP
-#define GOTT_UTIL_TDL_SCHEMA_BUILTIN_TYPES_HPP
+#ifndef GOTT_UTIL_TDL_SCHEMA_BY_NAME_HPP
+#define GOTT_UTIL_TDL_SCHEMA_BY_NAME_HPP
 
-#include <gott/util/tdl/schema/types/any.hpp>
-#include <gott/util/tdl/schema/types/document.hpp>
-#include <gott/util/tdl/schema/types/enumeration.hpp>
-#include <gott/util/tdl/schema/types/follow.hpp>
-#include <gott/util/tdl/schema/types/integer.hpp>
-#include <gott/util/tdl/schema/types/list.hpp>
-#include <gott/util/tdl/schema/types/literal.hpp>
-#include <gott/util/tdl/schema/types/named.hpp>
-#include <gott/util/tdl/schema/types/optional.hpp>
-#include <gott/util/tdl/schema/types/ordered.hpp>
-#include <gott/util/tdl/schema/types/string.hpp>
-#include <gott/util/tdl/schema/types/unordered.hpp>
+#include <gott/util/misc/commonheaders.hpp>
+
+namespace gott {
+namespace util {
+namespace tdl {
+namespace schema {
+
+/**
+ * Manages all named (native) schema types.
+ */
+class name_manager_t {
+public:
+  EXPORT name_manager_t();
+  EXPORT ~name_manager_t();
+
+  /**
+   * Add a type to the database.
+   * \param name The name to find the type with.
+   * \param type The type's id (see get_factory()).
+   */
+  EXPORT void add(std::wstring const &name, unsigned type);
+
+  /**
+   * Get a type from the database.
+   * \param name The type's name.
+   * \return The type's id  (see get_factory()).
+   */
+  EXPORT unsigned get(std::wstring const &name) const;
+
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
+};
+
+extern name_manager_t name_manager;
+
+}}}}
 
 #endif
