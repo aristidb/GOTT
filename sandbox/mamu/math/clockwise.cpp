@@ -27,12 +27,12 @@ int main()
 
     {
       std::for_each(polygon.begin(), polygon.end(),  clock_order_frontend<float>( data ) );
-      std::cout << ((data.get_ordering()==clock_order<float>::CounterClockwise)?"CounterClockwise":"Clockwise") << std::endl;
+      std::cout << ((data.get_ordering()==CounterClockwise)?"CounterClockwise":"Clockwise") << std::endl;
     }
 
     {
       std::for_each(polygon.rbegin(), polygon.rend(),  clock_order_frontend<float>( data ) );
-      std::cout << ((data.get_ordering()==clock_order<float>::CounterClockwise)?"CounterClockwise":"Clockwise") << std::endl;
+      std::cout << ((data.get_ordering()==CounterClockwise)?"CounterClockwise":"Clockwise") << std::endl;
     }
   }
 
@@ -47,12 +47,12 @@ int main()
 
     {
       std::for_each(polygon.begin(), polygon.end(),  clock_order_frontend<float>( data ) );
-      std::cout << ((data.get_ordering()==clock_order<float>::CounterClockwise)?"CounterClockwise":"Clockwise") << std::endl;
+      std::cout << ((data.get_ordering()==CounterClockwise)?"CounterClockwise":"Clockwise") << std::endl;
     }
 
     {
       std::for_each(polygon.rbegin(), polygon.rend(),  clock_order_frontend<float>( data ) );
-      std::cout << ((data.get_ordering()==clock_order<float>::CounterClockwise)?"CounterClockwise":"Clockwise") << std::endl;
+      std::cout << ((data.get_ordering()==CounterClockwise)?"CounterClockwise":"Clockwise") << std::endl;
     }
   }
 }

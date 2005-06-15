@@ -20,7 +20,7 @@ struct hyper_plane2
 template<typename T>
 inline hyper_plane2<T> create_oriented_hesse_line( vector2<T> const& a, vector2<T> const& b, vector2<T> const& test_point )
 {
-  vector2<T> normal = (a - b);
+  vector2<T> normal = (b - a);
   swap(normal[0], normal[1]);
   T length = std::sqrt( normal[0]*normal[0] + normal[1]*normal[1] );
   normal[1] = -normal[1];
@@ -35,7 +35,7 @@ inline hyper_plane2<T> create_oriented_hesse_line( vector2<T> const& a, vector2<
 template<typename T>
 inline hyper_plane2<T> create_hesse_line( vector2<T> const& a, vector2<T> const& b )
 {
-  vector2<T> normal = (a - b);
+  vector2<T> normal = (b - a);
   swap(normal[0], normal[1]);
   T length = std::sqrt( normal[0]*normal[0] + normal[1]*normal[1] );
   normal[1] = -normal[1];
@@ -48,7 +48,7 @@ inline hyper_plane2<T> create_hesse_line( vector2<T> const& a, vector2<T> const&
 template<typename T>
 inline hyper_plane2<T> create_line(vector2<T> const& a, vector2<T> const& b )
 {
-  vector2<T> normal = (a - b);
+  vector2<T> normal = (b - a);
   std::swap(normal[0], normal[1]);
   normal[1] = -normal[1];
   T projection = (a|normal);

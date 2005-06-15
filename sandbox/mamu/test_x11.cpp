@@ -28,9 +28,9 @@ class MyWindow : public gott::gui::x11::window
       error = FT_Set_Char_Size(
             face,    /* handle to face object           */
             0,       /* char_width in 1/64th of points  */
-            16*64,   /* char_height in 1/64th of points */
-            300,     /* horizontal device resolution    */
-            300 ); 
+            64*16,   /* char_height in 1/64th of points */
+            96,     /* horizontal device resolution    */
+            96 ); 
       if(error)
         throw runtime_error("Fehler bei FT_Set_Char_Size");
 
@@ -70,41 +70,6 @@ class MyWindow : public gott::gui::x11::window
 
       glLoadIdentity();
   
-
-      // pregenerated data:
-      glColor4f(1.0,1.0,1.0,1.0);
-#if 0
-      glBegin( GL_TRIANGLE_STRIP );
-      glVertex2d(3.62154e-312, 4.46765e-308);
-      glVertex2d(2.86558e-322, 3.62132e-312);
-      glVertex2d(12, 0);
-      
-      glVertex2d(34, 0);
-      glVertex2d(24.66, 15.5881);
-      glVertex2d(26.4219, 1.70312);
-      
-      glVertex2d(-2.30968e-07, 2.4729e-316);
-      glVertex2d(11, 0);
-      glVertex2d(4.44659e-323, 3.31562e-316);
-      
-      glVertex2d(-2.30968e-07, 2.4729e-316);
-      glVertex2d(11, 0);
-      glVertex2d(4.44659e-323, 3.31562e-316);
-      
-      glVertex2d(7.28125, 3.76562);
-      glVertex2d(9.10062, 2.05);
-      glVertex2d(9.27063, 4.3375);
-      glVertex2d(11.1337, 0.715625);
-      
-      glVertex2d(13.1013, 2.24062);
-      glVertex2d(13.3806, -0.2375);
-      glVertex2d(0, 0);
-      glVertex2d(15.8413, -0.809375);
-      glVertex2d(7.02375, 5.29062);
-//      glVertex2d(6.36063, 5.1);
-      glEnd( );
-#endif
-      
       glBegin(GL_TRIANGLES);
       glColor3f(1.0,0,0);
       glVertex2i( 400,450);
@@ -115,7 +80,7 @@ class MyWindow : public gott::gui::x11::window
       glEnd();
       
       glColor4f(1.0,1.0,1.0,1.0);
-      char text[] = "H";
+      char text[] = "A library to rule them all!";
       //glTranslatef(0,0,0.25);
       for ( std::size_t n = 0; n < sizeof(text) - 1; n++ )
       {
@@ -124,7 +89,7 @@ class MyWindow : public gott::gui::x11::window
           std::cout << gluErrorString( e ) << std::endl;
         vector_glyph g( face, FT_Get_Char_Index( face, text[n] ) );
         g.render();
-        glTranslatef( (face->glyph->advance.x/64.0f ), (face->glyph->advance.y/64.0f), 0 );
+        glTranslatef( (face->glyph->advance.x/16.0f ), (face->glyph->advance.y/16.0f), 0 );
       }
  
       swap_buffer();
@@ -136,8 +101,8 @@ class MyWindow : public gott::gui::x11::window
       glViewport( 0, 0,  r.width, r.height);
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
-   //   gluOrtho2D( 0, r.width, 0, -r.height );
-      gluOrtho2D( 0, r.width, r.height,0 );
+      gluOrtho2D( 0, r.width, 0, r.height );
+//      gluOrtho2D( 0, r.width, r.height,0 );
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
       glDisable(GL_CULL_FACE );
