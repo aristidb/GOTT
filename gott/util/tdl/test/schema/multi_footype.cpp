@@ -73,13 +73,9 @@ struct schema_multi_footype : tut::schema_basic {
     for (size_t i = 0; i < 2; ++i)
       v[i] = &c[i];
 
-    std::wcerr << 1;
     multi.instantiate(v, c[1]);
-    std::wcerr << 2;
     footype.instantiate(v, c[0]);
-    std::wcerr << 3;
     document.instantiate(v, context);
-    std::wcerr << 4;
   }
 };
 }

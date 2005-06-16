@@ -16,7 +16,7 @@ if debug:
 else:
 	cppdef = ['NDEBUG']
 caux = ARGUMENTS.get('aux', '')
-cflags += ' ' + caux
+cflags += ' ' + caux + ' '
 cflagsoverride = ARGUMENTS.get('cfoverride', 0)
 if cflagsoverride:
 	cflags = cflagsoverride

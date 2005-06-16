@@ -35,9 +35,10 @@ rule::factory::with_slotcfg *rule::factory::get_with_slotcfg() {
   return dynamic_cast<with_slotcfg *>(this);
 }
 
-namespace {
-  typedef vector<factory_template::rule_factory_builder> vbd_t;
-  vbd_t builders;
+typedef vector<factory_template::rule_factory_builder> vbd_t;
+static vbd_t &builders() {
+  static vbd_t v;
+  return v;
 }
 
 namespace gott {
@@ -46,12 +47,12 @@ namespace tdl {
 namespace schema {
 
 unsigned add_factory(factory_template::rule_factory_builder x) {
-  builders.push_back(x);
-  return builders.size() - 1;
+  builders().push_back(x);
+  return builders().size() - 1;
 }
 
 rule::factory *get_factory(unsigned x, rule::attributes const &a, unsigned l) {
-  return builders.at(x)(a, l);
+  return builders().at(x)(a, l);
 }
 
 }}}}
