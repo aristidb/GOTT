@@ -44,6 +44,8 @@ private:
   
   bool play(ev::child_succeed const &);
   bool play(ev::child_fail const &);
+
+  wchar_t const *name() const { return L"optional"; }
 };
 
 }}}}

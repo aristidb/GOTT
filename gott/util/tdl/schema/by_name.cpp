@@ -25,7 +25,10 @@ namespace tdl = gott::util::tdl;
 namespace schema = tdl::schema;
 using schema::name_manager_t;
 
-name_manager_t schema::name_manager;
+name_manager_t &schema::name_manager() {
+  static name_manager_t m;
+  return m;
+}
 
 class name_manager_t::IMPL {
 public:

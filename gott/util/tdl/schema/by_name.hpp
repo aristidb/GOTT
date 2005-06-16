@@ -32,10 +32,11 @@ namespace schema {
  * Manages all named (native) schema types.
  */
 class name_manager_t {
-public:
-  EXPORT name_manager_t();
-  EXPORT ~name_manager_t();
+  name_manager_t();
+  ~name_manager_t();
+  friend name_manager_t &name_manager();
 
+public:
   /**
    * Add a type to the database.
    * \param name The name to find the type with.
@@ -54,7 +55,7 @@ public:
   boost::scoped_ptr<IMPL> p;
 };
 
-extern name_manager_t name_manager;
+name_manager_t &name_manager();
 
 }}}}
 
