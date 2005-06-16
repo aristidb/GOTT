@@ -52,7 +52,6 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
       }
       else
       {
-          std::cout << " now I was here : TAG "<< int(tag) << std::endl;
         if( t_dat.temp_array.size() == 0 ) // assume that the last point in contour is an in point ... hopefully correct!
         {
           t_dat.temp_array.push_back( new vec3(outline.points[my_end-1].x, outline.points[my_end-1].y, 0) );
@@ -65,7 +64,6 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
 
         if( !( tag & 2 ) )
         {
-          std::cout << "I was here" << std::endl;
           char next_tag = ( index == my_end - 1 )
             ? outline.tags[start]
             : outline.tags[index + 1];
@@ -74,7 +72,7 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
           if( index == my_end - 1 )  data = v2_type( (*t_dat.temp_array.front())[0], (*t_dat.temp_array.front())[1] );
           else data = v2_type(outline.points[index+1].x, outline.points[index+1].y);
 
-          if( next_tag & 2 ) // further conic segments follow => median of two control points defines contour point
+          if( !(next_tag&1) && !( next_tag & 2 ) ) // further conic segments follow => median of two control points defines contour point
             data =  ( data + control_point ) * 0.5f;
           
           conic( tobj, t_dat.temp_array, previous, control_point, data);
@@ -86,7 +84,6 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
         }
         else if( tag & 2 )
         {
-          std::cout << "I AM HERER " << std::endl;
           v2_type next;
           v2_type control_point_2;
           if( index == my_end - 1 ){
@@ -118,8 +115,8 @@ vector_glyph::vector_glyph( FT_Face & face, std::size_t glyph_index )
   gluTessEndPolygon(tobj);
   gluDeleteTess(tobj);
 
-/*  std::size_t i = t_dat.temp_array.size(); 
-  do { --i; std::cout << " i :" << i << " d:" << t_dat.temp_array[i] << std::endl; delete t_dat.temp_array[i]; } while(i);*/
+  int i = t_dat.temp_array.size(); 
+  while( i-- != 0 ) delete t_dat.temp_array[i]; 
 }
 
 void vector_glyph::conic( GLUtesselator *tobj, std::vector<gott::math::vector3<double>*> & data, v2_type const& begin, v2_type const& mid, v2_type const& end ) const
@@ -167,7 +164,7 @@ void vector_glyph::end_array(tessel_data *glyph ){
 }
 void vector_glyph::combine( GLdouble coords[3], void *vertex_data[4], GLfloat weight[4], void **outData, tessel_data *d )
 {
-  std::cout << "BASTARD! combine has been called! call 911, someone has to implement it!" << std::endl;
+  std::cout << "BASTARD! combine has been called! call 911, someone has to fix that font!" << std::endl;
   d->temp_array.push_back( new vec3( coords[0], coords[1], coords[2] ) );
   /*new->r = w[0]*d[0]->r + w[1]*d[1]->r + w[2]*d[2]->r + w[3]*d[3]->r;
   new->g = w[0]*d[0]->g + w[1]*d[1]->g + w[2]*d[2]->g + w[3]*d[3]->g;
