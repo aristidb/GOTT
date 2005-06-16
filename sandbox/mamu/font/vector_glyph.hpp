@@ -24,15 +24,19 @@ struct vector_glyph
     };
 
   private:
+    typedef gott::math::vector3<double> vec3;
+    struct tessel_data{
+      std::vector<vec3*> temp_array;
+      vector_glyph *p;
+      tessel_data( vector_glyph* v ) :p(v) {}
+    };
     std::vector<v2_type> vertex_array;
     std::vector<mesh_info> array_info;
 
-    static void begin_array(GLenum mode, vector_glyph *glyph);
-    static void end_array(vector_glyph *glyph );
-    static void combine(  GLdouble coords[3], void *vertex_data[4],
-                                    GLfloat weight[4], void **outData,
-                                    vector_glyph *glyph);
-    static void add_vertex( gott::math::vector3<double>* vertex_data, vector_glyph * glyph );
+    static void begin_array(GLenum mode, tessel_data *d);
+    static void end_array(tessel_data *d);
+    static void combine( GLdouble coords[3], void *vertex_data[4], GLfloat weight[4], void **outData, tessel_data *d );
+    static void add_vertex( gott::math::vector3<double>* vertex_data, tessel_data *d );
 
     void conic( GLUtesselator *t, std::vector<gott::math::vector3<double>*> & data, v2_type const& begin, v2_type const& mid, v2_type const& end ) const;  
     void cubic( GLUtesselator *t, std::vector<gott::math::vector3<double>*> & data, v2_type const& begin, v2_type const& mid_1, v2_type const& mid_2, v2_type const& end ) const;  
