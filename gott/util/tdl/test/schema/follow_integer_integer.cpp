@@ -34,14 +34,14 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_follow_integer_integer : tut::schema_basic {
   schema_follow_integer_integer() {
-    context.begin(schema::match_document::factory::index(), 
+    context.begin(L"document", 
                   RA(wstring(L"doc")));
-      context.begin(schema::match_follow::factory::index(),
+      context.begin(L"follow",
                     RA(wstring(L"foll")));
-        context.begin(schema::match_integer::factory::index(),
+        context.begin(L"integer",
                     RA(wstring(L"int1")));
         context.end();
-        context.begin(schema::match_integer::factory::index(),
+        context.begin(L"integer",
                     RA(wstring(L"int2")));
         context.end();
       context.end();

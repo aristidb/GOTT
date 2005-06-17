@@ -37,9 +37,9 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_12plus_int : tut::schema_basic {
   schema_12plus_int() {
-    context.begin(schema::match_document::factory::index());
-      context.begin(schema::match_list::factory::index());
-        context.begin(schema::match_integer::factory::index(), 
+    context.begin(L"document");
+      context.begin(L"list");
+        context.begin(L"integer", 
                       RA(wstring(L"el")), slotcfg(slotcfg::minimum, 12));
         context.end();
       context.end();

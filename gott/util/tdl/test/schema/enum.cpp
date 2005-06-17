@@ -33,11 +33,11 @@ using stru::cf::C;
 namespace {
 struct schema_enumeration : tut::schema_basic {
   schema_enumeration() {
-    context.begin(schema::match_document::factory::index(), 
+    context.begin(L"document", 
                   schema::rule::attributes(wstring(L"doc")));
       vector<wstring> v(3);
       v[0] = L"first"; v[1] = L"second"; v[2] = L"third";
-      context.begin(schema::match_enumeration::factory::index(),
+      context.begin(L"enumeration",
                     schema::match_enumeration::attributes(v));
       context.end();
     context.end();

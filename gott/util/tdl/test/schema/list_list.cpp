@@ -33,21 +33,15 @@ using stru::cf::C;
 namespace {
 struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() {
-    context.begin(match_document::factory::index(), 
-                  rule::attributes(wstring(L"d")));
-      context.begin(match_ordered::factory::index(), 
-                    rule::attributes(wstring(L"o")));
-        context.begin(match_list::factory::index(), 
-                      rule::attributes(wstring(L"s")));
-          context.begin(match_list::factory::index(), 
-                        rule::attributes(wstring(L"t")));
-            context.begin(match_integer::factory::index(), 
-                          rule::attributes(wstring(L"ii")));
+    context.begin(L"document", rule::attributes(wstring(L"d")));
+      context.begin(L"ordered", rule::attributes(wstring(L"o")));
+        context.begin(L"list", rule::attributes(wstring(L"s")));
+          context.begin(L"list", rule::attributes(wstring(L"t")));
+            context.begin(L"integer", rule::attributes(wstring(L"ii")));
             ;context.end();
           ;context.end();
         ;context.end();
-        context.begin(match_string::factory::index(), 
-                      rule::attributes(wstring(L"xx")));
+        context.begin(L"string", rule::attributes(wstring(L"xx")));
       ;context.end();
     ;context.end();
   }

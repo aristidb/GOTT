@@ -34,15 +34,11 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_ordered_string_integer : tut::schema_basic {
   schema_ordered_string_integer() {
-    context.begin(schema::match_document::factory::index(), 
-                  RA(wstring(L"doc")));
-      context.begin(schema::match_ordered::factory::index(),
-                    RA(wstring(L"ord")));
-        context.begin(schema::match_string::factory::index(),
-                      RA(wstring(L"string")));
+    context.begin(L"document", RA(wstring(L"doc")));
+      context.begin(L"ordered", RA(wstring(L"ord")));
+        context.begin(L"string", RA(wstring(L"string")));
         context.end();
-        context.begin(schema::match_integer::factory::index(),
-                      RA(wstring(L"int")));
+        context.begin(L"integer", RA(wstring(L"int")));
         context.end();
       context.end();
     context.end();

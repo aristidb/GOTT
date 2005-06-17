@@ -37,9 +37,9 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_optional_int : tut::schema_basic {
   schema_optional_int() {
-    context.begin(schema::match_document::factory::index());
-      context.begin(schema::match_list::factory::index());
-        context.begin(schema::match_integer::factory::index(), 
+    context.begin(L"document");
+      context.begin(L"list");
+        context.begin(L"integer", 
                       RA(wstring(L"el")), slotcfg(slotcfg::optional));
         context.end();
       context.end();

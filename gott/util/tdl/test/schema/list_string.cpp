@@ -37,9 +37,9 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_list_string : tut::schema_basic {
   schema_list_string() {
-    context.begin(schema::match_document::factory::index());
-      context.begin(schema::match_list::factory::index());
-        context.begin(schema::match_string::factory::index(), 
+    context.begin(L"document");
+      context.begin(L"list");
+        context.begin(L"string", 
                       RA(wstring(L"el")), slotcfg(slotcfg::list));
         context.end();
       context.end();

@@ -43,9 +43,7 @@ void context::begin(unsigned i, rule::attributes const &a,
 
 void context::begin(std::wstring const &n, rule::attributes const &a,
                     optional<slotcfg> const &c, unsigned l) {
-  rule::factory *f = get_factory(name_manager().get(n), a, l);
-  pool.push_back(f);
-  add_owned(f, c);
+  begin(name_manager().get(n), a, c, l);
 }
 
 void context::end() {
@@ -94,7 +92,7 @@ void context::add_enc_slotted(rule::factory const *f, slotcfg const &c,
   if (c.get_mode() == slotcfg::one)
     return org.back()->add(*f);
 
-  begin(match_list::factory::index(), rule::attributes(false), e, 1);
+  begin(L"list", rule::attributes(false), e, 1);
     add_child(f, c);
   end();
 }

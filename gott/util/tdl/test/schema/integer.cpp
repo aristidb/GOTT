@@ -32,10 +32,8 @@ using stru::cf::C;
 namespace {
 struct schema_integer : tut::schema_basic {
   schema_integer() {
-    context.begin(schema::match_document::factory::index(), 
-                  schema::rule::attributes(wstring(L"doc")));
-      context.begin(schema::match_integer::factory::index(),
-                    schema::rule::attributes());
+    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
+      context.begin(L"integer", schema::rule::attributes());
       context.end();
     context.end();
   }

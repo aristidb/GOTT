@@ -32,10 +32,8 @@ using stru::cf::C;
 namespace {
 struct schema_string : tut::schema_basic {
   schema_string() {
-    context.begin(schema::match_document::factory::index(), 
-                  schema::rule::attributes(wstring(L"doc")));
-      context.begin(schema::match_string::factory::index(),
-                    schema::rule::attributes());
+    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
+      context.begin(L"string", schema::rule::attributes());
       context.end();
     context.end();
   }

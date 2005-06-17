@@ -34,23 +34,23 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {
    schema_any_ordered_integer_string__integer_string() {
-    context.begin(schema::match_document::factory::index(), 
+    context.begin(L"document", 
                   RA(wstring(L"doc")));
-      context.begin(schema::match_any::factory::index(),
+      context.begin(L"any",
                     RA(wstring(L"any")));
-        context.begin(schema::match_ordered::factory::index(),
+        context.begin(L"ordered",
                       RA(wstring(L"ord")));
-          context.begin(schema::match_integer::factory::index(),
+          context.begin(L"integer",
                       RA(wstring(L"int")));
           context.end();
-          context.begin(schema::match_string::factory::index(),
+          context.begin(L"string",
                       RA(wstring(L"string")));
           context.end();
         context.end();
-        context.begin(schema::match_integer::factory::index(),
+        context.begin(L"integer",
                       RA(wstring(L"int2")));
         context.end();
-        context.begin(schema::match_string::factory::index(),
+        context.begin(L"string",
                       RA(wstring(L"string2")));
         context.end();
       context.end();

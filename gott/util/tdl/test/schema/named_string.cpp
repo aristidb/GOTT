@@ -34,12 +34,9 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_named_string : tut::schema_basic {
   schema_named_string() {
-    context.begin(schema::match_document::factory::index(), 
-                  RA(wstring(L"doc")));
-      context.begin(schema::match_named::factory::index(),
-                    schema::match_named::attributes(L"ND"));
-        context.begin(schema::match_string::factory::index(),
-                    RA(wstring(L"S")));
+    context.begin(L"document", RA(wstring(L"doc")));
+      context.begin(L"named", schema::match_named::attributes(L"ND"));
+        context.begin(L"string", RA(wstring(L"S")));
         context.end();
       context.end();
     context.end();

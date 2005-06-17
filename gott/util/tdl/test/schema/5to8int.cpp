@@ -37,9 +37,9 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_5to8int : tut::schema_basic {
   schema_5to8int() {
-    context.begin(schema::match_document::factory::index());
-      context.begin(schema::match_list::factory::index());
-        context.begin(schema::match_integer::factory::index(), 
+    context.begin(L"document");
+      context.begin(L"list");
+        context.begin(L"integer", 
                       RA(wstring(L"el")), slotcfg(slotcfg::range, 5, 8));
         context.end();
       context.end();

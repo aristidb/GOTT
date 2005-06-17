@@ -40,10 +40,9 @@ rule::expect odd(std::size_t c) {
 namespace {
 struct schema_odd_int : tut::schema_basic {
   schema_odd_int() {
-    context.begin(schema::match_document::factory::index());
-      context.begin(schema::match_list::factory::index());
-        context.begin(schema::match_integer::factory::index(), 
-                      rule::attributes(wstring(L"el")), 
+    context.begin(L"document");
+      context.begin(L"list");
+        context.begin(L"integer", rule::attributes(wstring(L"el")), 
                       slotcfg(slotcfg::function, odd));
         context.end();
       context.end();

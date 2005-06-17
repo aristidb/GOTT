@@ -30,22 +30,18 @@ using stru::cf::S;
 using stru::cf::C;
 
 typedef schema::rule::attributes RA;
+using schema::match_literal;
 
 namespace {
 struct schema_unordered_foo_integer_string : tut::schema_basic {
   schema_unordered_foo_integer_string() {
-    context.begin(schema::match_document::factory::index(), 
-                  RA(wstring(L"doc")));
-      context.begin(schema::match_unordered::factory::index(),
-                    RA(wstring(L"ord")));
-        context.begin(schema::match_literal::factory::index(),
-                      schema::match_literal::attributes(wstring(L"foo")));
+    context.begin(L"document", RA(wstring(L"doc")));
+      context.begin(L"unordered", RA(wstring(L"ord")));
+        context.begin(L"literal", match_literal::attributes(wstring(L"foo")));
         context.end();
-        context.begin(schema::match_integer::factory::index(),
-                      RA(wstring(L"int")));
+        context.begin(L"integer", RA(wstring(L"int")));
         context.end();
-        context.begin(schema::match_string::factory::index(),
-                      RA(wstring(L"string")));
+        context.begin(L"string", RA(wstring(L"string")));
         context.end();
       context.end();
     context.end();

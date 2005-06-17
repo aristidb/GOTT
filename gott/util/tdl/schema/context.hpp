@@ -47,11 +47,20 @@ public:
    * \param length The expected number of children. 0 or the nearest value
    *               if unsure.
    */
-  void EXPORT begin(unsigned rule_id,
-                    rule::attributes const &attr = rule::attributes(),
-                    boost::optional<slotcfg> const &slt = boost::none,
-                    unsigned length = 0);
+  void begin(unsigned rule_id,
+             rule::attributes const &attr = rule::attributes(),
+             boost::optional<slotcfg> const &slt = boost::none,
+             unsigned length = 0);
 
+  /**
+   * Begin the declaration of a "rule".
+   * The context class owns its memory.
+   * \param name The type's name.
+   * \param attr The rule-factory's and later rule's attributes.
+   * \param slt (optional) Repetition definition.
+   * \param length The expected number of children. 0 or the nearest value
+   *               if unsure.
+   */
   void EXPORT begin(std::wstring const &name,
                     rule::attributes const &attr = rule::attributes(),
                     boost::optional<slotcfg> const &slt = boost::none,
