@@ -52,6 +52,11 @@ public:
                     boost::optional<slotcfg> const &slt = boost::none,
                     unsigned length = 0);
 
+  void EXPORT begin(std::wstring const &name,
+                    rule::attributes const &attr = rule::attributes(),
+                    boost::optional<slotcfg> const &slt = boost::none,
+                    unsigned length = 0);
+
   /**
    * End the declaration of a "rule".
    * @see begin

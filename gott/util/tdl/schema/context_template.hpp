@@ -44,20 +44,21 @@ public:
   /**
    * Begins the declaration of a "rule".
    * @see context::begin
-   * \param id The rule-factory builder's index.
+   * \param id The type's name.
    * \param ra The rule-factory's and later rule's attributes.
    */
-  void begin(unsigned id, 
+  void begin(std::wstring const &n, 
              rule::attributes const &ra = rule::attributes()) EXPORT;
 
   /**
    * Begins the declaration of a "rule".
    * @see context::begin
-   * \param id The rule-factory builder's index.
+   * \param n The type's name.
    * \param ra The rule-factory's and later rule's attributes.
    * \param s Repetition definition.
    */
-  void begin(unsigned id, rule::attributes const &ra, slotcfg const &s) EXPORT;
+  void begin(std::wstring const &n, rule::attributes const &ra, 
+             slotcfg const &s) EXPORT;
 
   /**
    * End the declaration of a "rule".
@@ -81,11 +82,13 @@ public:
 
 private:
   struct entry_begin {
-    entry_begin(unsigned i, rule::attributes const &a) : id(i), att(a) {}
-    entry_begin(unsigned i, rule::attributes const &a, slotcfg const &s)
-    : id(i), att(a), scfg(s) {}
+    entry_begin(std::wstring const &n, rule::attributes const &a) 
+      : id(n), att(a) {}
+    entry_begin(std::wstring const &n, rule::attributes const &a, 
+                slotcfg const &s)
+      : id(n), att(a), scfg(s) {}
 
-    unsigned id;
+    std::wstring id;
     rule::attributes att;
     boost::optional<slotcfg> scfg;
   };

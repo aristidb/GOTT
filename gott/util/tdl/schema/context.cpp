@@ -20,6 +20,7 @@
 
 #include "context.hpp"
 #include "slot.hpp"
+#include "by_name.hpp"
 #include "types/list.hpp"
 
 using boost::optional;
@@ -36,9 +37,14 @@ context::~context() {
 void context::begin(unsigned i, rule::attributes const &a,
                     optional<slotcfg> const &c, unsigned l) {
   rule::factory *f = get_factory(i, a, l);
-
   pool.push_back(f);
+  add_owned(f, c);
+}
 
+void context::begin(std::wstring const &n, rule::attributes const &a,
+                    optional<slotcfg> const &c, unsigned l) {
+  rule::factory *f = get_factory(name_manager().get(n), a, l);
+  pool.push_back(f);
   add_owned(f, c);
 }
 

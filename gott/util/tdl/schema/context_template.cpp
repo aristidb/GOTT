@@ -20,6 +20,7 @@
 
 #include "context_template.hpp"
 
+using std::wstring;
 using std::vector;
 using boost::static_visitor;
 using gott::util::tdl::schema::context_template;
@@ -28,11 +29,12 @@ using gott::util::tdl::schema::rule;
 context_template::context_template() {}
 context_template::~context_template() {}
 
-void context_template::begin(unsigned type, rule::attributes const &attr) {
+void context_template::begin(wstring const &type, 
+                             rule::attributes const &attr) {
   var.push_back(entry_begin(type, attr));
 }
 
-void context_template::begin(unsigned type, rule::attributes const &attr,
+void context_template::begin(wstring const &type, rule::attributes const &attr,
                              slotcfg const &scfg) {
   var.push_back(entry_begin(type, attr, scfg));
 }
