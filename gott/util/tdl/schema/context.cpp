@@ -21,7 +21,6 @@
 #include "context.hpp"
 #include "slot.hpp"
 #include "by_name.hpp"
-#include "types/list.hpp"
 
 using boost::optional;
 using gott::util::tdl::schema::rule;

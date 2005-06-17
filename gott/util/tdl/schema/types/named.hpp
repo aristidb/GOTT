@@ -39,7 +39,7 @@ public:
   typedef factory_template::slotcfg_onechild<
     match_named, slotcfg::one, slotcfg::single> factory;
   match_named(rule::factory const &, slotcfg const &, rule::attributes const &,
-    match &) EXPORT;
+    match &);
 
 private:
   bool play(ev::node const &);

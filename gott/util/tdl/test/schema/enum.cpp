@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/schema/types/enumeration.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -33,12 +34,10 @@ using stru::cf::C;
 namespace {
 struct schema_enumeration : tut::schema_basic {
   schema_enumeration() {
-    context.begin(L"document", 
-                  schema::rule::attributes(wstring(L"doc")));
+    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
       vector<wstring> v(3);
       v[0] = L"first"; v[1] = L"second"; v[2] = L"third";
-      context.begin(L"enumeration",
-                    schema::match_enumeration::attributes(v));
+      context.begin(L"enumeration", schema::match_enumeration::attributes(v));
       context.end();
     context.end();
   }

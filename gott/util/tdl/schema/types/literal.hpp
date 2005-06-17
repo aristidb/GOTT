@@ -35,7 +35,7 @@ public:
   rule::attributes attributes(std::wstring const &, bool cc = true);
   
   typedef factory_template::nochild<match_literal> factory;
-  match_literal(rule::attributes const &, match &) EXPORT;
+  match_literal(rule::attributes const &, match &);
 
   wchar_t const *name() const { return L"literal"; }
   

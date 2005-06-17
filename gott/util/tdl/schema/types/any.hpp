@@ -36,7 +36,7 @@ class match_any : public rule {
 public:
   typedef factory_template::manychildren<match_any> factory;
   match_any(std::vector<rule::factory const *> const &, 
-            rule::attributes const &, match &m) EXPORT;
+            rule::attributes const &, match &m);
   ~match_any();
 
 private:

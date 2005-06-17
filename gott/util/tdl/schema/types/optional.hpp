@@ -34,7 +34,6 @@ class match_optional : public rule {
 public:
   typedef factory_template::onechild<match_optional> factory;
 
-  EXPORT
   match_optional(rule::factory const &, rule::attributes const &, match &);
   ~match_optional();
   

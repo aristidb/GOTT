@@ -35,7 +35,7 @@ class match_unordered : public rule {
 public:
   typedef factory_template::manychildren<match_unordered> factory;
   match_unordered(factory_template::container const &, 
-                  rule::attributes const &, match &) EXPORT;
+                  rule::attributes const &, match &);
   ~match_unordered();
 
 private:

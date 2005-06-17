@@ -34,8 +34,7 @@ namespace schema {
 class match_document : public rule {
 public:
   typedef factory_template::onechild<match_document> factory;
-  match_document(rule::factory const &, rule::attributes const &, match &) 
-    EXPORT;
+  match_document(rule::factory const &, rule::attributes const &, match &); 
   
 private:
   rule::factory const &sub;

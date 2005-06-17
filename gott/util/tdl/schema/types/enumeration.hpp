@@ -36,7 +36,7 @@ public:
                                      bool = true);
   
   typedef factory_template::nochild<match_enumeration> factory;
-  match_enumeration(rule::attributes const &, match &) EXPORT;
+  match_enumeration(rule::attributes const &, match &);
 
   wchar_t const *name() const { return L"enumeration"; }
   

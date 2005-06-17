@@ -32,7 +32,7 @@ namespace schema {
 class match_string : public rule {
 public:
   typedef factory_template::nochild<match_string> factory;
-  match_string(rule::attributes const &, match &) EXPORT;
+  match_string(rule::attributes const &, match &);
   
 private:
   bool play(ev::node const &);

@@ -34,7 +34,7 @@ namespace schema {
 class match_integer : public rule {
 public:
   typedef factory_template::nochild<match_integer> factory;
-  match_integer(rule::attributes const &, match &) EXPORT;
+  match_integer(rule::attributes const &, match &);
   
 private:
   long val;

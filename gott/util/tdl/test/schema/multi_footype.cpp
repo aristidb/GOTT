@@ -21,6 +21,7 @@
 #include "common.hpp"
 #include <gott/util/tdl/schema/context_template.hpp>
 #include <gott/util/tdl/schema/slot.hpp>
+#include <gott/util/tdl/schema/types/named.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;

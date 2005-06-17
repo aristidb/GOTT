@@ -33,7 +33,7 @@ class match_ordered : public rule {
 public:
   typedef factory_template::manychildren<match_ordered> factory;
   match_ordered(std::vector<rule::factory const *> const &r, 
-                rule::attributes const &, match &) EXPORT;
+                rule::attributes const &, match &);
 
 private:
   std::vector<rule::factory const *> subrules;
