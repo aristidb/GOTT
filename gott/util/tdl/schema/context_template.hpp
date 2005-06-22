@@ -81,24 +81,8 @@ public:
   void instantiate(std::vector<context*> const &params, context &cont) EXPORT;
 
 private:
-  struct entry_begin {
-    entry_begin(std::wstring const &n, rule::attributes const &a) 
-      : id(n), att(a) {}
-    entry_begin(std::wstring const &n, rule::attributes const &a, 
-                slotcfg const &s)
-      : id(n), att(a), scfg(s) {}
-
-    std::wstring id;
-    rule::attributes att;
-    boost::optional<slotcfg> scfg;
-  };
-
-  struct entry_end {};
-  typedef boost::variant<eID, entry_begin, entry_end> job;
-  struct visitor;
-  typedef std::vector<job> book;
-
-  book var;
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
 };
 
 }}}}

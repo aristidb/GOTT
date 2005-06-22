@@ -26,38 +26,60 @@ using boost::static_visitor;
 using gott::util::tdl::schema::context_template;
 using gott::util::tdl::schema::rule;
 
-context_template::context_template() {}
+class context_template::IMPL {
+public:
+  struct entry_begin {
+    entry_begin(std::wstring const &n, rule::attributes const &a) 
+      : id(n), att(a) {}
+    entry_begin(std::wstring const &n, rule::attributes const &a, 
+                slotcfg const &s)
+      : id(n), att(a), scfg(s) {}
+
+    std::wstring id;
+    rule::attributes att;
+    boost::optional<slotcfg> scfg;
+  };
+
+  struct entry_end {};
+  typedef boost::variant<eID, entry_begin, entry_end> job;
+  struct visitor;
+  typedef std::vector<job> book;
+
+  book var;
+};
+
+context_template::context_template() : p(new IMPL) {}
 context_template::~context_template() {}
 
 void context_template::begin(wstring const &type, 
                              rule::attributes const &attr) {
-  var.push_back(entry_begin(type, attr));
+  p->var.push_back(IMPL::entry_begin(type, attr));
 }
 
 void context_template::begin(wstring const &type, rule::attributes const &attr,
                              slotcfg const &scfg) {
-  var.push_back(entry_begin(type, attr, scfg));
+  p->var.push_back(IMPL::entry_begin(type, attr, scfg));
 }
 
 void context_template::end() {
-  var.push_back(entry_end());
+  p->var.push_back(IMPL::entry_end());
 }
 
 void context_template::param(eID x) {
-  var.push_back(x);
+  p->var.push_back(x);
 }
 
-struct context_template::visitor : public static_visitor<>  {
+struct context_template::IMPL::visitor : public static_visitor<>  {
   visitor(vector<context*> const &vv, context &oo) : v(vv), o(oo) {}
 
   vector<context*> const &v;
   context &o;
 
-  void operator() (context_template::entry_begin const &b) {
+  void operator() (entry_begin const &b) {
     o.begin(b.id, b.att, b.scfg);
   }
 
-  void operator() (context_template::entry_end const &) {
+  void operator() (entry_end const &) {
     o.end();
   }
 
@@ -67,6 +89,6 @@ struct context_template::visitor : public static_visitor<>  {
 };
 
 void context_template::instantiate(vector<context*> const &v, context &c) {
-  visitor w(v, c);
-  for_each(var.begin(), var.end(), apply_visitor(w));
+  IMPL::visitor w(v, c);
+  for_each(p->var.begin(), p->var.end(), apply_visitor(w));
 }
