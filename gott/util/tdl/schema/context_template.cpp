@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "context_template.hpp"
+#include "by_name.hpp"
 
 using std::wstring;
 using std::vector;
@@ -29,13 +30,13 @@ using gott::util::tdl::schema::rule;
 class context_template::IMPL {
 public:
   struct entry_begin {
-    entry_begin(std::wstring const &n, rule::attributes const &a) 
+    entry_begin(unsigned n, rule::attributes const &a) 
       : id(n), att(a) {}
-    entry_begin(std::wstring const &n, rule::attributes const &a, 
+    entry_begin(unsigned n, rule::attributes const &a, 
                 slotcfg const &s)
       : id(n), att(a), scfg(s) {}
 
-    std::wstring id;
+    unsigned id;
     rule::attributes att;
     boost::optional<slotcfg> scfg;
   };
@@ -53,12 +54,12 @@ context_template::~context_template() {}
 
 void context_template::begin(wstring const &type, 
                              rule::attributes const &attr) {
-  p->var.push_back(IMPL::entry_begin(type, attr));
+  p->var.push_back(IMPL::entry_begin(name_manager().get(type), attr));
 }
 
 void context_template::begin(wstring const &type, rule::attributes const &attr,
                              slotcfg const &scfg) {
-  p->var.push_back(IMPL::entry_begin(type, attr, scfg));
+  p->var.push_back(IMPL::entry_begin(name_manager().get(type), attr, scfg));
 }
 
 void context_template::end() {
