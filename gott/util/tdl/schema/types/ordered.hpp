@@ -40,8 +40,6 @@ private:
   std::vector<rule::factory const *>::iterator pos;
 
   bool play(ev::child_succeed const &);
-
-  wchar_t const *name() const { return L"ordered"; }
 };
 
 }}}}

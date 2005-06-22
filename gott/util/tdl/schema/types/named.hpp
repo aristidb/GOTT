@@ -52,8 +52,6 @@ private:
   bool optional;
 
   enum { read_none, read_node, read_down, read_sub, read_up } state;
-
-  wchar_t const *name() const { return L"named"; }
 };
   
 }}}}

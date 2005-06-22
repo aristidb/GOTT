@@ -44,8 +44,6 @@ private:
   std::vector<rule::factory const *>::iterator pos;
   positioning::id begin;
 
-  wchar_t const *name() const { return L"any"; }
-
   bool play(ev::child_fail const &);
   bool play(ev::child_succeed const &);
 };

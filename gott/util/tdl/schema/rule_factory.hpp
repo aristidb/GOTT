@@ -44,14 +44,14 @@ struct EXPORT rule::factory {
    * Produce a rule object.
    * \param m The engine to work inside.
    */
-  virtual rule *get(match &m) const = 0;
+  LOCAL virtual rule *get(match &m) const = 0;
 
   /**
    * Let the produced rule have a/another child.
    * Adds in the default location.
    * \param child The rule-factory producing the child.
    */
-  virtual void add(factory const &child) = 0;
+  LOCAL virtual void add(factory const &child) = 0;
 
   /**
    * Lets the produced rule have a child in a specific slot.
@@ -59,12 +59,12 @@ struct EXPORT rule::factory {
    * \param child The rule-factory producing the child.
    * \param slot The slot to put the child into.
    */
-  virtual void add(factory const &child, unsigned slot);
+  LOCAL virtual void add(factory const &child, unsigned slot);
 
   /**
    * Try to cast to a slotcfg-enabled rule-factory.
    */
-  with_slotcfg *get_with_slotcfg();
+  LOCAL with_slotcfg *get_with_slotcfg();
 
   static const unsigned no_slot = unsigned(-1);
     // signifies that a slot number is no slot

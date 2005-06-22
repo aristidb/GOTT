@@ -58,7 +58,7 @@ public:
   /**
    * Returns the current expectation.
    */
-  expect expects() const { return expectation; }
+  LOCAL expect expects() const { return expectation; }
 
   // Event handlers
   // Tokens
@@ -69,64 +69,61 @@ public:
    *   - \c true on success
    *   - \c false on failure
    */
-  virtual bool play(ev::begin_parse const &) EXPORT;
+  virtual bool play(ev::begin_parse const &);
 
   /**
    * Tries to accept an ev::down token.
    * @copydoc play(ev::begin_parse const &)
    */
-  virtual bool play(ev::down const &) EXPORT;
+  virtual bool play(ev::down const &);
 
   /**
    * Tries to accept an ev::node token.
    * @copydoc play(ev::begin_parse const &)
    */
-  virtual bool play(ev::node const &) EXPORT;
+  virtual bool play(ev::node const &);
 
   /**
    * Tries to accept an ev::up token.
    * @copydoc play(ev::begin_parse const &)
    */
-  virtual bool play(ev::up const &) EXPORT;
+  virtual bool play(ev::up const &);
 
   /**
    * Tries to accept an ev::end_parse token.
    * @copydoc play(ev::begin_parse const &)
    */
-  virtual bool play(ev::end_parse const &) EXPORT;
+  virtual bool play(ev::end_parse const &);
 
   // Notifications
   /**
    * Tries to accept an ev::child_succeed event.
    * @copydoc play(ev::begin_parse const &)
    */
-  virtual bool play(ev::child_succeed const &) EXPORT;
+  virtual bool play(ev::child_succeed const &);
   
   /**
    * Tries to accept an ev::child_fail event.
    * @copydoc play(ev::begin_parse const &)
    */
-  virtual bool play(ev::child_fail const &) EXPORT;
+  virtual bool play(ev::child_fail const &);
 
   /// @internal
-  void finish();
+  void finish() LOCAL;
 
-  virtual ~rule() EXPORT = 0;
+  virtual ~rule() = 0;
 
   // Properties
   /**
    * Get the attributes associated with this rule.
    */
-  attributes const &get_attributes() const EXPORT;
-
-  virtual wchar_t const *name() const EXPORT = 0;
-    // well, mangled typeid() names are hard to read!
+  attributes const &get_attributes() const;
 
 protected:
-  match &matcher() EXPORT;
+  match &matcher();
     // return a reference to the match-object that embedded us
 
-  rule(expect e, attributes a, match &m) EXPORT;
+  rule(expect e, attributes a, match &m);
     // an implementation must supply attributes and its initial expectation
 
   expect expectation;

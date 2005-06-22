@@ -41,8 +41,6 @@ private:
   bool play(ev::node const &);
   
   bool is_integer(std::wstring const &);
-
-  wchar_t const *name() const { return L"integer"; }
 };
 
 }}}}

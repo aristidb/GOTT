@@ -28,38 +28,46 @@ using gott::util::tdl::simple::line_logger;
 parser::~parser() {}
 
 namespace {
-template<bool x> struct internal_line_logger {
-  internal_line_logger(line_logger *) {}
-  void start_line() {}
-  
-  void new_char() {}
-  void add_char(unsigned) {}
-  void set_char(unsigned) {}
-  
-  void start_token() {}
-  void end_token(std::wstring const &) {}
-  void no_token() {}
-};
-
-template<> struct internal_line_logger<true> {
-  line_logger &ref;
+struct internal_line_logger {
+  line_logger *ref;
   unsigned p;
   unsigned rp;
   
-  internal_line_logger(line_logger *x) : ref(*x) {}
-  void start_line() { p = 0; ref.start_line(); }
+  internal_line_logger(line_logger *x) : ref(x) {}
 
-  void new_char() { ++p; ref.line_position(p); }
-  void add_char(unsigned x) { p += x; ref.line_position(p); }
-  void set_char(unsigned x) { p = x; ref.line_position(p); }
+  void start_line() { 
+    p = 0; 
+    if (ref)
+      ref->start_line(); 
+  }
+
+  void new_char() { 
+    ++p; 
+    if (ref)
+      ref->line_position(p); 
+  }
+
+  void add_char(unsigned x) { 
+    p += x; 
+    if (ref)
+      ref->line_position(p); 
+  }
+
+  void set_char(unsigned x) { 
+    p = x; 
+    if (ref)
+      ref->line_position(p); 
+  }
   
   void start_token() { rp = p; }
+  
   void end_token(std::wstring const &n) {
-    ref.token(rp, p, n);
+    if (ref)
+      ref->token(rp, p, n);
   }
 };
   
-template<bool ll> class exec_parse {
+class exec_parse {
   wistream &stream;
   parser &parse;
   unsigned indent;
@@ -67,7 +75,7 @@ template<bool ll> class exec_parse {
   unsigned buff_indent;
   wstring current_line;
 
-  internal_line_logger<ll> ln;
+  internal_line_logger ln;
 
   void normal(unsigned = 0);
   void normal_line(wstring const &);
@@ -100,17 +108,11 @@ line_logger::~line_logger() {}
 
 void gott::util::tdl::simple::parse(std::wistream &s, 
                                     parser &p, line_logger *l) {
-  if (l) {
-    exec_parse<true> x(s, p, l);
-    x.run_parse();
-  } else {
-    exec_parse<false> x(s, p, l);
-    x.run_parse();
-  }
+  exec_parse x(s, p, l);
+  x.run_parse();
 }
 
-template<bool ll>
-void exec_parse<ll>::run_parse() {
+void exec_parse::run_parse() {
   parse.begin_parse();
 
   ln.start_line();
@@ -122,8 +124,7 @@ void exec_parse<ll>::run_parse() {
   parse.end_parse();
 }
 
-template<bool ll>
-void exec_parse<ll>::normal(unsigned last) {
+void exec_parse::normal(unsigned last) {
   if (!up) parse.down();
 
   struct uppor_t {
@@ -158,8 +159,7 @@ void exec_parse<ll>::normal(unsigned last) {
   (void)uppor; // Clean up!
 }
 
-template<bool ll>
-void exec_parse<ll>::normal_line(wstring const &s) {
+void exec_parse::normal_line(wstring const &s) {
   unsigned count = 0;
 
   bool to_down = false, empty = true;
@@ -211,8 +211,7 @@ void exec_parse<ll>::normal_line(wstring const &s) {
   up = (count == 1);
 }
 
-template<bool ll>
-bool exec_parse<ll>::empty_line() {
+bool exec_parse::empty_line() {
   if (stream.peek() == L'#') {
     stream.get();
     wstring s;
@@ -229,8 +228,7 @@ bool exec_parse<ll>::empty_line() {
   return false;
 }
 
-template<bool ll>
-void exec_parse<ll>::block() {
+void exec_parse::block() {
   unsigned old_indent = indent;
 
   wstring str;
@@ -263,8 +261,7 @@ void exec_parse<ll>::block() {
   restore_indent(old_indent);
 }
 
-template<bool ll>
-void exec_parse<ll>::skip_whitespace(wstring::const_iterator &it, 
+void exec_parse::skip_whitespace(wstring::const_iterator &it, 
                                      wstring::const_iterator const &end) {
   while (it != end && *it == L' ') {
     ln.new_char();
@@ -272,13 +269,11 @@ void exec_parse<ll>::skip_whitespace(wstring::const_iterator &it,
   }
 }
 
-template<bool ll>
-bool exec_parse<ll>::border(wchar_t c) {
+bool exec_parse::border(wchar_t c) {
   return (c == L' ' || c == L',' || c == L'"' || c == L'#' || c == L'(');
 }
 
-template<bool ll>
-wstring exec_parse<ll>::read_quoted(wstring::const_iterator &it, 
+wstring exec_parse::read_quoted(wstring::const_iterator &it, 
                                     wstring::const_iterator const &end) {
   wstring::const_iterator start = it;
   bool double_dquote = true;
@@ -301,8 +296,7 @@ wstring exec_parse<ll>::read_quoted(wstring::const_iterator &it,
   return s;
 }
 
-template<bool ll>
-wstring exec_parse<ll>::read_paren(wstring::const_iterator &it, 
+wstring exec_parse::read_paren(wstring::const_iterator &it, 
                                    wstring::const_iterator const &end) {
   wstring::const_iterator start = it++;
   struct balancer {
@@ -335,8 +329,7 @@ wstring exec_parse<ll>::read_paren(wstring::const_iterator &it,
   return result;
 }
 
-template<bool ll>
-wstring exec_parse<ll>::read_string(wstring::const_iterator &it, 
+wstring exec_parse::read_string(wstring::const_iterator &it, 
                                     wstring::const_iterator const &end) {
   ln.start_token();
   
@@ -356,8 +349,7 @@ wstring exec_parse<ll>::read_string(wstring::const_iterator &it,
   return out;
 }
 
-template<bool ll>
-void exec_parse<ll>::get_indent() {
+void exec_parse::get_indent() {
   if (buff_indent) {
     indent = buff_indent;
     buff_indent = 0;
@@ -376,8 +368,7 @@ void exec_parse<ll>::get_indent() {
   ln.set_char(indent - 1);
 }
 
-template<bool ll>
-void exec_parse<ll>::restore_indent(unsigned x) {
+void exec_parse::restore_indent(unsigned x) {
   buff_indent = indent;
   indent = x;
 }

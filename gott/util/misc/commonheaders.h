@@ -12,6 +12,10 @@
 #include <map>
 #include <exception>
 
+#ifdef HAVE_VISIBILITY
+#pragma GCC visibility pop
+#endif
+
 #include <sstream>
 #include <istream>
 #include <ostream>
@@ -22,10 +26,6 @@
 #include <utility>
 #include <typeinfo>
 #include <memory>
-
-#ifdef HAVE_VISIBILITY
-#pragma GCC visibility pop
-#endif
 
 #include <algorithm>
 #include <functional>

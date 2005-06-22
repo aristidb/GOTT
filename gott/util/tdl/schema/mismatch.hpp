@@ -37,7 +37,7 @@ namespace detail { struct line_pos; }
 class EXPORT mismatch : public std::exception {
   std::string w;
 public:
-  mismatch(detail::line_pos const &p);
+  mismatch(detail::line_pos const &p) LOCAL;
   ~mismatch() throw();
   char const *what() const throw();
 };

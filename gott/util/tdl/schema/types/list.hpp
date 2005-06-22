@@ -51,8 +51,6 @@ private:
   bool play(ev::child_succeed const &);
   bool full();
   bool empty();
-
-  wchar_t const *name() const { return L"list"; }
 };
 
 }}}}

@@ -36,8 +36,6 @@ public:
   
 private:
   bool play(ev::node const &);
-
-  virtual wchar_t const *name() const { return L"string"; }
 };
 
 }}}}

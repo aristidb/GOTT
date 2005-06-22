@@ -36,8 +36,6 @@ public:
   
   typedef factory_template::nochild<match_literal> factory;
   match_literal(rule::attributes const &, match &);
-
-  wchar_t const *name() const { return L"literal"; }
   
 private:
   bool play(ev::node const &);
