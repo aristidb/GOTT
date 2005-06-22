@@ -29,7 +29,6 @@
 #include <gott/util/tdl/schema/types/list.hpp>
 #include <gott/util/tdl/schema/types/literal.hpp>
 #include <gott/util/tdl/schema/types/named.hpp>
-#include <gott/util/tdl/schema/types/optional.hpp>
 #include <gott/util/tdl/schema/types/ordered.hpp>
 #include <gott/util/tdl/schema/types/string.hpp>
 #include <gott/util/tdl/schema/types/unordered.hpp>
