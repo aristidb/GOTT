@@ -21,7 +21,7 @@
 
 namespace hashd = HH_HASHD;
 
-#ifdef  NEED_HASH_FOR_STRING
+#ifdef NEED_HASH_FOR_STRING
 namespace HH_HASHD {
 template<class C,class CT,class A> struct hash<std::basic_string<C,CT,A> > {
   typedef std::basic_string<C,CT,A> string_t;

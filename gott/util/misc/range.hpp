@@ -28,8 +28,8 @@ namespace util {
 
 template<class T> struct range_t {
   typedef T value_type;
-  T begin, end;
-  range_t(T a, T b) : begin(a), end(b) {}
+  value_type begin, end;
+  range_t(value_type const &a, value_type const &b) : begin(a), end(b) {}
 };
 
 template<class T> 
