@@ -1,10 +1,10 @@
 def CheckCompilerVisibility(context):
 	context.Message('Checking if compiler supports visibility attributes...')
 	lastCPPDEF = context.env['CPPDEFINES'][:]
-	lastCCFLAGS = context.env['CCFLAGS']
+	lastCCFLAGS = context.env['CCFLAGS'][:]
 	
 	context.env.Append(CPPDEFINES = 'HAVE_VISIBILITY')
-	context.env.Append(CCFLAGS='-fvisibility=hidden')
+	context.env.Append(CCFLAGS = '-fvisibility=hidden')
 
 	result = context.TryCompile('int global __attribute((visibility("default")));', '.c')
 	if not result:
