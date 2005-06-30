@@ -18,6 +18,7 @@ struct  widget_events
     mouse_signal_type mouse_ev;
     key_signal_type key_ev;
 
+#if 0
     virtual void on_redraw() = 0;
     virtual void on_focus_enter() = 0;
     virtual void on_focus_leave() = 0;
@@ -25,6 +26,7 @@ struct  widget_events
     virtual void on_configure( gott::gui::rect const&) = 0;
     virtual void on_mouse(gott::gui::mouse_event const&) = 0;
     virtual void on_key(gott::gui::key_event const&) = 0;
+#endif
 
   public:
     void set_on_redraw( simple_event_type::slot_type const& slot );
@@ -43,8 +45,6 @@ struct  widget_events
     void exec_on_configure( gott::gui::rect const&);
     void exec_on_mouse(gott::gui::mouse_event const&);
     void exec_on_key(gott::gui::key_event const&);
-
-
 };
 
 }}

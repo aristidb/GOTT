@@ -39,44 +39,43 @@ void widget_events::set_on_key( key_signal_type::slot_type const& slot )
 
 void widget_events::exec_on_redraw()
 {
-  on_redraw();
+  //on_redraw();
   redraw_event();
 }
 
 void widget_events::exec_on_focus_enter()
 {
-  on_focus_enter();
+  //on_focus_enter();
   focus_enter();
 }
 
 void widget_events::exec_on_focus_leave()
 {
-  on_focus_leave();
+  //on_focus_leave();
   focus_leave();
 }
 
 void widget_events::exec_on_close()
 {
-  on_close();
+  //on_close();
   close_event();
 }
 
 void widget_events::exec_on_configure( gott::gui::rect const&r )
 {
-  on_configure(r);
+  //on_configure(r);
   configure_event(r);
 }
 
 void widget_events::exec_on_mouse(gott::gui::mouse_event const&m)
 {
-  on_mouse(m);
+  //on_mouse(m);
   mouse_ev(m);
-  
 }
 
 void widget_events::exec_on_key(gott::gui::key_event const&k)
 {
-  on_key(k);
+  //on_key(k);
   key_ev(k);
 }
 

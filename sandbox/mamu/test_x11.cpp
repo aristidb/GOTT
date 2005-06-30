@@ -7,6 +7,7 @@
 #include "x11/window.hpp"
 #include "font.hpp"
 #include "font/vector_glyph.hpp"
+#include <boost/bind.hpp>
 
 using namespace std;
 using namespace gott::gui;
@@ -38,10 +39,16 @@ class MyWindow : public gott::gui::x11::window
   public:
     MyWindow( application& app, rect const& r, std::string const& title, pixelformat const& p )
       : gott::gui::x11::window( app, r, title, p, window_flags::Defaults ), x_(0.01), y_(0.01) {
+        set_on_key(boost::bind(&MyWindow::on_key, this, _1));
+        set_on_redraw(boost::bind(&MyWindow::on_redraw, this));
+        set_on_configure(boost::bind(&MyWindow::on_configure, this, _1));
         get_face();
       }
     MyWindow( rect const& r, std::string const& title, pixelformat const& p )
       : gott::gui::x11::window( r, title, p, window_flags::Defaults ), x_(0.01), y_(0.01){
+        set_on_key(boost::bind(&MyWindow::on_key, this, _1));
+        set_on_redraw(boost::bind(&MyWindow::on_redraw, this));
+        set_on_configure(boost::bind(&MyWindow::on_configure, this, _1));
         get_face();
       }
 
@@ -94,6 +101,7 @@ class MyWindow : public gott::gui::x11::window
  
       swap_buffer();
     }
+    
     void on_configure( gott::gui::rect const& r)
     {
       window::on_configure(r);
