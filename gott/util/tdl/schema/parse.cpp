@@ -21,7 +21,7 @@
 #include "parse.hpp"
 #include "rule_factory.hpp"
 #include "event.hpp"
-#include "mismatch.hpp"
+#include "../exceptions.hpp"
 #include "position.hpp"
 #include "parse_position.hpp"
 

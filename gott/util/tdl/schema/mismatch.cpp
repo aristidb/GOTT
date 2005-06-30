@@ -18,24 +18,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mismatch.hpp"
+#include "../exceptions.hpp"
 #include "position.hpp"
 
-using gott::util::tdl::schema::mismatch;
+namespace schema = gott::util::tdl::schema;
+using schema::mismatch;
 
-mismatch::mismatch(detail::line_pos const &p) {
-  std::ostringstream o;
+static std::wstring build_string(schema::detail::line_pos const &p) {
+  std::wostringstream o;
   o << p.line << ':' << p.pos+1 << " : mismatch ";
   if (p.line_new > p.line || p.current > p.native_end)
     o << "after";
   else
     o << "at";
   o << " token " << p.tok;
-  w = o.str();
+  return o.str();
 }
 
-mismatch::~mismatch() throw() {}
-
-char const *mismatch::what() const throw() {
-  return w.c_str();
-}
+mismatch::mismatch(detail::line_pos const &p) : tdl_exception(build_string(p)) 
+  {}

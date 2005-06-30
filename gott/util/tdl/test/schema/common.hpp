@@ -20,7 +20,7 @@
 
 #include <gott/util/tdl/schema/parse.hpp>
 #include <gott/util/tdl/schema/context.hpp>
-#include <gott/util/tdl/schema/mismatch.hpp>
+#include <gott/util/tdl/exceptions.hpp>
 #include <gott/util/tdl/structure/tree.hpp>
 #include <gott/util/tdl/structure/comfort.hpp>
 #include <gott/util/tdl/structure/print.hpp>

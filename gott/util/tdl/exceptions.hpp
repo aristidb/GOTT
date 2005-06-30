@@ -1,5 +1,5 @@
 // Copyright (C) 2004-2005 by Aristid Breitkreuz (aribrei@arcor.de)
-// Content: TDL Schema engine
+// Content: TDL common base
 // Authors: Aristid Breitkreuz
 //
 // This File is part of the Gott Project (http://gott.sf.net)
@@ -18,14 +18,26 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_TDL_SCHEMA_MISMATCH_HPP
-#define GOTT_UTIL_TDL_SCHEMA_MISMATCH_HPP
+#ifndef GOTT_UTIL_TDL_EXCEPTIONS_HPP
+#define GOTT_UTIL_TDL_EXCEPTIONS_HPP
 
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
 namespace util {
 namespace tdl {
+
+class EXPORT tdl_exception {
+  std::string message_narrow;
+  std::wstring message_wide;
+protected:
+  tdl_exception(std::string const &msg) LOCAL;
+  tdl_exception(std::wstring const &msg) LOCAL;
+  ~tdl_exception() throw();
+public:
+  char const *what() const throw();
+};
+
 namespace schema {
 
 namespace detail { struct line_pos; }
@@ -34,14 +46,13 @@ namespace detail { struct line_pos; }
  * Schema mismatch exception.
  * Thrown when a rule failed to match and could not be backtracked.
  */
-class EXPORT mismatch : public std::exception {
-  std::string w;
+class EXPORT mismatch : public tdl_exception {
 public:
   mismatch(detail::line_pos const &p) LOCAL;
-  ~mismatch() throw();
-  char const *what() const throw();
 };
 
-}}}}
+}
+
+}}}
 
 #endif
