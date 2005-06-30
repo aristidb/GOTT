@@ -20,6 +20,7 @@
 
 #include "literal.hpp"
 #include "../event.hpp"
+#include "../../exceptions.hpp"
 
 using std::list;
 using std::wstring;
@@ -38,7 +39,7 @@ rule::attributes match_literal::attributes(wstring const &w, bool cc) {
 match_literal::match_literal(rule::attributes const &a, match &m)
 : rule(need, a, m) {
   if (get_attributes().user().type() != typeid(wstring))
-    throw std::bad_exception();
+    throw dont_accept(L"user-data other than wstring");
 }
 
 bool match_literal::play(ev::node const &n) {

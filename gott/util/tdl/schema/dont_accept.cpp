@@ -18,37 +18,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "by_name.hpp"
 #include "../exceptions.hpp"
 
-using std::wstring;
-namespace tdl = gott::util::tdl;
-namespace schema = tdl::schema;
-using schema::name_manager_t;
+using gott::util::tdl::schema::dont_accept;
 
-name_manager_t &schema::name_manager() {
-  static name_manager_t m;
-  return m;
-}
+dont_accept::dont_accept(std::wstring const &desc) 
+  : tdl_exception(L"Don't accept" + ((desc == L"" ? L"" : L": ") + desc)) {}
 
-class name_manager_t::IMPL {
-public:
-  hashd::hash_map<wstring, unsigned> items;
-};
-
-name_manager_t::name_manager_t() : p(new IMPL) {
-}
-
-name_manager_t::~name_manager_t() {
-}
-
-void name_manager_t::add(wstring const &name, unsigned id) {
-  p->items.insert(std::make_pair(name, id));
-}
-
-unsigned name_manager_t::get(wstring const &name) const {
-  hashd::hash_map<wstring, unsigned>::const_iterator it = p->items.find(name);
-  if (it == p->items.end())
-    throw unregistered_type(name);
-  return it->second;
-}
+dont_accept::~dont_accept() {}

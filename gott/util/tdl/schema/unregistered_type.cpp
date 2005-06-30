@@ -18,37 +18,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "by_name.hpp"
 #include "../exceptions.hpp"
 
-using std::wstring;
-namespace tdl = gott::util::tdl;
-namespace schema = tdl::schema;
-using schema::name_manager_t;
+using gott::util::tdl::tdl_exception;
+using gott::util::tdl::schema::unregistered_type;
 
-name_manager_t &schema::name_manager() {
-  static name_manager_t m;
-  return m;
-}
+unregistered_type::unregistered_type(std::wstring const &type)
+  : tdl_exception(L"Type " + type + L" not found in database") {}
 
-class name_manager_t::IMPL {
-public:
-  hashd::hash_map<wstring, unsigned> items;
-};
-
-name_manager_t::name_manager_t() : p(new IMPL) {
-}
-
-name_manager_t::~name_manager_t() {
-}
-
-void name_manager_t::add(wstring const &name, unsigned id) {
-  p->items.insert(std::make_pair(name, id));
-}
-
-unsigned name_manager_t::get(wstring const &name) const {
-  hashd::hash_map<wstring, unsigned>::const_iterator it = p->items.find(name);
-  if (it == p->items.end())
-    throw unregistered_type(name);
-  return it->second;
-}
+unregistered_type::~unregistered_type() {}

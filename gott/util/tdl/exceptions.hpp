@@ -46,13 +46,22 @@ namespace detail { struct line_pos; }
  * Schema mismatch exception.
  * Thrown when a rule failed to match and could not be backtracked.
  */
-class EXPORT mismatch : public tdl_exception {
-public:
+struct EXPORT mismatch : public tdl_exception {
   mismatch(detail::line_pos const &p) LOCAL;
+  ~mismatch();
+};
+
+struct EXPORT unregistered_type : public tdl_exception {
+  unregistered_type(std::wstring const &type) LOCAL;
+  ~unregistered_type();
+};
+
+struct EXPORT dont_accept : public tdl_exception {
+  dont_accept(std::wstring const &desc);
+  ~dont_accept();
 };
 
 }
-
 }}}
 
 #endif

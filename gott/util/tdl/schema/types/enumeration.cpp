@@ -20,6 +20,7 @@
 
 #include "enumeration.hpp"
 #include "../event.hpp"
+#include "../../exceptions.hpp"
 
 using std::list;
 using std::vector;
@@ -40,7 +41,7 @@ rule::attributes match_enumeration::attributes(vector<wstring> const &v,
 match_enumeration::match_enumeration(rule::attributes const &a, match &m) 
 : rule(need, a, m) {
   if (get_attributes().user().type() != typeid(vector<wstring>))
-    throw std::bad_exception();
+    throw dont_accept(L"user-data other than vector<wstring>");
 }
 
 bool match_enumeration::play(ev::node const &n) {

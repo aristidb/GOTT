@@ -23,6 +23,7 @@
 
 #include "rule.hpp"
 #include "rule_attr.hpp"
+#include "../exceptions.hpp"
 
 namespace gott {
 namespace util {
@@ -113,7 +114,7 @@ public:
   nochild(rule::attributes const &a) : attrib(a) {}
 
   void add(rule::factory const &child) { (void) child;
-    throw ::std::bad_exception();
+    throw dont_accept(L"children in nochild<>");
   }
 
   rule *get(match &m) const {
