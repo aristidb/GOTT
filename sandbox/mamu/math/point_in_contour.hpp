@@ -37,7 +37,7 @@ bool point_in_contour( InputPointIterator begin_contour, InputPointIterator end_
   vector2<T> prev_pos = *prev_it - point;
   unsigned char quadrant = detail::get_quadrant_number( prev_pos );
 
-  signed char array[4][4] = {
+  static const signed char array[4][4] = {
     { 0,-1, 1, 2}
   , { 1, 0, 2,-1}
   , {-1, 2, 0, 1}
