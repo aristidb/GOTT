@@ -26,4 +26,4 @@ using gott::util::tdl::schema::unregistered_type;
 unregistered_type::unregistered_type(std::wstring const &type)
   : tdl_exception(L"Type " + type + L" not found in database") {}
 
-unregistered_type::~unregistered_type() {}
+unregistered_type::~unregistered_type() throw() {}

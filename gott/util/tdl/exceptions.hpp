@@ -27,7 +27,7 @@ namespace gott {
 namespace util {
 namespace tdl {
 
-class EXPORT tdl_exception {
+class EXPORT tdl_exception : public std::exception {
   std::string message_narrow;
   std::wstring message_wide;
 protected:
@@ -48,17 +48,17 @@ namespace detail { struct line_pos; }
  */
 struct EXPORT mismatch : public tdl_exception {
   mismatch(detail::line_pos const &p) LOCAL;
-  ~mismatch();
+  ~mismatch() throw();
 };
 
 struct EXPORT unregistered_type : public tdl_exception {
   unregistered_type(std::wstring const &type) LOCAL;
-  ~unregistered_type();
+  ~unregistered_type() throw();
 };
 
 struct EXPORT dont_accept : public tdl_exception {
   dont_accept(std::wstring const &desc);
-  ~dont_accept();
+  ~dont_accept() throw();
 };
 
 }

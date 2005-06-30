@@ -25,4 +25,4 @@ using gott::util::tdl::schema::dont_accept;
 dont_accept::dont_accept(std::wstring const &desc) 
   : tdl_exception(L"Don't accept" + ((desc == L"" ? L"" : L": ") + desc)) {}
 
-dont_accept::~dont_accept() {}
+dont_accept::~dont_accept() throw() {}

@@ -131,6 +131,29 @@ void object::test<3>(int) {
 
 template<> template<>
 void object::test<4>(int) {
+  run_test(
+      L"a\n"
+      " 4,7,-9\n"
+      " sum\n"
+      "     -1220\n"
+      " plugin\n"
+      "                     x,y,z\n"
+  );
+  stru::cf::nd_list c, p;
+  p.push_back(S(Xany(L"x"), L"plugin-data"));
+  p.push_back(S(Xany(L"y"), L"plugin-data"));
+  p.push_back(S(Xany(L"z"), L"plugin-data"));
+  c.push_back(S(Xany(4), L"--other--"));
+  c.push_back(S(Xany(7), L"--other--"));
+  c.push_back(S(Xany(-9), L"--other--"));
+  c.push_back(C(S(Xany(-1220), L"sum-data"), L"sum"));
+  c.push_back(M(p, L"plugin"));
+  C(C(M(c, L"--unordered--"), L"a"), L"--doc--").write_to(xp);
+  ensure_equals("reordered #1", tree, xp);
+}
+
+template<> template<>
+void object::test<5>(int) {
   no_test();
 }
 

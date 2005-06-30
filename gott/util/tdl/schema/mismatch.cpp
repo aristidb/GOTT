@@ -38,4 +38,4 @@ static std::wstring build_string(schema::detail::line_pos const &p) {
 mismatch::mismatch(detail::line_pos const &p) : tdl_exception(build_string(p)) 
   {}
 
-mismatch::~mismatch() {}
+mismatch::~mismatch() throw() {}
