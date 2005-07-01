@@ -13,12 +13,16 @@ for root, dirs, _ in os.walk('.'):
 
 env.SharedLibrary('tdl', source_files)
 
-tut_obj = [
+module_test_obj = [
     'test/test_tut.cpp', 
     'test/simple_parse.cpp', 
     'test/simple_parse_meta.cpp',
     'test/structure.cpp',
     'test/query.cpp'
   ] + glob.glob('test/schema/*.cpp')
-env.Program('module_test', tut_obj, LIBS=['tdl', 'xany'], LIBPATH=['.','#/util/xany'])
+env.Program('module_test', module_test_obj, 
+	LIBS=['tdl', 'xany'], LIBPATH=['.','#/util/xany'])
 
+unit_test_obj = glob.glob('test/unit/*.cpp')
+env.Program('unit_test', unit_test_obj,
+	LIBS=['tdl', 'xany'], LIBPATH=['.','#/util/xany'])
