@@ -151,16 +151,13 @@ void match::IMPL::replay_buffer() {
 
 template<bool tok>
 void match::IMPL::handle_event(ev::event const &e) {
-  std::wcout << e << L"{\n";
   while (!parse.empty()) 
     if (handle_rule<tok>(e)) 
       break;
-  std::wcout << "}\n";
 }
 
 template<bool tok> 
 bool match::IMPL::handle_rule(ev::event const &event) {
-  std::wcout << typeid(*parse.back()).name() << L'\n';
   if (event.play(*parse.back())) {
     if (tok) pos.consume();
     return consume_event();

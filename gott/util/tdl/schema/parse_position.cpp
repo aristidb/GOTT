@@ -49,8 +49,8 @@ positioning::~positioning() {}
 
 template<class T>
 void positioning::add(T const &t) {
-  p->buffer.push_back(t);
   p->unconsumed = p->buffer.size();
+  p->buffer.push_back(t);
 }
 
 template void positioning::add(ev::begin_parse const &);
@@ -111,4 +111,14 @@ void positioning::replay(acceptor &acc) {
 
 bool positioning::want_replay() const {
   return p->replay;
+}
+
+void positioning::debug_dump() const {
+  std::wcout << L" [";
+  std::wcout << L'U' << p->unconsumed << L',';
+  std::wcout << L'C' << p->consumed << L',';
+  std::wcout << L'S' << p->seeked << L',';
+  std::wcout << L'R' << p->replay << L',';
+  std::wcout << L'I' << p->in_replay;
+  std::wcout << L"]\n";
 }

@@ -62,6 +62,7 @@ public:
   bool proceeded(id const &) const EXPORT; // from the unconsumed token
 
   unsigned debug_current() const;
+  void debug_dump() const;
 
 private:
   class IMPL;

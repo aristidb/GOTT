@@ -20,5 +20,5 @@ tut_obj = [
     'test/structure.cpp',
     'test/query.cpp'
   ] + glob.glob('test/schema/*.cpp')
-env.Program('ut', tut_obj, LIBS=['tdl', 'xany'], LIBPATH=['.','#/util/xany'])
+env.Program('module_test', tut_obj, LIBS=['tdl', 'xany'], LIBPATH=['.','#/util/xany'])
 
