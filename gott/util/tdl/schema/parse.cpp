@@ -131,7 +131,6 @@ void match::IMPL::add(rule::factory const &f) {
 
 template<class T>
 void match::IMPL::handle_token(T const &e) {
-  std::wcout << L"original ";
   pos.add(e);
   handle_event<true>(e);
   while (pos.want_replay())
