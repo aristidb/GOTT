@@ -60,7 +60,7 @@ template void positioning::add(ev::up const &);
 template void positioning::add(ev::node const &);
 
 void positioning::consume() {
-  p->consumed = p->unconsumed + p->in_replay;
+  ++p->consumed;
 }
 
 bool positioning::proceeded(id const &x) const {
@@ -72,11 +72,11 @@ unsigned positioning::debug_current() const {
 }
 
 positioning::id positioning::current() {
-  return std::make_pair(p->unconsumed, p->struc.point());
+  return std::make_pair(p->consumed, p->struc.point());
 }
 
 positioning::id positioning::next() {
-  return std::make_pair(p->unconsumed + 1, p->struc.point());
+  return std::make_pair(p->unconsumed, p->struc.point());
 }
 
 void positioning::seek(id const &x) {
@@ -98,12 +98,14 @@ void positioning::replay(acceptor &acc) {
   if (p->replay) {
     p->replay = false;
     p->in_replay = true;
-    for (p->unconsumed = p->seeked;
+    for (p->unconsumed = p->consumed + 1;
          p->unconsumed < p->buffer.size();
          ++p->unconsumed) {
       acc(get(p->buffer[p->unconsumed]));
       if (p->replay)
         break;
+      GOTT_ASSERT_2(p->consumed, p->unconsumed, gott::debug::equals(), 
+                    "Gotta consume token");
     }
     p->in_replay = false;
   }

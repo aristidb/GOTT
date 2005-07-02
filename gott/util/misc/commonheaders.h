@@ -62,5 +62,6 @@
 #include <gott/util/misc/autoconv.hpp>
 
 #include <gott/util/debug/warnings.hpp>
+#include <gott/util/debug/assert.hpp>
 
 #endif

@@ -71,6 +71,22 @@ struct element_separator<T, wchar_t> {
   static wchar_t const *sep() { return L" "; }
 };
 
+template<> struct element_separator<char, char> {
+  static char const *sep() { return ""; }
+};
+
+template<> struct element_separator<wchar_t, char> {
+  static char const *sep() { return ""; }
+};
+
+template<> struct element_separator<char, wchar_t> {
+  static wchar_t const *sep() { return L""; }
+};
+
+template<> struct element_separator<wchar_t, wchar_t> {
+  static wchar_t const *sep() { return L""; }
+};
+
 template<class Ch, class CT, class T>
 basic_ostream<Ch,CT> &operator<<(basic_ostream<Ch,CT> &s, 
                                  gott::util::range_t<T> const &x) {
