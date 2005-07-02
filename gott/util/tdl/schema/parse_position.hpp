@@ -39,7 +39,7 @@ public:
   positioning(structure::revocable_structure &);
   ~positioning();
 
-  typedef std::pair<std::size_t, structure::revocable_structure::pth> id;
+  typedef std::pair<long, structure::revocable_structure::pth> id;
 
   id current() EXPORT;
   id next() EXPORT;

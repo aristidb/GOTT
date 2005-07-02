@@ -63,5 +63,6 @@
 
 #include <gott/util/debug/warnings.hpp>
 #include <gott/util/debug/assert.hpp>
+#include <gott/util/debug/util.hpp>
 
 #endif

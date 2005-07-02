@@ -37,11 +37,11 @@ public:
   revocable_structure &struc;
 
   buffer_t buffer;
-  size_t unconsumed, consumed, seeked;
+  long unconsumed, consumed, seeked;
   bool replay, in_replay;
 
   IMPL(revocable_structure &s) 
-    : struc(s), unconsumed(0), consumed(0), replay(false) {}
+    : struc(s), unconsumed(0), consumed(-1), replay(false) {}
 };
 
 positioning::positioning(revocable_structure &s) : p(new IMPL(s)) {}
@@ -51,6 +51,7 @@ template<class T>
 void positioning::add(T const &t) {
   p->unconsumed = p->buffer.size();
   p->buffer.push_back(t);
+  debug_dump();
 }
 
 template void positioning::add(ev::begin_parse const &);
@@ -64,6 +65,7 @@ void positioning::consume() {
 }
 
 bool positioning::proceeded(id const &x) const {
+  std::wcerr << L"proceeded::" << x.first << L" <? " << p->consumed << L'\n';
   return x.first < p->consumed;
 }
 
@@ -72,15 +74,18 @@ unsigned positioning::debug_current() const {
 }
 
 positioning::id positioning::current() {
-  return std::make_pair(p->consumed, p->struc.point());
+  std::wcerr << L'C'; debug_dump(); std::wcerr << L'\n';
+  return std::make_pair(p->unconsumed, p->struc.point());
 }
 
 positioning::id positioning::next() {
+  std::wcerr << L'N'; debug_dump(); std::wcerr << L'\n';
   return std::make_pair(p->unconsumed, p->struc.point());
 }
 
 void positioning::seek(id const &x) {
-  p->consumed = p->seeked = x.first;
+  std::wcerr << L'S' << x.first << L" <<"; debug_dump(); std::wcerr << L'\n';
+  p->seeked = x.first;
   p->struc.revert(x.second);
   p->replay = true;
 }
@@ -98,8 +103,9 @@ void positioning::replay(acceptor &acc) {
   if (p->replay) {
     p->replay = false;
     p->in_replay = true;
+    p->consumed = p->seeked;
     for (p->unconsumed = p->consumed + 1;
-         p->unconsumed < p->buffer.size();
+         p->unconsumed < long(p->buffer.size());
          ++p->unconsumed) {
       acc(get(p->buffer[p->unconsumed]));
       if (p->replay)
@@ -116,11 +122,11 @@ bool positioning::want_replay() const {
 }
 
 void positioning::debug_dump() const {
-  std::wcout << L" [";
-  std::wcout << L'U' << p->unconsumed << L',';
-  std::wcout << L'C' << p->consumed << L',';
-  std::wcout << L'S' << p->seeked << L',';
-  std::wcout << L'R' << p->replay << L',';
-  std::wcout << L'I' << p->in_replay;
-  std::wcout << L"]\n";
+  std::wcerr << L"[";
+  std::wcerr << L'U' << p->unconsumed << L',';
+  std::wcerr << L'C' << p->consumed << L',';
+  std::wcerr << L'S' << p->seeked << L',';
+  std::wcerr << L'R' << p->replay << L',';
+  std::wcerr << L'I' << p->in_replay;
+  std::wcerr << L"]";
 }
