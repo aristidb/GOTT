@@ -47,7 +47,7 @@ public:
    * \param id The type's name.
    * \param ra The rule-factory's and later rule's attributes.
    */
-  void begin(std::wstring const &n, 
+  void begin(std::wstring const &id, 
              rule::attributes const &ra = rule::attributes()) EXPORT;
 
   /**

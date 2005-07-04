@@ -1,4 +1,5 @@
 Import('env')
 #env.PCH('commonheaders.h')
-env.Command('commonheaders.h.gch', 'commonheaders.h', '$CXXCOM')
-env.SideEffect('commonheaders.dummy.h', 'commonheaders.h.gch')
+if 0:
+	env.Command('commonheaders.h.gch', 'commonheaders.h', '$CXXCOM')
+	env.SideEffect('commonheaders.dummy.h', 'commonheaders.h.gch')
