@@ -58,6 +58,7 @@ public:
   void add(T const &); // add a token but don't consume it yet
 
   void consume(); // consume the current token
+  void pass();
 
   bool proceeded(id const &) const EXPORT; // from the unconsumed token
 

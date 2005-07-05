@@ -39,9 +39,10 @@ public:
   buffer_t buffer;
   long unconsumed, consumed, seeked;
   bool replay, in_replay;
+  bool in_pass;
 
   IMPL(revocable_structure &s) 
-    : struc(s), unconsumed(0), consumed(-1), replay(false) {}
+    : struc(s), unconsumed(0), consumed(-1), replay(false), in_pass(false) {}
 };
 
 positioning::positioning(revocable_structure &s) : p(new IMPL(s)) {}
@@ -51,6 +52,7 @@ template<class T>
 void positioning::add(T const &t) {
   p->unconsumed = p->buffer.size();
   p->buffer.push_back(t);
+  p->in_pass = false;
   debug_dump();
 }
 
@@ -64,6 +66,10 @@ void positioning::consume() {
   ++p->consumed;
 }
 
+void positioning::pass() {
+  p->in_pass = true;
+}
+
 bool positioning::proceeded(id const &x) const {
   std::wcerr << L"proceeded::" << x.first << L" <? " << p->consumed << L'\n';
   return x.first < p->consumed;
@@ -75,12 +81,11 @@ unsigned positioning::debug_current() const {
 
 positioning::id positioning::current() {
   std::wcerr << L'C'; debug_dump(); std::wcerr << L'\n';
-  return std::make_pair(p->unconsumed, p->struc.point());
+  return std::make_pair(p->in_pass ? p->consumed : p->unconsumed, p->struc.point());
 }
 
 positioning::id positioning::next() {
-  std::wcerr << L'N'; debug_dump(); std::wcerr << L'\n';
-  return std::make_pair(p->unconsumed, p->struc.point());
+  return current();
 }
 
 void positioning::seek(id const &x) {
@@ -103,6 +108,7 @@ void positioning::replay(acceptor &acc) {
   if (p->replay) {
     p->replay = false;
     p->in_replay = true;
+    p->in_pass = false;
     p->consumed = p->seeked;
     for (p->unconsumed = p->consumed + 1;
          p->unconsumed < long(p->buffer.size());

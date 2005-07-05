@@ -166,8 +166,10 @@ bool match::IMPL::handle_rule(ev::event const &event) {
   if (event.play(current)) {
     if (tok) pos.consume();
     return consume_event();
-  } else
+  } else {
+    if (tok) pos.pass();
     return pass_event();
+  }
 }
 
 bool match::IMPL::consume_event() {
@@ -183,6 +185,7 @@ bool match::IMPL::pass_event() {
     fail_rule();
     return true;
   } else {
+    std::wcerr << L"PASS\n";
     succeed_rule();
     std::wcerr << L"pass::" << pos.want_replay() << L'\n';
     return pos.want_replay();
