@@ -42,7 +42,6 @@ public:
   typedef std::pair<long, structure::revocable_structure::pth> id;
 
   id current() EXPORT;
-  id next() EXPORT;
   void seek(id const &) EXPORT;
   void seek_and_forget(id const &) EXPORT;
   void forget(id const &) EXPORT;
@@ -57,13 +56,14 @@ public:
   template<class T>
   void add(T const &); // add a token but don't consume it yet
 
-  void consume(); // consume the current token
-  void pass();
+  void consume();
+  void pass(); 
 
   bool proceeded(id const &) const EXPORT; // from the unconsumed token
 
-  unsigned debug_current() const;
+#ifdef DEBUG
   void debug_dump() const;
+#endif
 
 private:
   class IMPL;

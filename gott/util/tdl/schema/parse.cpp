@@ -131,7 +131,6 @@ void match::IMPL::add(rule::factory const &f) {
 
 template<class T>
 void match::IMPL::handle_token(T const &e) {
-  std::wcerr << L'T';
   pos.add(e);
   handle_event<true>(e);
   while (pos.want_replay())
@@ -151,8 +150,6 @@ void match::IMPL::replay_buffer() {
 
 template<bool tok>
 void match::IMPL::handle_event(ev::event const &e) {
-  std::wcerr << e;
-  gott::debug::brace b(std::wcerr);
   while (!parse.empty()) 
     if (handle_rule<tok>(e)) 
       break;
@@ -161,8 +158,6 @@ void match::IMPL::handle_event(ev::event const &e) {
 template<bool tok> 
 bool match::IMPL::handle_rule(ev::event const &event) {
   rule &current = *parse.back();
-  std::wcerr << typeid(current).name() << L':' << range(current.get_attributes().tags());
-  gott::debug::brace b(std::wcerr);
   if (event.play(current)) {
     if (tok) pos.consume();
     return consume_event();
@@ -173,21 +168,17 @@ bool match::IMPL::handle_rule(ev::event const &event) {
 }
 
 bool match::IMPL::consume_event() {
-  std::wcerr << L"consume\n";
   if (parse.back()->expects() == rule::nothing)
     succeed_rule();
   return true;
 }
 
 bool match::IMPL::pass_event() {
-  std::wcerr << L"pass\n";
   if (parse.back()->expects() == rule::need) {
     fail_rule();
     return true;
   } else {
-    std::wcerr << L"PASS\n";
     succeed_rule();
-    std::wcerr << L"pass::" << pos.want_replay() << L'\n';
     return pos.want_replay();
   }
 }

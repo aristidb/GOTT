@@ -53,7 +53,6 @@ void positioning::add(T const &t) {
   p->unconsumed = p->buffer.size();
   p->buffer.push_back(t);
   p->in_pass = false;
-  debug_dump();
 }
 
 template void positioning::add(ev::begin_parse const &);
@@ -71,25 +70,17 @@ void positioning::pass() {
 }
 
 bool positioning::proceeded(id const &x) const {
-  std::wcerr << L"proceeded::" << x.first << L" <? " << p->consumed << L'\n';
   return x.first < p->consumed;
 }
 
-unsigned positioning::debug_current() const {
-  return p->unconsumed;
-}
-
 positioning::id positioning::current() {
-  std::wcerr << L'C'; debug_dump(); std::wcerr << L'\n';
-  return std::make_pair(p->in_pass ? p->consumed : p->unconsumed, p->struc.point());
-}
-
-positioning::id positioning::next() {
-  return current();
+  if (p->in_pass)
+    return std::make_pair(p->consumed, p->struc.point());
+  else
+    return std::make_pair(p->unconsumed, p->struc.point());
 }
 
 void positioning::seek(id const &x) {
-  std::wcerr << L'S' << x.first << L" <<"; debug_dump(); std::wcerr << L'\n';
   p->seeked = x.first;
   p->struc.revert(x.second);
   p->replay = true;
@@ -127,6 +118,7 @@ bool positioning::want_replay() const {
   return p->replay;
 }
 
+#ifdef DEBUG
 void positioning::debug_dump() const {
   std::wcerr << L"[";
   std::wcerr << L'U' << p->unconsumed << L',';
@@ -136,3 +128,4 @@ void positioning::debug_dump() const {
   std::wcerr << L'I' << p->in_replay;
   std::wcerr << L"]";
 }
+#endif
