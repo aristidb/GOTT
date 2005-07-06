@@ -22,6 +22,7 @@
 #include <gott/util/tdl/schema/parse_position.hpp>
 #include <gott/util/tdl/structure/structure.hpp>
 #include <gott/util/tdl/simple/parse/parser.hpp>
+#include <gott/util/tdl/schema/context.hpp>
 #include <gott/util/tut/tut.h>
 
 namespace tdl = gott::util::tdl;
@@ -48,8 +49,12 @@ struct test_base {
   test_base() 
     : match(no_stru),
       pos(match.pos()),
-      parse(match)
-    {}
+      parse(match) {
+    tdl::schema::context c;
+    c.begin(L"document");
+    c.end();
+    match.add(c.get());
+  }
 };
 
 typedef tut::test_group<test_base> tf;
