@@ -127,36 +127,33 @@ void exec_parse::run_parse() {
 void exec_parse::normal(unsigned last) {
   if (!up) parse.down();
 
-  struct uppor_t {
-    parser &p;
-    ~uppor_t() {
-      p.up();
-    }
-  } uppor = {parse};
-
-  do {
-    if (getline(stream, current_line))
-      if (indent == 1 && current_line == L"***") // no space before, no behind
-        throw cancellor();
-      else
-        normal_line(current_line);
-
-    unsigned old = indent;
+  try {
     do {
-      ln.start_line();
-      get_indent();
-    } while (empty_line());
+      if (getline(stream, current_line))
+        if (indent == 1 && current_line == L"***") // no space before, no behind
+          throw cancellor();
+        else
+          normal_line(current_line);
 
-    if (started_document && indent > old)
-      normal(old);
-    else if (started_document && up)
-      parse.up();
+      unsigned old = indent;
+      do {
+        ln.start_line();
+        get_indent();
+      } while (empty_line());
 
-    if (indent <= last)
-      break;
-  } while (stream);
+      if (started_document && indent > old)
+        normal(old);
+      else if (started_document && up)
+        parse.up();
 
-  (void)uppor; // Clean up!
+      if (indent <= last)
+        break;
+    } while (stream);
+  } catch (cancellor&) {
+    parse.up();
+    throw;
+  }
+  parse.up();
 }
 
 void exec_parse::normal_line(wstring const &s) {

@@ -57,6 +57,8 @@ public:
   void succeed_rule();
   void fail_rule();
 
+  void fail_all();
+
   typedef list<shared_ptr<rule> > Stack;
   Stack parse;
 
@@ -150,6 +152,8 @@ void match::IMPL::replay_buffer() {
 
 template<bool tok>
 void match::IMPL::handle_event(ev::event const &e) {
+  if (parse.empty()) 
+    fail_all();
   while (!parse.empty()) 
     if (handle_rule<tok>(e)) 
       break;
@@ -197,5 +201,9 @@ void match::IMPL::fail_rule() {
   if (!parse.empty())
     handle_event<false>(ev::child_fail());
   else
-    throw mismatch(ln);
+    fail_all();
+}
+
+void match::IMPL::fail_all() {
+  throw mismatch(ln);
 }

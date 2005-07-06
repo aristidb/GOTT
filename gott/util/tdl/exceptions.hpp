@@ -30,11 +30,10 @@ namespace tdl {
 class EXPORT tdl_exception : public std::exception {
   std::string message_narrow;
   std::wstring message_wide;
-protected:
+public:
   tdl_exception(std::string const &msg) LOCAL;
   tdl_exception(std::wstring const &msg) LOCAL;
   ~tdl_exception() throw();
-public:
   char const *what() const throw();
 };
 
@@ -57,7 +56,7 @@ struct EXPORT unregistered_type : public tdl_exception {
 };
 
 struct EXPORT dont_accept : public tdl_exception {
-  dont_accept(std::wstring const &desc);
+  dont_accept(std::wstring const &desc) LOCAL;
   ~dont_accept() throw();
 };
 

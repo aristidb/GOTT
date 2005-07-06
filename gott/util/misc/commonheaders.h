@@ -11,6 +11,7 @@
 #include <deque>
 #include <map>
 #include <exception>
+#include <stdexcept>
 
 #ifdef HAVE_VISIBILITY
 #pragma GCC visibility pop
