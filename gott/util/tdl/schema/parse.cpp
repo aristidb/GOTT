@@ -59,14 +59,14 @@ public:
 
   void fail_all();
 
-  typedef list<shared_ptr<rule> > Stack;
-  Stack parse;
-
   structure::revocable_structure &struc;
   positioning pos;
 
   match &ref;
   detail::line_pos ln;
+
+  typedef list<shared_ptr<rule> > Stack;
+  Stack parse;
 };
 
 match::match(structure::revocable_structure &p) : pIMPL(new IMPL(p, *this)) {}

@@ -33,7 +33,7 @@ struct print_ptr {
 };
 
 template<class C, class CT>
-ostream &operator<<(basic_ostream<C, CT> &s, print_ptr const &p) {
+basic_ostream<C, CT> &operator<<(basic_ostream<C, CT> &s, print_ptr const &p) {
   return s.operator<<(p.data);
 }
 
