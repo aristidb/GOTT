@@ -37,7 +37,7 @@ public:
   typedef factory_template::slotcfg_manychildren<
             match_unordered,
             slotcfg::one,
-            slotcfg::one>
+            slotcfg::all>
           factory;
   match_unordered(std::vector<element> const &, rule::attributes const &, 
                   match &);
