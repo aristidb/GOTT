@@ -6,7 +6,9 @@
 #include "x11/application.hpp"
 #include "x11/window.hpp"
 #include "font.hpp"
+#include "font/pixel_glyph.hpp"
 #include "font/vector_glyph.hpp"
+#include "device.hpp"
 #include <boost/bind.hpp>
 
 using namespace std;
@@ -18,6 +20,7 @@ class MyWindow : public gott::gui::x11::window
 {
   private:
     float x_,y_;
+    device_property dev;
     FT_Face face;
     void get_face() {
       int error = FT_New_Face( gott::gui::font::get_instance(),
@@ -28,8 +31,8 @@ class MyWindow : public gott::gui::x11::window
         throw runtime_error("Fehler bei FT_New_Face");
       error = FT_Set_Char_Size(
             face,    /* handle to face object           */
-            0,       /* char_width in 1/64th of points  */
-            64*16,   /* char_height in 1/64th of points */
+            64*20,       /* char_width in 1/64th of points  */
+            64*20,   /* char_height in 1/64th of points */
             96,     /* horizontal device resolution    */
             96 ); 
       if(error)
@@ -38,17 +41,23 @@ class MyWindow : public gott::gui::x11::window
     }
   public:
     MyWindow( application& app, rect const& r, std::string const& title, pixelformat const& p )
-      : gott::gui::x11::window( app, r, title, p, window_flags::Defaults ), x_(0.01), y_(0.01) {
+      : gott::gui::x11::window( app, r, title, p, window_flags::Defaults ), x_(0.01), y_(10.01) {
         set_on_key(boost::bind(&MyWindow::on_key, this, _1));
         set_on_redraw(boost::bind(&MyWindow::on_redraw, this));
         set_on_configure(boost::bind(&MyWindow::on_configure, this, _1));
+        dev.dot_layout = device_property::CRTDiffuse;
+        dev.v_dpi = 96;
+        dev.h_dpi = 96;
         get_face();
       }
     MyWindow( rect const& r, std::string const& title, pixelformat const& p )
-      : gott::gui::x11::window( r, title, p, window_flags::Defaults ), x_(0.01), y_(0.01){
+      : gott::gui::x11::window( r, title, p, window_flags::Defaults ), x_(0.01), y_(10.01){
         set_on_key(boost::bind(&MyWindow::on_key, this, _1));
         set_on_redraw(boost::bind(&MyWindow::on_redraw, this));
         set_on_configure(boost::bind(&MyWindow::on_configure, this, _1));
+        dev.dot_layout = device_property::CRTDiffuse;
+        dev.v_dpi = 96;
+        dev.h_dpi = 96;
         get_face();
       }
 
@@ -76,7 +85,7 @@ class MyWindow : public gott::gui::x11::window
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       glLoadIdentity();
-  
+
       glBegin(GL_TRIANGLES);
       glColor3f(1.0,0,0);
       glVertex2i( 400,450);
@@ -86,9 +95,23 @@ class MyWindow : public gott::gui::x11::window
       glVertex2i( 700,230);
       glEnd();
       
-      glColor4f(1.0,1.0,1.0,1.0);
       char text[] = "A library to rule them all!";
       //glTranslatef(0,0,0.25);
+      glRasterPos2f( x_, y_ );
+      float t_x = x_, t_y = y_;
+      for ( std::size_t n = 0; n < sizeof(text) - 1; n++ )
+      {
+        GLenum e = glGetError();
+        if( e != GL_NO_ERROR )
+          std::cout << gluErrorString( e ) << std::endl;
+        pixel_glyph g( face, FT_Get_Char_Index( face, text[n] ), dev);
+        g.render();
+        t_x += face->glyph->advance.x/32.0f;
+        t_y += face->glyph->advance.y/32.0f;
+        glRasterPos2f( t_x, t_y );
+      }
+      glColor4f(0.2,0.2,1.20,1.0);
+      glTranslatef(0,100,0.0);
       for ( std::size_t n = 0; n < sizeof(text) - 1; n++ )
       {
         GLenum e = glGetError();
@@ -101,7 +124,7 @@ class MyWindow : public gott::gui::x11::window
  
       swap_buffer();
     }
-    
+
     void on_configure( gott::gui::rect const& r)
     {
       window::on_configure(r);
