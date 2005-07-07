@@ -38,7 +38,7 @@ env.Program('test_clockwise', 'math/clockwise.cpp')
 
 SConscript(dirs = ['x11'])
 
-source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp', 'font.cpp', 'font/vector_glyph.cpp']
+source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp', 'font.cpp', 'font/pixel_glyph.cpp', 'font/vector_glyph.cpp']
 
 # env.SharedLibrary('gottbase', source_files)
 env.StaticLibrary('gottbase', source_files)
