@@ -270,22 +270,31 @@ private:
   rule::attributes attrib;
 };
 
-#if 0 // not done yet
 template<class T, slotcfg::simple_mode Def, slotcfg::mode Accepted>
 class slotcfg_manychildren : public detail::factory_with_slotcfg<Accepted> {
 public:
+  typedef std::pair<rule::factory const *, slotcfg> element;
+  
   slotcfg_manychildren(rule::attributes const &a, unsigned n) : attrib(a) {
     sub.reserve(n);
   }
 
-  void add(rule::factory const &f) {
-    sub.push_back(&f);
+  void add(rule::factory const &child) {
+    add(child, slotcfg(Def));
   }
 
-  void add(rule::factory const &f, unsigned i) {
-    if (sub.size() <= i)
-      sub.resize(i + 1);
-    sub[i] = &f;
+  void add(rule::factory const &child, unsigned slot) {
+    add(child, slot, slotcfg(Def));
+  }
+
+  void add(rule::factory const &child, slotcfg const &cfg) {
+    sub.push_back(element(&child, cfg));
+  }
+
+  void add(rule::factory const &child, unsigned slot, slotcfg const &cfg) {
+    if (sub.size() <= slot)
+      sub.resize(slot);
+    sub[slot] = element(child, cfg);
   }
 
   rule *get(match &m) const {
@@ -302,10 +311,9 @@ public:
   }
   
 private:
-  container sub;
+  std::vector<element> sub;
   rule::attributes attrib;
 };
-#endif
 
 }
 
