@@ -294,7 +294,7 @@ public:
   void add(rule::factory const &child, unsigned slot, slotcfg const &cfg) {
     if (sub.size() <= slot)
       sub.resize(slot);
-    sub[slot] = element(child, cfg);
+    sub[slot] = element(&child, cfg);
   }
 
   rule *get(match &m) const {

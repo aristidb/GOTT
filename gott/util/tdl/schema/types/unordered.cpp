@@ -27,11 +27,10 @@ namespace ev = gott::util::tdl::schema::ev;
 using schema::rule;
 using schema::match_unordered;
 
-match_unordered::match_unordered(vector<rule::factory const *> const &r, 
+match_unordered::match_unordered(vector<element> const &r, 
                                  rule::attributes const &a, match &m) 
 : rule(need, a, m), last(m.pos().current()) {
-  for (size_t i = 0; i < r.size(); ++i)
-    children.push_back(std::make_pair(r[i], slotcfg::one));
+  copy(range(r), std::back_inserter(children));
 
   pos = children.begin();
 

@@ -32,14 +32,19 @@ namespace tdl {
 namespace schema {
 
 class match_unordered : public rule {
+  typedef std::pair<rule::factory const *, slotcfg> element;
 public:
-  typedef factory_template::manychildren<match_unordered> factory;
-  match_unordered(factory_template::container const &, 
-                  rule::attributes const &, match &);
+  typedef factory_template::slotcfg_manychildren<
+            match_unordered,
+            slotcfg::one,
+            slotcfg::one>
+          factory;
+  match_unordered(std::vector<element> const &, rule::attributes const &, 
+                  match &);
   ~match_unordered();
 
 private:
-  typedef std::list<std::pair<rule::factory const *, slotcfg> > list_t;
+  typedef std::list<element> list_t;
   list_t children;
   list_t::iterator pos;
   positioning::id last;
