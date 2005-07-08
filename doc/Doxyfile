@@ -25,7 +25,7 @@ ABBREVIATE_BRIEF       = "The $name class" \
 ALWAYS_DETAILED_SEC    = NO
 INLINE_INHERITED_MEMB  = NO
 FULL_PATH_NAMES        = YES
-STRIP_FROM_PATH        = /home/ari/coding/gott/gott/gott/
+STRIP_FROM_PATH        = ../
 STRIP_FROM_INC_PATH    = 
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = YES
@@ -81,7 +81,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = /home/ari/coding/gott/gott/gott/
+INPUT                  = ../gott/
 FILE_PATTERNS          = *.h \
                          *.hh \
                          *.hxx \
@@ -92,7 +92,7 @@ FILE_PATTERNS          = *.h \
                          *.HH \
                          *.H++
 RECURSIVE              = YES
-EXCLUDE                = /home/ari/coding/gott/gott/gott/.sconf_temp/
+EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = 
