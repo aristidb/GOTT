@@ -23,7 +23,7 @@ pixel_glyph::pixel_glyph( FT_Face & face, std::size_t glyph_index, device_proper
   };*/
   error=FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER );
   if(error)
-    throw runtime_error("Fehler bei FT_Set_Char_Size");
+    throw runtime_error("Fehler bei FT_Load_Glyp");
 
   FT_Bitmap & bitmap = face->glyph->bitmap;
 
