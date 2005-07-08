@@ -15,13 +15,19 @@ pixel_glyph::pixel_glyph( FT_Face & face, std::size_t glyph_index, device_proper
 {
 
   int error;
-/*  switch( d.dot_layout ) {
-    case LCDVertical: error =FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER | FT_LOAD_TARGET_LCD_V );break;
-    case LCDHorizontal: error=FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER | FT_LOAD_TARGET_LCD );break;
-    case CRTDiffuse: 
-    default: error=FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER );break;
-  };*/
+#if 1
+  switch( d.dot_layout ) {
+    case device_property::LCDVertical: 
+      error =FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER | FT_LOAD_TARGET_LCD_V );break;
+    case device_property::LCDHorizontal: 
+      error=FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER | FT_LOAD_TARGET_LCD );break;
+    case device_property::CRTDiffuse: 
+    default: 
+      error=FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER );break;
+  };
+#else
   error=FT_Load_Glyph( face, glyph_index, FT_LOAD_RENDER );
+#endif
   if(error)
     throw runtime_error("Fehler bei FT_Load_Glyp");
 
