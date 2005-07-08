@@ -23,17 +23,15 @@
 #include <gott/util/tdl/schema/slot.hpp>
 #include <gott/util/tdl/schema/types/literal.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
+namespace util = gott::util;
+namespace schema = util::tdl::schema;
+namespace stru = util::tdl::structure;
+namespace simple = util::tdl::simple;
+using util::xany::Xany;
 using std::wstring;
 using namespace stru::cf;
 using schema::slotcfg;
 using schema::rule;
-
-typedef schema::rule::attributes RA;
 
 namespace {
 struct recursive : tut::schema_basic {
