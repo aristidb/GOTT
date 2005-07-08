@@ -82,6 +82,7 @@ public:
 
   /**
    * Add a reference to another context as a "rule".
+   * The context must be fully initialized and filled.
    * The added context is not owned.
    * \param other The context to refer to.
    */
