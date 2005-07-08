@@ -91,5 +91,5 @@ struct context_template::IMPL::visitor : public static_visitor<>  {
 
 void context_template::instantiate(vector<context*> const &v, context &c) {
   IMPL::visitor w(v, c);
-  for_each(p->var.begin(), p->var.end(), apply_visitor(w));
+  for_each(range(p->var), apply_visitor(w));
 }
