@@ -45,7 +45,7 @@ class MyWindow : public gott::gui::x11::window
         set_on_key(boost::bind(&MyWindow::on_key, this, _1));
         set_on_redraw(boost::bind(&MyWindow::on_redraw, this));
         set_on_configure(boost::bind(&MyWindow::on_configure, this, _1));
-        dev.dot_layout = device_property::CRTDiffuse;
+        dev.dot_layout = device_property::LCDHorizontal;//device_property::CRTDiffuse;
         dev.v_dpi = 96;
         dev.h_dpi = 96;
         get_face();
@@ -55,7 +55,7 @@ class MyWindow : public gott::gui::x11::window
         set_on_key(boost::bind(&MyWindow::on_key, this, _1));
         set_on_redraw(boost::bind(&MyWindow::on_redraw, this));
         set_on_configure(boost::bind(&MyWindow::on_configure, this, _1));
-        dev.dot_layout = device_property::CRTDiffuse;
+        dev.dot_layout = device_property::LCDHorizontal;//device_property::CRTDiffuse;
         dev.v_dpi = 96;
         dev.h_dpi = 96;
         get_face();
