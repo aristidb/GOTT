@@ -65,7 +65,7 @@ typedef tf::object object;
 }
 
 namespace {
-  tut::tf recursive("recursive");
+  tut::tf recursive("schema::recursive");
 }
 
 namespace tut {
