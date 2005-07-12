@@ -36,8 +36,8 @@ void fail(int line, char const *file, char const *lhs, char const *rhs,
 }
 
 template<class T, class F>
-void assert_1(T const &value, F function, 
-              int line, char const *file, 
+void assert_1(T const &value, F function,
+              int line, char const *file,
               char const *var_name,
               char const *message) {
   if (!function(value))
@@ -60,10 +60,19 @@ struct equals {
   }
 };
 
-#define GOTT_ASSERT_1(x, f, m) \
-  gott::debug::assert_1((x),(f),__LINE__,__FILE__,#x,m)
-#define GOTT_ASSERT_2(x, y, f, m) \
-  gott::debug::assert_2((x),(y),(f),__LINE__,__FILE__,#x,#y,m)
+// MM: Good ol' gcc 3.3/3.2 doesn't like the parens around f and prints a
+// syntax error.
+#if defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ < 4
+  #define GOTT_ASSERT_1(x, f, m) \
+    gott::debug::assert_1((x), f,__LINE__,__FILE__,#x,m)
+  #define GOTT_ASSERT_2(x, y, f, m) \
+    gott::debug::assert_2((x),(y), f,__LINE__,__FILE__,#x,#y,m)
+#else
+  #define GOTT_ASSERT_1(x, f, m) \
+    gott::debug::assert_1((x),(f),__LINE__,__FILE__,#x,m)
+  #define GOTT_ASSERT_2(x, y, f, m) \
+    gott::debug::assert_2((x),(y),(f),__LINE__,__FILE__,#x,#y,m)
+#endif  
 
 }}
 

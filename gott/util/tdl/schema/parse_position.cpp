@@ -41,7 +41,7 @@ public:
   bool replay, in_replay;
   bool in_pass;
 
-  IMPL(revocable_structure &s) 
+  IMPL(revocable_structure &s)
     : struc(s), unconsumed(0), consumed(-1), replay(false), in_pass(false) {}
 };
 
@@ -107,8 +107,8 @@ void positioning::replay(acceptor &acc) {
       acc(get(p->buffer[p->unconsumed]));
       if (p->replay)
         break;
-      GOTT_ASSERT_2(p->consumed, p->unconsumed, std::equal_to<long>(), 
-                    "Gotta consume token");
+
+      GOTT_ASSERT_2(p->consumed, p->unconsumed, gott::debug::equals(), "Gotta consume token");
     }
     p->in_replay = false;
   }
