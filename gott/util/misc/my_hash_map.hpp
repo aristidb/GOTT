@@ -5,7 +5,11 @@
 
 #ifdef __GNUC__
 #define HH_HASH_MAP <ext/hash_map>
-#define HH_HASHD __gnu_cxx
+  #if (__GNUC__ < 3) || (__GNUC__ == 3 && __GNUC_MINOR__ == 0)
+    #define HH_HASHD std
+  #else
+    #define HH_HASHD __gnu_cxx
+  #endif
 #define NEED_HASH_FOR_STRING
 #else
 #define HH_HASH_MAP <hash_map>
