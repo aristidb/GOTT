@@ -108,7 +108,8 @@ void positioning::replay(acceptor &acc) {
       if (p->replay)
         break;
 
-      GOTT_ASSERT_2(p->consumed, p->unconsumed, gott::debug::equals(), "Gotta consume token");
+      GOTT_ASSERT_2(p->consumed, p->unconsumed, std::equal_to<long>(),
+                    "Gotta consume token");
     }
     p->in_replay = false;
   }
