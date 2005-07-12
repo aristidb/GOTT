@@ -71,7 +71,7 @@ struct Schema : tut::schema_basic {
         document.begin(L"string", ra(L"module-id"));
         document.end();
 
-        document.begin(L"integer", ra(L"version-spec"), 
+        document.begin(L"string", ra(L"version-spec"), 
                        slotcfg(slotcfg::range, 1, 2));
         document.end();
       document.end();
@@ -87,12 +87,12 @@ struct Schema : tut::schema_basic {
 
         document.begin(L"named", match_named::attributes(L"type", false));
           document.begin(L"ordered", rule::attributes(false));
-            document.begin(L"follow", rule::attributes(false));
+            document.begin(L"follow", rule::attributes(L"T1", false));
               document.begin(L"string", ra(L"name"));
               document.end();
 
               document.begin(L"string", ra(L"parameter"), 
-                                 slotcfg(slotcfg::list));
+                             slotcfg(slotcfg::list));
               document.end();
             document.end();
 
@@ -176,8 +176,7 @@ void object::test<1>(int) {
   run_test(
       L"module anything 0.0\n"
        "export\n"
-       "type anything\n"
-       "  optional follow string, anything\""
+       "type anything, optional follow string, anything"
   );
   S(Xany()).write_to(xp);
   ensure_equals(tree, xp);
