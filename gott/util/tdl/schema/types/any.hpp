@@ -39,6 +39,8 @@ public:
             rule::attributes const &, match &m);
   ~match_any();
 
+  static bool accept_empty(std::vector<rule::factory const *> const &);
+
 private:
   std::vector<rule::factory const *> v;
   std::vector<rule::factory const *>::iterator pos;

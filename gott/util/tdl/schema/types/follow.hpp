@@ -36,6 +36,8 @@ public:
   typedef factory_template::somechildren<match_follow, 2> factory;
   match_follow(rule::factory const * const a[2], rule::attributes const &a, 
                match &m);
+
+  static bool accept_empty(rule::factory const * const [2]);
   
 private:
   rule::factory const &pre, &post;

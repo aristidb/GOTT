@@ -37,6 +37,8 @@ bool match_follow::play(ev::child_succeed const &) {
     if (first_empty = !matcher().pos().proceeded(start))
       matcher().add(post);
     state = pre_parsed;
+    if (post.accept_empty())
+      expectation = maybe;
   } else
     post_done();
   return true;
@@ -64,4 +66,8 @@ bool match_follow::play(ev::up const &) {
     return true;
   }
   return false;
+}
+
+bool match_follow::accept_empty(rule::factory const * const el[2]) {
+  return el[0]->accept_empty() && el[1]->accept_empty();
 }

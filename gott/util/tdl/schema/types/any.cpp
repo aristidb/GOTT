@@ -53,3 +53,11 @@ bool match_any::play(ev::child_succeed const &) {
   expectation = nothing;
   return true;
 }
+
+bool match_any::accept_empty(vector<rule::factory const *> const &choices) {
+  for (vector<rule::factory const *>::const_iterator it = choices.begin(); 
+       it != choices.end(); ++it)
+    if ((*it)->accept_empty())
+      return true;
+  return false;
+}

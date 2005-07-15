@@ -41,6 +41,8 @@ public:
   match_named(rule::factory const &, slotcfg const &, rule::attributes const &,
     match &);
 
+  static bool accept_empty(bool) { return false; }
+
 private:
   bool play(ev::node const &);
   bool play(ev::down const &);

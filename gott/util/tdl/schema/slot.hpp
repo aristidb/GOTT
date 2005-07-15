@@ -220,6 +220,10 @@ public:
     return new slotcfg_onechild(a);
   }
 
+  bool accept_empty() const {
+    return T::accept_empty(scfg.prefix_optional() || sub->accept_empty());
+  }
+
 private:
   rule::factory const *sub;
   slotcfg scfg;
@@ -261,6 +265,10 @@ public:
 
   static rule::factory *build(rule::attributes const &a, unsigned) {
     return new slotcfg_somechildren(a);
+  }
+
+  bool accept_empty() const {
+    return T::accept_empty(sub, scfg);
   }
 
 private:
@@ -308,6 +316,10 @@ public:
 
   static rule::factory *build(rule::attributes const &a, unsigned n) {
     return new slotcfg_manychildren(a, n);
+  }
+
+  bool accept_empty() const {
+    return T::accept_empty(sub);
   }
   
 private:

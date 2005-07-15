@@ -41,6 +41,8 @@ class slotcfg;
 struct EXPORT rule::factory {
   struct with_slotcfg;
 
+  virtual bool accept_empty() const = 0;
+
   /**
    * Produce a rule object.
    * \param m The engine to work inside.
@@ -113,6 +115,10 @@ template<class T> class nochild : public rule::factory {
 public:
   nochild(rule::attributes const &a) : attrib(a) {}
 
+  bool accept_empty() const {
+    return T::accept_empty();
+  }
+
   void add(rule::factory const &child) { (void) child;
     throw dont_accept(L"children in nochild<>");
   }
@@ -155,6 +161,10 @@ public:
     return new onechild(a);
   }
 
+  bool accept_empty() const {
+    return T::accept_empty(sub->accept_empty());
+  }
+
 private:
   rule::factory const *sub;
   rule::attributes attrib;
@@ -184,6 +194,10 @@ public:
 
   static rule::factory *build(rule::attributes const &a, unsigned) {
     return new somechildren(a);
+  }
+
+  bool accept_empty() const {
+    return T::accept_empty(sub);
   }
 
 private:
@@ -219,6 +233,10 @@ public:
 
   static rule::factory *build(rule::attributes const &a, unsigned n) {
     return new manychildren(a, n);
+  }
+
+  bool accept_empty() const {
+    return T::accept_empty(sub);
   }
 
 private:

@@ -33,6 +33,8 @@ class match_string : public rule {
 public:
   typedef factory_template::nochild<match_string> factory;
   match_string(rule::attributes const &, match &);
+
+  static bool accept_empty() { return false; }
   
 private:
   bool play(ev::node const &);

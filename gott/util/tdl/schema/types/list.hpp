@@ -42,6 +42,8 @@ public:
                   match &);
   ~match_list();
 
+  static bool accept_empty(bool x) { return x; }
+
 private:
   rule::factory const &sub;
   positioning::id last;

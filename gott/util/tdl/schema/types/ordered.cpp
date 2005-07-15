@@ -43,3 +43,11 @@ bool match_ordered::play(ev::child_succeed const &) {
     expectation = nothing;
   return true;
 }
+
+bool match_ordered::accept_empty(vector<rule::factory const *> const &children) {
+  bool accept = true;
+  for (vector<rule::factory const *>::const_iterator it = children.begin(); 
+       it != children.end(); ++it)
+    accept &= (*it)->accept_empty();
+  return accept;
+}

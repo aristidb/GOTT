@@ -73,3 +73,11 @@ bool match_unordered::play(ev::child_fail const &) {
   matcher().add(*pos->first);
   return true;
 }
+
+bool match_unordered::accept_empty(vector<element> const &children) {
+  bool accept = true;
+  for (vector<element>::const_iterator it = children.begin(); 
+       it != children.end(); ++it)
+    accept &= it->second.prefix_optional() || it->first->accept_empty();
+  return accept;
+}

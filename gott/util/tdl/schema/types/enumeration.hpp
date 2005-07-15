@@ -37,6 +37,8 @@ public:
   
   typedef factory_template::nochild<match_enumeration> factory;
   match_enumeration(rule::attributes const &, match &);
+
+  static bool accept_empty() { return false; }
   
 private:
   bool play(ev::node const &);

@@ -35,6 +35,8 @@ public:
   match_ordered(std::vector<rule::factory const *> const &r, 
                 rule::attributes const &, match &);
 
+  static bool accept_empty(std::vector<rule::factory const *> const &r);
+
 private:
   std::vector<rule::factory const *> subrules;
   std::vector<rule::factory const *>::iterator pos;

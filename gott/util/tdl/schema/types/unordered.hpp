@@ -43,6 +43,8 @@ public:
                   match &);
   ~match_unordered();
 
+  static bool accept_empty(std::vector<element> const &);
+
 private:
   typedef std::list<element> list_t;
   list_t children;

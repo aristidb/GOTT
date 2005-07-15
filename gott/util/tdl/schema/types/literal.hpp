@@ -36,6 +36,8 @@ public:
   
   typedef factory_template::nochild<match_literal> factory;
   match_literal(rule::attributes const &, match &);
+
+  static bool accept_empty() { return false; }
   
 private:
   bool play(ev::node const &);

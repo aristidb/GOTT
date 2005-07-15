@@ -35,6 +35,8 @@ class match_integer : public rule {
 public:
   typedef factory_template::nochild<match_integer> factory;
   match_integer(rule::attributes const &, match &);
+
+  static bool accept_empty() { return false; }
   
 private:
   long val;
