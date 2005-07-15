@@ -41,6 +41,13 @@ public:
   bool replay, in_replay;
   bool in_pass;
 
+  long current() {
+    if (in_pass)
+      return consumed;
+    else
+      return unconsumed;
+  }
+
   IMPL(revocable_structure &s)
     : struc(s), unconsumed(0), consumed(-1), replay(false), in_pass(false) {}
 };
@@ -74,10 +81,11 @@ bool positioning::proceeded(id const &x) const {
 }
 
 positioning::id positioning::current() {
-  if (p->in_pass)
-    return std::make_pair(p->consumed, p->struc.point());
-  else
-    return std::make_pair(p->unconsumed, p->struc.point());
+  return id(p->current(), p->struc.point());
+}
+
+positioning::id positioning::current_readonly() {
+  return id(p->current(), -1);
 }
 
 void positioning::seek(id const &x) {

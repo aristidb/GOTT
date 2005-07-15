@@ -42,6 +42,7 @@ public:
   typedef std::pair<long, structure::revocable_structure::pth> id;
 
   id current() EXPORT;
+  id current_readonly() EXPORT;
   void seek(id const &) EXPORT;
   void seek_and_forget(id const &) EXPORT;
   void forget(id const &) EXPORT;

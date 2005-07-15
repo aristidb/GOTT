@@ -28,14 +28,16 @@ using schema::match_follow;
 match_follow::match_follow(rule::factory const * const a[2], 
                            rule::attributes const &at, match &m) 
 : rule(need, at, m), pre(*a[0]), post(*a[1]), state(initial), 
-    first_empty(false) {
+    first_empty(false), start(m.pos().current_readonly()) {
   matcher().add(pre);
 }
 
 bool match_follow::play(ev::child_succeed const &) {
-  if (state == initial)
+  if (state == initial) {
+    if (first_empty = !matcher().pos().proceeded(start))
+      matcher().add(post);
     state = pre_parsed;
-  else
+  } else
     post_done();
   return true;
 }

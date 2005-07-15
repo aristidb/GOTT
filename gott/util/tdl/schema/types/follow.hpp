@@ -24,6 +24,7 @@
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
 #include "../slot.hpp"
+#include "../parse_position.hpp"
 
 namespace gott {
 namespace util {
@@ -40,6 +41,7 @@ private:
   rule::factory const &pre, &post;
   enum { initial, pre_parsed, post_parsed, none } state;
   bool first_empty;
+  positioning::id start;
 
   bool play(ev::child_succeed const &);
   bool play(ev::down const &);
