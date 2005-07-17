@@ -91,6 +91,7 @@ GOTT_A_R2I(copy, I2)
 // copy_n omitted
 GOTT_A_R2I(copy_backward, I2)
 GOTT_A_R2I(swap_ranges, I2)
+GOTT_A_R2I_P1(transform, I2)
 
 #undef GOTT_A_R1
 #undef GOTT_A_R1_P1

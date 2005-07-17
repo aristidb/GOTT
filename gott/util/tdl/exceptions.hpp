@@ -46,7 +46,7 @@ namespace detail { struct line_pos; }
  * Thrown when a rule failed to match and could not be backtracked.
  */
 struct EXPORT mismatch : public tdl_exception {
-  mismatch(detail::line_pos const &p) LOCAL;
+  mismatch(detail::line_pos const &p, std::list<std::wstring> const &) LOCAL;
   ~mismatch() throw();
 };
 

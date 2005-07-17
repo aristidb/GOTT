@@ -23,19 +23,23 @@
 
 namespace schema = gott::util::tdl::schema;
 using schema::mismatch;
+using gott::util::range;
 
-static std::wstring build_string(schema::detail::line_pos const &p) {
+static std::wstring build_string(schema::detail::line_pos const &p,
+                                 std::list<std::wstring> const &t) {
   std::wostringstream o;
-  o << p.line << ':' << p.pos+1 << " : mismatch ";
+  o << p.line << L':' << p.pos+1 << L" : mismatch";
+  if (0)
+  o << L"near rule " << range(t);
   if (p.line_new > p.line || p.current > p.native_end)
-    o << "after";
+    o << L" after token ";
   else
-    o << "at";
-  o << " token " << p.tok;
+    o << L" at token ";
+  o << p.tok;
   return o.str();
 }
 
-mismatch::mismatch(detail::line_pos const &p) : tdl_exception(build_string(p)) 
-  {}
+mismatch::mismatch(detail::line_pos const &p, std::list<std::wstring> const &t)
+: tdl_exception(build_string(p, t)) {}
 
 mismatch::~mismatch() throw() {}

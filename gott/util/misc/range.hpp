@@ -73,6 +73,11 @@ range_t<T> offset(range_t<T> const &o, S a, S b = S()) {
   return range(advanced(o.begin, a), advanced(o.end, b));
 }
 
+template<class T>
+range_t<T> simply(T const &x) {
+  return range(x, x);
+}
+
 }}
 
 #endif
