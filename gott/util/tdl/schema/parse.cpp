@@ -67,7 +67,6 @@ public:
 
   typedef list<shared_ptr<rule> > Stack;
   Stack parse;
-  std::type_info const *deepest_happy;
 
   static std::wstring get_name(shared_ptr<rule> const &);
 };
@@ -132,7 +131,6 @@ void match::IMPL::add(rule::factory const &f) {
   Stack::iterator it = --parse.end();
   shared_ptr<rule> x(f.get(ref));
   parse.insert(++it, x);
-  deepest_happy = &typeid(*x);
 }
 
 template<class T>
