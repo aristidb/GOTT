@@ -86,7 +86,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch after token ");
+        std::string(mm.what()), "0:1 : mismatch in document after token ");
   }
 }
 
@@ -97,7 +97,7 @@ void object::test<4>(int) {
     fail("following");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token foo");
+        std::string(mm.what()), "1:1 : mismatch in document after token foo");
   }
 }
 
@@ -108,7 +108,7 @@ void object::test<5>(int) {
     fail("just integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 4");
+        std::string(mm.what()), "1:1 : mismatch in document after token 4");
   }
 }
 
@@ -119,7 +119,7 @@ void object::test<6>(int) {
     fail("too many strings");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch at token y");
+        std::string(mm.what()), "1:5 : mismatch in document at token y");
   }
 }
 

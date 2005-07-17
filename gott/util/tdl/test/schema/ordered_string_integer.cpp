@@ -73,7 +73,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token d7");
+        std::string(mm.what()), "1:1 : mismatch in document>ordered>integer after token d7");
   }
 }
 
@@ -84,7 +84,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch after token ");
+        std::string(mm.what()), "0:1 : mismatch in document>ordered>integer after token ");
   }
 }
 
@@ -95,7 +95,7 @@ void object::test<4>(int) {
     fail("following");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token foo");
+        std::string(mm.what()), "1:1 : mismatch in document>ordered>integer after token foo");
   }
 }
 
@@ -106,7 +106,7 @@ void object::test<5>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token foo");
+        std::string(mm.what()), "1:1 : mismatch in document>ordered>integer after token foo");
   }
 }
 
@@ -116,7 +116,7 @@ void object::test<6>(int) {
     run_test(L"x,4,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch at token y");
+        std::string(mm.what()), "1:5 : mismatch in document>ordered>integer at token y");
   }
 }
 
@@ -126,7 +126,7 @@ void object::test<7>(int) {
     run_test(L"4,x,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:3 : mismatch at token x");
+        std::string(mm.what()), "1:3 : mismatch in document>ordered>integer at token x");
   }
 }
 

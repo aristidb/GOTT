@@ -61,3 +61,7 @@ bool match_any::accept_empty(vector<rule::factory const *> const &choices) {
       return true;
   return false;
 }
+
+wchar_t const *match_any::name() const {
+  return L"any";
+}

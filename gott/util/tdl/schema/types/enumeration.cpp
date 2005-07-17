@@ -61,3 +61,7 @@ bool match_enumeration::play(ev::node const &n) {
 
   return false;
 }
+
+wchar_t const *match_enumeration::name() const {
+  return L"enumeration";
+}

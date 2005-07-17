@@ -71,3 +71,7 @@ bool match_follow::play(ev::up const &) {
 bool match_follow::accept_empty(rule::factory const * const el[2]) {
   return el[0]->accept_empty() && el[1]->accept_empty();
 }
+
+wchar_t const *match_follow::name() const {
+  return L"follow";
+}

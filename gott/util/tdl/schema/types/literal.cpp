@@ -56,3 +56,7 @@ bool match_literal::play(ev::node const &n) {
 
   return false;
 }
+
+wchar_t const *match_literal::name() const {
+  return L"literal";
+}

@@ -38,6 +38,7 @@ public:
   
 private:
   bool play(ev::node const &);
+  wchar_t const *name() const;
 };
 
 }}}}

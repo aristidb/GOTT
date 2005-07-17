@@ -66,7 +66,7 @@ public:
   detail::line_pos ln;
 
   typedef list<shared_ptr<rule> > Stack;
-  Stack parse;
+  Stack parse, shadow;
 
   static std::wstring get_name(shared_ptr<rule> const &);
 };
@@ -135,6 +135,7 @@ void match::IMPL::add(rule::factory const &f) {
 
 template<class T>
 void match::IMPL::handle_token(T const &e) {
+  shadow = parse;
   pos.add(e);
   handle_event<true>(e);
   while (pos.want_replay())
@@ -208,12 +209,10 @@ void match::IMPL::fail_rule() {
 
 void match::IMPL::fail_all() {
   std::list<wstring> names;
-  transform(range(parse), simply(std::back_inserter(names)), get_name);
+  transform(range(shadow), simply(std::back_inserter(names)), get_name);
   throw mismatch(ln, names);
 }
 
 wstring match::IMPL::get_name(shared_ptr<rule> const &rp) {
-  std::wostringstream o;
-  o << typeid(*rp).name();
-  return o.str();
+  return rp->name();
 }

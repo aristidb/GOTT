@@ -81,3 +81,7 @@ bool match_unordered::accept_empty(vector<element> const &children) {
     accept &= it->second.prefix_optional() || it->first->accept_empty();
   return accept;
 }
+
+wchar_t const *match_unordered::name() const {
+  return L"unordered";
+}

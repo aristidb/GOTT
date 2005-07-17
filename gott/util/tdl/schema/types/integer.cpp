@@ -73,3 +73,6 @@ bool match_integer::is_integer(wstring const &s) {
   return true;
 }
 
+wchar_t const *match_integer::name() const {
+  return L"integer";
+}

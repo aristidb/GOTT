@@ -72,7 +72,7 @@ void object::test<3>(int) {
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token foo");
+        std::string(mm.what()), "1:1 : mismatch in document after token foo");
   }
 }
 
@@ -83,7 +83,7 @@ void object::test<4>(int) {
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "2:1 : mismatch at token bar");
+        std::string(mm.what()), "2:1 : mismatch in document at token bar");
   }
 }
 

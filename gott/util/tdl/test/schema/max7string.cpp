@@ -89,7 +89,7 @@ void object::test<8>(int n) {
     fail("too many");
   } catch(schema::mismatch const &m) {
     ensure_equals("correct error", m.what(), 
-                  std::string("1:15 : mismatch at token 7"));
+                  std::string("1:15 : mismatch in document at token 7"));
   }
 }
 
@@ -100,7 +100,7 @@ void object::test<15>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch after token 1");
+                  "1:1 : mismatch in document after token 1");
   }
 }
 

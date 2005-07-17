@@ -60,6 +60,11 @@ public:
    */
   LOCAL expect expects() const { return expectation; }
 
+  /**
+   * A nice name for the rule.
+   */
+  virtual wchar_t const *name() const = 0;
+
   // Event handlers
   // Tokens
   /**

@@ -71,14 +71,14 @@ bool match_named::play(ev::down const &) {
 bool match_named::play(ev::child_succeed const &) {
   state = read_sub;
   if (optional) {
-    // WE NEED NO LONGER GO BACK
+    // TODO? WE NEED NO LONGER GO BACK
   }
   return true;
 }
 
 bool match_named::play(ev::child_fail const &) {
   if (optional) {
-    // GO BACK
+    // TODO? GO BACK
     return true;
   }
   return false;
@@ -93,3 +93,6 @@ bool match_named::play(ev::up const &) {
   return false;
 }
 
+wchar_t const *match_named::name() const {
+  return L"named";
+}

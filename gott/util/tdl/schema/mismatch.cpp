@@ -28,9 +28,8 @@ using gott::util::range;
 static std::wstring build_string(schema::detail::line_pos const &p,
                                  std::list<std::wstring> const &t) {
   std::wostringstream o;
-  o << p.line << L':' << p.pos+1 << L" : mismatch";
-  if (0)
-  o << L"near rule " << range(t);
+  o << p.line << L':' << p.pos+1 << L" : mismatch in ";
+  print_separated(o, range(t), L">");
   if (p.line_new > p.line || p.current > p.native_end)
     o << L" after token ";
   else

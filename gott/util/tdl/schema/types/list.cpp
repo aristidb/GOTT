@@ -71,3 +71,7 @@ bool match_list::empty() {
 
   return true;
 }
+
+wchar_t const *match_list::name() const {
+  return L"list";
+}

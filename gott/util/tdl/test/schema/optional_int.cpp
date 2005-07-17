@@ -79,7 +79,7 @@ void object::test<3>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch after token 1");
+                  "1:1 : mismatch in document after token 1");
   }
 }
 
@@ -90,7 +90,7 @@ void object::test<4>(int) {
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch at token zzzz");
+                  "1:1 : mismatch in document at token zzzz");
   }
 }
 
@@ -105,7 +105,7 @@ void object::test<5>(int t) {
     fail("many");
   } catch(schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "2:1 : mismatch at token 2");
+                  "2:1 : mismatch in document at token 2");
   }
 }
 

@@ -39,3 +39,7 @@ bool match_string::play(ev::node const &n) {
 
   return false;
 }
+
+wchar_t const *match_string::name() const {
+  return L"string";
+}

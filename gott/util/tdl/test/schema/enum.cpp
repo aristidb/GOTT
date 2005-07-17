@@ -82,7 +82,7 @@ void object::test<4>(int) {
     fail("out-of");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token d7");
+        std::string(mm.what()), "1:1 : mismatch in document at token d7");
   }
 }
 
@@ -93,7 +93,7 @@ void object::test<5>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch after token ");  
+        std::string(mm.what()), "0:1 : mismatch in document after token ");  
   }
 }
 
@@ -104,7 +104,7 @@ void object::test<6>(int) {
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token second");  
+        std::string(mm.what()), "1:1 : mismatch in document after token second");  
   }
 }
 
@@ -115,7 +115,7 @@ void object::test<7>(int) {
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token foo");
+        std::string(mm.what()), "1:1 : mismatch in document at token foo");
   }
 }
 

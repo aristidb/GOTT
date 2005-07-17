@@ -48,6 +48,7 @@ private:
   bool play(ev::child_succeed const &);
   bool play(ev::down const &);
   bool play(ev::up const &);
+  wchar_t const *name() const;
 
   void post_done();
 };

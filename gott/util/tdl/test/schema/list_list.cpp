@@ -98,7 +98,7 @@ void object::test<4>(int) {
     fail("empty");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "0:1 : mismatch after token ");
+                  "0:1 : mismatch in document after token ");
   }
 }
 
@@ -109,7 +109,7 @@ void object::test<5>(int) {
     fail("should be greedy");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch after token 44");
+                  "1:1 : mismatch in document after token 44");
   }
 }
 

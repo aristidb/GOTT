@@ -51,3 +51,7 @@ bool match_ordered::accept_empty(vector<rule::factory const *> const &children) 
     accept &= (*it)->accept_empty();
   return accept;
 }
+
+wchar_t const *match_ordered::name() const {
+  return L"ordered";
+}
