@@ -100,7 +100,7 @@ void object::test<15>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch in document after token 1");
+                  "1:1 : mismatch in document>list>string after token 1");
   }
 }
 

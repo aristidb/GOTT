@@ -52,7 +52,7 @@ typedef tf::object object;
 }
 
 namespace {
-  tut::tf ordered_integer_string_test("schema::ordered_string_integer");
+  tut::tf ordered_string_integer_test("schema::ordered_string_integer");
 }
 
 namespace tut {
@@ -84,7 +84,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>ordered>integer after token ");
+        std::string(mm.what()), "0:1 : mismatch in document>ordered>string after token ");
   }
 }
 
@@ -116,7 +116,7 @@ void object::test<6>(int) {
     run_test(L"x,4,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch in document>ordered>integer at token y");
+        std::string(mm.what()), "1:5 : mismatch in document at token y");
   }
 }
 

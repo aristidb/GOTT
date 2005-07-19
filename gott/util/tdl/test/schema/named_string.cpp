@@ -70,7 +70,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document at token d7");
+        std::string(mm.what()), "1:1 : mismatch in document>named at token d7");
   }
 }
 
@@ -81,7 +81,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document after token ");
+        std::string(mm.what()), "0:1 : mismatch in document>named after token ");
   }
 }
 
@@ -92,7 +92,7 @@ void object::test<4>(int) {
     fail("non-followed string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:4 : mismatch in document at token foo");
+        std::string(mm.what()), "1:4 : mismatch in document>named at token foo");
   }
 }
 
@@ -103,7 +103,7 @@ void object::test<5>(int) {
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document at token 4");
+        std::string(mm.what()), "1:1 : mismatch in document>named at token 4");
   }
 }
 
@@ -114,7 +114,7 @@ void object::test<6>(int) {
     fail("nonsense");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document at token 4");
+        std::string(mm.what()), "1:1 : mismatch in document>named at token 4");
   }
 }
 
@@ -125,7 +125,7 @@ void object::test<7>(int) {
     fail("just label");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document after token ND");
+        std::string(mm.what()), "1:1 : mismatch in document>named after token ND");
   }
 }
 

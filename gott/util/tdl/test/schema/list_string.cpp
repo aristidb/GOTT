@@ -88,7 +88,7 @@ void object::test<4>(int) {
     fail("following");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document after token a");
+        "1:1 : mismatch in document>list>string after token a");
   }
 }
 

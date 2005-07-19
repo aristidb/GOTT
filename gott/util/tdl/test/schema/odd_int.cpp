@@ -71,7 +71,7 @@ void object::test<1>(int n) {
     fail("even");
   } catch(schema::mismatch const &m) {
     std::stringstream err;
-    err << n << ":3 : mismatch in document after token 0";
+    err << n << ":3 : mismatch in document>list>integer after token 0";
     ensure_equals("correct error", m.what(), err.str());
   }
 }
@@ -83,7 +83,7 @@ void object::test<12>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch in document after token 1");
+                  "1:1 : mismatch in document>list>integer after token 1");
   }
 }
 
@@ -94,7 +94,7 @@ void object::test<13>(int) {
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch in document at token zzzz");
+                  "1:1 : mismatch in document>list>integer at token zzzz");
   }
 }
 

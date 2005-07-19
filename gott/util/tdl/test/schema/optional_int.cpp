@@ -90,7 +90,7 @@ void object::test<4>(int) {
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch in document at token zzzz");
+                  "1:1 : mismatch in document>list>integer at token zzzz");
   }
 }
 
