@@ -23,6 +23,7 @@
 #include "document.hpp"
 #include "enumeration.hpp"
 #include "follow.hpp"
+#include "follow_ordered.hpp"
 #include "integer.hpp"
 #include "list.hpp"
 #include "literal.hpp"
@@ -37,18 +38,20 @@ struct builtin_types {
 } auto_reg;
 }
 
-namespace s = gott::util::tdl::schema;
+using namespace gott::util::tdl::schema;
 
 builtin_types::builtin_types() {
-  s::name_manager().add(L"any",         s::match_any::factory::index());
-  s::name_manager().add(L"document",    s::match_document::factory::index());
-  s::name_manager().add(L"enumeration", s::match_enumeration::factory::index());
-  s::name_manager().add(L"follow",      s::match_follow::factory::index());
-  s::name_manager().add(L"integer",     s::match_integer::factory::index());
-  s::name_manager().add(L"list",        s::match_list::factory::index());
-  s::name_manager().add(L"literal",     s::match_literal::factory::index());
-  s::name_manager().add(L"named",       s::match_named::factory::index());
-  s::name_manager().add(L"ordered",     s::match_ordered::factory::index());
-  s::name_manager().add(L"string",      s::match_string::factory::index());
-  s::name_manager().add(L"unordered",   s::match_unordered::factory::index());
+  name_manager().add(L"any",         match_any::factory::index());
+  name_manager().add(L"document",    match_document::factory::index());
+  name_manager().add(L"enumeration", match_enumeration::factory::index());
+  name_manager().add(L"follow",      match_follow::factory::index());
+  name_manager().add(L"follow_ordered", 
+                                     match_follow_ordered::factory::index());
+  name_manager().add(L"integer",     match_integer::factory::index());
+  name_manager().add(L"list",        match_list::factory::index());
+  name_manager().add(L"literal",     match_literal::factory::index());
+  name_manager().add(L"named",       match_named::factory::index());
+  name_manager().add(L"ordered",     match_ordered::factory::index());
+  name_manager().add(L"string",      match_string::factory::index());
+  name_manager().add(L"unordered",   match_unordered::factory::index());
 }

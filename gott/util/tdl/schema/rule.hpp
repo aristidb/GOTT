@@ -55,6 +55,10 @@ public:
     over_filled = -4
   };
 
+  static bool accept_more(expect e) {
+    return e > 0;
+  }
+
   /**
    * Returns the current expectation.
    */

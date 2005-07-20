@@ -18,11 +18,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_TDL_SCHEMA_FOLLOW_HPP
-#define GOTT_TDL_SCHEMA_FOLLOW_HPP
+#ifndef GOTT_TDL_SCHEMA_FOLLOW_ORDERED_HPP
+#define GOTT_TDL_SCHEMA_FOLLOW_ORDERED_HPP
 
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
+#include "../slot.hpp"
 #include "../parse_position.hpp"
 
 namespace gott {
@@ -30,27 +31,35 @@ namespace util {
 namespace tdl {
 namespace schema {
 
-class match_follow : public rule {
+class match_follow_ordered : public rule {
+  typedef std::pair<rule::factory const *, slotcfg> element;
 public:
-  typedef factory_template::somechildren<match_follow, 2> factory;
-  match_follow(rule::factory const * const a[2], rule::attributes const &a, 
-               match &m);
+  typedef 
+    factory_template::slotcfg_manychildren<
+      match_follow_ordered, 
+      slotcfg::one,
+      slotcfg::all
+    >
+    factory;
 
-  static bool accept_empty(rule::factory const * const [2]);
+  match_follow_ordered(std::vector<element> const &, rule::attributes const &, 
+                       match &);
+  ~match_follow_ordered();
+
+  static bool accept_empty(std::vector<element> const &);
   
 private:
-  rule::factory const &pre, &post;
-  enum { initial, pre_parsed, post_parsed, none } state;
-  bool first_empty;
-  positioning::id start;
+  typedef std::vector<element> container;
+  container children;
+  container::iterator pos;
+  unsigned opened;
 
+  bool update();
+  
   bool play(ev::child_succeed const &);
   bool play(ev::down const &);
   bool play(ev::up const &);
   wchar_t const *name() const;
-
-  void pre_done();
-  void post_done();
 };
 
 }}}}
