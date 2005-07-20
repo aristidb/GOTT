@@ -29,7 +29,7 @@ using schema::match_follow_ordered;
 
 match_follow_ordered::match_follow_ordered(std::vector<element> const &c, 
     rule::attributes const &a, match &m)
-: rule(need, a, m), children(c), pos(children.begin()), opened(0) {
+: rule(need, a, m), children(c), pos(children.begin()), opened(0), state(downwards) {
   if (pos == children.end() || !update())
     expectation = nothing;
   matcher().add(*pos->first);
@@ -38,21 +38,24 @@ match_follow_ordered::match_follow_ordered(std::vector<element> const &c,
 match_follow_ordered::~match_follow_ordered() {}
 
 bool match_follow_ordered::play(ev::child_succeed const &) {
+  pos->second.add();
+  if (!update())
+    state = upwards;
   return true;
 }
 
 bool match_follow_ordered::play(ev::down const &) {
   ++opened;
-  if (update()) {
+  if (state == downwards && update()) {
     matcher().add(*pos->first);
     return true;
-  } else {
-    expectation = nothing;
+  } else 
     return false;
-  }
 }
 
 bool match_follow_ordered::play(ev::up const &) {
+  if (state != upwards)
+    return false;
   if (--opened == 0)
     expectation = nothing;
   return true;

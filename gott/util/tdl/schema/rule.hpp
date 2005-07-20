@@ -56,7 +56,7 @@ public:
   };
 
   static bool accept_more(expect e) {
-    return e > 0;
+    return e != nothing;
   }
 
   /**

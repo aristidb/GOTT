@@ -53,6 +53,7 @@ private:
   container children;
   container::iterator pos;
   unsigned opened;
+  enum { downwards, upwards } state;
 
   bool update();
   
