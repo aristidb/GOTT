@@ -40,13 +40,19 @@ struct builtin_types {
 
 using namespace gott::util::tdl::schema;
 
+//#define FOLLOW_ORDERED_AS_FOLLOW
+
 builtin_types::builtin_types() {
   name_manager().add(L"any",         match_any::factory::index());
   name_manager().add(L"document",    match_document::factory::index());
   name_manager().add(L"enumeration", match_enumeration::factory::index());
+#ifndef FOLLOW_ORDERED_AS_FOLLOW
   name_manager().add(L"follow",      match_follow::factory::index());
   name_manager().add(L"follow_ordered", 
                                      match_follow_ordered::factory::index());
+#else
+  name_manager().add(L"follow",      match_follow_ordered::factory::index());
+#endif
   name_manager().add(L"integer",     match_integer::factory::index());
   name_manager().add(L"list",        match_list::factory::index());
   name_manager().add(L"literal",     match_literal::factory::index());
