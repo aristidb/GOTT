@@ -33,27 +33,40 @@ match_follow::match_follow(rule::factory const * const a[2],
 }
 
 bool match_follow::play(ev::child_succeed const &) {
-  if (state == initial) {
-    if (first_empty = !matcher().pos().proceeded(start))
-      matcher().add(post);
-    state = pre_parsed;
-    if (post.accept_empty())
-      expectation = maybe;
-  } else
+  if (state == initial)
+    pre_done();
+  else
     post_done();
   return true;
+}
+
+void match_follow::pre_done() {
+  if (first_empty = !matcher().pos().proceeded(start))
+    matcher().add(post);
+  state = pre_parsed;
+  if (post.accept_empty())
+    expectation = maybe;
 }
 
 void match_follow::post_done() {
   if (first_empty) {
     state = none;
     expectation = nothing;
-  } else
-    state = post_parsed;
+  } else {
+    if (matcher().pos().proceeded(between))
+      state = post_parsed;
+    else {
+      matcher().pos().seek(between);
+      state = none;
+      expectation = nothing;
+    }
+  }
 }
 
 bool match_follow::play(ev::down const &) {
   if (state == pre_parsed) {
+    if (expectation != need)
+      between = matcher().pos().current();
     matcher().add(post);
     return true;
   }

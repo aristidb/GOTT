@@ -43,13 +43,14 @@ private:
   rule::factory const &pre, &post;
   enum { initial, pre_parsed, post_parsed, none } state;
   bool first_empty;
-  positioning::id start;
+  positioning::id start, between;
 
   bool play(ev::child_succeed const &);
   bool play(ev::down const &);
   bool play(ev::up const &);
   wchar_t const *name() const;
 
+  void pre_done();
   void post_done();
 };
 
