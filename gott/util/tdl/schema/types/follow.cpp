@@ -52,21 +52,12 @@ void match_follow::post_done() {
   if (first_empty) {
     state = none;
     expectation = nothing;
-  } else {
-    if (matcher().pos().proceeded(between))
-      state = post_parsed;
-    else {
-      matcher().pos().seek(between);
-      state = none;
-      expectation = nothing;
-    }
-  }
+  } else 
+    state = post_parsed;
 }
 
 bool match_follow::play(ev::down const &) {
   if (state == pre_parsed) {
-    if (expectation != need)
-      between = matcher().pos().current();
     matcher().add(post);
     return true;
   }
