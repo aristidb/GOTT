@@ -82,8 +82,8 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>follow>string after token ");
+    ensure_equals("correct error", std::string(mm.what()), 
+      "0:1 : mismatch in document(doc)>follow(foll)>string(s) after token ");
   }
 }
 
@@ -103,8 +103,8 @@ void object::test<5>(int) {
     run_test(L"4 99,y");
     fail("stuff");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:6 : mismatch in document>follow>list>integer at token y");
+    ensure_equals("correct error", std::string(mm.what()), 
+     "1:6 : mismatch in document(doc)>follow(foll)>list>integer(i) at token y");
   }
 }
 

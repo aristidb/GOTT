@@ -71,8 +71,8 @@ void object::test<3>(int) {
     run_test(L"foo bar");
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document after token foo");
+    ensure_equals("correct error", std::string(mm.what()),  
+                  "1:1 : mismatch in document(doc) after token foo");
   }
 }
 
@@ -82,8 +82,8 @@ void object::test<4>(int) {
     run_test(L"foo\nbar");
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "2:1 : mismatch in document at token bar");
+    ensure_equals("correct error", std::string(mm.what()), 
+                  "2:1 : mismatch in document(doc) at token bar");
   }
 }
 

@@ -33,7 +33,7 @@ using schema::rule;
 using schema::match_literal;
 
 rule::attributes match_literal::attributes(wstring const &w, bool cc) {
-  return rule::attributes(std::list<wstring>(), cc, w);
+  return rule::attributes(std::list<wstring>(1, w), cc, w);
 }
 
 match_literal::match_literal(rule::attributes const &a, match &m)

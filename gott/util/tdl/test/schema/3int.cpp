@@ -76,7 +76,7 @@ void object::test<2>(int) {
     fail("empty");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()), 
-                  "0:1 : mismatch in document>list>integer after token ");
+                  "0:1 : mismatch in document>list>integer(el) after token ");
   }
 }
 
@@ -98,7 +98,7 @@ void object::test<4>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch in document>list>integer after token 1");
+                  "1:1 : mismatch in document>list>integer(el) after token 1");
   }
 }
 

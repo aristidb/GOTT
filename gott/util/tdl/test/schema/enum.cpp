@@ -34,7 +34,7 @@ using stru::cf::C;
 namespace {
 struct schema_enumeration : tut::schema_basic {
   schema_enumeration() {
-    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
+    context.begin(L"document");
       vector<wstring> v(3);
       v[0] = L"first"; v[1] = L"second"; v[2] = L"third";
       context.begin(L"enumeration", schema::match_enumeration::attributes(v));
@@ -57,21 +57,21 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"first");
-  C(S(Xany(0)), L"doc").write_to(xp);
+  C(S(Xany(0))).write_to(xp);
   ensure_equals("first", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
   run_test(L"second");
-  C(S(Xany(1)), L"doc").write_to(xp);
+  C(S(Xany(1))).write_to(xp);
   ensure_equals("second", tree, xp);
 }
 
 template<> template<>
 void object::test<3>(int) {
   run_test(L"third");
-  C(S(Xany(2)), L"doc").write_to(xp);
+  C(S(Xany(2))).write_to(xp);
   ensure_equals("third", tree, xp);
 }
 

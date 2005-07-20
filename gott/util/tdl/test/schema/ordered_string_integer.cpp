@@ -34,11 +34,11 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_ordered_string_integer : tut::schema_basic {
   schema_ordered_string_integer() {
-    context.begin(L"document", RA(wstring(L"doc")));
-      context.begin(L"ordered", RA(wstring(L"ord")));
-        context.begin(L"string", RA(wstring(L"string")));
+    context.begin(L"document");
+      context.begin(L"ordered");
+        context.begin(L"string");
         context.end();
-        context.begin(L"integer", RA(wstring(L"int")));
+        context.begin(L"integer");
         context.end();
       context.end();
     context.end();
@@ -60,9 +60,9 @@ template<> template<>
 void object::test<1>(int) {
   run_test(L"(hallo)\n-74545656");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"(hallo)"), L"string"));
-  c.push_back(S(Xany(-74545656), L"int"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  c.push_back(S(Xany(L"(hallo)")));
+  c.push_back(S(Xany(-74545656)));
+  C(M(c)).write_to(xp);
   ensure_equals("single ordered_string_integer entity", tree, xp);
 }
 

@@ -36,8 +36,8 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_follow_list : tut::schema_basic {
   schema_follow_list() {
-    context.begin(L"document", RA(wstring(L"doc")));
-      context.begin(L"follow", RA(wstring(L"foll")));
+    context.begin(L"document");
+      context.begin(L"follow");
         context.begin(L"integer", RA(wstring(L"i")), 
                       slotcfg(slotcfg::list));
         context.end();
@@ -65,14 +65,14 @@ void object::test<1>(int) {
   stru::cf::nd_list c;
   c.push_back(S(Xany(4), L"i"));
   c.push_back(S(Xany(L"5"), L"s"));
-  C(M(c, L"foll"), L"doc").write_to(xp);
+  C(M(c)).write_to(xp);
   ensure_equals("single follow_list entity", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
   run_test(L"d7");
-  C(C(S(Xany(L"d7"), L"s"), L"foll"), L"doc").write_to(xp);
+  C(C(S(Xany(L"d7"), L"s"))).write_to(xp);
   ensure_equals("just string", tree, xp);
 }
 
@@ -82,8 +82,8 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>follow>list>integer after token ");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "0:1 : mismatch in document>follow>list>integer(i) after token ");
   }
 }
 
@@ -93,7 +93,7 @@ void object::test<4>(int) {
   stru::cf::nd_list c;
   c.push_back(S(Xany(-77), L"i"));
   c.push_back(S(Xany(L"foo"), L"s"));
-  C(M(c, L"foll"), L"doc").write_to(xp);
+  C(M(c)).write_to(xp);
   ensure_equals("followed string", tree, xp);
 }
 
@@ -103,8 +103,8 @@ void object::test<5>(int) {
     run_test(L"4");
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>follow>list>integer after token 4");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document>follow>list>integer(i) after token 4");
   }
 }
 

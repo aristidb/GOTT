@@ -33,8 +33,8 @@ using stru::cf::C;
 namespace {
 struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() {
-    context.begin(L"document", rule::attributes(wstring(L"d")));
-      context.begin(L"ordered", rule::attributes(wstring(L"o")));
+    context.begin(L"document");
+      context.begin(L"ordered");
         context.begin(L"list", rule::attributes(wstring(L"s")));
           context.begin(L"list", rule::attributes(wstring(L"t")));
             context.begin(L"integer", rule::attributes(wstring(L"ii")));
@@ -64,7 +64,7 @@ void object::test<1>(int) {
   stru::cf::nd_list c;
   c.push_back(S(Xany(), L"s"));
   c.push_back(S(Xany(L"a_string"), L"xx"));
-  C(M(c,L"o"),L"d").write_to(xp);
+  C(M(c)).write_to(xp);
   ensure_equals("string only", tree, xp);
 }
 
@@ -77,7 +77,7 @@ void object::test<2>(int) {
   stru::cf::nd_list c;
   c.push_back(C(M(i, L"t"), L"s"));
   c.push_back(S(Xany(L"a"), L"xx"));
-  C(M(c,L"o"),L"d").write_to(xp);
+  C(M(c)).write_to(xp);
   ensure_equals("ints+string", tree, xp);
 }
 
@@ -87,7 +87,7 @@ void object::test<3>(int) {
   stru::cf::nd_list c;
   c.push_back(C(C(S(Xany(7000),L"ii"),L"t"),L"s"));
   c.push_back(S(Xany(L"(4)"), L"xx"));
-  C(M(c,L"o"),L"d").write_to(xp);
+  C(M(c)).write_to(xp);
   ensure_equals("int+string", tree, xp);
 }
 
@@ -98,7 +98,8 @@ void object::test<4>(int) {
     fail("empty");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-          "0:1 : mismatch in document>ordered>list>list>integer after token ");
+       "0:1 : mismatch in document>ordered>list(s)>list(t)>integer(ii)"
+       " after token ");
   }
 }
 
@@ -109,7 +110,8 @@ void object::test<5>(int) {
     fail("should be greedy");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-        "1:1 : mismatch in document>ordered>list>list>integer after token 44");
+        "1:1 : mismatch in document>ordered>list(s)>list(t)>integer(ii)"
+        " after token 44");
   }
 }
 

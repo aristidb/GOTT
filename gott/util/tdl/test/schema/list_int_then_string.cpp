@@ -35,7 +35,7 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_list_int_then_string : tut::schema_basic {
   schema_list_int_then_string() {
-    context.begin(L"document", RA(wstring(L"doc")));
+    context.begin(L"document");
       context.begin(L"ordered", RA(wstring(L"ord")));
         context.begin(L"list", RA(wstring(L"list")));
           context.begin(L"integer", RA(wstring(L"int")));
@@ -65,7 +65,7 @@ void object::test<1>(int) {
   stru::cf::nd_list c;
   c.push_back(C(S(Xany(4), L"int"), L"list"));
   c.push_back(S(Xany(L"x"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  C(M(c, L"ord")).write_to(xp);
   ensure_equals("single integer, then string", tree, xp);
 }
 
@@ -75,7 +75,7 @@ void object::test<2>(int) {
   stru::cf::nd_list c;
   c.push_back(S(Xany(), L"list"));
   c.push_back(S(Xany(L"d7"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  C(M(c, L"ord")).write_to(xp);
   ensure_equals("just string", tree, xp);
 }
 
@@ -85,8 +85,9 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>ordered>list>integer after token ");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "0:1 : mismatch in document>ordered(ord)>list(list)>integer(int)"
+        " after token ");
   }
 }
 
@@ -96,8 +97,8 @@ void object::test<4>(int) {
     run_test(L"foo bar");
     fail("following");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document after token foo");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document after token foo");
   }
 }
 
@@ -107,8 +108,9 @@ void object::test<5>(int) {
     run_test(L"4");
     fail("just integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>ordered>list>integer after token 4");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document>ordered(ord)>list(list)>integer(int)"
+        " after token 4");
   }
 }
 
@@ -132,7 +134,7 @@ void object::test<7>(int) {
   stru::cf::nd_list c;
   c.push_back(M(ll, L"list"));
   c.push_back(S(Xany(L"(zzz doink)"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  C(M(c, L"ord")).write_to(xp);
   ensure_equals("many thingies", tree, xp);
 }
 

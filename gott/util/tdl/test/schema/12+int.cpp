@@ -75,7 +75,7 @@ void object::test<1>(int n) {
       err << "0:1";
     else
       err << "1:" << ((n-1)*2-1);
-    err << " : mismatch in document>list>integer after token ";
+    err << " : mismatch in document>list>integer(el) after token ";
     if (n > 1)
       err << (n - 1);
     ensure_equals("correct error", m.what(), err.str());
@@ -89,7 +89,7 @@ void object::test<12>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch in document>list>integer after token 1");
+                  "1:1 : mismatch in document>list>integer(el) after token 1");
   }
 }
 
@@ -100,7 +100,7 @@ void object::test<13>(int) {
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch in document>list>integer at token zzzz");
+                  "1:1 : mismatch in document>list>integer(el) at token zzzz");
   }
 }
 

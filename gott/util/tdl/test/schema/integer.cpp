@@ -32,8 +32,8 @@ using stru::cf::C;
 namespace {
 struct schema_integer : tut::schema_basic {
   schema_integer() {
-    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
-      context.begin(L"integer", schema::rule::attributes());
+    context.begin(L"document");
+      context.begin(L"integer");
       context.end();
     context.end();
   }
@@ -53,7 +53,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"4");
-  C(S(Xany(4)), L"doc").write_to(xp);
+  C(S(Xany(4))).write_to(xp);
   ensure_equals("single integer entity", tree, xp);
 }
 
@@ -64,7 +64,7 @@ void object::test<2>(int) {
     fail("non-integral");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>integer at token d7");
+      std::string(mm.what()), "1:1 : mismatch in document>integer at token d7");
   }
 }
 
@@ -75,7 +75,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>integer after token ");
+     std::string(mm.what()), "0:1 : mismatch in document>integer after token ");
   }
 }
 
@@ -104,7 +104,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   run_test(L"-777777");
-  C(S(Xany(-777777)), L"doc").write_to(xp);
+  C(S(Xany(-777777))).write_to(xp);
   ensure_equals("negative", tree, xp);
 }
 
@@ -115,7 +115,7 @@ void object::test<7>(int) {
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>integer at token foo");
+     std::string(mm.what()), "1:1 : mismatch in document>integer at token foo");
   }
 }
 

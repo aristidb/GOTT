@@ -34,15 +34,11 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_follow_integer_integer : tut::schema_basic {
   schema_follow_integer_integer() {
-    context.begin(L"document", 
-                  RA(wstring(L"doc")));
-      context.begin(L"follow",
-                    RA(wstring(L"foll")));
-        context.begin(L"integer",
-                    RA(wstring(L"int1")));
+    context.begin(L"document", RA(wstring(L"doc")));
+      context.begin(L"follow", RA(wstring(L"foll")));
+        context.begin(L"integer", RA(wstring(L"int1")));
         context.end();
-        context.begin(L"integer",
-                    RA(wstring(L"int2")));
+        context.begin(L"integer", RA(wstring(L"int2")));
         context.end();
       context.end();
     context.end();
@@ -76,8 +72,8 @@ void object::test<2>(int) {
     run_test(L"d7");
     fail("just string");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>follow>integer at token d7");
+    ensure_equals("correct error", std::string(mm.what()),
+      "1:1 : mismatch in document(doc)>follow(foll)>integer(int1) at token d7");
   }
 }
 
@@ -87,8 +83,8 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>follow>integer after token ");
+    ensure_equals("correct error", std::string(mm.what()), 
+     "0:1 : mismatch in document(doc)>follow(foll)>integer(int1) after token ");
   }
 }
 
@@ -98,8 +94,8 @@ void object::test<4>(int) {
     run_test(L"-77 foo");
     fail("followed string");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch in document>follow>integer at token foo");
+    ensure_equals("correct error", std::string(mm.what()), 
+     "1:5 : mismatch in document(doc)>follow(foll)>integer(int2) at token foo");
   }
 }
 
@@ -109,8 +105,8 @@ void object::test<5>(int) {
     run_test(L"4");
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>follow after token 4");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document(doc)>follow(foll) after token 4");
   }
 }
 
@@ -120,8 +116,8 @@ void object::test<6>(int) {
     run_test(L"4 99,y");
     fail("follows");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:6 : mismatch in document>follow at token y");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:6 : mismatch in document(doc)>follow(foll) at token y");
   }
 }
 

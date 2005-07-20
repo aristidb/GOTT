@@ -33,7 +33,7 @@ using stru::cf::C;
 namespace {
 struct schema_literal : tut::schema_basic {
   schema_literal() {
-    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
+    context.begin(L"document");
       context.begin(L"literal", schema::match_literal::attributes(L"foobar"));
       context.end();
     context.end();
@@ -54,7 +54,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"foobar");
-  C(S(Xany(L"foobar")), L"doc").write_to(xp);
+  C(S(Xany(L"foobar"), L"foobar")).write_to(xp);
   ensure_equals("single foobar entity", tree, xp);
 }
 
@@ -64,8 +64,8 @@ void object::test<2>(int) {
     run_test(L"d7");
     fail("non-foobar");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>literal at token d7");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document>literal(foobar) at token d7");
   }
 }
 
@@ -75,8 +75,8 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-     std::string(mm.what()), "0:1 : mismatch in document>literal after token ");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "0:1 : mismatch in document>literal(foobar) after token ");
   }
 }
 
@@ -86,8 +86,8 @@ void object::test<4>(int) {
     run_test(L"foobar bar");
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document after token foobar");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document after token foobar");
   }
 }
 
@@ -97,8 +97,8 @@ void object::test<5>(int) {
     run_test(L"foo\nbar");
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>literal at token foo");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document>literal(foobar) at token foo");
   }
 }
 

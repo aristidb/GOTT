@@ -35,12 +35,11 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_unordered_list_integer_string : tut::schema_basic {
   schema_unordered_list_integer_string() {
-    context.begin(L"document", RA(wstring(L"doc")));
-      context.begin(L"unordered", RA(wstring(L"ord")));
-        context.begin(L"integer", RA(wstring(L"int")), 
-                      schema::slotcfg(schema::slotcfg::list));
+    context.begin(L"document");
+      context.begin(L"unordered");
+        context.begin(L"integer", RA(), schema::slotcfg(schema::slotcfg::list));
         context.end();
-        context.begin(L"string", RA(wstring(L"string")));
+        context.begin(L"string");
         context.end();
       context.end();
     context.end();
@@ -62,16 +61,16 @@ template<> template<>
 void object::test<1>(int) {
   run_test(L"4\nx");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(4), L"int"));
-  c.push_back(S(Xany(L"x"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  c.push_back(S(Xany(4)));
+  c.push_back(S(Xany(L"x")));
+  C(M(c)).write_to(xp);
   ensure_equals("int then string", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
   run_test(L"d7");
-  C(C(S(Xany(L"d7"), L"string"), L"ord"), L"doc").write_to(xp);
+  C(C(S(Xany(L"d7")))).write_to(xp);
   ensure_equals("single string", tree, xp);
 }
 
@@ -81,8 +80,8 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>unordered>integer after token ");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "0:1 : mismatch in document>unordered>integer after token ");
   }
 }
 
@@ -92,8 +91,8 @@ void object::test<4>(int) {
     run_test(L"list bar");
     fail("string following string");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>unordered>integer after token list");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document>unordered>integer after token list");
   }
 }
 
@@ -103,8 +102,8 @@ void object::test<5>(int) {
     run_test(L"list,list");
     fail("two strings");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:6 : mismatch in document>unordered>integer at token list");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:6 : mismatch in document>unordered>integer at token list");
   }
 }
 
@@ -114,8 +113,8 @@ void object::test<6>(int) {
     run_test(L"4,x,y");
     fail("int then two strings");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch in document>unordered>integer at token y");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:5 : mismatch in document>unordered>integer at token y");
   }
 }
 
@@ -125,8 +124,8 @@ void object::test<7>(int) {
     run_test(L"732 bar");
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>unordered>integer after token 732");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document>unordered>integer after token 732");
   }
 }
 
@@ -134,9 +133,9 @@ template<> template<>
 void object::test<8>(int) {
   run_test(L"foo,77");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"foo"), L"string"));
-  c.push_back(S(Xany(77), L"int"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  c.push_back(S(Xany(L"foo")));
+  c.push_back(S(Xany(77)));
+  C(M(c)).write_to(xp);
   ensure_equals("reordered #1", tree, xp);
 }
 
@@ -144,10 +143,10 @@ template<> template<>
 void object::test<9>(int) {
   run_test(L"1,foo,77");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(1), L"int"));
-  c.push_back(S(Xany(L"foo"), L"string"));
-  c.push_back(S(Xany(77), L"int"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  c.push_back(S(Xany(1)));
+  c.push_back(S(Xany(L"foo")));
+  c.push_back(S(Xany(77)));
+  C(M(c)).write_to(xp);
   ensure_equals("reordered #2", tree, xp);
 }
 

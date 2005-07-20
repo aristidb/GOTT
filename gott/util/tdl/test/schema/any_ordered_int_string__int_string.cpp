@@ -34,24 +34,17 @@ typedef schema::rule::attributes RA;
 namespace {
 struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {
    schema_any_ordered_integer_string__integer_string() {
-    context.begin(L"document", 
-                  RA(wstring(L"doc")));
-      context.begin(L"any",
-                    RA(wstring(L"any")));
-        context.begin(L"ordered",
-                      RA(wstring(L"ord")));
-          context.begin(L"integer",
-                      RA(wstring(L"int")));
+    context.begin(L"document");
+      context.begin(L"any");
+        context.begin(L"ordered");
+          context.begin(L"integer", RA(wstring(L"int")));
           context.end();
-          context.begin(L"string",
-                      RA(wstring(L"string")));
+          context.begin(L"string", RA(wstring(L"string")));
           context.end();
         context.end();
-        context.begin(L"integer",
-                      RA(wstring(L"int2")));
+        context.begin(L"integer", RA(wstring(L"int2")));
         context.end();
-        context.begin(L"string",
-                      RA(wstring(L"string2")));
+        context.begin(L"string", RA(wstring(L"string2")));
         context.end();
       context.end();
     context.end();
@@ -75,14 +68,14 @@ void object::test<1>(int) {
   stru::cf::nd_list c;
   c.push_back(S(Xany(4), L"int"));
   c.push_back(S(Xany(L"x"), L"string"));
-  C(C(M(c, L"ord"), L"any"), L"doc").write_to(xp);
+  C(C(M(c))).write_to(xp);
   ensure_equals("single ordered_integer_string entity", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
   run_test(L"d7");
-  C(C(S(Xany(L"d7"), L"string2"), L"any"), L"doc").write_to(xp);
+  C(C(S(Xany(L"d7"), L"string2"))).write_to(xp);
   ensure_equals("just string", tree, xp);
 }
 
@@ -92,8 +85,8 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>any>ordered>integer after token ");
+    ensure_equals("correct error", std::string(mm.what()),
+        "0:1 : mismatch in document>any>ordered>integer(int) after token ");
   }
 }
 
@@ -111,7 +104,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   run_test(L"4");
-  C(C(S(Xany(4), L"int2"), L"any"), L"doc").write_to(xp);
+  C(C(S(Xany(4), L"int2"))).write_to(xp);
   ensure_equals("just integer", tree, xp);
 }
 
@@ -131,8 +124,8 @@ void object::test<7>(int) {
     run_test(L"732 bar");
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>any>ordered>string after token 732");
+    ensure_equals("correct error", std::string(mm.what()),
+       "1:1 : mismatch in document>any>ordered>string(string) after token 732");
   }
 }
 

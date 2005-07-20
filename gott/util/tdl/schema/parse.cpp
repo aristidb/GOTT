@@ -214,5 +214,12 @@ void match::IMPL::fail_all() {
 }
 
 wstring match::IMPL::get_name(shared_ptr<rule> const &rp) {
-  return rp->name();
+  std::wostringstream out;
+  out << rp->name();
+  if (!rp->get_attributes().tags().empty()) {
+    out << L'(';
+    print_separated(out, range(rp->get_attributes().tags()), L",");
+    out << L')';
+  }
+  return out.str();
 }
