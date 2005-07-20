@@ -67,7 +67,7 @@ struct Schema : tut::schema_basic {
 
   void module_id(schema::context_template &document) {
     document.begin(L"named", match_named::attributes(L"module"));
-      document.begin(L"follow");
+      document.begin(L"follow", rule::attributes(false));
         document.begin(L"string", ra(L"module-id"));
         document.end();
 
@@ -173,17 +173,42 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
+  try {
   run_test(
       L"module anything 0.0\n"
        "export\n"
-       "type anything, optional follow string, anything"
+       "type\n"
+       "  anything\n"
+       "  optional follow string, anything\n"
   );
   S(Xany()).write_to(xp);
   ensure_equals(tree, xp);
+  } catch (schema::mismatch const &m) {
+    std::cout << tree << std::endl;
+    throw;
+  }
 }
 
 template<> template<>
 void object::test<2>(int) {
+  try {
+  run_test(
+      L"module anything 0.0\n"
+       "export\n"
+       "type\n"
+       "  anything param1,param2\n"
+       "  optional follow string, anything\n"
+  );
+  S(Xany()).write_to(xp);
+  ensure_equals(tree, xp);
+  } catch (schema::mismatch const &m) {
+    std::cout << tree << std::endl;
+    throw;
+  }
+}
+
+template<> template<>
+void object::test<3>(int) {
   no_test();
 }
 
