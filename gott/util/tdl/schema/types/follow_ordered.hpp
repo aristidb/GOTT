@@ -49,7 +49,20 @@ public:
   static bool accept_empty(std::vector<element> const &);
   
 private:
-  typedef std::vector<element> container;
+  struct active_element {
+    rule::factory const *generator;
+    slotcfg slot;
+    bool accept_empty, rest_accept_empty;
+    positioning::id before;
+    unsigned opened;
+    
+    active_element(element const &e) 
+      : generator(e.first), slot(e.second), accept_empty(generator->accept_empty()) {}
+  };
+
+  void init_rest_accept_empty();
+  
+  typedef std::vector<active_element> container;
   container children;
   container::iterator pos;
   unsigned opened;

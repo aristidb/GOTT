@@ -29,25 +29,51 @@ using schema::match_follow_ordered;
 
 match_follow_ordered::match_follow_ordered(std::vector<element> const &c, 
     rule::attributes const &a, match &m)
-: rule(need, a, m), children(c), pos(children.begin()), opened(0), state(downwards) {
-  if (pos == children.end() || !update())
+: rule(need, a, m), children(c.begin(), c.end()), 
+    pos(children.begin()), opened(0), state(downwards) {
+  init_rest_accept_empty();
+  if (pos == children.end() || !update()) {
     expectation = nothing;
-  matcher().add(*pos->first);
+    return;
+  }
+  pos->before = matcher().pos().current();
+  matcher().add(*pos->generator);
+}
+
+void match_follow_ordered::init_rest_accept_empty() {
+  bool rest_accept_empty = true;
+  for (container::reverse_iterator it = children.rbegin(); 
+       it != children.rend(); ++it)
+    it->rest_accept_empty = (rest_accept_empty &= it->accept_empty);
 }
 
 match_follow_ordered::~match_follow_ordered() {}
 
 bool match_follow_ordered::play(ev::child_succeed const &) {
-  pos->second.add();
-  if (!update())
-    state = upwards;
-  return true;
+  if (matcher().pos().proceeded(pos->before)) {
+    pos->slot.add();
+    if (pos->rest_accept_empty)
+      expectation = maybe;
+    if (!update())
+      state = upwards;
+    return true;
+  } else {
+    matcher().pos().seek(pos->before);
+    opened = pos->opened;
+    if (pos->slot.expectation() != need) {
+      ++pos;
+      update();
+    }
+    return true;
+  }
 }
 
 bool match_follow_ordered::play(ev::down const &) {
   ++opened;
   if (state == downwards && update()) {
-    matcher().add(*pos->first);
+    pos->opened = opened;
+    pos->before = matcher().pos().current();
+    matcher().add(*pos->generator);
     return true;
   } else 
     return false;
@@ -62,7 +88,7 @@ bool match_follow_ordered::play(ev::up const &) {
 }
 
 bool match_follow_ordered::update() {
-  if (!accept_more(pos->second.expectation()))
+  if (!accept_more(pos->slot.expectation()))
     ++pos;
   return pos != children.end();
 }
@@ -76,5 +102,6 @@ bool match_follow_ordered::accept_empty(vector<element> const &children) {
 }
 
 wchar_t const *match_follow_ordered::name() const {
-  return L"follow_ordered";
+//  return L"follow_ordered";
+  return L"follow";
 }

@@ -40,7 +40,7 @@ struct builtin_types {
 
 using namespace gott::util::tdl::schema;
 
-//#define FOLLOW_ORDERED_AS_FOLLOW
+#define FOLLOW_ORDERED_AS_FOLLOW
 
 builtin_types::builtin_types() {
   name_manager().add(L"any",         match_any::factory::index());
