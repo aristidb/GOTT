@@ -70,10 +70,8 @@ bool match_follow_ordered::play(ev::child_fail const &) {
 }
 
 bool match_follow_ordered::play(ev::down const &) {
-  if (saw_up)
-    return false;
-  ++opened;
-  if (search_insertible()) {
+  if (!saw_up && search_insertible()) {
+    ++opened;
     last = matcher().pos().current();
     matcher().add(*pos->generator);
     return true;
@@ -83,8 +81,11 @@ bool match_follow_ordered::play(ev::down const &) {
 
 bool match_follow_ordered::play(ev::up const &) {
   saw_up = true;
-  --opened;
-  return opened >= 0;
+  if (--opened < 0) {
+    opened = 0;
+    return false;
+  }
+  return true;
 }
 
 bool match_follow_ordered::search_insertible() const {
@@ -94,8 +95,12 @@ bool match_follow_ordered::search_insertible() const {
 }
 
 rule::expect match_follow_ordered::expectation() const {
-  if (opened == 0 && !search_insertible())
-    return nothing;
+  if (opened != 0)
+    return need; 
+  if (!search_insertible())
+    return nothing; 
+  if (pos->slot.expectation() != need && pos->rest_accept_empty) 
+    return maybe; 
   return need;
 }
 
