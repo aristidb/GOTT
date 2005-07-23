@@ -50,7 +50,7 @@ void slotcfg::add() {
 }
 
 rule::expect slotcfg::expectation() const {
-  if (cancelled)
+  if (count == cancelled)
     return rule::nothing;
   
   switch (m) {
