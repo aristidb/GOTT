@@ -61,9 +61,10 @@ bool match_unordered::play(ev::child_fail const &) {
   matcher().pos().seek(last);
   bool happy = pos->second.expectation() != need;
   if (++pos == children.end())
-    if (happy)
+    if (happy) {
+      children.clear();
       return true;
-    else {
+    } else {
       all_happy = false;
       return false;
     }
