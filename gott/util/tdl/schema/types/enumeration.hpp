@@ -24,13 +24,14 @@
 
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
+#include "../happy_once.hpp"
 
 namespace gott {
 namespace util {
 namespace tdl {
 namespace schema {
 
-class match_enumeration : public rule {
+class match_enumeration : public happy_once {
 public:
   static EXPORT rule::attributes attributes(std::vector<std::wstring> const &, 
                                      bool = true);

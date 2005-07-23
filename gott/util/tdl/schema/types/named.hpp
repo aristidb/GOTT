@@ -31,19 +31,19 @@ namespace util {
 namespace tdl {
 namespace schema {
 
+// TODO: deal with empty contents
 class match_named : public rule {
 public:
   static EXPORT
   rule::attributes attributes(std::wstring const &s, bool cc = true);
   
-  typedef factory_template::slotcfg_onechild<
-    match_named, slotcfg::one, slotcfg::single> factory;
-  match_named(rule::factory const &, slotcfg const &, rule::attributes const &,
-    match &);
+  typedef factory_template::onechild<match_named> factory;
+  match_named(rule::factory const &, rule::attributes const &, match &);
 
   static bool accept_empty(bool) { return false; }
 
 private:
+  expect expectation() const;
   bool play(ev::node const &);
   bool play(ev::down const &);
   bool play(ev::up const &);
@@ -52,9 +52,8 @@ private:
   wchar_t const *name() const;
   
   rule::factory const &sub;
-  bool optional;
 
-  enum { read_none, read_node, read_down, read_sub, read_up } state;
+  enum { read_none, read_node, read_down, read_sub, done } state;
 };
   
 }}}}

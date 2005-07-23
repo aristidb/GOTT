@@ -59,8 +59,8 @@ private:
   }
 };
 
-rule::rule(expect e, attributes a, match &m) 
-: expectation(e), pIMPL(new IMPL(m, a)) {
+rule::rule(attributes const &a, match &m) 
+: pIMPL(new IMPL(m, a)) {
 }
 
 void rule::finish() {

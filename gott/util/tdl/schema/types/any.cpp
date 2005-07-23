@@ -24,10 +24,11 @@ using std::vector;
 namespace schema = gott::util::tdl::schema;
 namespace ev = schema::ev;
 using schema::match_any;
+using schema::rule;
 
 match_any::match_any(vector<rule::factory const *> const &vv,
                      rule::attributes const &a, match &m) 
-: rule(need, a, m), v(vv), pos(v.begin()) {
+: rule(a, m), v(vv), pos(v.begin()), happy(false) {
   if (pos != v.end()) {
     begin = matcher().pos().current();
     matcher().add(**pos);
@@ -50,7 +51,7 @@ bool match_any::play(ev::child_fail const &) {
 }
 
 bool match_any::play(ev::child_succeed const &) {
-  expectation = nothing;
+  happy = true;
   return true;
 }
 
@@ -60,6 +61,13 @@ bool match_any::accept_empty(vector<rule::factory const *> const &choices) {
     if ((*it)->accept_empty())
       return true;
   return false;
+}
+
+rule::expect match_any::expectation() const {
+  if (happy)
+    return nothing;
+  else
+    return need;
 }
 
 wchar_t const *match_any::name() const {

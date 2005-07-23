@@ -28,13 +28,13 @@ using schema::rule;
 using schema::match_integer;
 
 match_integer::match_integer(rule::attributes const &a, match &m) 
-: rule(need, a, m) {}
+: happy_once(a, m) {}
 
 bool match_integer::play(ev::node const &n) {
-  if (expects() == need && is_integer(n.get_data())) {
+  if (expectation() == need && is_integer(n.get_data())) {
     matcher().structure().data(gott::util::xany::Xany(val));
 
-    expectation = nothing;
+    be_happy();
     return true;
   }
 

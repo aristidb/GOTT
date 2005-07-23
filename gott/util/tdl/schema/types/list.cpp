@@ -28,10 +28,9 @@ using schema::match_list;
 
 match_list::match_list(rule::factory const &r, slotcfg const &c,
                                  rule::attributes const &a, match &m)
-: rule(need, a, m), sub(r), cfg(c) {
+: rule(a, m), sub(r), cfg(c) {
   last = m.pos().current();
-  expectation = cfg.expectation();
-  if (expectation == rule::need || expectation == rule::maybe)
+  if (accept_more(expectation()))
     matcher().add(sub);
 }
 
@@ -53,9 +52,8 @@ bool match_list::play(ev::child_succeed const &) {
 
 bool match_list::full() {
   cfg.add();
-  expectation = cfg.expectation();
 
-  if (expects() != nothing) {
+  if (expectation() != nothing) {
     matcher().pos().forget(last);
     last = matcher().pos().current();
     matcher().add(sub);
@@ -66,10 +64,14 @@ bool match_list::full() {
 
 bool match_list::empty() {
   matcher().pos().seek(last);
-  if (expectation != need)
-    expectation = nothing;
+  if (expectation() != need)
+    cfg.cancel();
 
   return true;
+}
+
+rule::expect match_list::expectation() const {
+  return cfg.expectation();
 }
 
 wchar_t const *match_list::name() const {

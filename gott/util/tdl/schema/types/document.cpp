@@ -27,7 +27,7 @@ using schema::match_document;
 
 match_document::match_document(rule::factory const &sr, 
                                rule::attributes const &a, match &m)
-: rule(need, a, m), sub(sr), state(first) {}
+: rule(a, m), sub(sr), state(first), happy(false) {}
 
 bool match_document::play(ev::begin_parse const &) {
   state = begun_parse;
@@ -53,7 +53,7 @@ bool match_document::play(ev::up const &) {
 
 bool match_document::play(ev::end_parse const &) {
   if (state == closed) {
-    expectation = nothing;
+    happy = true;
     return true;
   }
 
@@ -62,6 +62,10 @@ bool match_document::play(ev::end_parse const &) {
 
 bool match_document::play(ev::child_succeed const &) {
   return true;
+}
+
+rule::expect match_document::expectation() const {
+  return happy ? nothing : need;
 }
 
 wchar_t const *match_document::name() const {

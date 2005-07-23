@@ -39,13 +39,13 @@ rule::attributes match_enumeration::attributes(vector<wstring> const &v,
 }
 
 match_enumeration::match_enumeration(rule::attributes const &a, match &m) 
-: rule(need, a, m) {
+: happy_once(a, m) {
   if (get_attributes().user().type() != typeid(vector<wstring>))
     throw dont_accept(L"user-data other than vector<wstring>");
 }
 
 bool match_enumeration::play(ev::node const &n) {
-  if (expects() == need) {
+  if (expectation() == need) {
     vector<wstring> v = Xany_cast<vector<wstring> >(get_attributes().user());
 
     vector<wstring>::const_iterator it = 
@@ -55,7 +55,7 @@ bool match_enumeration::play(ev::node const &n) {
       return false;
     
     matcher().structure().data(Xany(it - v.begin()));
-    expectation = nothing;
+    be_happy();
     return true;
   }
 

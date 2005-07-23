@@ -29,11 +29,10 @@ using schema::match_follow_ordered;
 
 match_follow_ordered::match_follow_ordered(std::vector<element> const &c, 
     rule::attributes const &a, match &m)
-: rule(need, a, m), children(c.begin(), c.end()), pos(children.begin()), 
+: rule(a, m), children(c.begin(), c.end()), pos(children.begin()), 
     opened(0), saw_up(false), last(m.pos().current()) {
   init_rest_accept_empty();
-  adjust_expectation();
-  if (expectation == nothing)
+  if (expectation() == nothing)
     return;
   last = matcher().pos().current();
   matcher().add(*pos->generator);
@@ -53,7 +52,6 @@ match_follow_ordered::~match_follow_ordered() {}
 bool match_follow_ordered::play(ev::child_succeed const &) {
   if (matcher().pos().proceeded(last)) {
     pos->slot.add();
-    adjust_expectation();
   } else if (search_insertible()) {
     last = matcher().pos().current();
     matcher().add(*pos->generator);
@@ -68,7 +66,6 @@ bool match_follow_ordered::play(ev::child_fail const &) {
     return false;
   matcher().pos().seek(last);
   matcher().add(*pos->generator);
-  adjust_expectation();
   return true;
 }
 
@@ -76,7 +73,6 @@ bool match_follow_ordered::play(ev::down const &) {
   if (saw_up)
     return false;
   ++opened;
-  adjust_expectation();
   if (search_insertible()) {
     last = matcher().pos().current();
     matcher().add(*pos->generator);
@@ -88,23 +84,19 @@ bool match_follow_ordered::play(ev::down const &) {
 bool match_follow_ordered::play(ev::up const &) {
   saw_up = true;
   --opened;
-  adjust_expectation();
   return opened >= 0;
 }
 
-bool match_follow_ordered::search_insertible() {
+bool match_follow_ordered::search_insertible() const {
   while (pos != children.end() && !accept_more(pos->slot.expectation()))
     ++pos;
   return pos != children.end();
 }
 
-void match_follow_ordered::adjust_expectation() {
-  if (opened > 0)
-    expectation = need;
-  else if (!search_insertible())
-    expectation = nothing;
-  else if (pos->slot.expectation() != need && pos->rest_accept_empty)
-    expectation = maybe;
+rule::expect match_follow_ordered::expectation() const {
+  if (opened == 0 && !search_insertible())
+    return nothing;
+  return need;
 }
 
 bool match_follow_ordered::accept_empty(vector<element> const &children) {

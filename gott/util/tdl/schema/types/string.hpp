@@ -23,13 +23,14 @@
 
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
+#include "../happy_once.hpp"
 
 namespace gott {
 namespace util {
 namespace tdl {
 namespace schema {
 
-class match_string : public rule {
+class match_string : public happy_once {
 public:
   typedef factory_template::nochild<match_string> factory;
   match_string(rule::attributes const &, match &);

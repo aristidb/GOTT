@@ -23,17 +23,19 @@
 
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
+#include "../happy_once.hpp"
 
 namespace gott {
 namespace util {
 namespace tdl {
 namespace schema {
 
-class match_ordered : public rule {
+class match_ordered : public happy_once {
 public:
   typedef factory_template::manychildren<match_ordered> factory;
   match_ordered(std::vector<rule::factory const *> const &r, 
                 rule::attributes const &, match &);
+  ~match_ordered();
 
   static bool accept_empty(std::vector<rule::factory const *> const &r);
 

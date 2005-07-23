@@ -37,20 +37,20 @@ rule::attributes match_literal::attributes(wstring const &w, bool cc) {
 }
 
 match_literal::match_literal(rule::attributes const &a, match &m)
-: rule(need, a, m) {
+: happy_once(a, m) {
   if (get_attributes().user().type() != typeid(wstring))
     throw dont_accept(L"user-data other than wstring");
 }
 
 bool match_literal::play(ev::node const &n) {
-  if (expects() == need) {
+  if (expectation() == need) {
     wstring x = Xany_cast<wstring>(get_attributes().user());
 
     if (x != n.get_data())
       return false;
     
     matcher().structure().data(Xany(n.get_data()));
-    expectation = nothing;
+    be_happy();
     return true;
   }
 

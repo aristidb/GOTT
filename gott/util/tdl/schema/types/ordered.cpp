@@ -29,18 +29,20 @@ using schema::match_ordered;
 
 match_ordered::match_ordered(vector<rule::factory const *> const &r, 
                              rule::attributes const &a, match &m)
-: rule(need, a, m), subrules(r), pos(subrules.begin()) {
+: happy_once(a, m), subrules(r), pos(subrules.begin()) {
   if (pos != subrules.end())
     matcher().add(**pos);
   else
-    expectation = nothing;  
+    be_happy();
 }
+
+match_ordered::~match_ordered() {}
 
 bool match_ordered::play(ev::child_succeed const &) {
   if (++pos != subrules.end()) 
     matcher().add(**pos);
   else 
-    expectation = nothing;
+    be_happy();
   return true;
 }
 

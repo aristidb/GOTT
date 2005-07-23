@@ -45,7 +45,9 @@ private:
   std::vector<rule::factory const *> v;
   std::vector<rule::factory const *>::iterator pos;
   positioning::id begin;
+  bool happy;
 
+  expect expectation() const;
   bool play(ev::child_fail const &);
   bool play(ev::child_succeed const &);
   wchar_t const *name() const;

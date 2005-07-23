@@ -132,6 +132,8 @@ public:
 
   /// Add an element.
   void add() EXPORT;
+  /// Cancel a sequence.
+  void cancel() EXPORT;
   /// Accept or not.
   rule::expect expectation() const EXPORT;
 
@@ -147,6 +149,8 @@ private:
   type_t;
 
   type_t type;
+
+  enum { cancelled = size_t(-1) };
   std::size_t count;
 };
 

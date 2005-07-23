@@ -62,7 +62,7 @@ public:
   /**
    * Returns the current expectation.
    */
-  LOCAL expect expects() const { return expectation; }
+  virtual expect expectation() const = 0;
 
   /**
    * A nice name for the rule.
@@ -132,10 +132,8 @@ protected:
   match &matcher();
     // return a reference to the match-object that embedded us
 
-  rule(expect e, attributes a, match &m);
-    // an implementation must supply attributes and its initial expectation
-
-  expect expectation;
+  rule(attributes const &a, match &m);
+    // an implementation must supply attributes
 
 private:
   class IMPL;

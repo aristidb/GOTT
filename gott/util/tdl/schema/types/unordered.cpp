@@ -29,15 +29,13 @@ using schema::match_unordered;
 
 match_unordered::match_unordered(vector<element> const &r, 
                                  rule::attributes const &a, match &m) 
-: rule(need, a, m), last(m.pos().current()) {
+: rule(a, m), last(m.pos().current()), all_happy(true) {
   copy(range(r), std::back_inserter(children));
 
   pos = children.begin();
 
   if (pos != children.end())
     matcher().add(*pos->first);
-  else
-    expectation = nothing;
 }
 
 match_unordered::~match_unordered() {
@@ -49,9 +47,7 @@ bool match_unordered::play(ev::child_succeed const &) {
   if (pos->second.expectation() == rule::nothing) 
     children.erase(pos);
 
-  if (children.empty())
-    expectation = nothing;
-  else {
+  if (!children.empty()) {
     pos = children.begin();
     matcher().pos().forget(last);
     last = matcher().pos().current();
@@ -65,13 +61,20 @@ bool match_unordered::play(ev::child_fail const &) {
   matcher().pos().seek(last);
   bool happy = pos->second.expectation() != need;
   if (++pos == children.end())
-    if (happy) {
-      expectation = nothing;
+    if (happy)
       return true;
-    } else
+    else {
+      all_happy = false;
       return false;
+    }
   matcher().add(*pos->first);
   return true;
+}
+
+rule::expect match_unordered::expectation() const {
+  if (children.empty() && all_happy)
+    return nothing;
+  return need;
 }
 
 bool match_unordered::accept_empty(vector<element> const &children) {

@@ -175,13 +175,13 @@ bool match::IMPL::handle_rule(ev::event const &event) {
 }
 
 bool match::IMPL::consume_event() {
-  if (parse.back()->expects() == rule::nothing)
+  if (parse.back()->expectation() == rule::nothing)
     succeed_rule();
   return true;
 }
 
 bool match::IMPL::pass_event() {
-  if (parse.back()->expects() == rule::need) {
+  if (parse.back()->expectation() == rule::need) {
     fail_rule();
     return true;
   } else {

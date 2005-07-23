@@ -50,7 +50,9 @@ private:
   list_t children;
   list_t::iterator pos;
   positioning::id last;
+  bool all_happy;
 
+  expect expectation() const;
   bool play(ev::child_succeed const &);
   bool play(ev::child_fail const &);
   wchar_t const *name() const;

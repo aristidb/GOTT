@@ -35,10 +35,9 @@ rule::attributes match_named::attributes(wstring const &s, bool cc) {
   return rule::attributes(std::list<wstring>(1, s), cc, s);
 }
 
-match_named::match_named(rule::factory const &s, slotcfg const &c,
-                         rule::attributes const &a, match &m) 
-: rule(need, a, m), sub(s), optional(c.get_mode() == slotcfg::optional),
-state(read_none) {
+match_named::match_named(rule::factory const &s, rule::attributes const &a, 
+                         match &m) 
+: rule(a, m), sub(s), state(read_none) {
   if (a.user().type() != typeid(wstring))
     throw std::bad_exception();
 }
@@ -49,10 +48,6 @@ bool match_named::play(ev::node const &n) {
 
   if (n.get_data() == Xany_cast<wstring>(get_attributes().user())) {
     state = read_node;
-    if (optional) {
-      expectation = maybe;
-      // WE ARE OPTIONAL, MIGHT HAVE TO RECOVER THE INCOMING up EVENT
-    }
     return true;
   }
   
@@ -70,27 +65,23 @@ bool match_named::play(ev::down const &) {
 
 bool match_named::play(ev::child_succeed const &) {
   state = read_sub;
-  if (optional) {
-    // TODO? WE NEED NO LONGER GO BACK
-  }
   return true;
 }
 
 bool match_named::play(ev::child_fail const &) {
-  if (optional) {
-    // TODO? GO BACK
-    return true;
-  }
   return false;
 }
 
 bool match_named::play(ev::up const &) {
   if (state == read_sub) {
-    state = read_up;
-    expectation = nothing;
+    state = done;
     return true;
   }
   return false;
+}
+
+rule::expect match_named::expectation() const {
+  return state == done ? nothing : need;
 }
 
 wchar_t const *match_named::name() const {

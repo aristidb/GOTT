@@ -27,7 +27,7 @@ using schema::match_follow;
 
 match_follow::match_follow(rule::factory const * const a[2], 
                            rule::attributes const &at, match &m) 
-: rule(need, at, m), pre(*a[0]), post(*a[1]), state(initial), 
+: rule(at, m), pre(*a[0]), post(*a[1]), state(initial), 
     first_empty(false), start(m.pos().current_readonly()) {
   matcher().add(pre);
 }
@@ -45,13 +45,13 @@ void match_follow::pre_done() {
     matcher().add(post);
   state = pre_parsed;
   if (post.accept_empty())
-    expectation = maybe;
+    ;//expectation = maybe;
 }
 
 void match_follow::post_done() {
   if (first_empty) {
     state = none;
-    expectation = nothing;
+    ;//expectation = nothing;
   } else 
     state = post_parsed;
 }
@@ -66,7 +66,7 @@ bool match_follow::play(ev::down const &) {
 
 bool match_follow::play(ev::up const &) {
   if (state == post_parsed) {
-    expectation = nothing;
+    ;//expectation = nothing;
     return true;
   }
   return false;

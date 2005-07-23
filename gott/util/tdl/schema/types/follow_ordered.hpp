@@ -59,16 +59,16 @@ private:
   };
 
   void init_rest_accept_empty();
-  bool search_insertible();
-  void adjust_expectation();
-  
+  bool search_insertible() const;
+
   typedef std::vector<active_element> container;
   container children;
-  container::iterator pos;
+  mutable container::iterator pos;
   int opened;
   bool saw_up;
   positioning::id last;
 
+  expect expectation() const;
   bool play(ev::child_succeed const &);
   bool play(ev::child_fail const &);
   bool play(ev::down const &);

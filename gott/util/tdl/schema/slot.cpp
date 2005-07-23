@@ -50,6 +50,9 @@ void slotcfg::add() {
 }
 
 rule::expect slotcfg::expectation() const {
+  if (cancelled)
+    return rule::nothing;
+  
   switch (m) {
   case one:
     if (count == 1)
@@ -114,6 +117,10 @@ rule::expect slotcfg::expectation() const {
   }
 
   throw std::bad_exception();
+}
+
+void slotcfg::cancel() {
+  count = cancelled;
 }
 
 bool slotcfg::prefix_optional() const {

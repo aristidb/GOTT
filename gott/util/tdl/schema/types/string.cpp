@@ -27,13 +27,13 @@ using schema::rule;
 using schema::match_string;
 
 match_string::match_string(rule::attributes const &a, match &m)
-: rule(need, a, m) {}
+: happy_once(a, m) {}
 
 bool match_string::play(ev::node const &n) {
-  if (expects() == need) {
+  if (expectation() == need) {
     matcher().structure().data(gott::util::xany::Xany(n.get_data()));
 
-    expectation = nothing;
+    be_happy();
     return true;
   }
 

@@ -23,6 +23,7 @@
 
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
+#include "../happy_once.hpp"
 
 namespace gott {
 namespace util {
@@ -31,7 +32,8 @@ namespace schema {
 
 // Matcher integer
 // Matches an integral number constant
-class match_integer : public rule {
+
+class match_integer : public happy_once {
 public:
   typedef factory_template::nochild<match_integer> factory;
   match_integer(rule::attributes const &, match &);
@@ -40,6 +42,7 @@ public:
   
 private:
   long val;
+
   bool play(ev::node const &);
   wchar_t const *name() const;
   

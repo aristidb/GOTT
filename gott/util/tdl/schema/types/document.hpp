@@ -41,7 +41,9 @@ public:
 private:
   rule::factory const &sub;
   enum { first, begun_parse, opened, closed } state;
+  bool happy;
 
+  expect expectation() const;
   bool play(ev::begin_parse const &);
   bool play(ev::down const &);
   bool play(ev::up const &);
