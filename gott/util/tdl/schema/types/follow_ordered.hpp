@@ -67,7 +67,7 @@ private:
   container::iterator pos;
   int opened;
   bool saw_up;
-  positioning::id last; // POINT OF REMEMBERING (up means up)
+  positioning::id last;
 
   bool play(ev::child_succeed const &);
   bool play(ev::child_fail const &);

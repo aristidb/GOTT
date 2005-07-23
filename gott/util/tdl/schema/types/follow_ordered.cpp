@@ -73,6 +73,8 @@ bool match_follow_ordered::play(ev::child_fail const &) {
 }
 
 bool match_follow_ordered::play(ev::down const &) {
+  if (saw_up)
+    return false;
   ++opened;
   adjust_expectation();
   if (search_insertible()) {
