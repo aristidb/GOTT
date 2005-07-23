@@ -29,50 +29,54 @@ using schema::match_follow_ordered;
 
 match_follow_ordered::match_follow_ordered(std::vector<element> const &c, 
     rule::attributes const &a, match &m)
-: rule(need, a, m), children(c.begin(), c.end()), 
-    pos(children.begin()), opened(0), state(downwards) {
+: rule(need, a, m), children(c.begin(), c.end()), pos(children.begin()), 
+    opened(0), saw_up(false), last(m.pos().current()) {
   init_rest_accept_empty();
-  if (pos == children.end() || !update()) {
-    expectation = nothing;
+  adjust_expectation();
+  if (expectation == nothing)
     return;
-  }
-  pos->before = matcher().pos().current();
+  last = matcher().pos().current();
   matcher().add(*pos->generator);
 }
 
 void match_follow_ordered::init_rest_accept_empty() {
   bool rest_accept_empty = true;
   for (container::reverse_iterator it = children.rbegin(); 
-       it != children.rend(); ++it)
-    it->rest_accept_empty = (rest_accept_empty &= it->accept_empty);
+       it != children.rend(); ++it) {
+    it->rest_accept_empty = rest_accept_empty;
+    rest_accept_empty &= it->generator->accept_empty();
+  }
 }
 
 match_follow_ordered::~match_follow_ordered() {}
 
 bool match_follow_ordered::play(ev::child_succeed const &) {
-  if (matcher().pos().proceeded(pos->before)) {
+  if (matcher().pos().proceeded(last)) {
     pos->slot.add();
-    if (pos->rest_accept_empty)
-      expectation = maybe;
-    if (!update())
-      state = upwards;
-    return true;
-  } else {
-    matcher().pos().seek(pos->before);
-    opened = pos->opened;
-    if (pos->slot.expectation() != need) {
-      ++pos;
-      update();
-    }
-    return true;
-  }
+    adjust_expectation();
+  } else if (search_insertible()) {
+    last = matcher().pos().current();
+    matcher().add(*pos->generator);
+  } else
+    return false;
+  return true;
+}
+
+bool match_follow_ordered::play(ev::child_fail const &) {
+  ++pos; // Skip the undoable
+  if (!search_insertible())
+    return false;
+  matcher().pos().seek(last);
+  matcher().add(*pos->generator);
+  adjust_expectation();
+  return true;
 }
 
 bool match_follow_ordered::play(ev::down const &) {
   ++opened;
-  if (state == downwards && update()) {
-    pos->opened = opened;
-    pos->before = matcher().pos().current();
+  adjust_expectation();
+  if (search_insertible()) {
+    last = matcher().pos().current();
     matcher().add(*pos->generator);
     return true;
   } else 
@@ -80,17 +84,25 @@ bool match_follow_ordered::play(ev::down const &) {
 }
 
 bool match_follow_ordered::play(ev::up const &) {
-  if (state != upwards)
-    return false;
-  if (--opened == 0)
-    expectation = nothing;
-  return true;
+  saw_up = true;
+  --opened;
+  adjust_expectation();
+  return opened >= 0;
 }
 
-bool match_follow_ordered::update() {
-  if (!accept_more(pos->slot.expectation()))
+bool match_follow_ordered::search_insertible() {
+  while (pos != children.end() && !accept_more(pos->slot.expectation()))
     ++pos;
   return pos != children.end();
+}
+
+void match_follow_ordered::adjust_expectation() {
+  if (opened > 0)
+    expectation = need;
+  else if (!search_insertible())
+    expectation = nothing;
+  else if (pos->slot.expectation() != need && pos->rest_accept_empty)
+    expectation = maybe;
 }
 
 bool match_follow_ordered::accept_empty(vector<element> const &children) {

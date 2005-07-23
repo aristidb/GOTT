@@ -104,7 +104,7 @@ void object::test<5>(int) {
     fail("stuff");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-     "1:6 : mismatch in document(doc)>follow(foll)>list>integer(i) at token y");
+     "1:6 : mismatch in document(doc)>follow(foll) at token y");
   }
 }
 

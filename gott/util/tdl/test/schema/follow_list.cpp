@@ -61,10 +61,11 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"4\n 5");
+  run_test(L"4\n 5 x");
   stru::cf::nd_list c;
   c.push_back(S(Xany(4), L"i"));
-  c.push_back(S(Xany(L"5"), L"s"));
+  c.push_back(S(Xany(5), L"i"));
+  c.push_back(S(Xany(L"x"), L"s"));
   C(M(c)).write_to(xp);
   ensure_equals("single follow_list entity", tree, xp);
 }
@@ -83,7 +84,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "0:1 : mismatch in document>follow>list>integer(i) after token ");
+        "0:1 : mismatch in document>follow>integer(i) after token ");
   }
 }
 
@@ -104,7 +105,7 @@ void object::test<5>(int) {
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>follow>list>integer(i) after token 4");
+        "1:1 : mismatch in document>follow after token 4");
   }
 }
 

@@ -52,25 +52,25 @@ private:
   struct active_element {
     rule::factory const *generator;
     slotcfg slot;
-    bool accept_empty, rest_accept_empty;
-    positioning::id before;
-    unsigned opened;
+    bool rest_accept_empty;
     
     active_element(element const &e) 
-      : generator(e.first), slot(e.second), accept_empty(generator->accept_empty()) {}
+      : generator(e.first), slot(e.second) {}
   };
 
   void init_rest_accept_empty();
+  bool search_insertible();
+  void adjust_expectation();
   
   typedef std::vector<active_element> container;
   container children;
   container::iterator pos;
-  unsigned opened;
-  enum { downwards, upwards } state;
+  int opened;
+  bool saw_up;
+  positioning::id last; // POINT OF REMEMBERING (up means up)
 
-  bool update();
-  
   bool play(ev::child_succeed const &);
+  bool play(ev::child_fail const &);
   bool play(ev::down const &);
   bool play(ev::up const &);
   wchar_t const *name() const;
