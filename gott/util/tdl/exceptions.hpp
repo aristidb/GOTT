@@ -56,8 +56,17 @@ struct EXPORT unregistered_type : public tdl_exception {
 };
 
 struct EXPORT dont_accept : public tdl_exception {
-  dont_accept(std::wstring const &desc) LOCAL;
+  dont_accept(std::wstring const &desc);
   ~dont_accept() throw();
+};
+
+}
+
+namespace structure {
+
+struct EXPORT failed_repatch : public tdl_exception {
+  failed_repatch(std::wstring const &desc);
+  ~failed_repatch() throw();
 };
 
 }
