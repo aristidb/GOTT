@@ -124,10 +124,20 @@ public:
   }
 
   /**
-   * Returns the object's data' type.
+   * Returns the object's data type.
    */
   std::type_info const &type() const {
     return place ? place->type() : typeid(void);
+  }
+
+  /**
+   * Checks for type compatibilty.
+   */
+  template<class T>
+  bool compatible() const {
+    if (!place)
+      return false;
+    return typeid(typename promote<T>::type) == place->type();
   }
 
 private:

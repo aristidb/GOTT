@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_STRUCTURE_TYPES_INTEGER_HPP
 #define GOTT_UTIL_TDL_STRUCTURE_TYPES_INTEGER_HPP
 
-#include "repatch.hpp"
+#include "../repatch.hpp"
 
 namespace gott {
 namespace util {
@@ -29,11 +29,16 @@ namespace tdl {
 namespace structure {
 
 class repatch_integer : repatcher {
-
+public:
+  repatch_context *deferred_write(writable_structure &);
 };
 
-GOTT_UTIL_XANY_DECLARE_PROMOTER(repatch_integer *, repatcher *)
+}}
 
-}}}}
+namespace xany {
+GOTT_UTIL_XANY_DECLARE_PROMOTER(tdl::structure::repatch_integer *, 
+                                tdl::structure::repatcher *);
+}
+}}
 
 #endif
