@@ -28,8 +28,10 @@ namespace util {
 namespace tdl {
 namespace structure {
 
-class repatch_integer : repatcher {
+class EXPORT repatch_integer : repatcher {
 public:
+  repatch_integer();
+  ~repatch_integer();
   repatch_context *deferred_write(writable_structure &);
 };
 

@@ -27,8 +27,11 @@ using structure::repatch_integer;
 using structure::repatch_context;
 using structure::writable_structure;
 
+repatch_integer::repatch_integer() {}
+repatch_integer::~repatch_integer() {}
+
 repatch_context *repatch_integer::deferred_write(writable_structure &s) {
-  struct context : repatch_context {
+  struct EXPORT context : repatch_context {
     context(writable_structure &s) : target(s) {}
 
     writable_structure &target;
@@ -38,11 +41,8 @@ repatch_context *repatch_integer::deferred_write(writable_structure &s) {
         target.data(x);
       else if (x.compatible<std::wstring>()) {
         std::wstring input = xany::Xany_cast<std::wstring>(x);
-        wchar_t const *begin = input.c_str();
-        wchar_t const *end = begin + input.length();
-        wchar_t **int_end;
-        long result = std::wcstol(input.c_str(), int_end, 0);
-        if (*int_end != end)
+        long result;
+        if (!is_integer(input, result))
           throw failed_repatch(L"repatch_integer: could not match integer");
         target.data(xany::Xany(result));
       }
@@ -55,6 +55,38 @@ repatch_context *repatch_integer::deferred_write(writable_structure &s) {
 
     void sorry() {
       throw failed_repatch(L"repatch_integer: accept data solely");
+    }
+
+    bool is_integer(std::wstring const &s, long &val) {
+      long sign = 1;
+      val = 0;
+  
+      std::wstring::const_iterator it = s.begin();
+  
+      if (it == s.end())
+        return false;
+
+      if (*it == L'-') {
+        ++it;
+        sign = -1;
+        if (it == s.end())
+          return false;
+      }
+  
+      if (!iswdigit(*it))
+        return false;
+    
+//    if (*it == L'0' && it[1] == L'x')
+//      return is_hex(it + 2, s.end(), v, sign)
+
+      for (; it != s.end() && std::iswdigit(*it); ++it)
+        val = val * 10 + (*it - L'0');
+
+      if (it != s.end())
+        return false;
+
+      val *= sign;
+      return true;
     }
   };
   return new context(s);

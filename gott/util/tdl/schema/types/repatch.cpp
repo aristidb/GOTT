@@ -28,11 +28,10 @@ using schema::match_repatch;
 
 match_repatch::match_repatch(rule::attributes const &a, match &m)
 : happy_once(a, m) {
-  try {
-    repatcher = xany::Xany_cast<structure::repatcher *>(a.user());
-  } catch (std::bad_cast &) {
+  if (a.user().type() != typeid(structure::repatcher *))
     throw dont_accept(L"non-repatch user attribute");
-  }
+
+  repatcher = xany::Xany_cast<structure::repatcher *>(a.user());
 }
 
 bool match_repatch::play(ev::node const &n) {

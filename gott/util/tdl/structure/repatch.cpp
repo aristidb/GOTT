@@ -26,8 +26,8 @@ using structure::repatcher;
 using structure::repatch_context;
 using structure::failed_repatch;
 
+repatcher::repatcher() {}
 repatcher::~repatcher() {}
-
 
 repatch_context::~repatch_context() {}
 

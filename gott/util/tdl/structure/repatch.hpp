@@ -35,6 +35,7 @@ class repatch_context;
  */
 class EXPORT repatcher {
 public:
+  repatcher();
   virtual ~repatcher() = 0;
   virtual repatch_context *deferred_write(writable_structure &) = 0;
 };
