@@ -24,14 +24,13 @@
 namespace structure = gott::util::tdl::structure;
 
 using structure::repatch_integer;
-using structure::repatch_context;
 using structure::writable_structure;
 
 repatch_integer::repatch_integer() {}
 repatch_integer::~repatch_integer() {}
 
-repatch_context *repatch_integer::deferred_write(writable_structure &s) {
-  struct EXPORT context : repatch_context {
+writable_structure *repatch_integer::deferred_write(writable_structure &s) {
+  struct EXPORT context : repatch_node_context {
     context(writable_structure &s) : target(s) {}
 
     writable_structure &target;
@@ -46,15 +45,6 @@ repatch_context *repatch_integer::deferred_write(writable_structure &s) {
           throw failed_repatch(L"repatch_integer: could not match integer");
         target.data(xany::Xany(result));
       }
-    }
-
-    void begin() { sorry(); }
-    void end() { sorry(); }
-    void add_tag(std::wstring const &) { sorry(); }
-    void set_tags(std::list<std::wstring> const &) { sorry(); }
-
-    void sorry() {
-      throw failed_repatch(L"repatch_integer: accept data solely");
     }
 
     bool is_integer(std::wstring const &s, long &val) {

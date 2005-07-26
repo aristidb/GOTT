@@ -28,8 +28,6 @@ namespace util {
 namespace tdl {
 namespace structure {
 
-class repatch_context;
-
 /**
  * This class represents a structure patcher.
  */
@@ -37,15 +35,30 @@ class EXPORT repatcher {
 public:
   repatcher();
   virtual ~repatcher() = 0;
-  virtual repatch_context *deferred_write(writable_structure &) = 0;
+  virtual writable_structure *deferred_write(writable_structure &) = 0;
 };
 
-class EXPORT repatch_context : public writable_structure {
+class EXPORT repatch_nothing : public repatcher {
 public:
-  virtual ~repatch_context() = 0;
+  ~repatch_nothing();
+  virtual writable_structure *deferred_write(writable_structure &) = 0;
 };
 
-}}}}
+class repatch_node_context : public writable_structure {
+  void begin();
+  void end();
+  void set_tags(std::list<std::wstring> const &);
+  void add_tag(std::wstring const &);
+};
+
+}}
+
+namespace xany {
+GOTT_UTIL_XANY_DECLARE_PROMOTER(tdl::structure::repatch_nothing *, 
+                                tdl::structure::repatcher *);
+}
+
+}}
 
 // FIXME FIXME FIXME DIRTY HACK just for testing
 EXPORT extern char const _ZTSPN4gott4util3tdl9structure9repatcherE[128];

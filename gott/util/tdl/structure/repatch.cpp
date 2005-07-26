@@ -23,13 +23,47 @@
 
 namespace structure = gott::util::tdl::structure;
 using structure::repatcher;
-using structure::repatch_context;
 using structure::failed_repatch;
+using structure::writable_structure;
+using structure::repatch_nothing;
+using structure::repatch_node_context;
 
 repatcher::repatcher() {}
 repatcher::~repatcher() {}
 
-repatch_context::~repatch_context() {}
-
 failed_repatch::failed_repatch(std::wstring const &s) : tdl_exception(s) {}
 failed_repatch::~failed_repatch() throw() {}
+
+repatch_nothing::~repatch_nothing() {}
+
+writable_structure *repatch_nothing::deferred_write(writable_structure &s) {
+  struct context : writable_structure {
+    writable_structure &target;
+    context(writable_structure &s) : target(s) {}
+
+    void begin() { target.begin(); }
+    void end() { target.end(); }
+    void data(xany::Xany const &x) { target.data(x); }
+    void add_tag(std::wstring const &s) { target.add_tag(s); }
+    void set_tags(std::list<std::wstring> const &x) { target.set_tags(x); }
+  };
+  return new context(s);
+}
+
+void repatch_node_context::begin() {
+  throw failed_repatch(L"accept node data solely");
+}
+
+void repatch_node_context::end() {
+  throw failed_repatch(L"accept node data solely");
+}
+
+void repatch_node_context::add_tag(std::wstring const &) {
+  throw failed_repatch(L"accept node data solely");
+}
+
+void repatch_node_context::set_tags(std::list<std::wstring> const &) {
+  throw failed_repatch(L"accept node data solely");
+}
+
+

@@ -32,7 +32,7 @@ class EXPORT repatch_integer : repatcher {
 public:
   repatch_integer();
   ~repatch_integer();
-  repatch_context *deferred_write(writable_structure &);
+  writable_structure *deferred_write(writable_structure &);
 };
 
 }}
