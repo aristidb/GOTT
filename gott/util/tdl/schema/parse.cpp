@@ -40,7 +40,7 @@ class match::IMPL {
 public:
   IMPL(structure::revocable_structure &x, match &r);
 
-  void add(rule::factory const &, structure::repatcher * = 0);
+  void add(rule::factory const &, structure::repatcher *);
 
   template<class T>
   void handle_token(T const &);
@@ -92,13 +92,17 @@ match::match(structure::revocable_structure &p) : pIMPL(new IMPL(p, *this)) {}
 
 match::match(rule::factory const &f, structure::revocable_structure &p)
 : pIMPL(new IMPL(p, *this)) {
-  pIMPL->add(f);
+  pIMPL->add(f, 0);
 }
 
 match::~match() { delete pIMPL; }
 
 void match::add(rule::factory const &rf) {
-  pIMPL->add(rf);
+  pIMPL->add(rf, 0);
+}
+
+void match::add(rule::factory const &rf, structure::repatcher *r) {
+  pIMPL->add(rf, r);
 }
 
 structure::revocable_structure &match::revocable_structure() const {
