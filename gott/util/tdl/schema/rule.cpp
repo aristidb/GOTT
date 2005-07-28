@@ -43,19 +43,19 @@ public:
 
   void end_structure() {
     if (attrib.coat())
-      cont->structure().end();
+      cont->direct_structure().end();
   }
 
 private:
   void add_tags() {
     void (writable_structure::*add)(wstring const &) =
       &writable_structure::add_tag;
-    for_each(range(attrib.tags()), bind(add, &cont->structure(), _1));
+    for_each(range(attrib.tags()), bind(add, &cont->direct_structure(), _1));
   }
 
   void start_structure() {
     if (attrib.coat())
-      cont->structure().begin();
+      cont->direct_structure().begin();
   }
 };
 

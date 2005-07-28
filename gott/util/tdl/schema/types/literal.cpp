@@ -49,7 +49,7 @@ bool match_literal::play(ev::node const &n) {
     if (x != n.get_data())
       return false;
     
-    matcher().structure().data(Xany(n.get_data()));
+    matcher().direct_structure().data(Xany(n.get_data()));
     be_happy();
     return true;
   }

@@ -54,7 +54,7 @@ bool match_enumeration::play(ev::node const &n) {
     if (it == v.end())
       return false;
     
-    matcher().structure().data(Xany(it - v.begin()));
+    matcher().direct_structure().data(Xany(it - v.begin()));
     be_happy();
     return true;
   }

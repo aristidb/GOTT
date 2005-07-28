@@ -82,7 +82,13 @@ public:
   /**
    * Return a reference to the tree the engine writes to.
    */
-  structure::revocable_structure &structure() const EXPORT;
+  structure::revocable_structure &revocable_structure() const EXPORT;
+
+  /**
+   * Return a reference to the current wrapped structure the engine directly
+   * writes to.
+   */
+  structure::writable_structure &direct_structure() const EXPORT;
 
 public:
   /**

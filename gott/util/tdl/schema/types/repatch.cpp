@@ -35,20 +35,15 @@ match_repatch::match_repatch(rule::attributes const &a, match &m)
 }
 
 bool match_repatch::play(ev::node const &n) {
-  if (expectation() == need) {
-    try {
-      boost::scoped_ptr<structure::writable_structure> 
-        con(repatcher->deferred_write(matcher().structure()));
-      con->data(gott::util::xany::Xany(n.get_data()));
-    } catch (structure::failed_repatch &) {
-      return false;
-    }
+  if (expectation() != need)
+    return false;
 
-    be_happy();
-    return true;
-  }
-
-  return false;
+  boost::scoped_ptr<structure::writable_structure> 
+    con(repatcher->deferred_write(matcher().direct_structure()));
+  con->data(gott::util::xany::Xany(n.get_data()));
+  
+  be_happy();
+  return true;
 }
 
 wchar_t const *match_repatch::name() const {

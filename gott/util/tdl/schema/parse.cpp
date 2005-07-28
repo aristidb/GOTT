@@ -24,6 +24,7 @@
 #include "../exceptions.hpp"
 #include "position.hpp"
 #include "parse_position.hpp"
+#include "../structure/repatch.hpp"
 
 using std::wstring;
 using std::list;
@@ -33,12 +34,13 @@ namespace structure = gott::util::tdl::structure;
 
 using gott::util::tdl::schema::match;
 using gott::util::tdl::schema::positioning;
+using structure::writable_structure;
 
 class match::IMPL {
 public:
   IMPL(structure::revocable_structure &x, match &r);
 
-  void add(rule::factory const &);
+  void add(rule::factory const &, structure::repatcher * = 0);
 
   template<class T>
   void handle_token(T const &);
@@ -48,6 +50,7 @@ public:
   void handle_tevent(ev::token_t const &);
   template<bool tok>
   void handle_event(ev::event const &);
+  bool try_play(ev::event const &, rule &r);
   template<bool tok>
   bool handle_rule(ev::event const &);
 
@@ -59,14 +62,28 @@ public:
 
   void fail_all();
 
-  structure::revocable_structure &struc;
+  structure::revocable_structure &base_struc;
+
+  shared_ptr<writable_structure> const &direct_structure_non_base();
+  
   positioning pos;
 
   match &ref;
   detail::line_pos ln;
 
-  typedef list<shared_ptr<rule> > Stack;
-  Stack parse, shadow;
+  struct entry {
+    shared_ptr<rule> the_rule;
+    shared_ptr<writable_structure> structure;
+
+    entry(shared_ptr<rule> const &r, shared_ptr<writable_structure> s = 0)
+      : the_rule(r), structure(s) {}
+
+    operator shared_ptr<rule>() { return the_rule; }
+  };
+
+  typedef list<entry> Stack;
+  Stack parse;
+  std::list<shared_ptr<rule> > shadow;
 
   static std::wstring get_name(shared_ptr<rule> const &);
 };
@@ -80,14 +97,19 @@ match::match(rule::factory const &f, structure::revocable_structure &p)
 
 match::~match() { delete pIMPL; }
 
-// Forwarding
-
 void match::add(rule::factory const &rf) {
   pIMPL->add(rf);
 }
 
-structure::revocable_structure &match::structure() const {
-  return pIMPL->struc;
+structure::revocable_structure &match::revocable_structure() const {
+  return pIMPL->base_struc;
+}
+
+structure::writable_structure &match::direct_structure() const {
+  shared_ptr<writable_structure> const &s = pIMPL->direct_structure_non_base();
+  if (s)
+    return *s;
+  return pIMPL->base_struc;
 }
 
 simple::line_logger *match::get_debug() const {
@@ -125,17 +147,29 @@ void match::comment(wstring const &, bool) {}
 // Implementation
 
 match::IMPL::IMPL(structure::revocable_structure &p, match &r)
-  : struc(p), pos(struc), ref(r) {}
+  : base_struc(p), pos(base_struc), ref(r) {}
 
-void match::IMPL::add(rule::factory const &f) {
+shared_ptr<writable_structure> const&match::IMPL::direct_structure_non_base() {
+  if (parse.empty()) {
+    static shared_ptr<writable_structure> nothing;
+    return nothing;
+  }
+  return parse.back().structure;
+}
+
+void match::IMPL::add(rule::factory const &f, structure::repatcher *r) {
+  shared_ptr<writable_structure> struc = direct_structure_non_base();
+  if (r)
+    struc.reset(r->deferred_write(struc ? *struc : base_struc));
   Stack::iterator it = --parse.end();
   shared_ptr<rule> x(f.get(ref));
-  parse.insert(++it, x);
+  parse.insert(++it, entry(x, struc));
 }
 
 template<class T>
 void match::IMPL::handle_token(T const &e) {
-  shadow = parse;
+  shadow.clear();
+  copy(range(parse), std::back_inserter(shadow));
   pos.add(e);
   handle_event<true>(e);
   while (pos.want_replay())
@@ -164,8 +198,7 @@ void match::IMPL::handle_event(ev::event const &e) {
 
 template<bool tok> 
 bool match::IMPL::handle_rule(ev::event const &event) {
-  rule &current = *parse.back();
-  if (event.play(current)) {
+  if (try_play(event, *parse.back().the_rule)) {
     if (tok) pos.consume();
     return consume_event();
   } else {
@@ -174,14 +207,22 @@ bool match::IMPL::handle_rule(ev::event const &event) {
   }
 }
 
+bool match::IMPL::try_play(ev::event const &event, rule &current) {
+  try {
+    return event.play(current);
+  } catch (tdl_exception &) {
+    return false;
+  }
+}
+
 bool match::IMPL::consume_event() {
-  if (parse.back()->expectation() == rule::nothing)
+  if (parse.back().the_rule->expectation() == rule::nothing)
     succeed_rule();
   return true;
 }
 
 bool match::IMPL::pass_event() {
-  if (parse.back()->expectation() == rule::need) {
+  if (parse.back().the_rule->expectation() == rule::need) {
     fail_rule();
     return true;
   } else {
@@ -191,7 +232,7 @@ bool match::IMPL::pass_event() {
 }
 
 void match::IMPL::succeed_rule() {
-  parse.back()->finish();
+  parse.back().the_rule->finish();
   parse.pop_back();
 
   if (!parse.empty())
