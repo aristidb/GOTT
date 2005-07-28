@@ -6,7 +6,7 @@ def CheckCompilerVisibility(context):
 	context.env.Append(CPPDEFINES = 'HAVE_VISIBILITY')
 	context.env.Append(CCFLAGS = '-fvisibility=hidden')
 
-	result = context.TryCompile('int global __attribute((visibility("default")));', '.cpp')
+	result = context.TryCompile("int global __attribute__((visibility(\"default\")));\n", '.cpp')
 	if not result:
 		context.env.Replace(CCFLAGS = lastCCFLAGS)
 		context.env.Replace(CPPDEFINES = lastCPPDEF)

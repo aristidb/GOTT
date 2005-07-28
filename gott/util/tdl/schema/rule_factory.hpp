@@ -86,7 +86,7 @@ namespace factory_template {
 typedef std::vector<rule::factory const *> container;
 
 typedef
-  rule::factory *(*rule_factory_builder)(rule::attributes const &, unsigned);
+  rule::factory *(*rule_factory_builder)(rule::attributes const &);
 
 template<class T> struct enreg;
 
@@ -132,7 +132,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a, unsigned) {
+  static rule::factory *build(rule::attributes const &a) {
     return new nochild(a);
   }
 
@@ -157,7 +157,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a, unsigned) {
+  static rule::factory *build(rule::attributes const &a) {
     return new onechild(a);
   }
 
@@ -192,7 +192,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a, unsigned) {
+  static rule::factory *build(rule::attributes const &a) {
     return new somechildren(a);
   }
 
@@ -208,9 +208,7 @@ private:
 
 template<class T> class manychildren : public rule::factory {
 public:
-  manychildren(rule::attributes const &a, unsigned n) : attrib(a) {
-    sub.reserve(n);
-  }
+  manychildren(rule::attributes const &a) : attrib(a) {}
 
   void add(rule::factory const &child) {
     sub.push_back(&child);
@@ -231,8 +229,8 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a, unsigned n) {
-    return new manychildren(a, n);
+  static rule::factory *build(rule::attributes const &a) {
+    return new manychildren(a);
   }
 
   bool accept_empty() const {
@@ -265,10 +263,8 @@ unsigned add_factory(factory_template::rule_factory_builder x) EXPORT;
  * Get a rule::factory instance by its type's index.
  * \param x The type's index.
  * \param a The additional attributes.
- * \param length The expected number of children (optional depending on type).
  */
-rule::factory *get_factory(unsigned x, rule::attributes const &a,
-                           unsigned length);
+rule::factory *get_factory(unsigned x, rule::attributes const &a);
 
 }}}}
 

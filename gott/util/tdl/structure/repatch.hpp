@@ -60,7 +60,11 @@ GOTT_UTIL_XANY_DECLARE_PROMOTER(tdl::structure::repatch_nothing *,
 
 }}
 
+#if 1
+
 // FIXME FIXME FIXME DIRTY HACK just for testing
-EXPORT extern char const _ZTSPN4gott4util3tdl9structure9repatcherE[128];
+__attribute__((visibility("default"))) extern char const _ZTSPN4gott4util3tdl9structure9repatcherE[128];
+
+#endif
 
 #endif

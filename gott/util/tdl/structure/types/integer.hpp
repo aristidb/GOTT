@@ -28,7 +28,7 @@ namespace util {
 namespace tdl {
 namespace structure {
 
-class EXPORT repatch_integer : repatcher {
+class EXPORT repatch_integer : public repatcher {
 public:
   repatch_integer();
   ~repatch_integer();

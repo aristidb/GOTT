@@ -214,7 +214,7 @@ bool match::IMPL::handle_rule(ev::event const &event) {
 bool match::IMPL::try_play(ev::event const &event, rule &current) {
   try {
     return event.play(current);
-  } catch (tdl_exception &) {
+  } catch (structure::failed_repatch &) {
     return false;
   }
 }

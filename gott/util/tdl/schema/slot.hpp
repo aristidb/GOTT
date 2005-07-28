@@ -220,7 +220,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a, unsigned) {
+  static rule::factory *build(rule::attributes const &a) {
     return new slotcfg_onechild(a);
   }
 
@@ -267,7 +267,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a, unsigned) {
+  static rule::factory *build(rule::attributes const &a) {
     return new slotcfg_somechildren(a);
   }
 
@@ -287,9 +287,7 @@ class slotcfg_manychildren : public detail::factory_with_slotcfg<Accepted> {
 public:
   typedef std::pair<rule::factory const *, slotcfg> element;
   
-  slotcfg_manychildren(rule::attributes const &a, unsigned n) : attrib(a) {
-    sub.reserve(n);
-  }
+  slotcfg_manychildren(rule::attributes const &a) : attrib(a) {}
 
   void add(rule::factory const &child) {
     add(child, slotcfg(Def));
@@ -318,8 +316,8 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a, unsigned n) {
-    return new slotcfg_manychildren(a, n);
+  static rule::factory *build(rule::attributes const &a) {
+    return new slotcfg_manychildren(a);
   }
 
   bool accept_empty() const {

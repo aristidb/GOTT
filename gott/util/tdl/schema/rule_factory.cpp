@@ -51,8 +51,8 @@ unsigned add_factory(factory_template::rule_factory_builder x) {
   return builders().size() - 1;
 }
 
-rule::factory *get_factory(unsigned x, rule::attributes const &a, unsigned l) {
-  return builders().at(x)(a, l);
+rule::factory *get_factory(unsigned x, rule::attributes const &a) {
+  return builders().at(x)(a);
 }
 
 }}}}
