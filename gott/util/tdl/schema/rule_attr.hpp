@@ -22,6 +22,7 @@
 #define GOTT_UTIL_TDL_SCHEMA_RULE_ATTR_HPP
 
 #include "rule.hpp"
+#include "../structure/repatch.hpp"
 
 namespace gott {
 namespace util {
@@ -58,13 +59,13 @@ public:
 
   xany::Xany const &user() const { return u; }
 
-  structure::repatcher const *repatcher() const { return r; }
+  structure::repatcher const *repatcher() const { return r.get(); }
 
 private:
   bool c;
   std::list<std::wstring> t;
   xany::Xany u;
-  structure::repatcher const *r;
+  boost::shared_ptr<structure::repatcher const> r;
 };
 
 }}}}
