@@ -43,7 +43,8 @@ repatch_integer::deferred_write(writable_structure &s) const {
         if (!is_integer(input, result))
           throw failed_repatch(L"repatch_integer: could not match integer");
         target.data(xany::Xany(result));
-      }
+      } else
+        throw failed_repatch(L"repatch_integer: could not match integer");
     }
 
     bool is_integer(std::wstring const &s, long &val) {
