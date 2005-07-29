@@ -179,9 +179,8 @@ slotcfg slotcfg::no_optional() const {
   throw std::bad_exception();
 }
 
-
-void rule::factory::with_slotcfg::add(rule::factory const &child,
-                                      unsigned, slotcfg const &cfg) {
+void rule::factory::with_slotcfg::add(rule::factory const &child, unsigned, 
+                                      slotcfg const &cfg) {
   add(child, cfg);
 }
 

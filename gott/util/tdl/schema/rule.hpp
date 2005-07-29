@@ -27,6 +27,8 @@
 namespace gott {
 namespace util {
 namespace tdl {
+namespace structure { class repatcher; }
+
 namespace schema {
 
 class match;

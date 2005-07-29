@@ -40,7 +40,7 @@ class match::IMPL {
 public:
   IMPL(structure::revocable_structure &x, match &r);
 
-  void add(rule::factory const &, structure::repatcher const *);
+  void add(rule::factory const &);
 
   template<class T>
   void handle_token(T const &);
@@ -92,17 +92,13 @@ match::match(structure::revocable_structure &p) : pIMPL(new IMPL(p, *this)) {}
 
 match::match(rule::factory const &f, structure::revocable_structure &p)
 : pIMPL(new IMPL(p, *this)) {
-  pIMPL->add(f, 0);
+  pIMPL->add(f);
 }
 
 match::~match() { delete pIMPL; }
 
 void match::add(rule::factory const &rf) {
-  pIMPL->add(rf, 0);
-}
-
-void match::add(rule::factory const &rf, structure::repatcher const *r) {
-  pIMPL->add(rf, r);
+  pIMPL->add(rf);
 }
 
 structure::revocable_structure &match::revocable_structure() const {
@@ -161,12 +157,12 @@ shared_ptr<writable_structure> const&match::IMPL::direct_structure_non_base() {
   return parse.back().structure;
 }
 
-void match::IMPL::add(rule::factory const &f, structure::repatcher const *r) {
+void match::IMPL::add(rule::factory const &f) {
   shared_ptr<writable_structure> struc = direct_structure_non_base();
-  if (r)
-    struc.reset(r->deferred_write(struc ? *struc : base_struc));
   Stack::iterator it = --parse.end();
   shared_ptr<rule> x(f.get(ref));
+  if (structure::repatcher const *r = x->get_attributes().repatcher())
+    struc.reset(r->deferred_write(struc ? *struc : base_struc));
   parse.insert(++it, entry(x, struc));
 }
 

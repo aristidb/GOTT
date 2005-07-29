@@ -164,7 +164,9 @@ struct EXPORT rule::factory::with_slotcfg {
    * Adds in the default location.
    * \param child The rule-factory producing the child.
    * \param cfg The "repetition definition" of the child.
+   * \param repatcher The surrounding repatcher.
    */
+  LOCAL
   virtual void add(factory const &child, slotcfg const &cfg) = 0;
 
   /**
@@ -173,11 +175,15 @@ struct EXPORT rule::factory::with_slotcfg {
    * \param child The rule-factory producing the child.
    * \param slot The slot to put the child into.
    * \param cfg The "repetition definition" of the child.
+   * \param repatcher The surrounding repatcher.
    */
+  LOCAL
   virtual void add(factory const &child, unsigned slot, slotcfg const &cfg);
 
+  LOCAL
   virtual slotcfg::mode accepted_modes() const = 0;
 
+  LOCAL
   bool supports(slotcfg const &) const;
 
   virtual ~with_slotcfg() = 0;

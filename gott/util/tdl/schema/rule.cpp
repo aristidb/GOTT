@@ -36,7 +36,8 @@ public:
   match *cont;
   attributes attrib;
 
-  IMPL(match &m, attributes const &a) : cont(&m), attrib(a) {
+  IMPL(match &m, attributes const &a) 
+  : cont(&m), attrib(a) {
     start_structure();
     add_tags();
   }

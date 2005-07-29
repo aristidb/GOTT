@@ -28,16 +28,12 @@
 namespace gott {
 namespace util {
 namespace tdl {
-namespace structure { class repatcher; }
-
 namespace schema {
 
 /**
  * Memory-owning context class.
  */
 class context : public boost::noncopyable {
-  class IMPL;
-
 public:
   context() EXPORT;
   ~context() EXPORT;
@@ -53,8 +49,7 @@ public:
    */
   void begin(unsigned rule_id,
              rule::attributes const &attr = rule::attributes(),
-             boost::optional<slotcfg> const &slt = boost::none,
-             structure::repatcher const *r = 0);
+             boost::optional<slotcfg> const &slt = boost::none);
 
   /**
    * Begin the declaration of a "rule".
@@ -65,16 +60,23 @@ public:
    * \param length The expected number of children. 0 or the nearest value
    *               if unsure.
    */
-  void begin(std::wstring const &name,
-             rule::attributes const &attr = rule::attributes(),
-             boost::optional<slotcfg> const &slt = boost::none,
-             structure::repatcher const *r = 0) EXPORT;
+  void EXPORT begin(std::wstring const &name,
+                    rule::attributes const &attr = rule::attributes(),
+                    boost::optional<slotcfg> const &slt = boost::none);
 
   /**
    * End the declaration of a "rule".
    * @see begin
    */
   void end() EXPORT;
+
+  /**
+   * A little convenience wrapper around begin.
+   */
+  template<class T>
+  void begin_t(rule::attributes const &attr, unsigned c = 0) {
+    begin(T::factory::index(), attr, c);
+  }
 
   /**
    * Add a reference to another context as a "rule".
@@ -84,20 +86,22 @@ public:
    */
   void ref(context const &other) EXPORT;
 
-  struct entry {
-    rule::factory const *factory;
-    structure::repatcher const *repatcher;
-    entry(rule::factory const *f, structure::repatcher const *rr) 
-      : factory(f), repatcher(rr) {}
-  };
-
   /**
    * Instantiate the context.
    */
-  EXPORT entry get() const;
+  rule::factory const &get() const EXPORT;
 
 private:
-  boost::scoped_ptr<IMPL> p;
+  typedef std::vector<rule::factory *> container;
+  container pool;
+  rule::factory const *first;
+  std::list<rule::factory *> org;
+
+  void add_child(rule::factory const *, boost::optional<slotcfg> const &);
+  void add_slotted(rule::factory const *, slotcfg const &);
+  void add_enc_slotted(rule::factory const *, slotcfg const &,
+                       boost::optional<slotcfg> const & = boost::none);
+  void add_owned(rule::factory *, boost::optional<slotcfg> const &);
 };
 
 /**

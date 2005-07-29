@@ -28,6 +28,8 @@
 namespace gott {
 namespace util {
 namespace tdl {
+namespace structure { class repatcher; }
+
 namespace schema {
 
 class match;
@@ -53,6 +55,7 @@ struct EXPORT rule::factory {
    * Let the produced rule have a/another child.
    * Adds in the default location.
    * \param child The rule-factory producing the child.
+   * \param repatcher The surrounding repatcher.
    */
   LOCAL virtual void add(factory const &child) = 0;
 
@@ -61,6 +64,7 @@ struct EXPORT rule::factory {
    * Slots semantics are optional.
    * \param child The rule-factory producing the child.
    * \param slot The slot to put the child into.
+   * \param repatcher The surrounding repatcher.
    */
   LOCAL virtual void add(factory const &child, unsigned slot);
 

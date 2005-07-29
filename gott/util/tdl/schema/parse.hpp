@@ -82,14 +82,6 @@ public:
   void add(rule::factory const &rf) EXPORT;
 
   /**
-   * Match next a rule and shrink-wrap the output tree for that rule
-   * in a "repatcher".
-   * \param rf The rule-factory specifying the to-be-added rule.
-   * \param r The wrapping repatcher.
-   */
-  void add(rule::factory const &rf, structure::repatcher const *r) EXPORT;
-
-  /**
    * Return a reference to the tree the engine writes to.
    */
   structure::revocable_structure &revocable_structure() const EXPORT;

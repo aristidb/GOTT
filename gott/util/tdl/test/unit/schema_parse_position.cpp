@@ -47,14 +47,11 @@ struct test_base {
   tdl::simple::parser &parse;
 
   test_base() 
-    : match(no_stru),
-      pos(match.pos()),
-      parse(match) {
+  : match(no_stru), pos(match.pos()), parse(match) {
     tdl::schema::context c;
     c.begin(L"document");
     c.end();
-    tdl::schema::context::entry e = c.get();
-    match.add(*e.factory, e.repatcher);
+    match.add(c.get());
   }
 };
 

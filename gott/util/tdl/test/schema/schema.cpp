@@ -87,7 +87,7 @@ struct Schema : tut::schema_basic {
 
         document.begin(L"named", match_named::attributes(L"type", false));
           document.begin(L"ordered", rule::attributes(false));
-            document.begin(L"follow", rule::attributes(L"T1", false));
+            document.begin(L"follow", rule::attributes(L"T1", false, 0));
               document.begin(L"string", ra(L"name"));
               document.end();
 
