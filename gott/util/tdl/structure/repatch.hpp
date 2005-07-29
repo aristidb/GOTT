@@ -38,18 +38,25 @@ public:
   virtual writable_structure *deferred_write(writable_structure &) const = 0;
 };
 
+class EXPORT simple_repatcher_context : public writable_structure {
+protected:
+  writable_structure &target;
+
+public:
+  simple_repatcher_context(writable_structure &x) : target(x) {}
+  ~simple_repatcher_context();
+  void begin();
+  void end();
+  void data(xany::Xany const &);
+  void add_tag(std::wstring const &);
+  void set_tags(std::list<std::wstring> const &);
+};
+
 class EXPORT repatch_nothing : public repatcher {
 public:
   repatch_nothing();
   ~repatch_nothing();
   writable_structure *deferred_write(writable_structure &) const;
-};
-
-class repatch_node_context : public writable_structure {
-  void begin();
-  void end();
-  void set_tags(std::list<std::wstring> const &);
-  void add_tag(std::wstring const &);
 };
 
 }}

@@ -25,8 +25,8 @@ namespace structure = gott::util::tdl::structure;
 using structure::repatcher;
 using structure::failed_repatch;
 using structure::writable_structure;
+using structure::simple_repatcher_context;
 using structure::repatch_nothing;
-using structure::repatch_node_context;
 
 repatcher::repatcher() {}
 repatcher::~repatcher() {}
@@ -34,38 +34,32 @@ repatcher::~repatcher() {}
 failed_repatch::failed_repatch(std::wstring const &s) : tdl_exception(s) {}
 failed_repatch::~failed_repatch() throw() {}
 
+simple_repatcher_context::~simple_repatcher_context() {}
+
+void simple_repatcher_context::begin() {
+  target.begin();
+}
+
+void simple_repatcher_context::end() {
+  target.end();
+}
+
+void simple_repatcher_context::data(xany::Xany const &x) {
+  target.data(x);
+}
+
+void simple_repatcher_context::add_tag(std::wstring const &s) {
+  target.add_tag(s);
+}
+
+void simple_repatcher_context::set_tags(std::list<std::wstring> const &l) {
+  target.set_tags(l);
+}
+
 repatch_nothing::repatch_nothing() {}
 repatch_nothing::~repatch_nothing() {}
 
 writable_structure *
 repatch_nothing::deferred_write(writable_structure &s) const {
-  struct context : writable_structure {
-    writable_structure &target;
-    context(writable_structure &s) : target(s) {}
-
-    void begin() { target.begin(); }
-    void end() { target.end(); }
-    void data(xany::Xany const &x) { target.data(x); }
-    void add_tag(std::wstring const &s) { target.add_tag(s); }
-    void set_tags(std::list<std::wstring> const &x) { target.set_tags(x); }
-  };
-  return new context(s);
+  return new simple_repatcher_context(s);
 }
-
-void repatch_node_context::begin() {
-  throw failed_repatch(L"accept node data solely");
-}
-
-void repatch_node_context::end() {
-  throw failed_repatch(L"accept node data solely");
-}
-
-void repatch_node_context::add_tag(std::wstring const &) {
-  throw failed_repatch(L"accept node data solely");
-}
-
-void repatch_node_context::set_tags(std::list<std::wstring> const &) {
-  throw failed_repatch(L"accept node data solely");
-}
-
-
