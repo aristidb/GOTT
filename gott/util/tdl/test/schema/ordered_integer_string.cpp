@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -36,9 +37,10 @@ struct schema_ordered_integer_string : tut::schema_basic {
   schema_ordered_integer_string() {
     context.begin(L"document");
       context.begin(L"ordered");
-        context.begin(L"integer");
+        context.begin(L"node", 
+             schema::rule::attributes(true, new stru::repatch_integer()));
         context.end();
-        context.begin(L"string");
+        context.begin(L"node");
         context.end();
       context.end();
     context.end();
@@ -73,7 +75,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>ordered>integer at token d7");
+        std::string(mm.what()), "1:1 : mismatch in document>ordered>node at token d7");
   }
 }
 
@@ -84,7 +86,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>ordered>integer after token ");
+        std::string(mm.what()), "0:1 : mismatch in document>ordered>node after token ");
   }
 }
 
@@ -95,7 +97,7 @@ void object::test<4>(int) {
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>ordered>integer at token foo");
+        std::string(mm.what()), "1:1 : mismatch in document>ordered>node at token foo");
   }
 }
 
@@ -106,7 +108,7 @@ void object::test<5>(int) {
     fail("just integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>ordered>string after token 4");
+        std::string(mm.what()), "1:1 : mismatch in document>ordered>node after token 4");
   }
 }
 
@@ -127,7 +129,7 @@ void object::test<7>(int) {
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>ordered>string after token 732");
+        std::string(mm.what()), "1:1 : mismatch in document>ordered>node after token 732");
   }
 }
 

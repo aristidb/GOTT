@@ -20,6 +20,7 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -37,9 +38,10 @@ struct schema_unordered_list_integer_string : tut::schema_basic {
   schema_unordered_list_integer_string() {
     context.begin(L"document");
       context.begin(L"unordered");
-        context.begin(L"integer", RA(), schema::slotcfg(schema::slotcfg::list));
+        context.begin(L"node", RA(true, new stru::repatch_integer()), 
+                      schema::slotcfg(schema::slotcfg::list));
         context.end();
-        context.begin(L"string");
+        context.begin(L"node");
         context.end();
       context.end();
     context.end();
@@ -81,7 +83,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "0:1 : mismatch in document>unordered>integer after token ");
+        "0:1 : mismatch in document>unordered>node after token ");
   }
 }
 
@@ -92,7 +94,7 @@ void object::test<4>(int) {
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>integer after token list");
+        "1:1 : mismatch in document>unordered>node after token list");
   }
 }
 
@@ -103,7 +105,7 @@ void object::test<5>(int) {
     fail("two strings");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:6 : mismatch in document>unordered>integer at token list");
+        "1:6 : mismatch in document>unordered>node at token list");
   }
 }
 
@@ -114,7 +116,7 @@ void object::test<6>(int) {
     fail("int then two strings");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:5 : mismatch in document>unordered>integer at token y");
+        "1:5 : mismatch in document>unordered>node at token y");
   }
 }
 
@@ -125,7 +127,7 @@ void object::test<7>(int) {
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>integer after token 732");
+        "1:1 : mismatch in document>unordered>node after token 732");
   }
 }
 

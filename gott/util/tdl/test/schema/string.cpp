@@ -33,7 +33,7 @@ namespace {
 struct schema_string : tut::schema_basic {
   schema_string() {
     context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
-      context.begin(L"string", schema::rule::attributes());
+      context.begin(L"node");
       context.end();
     context.end();
   }

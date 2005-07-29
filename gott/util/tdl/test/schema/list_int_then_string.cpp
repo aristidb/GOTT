@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -38,10 +39,10 @@ struct schema_list_int_then_string : tut::schema_basic {
     context.begin(L"document");
       context.begin(L"ordered", RA(wstring(L"ord")));
         context.begin(L"list", RA(wstring(L"list")));
-          context.begin(L"integer", RA(wstring(L"int")));
+          context.begin(L"node", RA(L"int", true, new stru::repatch_integer()));
           context.end();
         context.end();
-        context.begin(L"string", RA(wstring(L"string")));
+        context.begin(L"node", RA(wstring(L"string")));
         context.end();
       context.end();
     context.end();
@@ -86,7 +87,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "0:1 : mismatch in document>ordered(ord)>list(list)>integer(int)"
+        "0:1 : mismatch in document>ordered(ord)>list(list)>node(int)"
         " after token ");
   }
 }
@@ -109,7 +110,7 @@ void object::test<5>(int) {
     fail("just integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>ordered(ord)>list(list)>integer(int)"
+        "1:1 : mismatch in document>ordered(ord)>list(list)>node(int)"
         " after token 4");
   }
 }

@@ -21,9 +21,8 @@
 #include "common.hpp"
 #include <gott/util/tdl/schema/context_template.hpp>
 #include <gott/util/tdl/schema/slot.hpp>
-#include <gott/util/tdl/schema/types/literal.hpp>
 #include <gott/util/tdl/schema/types/named.hpp>
-#include <gott/util/tdl/schema/types/enumeration.hpp>
+#include <gott/util/tdl/structure/types/enumeration.hpp>
 
 namespace util = gott::util;
 namespace schema = util::tdl::schema;
@@ -35,9 +34,7 @@ using namespace stru::cf;
 using schema::slotcfg;
 using schema::rule;
 
-using schema::match_literal;
 using schema::match_named;
-using schema::match_enumeration;
 
 rule::attributes ra(wchar_t const *t) { 
   return rule::attributes(wstring(t)); 
@@ -68,10 +65,10 @@ struct Schema : tut::schema_basic {
   void module_id(schema::context_template &document) {
     document.begin(L"named", match_named::attributes(L"module"));
       document.begin(L"follow", rule::attributes(false));
-        document.begin(L"string", ra(L"module-id"));
+        document.begin(L"node", ra(L"module-id"));
         document.end();
 
-        document.begin(L"string", ra(L"version-spec"), 
+        document.begin(L"node", ra(L"version-spec"), 
                        slotcfg(slotcfg::range, 1, 2));
         document.end();
       document.end();
@@ -81,17 +78,18 @@ struct Schema : tut::schema_basic {
   void type_declarations(schema::context_template &document) {
     document.begin(L"list", ra(L"type-declarations"));
       document.begin(L"ordered", ra(L"type-declaration"));
-        document.begin(L"literal", match_literal::attributes(L"export"),
-                       slotcfg(slotcfg::optional));
+        document.begin(L"node", rule::attributes(L"export", true,
+             new stru::repatch_enumeration(std::vector<wstring>(1, L"export"))),
+             slotcfg(slotcfg::optional));
         document.end();
 
         document.begin(L"named", match_named::attributes(L"type", false));
           document.begin(L"ordered", rule::attributes(false));
             document.begin(L"follow", rule::attributes(L"T1", false, 0));
-              document.begin(L"string", ra(L"name"));
+              document.begin(L"node", ra(L"name"));
               document.end();
 
-              document.begin(L"string", ra(L"parameter"), 
+              document.begin(L"node", ra(L"parameter"), 
                              slotcfg(slotcfg::list));
               document.end();
             document.end();
@@ -108,8 +106,8 @@ struct Schema : tut::schema_basic {
        {
          std::vector<wstring> choice(2);
          choice[0] = L"enclosed"; choice[1] = L"flat";
-         document.begin(L"enumeration", 
-                        match_enumeration::attributes(choice));
+         document.begin(L"node", rule::attributes(L"coat", true,
+                                        new stru::repatch_enumeration(choice)));
          document.end();
        }
 
@@ -118,7 +116,7 @@ struct Schema : tut::schema_basic {
          document.begin(L"named", 
                         match_named::attributes(L":", false),
                         slotcfg(slotcfg::optional));
-           document.begin(L"string", ra(L"tag")); 
+           document.begin(L"node", ra(L"tag")); 
            document.end();
          document.end();
 
@@ -132,12 +130,12 @@ struct Schema : tut::schema_basic {
 
   void normal_type(schema::context_template &document) {
     document.begin(L"follow", ra(L"normal-type"));
-      document.begin(L"string", ra(L"type"));
+      document.begin(L"node", ra(L"type"));
       document.end();
 
       document.begin(L"any", ra(L"parameters"), slotcfg(slotcfg::list));
         document.param(0);
-        //document.begin(L"string");
+        //document.begin(L"node");
         //document.end();
       document.end();
     document.end();
@@ -150,8 +148,8 @@ struct Schema : tut::schema_basic {
         std::vector<wstring> single(4);
         single[0] = L"one";  single[1] = L"optional";
         single[2] = L"list"; single[3] = L"some";
-        document.begin(L"enumeration", 
-                       match_enumeration::attributes(single));
+        document.begin(L"node", rule::attributes(L"slot", true, 
+                                        new stru::repatch_enumeration(single)));
         document.end();
       }
 

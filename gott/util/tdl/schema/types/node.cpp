@@ -18,18 +18,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "string.hpp"
+#include "node.hpp"
 #include "../event.hpp"
 
 namespace schema = gott::util::tdl::schema;
 namespace ev = gott::util::tdl::schema::ev;
 using schema::rule;
-using schema::match_string;
+using schema::match_node;
 
-match_string::match_string(rule::attributes const &a, match &m)
+match_node::match_node(rule::attributes const &a, match &m)
 : happy_once(a, m) {}
 
-bool match_string::play(ev::node const &n) {
+bool match_node::play(ev::node const &n) {
   if (expectation() == need) {
     matcher().direct_structure().data(gott::util::xany::Xany(n.get_data()));
 
@@ -40,6 +40,6 @@ bool match_string::play(ev::node const &n) {
   return false;
 }
 
-wchar_t const *match_string::name() const {
-  return L"string";
+wchar_t const *match_node::name() const {
+  return L"node";
 }

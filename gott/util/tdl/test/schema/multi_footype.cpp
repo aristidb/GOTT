@@ -22,6 +22,7 @@
 #include <gott/util/tdl/schema/context_template.hpp>
 #include <gott/util/tdl/schema/slot.hpp>
 #include <gott/util/tdl/schema/types/named.hpp>
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -51,15 +52,16 @@ struct schema_multi_footype : tut::schema_basic {
 
     multi.begin(L"unordered", RA(wstring(L"--unordered--")));
       multi.begin(L"named", schema::match_named::attributes(L"plugin"));
-        multi.begin(L"string", RA(wstring(L"plugin-data")), 
+        multi.begin(L"node", RA(wstring(L"plugin-data")), 
                     slotcfg(slotcfg::list));
         multi.end();
       multi.end();
       multi.begin(L"named", schema::match_named::attributes(L"sum"));
-        multi.begin(L"integer", RA(wstring(L"sum-data"))); // > 0
+        multi.begin(L"node", 
+                    RA(L"sum-data", true, new stru::repatch_integer())); // > 0
         multi.end();
       multi.end();
-      multi.begin(L"integer", RA(wstring(L"--other--")), 
+      multi.begin(L"node", RA(L"--other--", true, new stru::repatch_integer()), 
                   slotcfg(slotcfg::some));
       multi.end();
     multi.end();

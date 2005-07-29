@@ -37,7 +37,7 @@ struct schema_named_string : tut::schema_basic {
   schema_named_string() {
     context.begin(L"document", RA(wstring(L"doc")));
       context.begin(L"named", schema::match_named::attributes(L"ND"));
-        context.begin(L"string", RA(wstring(L"S")));
+        context.begin(L"node", RA(wstring(L"S")));
         context.end();
       context.end();
     context.end();

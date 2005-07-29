@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
-#include <gott/util/tdl/schema/types/enumeration.hpp>
+#include <gott/util/tdl/structure/types/enumeration.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -30,6 +30,8 @@ using std::vector;
 using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
+using schema::rule;
+using stru::repatch_enumeration;
 
 namespace {
 struct schema_enumeration : tut::schema_basic {
@@ -37,7 +39,8 @@ struct schema_enumeration : tut::schema_basic {
     context.begin(L"document");
       vector<wstring> v(3);
       v[0] = L"first"; v[1] = L"second"; v[2] = L"third";
-      context.begin(L"enumeration", schema::match_enumeration::attributes(v));
+      context.begin(L"node", rule::attributes(std::list<wstring>(), true, 0, 
+                                              new repatch_enumeration(v)));
       context.end();
     context.end();
   }
@@ -82,7 +85,7 @@ void object::test<4>(int) {
     fail("out-of");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>enumeration at token d7");
+        std::string(mm.what()), "1:1 : mismatch in document>node at token d7");
   }
 }
 
@@ -93,7 +96,7 @@ void object::test<5>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>enumeration after token ");  
+        std::string(mm.what()), "0:1 : mismatch in document>node after token ");  
   }
 }
 
@@ -115,7 +118,7 @@ void object::test<7>(int) {
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>enumeration at token foo");
+        std::string(mm.what()), "1:1 : mismatch in document>node at token foo");
   }
 }
 

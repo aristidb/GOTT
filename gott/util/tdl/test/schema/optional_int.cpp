@@ -20,6 +20,7 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -39,8 +40,8 @@ struct schema_optional_int : tut::schema_basic {
   schema_optional_int() {
     context.begin(L"document");
       context.begin(L"list");
-        context.begin(L"integer", 
-                      RA(wstring(L"el")), slotcfg(slotcfg::optional));
+        context.begin(L"node", RA(L"el", true, new stru::repatch_integer()),
+                      slotcfg(slotcfg::optional));
         context.end();
       context.end();
     context.end();
@@ -90,7 +91,7 @@ void object::test<4>(int) {
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch in document>list>integer(el) at token zzzz");
+                  "1:1 : mismatch in document>list>node(el) at token zzzz");
   }
 }
 

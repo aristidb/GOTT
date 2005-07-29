@@ -21,14 +21,11 @@
 #include "../by_name.hpp"
 #include "any.hpp"
 #include "document.hpp"
-#include "enumeration.hpp"
 #include "follow_ordered.hpp"
-#include "integer.hpp"
 #include "list.hpp"
-#include "literal.hpp"
 #include "named.hpp"
 #include "ordered.hpp"
-#include "string.hpp"
+#include "node.hpp"
 #include "unordered.hpp"
 #include "repatch.hpp"
 
@@ -43,14 +40,11 @@ using namespace gott::util::tdl::schema;
 builtin_types::builtin_types() {
   name_manager().add(L"any",            match_any::factory::index());
   name_manager().add(L"document",       match_document::factory::index());
-  name_manager().add(L"enumeration",    match_enumeration::factory::index());
   name_manager().add(L"follow",         match_follow_ordered::factory::index());
-  name_manager().add(L"integer",        match_integer::factory::index());
   name_manager().add(L"list",           match_list::factory::index());
-  name_manager().add(L"literal",        match_literal::factory::index());
   name_manager().add(L"named",          match_named::factory::index());
   name_manager().add(L"ordered",        match_ordered::factory::index());
-  name_manager().add(L"string",         match_string::factory::index());
+  name_manager().add(L"node",           match_node::factory::index());
   name_manager().add(L"unordered",      match_unordered::factory::index());
   name_manager().add(L"repatch",        match_repatch::factory::index());
 }

@@ -39,8 +39,7 @@ struct schema_list_string : tut::schema_basic {
   schema_list_string() {
     context.begin(L"document");
       context.begin(L"list");
-        context.begin(L"string", 
-                      RA(wstring(L"el")), slotcfg(slotcfg::list));
+        context.begin(L"node", RA(wstring(L"el")), slotcfg(slotcfg::list));
         context.end();
       context.end();
     context.end();
@@ -88,7 +87,7 @@ void object::test<4>(int) {
     fail("following");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>list>string(el) after token a");
+        "1:1 : mismatch in document>list>node(el) after token a");
   }
 }
 

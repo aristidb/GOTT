@@ -39,8 +39,7 @@ struct schema_epsilon : tut::schema_basic {
   schema_epsilon() {
     context.begin(L"document");
       context.begin(L"list");
-        context.begin(L"integer", 
-                      RA(wstring(L"el")), slotcfg(slotcfg::exact, 0));
+        context.begin(L"node", RA(), slotcfg(slotcfg::exact, 0));
         context.end();
       context.end();
     context.end();

@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
-#include <gott/util/tdl/schema/types/literal.hpp>
+#include <gott/util/tdl/structure/types/enumeration.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -29,12 +29,14 @@ using u::xany::Xany;
 using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
+using schema::rule;
 
 namespace {
 struct schema_literal : tut::schema_basic {
   schema_literal() {
     context.begin(L"document");
-      context.begin(L"literal", schema::match_literal::attributes(L"foobar"));
+      context.begin(L"node", rule::attributes(L"foobar", true, 
+            new stru::repatch_enumeration(std::vector<wstring>(1, L"foobar"))));
       context.end();
     context.end();
   }
@@ -54,7 +56,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"foobar");
-  C(S(Xany(L"foobar"), L"foobar")).write_to(xp);
+  C(S(Xany(0), L"foobar")).write_to(xp);
   ensure_equals("single foobar entity", tree, xp);
 }
 
@@ -65,7 +67,7 @@ void object::test<2>(int) {
     fail("non-foobar");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>literal(foobar) at token d7");
+        "1:1 : mismatch in document>node(foobar) at token d7");
   }
 }
 
@@ -76,7 +78,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "0:1 : mismatch in document>literal(foobar) after token ");
+        "0:1 : mismatch in document>node(foobar) after token ");
   }
 }
 
@@ -98,7 +100,7 @@ void object::test<5>(int) {
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>literal(foobar) at token foo");
+        "1:1 : mismatch in document>node(foobar) at token foo");
   }
 }
 

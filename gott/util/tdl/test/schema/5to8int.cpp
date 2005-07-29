@@ -20,6 +20,7 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -39,8 +40,9 @@ struct schema_5to8int : tut::schema_basic {
   schema_5to8int() {
     context.begin(L"document");
       context.begin(L"list");
-        context.begin(L"integer", 
-                      RA(wstring(L"el")), slotcfg(slotcfg::range, 5, 8));
+        context.begin(L"node", 
+                      RA(L"el", true, new stru::repatch_integer()),
+                      slotcfg(slotcfg::range, 5, 8));
         context.end();
       context.end();
     context.end();
@@ -68,7 +70,7 @@ void object::test<1>(int c) {
     fail("too few");
   } catch (schema::mismatch const &m) {
     std::ostringstream err;
-    err << (c-1) << ":1 : mismatch in document>list>integer(el) after token ";
+    err << (c-1) << ":1 : mismatch in document>list>node(el) after token ";
     if (c > 1) err << 76 + c;
     ensure_equals("correct error", m.what(), err.str());
   }
@@ -108,7 +110,7 @@ void object::test<16>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()), 
-                  "1:1 : mismatch in document>list>integer(el) after token 1");
+                  "1:1 : mismatch in document>list>node(el) after token 1");
   }
 }
 
@@ -119,7 +121,7 @@ void object::test<17>(int) {
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()), 
-                  "1:1 : mismatch in document>list>integer(el) at token lala");
+                  "1:1 : mismatch in document>list>node(el) at token lala");
   }
 }
 

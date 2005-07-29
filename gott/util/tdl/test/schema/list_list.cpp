@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 using namespace u::tdl::schema;
@@ -37,11 +38,12 @@ struct schema_multi_footype : tut::schema_basic {
       context.begin(L"ordered");
         context.begin(L"list", rule::attributes(wstring(L"s")));
           context.begin(L"list", rule::attributes(wstring(L"t")));
-            context.begin(L"integer", rule::attributes(wstring(L"ii")));
+            context.begin(L"node", 
+                    rule::attributes(L"ii", true, new stru::repatch_integer()));
             ;context.end();
           ;context.end();
         ;context.end();
-        context.begin(L"string", rule::attributes(wstring(L"xx")));
+        context.begin(L"node", rule::attributes(wstring(L"xx")));
       ;context.end();
     ;context.end();
   }
@@ -98,7 +100,7 @@ void object::test<4>(int) {
     fail("empty");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-       "0:1 : mismatch in document>ordered>list(s)>list(t)>integer(ii)"
+       "0:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
        " after token ");
   }
 }
@@ -110,7 +112,7 @@ void object::test<5>(int) {
     fail("should be greedy");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-        "1:1 : mismatch in document>ordered>list(s)>list(t)>integer(ii)"
+        "1:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
         " after token 44");
   }
 }

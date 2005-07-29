@@ -19,7 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
-#include <gott/util/tdl/schema/types/literal.hpp>
+#include <gott/util/tdl/structure/types/enumeration.hpp>
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -31,18 +32,18 @@ using stru::cf::S;
 using stru::cf::C;
 
 typedef schema::rule::attributes RA;
-using schema::match_literal;
 
 namespace {
 struct schema_unordered_foo_integer_string : tut::schema_basic {
   schema_unordered_foo_integer_string() {
     context.begin(L"document");
       context.begin(L"unordered");
-        context.begin(L"literal", match_literal::attributes(wstring(L"foo")));
+        context.begin(L"node", RA(L"foo", true, 
+               new stru::repatch_enumeration(std::vector<wstring>(1, L"foo"))));
         context.end();
-        context.begin(L"integer");
+        context.begin(L"node", RA(true, new stru::repatch_integer()));
         context.end();
-        context.begin(L"string");
+        context.begin(L"node");
         context.end();
       context.end();
     context.end();
@@ -64,7 +65,7 @@ template<> template<>
 void object::test<1>(int) {
   run_test(L"foo\n4\nx");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"foo"), L"foo"));
+  c.push_back(S(Xany(0), L"foo"));
   c.push_back(S(Xany(4)));
   c.push_back(S(Xany(L"x")));
   C(M(c)).write_to(xp);
@@ -78,7 +79,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>literal(foo) after token d7");
+        "1:1 : mismatch in document>unordered>node(foo) after token d7");
   }
 }
 
@@ -89,7 +90,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "0:1 : mismatch in document>unordered>literal(foo) after token ");
+        "0:1 : mismatch in document>unordered>node(foo) after token ");
   }
 }
 
@@ -100,7 +101,7 @@ void object::test<4>(int) {
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>integer after token foo");
+        "1:1 : mismatch in document>unordered>node after token foo");
   }
 }
 
@@ -111,7 +112,7 @@ void object::test<5>(int) {
     fail("just foo");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>integer after token foo");
+        "1:1 : mismatch in document>unordered>node after token foo");
   }
 }
 
@@ -121,7 +122,7 @@ void object::test<6>(int) {
     run_test(L"4,x,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:5 : mismatch in document>unordered>literal(foo) at token y");
+        "1:5 : mismatch in document>unordered>node(foo) at token y");
   }
 }
 
@@ -132,7 +133,7 @@ void object::test<7>(int) {
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>literal(foo) after token 732");
+        "1:1 : mismatch in document>unordered>node(foo) after token 732");
   }
 }
 
@@ -141,7 +142,7 @@ void object::test<8>(int) {
   run_test(L"77,foo,foo");
   stru::cf::nd_list c;
   c.push_back(S(Xany(77)));
-  c.push_back(S(Xany(L"foo"), L"foo"));
+  c.push_back(S(Xany(0), L"foo"));
   c.push_back(S(Xany(L"foo")));
   C(M(c)).write_to(xp);
   ensure_equals("reordered #1", tree, xp);
@@ -153,7 +154,7 @@ void object::test<9>(int) {
   stru::cf::nd_list c;
   c.push_back(S(Xany(L"hallo")));
   c.push_back(S(Xany(-4)));
-  c.push_back(S(Xany(L"foo"), L"foo"));
+  c.push_back(S(Xany(0), L"foo"));
   C(M(c)).write_to(xp);
   ensure_equals("reordered #2", tree, xp);
 }

@@ -20,6 +20,7 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -38,9 +39,9 @@ struct schema_follow_then_list : tut::schema_basic {
   schema_follow_then_list() {
     context.begin(L"document", RA(wstring(L"doc")));
       context.begin(L"follow", RA(wstring(L"foll")));
-        context.begin(L"string", RA(wstring(L"s")));
+        context.begin(L"node", RA(wstring(L"s")));
         context.end();
-        context.begin(L"integer", RA(wstring(L"i")), 
+        context.begin(L"node", RA(L"i", true, new stru::repatch_integer()), 
                       slotcfg(slotcfg::list));
         context.end();
       context.end();
@@ -83,7 +84,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-      "0:1 : mismatch in document(doc)>follow(foll)>string(s) after token ");
+      "0:1 : mismatch in document(doc)>follow(foll)>node(s) after token ");
   }
 }
 

@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -30,15 +31,16 @@ using stru::cf::S;
 using stru::cf::C;
 
 typedef schema::rule::attributes RA;
+typedef stru::repatch_integer I;
 
 namespace {
 struct schema_follow_integer_integer : tut::schema_basic {
   schema_follow_integer_integer() {
     context.begin(L"document", RA(wstring(L"doc")));
       context.begin(L"follow", RA(wstring(L"foll")));
-        context.begin(L"integer", RA(wstring(L"int1")));
+        context.begin(L"node", RA(L"int1", true, new I()));
         context.end();
-        context.begin(L"integer", RA(wstring(L"int2")));
+        context.begin(L"node", RA(L"int2", true, new I()));
         context.end();
       context.end();
     context.end();
@@ -73,7 +75,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()),
-      "1:1 : mismatch in document(doc)>follow(foll)>integer(int1) at token d7");
+      "1:1 : mismatch in document(doc)>follow(foll)>node(int1) at token d7");
   }
 }
 
@@ -84,7 +86,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-     "0:1 : mismatch in document(doc)>follow(foll)>integer(int1) after token ");
+     "0:1 : mismatch in document(doc)>follow(foll)>node(int1) after token ");
   }
 }
 
@@ -95,7 +97,7 @@ void object::test<4>(int) {
     fail("followed string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-     "1:5 : mismatch in document(doc)>follow(foll)>integer(int2) at token foo");
+     "1:5 : mismatch in document(doc)>follow(foll)>node(int2) at token foo");
   }
 }
 

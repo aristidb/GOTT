@@ -30,10 +30,10 @@ namespace util {
 namespace tdl {
 namespace schema {
 
-class match_string : public happy_once {
+class match_node : public happy_once {
 public:
-  typedef factory_template::nochild<match_string> factory;
-  match_string(rule::attributes const &, match &);
+  typedef factory_template::nochild<match_node> factory;
+  match_node(rule::attributes const &, match &);
 
   static bool accept_empty() { return false; }
   

@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -28,12 +29,13 @@ using u::xany::Xany;
 using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
+typedef schema::rule::attributes RA;
 
 namespace {
 struct schema_integer : tut::schema_basic {
   schema_integer() {
     context.begin(L"document");
-      context.begin(L"integer");
+      context.begin(L"node", RA(L"i", true, new stru::repatch_integer()));
       context.end();
     context.end();
   }
@@ -53,7 +55,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"4");
-  C(S(Xany(4))).write_to(xp);
+  C(S(Xany(4), L"i")).write_to(xp);
   ensure_equals("single integer entity", tree, xp);
 }
 
@@ -64,7 +66,7 @@ void object::test<2>(int) {
     fail("non-integral");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-      std::string(mm.what()), "1:1 : mismatch in document>integer at token d7");
+      std::string(mm.what()), "1:1 : mismatch in document>node(i) at token d7");
   }
 }
 
@@ -75,7 +77,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-     std::string(mm.what()), "0:1 : mismatch in document>integer after token ");
+     std::string(mm.what()), "0:1 : mismatch in document>node(i) after token ");
   }
 }
 
@@ -104,7 +106,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   run_test(L"-777777");
-  C(S(Xany(-777777))).write_to(xp);
+  C(S(Xany(-777777), L"i")).write_to(xp);
   ensure_equals("negative", tree, xp);
 }
 
@@ -115,7 +117,7 @@ void object::test<7>(int) {
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-     std::string(mm.what()), "1:1 : mismatch in document>integer at token foo");
+     std::string(mm.what()), "1:1 : mismatch in document>node(i) at token foo");
   }
 }
 

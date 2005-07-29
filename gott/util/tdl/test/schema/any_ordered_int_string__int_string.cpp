@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace u = gott::util;
 namespace schema = u::tdl::schema;
@@ -37,14 +38,14 @@ struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {
     context.begin(L"document");
       context.begin(L"any");
         context.begin(L"ordered");
-          context.begin(L"integer", RA(wstring(L"int")));
+          context.begin(L"node", RA(L"int", true, new stru::repatch_integer()));
           context.end();
-          context.begin(L"string", RA(wstring(L"string")));
+          context.begin(L"node", RA(wstring(L"string")));
           context.end();
         context.end();
-        context.begin(L"integer", RA(wstring(L"int2")));
+        context.begin(L"node", RA(L"int2", true, new stru::repatch_integer()));
         context.end();
-        context.begin(L"string", RA(wstring(L"string2")));
+        context.begin(L"node", RA(wstring(L"string2")));
         context.end();
       context.end();
     context.end();
@@ -86,7 +87,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()),
-        "0:1 : mismatch in document>any>ordered>integer(int) after token ");
+        "0:1 : mismatch in document>any>ordered>node(int) after token ");
   }
 }
 
@@ -125,7 +126,7 @@ void object::test<7>(int) {
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()),
-       "1:1 : mismatch in document>any>ordered>string(string) after token 732");
+       "1:1 : mismatch in document>any>ordered>node(string) after token 732");
   }
 }
 

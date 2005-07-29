@@ -35,8 +35,7 @@ struct schema_max7string : tut::schema_basic {
   schema_max7string() {
     context.begin(L"document");
       context.begin(L"list");
-        context.begin(L"string",
-                      RA(wstring(L"el")), slotcfg(slotcfg::maximum, 7));
+        context.begin(L"node", RA(L"el", true), slotcfg(slotcfg::maximum, 7));
         context.end();
       context.end();
     context.end();
@@ -100,7 +99,7 @@ void object::test<15>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch in document>list>string(el) after token 1");
+                  "1:1 : mismatch in document>list>node(el) after token 1");
   }
 }
 

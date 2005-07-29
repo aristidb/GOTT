@@ -45,7 +45,7 @@ repatch_enumeration::deferred_write(writable_structure &s) const {
         std::vector<std::wstring>::const_iterator it;
         if ((it = find(range(alternatives), input)) == alternatives.end())
           throw failed_repatch(L"repatch_enumeration: could not match enumeration");
-        target.data(xany::Xany(long(it - alternatives.end())));
+        target.data(xany::Xany(long(it - alternatives.begin())));
       } else
         throw failed_repatch(L"repatch_enumeration: could not match enumeration");
     }

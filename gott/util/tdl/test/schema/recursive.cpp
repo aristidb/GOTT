@@ -21,7 +21,8 @@
 #include "common.hpp"
 #include <gott/util/tdl/schema/context_template.hpp>
 #include <gott/util/tdl/schema/slot.hpp>
-#include <gott/util/tdl/schema/types/literal.hpp>
+#include <gott/util/tdl/structure/types/enumeration.hpp>
+#include <gott/util/tdl/structure/types/integer.hpp>
 
 namespace util = gott::util;
 namespace schema = util::tdl::schema;
@@ -45,9 +46,10 @@ struct recursive : tut::schema_basic {
     document.end();
 
     type.begin(L"ordered", rule::attributes(false));
-      type.begin(L"integer");
+      type.begin(L"node", rule::attributes(true, new stru::repatch_integer()));
       type.end();
-      type.begin(L"ordered", rule::attributes(false), slotcfg(slotcfg::optional));
+      type.begin(L"ordered", rule::attributes(false), 
+                 slotcfg(slotcfg::optional));
         type.param(0);
       type.end();
     type.end();
