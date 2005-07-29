@@ -34,7 +34,8 @@ struct schema_basic {
   std::wstring rest;
   schema_basic() : match(tree) {}
   void run_test(std::wstring const &input) {
-    match.add(context.get());
+    gott::util::tdl::schema::context::entry e = context.get();
+    match.add(*e.factory, e.repatcher);
     std::wistringstream stream(input);
     gott::util::tdl::simple::parse(stream, match, match.get_debug());
     rest = stream.str().c_str() + stream.tellg();

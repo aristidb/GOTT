@@ -29,7 +29,8 @@ using structure::writable_structure;
 repatch_integer::repatch_integer() {}
 repatch_integer::~repatch_integer() {}
 
-writable_structure *repatch_integer::deferred_write(writable_structure &s) {
+writable_structure *
+repatch_integer::deferred_write(writable_structure &s) const {
   struct EXPORT context : repatch_node_context {
     context(writable_structure &s) : target(s) {}
 

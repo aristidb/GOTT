@@ -35,13 +35,14 @@ class EXPORT repatcher {
 public:
   repatcher();
   virtual ~repatcher() = 0;
-  virtual writable_structure *deferred_write(writable_structure &) = 0;
+  virtual writable_structure *deferred_write(writable_structure &) const = 0;
 };
 
 class EXPORT repatch_nothing : public repatcher {
 public:
+  repatch_nothing();
   ~repatch_nothing();
-  virtual writable_structure *deferred_write(writable_structure &) = 0;
+  writable_structure *deferred_write(writable_structure &) const;
 };
 
 class repatch_node_context : public writable_structure {

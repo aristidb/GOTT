@@ -28,7 +28,7 @@
 namespace gott {
 namespace util {
 namespace tdl {
-namespace structure { class repatch; }
+namespace structure { class repatcher; }
 
 namespace schema {
 
@@ -36,6 +36,8 @@ namespace schema {
  * Memory-owning context class.
  */
 class context : public boost::noncopyable {
+  class IMPL;
+
 public:
   context() EXPORT;
   ~context() EXPORT;
@@ -52,7 +54,7 @@ public:
   void begin(unsigned rule_id,
              rule::attributes const &attr = rule::attributes(),
              boost::optional<slotcfg> const &slt = boost::none,
-             structure::repatch *r = 0);
+             structure::repatcher const *r = 0);
 
   /**
    * Begin the declaration of a "rule".
@@ -66,7 +68,7 @@ public:
   void begin(std::wstring const &name,
              rule::attributes const &attr = rule::attributes(),
              boost::optional<slotcfg> const &slt = boost::none,
-             structure::repatch *r = 0) EXPORT;
+             structure::repatcher const *r = 0) EXPORT;
 
   /**
    * End the declaration of a "rule".
@@ -82,13 +84,19 @@ public:
    */
   void ref(context const &other) EXPORT;
 
+  struct entry {
+    rule::factory const *factory;
+    structure::repatcher const *repatcher;
+    entry(rule::factory const *f, structure::repatcher const *rr) 
+      : factory(f), repatcher(rr) {}
+  };
+
   /**
    * Instantiate the context.
    */
-  rule::factory const &get() const EXPORT;
+  EXPORT entry get() const;
 
 private:
-  class IMPL;
   boost::scoped_ptr<IMPL> p;
 };
 

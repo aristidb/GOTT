@@ -87,7 +87,7 @@ public:
    * \param rf The rule-factory specifying the to-be-added rule.
    * \param r The wrapping repatcher.
    */
-  void add(rule::factory const &rf, structure::repatcher *r) EXPORT;
+  void add(rule::factory const &rf, structure::repatcher const *r) EXPORT;
 
   /**
    * Return a reference to the tree the engine writes to.

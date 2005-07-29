@@ -34,9 +34,11 @@ repatcher::~repatcher() {}
 failed_repatch::failed_repatch(std::wstring const &s) : tdl_exception(s) {}
 failed_repatch::~failed_repatch() throw() {}
 
+repatch_nothing::repatch_nothing() {}
 repatch_nothing::~repatch_nothing() {}
 
-writable_structure *repatch_nothing::deferred_write(writable_structure &s) {
+writable_structure *
+repatch_nothing::deferred_write(writable_structure &s) const {
   struct context : writable_structure {
     writable_structure &target;
     context(writable_structure &s) : target(s) {}

@@ -53,7 +53,8 @@ struct test_base {
     tdl::schema::context c;
     c.begin(L"document");
     c.end();
-    match.add(c.get());
+    tdl::schema::context::entry e = c.get();
+    match.add(*e.factory, e.repatcher);
   }
 };
 
