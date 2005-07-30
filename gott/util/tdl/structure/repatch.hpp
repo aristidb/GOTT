@@ -59,20 +59,6 @@ public:
   writable_structure *deferred_write(writable_structure &) const;
 };
 
-}}
-
-namespace xany {
-GOTT_UTIL_XANY_DECLARE_PROMOTER(tdl::structure::repatch_nothing *, 
-                                tdl::structure::repatcher *);
-}
-
-}}
-
-#if 1
-
-// FIXME FIXME FIXME DIRTY HACK just for testing
-__attribute__((visibility("default"))) extern char const _ZTSPN4gott4util3tdl9structure9repatcherE[];
-
-#endif
+}}}}
 
 #endif

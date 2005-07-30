@@ -44,12 +44,12 @@ public:
   enum { cancelled = size_t(-1) };
   size_t count;
 
-  IMPL(mode mm = one, type_t tt = size_t(1), size_t cc = 0)
+  IMPL(mode mm, type_t tt = size_t(1), size_t cc = 0)
   : m(mm), type(tt), count(cc) {}
 };
 
 slotcfg::slotcfg() 
-: p(new IMPL) {}
+: p(new IMPL(one)) {}
 
 slotcfg::slotcfg(slotcfg const &b)
 : p(new IMPL(b.p->m, b.p->type, b.p->count)) {}
@@ -69,7 +69,7 @@ slotcfg::slotcfg(function_mode mm, callback const &cb)
 slotcfg::~slotcfg() {}
 
 void slotcfg::operator=(slotcfg const &b) {
-  p.reset(new IMPL((b.p->m, b.p->type, b.p->count)));
+  p.reset(new IMPL(b.p->m, b.p->type, b.p->count));
 }
 
 void slotcfg::add() {
@@ -207,6 +207,7 @@ slotcfg slotcfg::no_optional() const {
   case function:
     return slotcfg(function, callback(denull(get<callback>(p->type))));
   }
+
   throw std::bad_exception();
 }
 
