@@ -18,30 +18,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_TDL_SCHEMA_POSITION_HPP
-#define GOTT_UTIL_TDL_SCHEMA_POSITION_HPP
+#include "stream_position.hpp"
 
-#include <gott/util/misc/commonheaders.hpp>
-#include <gott/util/tdl/simple/parse/parser.hpp>
+using gott::util::tdl::schema::detail::line_pos;
 
-namespace gott {
-namespace util {
-namespace tdl {
-namespace schema {
-namespace detail {
+line_pos::line_pos() 
+  : line_new(0), line(0), pos(0), native_end(0), current(0), after(false) {}
 
-struct line_pos : public simple::line_logger {
-  line_pos();
-  void start_line();
-  void token(unsigned start, unsigned end, std::wstring const &nd);
-  void line_position(unsigned line_pos);
+void line_pos::start_line() { ++line_new; }
 
-  unsigned line_new, line, pos;
-  unsigned native_end, current;
-  std::wstring tok;
-  bool after;
-};
+void line_pos::token(unsigned p, unsigned e, std::wstring const &w) {
+  pos = p;
+  native_end = e;
+  tok = w;
+  line = line_new;
+}
 
-}}}}}
-
-#endif
+void line_pos::line_position(unsigned x) {
+  current = x;
+}

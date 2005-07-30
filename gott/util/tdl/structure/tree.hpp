@@ -179,18 +179,11 @@ public:
 #endif
 
 private:
-  typedef unsigned long tag;
-  
-  static boost::intrusive_ptr<node> erase(boost::intrusive_ptr<node>);
-  boost::intrusive_ptr<node> root, pos;
-  tag current_tag;
-  hashd::hash_map<tag, boost::intrusive_ptr<node> > tagpos;
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
 
   EXPORT friend void intrusive_ptr_add_ref(node *);
   EXPORT friend void intrusive_ptr_release(node *);
-
-  bool del_since(boost::intrusive_ptr<node> &, tag);
-  void foo();
 };
 
 /**

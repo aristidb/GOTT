@@ -26,40 +26,51 @@ using std::list;
 using gott::util::xany::Xany;
 using gott::util::tdl::structure::direct_print;
 
+class direct_print::IMPL {
+public:
+  IMPL(wostream &o, unsigned s)
+  : out(o), level(-s), step(s), line_ended(true), tag_printed(false) {}
+  
+  wostream &out;
+  unsigned level;
+  unsigned const step;
+  bool line_ended, tag_printed;    
+};
+
 direct_print::direct_print(wostream &o, unsigned s) 
-: out(o), level(-s), step(s), line_ended(true), tag_printed(false) {}
+: p(new IMPL(o, s)) {}
 
 direct_print::~direct_print() {}
 
 void direct_print::begin() {
-  level += step;
-  if (!line_ended)
-    out << L'\n';
-  line_ended = true;
+  p->level += p->step;
+  if (!p->line_ended)
+    p->out << L'\n';
+  p->line_ended = true;
 }
 
 void direct_print::end() {
-  level -= step;
+  p->level -= p->step;
 }
 
 void direct_print::data(Xany const &x) {
-  for (unsigned i = 0; i < level; ++i)
-    out << L' ';
+  for (unsigned i = 0; i < p->level; ++i)
+    p->out << L' ';
   if (x.empty())
-    out << L'-';
+    p->out << L'-';
   else
-    out << x;
-  tag_printed = false;
-  line_ended = false;
+    p->out << x;
+  p->tag_printed = false;
+  p->line_ended = false;
 }
 
 void direct_print::add_tag(wstring const &s) {
-  if (tag_printed)
-    out << L", ";
+  if (p->tag_printed)
+    p->out << L", ";
   else
-    out << L" : ";
-  out << s;
-  tag_printed = true;
+    p->out << L" : ";
+  p->out << s;
+  p->tag_printed = true;
 }
 
 void direct_print::set_tags(list<wstring> const &l) {

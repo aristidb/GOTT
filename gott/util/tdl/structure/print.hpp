@@ -49,10 +49,8 @@ private:
   void add_tag(std::wstring const &);
   void set_tags(std::list<std::wstring> const &);
 
-  std::wostream &out;
-  unsigned level;
-  unsigned const step;
-  bool line_ended, tag_printed;
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
 };
 
 /**

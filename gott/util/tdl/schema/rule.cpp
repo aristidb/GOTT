@@ -68,7 +68,7 @@ void rule::finish() {
   pIMPL->end_structure();
 }
 
-rule::~rule() { delete pIMPL; }
+rule::~rule() {}
 
 rule::attributes const &rule::get_attributes() const { return pIMPL->attrib; }
 match &rule::matcher() { return *pIMPL->cont; }

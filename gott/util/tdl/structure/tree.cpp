@@ -41,13 +41,27 @@ writable_structure::~writable_structure() {}
 revocable_structure::~revocable_structure() {}
 copyable_structure::~copyable_structure() {}
 
+class tree::IMPL {
+public:
+  IMPL() : current_tag(0) {}
+
+  typedef unsigned long tag;
+  
+  static boost::intrusive_ptr<node> erase(boost::intrusive_ptr<node>);
+  boost::intrusive_ptr<node> root, pos;
+  tag current_tag;
+  hashd::hash_map<tag, boost::intrusive_ptr<node> > tagpos;
+
+  bool del_since(boost::intrusive_ptr<node> &, tag);
+};
+
 struct tree::node {
   size_t use_count;
   Xany data;
   list<wstring> tags;
   intrusive_ptr<node> child0, lastchild, dad, sibling, last;
   size_t size;
-  tree::tag ttag;
+  IMPL::tag ttag;
   
   class index;
   scoped_ptr<index> indx;
@@ -92,7 +106,7 @@ struct tree::node {
     }
   };
   
-  node(tree::tag t) : use_count(0), size(0), ttag(t) {}
+  node(IMPL::tag t) : use_count(0), size(0), ttag(t) {}
 
   bool equals(node const &) const;
 };
@@ -106,7 +120,7 @@ void stru::intrusive_ptr_release(tree::node *p) {
     delete p;
 }
 
-intrusive_ptr<tree::node> tree::erase(intrusive_ptr<node> x) {
+intrusive_ptr<tree::node> tree::IMPL::erase(intrusive_ptr<node> x) {
   --x->dad->size;
 
   if (x->sibling) 
@@ -124,65 +138,65 @@ intrusive_ptr<tree::node> tree::erase(intrusive_ptr<node> x) {
   return x->sibling;
 }
 
-tree::tree() : current_tag(0) {}
+tree::tree() : p(new IMPL) {}
 tree::~tree() {}
 
 void tree::begin() {
-  if (!pos) {
-    root = intrusive_ptr<node>(new node(current_tag));
-    pos = root;
+  if (!p->pos) {
+    p->root = intrusive_ptr<node>(new node(p->current_tag));
+    p->pos = p->root;
     return;
   }
   
-  intrusive_ptr<node> nn(new node(current_tag));
-  nn->dad = pos;
+  intrusive_ptr<node> nn(new node(p->current_tag));
+  nn->dad = p->pos;
 
-  if (!pos->child0) {
-    pos->child0 = nn;
-    pos->lastchild = nn;
+  if (!p->pos->child0) {
+    p->pos->child0 = nn;
+    p->pos->lastchild = nn;
   } else {
-    pos->lastchild->sibling = nn;
-    nn->last = pos->lastchild;
-    pos->lastchild = nn;
+    p->pos->lastchild->sibling = nn;
+    nn->last = p->pos->lastchild;
+    p->pos->lastchild = nn;
   }
   
-  ++pos->size;
+  ++p->pos->size;
   
-  pos = nn;
+  p->pos = nn;
 }
 
 void tree::end() {
-  if (pos != root)
-    pos = pos->dad;
+  if (p->pos != p->root)
+    p->pos = p->pos->dad;
 }
 
 void tree::data(Xany const &x) {
-  pos->data = x;
+  p->pos->data = x;
 }
 
 void tree::add_tag(wstring const &s) {
-  pos->tags.push_back(s);
+  p->pos->tags.push_back(s);
 }
 
 void tree::set_tags(list<wstring> const &l) {
-  pos->tags = l;
+  p->pos->tags = l;
 }
 
 revocable_structure::pth tree::point() {
-  tagpos[++current_tag] = pos;
-  return current_tag;
+  p->tagpos[++p->current_tag] = p->pos;
+  return p->current_tag;
 }
 
 void tree::revert(revocable_structure::pth const &mp) {
-  del_since(root, mp);
-  pos = tagpos[mp];
+  p->del_since(p->root, mp);
+  p->pos = p->tagpos[mp];
 }
 
-void tree::get_rid_of(revocable_structure::pth const &p) {
-  tagpos.erase(tagpos.find(p));
+void tree::get_rid_of(revocable_structure::pth const &x) {
+  p->tagpos.erase(p->tagpos.find(x));
 }
 
-bool tree::del_since(intrusive_ptr<node> &n, tag t) {
+bool tree::IMPL::del_since(intrusive_ptr<node> &n, tag t) {
   for (intrusive_ptr<node> i = n->child0; i;)
     if (del_since(i, t)) 
       i = erase(i);
@@ -214,7 +228,7 @@ tree::iterator tree::iterator::next() const { return n->sibling; }
 Xany const &tree::iterator::get_data() const { return n->data; }
 list<wstring> const &tree::iterator::get_tags() const { return n->tags; }
 
-tree::iterator tree::get_root() const { return root; }
+tree::iterator tree::get_root() const { return p->root; }
 
 bool tree::iterator::contents_equal(iterator const &o) const {
   return n->equals(*o.n);
@@ -271,11 +285,11 @@ void tree::copy_to(writable_structure &target) const {
       target.end();
     }
   } visitor = {target};
-  visitor(root);
+  visitor(p->root);
 }
 
 bool tree::operator==(tree const &o) const {
-  return root->equals(*o.root);
+  return p->root->equals(*o.p->root);
 }
 
 bool tree::node::equals(node const &o) const {
@@ -319,7 +333,6 @@ std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
 using std::wostream;
 
 void tree::dump(wostream &stream) {
-  intrusive_ptr<node> it = root;
   struct visitor {
     wostream &out;
     unsigned level;
@@ -352,7 +365,7 @@ void tree::dump(wostream &stream) {
     }
     visitor(wostream &oo, intrusive_ptr<node> p) : out(oo), level(0), pp(p) {}
   };
-  visitor v(stream, pos);
-  v(root);
+  visitor v(stream, p->pos);
+  v(p->root);
 }
 #endif

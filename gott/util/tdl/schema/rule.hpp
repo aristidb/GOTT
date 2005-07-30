@@ -139,7 +139,9 @@ protected:
 
 private:
   class IMPL;
-  IMPL *pIMPL;
+  boost::scoped_ptr<IMPL> pIMPL;
+
+  rule();
 };
 
 }}}}

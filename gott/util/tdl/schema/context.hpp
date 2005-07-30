@@ -92,16 +92,8 @@ public:
   rule::factory const &get() const EXPORT;
 
 private:
-  typedef std::vector<rule::factory *> container;
-  container pool;
-  rule::factory const *first;
-  std::list<rule::factory *> org;
-
-  void add_child(rule::factory const *, boost::optional<slotcfg> const &);
-  void add_slotted(rule::factory const *, slotcfg const &);
-  void add_enc_slotted(rule::factory const *, slotcfg const &,
-                       boost::optional<slotcfg> const & = boost::none);
-  void add_owned(rule::factory *, boost::optional<slotcfg> const &);
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
 };
 
 /**

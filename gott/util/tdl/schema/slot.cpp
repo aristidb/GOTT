@@ -27,45 +27,76 @@ using boost::get;
 using gott::util::tdl::schema::rule;
 using gott::util::tdl::schema::slotcfg;
 
-slotcfg::slotcfg() : m(one), count(0) {}
+class slotcfg::IMPL {
+public:
+  mode m;
 
-slotcfg::slotcfg(slotcfg const &b) : m(b.m), type(b.type), count(b.count) {}
+  typedef
+    boost::variant<
+      std::size_t,
+      std::pair<std::size_t, std::size_t>,
+      callback
+    >
+  type_t;
+
+  type_t type;
+
+  enum { cancelled = size_t(-1) };
+  size_t count;
+
+  IMPL(mode mm = one, type_t tt = size_t(1), size_t cc = 0)
+  : m(mm), type(tt), count(cc) {}
+};
+
+slotcfg::slotcfg() 
+: p(new IMPL) {}
+
+slotcfg::slotcfg(slotcfg const &b)
+: p(new IMPL(b.p->m, b.p->type, b.p->count)) {}
 
 slotcfg::slotcfg(simple_mode mm) 
-: m(mm), count(0) {}
+: p(new IMPL(mm)) {}
 
 slotcfg::slotcfg(sized_mode mm, size_t s)
-: m(mm), type(s), count(0) {}
+: p(new IMPL(mm, s)) {}
 
 slotcfg::slotcfg(range_mode mm, size_t a, size_t b)
-: m(mm), type(make_pair(a, b)), count(0) {}
+: p(new IMPL(mm, make_pair(a, b))) {}
 
 slotcfg::slotcfg(function_mode mm, callback const &cb)
-: m(mm), type(cb), count(0) {}
+: p(new IMPL(mm, cb)) {}
 
 slotcfg::~slotcfg() {}
 
+void slotcfg::operator=(slotcfg const &b) {
+  p.reset(new IMPL((b.p->m, b.p->type, b.p->count)));
+}
+
 void slotcfg::add() {
-  ++count;
+  ++p->count;
+}
+
+slotcfg::mode slotcfg::get_mode() const {
+  return p->m;
 }
 
 rule::expect slotcfg::expectation() const {
-  if (count == cancelled)
+  if (p->count == IMPL::cancelled)
     return rule::nothing;
   
-  switch (m) {
+  switch (p->m) {
   case one:
-    if (count == 1)
+    if (p->count == 1)
       return rule::nothing;
-    else if (count == 0)
+    else if (p->count == 0)
       return rule::need;
     else
       return rule::over_filled;
 
   case optional:
-    if (count == 0)
+    if (p->count == 0)
       return rule::maybe;
-    else if (count == 1)
+    else if (p->count == 1)
       return rule::nothing;
     else
       return rule::over_filled;
@@ -74,70 +105,70 @@ rule::expect slotcfg::expectation() const {
     return rule::maybe;
 
   case some:
-    if (count > 0)
+    if (p->count > 0)
       return rule::maybe;
     else
       return rule::need;
 
   case exact:
-    if (count < get<size_t>(type))
+    if (p->count < get<size_t>(p->type))
       return rule::need;
-    else if (count == get<size_t>(type))
+    else if (p->count == get<size_t>(p->type))
       return rule::nothing;
     else
       return rule::over_filled;
 
   case minimum:
-    if (count >= get<size_t>(type))
+    if (p->count >= get<size_t>(p->type))
       return rule::maybe;
     else
       return rule::need;
 
   case maximum:
-    if (count < get<size_t>(type))
+    if (p->count < get<size_t>(p->type))
       return rule::maybe;
-    else if (count == get<size_t>(type))
+    else if (p->count == get<size_t>(p->type))
       return rule::nothing;
     else
       return rule::over_filled;
 
   case range:
-    if (count < get<pair<size_t, size_t> >(type).first)
+    if (p->count < get<pair<size_t, size_t> >(p->type).first)
       return rule::need;
-    if (count >= get<pair<size_t, size_t> >(type).first
-        && count < get<pair<size_t, size_t> >(type).second)
+    if (p->count >= get<pair<size_t, size_t> >(p->type).first
+        && p->count < get<pair<size_t, size_t> >(p->type).second)
       return rule::maybe;
-    else if (count == get<pair<size_t, size_t> >(type).second)
+    else if (p->count == get<pair<size_t, size_t> >(p->type).second)
       return rule::nothing;
     else
       return rule::over_filled;
 
   case function:
-    return get<callback>(type)(count);
+    return get<callback>(p->type)(p->count);
   }
 
   throw std::bad_exception();
 }
 
 void slotcfg::cancel() {
-  count = cancelled;
+  p->count = IMPL::cancelled;
 }
 
 bool slotcfg::prefix_optional() const {
-  switch (m) {
+  switch (p->m) {
   case optional:
   case list:
   case maximum:
     return true;
 
   case minimum:
-    return get<size_t>(type) == 0;
+    return get<size_t>(p->type) == 0;
 
   case range:
-    return get<pair<size_t, size_t> >(type).first == 0;
+    return get<pair<size_t, size_t> >(p->type).first == 0;
 
   case function:
-    return get<callback>(type)(0) > 0;
+    return get<callback>(p->type)(0) > 0;
   }
 
   return false;
@@ -157,24 +188,24 @@ namespace {
 }
 
 slotcfg slotcfg::no_optional() const {
-  switch (m) {
+  switch (p->m) {
   case optional:
     return slotcfg(one);
   case list:
     return slotcfg(some);
   case maximum:
-    return slotcfg(range, 1, get<size_t>(type));
+    return slotcfg(range, 1, get<size_t>(p->type));
 
   case minimum:
-    return slotcfg(minimum, !get<size_t>(type) ? 1 : get<size_t>(type));
+    return slotcfg(minimum, !get<size_t>(p->type) ? 1 : get<size_t>(p->type));
 
   case range:
-    if (get<pair<size_t, size_t> >(type).first == 0)
-      return slotcfg(range, 1, get<pair<size_t, size_t> >(type).second);
+    if (get<pair<size_t, size_t> >(p->type).first == 0)
+      return slotcfg(range, 1, get<pair<size_t, size_t> >(p->type).second);
     return *this;
 
   case function:
-    return slotcfg(function, callback(denull(get<callback>(type))));
+    return slotcfg(function, callback(denull(get<callback>(p->type))));
   }
   throw std::bad_exception();
 }

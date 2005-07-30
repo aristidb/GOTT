@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "../exceptions.hpp"
-#include "position.hpp"
+#include "stream_position.hpp"
 
 namespace schema = gott::util::tdl::schema;
 using schema::mismatch;

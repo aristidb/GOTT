@@ -117,18 +117,20 @@ public:
   /// Constructor.
   slotcfg(function_mode, callback const &) EXPORT;
 
-  /// Constructor.
+  /// Copy-Constructor.
   slotcfg(slotcfg const &) EXPORT;
 
   /// Destructor.
   ~slotcfg() EXPORT;
+
+  void operator=(slotcfg const &o) EXPORT;
 
   /// Whether the object accepts 0 children.
   bool prefix_optional() const;
   /// A variant of the object that does not accept 0 children.
   slotcfg no_optional() const;
   /// The mode the object is in.
-  mode get_mode() const { return m; }
+  mode get_mode() const EXPORT;
 
   /// Add an element.
   void add() EXPORT;
@@ -138,20 +140,8 @@ public:
   rule::expect expectation() const EXPORT;
 
 private:
-  mode m;
-
-  typedef
-    boost::variant<
-      std::size_t,
-      std::pair<std::size_t, std::size_t>,
-      callback
-    >
-  type_t;
-
-  type_t type;
-
-  enum { cancelled = size_t(-1) };
-  std::size_t count;
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
 };
 
 /**

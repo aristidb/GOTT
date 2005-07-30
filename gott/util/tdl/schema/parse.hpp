@@ -115,7 +115,9 @@ private:
 
 private:
   class IMPL;
-  IMPL *pIMPL;
+  boost::scoped_ptr<IMPL> pIMPL;
+
+  match();
 };
 
 }}}}

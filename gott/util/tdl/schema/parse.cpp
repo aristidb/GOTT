@@ -22,7 +22,7 @@
 #include "rule_factory.hpp"
 #include "event.hpp"
 #include "../exceptions.hpp"
-#include "position.hpp"
+#include "stream_position.hpp"
 #include "parse_position.hpp"
 #include "../structure/repatch.hpp"
 
@@ -95,7 +95,7 @@ match::match(rule::factory const &f, structure::revocable_structure &p)
   pIMPL->add(f);
 }
 
-match::~match() { delete pIMPL; }
+match::~match() {}
 
 void match::add(rule::factory const &rf) {
   pIMPL->add(rf);

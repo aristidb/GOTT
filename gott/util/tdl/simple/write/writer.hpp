@@ -29,15 +29,6 @@ namespace tdl {
 namespace simple {
 
 class writer {
-  std::wostream &stream;
-  unsigned level;
-  unsigned indentation_width;
-  bool newline;
-  bool last_block;
-  bool level_change;
-
-  void indent();
-  void print_as_block(std::wstring const &s);
 public:
   EXPORT writer(std::wostream &, unsigned = 4);
   EXPORT void down();
@@ -49,6 +40,10 @@ public:
   EXPORT void end_document();
 
   EXPORT class non_conformant_block {};
+
+private:
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
 };
 
 }}}}
