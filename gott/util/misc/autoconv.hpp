@@ -39,7 +39,7 @@ basic_ostream<C, CT> &operator<<(basic_ostream<C, CT> &s, print_ptr const &p) {
 
 inline ostream &operator<<(ostream &o, wchar_t const *in) {
   typedef codecvt<wchar_t, char, mbstate_t> CCV;
-  CCV const &c = use_facet<CCV>(std::locale());
+  CCV const &c = use_facet<CCV>(o.getloc());
   mbstate_t st = mbstate_t();
   size_t l = wcslen(in);
   string out(l / c.encoding(), '$');
