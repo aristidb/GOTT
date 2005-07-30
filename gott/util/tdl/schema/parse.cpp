@@ -40,7 +40,7 @@ class match::IMPL {
 public:
   IMPL(structure::revocable_structure &x, match &r);
 
-  void add(rule::factory const &);
+  void add(rule_factory const &);
 
   template<class T>
   void handle_token(T const &);
@@ -69,7 +69,7 @@ public:
   positioning pos;
 
   match &ref;
-  detail::line_pos ln;
+  detail::stream_position ln;
 
   struct entry {
     shared_ptr<rule> the_rule;
@@ -90,14 +90,14 @@ public:
 
 match::match(structure::revocable_structure &p) : pIMPL(new IMPL(p, *this)) {}
 
-match::match(rule::factory const &f, structure::revocable_structure &p)
+match::match(rule_factory const &f, structure::revocable_structure &p)
 : pIMPL(new IMPL(p, *this)) {
   pIMPL->add(f);
 }
 
 match::~match() {}
 
-void match::add(rule::factory const &rf) {
+void match::add(rule_factory const &rf) {
   pIMPL->add(rf);
 }
 
@@ -157,11 +157,11 @@ shared_ptr<writable_structure> const&match::IMPL::direct_structure_non_base() {
   return parse.back().structure;
 }
 
-void match::IMPL::add(rule::factory const &f) {
+void match::IMPL::add(rule_factory const &f) {
   shared_ptr<writable_structure> struc = direct_structure_non_base();
   Stack::iterator it = --parse.end();
   shared_ptr<rule> x(f.get(ref));
-  if (structure::repatcher const *r = x->get_attributes().repatcher())
+  if (structure::repatcher const *r = x->attributes().repatcher())
     struc.reset(r->deferred_write(struc ? *struc : base_struc));
   parse.insert(++it, entry(x, struc));
 }
@@ -257,9 +257,9 @@ void match::IMPL::fail_all() {
 wstring match::IMPL::get_name(shared_ptr<rule> const &rp) {
   std::wostringstream out;
   out << rp->name();
-  if (!rp->get_attributes().tags().empty()) {
+  if (!rp->attributes().tags().empty()) {
     out << L'(';
-    print_separated(out, range(rp->get_attributes().tags()), L",");
+    print_separated(out, range(rp->attributes().tags()), L",");
     out << L')';
   }
   return out.str();

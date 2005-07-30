@@ -24,41 +24,42 @@
 #include "rule_factory.hpp"
 
 using boost::optional;
-using gott::util::tdl::schema::rule;
 using gott::util::tdl::schema::context;
+using gott::util::tdl::schema::rule;
+using gott::util::tdl::schema::rule_factory;
 
 class context::IMPL {
 public:
-  typedef std::vector<rule::factory *> container;
+  typedef std::vector<rule_factory *> container;
   container pool;
-  rule::factory const *first;
-  std::list<rule::factory *> org;
+  rule_factory const *first;
+  std::list<rule_factory *> org;
 
-  void begin(unsigned, rule::attributes const &, optional<slotcfg> const &);
+  void begin(unsigned, rule_attr const &, optional<slotcfg> const &);
   void end();
   void ref(context const &);
 
-  void add_child(rule::factory const *, boost::optional<slotcfg> const &);
-  void add_slotted(rule::factory const *, slotcfg const &);
-  void add_enc_slotted(rule::factory const *, slotcfg const &,
+  void add_child(rule_factory const *, boost::optional<slotcfg> const &);
+  void add_slotted(rule_factory const *, slotcfg const &);
+  void add_enc_slotted(rule_factory const *, slotcfg const &,
                        boost::optional<slotcfg> const & = boost::none);
-  void add_owned(rule::factory *, boost::optional<slotcfg> const &);
+  void add_owned(rule_factory *, boost::optional<slotcfg> const &);
 
   IMPL() : first(0) {}
   ~IMPL() { 
-    for_each(range(pool), boost::checked_delete<rule::factory>); 
+    for_each(range(pool), boost::checked_delete<rule_factory>); 
   }
 };
 
 context::context() : p(new IMPL) {}
 context::~context() {}
 
-void context::begin(std::wstring const &n, rule::attributes const &a,
+void context::begin(std::wstring const &n, rule_attr const &a,
                     optional<slotcfg> const &c) {
   begin(name_manager().get(n), a, c);
 }
 
-void context::begin(unsigned i, rule::attributes const &a, 
+void context::begin(unsigned i, rule_attr const &a, 
                     optional<slotcfg> const &c) {
   p->begin(i, a, c);
 }
@@ -71,13 +72,13 @@ void context::ref(context const &other) {
   p->ref(other);
 }
 
-rule::factory const &context::get() const {
+rule_factory const &context::get() const {
   return *p->first;
 }
 
-void context::IMPL::begin(unsigned i, rule::attributes const &a,
+void context::IMPL::begin(unsigned i, rule_attr const &a,
                           optional<slotcfg> const &c) {
-  rule::factory *f = get_factory(i, a);
+  rule_factory *f = get_factory(i, a);
   pool.push_back(f);
   add_owned(f, c);
 }
@@ -90,12 +91,12 @@ void context::IMPL::ref(context const &other) {
   add_child(&other.get(), boost::none);
 }
 
-void context::IMPL::add_owned(rule::factory *f, optional<slotcfg> const &c) {
+void context::IMPL::add_owned(rule_factory *f, optional<slotcfg> const &c) {
   add_child(f, c);
   org.push_back(f);
 }
 
-void context::IMPL::add_child(rule::factory const *f, 
+void context::IMPL::add_child(rule_factory const *f, 
                               optional<slotcfg> const &c) {
   if (!org.empty())
     if (!c)
@@ -106,8 +107,8 @@ void context::IMPL::add_child(rule::factory const *f,
     first = f;
 }
 
-void context::IMPL::add_slotted(rule::factory const *f, slotcfg const &c) {
-  rule::factory::with_slotcfg *w = org.back()->get_with_slotcfg();
+void context::IMPL::add_slotted(rule_factory const *f, slotcfg const &c) {
+  rule_factory::with_slotcfg *w = org.back()->get_with_slotcfg();
 
   if (!w)
     return add_enc_slotted(f, c);
@@ -120,13 +121,13 @@ void context::IMPL::add_slotted(rule::factory const *f, slotcfg const &c) {
     add_enc_slotted(f, c);
 }
 
-void context::IMPL::add_enc_slotted(rule::factory const *f, slotcfg const &c,
+void context::IMPL::add_enc_slotted(rule_factory const *f, slotcfg const &c,
                                     optional<slotcfg> const &e) {
   if (c.get_mode() == slotcfg::one)
     return org.back()->add(*f);
 
   static unsigned const list_id = name_manager().get(L"list");
-  begin(list_id, rule::attributes(false), e);
+  begin(list_id, rule_attr(false), e);
     add_child(f, c);
   end();
 }

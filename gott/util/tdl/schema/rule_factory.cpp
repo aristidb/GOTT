@@ -22,16 +22,16 @@
 #include "slot.hpp"
 
 using std::vector;
-using gott::util::tdl::schema::rule;
+using gott::util::tdl::schema::rule_factory;
 namespace factory_template = gott::util::tdl::schema::factory_template;
 
-void rule::factory::add(rule::factory const &f, unsigned) {
+void rule_factory::add(rule_factory const &f, unsigned) {
   add(f);
 }
 
-rule::factory::~factory() {}
+rule_factory::~rule_factory() {}
 
-rule::factory::with_slotcfg *rule::factory::get_with_slotcfg() {
+rule_factory::with_slotcfg *rule_factory::get_with_slotcfg() {
   return dynamic_cast<with_slotcfg *>(this);
 }
 
@@ -51,7 +51,7 @@ unsigned add_factory(factory_template::rule_factory_builder x) {
   return builders().size() - 1;
 }
 
-rule::factory *get_factory(unsigned x, rule::attributes const &a) {
+rule_factory *get_factory(unsigned x, rule_attr const &a) {
   return builders().at(x)(a);
 }
 

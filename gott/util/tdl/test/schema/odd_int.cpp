@@ -33,6 +33,7 @@ using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
 using schema::rule;
+using schema::rule_attr;
 
 rule::expect odd(std::size_t c) {
   return c % 2 ? rule::maybe : rule::need;
@@ -43,7 +44,7 @@ struct schema_odd_int : tut::schema_basic {
   schema_odd_int() {
     context.begin(L"document");
       context.begin(L"list");
-        context.begin(L"node", rule::attributes(L"el", true,
+        context.begin(L"node", rule_attr(L"el", true,
                                                    new stru::repatch_integer()),
                       slotcfg(slotcfg::function, odd));
         context.end();

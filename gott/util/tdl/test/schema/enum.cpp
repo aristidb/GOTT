@@ -30,7 +30,7 @@ using std::vector;
 using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
-using schema::rule;
+using schema::rule_attr;
 using stru::repatch_enumeration;
 
 namespace {
@@ -39,8 +39,8 @@ struct schema_enumeration : tut::schema_basic {
     context.begin(L"document");
       vector<wstring> v(3);
       v[0] = L"first"; v[1] = L"second"; v[2] = L"third";
-      context.begin(L"node", rule::attributes(std::list<wstring>(), true, 0, 
-                                              new repatch_enumeration(v)));
+      context.begin(L"node", rule_attr(std::list<wstring>(), true, Xany(),
+                                       new repatch_enumeration(v)));
       context.end();
     context.end();
   }

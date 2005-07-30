@@ -28,15 +28,16 @@ using std::wstring;
 namespace schema = gott::util::tdl::schema;
 using schema::match;
 using schema::rule;
-namespace ev = gott::util::tdl::schema::ev;
+using schema::rule_attr;
+namespace ev = schema::ev;
 using gott::util::tdl::structure::writable_structure;
 
 class rule::IMPL {
 public:
   match *cont;
-  attributes attrib;
+  rule_attr attrib;
 
-  IMPL(match &m, attributes const &a) 
+  IMPL(match &m, rule_attr const &a) 
   : cont(&m), attrib(a) {
     start_structure();
     add_tags();
@@ -60,7 +61,7 @@ private:
   }
 };
 
-rule::rule(attributes const &a, match &m) 
+rule::rule(rule_attr const &a, match &m) 
 : pIMPL(new IMPL(m, a)) {
 }
 
@@ -70,7 +71,7 @@ void rule::finish() {
 
 rule::~rule() {}
 
-rule::attributes const &rule::get_attributes() const { return pIMPL->attrib; }
+rule_attr const &rule::attributes() const { return pIMPL->attrib; }
 match &rule::matcher() { return *pIMPL->cont; }
 
 bool rule::play(ev::begin_parse const &) { return false; }

@@ -29,13 +29,13 @@ using u::xany::Xany;
 using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
-using schema::rule;
+using schema::rule_attr;
 
 namespace {
 struct schema_literal : tut::schema_basic {
   schema_literal() {
     context.begin(L"document");
-      context.begin(L"node", rule::attributes(L"foobar", true, 
+      context.begin(L"node", rule_attr(L"foobar", true, 
             new stru::repatch_enumeration(std::vector<wstring>(1, L"foobar"))));
       context.end();
     context.end();

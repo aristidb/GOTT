@@ -48,7 +48,7 @@ public:
    *               if unsure.
    */
   void begin(unsigned rule_id,
-             rule::attributes const &attr = rule::attributes(),
+             rule_attr const &attr = rule_attr(),
              boost::optional<slotcfg> const &slt = boost::none);
 
   /**
@@ -61,7 +61,7 @@ public:
    *               if unsure.
    */
   void EXPORT begin(std::wstring const &name,
-                    rule::attributes const &attr = rule::attributes(),
+                    rule_attr const &attr = rule_attr(),
                     boost::optional<slotcfg> const &slt = boost::none);
 
   /**
@@ -74,7 +74,7 @@ public:
    * A little convenience wrapper around begin.
    */
   template<class T>
-  void begin_t(rule::attributes const &attr, unsigned c = 0) {
+  void begin_t(rule_attr const &attr, unsigned c = 0) {
     begin(T::factory::index(), attr, c);
   }
 
@@ -89,7 +89,7 @@ public:
   /**
    * Instantiate the context.
    */
-  rule::factory const &get() const EXPORT;
+  rule_factory const &get() const EXPORT;
 
 private:
   class IMPL;

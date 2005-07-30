@@ -32,7 +32,7 @@ using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_12plus_int : tut::schema_basic {

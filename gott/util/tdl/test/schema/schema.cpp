@@ -32,12 +32,12 @@ using util::xany::Xany;
 using std::wstring;
 using namespace stru::cf;
 using schema::slotcfg;
-using schema::rule;
+using schema::rule_attr;
 
 using schema::match_named;
 
-rule::attributes ra(wchar_t const *t) { 
-  return rule::attributes(wstring(t)); 
+rule_attr ra(wchar_t const *t) { 
+  return rule_attr(wstring(t)); 
 }
 
 namespace {
@@ -64,7 +64,7 @@ struct Schema : tut::schema_basic {
 
   void module_id(schema::context_template &document) {
     document.begin(L"named", match_named::attributes(L"module"));
-      document.begin(L"follow", rule::attributes(false));
+      document.begin(L"follow", rule_attr(false));
         document.begin(L"node", ra(L"module-id"));
         document.end();
 
@@ -78,14 +78,14 @@ struct Schema : tut::schema_basic {
   void type_declarations(schema::context_template &document) {
     document.begin(L"list", ra(L"type-declarations"));
       document.begin(L"ordered", ra(L"type-declaration"));
-        document.begin(L"node", rule::attributes(L"export", true,
+        document.begin(L"node", rule_attr(L"export", true,
              new stru::repatch_enumeration(std::vector<wstring>(1, L"export"))),
              slotcfg(slotcfg::optional));
         document.end();
 
         document.begin(L"named", match_named::attributes(L"type", false));
-          document.begin(L"ordered", rule::attributes(false));
-            document.begin(L"follow", rule::attributes(L"T1", false, 0));
+          document.begin(L"ordered", rule_attr(false));
+            document.begin(L"follow", rule_attr(L"T1", false, 0));
               document.begin(L"node", ra(L"name"));
               document.end();
 
@@ -106,13 +106,13 @@ struct Schema : tut::schema_basic {
        {
          std::vector<wstring> choice(2);
          choice[0] = L"enclosed"; choice[1] = L"flat";
-         document.begin(L"node", rule::attributes(L"coat", true,
+         document.begin(L"node", rule_attr(L"coat", true,
                                         new stru::repatch_enumeration(choice)));
          document.end();
        }
 
        document.begin(L"follow", 
-                      rule::attributes(false));
+                      rule_attr(false));
          document.begin(L"named", 
                         match_named::attributes(L":", false),
                         slotcfg(slotcfg::optional));
@@ -148,7 +148,7 @@ struct Schema : tut::schema_basic {
         std::vector<wstring> single(4);
         single[0] = L"one";  single[1] = L"optional";
         single[2] = L"list"; single[3] = L"some";
-        document.begin(L"node", rule::attributes(L"slot", true, 
+        document.begin(L"node", rule_attr(L"slot", true, 
                                         new stru::repatch_enumeration(single)));
         document.end();
       }

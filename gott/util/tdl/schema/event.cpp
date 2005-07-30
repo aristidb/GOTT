@@ -20,6 +20,7 @@
 
 #include "event.hpp"
 #include "parse.hpp"
+#include "rule.hpp"
 
 namespace ev = gott::util::tdl::schema::ev;
 using gott::util::tdl::schema::rule;

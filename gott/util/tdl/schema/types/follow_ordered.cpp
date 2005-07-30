@@ -28,7 +28,7 @@ using schema::rule;
 using schema::match_follow_ordered;
 
 match_follow_ordered::match_follow_ordered(std::vector<element> const &c, 
-    rule::attributes const &a, match &m)
+    rule_attr const &a, match &m)
 : rule(a, m), children(c.begin(), c.end()), pos(children.begin()), 
     opened(0), saw_up(false), last(m.pos().current()) {
   init_rest_accept_empty();

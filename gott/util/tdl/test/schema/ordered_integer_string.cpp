@@ -30,7 +30,7 @@ using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
 
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_ordered_integer_string : tut::schema_basic {
@@ -38,7 +38,7 @@ struct schema_ordered_integer_string : tut::schema_basic {
     context.begin(L"document");
       context.begin(L"ordered");
         context.begin(L"node", 
-             schema::rule::attributes(true, new stru::repatch_integer()));
+             schema::rule_attr(true, new stru::repatch_integer()));
         context.end();
         context.begin(L"node");
         context.end();

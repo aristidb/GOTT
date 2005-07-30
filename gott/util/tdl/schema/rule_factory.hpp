@@ -21,7 +21,6 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_RULE_FACTORY_HPP
 #define GOTT_UTIL_TDL_SCHEMA_RULE_FACTORY_HPP
 
-#include "rule.hpp"
 #include "rule_attr.hpp"
 #include "../exceptions.hpp"
 
@@ -40,7 +39,8 @@ class slotcfg;
  * Classes implementing this can produce rule objects and are the standardized
  * way to do so.
  */
-struct EXPORT rule::factory {
+class EXPORT rule_factory {
+  public:   
   struct with_slotcfg;
 
   virtual bool accept_empty() const = 0;
@@ -57,7 +57,7 @@ struct EXPORT rule::factory {
    * \param child The rule-factory producing the child.
    * \param repatcher The surrounding repatcher.
    */
-  LOCAL virtual void add(factory const &child) = 0;
+  LOCAL virtual void add(rule_factory const &child) = 0;
 
   /**
    * Lets the produced rule have a child in a specific slot.
@@ -66,7 +66,7 @@ struct EXPORT rule::factory {
    * \param slot The slot to put the child into.
    * \param repatcher The surrounding repatcher.
    */
-  LOCAL virtual void add(factory const &child, unsigned slot);
+  LOCAL virtual void add(rule_factory const &child, unsigned slot);
 
   /**
    * Try to cast to a slotcfg-enabled rule-factory.
@@ -79,7 +79,7 @@ struct EXPORT rule::factory {
     //      SHALL NOT accept this slot-number: behaviour when
     //      passed this is undefined!
 
-  virtual ~factory() = 0;
+  virtual ~rule_factory() = 0;
 };
 
 /**
@@ -87,10 +87,10 @@ struct EXPORT rule::factory {
  */
 namespace factory_template {
 
-typedef std::vector<rule::factory const *> container;
+typedef std::vector<rule_factory const *> container;
 
 typedef
-  rule::factory *(*rule_factory_builder)(rule::attributes const &);
+  rule_factory *(*rule_factory_builder)(rule_attr const &);
 
 template<class T> struct enreg;
 
@@ -98,32 +98,32 @@ template<class T> struct enreg;
 
 /*
  * template <class T>
- * class X : public rule::factory {
+ * class X : public rule_factory {
  * public:
- *   X(rule::attributes const &attr, [unsigned nochild]);
+ *   X(rule_attr const &attr, [unsigned nochild]);
  *     // construct a factory that will produce with the given
  *    // attributes and the given number of children
  *
  *  static unsigned index();
  *    // return an index for this factory (parameter to get_factory)
  *
- *  static rule::factory *build(rule::attributes const&attr, unsigned nochild);
+ *  static rule_factory *build(rule_attr const&attr, unsigned nochild);
  *    // rule_factory_builder: build an instance of this type with
  *    // given parameters
  *
- *  ... (implementation of rule::factory, details)
+ *  ... (implementation of rule_factory, details)
  * };
  */
 
-template<class T> class nochild : public rule::factory {
+template<class T> class nochild : public rule_factory {
 public:
-  nochild(rule::attributes const &a) : attrib(a) {}
+  nochild(rule_attr const &a) : attrib(a) {}
 
   bool accept_empty() const {
     return T::accept_empty();
   }
 
-  void add(rule::factory const &child) { (void) child;
+  void add(rule_factory const &child) { (void) child;
     throw dont_accept(L"children in nochild<>");
   }
 
@@ -136,19 +136,19 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a) {
+  static rule_factory *build(rule_attr const &a) {
     return new nochild(a);
   }
 
 private:
-  rule::attributes attrib;
+  rule_attr attrib;
 };
 
-template<class T> class onechild : public rule::factory {
+template<class T> class onechild : public rule_factory {
 public:
-  onechild(rule::attributes const &a) : attrib(a) {}
+  onechild(rule_attr const &a) : attrib(a) {}
 
-  void add(rule::factory const &child) {
+  void add(rule_factory const &child) {
     sub = &child;
   }
 
@@ -161,7 +161,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a) {
+  static rule_factory *build(rule_attr const &a) {
     return new onechild(a);
   }
 
@@ -170,19 +170,19 @@ public:
   }
 
 private:
-  rule::factory const *sub;
-  rule::attributes attrib;
+  rule_factory const *sub;
+  rule_attr attrib;
 };
 
-template<class T, unsigned N> class somechildren : public rule::factory {
+template<class T, unsigned N> class somechildren : public rule_factory {
 public:
-  somechildren(rule::attributes const &a) : pos(0), attrib(a) {}
+  somechildren(rule_attr const &a) : pos(0), attrib(a) {}
 
-  void add(rule::factory const &child) {
+  void add(rule_factory const &child) {
     sub[pos++] = &child;
   }
 
-  void add(rule::factory const &child, unsigned slot) {
+  void add(rule_factory const &child, unsigned slot) {
     sub[slot] = &child;
     pos = slot + 1;
   }
@@ -196,7 +196,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a) {
+  static rule_factory *build(rule_attr const &a) {
     return new somechildren(a);
   }
 
@@ -205,20 +205,20 @@ public:
   }
 
 private:
-  rule::factory const *sub[N];
+  rule_factory const *sub[N];
   unsigned pos;
-  rule::attributes attrib;
+  rule_attr attrib;
 };
 
-template<class T> class manychildren : public rule::factory {
+template<class T> class manychildren : public rule_factory {
 public:
-  manychildren(rule::attributes const &a) : attrib(a) {}
+  manychildren(rule_attr const &a) : attrib(a) {}
 
-  void add(rule::factory const &child) {
+  void add(rule_factory const &child) {
     sub.push_back(&child);
   }
 
-  void add(rule::factory const &child, unsigned slot) {
+  void add(rule_factory const &child, unsigned slot) {
     if (sub.size() <= slot)
       sub.resize(slot + 1);
     sub[slot] = &child;
@@ -233,7 +233,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a) {
+  static rule_factory *build(rule_attr const &a) {
     return new manychildren(a);
   }
 
@@ -243,10 +243,10 @@ public:
 
 private:
   container sub;
-  rule::attributes attrib;
+  rule_attr attrib;
 };
 
-// A rule::factory will want to enregister itself (add_factory) 
+// A rule_factory will want to enregister itself (add_factory) 
 // and be assigned an index.
 // This little class eases that.
 template<class T> struct enreg {
@@ -257,18 +257,18 @@ template<class T> struct enreg {
 }
 
 /**
- * Add a rule::factory type to the database and return its assigned index.
+ * Add a rule_factory type to the database and return its assigned index.
  * \param x The builder of the type to be added.
  * \return The type's index.
  */
 unsigned add_factory(factory_template::rule_factory_builder x) EXPORT;
 
 /**
- * Get a rule::factory instance by its type's index.
+ * Get a rule_factory instance by its type's index.
  * \param x The type's index.
  * \param a The additional attributes.
  */
-rule::factory *get_factory(unsigned x, rule::attributes const &a);
+rule_factory *get_factory(unsigned x, rule_attr const &a);
 
 }}}}
 

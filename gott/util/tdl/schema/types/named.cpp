@@ -29,13 +29,14 @@ using gott::util::xany::Xany_cast;
 namespace schema = gott::util::tdl::schema;
 namespace ev = gott::util::tdl::schema::ev;
 using schema::rule;
+using schema::rule_attr;
 using schema::match_named;
 
-rule::attributes match_named::attributes(wstring const &s, bool cc) {
-  return rule::attributes(std::list<wstring>(1, s), cc, s);
+rule_attr match_named::attributes(wstring const &s, bool cc) {
+  return rule_attr(std::list<wstring>(1, s), cc, Xany(s));
 }
 
-match_named::match_named(rule::factory const &s, rule::attributes const &a, 
+match_named::match_named(rule_factory const &s, rule_attr const &a, 
                          match &m) 
 : rule(a, m), sub(s), state(read_none) {
   if (a.user().type() != typeid(wstring))
@@ -46,7 +47,7 @@ bool match_named::play(ev::node const &n) {
   if (state != read_none)
     return false;
 
-  if (n.get_data() == Xany_cast<wstring>(get_attributes().user())) {
+  if (n.get_data() == Xany_cast<wstring>(rule::attributes().user())) {
     state = read_node;
     return true;
   }

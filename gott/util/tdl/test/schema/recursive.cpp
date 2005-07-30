@@ -32,7 +32,7 @@ using util::xany::Xany;
 using std::wstring;
 using namespace stru::cf;
 using schema::slotcfg;
-using schema::rule;
+using schema::rule_attr;
 
 namespace {
 struct recursive : tut::schema_basic {
@@ -45,10 +45,10 @@ struct recursive : tut::schema_basic {
       document.param(0);
     document.end();
 
-    type.begin(L"ordered", rule::attributes(false));
-      type.begin(L"node", rule::attributes(true, new stru::repatch_integer()));
+    type.begin(L"ordered", rule_attr(false));
+      type.begin(L"node", rule_attr(true, new stru::repatch_integer()));
       type.end();
-      type.begin(L"ordered", rule::attributes(false), 
+      type.begin(L"ordered", rule_attr(false), 
                  slotcfg(slotcfg::optional));
         type.param(0);
       type.end();

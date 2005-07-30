@@ -146,18 +146,17 @@ private:
 
 /**
  * A rule-factory supporting slotcfg-objects. Accessed via 
- * rule::factory::get_with_slotcfg.
+ * rule_factory::get_with_slotcfg.
  */
-struct EXPORT rule::factory::with_slotcfg {
+struct EXPORT rule_factory::with_slotcfg {
   /**
    * Let the produced rule have a/another child.
    * Adds in the default location.
    * \param child The rule-factory producing the child.
    * \param cfg The "repetition definition" of the child.
-   * \param repatcher The surrounding repatcher.
    */
   LOCAL
-  virtual void add(factory const &child, slotcfg const &cfg) = 0;
+  virtual void add(rule_factory const &child, slotcfg const &cfg) = 0;
 
   /**
    * Lets the produced rule have a child in a specific slot.
@@ -165,10 +164,9 @@ struct EXPORT rule::factory::with_slotcfg {
    * \param child The rule-factory producing the child.
    * \param slot The slot to put the child into.
    * \param cfg The "repetition definition" of the child.
-   * \param repatcher The surrounding repatcher.
    */
   LOCAL
-  virtual void add(factory const &child, unsigned slot, slotcfg const &cfg);
+  virtual void add(rule_factory const&child, unsigned slot, slotcfg const &cfg);
 
   LOCAL
   virtual slotcfg::mode accepted_modes() const = 0;
@@ -181,8 +179,8 @@ struct EXPORT rule::factory::with_slotcfg {
 
 namespace detail {
   template<slotcfg::mode A> struct factory_with_slotcfg 
-  : public rule::factory, rule::factory::with_slotcfg {
-    void add(factory const &) { 
+  : public rule_factory, rule_factory::with_slotcfg {
+    void add(rule_factory const &) { 
       throw std::bad_cast(); 
     }
 
@@ -195,14 +193,14 @@ namespace factory_template {
 template<class T, slotcfg::simple_mode Def, slotcfg::mode Accepted> 
 struct slotcfg_onechild : public detail::factory_with_slotcfg<Accepted> {
 public:
-  slotcfg_onechild(rule::attributes const &a) : attrib(a) {}
+  slotcfg_onechild(rule_attr const &a) : attrib(a) {}
   
-  void add(rule::factory const &child) { 
+  void add(rule_factory const &child) { 
     sub = &child;
     scfg = slotcfg(Def);
   }
 
-  void add(rule::factory const &child, slotcfg const &cfg) { 
+  void add(rule_factory const &child, slotcfg const &cfg) { 
     sub = &child; 
     scfg = cfg;
   }
@@ -216,7 +214,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a) {
+  static rule_factory *build(rule_attr const &a) {
     return new slotcfg_onechild(a);
   }
 
@@ -225,31 +223,31 @@ public:
   }
 
 private:
-  rule::factory const *sub;
+  rule_factory const *sub;
   slotcfg scfg;
-  rule::attributes attrib;
+  rule_attr attrib;
 };
 
 template<class T, unsigned N, slotcfg::simple_mode Def, slotcfg::mode Accepted>
 class slotcfg_somechildren : public detail::factory_with_slotcfg<Accepted> {
 public:
-  slotcfg_somechildren(rule::attributes const &a) : pos(0), attrib(a) {}
+  slotcfg_somechildren(rule_attr const &a) : pos(0), attrib(a) {}
 
-  void add(rule::factory const &child) { 
+  void add(rule_factory const &child) { 
     add(child, slotcfg(Def));
   }
 
-  void add(rule::factory const &child, unsigned slot) {
+  void add(rule_factory const &child, unsigned slot) {
     add(child, slot, slotcfg(Def));
   }
 
-  void add(rule::factory const &child, slotcfg const &cfg) {
+  void add(rule_factory const &child, slotcfg const &cfg) {
     sub[pos] = child;
     scfg[pos] = cfg;
     ++pos;
   }
 
-  void add(rule::factory const &child, unsigned slot, slotcfg const &cfg) {
+  void add(rule_factory const &child, unsigned slot, slotcfg const &cfg) {
     pos = slot;
     add(child, cfg);
   }
@@ -263,7 +261,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a) {
+  static rule_factory *build(rule_attr const &a) {
     return new slotcfg_somechildren(a);
   }
 
@@ -272,32 +270,32 @@ public:
   }
 
 private:
-  rule::factory const *sub[N];
+  rule_factory const *sub[N];
   unsigned pos;
   slotcfg scfg[N];
-  rule::attributes attrib;
+  rule_attr attrib;
 };
 
 template<class T, slotcfg::simple_mode Def, slotcfg::mode Accepted>
 class slotcfg_manychildren : public detail::factory_with_slotcfg<Accepted> {
 public:
-  typedef std::pair<rule::factory const *, slotcfg> element;
+  typedef std::pair<rule_factory const *, slotcfg> element;
   
-  slotcfg_manychildren(rule::attributes const &a) : attrib(a) {}
+  slotcfg_manychildren(rule_attr const &a) : attrib(a) {}
 
-  void add(rule::factory const &child) {
+  void add(rule_factory const &child) {
     add(child, slotcfg(Def));
   }
 
-  void add(rule::factory const &child, unsigned slot) {
+  void add(rule_factory const &child, unsigned slot) {
     add(child, slot, slotcfg(Def));
   }
 
-  void add(rule::factory const &child, slotcfg const &cfg) {
+  void add(rule_factory const &child, slotcfg const &cfg) {
     sub.push_back(element(&child, cfg));
   }
 
-  void add(rule::factory const &child, unsigned slot, slotcfg const &cfg) {
+  void add(rule_factory const &child, unsigned slot, slotcfg const &cfg) {
     if (sub.size() <= slot)
       sub.resize(slot);
     sub[slot] = element(&child, cfg);
@@ -312,7 +310,7 @@ public:
     return e.val;
   }
 
-  static rule::factory *build(rule::attributes const &a) {
+  static rule_factory *build(rule_attr const &a) {
     return new slotcfg_manychildren(a);
   }
 
@@ -322,7 +320,7 @@ public:
   
 private:
   std::vector<element> sub;
-  rule::attributes attrib;
+  rule_attr attrib;
 };
 
 }

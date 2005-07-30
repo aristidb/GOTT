@@ -48,7 +48,7 @@ public:
    * \param ra The rule-factory's and later rule's attributes.
    */
   void begin(std::wstring const &id, 
-             rule::attributes const &ra = rule::attributes()) EXPORT;
+             rule_attr const &ra = rule_attr()) EXPORT;
 
   /**
    * Begins the declaration of a "rule".
@@ -57,7 +57,7 @@ public:
    * \param ra The rule-factory's and later rule's attributes.
    * \param s Repetition definition.
    */
-  void begin(std::wstring const &n, rule::attributes const &ra, 
+  void begin(std::wstring const &n, rule_attr const &ra, 
              slotcfg const &s) EXPORT;
 
   /**

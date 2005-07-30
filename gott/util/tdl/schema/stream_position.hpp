@@ -30,8 +30,8 @@ namespace tdl {
 namespace schema {
 namespace detail {
 
-struct line_pos : public simple::line_logger {
-  line_pos();
+struct stream_position : public simple::line_logger {
+  stream_position();
   void start_line();
   void token(unsigned start, unsigned end, std::wstring const &nd);
   void line_position(unsigned line_pos);

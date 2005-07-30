@@ -26,7 +26,7 @@ namespace ev = gott::util::tdl::schema::ev;
 using schema::rule;
 using schema::match_node;
 
-match_node::match_node(rule::attributes const &a, match &m)
+match_node::match_node(rule_attr const &a, match &m)
 : happy_once(a, m) {}
 
 bool match_node::play(ev::node const &n) {

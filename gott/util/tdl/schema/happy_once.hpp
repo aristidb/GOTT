@@ -22,16 +22,17 @@
 #define GOTT_UTIL_TDL_SCHEMA_HAPPY_ONCE_HPP
 
 #include "rule.hpp"
-#include "rule_attr.hpp"
 
 namespace gott {
 namespace util {
 namespace tdl {
 namespace schema {
 
+class rule_attr;
+
 class EXPORT happy_once : public rule {
 public:
-  happy_once(attributes const &a, match &m);
+  happy_once(rule_attr const &a, match &m);
   ~happy_once();
   expect expectation() const;
 

@@ -20,20 +20,20 @@
 
 #include "stream_position.hpp"
 
-using gott::util::tdl::schema::detail::line_pos;
+using gott::util::tdl::schema::detail::stream_position;
 
-line_pos::line_pos() 
+stream_position::stream_position() 
   : line_new(0), line(0), pos(0), native_end(0), current(0), after(false) {}
 
-void line_pos::start_line() { ++line_new; }
+void stream_position::start_line() { ++line_new; }
 
-void line_pos::token(unsigned p, unsigned e, std::wstring const &w) {
+void stream_position::token(unsigned p, unsigned e, std::wstring const &w) {
   pos = p;
   native_end = e;
   tok = w;
   line = line_new;
 }
 
-void line_pos::line_position(unsigned x) {
+void stream_position::line_position(unsigned x) {
   current = x;
 }

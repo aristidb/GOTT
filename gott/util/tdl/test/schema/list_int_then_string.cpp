@@ -31,7 +31,7 @@ using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_list_int_then_string : tut::schema_basic {

@@ -25,7 +25,7 @@ namespace schema = gott::util::tdl::schema;
 using schema::mismatch;
 using gott::util::range;
 
-static std::wstring build_string(schema::detail::line_pos const &p,
+static std::wstring build_string(schema::detail::stream_position const &p,
                                  std::list<std::wstring> const &t) {
   std::wostringstream o;
   o << p.line << L':' << p.pos+1 << L" : mismatch in ";
@@ -38,7 +38,8 @@ static std::wstring build_string(schema::detail::line_pos const &p,
   return o.str();
 }
 
-mismatch::mismatch(detail::line_pos const &p, std::list<std::wstring> const &t)
+mismatch::mismatch(detail::stream_position const &p, 
+                   std::list<std::wstring> const &t)
 : tdl_exception(build_string(p, t)) {}
 
 mismatch::~mismatch() throw() {}

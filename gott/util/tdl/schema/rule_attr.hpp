@@ -31,24 +31,23 @@ namespace structure { class repatcher; }
 
 namespace schema {
 
-// Class rule::attributes
-// Defines the user-supplyable attributes for a rule
-class rule::attributes {
+// Class rule::rule_attr
+// Defines the user-supplyable rule_attr for a rule
+class rule_attr {
 public:
-  explicit attributes(bool cc = true, structure::repatcher const *rr = 0) 
+  explicit rule_attr(bool cc = true, structure::repatcher const *rr = 0) 
   : c(cc), r(rr) {}
 
-  explicit attributes(std::list<std::wstring> const &l, bool cc = true, 
+  explicit rule_attr(std::list<std::wstring> const &l, bool cc = true, 
       structure::repatcher const *rr = 0)
   : c(cc), t(l), r(rr) {}
 
-  explicit attributes(std::wstring const &s, bool cc = true, 
+  explicit rule_attr(std::wstring const &s, bool cc = true, 
       structure::repatcher const *rr = 0)
   : c(cc), t(1, s), r(rr) {}
 
-  template<class T> 
-  explicit attributes(std::list<std::wstring> const &l, bool cc, T const &x,
-      structure::repatcher const *rr = 0)
+  explicit rule_attr(std::list<std::wstring> const &l, bool cc, 
+                     xany::Xany const &x, structure::repatcher const *rr = 0)
   : c(cc), t(l), u(x), r(rr) {}
 
   bool coat() const { return c; }

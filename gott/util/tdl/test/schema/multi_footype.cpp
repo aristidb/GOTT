@@ -34,7 +34,7 @@ using stru::cf::S;
 using stru::cf::C;
 using schema::slotcfg;
 
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_multi_footype : tut::schema_basic {

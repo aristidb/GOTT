@@ -27,7 +27,6 @@
 #include "ordered.hpp"
 #include "node.hpp"
 #include "unordered.hpp"
-#include "repatch.hpp"
 
 namespace {
 struct builtin_types {
@@ -46,5 +45,4 @@ builtin_types::builtin_types() {
   name_manager().add(L"ordered",        match_ordered::factory::index());
   name_manager().add(L"node",           match_node::factory::index());
   name_manager().add(L"unordered",      match_unordered::factory::index());
-  name_manager().add(L"repatch",        match_repatch::factory::index());
 }

@@ -34,12 +34,12 @@ namespace schema {
 class match_document : public rule {
 public:
   typedef factory_template::onechild<match_document> factory;
-  match_document(rule::factory const &, rule::attributes const &, match &);
+  match_document(rule_factory const &, rule_attr const &, match &);
 
   static bool accept_empty(...) { return false; }
   
 private:
-  rule::factory const &sub;
+  rule_factory const &sub;
   enum { first, begun_parse, opened, closed } state;
   bool happy;
 

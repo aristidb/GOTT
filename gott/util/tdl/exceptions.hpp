@@ -39,14 +39,15 @@ public:
 
 namespace schema {
 
-namespace detail { struct line_pos; }
+namespace detail { struct stream_position; }
 
 /**
  * Schema mismatch exception.
  * Thrown when a rule failed to match and could not be backtracked.
  */
 struct EXPORT mismatch : public tdl_exception {
-  mismatch(detail::line_pos const &p, std::list<std::wstring> const &) LOCAL;
+  LOCAL
+  mismatch(detail::stream_position const &p, std::list<std::wstring> const &);
   ~mismatch() throw();
 };
 

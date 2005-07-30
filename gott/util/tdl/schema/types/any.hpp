@@ -35,15 +35,15 @@ namespace schema {
 class match_any : public rule {
 public:
   typedef factory_template::manychildren<match_any> factory;
-  match_any(std::vector<rule::factory const *> const &, 
-            rule::attributes const &, match &m);
+  match_any(std::vector<rule_factory const *> const &, 
+            rule_attr const &, match &m);
   ~match_any();
 
-  static bool accept_empty(std::vector<rule::factory const *> const &);
+  static bool accept_empty(std::vector<rule_factory const *> const &);
 
 private:
-  std::vector<rule::factory const *> v;
-  std::vector<rule::factory const *>::iterator pos;
+  std::vector<rule_factory const *> v;
+  std::vector<rule_factory const *>::iterator pos;
   positioning::id begin;
   bool happy;
 

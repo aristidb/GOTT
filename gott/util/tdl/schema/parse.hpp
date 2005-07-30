@@ -25,8 +25,6 @@
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tdl/structure/structure.hpp>
 
-#include "rule.hpp"
-
 namespace gott {
 namespace util {
 namespace tdl {
@@ -35,6 +33,7 @@ namespace structure { class repatcher; }
 namespace schema {
 
 class positioning;
+class rule_factory;
 
 /**
  * TDL schema matching engine.
@@ -71,7 +70,7 @@ public:
    * \param rf The rule-factory specifying the document type.
    * \param tree The tree to write to.
    */
-  match(rule::factory const &rf, structure::revocable_structure &tree) EXPORT;
+  match(rule_factory const &rf, structure::revocable_structure &tree) EXPORT;
 
   ~match() EXPORT;
 
@@ -79,7 +78,7 @@ public:
    * Tells the engine to match next a rule specified by a rule-factory.
    * \param rf The rule-factory specifying the to-be-added rule.
    */
-  void add(rule::factory const &rf) EXPORT;
+  void add(rule_factory const &rf) EXPORT;
 
   /**
    * Return a reference to the tree the engine writes to.

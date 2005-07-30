@@ -31,7 +31,7 @@ using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
 
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_unordered_list_integer_string : tut::schema_basic {

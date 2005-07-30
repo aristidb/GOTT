@@ -38,14 +38,14 @@ public:
                                              slotcfg::all>
           factory;
 
-  match_list(rule::factory const &, slotcfg const &, rule::attributes const &,
+  match_list(rule_factory const &, slotcfg const &, rule_attr const &,
                   match &);
   ~match_list();
 
   static bool accept_empty(bool x) { return x; }
 
 private:
-  rule::factory const &sub;
+  rule_factory const &sub;
   positioning::id last;
   slotcfg cfg;
 

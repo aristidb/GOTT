@@ -19,13 +19,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "slot.hpp"
+#include "rule.hpp"
 
 using std::size_t;
 using std::pair;
 using std::make_pair;
 using boost::get;
-using gott::util::tdl::schema::rule;
-using gott::util::tdl::schema::slotcfg;
+namespace schema = gott::util::tdl::schema;
+using schema::rule;
+using schema::rule_factory;
+using schema::slotcfg;
 
 class slotcfg::IMPL {
 public:
@@ -211,13 +214,13 @@ slotcfg slotcfg::no_optional() const {
   throw std::bad_exception();
 }
 
-void rule::factory::with_slotcfg::add(rule::factory const &child, unsigned, 
+void rule_factory::with_slotcfg::add(rule_factory const &child, unsigned, 
                                       slotcfg const &cfg) {
   add(child, cfg);
 }
 
-bool rule::factory::with_slotcfg::supports(slotcfg const &c) const {
+bool rule_factory::with_slotcfg::supports(slotcfg const &c) const {
   return bool(accepted_modes() & c.get_mode());
 }
 
-rule::factory::with_slotcfg::~with_slotcfg() {}
+rule_factory::with_slotcfg::~with_slotcfg() {}

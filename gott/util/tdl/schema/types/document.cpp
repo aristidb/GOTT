@@ -25,8 +25,8 @@ namespace ev = gott::util::tdl::schema::ev;
 using schema::rule;
 using schema::match_document;
 
-match_document::match_document(rule::factory const &sr, 
-                               rule::attributes const &a, match &m)
+match_document::match_document(rule_factory const &sr, 
+                               rule_attr const &a, match &m)
 : rule(a, m), sub(sr), state(first), happy(false) {}
 
 bool match_document::play(ev::begin_parse const &) {

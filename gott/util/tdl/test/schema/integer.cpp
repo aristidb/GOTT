@@ -29,7 +29,7 @@ using u::xany::Xany;
 using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_integer : tut::schema_basic {

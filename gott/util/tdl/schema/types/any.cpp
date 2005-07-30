@@ -26,8 +26,8 @@ namespace ev = schema::ev;
 using schema::match_any;
 using schema::rule;
 
-match_any::match_any(vector<rule::factory const *> const &vv,
-                     rule::attributes const &a, match &m) 
+match_any::match_any(vector<rule_factory const *> const &vv,
+                     rule_attr const &a, match &m) 
 : rule(a, m), v(vv), pos(v.begin()), happy(false) {
   if (pos != v.end()) {
     begin = matcher().pos().current();
@@ -55,8 +55,8 @@ bool match_any::play(ev::child_succeed const &) {
   return true;
 }
 
-bool match_any::accept_empty(vector<rule::factory const *> const &choices) {
-  for (vector<rule::factory const *>::const_iterator it = choices.begin(); 
+bool match_any::accept_empty(vector<rule_factory const *> const &choices) {
+  for (vector<rule_factory const *>::const_iterator it = choices.begin(); 
        it != choices.end(); ++it)
     if ((*it)->accept_empty())
       return true;

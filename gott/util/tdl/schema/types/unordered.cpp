@@ -28,7 +28,7 @@ using schema::rule;
 using schema::match_unordered;
 
 match_unordered::match_unordered(vector<element> const &r, 
-                                 rule::attributes const &a, match &m) 
+                                 rule_attr const &a, match &m) 
 : rule(a, m), last(m.pos().current()), all_happy(true) {
   copy(range(r), std::back_inserter(children));
 

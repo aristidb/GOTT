@@ -30,7 +30,7 @@ using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
 
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {

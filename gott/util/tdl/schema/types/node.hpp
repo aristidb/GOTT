@@ -33,7 +33,7 @@ namespace schema {
 class match_node : public happy_once {
 public:
   typedef factory_template::nochild<match_node> factory;
-  match_node(rule::attributes const &, match &);
+  match_node(rule_attr const &, match &);
 
   static bool accept_empty() { return false; }
   

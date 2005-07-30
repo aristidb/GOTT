@@ -32,7 +32,7 @@ namespace tdl {
 namespace schema {
 
 class match_follow_ordered : public rule {
-  typedef std::pair<rule::factory const *, slotcfg> element;
+  typedef std::pair<rule_factory const *, slotcfg> element;
 public:
   typedef 
     factory_template::slotcfg_manychildren<
@@ -42,7 +42,7 @@ public:
     >
     factory;
 
-  match_follow_ordered(std::vector<element> const &, rule::attributes const &, 
+  match_follow_ordered(std::vector<element> const &, rule_attr const &, 
                        match &);
   ~match_follow_ordered();
 
@@ -50,7 +50,7 @@ public:
   
 private:
   struct active_element {
-    rule::factory const *generator;
+    rule_factory const *generator;
     slotcfg slot;
     bool rest_accept_empty;
     

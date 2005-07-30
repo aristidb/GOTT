@@ -26,8 +26,8 @@ using schema::rule;
 using schema::slotcfg;
 using schema::match_list;
 
-match_list::match_list(rule::factory const &r, slotcfg const &c,
-                                 rule::attributes const &a, match &m)
+match_list::match_list(rule_factory const &r, slotcfg const &c,
+                                 rule_attr const &a, match &m)
 : rule(a, m), sub(r), cfg(c) {
   last = m.pos().current();
   if (accept_more(expectation()))

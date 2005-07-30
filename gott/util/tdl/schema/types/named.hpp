@@ -35,10 +35,10 @@ namespace schema {
 class match_named : public rule {
 public:
   static EXPORT
-  rule::attributes attributes(std::wstring const &s, bool cc = true);
+  rule_attr attributes(std::wstring const &s, bool cc = true);
   
   typedef factory_template::onechild<match_named> factory;
-  match_named(rule::factory const &, rule::attributes const &, match &);
+  match_named(rule_factory const &, rule_attr const &, match &);
 
   static bool accept_empty(bool) { return false; }
 
@@ -51,7 +51,7 @@ private:
   bool play(ev::child_fail const &);
   wchar_t const *name() const;
   
-  rule::factory const &sub;
+  rule_factory const &sub;
 
   enum { read_none, read_node, read_down, read_sub, done } state;
 };

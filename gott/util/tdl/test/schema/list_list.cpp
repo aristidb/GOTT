@@ -36,14 +36,14 @@ struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() {
     context.begin(L"document");
       context.begin(L"ordered");
-        context.begin(L"list", rule::attributes(wstring(L"s")));
-          context.begin(L"list", rule::attributes(wstring(L"t")));
+        context.begin(L"list", rule_attr(wstring(L"s")));
+          context.begin(L"list", rule_attr(wstring(L"t")));
             context.begin(L"node", 
-                    rule::attributes(L"ii", true, new stru::repatch_integer()));
+                    rule_attr(L"ii", true, new stru::repatch_integer()));
             ;context.end();
           ;context.end();
         ;context.end();
-        context.begin(L"node", rule::attributes(wstring(L"xx")));
+        context.begin(L"node", rule_attr(wstring(L"xx")));
       ;context.end();
     ;context.end();
   }

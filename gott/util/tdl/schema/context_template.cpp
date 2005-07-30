@@ -30,14 +30,14 @@ using gott::util::tdl::schema::rule;
 class context_template::IMPL {
 public:
   struct entry_begin {
-    entry_begin(unsigned n, rule::attributes const &a) 
+    entry_begin(unsigned n, rule_attr const &a) 
       : id(n), att(a) {}
-    entry_begin(unsigned n, rule::attributes const &a, 
+    entry_begin(unsigned n, rule_attr const &a, 
                 slotcfg const &s)
       : id(n), att(a), scfg(s) {}
 
     unsigned id;
-    rule::attributes att;
+    rule_attr att;
     boost::optional<slotcfg> scfg;
   };
 
@@ -53,11 +53,11 @@ context_template::context_template() : p(new IMPL) {}
 context_template::~context_template() {}
 
 void context_template::begin(wstring const &type, 
-                             rule::attributes const &attr) {
+                             rule_attr const &attr) {
   p->var.push_back(IMPL::entry_begin(name_manager().get(type), attr));
 }
 
-void context_template::begin(wstring const &type, rule::attributes const &attr,
+void context_template::begin(wstring const &type, rule_attr const &attr,
                              slotcfg const &scfg) {
   p->var.push_back(IMPL::entry_begin(name_manager().get(type), attr, scfg));
 }

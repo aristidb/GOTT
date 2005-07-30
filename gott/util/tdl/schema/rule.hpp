@@ -32,6 +32,7 @@ namespace structure { class repatcher; }
 namespace schema {
 
 class match;
+class rule_attr;
 
 /**
  * The base class of the implementation of a rule-matcher object.
@@ -40,8 +41,6 @@ class match;
  */
 class EXPORT rule {
 public:
-  struct factory;
-  class attributes;
 
   /**
    * The possible expectations of a living rule object.
@@ -128,13 +127,13 @@ public:
   /**
    * Get the attributes associated with this rule.
    */
-  attributes const &get_attributes() const;
+  rule_attr const &attributes() const EXPORT;
 
 protected:
   match &matcher();
     // return a reference to the match-object that embedded us
 
-  rule(attributes const &a, match &m);
+  rule(rule_attr const &a, match &m);
     // an implementation must supply attributes
 
 private:

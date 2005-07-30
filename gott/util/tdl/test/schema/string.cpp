@@ -32,7 +32,7 @@ using stru::cf::C;
 namespace {
 struct schema_string : tut::schema_basic {
   schema_string() {
-    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
+    context.begin(L"document", schema::rule_attr(wstring(L"doc")));
       context.begin(L"node");
       context.end();
     context.end();

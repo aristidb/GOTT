@@ -28,7 +28,7 @@ using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
 
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_max7string : tut::schema_basic {
