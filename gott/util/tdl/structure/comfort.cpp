@@ -21,7 +21,7 @@
 #include "comfort.hpp"
 #include "structure.hpp"
 
-using gott::util::xany::Xany;
+using gott::xany::Xany;
 namespace cf = gott::util::tdl::structure::cf;
 using cf::node_inserter_t;
 using gott::util::tdl::structure::writable_structure;

@@ -35,8 +35,8 @@ namespace schema {
  */
 class context : public boost::noncopyable {
 public:
-  context() EXPORT;
-  ~context() EXPORT;
+  context() GOTT_EXPORT;
+  ~context() GOTT_EXPORT;
 
   /**
    * Begin the declaration of a "rule".
@@ -60,7 +60,7 @@ public:
    * \param length The expected number of children. 0 or the nearest value
    *               if unsure.
    */
-  void EXPORT begin(std::wstring const &name,
+  void GOTT_EXPORT begin(std::wstring const &name,
                     rule_attr const &attr = rule_attr(),
                     boost::optional<slotcfg> const &slt = boost::none);
 
@@ -68,7 +68,7 @@ public:
    * End the declaration of a "rule".
    * @see begin
    */
-  void end() EXPORT;
+  void end() GOTT_EXPORT;
 
   /**
    * A little convenience wrapper around begin.
@@ -84,12 +84,12 @@ public:
    * The added context is not owned.
    * \param other The context to refer to.
    */
-  void ref(context const &other) EXPORT;
+  void ref(context const &other) GOTT_EXPORT;
 
   /**
    * Instantiate the context.
    */
-  rule_factory const &get() const EXPORT;
+  rule_factory const &get() const GOTT_EXPORT;
 
 private:
   class IMPL;

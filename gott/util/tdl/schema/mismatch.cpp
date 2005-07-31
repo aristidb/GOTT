@@ -23,7 +23,7 @@
 
 namespace schema = gott::util::tdl::schema;
 using schema::mismatch;
-using gott::util::range;
+using gott::range;
 
 static std::wstring build_string(schema::detail::stream_position const &p,
                                  std::list<std::wstring> const &t) {

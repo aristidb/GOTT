@@ -48,45 +48,45 @@ public: // Iterators
     /**
      * The number of children.
      */
-    EXPORT size_type size() const;
+    GOTT_EXPORT size_type size() const;
     
     /**
      * Gets a child by index. Creates the index table as necessary.
      * \param n The index to get an element at.
      */
-    EXPORT iterator operator[](size_type n) const;
+    GOTT_EXPORT iterator operator[](size_type n) const;
 
     /**
      * Gets children by tag.
      * \param tag The tag to search for.
      */
-    EXPORT tagged_iterator with_tag(std::wstring const &tag) const;
+    GOTT_EXPORT tagged_iterator with_tag(std::wstring const &tag) const;
     
     /**
      * Gets the first child.
      */
-    EXPORT iterator first_child() const;
+    GOTT_EXPORT iterator first_child() const;
 
     /**
      * Gets the iterator with the next-higher position. This is: the right 
      * sibling.
      */
-    EXPORT iterator next() const;
+    GOTT_EXPORT iterator next() const;
 
     /**
      * Gets the parental node.
      */
-    EXPORT iterator up() const;
+    GOTT_EXPORT iterator up() const;
     
     /**
      * Gets the data.
      */
-    EXPORT xany::Xany const &get_data() const;
+    GOTT_EXPORT xany::Xany const &get_data() const;
 
     /**
      * Gets all tags.
      */
-    EXPORT std::list<std::wstring> const &get_tags() const;
+    GOTT_EXPORT std::list<std::wstring> const &get_tags() const;
 
     /**
      * Checks whether the iterator is valid.
@@ -97,7 +97,7 @@ public: // Iterators
      * Checks whether two iterators are equal by structure and content.
      * \param other The structure to compare with.
      */
-    EXPORT bool contents_equal(iterator const &other) const;
+    GOTT_EXPORT bool contents_equal(iterator const &other) const;
 
     /**
      * @see query::selection
@@ -116,25 +116,25 @@ public: // Iterators
   /**
    * Iterates through a set of nodes with a common tag.
    */
-  EXPORT class tagged_iterator {
+  GOTT_EXPORT class tagged_iterator {
   public:
-    EXPORT tagged_iterator(tagged_iterator const &);
-    EXPORT ~tagged_iterator();
+    GOTT_EXPORT tagged_iterator(tagged_iterator const &);
+    GOTT_EXPORT ~tagged_iterator();
     
     /**
      * Go to the next node with the same tag.
      */
-    EXPORT void operator++();
+    GOTT_EXPORT void operator++();
 
     /**
      * Checks whether the iterator is still valid.
      */
-    EXPORT operator bool() const;
+    GOTT_EXPORT operator bool() const;
 
     /**
      * Get a normal iterator.
      */
-    EXPORT iterator get() const;
+    GOTT_EXPORT iterator get() const;
   
   private:
     class IMPL;
@@ -147,7 +147,7 @@ public: // Iterators
   /**
    * Get an iterator for the root node.
    */
-  EXPORT iterator get_root() const;
+  GOTT_EXPORT iterator get_root() const;
 
 private: // Inherited interface
   // Don't call these directly (exported symbols for no use is nothing I like)
@@ -162,28 +162,28 @@ private: // Inherited interface
   void get_rid_of(pth const &);
 
 public:
-  EXPORT void copy_to(writable_structure &ws) const;
+  GOTT_EXPORT void copy_to(writable_structure &ws) const;
 
   /**
    * Checks whether the tree is equal to another tree.
    * \param o The tree to check against.
    */
-  EXPORT bool operator==(tree const &o) const;
+  GOTT_EXPORT bool operator==(tree const &o) const;
 
 public:
-  EXPORT tree();
-  EXPORT ~tree();
+  GOTT_EXPORT tree();
+  GOTT_EXPORT ~tree();
 
 #ifdef DEBUG
-  EXPORT void dump(std::wostream &);
+  GOTT_EXPORT void dump(std::wostream &);
 #endif
 
 private:
   class IMPL;
   boost::scoped_ptr<IMPL> p;
 
-  EXPORT friend void intrusive_ptr_add_ref(node *);
-  EXPORT friend void intrusive_ptr_release(node *);
+  GOTT_EXPORT friend void intrusive_ptr_add_ref(node *);
+  GOTT_EXPORT friend void intrusive_ptr_release(node *);
 };
 
 /**
@@ -200,7 +200,7 @@ inline bool operator!=(tree const &lhs, tree const &rhs) {
  * \param s The stream to print to.
  * \param i The iterator to print.
  */
-EXPORT std::wostream &operator<<(std::wostream &s, tree::iterator const &i);
+GOTT_EXPORT std::wostream &operator<<(std::wostream &s, tree::iterator const &i);
 
 /**
  * Print a tree::iterator to a (normal) stream.

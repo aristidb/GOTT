@@ -39,7 +39,7 @@ class slotcfg;
  * Classes implementing this can produce rule objects and are the standardized
  * way to do so.
  */
-class EXPORT rule_factory {
+class GOTT_EXPORT rule_factory {
   public:   
   struct with_slotcfg;
 
@@ -261,7 +261,7 @@ template<class T> struct enreg {
  * \param x The builder of the type to be added.
  * \return The type's index.
  */
-unsigned add_factory(factory_template::rule_factory_builder x) EXPORT;
+unsigned add_factory(factory_template::rule_factory_builder x) GOTT_EXPORT;
 
 /**
  * Get a rule_factory instance by its type's index.

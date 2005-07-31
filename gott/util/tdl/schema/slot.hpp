@@ -103,41 +103,41 @@ public:
   /**
    * Initialize a slotcfg object accepting one child.
    */
-  slotcfg() EXPORT;
+  slotcfg() GOTT_EXPORT;
 
   /// Constructor.
-  slotcfg(simple_mode) EXPORT;
+  slotcfg(simple_mode) GOTT_EXPORT;
 
   /// Constructor.
-  slotcfg(sized_mode, std::size_t) EXPORT;
+  slotcfg(sized_mode, std::size_t) GOTT_EXPORT;
 
   /// Constructor.
-  slotcfg(range_mode, std::size_t, std::size_t) EXPORT;
+  slotcfg(range_mode, std::size_t, std::size_t) GOTT_EXPORT;
 
   /// Constructor.
-  slotcfg(function_mode, callback const &) EXPORT;
+  slotcfg(function_mode, callback const &) GOTT_EXPORT;
 
   /// Copy-Constructor.
-  slotcfg(slotcfg const &) EXPORT;
+  slotcfg(slotcfg const &) GOTT_EXPORT;
 
   /// Destructor.
-  ~slotcfg() EXPORT;
+  ~slotcfg() GOTT_EXPORT;
 
-  void operator=(slotcfg const &o) EXPORT;
+  void operator=(slotcfg const &o) GOTT_EXPORT;
 
   /// Whether the object accepts 0 children.
   bool prefix_optional() const;
   /// A variant of the object that does not accept 0 children.
   slotcfg no_optional() const;
   /// The mode the object is in.
-  mode get_mode() const EXPORT;
+  mode get_mode() const GOTT_EXPORT;
 
   /// Add an element.
-  void add() EXPORT;
+  void add() GOTT_EXPORT;
   /// Cancel a sequence.
-  void cancel() EXPORT;
+  void cancel() GOTT_EXPORT;
   /// Accept or not.
-  rule::expect expectation() const EXPORT;
+  rule::expect expectation() const GOTT_EXPORT;
 
 private:
   class IMPL;
@@ -148,7 +148,7 @@ private:
  * A rule-factory supporting slotcfg-objects. Accessed via 
  * rule_factory::get_with_slotcfg.
  */
-struct EXPORT rule_factory::with_slotcfg {
+struct GOTT_EXPORT rule_factory::with_slotcfg {
   /**
    * Let the produced rule have a/another child.
    * Adds in the default location.

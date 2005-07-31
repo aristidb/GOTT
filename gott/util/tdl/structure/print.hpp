@@ -39,8 +39,8 @@ public:
    * \param out The stream to write to.
    * \param step The indentation width.
    */
-  EXPORT direct_print(std::wostream &out, unsigned step = 4);
-  EXPORT ~direct_print();
+  GOTT_EXPORT direct_print(std::wostream &out, unsigned step = 4);
+  GOTT_EXPORT ~direct_print();
 
 private:
   void begin();

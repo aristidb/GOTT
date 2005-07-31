@@ -31,14 +31,14 @@ namespace structure {
 /**
  * This class represents a structure patcher.
  */
-class EXPORT repatcher {
+class GOTT_EXPORT repatcher {
 public:
   repatcher();
   virtual ~repatcher() = 0;
   virtual writable_structure *deferred_write(writable_structure &) const = 0;
 };
 
-class EXPORT simple_repatcher_context : public writable_structure {
+class GOTT_EXPORT simple_repatcher_context : public writable_structure {
 protected:
   writable_structure &target;
 
@@ -52,7 +52,7 @@ public:
   void set_tags(std::list<std::wstring> const &);
 };
 
-class EXPORT repatch_nothing : public repatcher {
+class GOTT_EXPORT repatch_nothing : public repatcher {
 public:
   repatch_nothing();
   ~repatch_nothing();

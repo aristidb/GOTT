@@ -24,7 +24,6 @@
 #include <iterator>
 
 namespace gott {
-namespace util {
 
 template<class T> struct range_t {
   typedef T value_type;
@@ -78,6 +77,6 @@ range_t<T> simply(T const &x) {
   return range(x, x);
 }
 
-}}
+}
 
 #endif

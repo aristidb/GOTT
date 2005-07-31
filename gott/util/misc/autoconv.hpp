@@ -88,7 +88,7 @@ template<> struct element_separator<wchar_t, wchar_t> {
 };
 
 template<class Ch, class CT, class T>
-void print_separated(basic_ostream<Ch,CT> &s, gott::util::range_t<T> const &x,
+void print_separated(basic_ostream<Ch,CT> &s, gott::range_t<T> const &x,
                      Ch const *sep) {
   T i = x.begin;
   s << *i++;
@@ -98,7 +98,7 @@ void print_separated(basic_ostream<Ch,CT> &s, gott::util::range_t<T> const &x,
 
 template<class Ch, class CT, class T>
 basic_ostream<Ch,CT> &operator<<(basic_ostream<Ch,CT> &s, 
-                                 gott::util::range_t<T> const &x) {
+                                 gott::range_t<T> const &x) {
   print_separated(s, x, 
       element_separator<typename iterator_traits<T>::value_type, Ch>::sep());
   return s;

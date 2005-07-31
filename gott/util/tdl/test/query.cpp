@@ -34,9 +34,9 @@ namespace tdl = gott::util::tdl;
 using tdl::structure::tree;
 using tdl::structure::writable_structure;
 using tdl::query::selection;
-using gott::util::xany::Xany;
-using gott::util::range;
-using gott::util::const_range;
+using gott::xany::Xany;
+using gott::range;
+using gott::const_range;
 namespace cf = tdl::structure::cf;
 
 namespace tut {

@@ -28,19 +28,13 @@ namespace util {
 namespace tdl {
 namespace structure {
 
-class EXPORT repatch_integer : public repatcher {
+class GOTT_EXPORT repatch_integer : public repatcher {
 public:
   repatch_integer();
   ~repatch_integer();
   writable_structure *deferred_write(writable_structure &) const;
 };
 
-}}
-
-namespace xany {
-GOTT_UTIL_XANY_DECLARE_PROMOTER(tdl::structure::repatch_integer *, 
-                                tdl::structure::repatcher *);
-}
-}}
+}}}}
 
 #endif

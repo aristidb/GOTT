@@ -22,7 +22,7 @@
 #include "../simple/parse/parser.hpp"
 
 using std::wstring;
-using gott::util::xany::Xany;
+using gott::xany::Xany;
 using gott::util::tdl::simple::parser;
 using gott::util::tdl::structure::writable_structure;
 

@@ -62,7 +62,7 @@ public:
    * Constructs a new match object writing to a tree/something.
    * \param tree The tree to write to.
    */
-  match(structure::revocable_structure &tree) EXPORT;
+  match(structure::revocable_structure &tree) GOTT_EXPORT;
 
   /**
    * Constructs a new match object writing to a tree/something matching a 
@@ -70,39 +70,39 @@ public:
    * \param rf The rule-factory specifying the document type.
    * \param tree The tree to write to.
    */
-  match(rule_factory const &rf, structure::revocable_structure &tree) EXPORT;
+  match(rule_factory const &rf, structure::revocable_structure &tree) GOTT_EXPORT;
 
-  ~match() EXPORT;
+  ~match() GOTT_EXPORT;
 
   /**
    * Tells the engine to match next a rule specified by a rule-factory.
    * \param rf The rule-factory specifying the to-be-added rule.
    */
-  void add(rule_factory const &rf) EXPORT;
+  void add(rule_factory const &rf) GOTT_EXPORT;
 
   /**
    * Return a reference to the tree the engine writes to.
    */
-  structure::revocable_structure &revocable_structure() const EXPORT;
+  structure::revocable_structure &revocable_structure() const GOTT_EXPORT;
 
   /**
    * Return a reference to the current wrapped structure the engine directly
    * writes to.
    */
-  structure::writable_structure &direct_structure() const EXPORT;
+  structure::writable_structure &direct_structure() const GOTT_EXPORT;
 
 public:
   /**
    * Return a reference to the back-tracking and book-keeping sub-engine.
    */
-  positioning &pos() const EXPORT;
+  positioning &pos() const GOTT_EXPORT;
 
 public:
   /**
    * Return a pointer to the internal line-logger.
    * If this is passed to simple::parse, we can better report errors.
    */
-  simple::line_logger *get_debug() const EXPORT;
+  simple::line_logger *get_debug() const GOTT_EXPORT;
 
 private:
   void begin_parse();

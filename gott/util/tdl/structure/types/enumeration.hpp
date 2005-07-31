@@ -28,7 +28,7 @@ namespace util {
 namespace tdl {
 namespace structure {
 
-class EXPORT repatch_enumeration : public repatcher {
+class GOTT_EXPORT repatch_enumeration : public repatcher {
 public:
   repatch_enumeration(std::vector<std::wstring> const &);
   ~repatch_enumeration();
@@ -38,12 +38,6 @@ private:
   std::vector<std::wstring> alternatives;
 };
 
-}}
-
-namespace xany {
-GOTT_UTIL_XANY_DECLARE_PROMOTER(tdl::structure::repatch_enumeration *, 
-                                tdl::structure::repatcher *);
-}
-}}
+}}}}
 
 #endif

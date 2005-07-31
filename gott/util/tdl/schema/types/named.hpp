@@ -34,7 +34,7 @@ namespace schema {
 // TODO: deal with empty contents
 class match_named : public rule {
 public:
-  static EXPORT
+  static GOTT_EXPORT
   rule_attr attributes(std::wstring const &s, bool cc = true);
   
   typedef factory_template::onechild<match_named> factory;

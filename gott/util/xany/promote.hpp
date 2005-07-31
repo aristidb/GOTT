@@ -22,7 +22,6 @@
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
-namespace util {
 namespace xany {
 
 /**
@@ -63,7 +62,7 @@ struct standard_promote {
   static reference get_back(New &v) { return reference(v); }
 };
 
-#define GOTT_UTIL_XANY_DECLARE_PROMOTER(Old, New) \
+#define GOTT_XANY_DECLARE_PROMOTER(Old, New) \
   template<> struct promote<Old> : standard_promote<Old, New> {}
 
 template<class ElementT, class New>
@@ -74,27 +73,27 @@ struct array_promote {
   static New get(ElementT const *v) { return New(v); }
 };
 
-#define GOTT_UTIL_XANY_ARRAY_PROMOTER(OldE, New) \
+#define GOTT_XANY_ARRAY_PROMOTER(OldE, New) \
   template<int Size> \
   struct promote<OldE [Size]> : array_promote<OldE, New> {}
 
-GOTT_UTIL_XANY_DECLARE_PROMOTER(char, long);
-GOTT_UTIL_XANY_DECLARE_PROMOTER(short, long);
-GOTT_UTIL_XANY_DECLARE_PROMOTER(int, long);
-GOTT_UTIL_XANY_DECLARE_PROMOTER(unsigned char, unsigned long);
-GOTT_UTIL_XANY_DECLARE_PROMOTER(unsigned short, unsigned long);
-GOTT_UTIL_XANY_DECLARE_PROMOTER(unsigned int, unsigned long);
+GOTT_XANY_DECLARE_PROMOTER(char, long);
+GOTT_XANY_DECLARE_PROMOTER(short, long);
+GOTT_XANY_DECLARE_PROMOTER(int, long);
+GOTT_XANY_DECLARE_PROMOTER(unsigned char, unsigned long);
+GOTT_XANY_DECLARE_PROMOTER(unsigned short, unsigned long);
+GOTT_XANY_DECLARE_PROMOTER(unsigned int, unsigned long);
 
-GOTT_UTIL_XANY_DECLARE_PROMOTER(float, double);
+GOTT_XANY_DECLARE_PROMOTER(float, double);
 
-GOTT_UTIL_XANY_DECLARE_PROMOTER(char const *, std::string);
-GOTT_UTIL_XANY_DECLARE_PROMOTER(char *, std::string);
-GOTT_UTIL_XANY_ARRAY_PROMOTER(char, std::string);
+GOTT_XANY_DECLARE_PROMOTER(char const *, std::string);
+GOTT_XANY_DECLARE_PROMOTER(char *, std::string);
+GOTT_XANY_ARRAY_PROMOTER(char, std::string);
 
-GOTT_UTIL_XANY_DECLARE_PROMOTER(wchar_t const *, std::wstring);
-GOTT_UTIL_XANY_DECLARE_PROMOTER(wchar_t *, std::wstring);
-GOTT_UTIL_XANY_ARRAY_PROMOTER(wchar_t, std::wstring);
+GOTT_XANY_DECLARE_PROMOTER(wchar_t const *, std::wstring);
+GOTT_XANY_DECLARE_PROMOTER(wchar_t *, std::wstring);
+GOTT_XANY_ARRAY_PROMOTER(wchar_t, std::wstring);
 
-}}}
+}}
 
 #endif

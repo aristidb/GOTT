@@ -94,7 +94,7 @@ public:
   bool play(rule &r) const;
   void print(std::wostream &s) const;
 
-  std::wstring const &get_data() const EXPORT;
+  std::wstring const &get_data() const GOTT_EXPORT;
     // get the data of this node-event
 };
 

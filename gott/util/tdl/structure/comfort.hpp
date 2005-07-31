@@ -47,10 +47,10 @@ public:
    * Actually writes the structure in spe.
    * \param ws The structure to write to.
    */
-  EXPORT void write_to(writable_structure &ws) const;
+  GOTT_EXPORT void write_to(writable_structure &ws) const;
 
   node_inserter_t(xany::Xany const &d, nd_list const &c, tag_list const &t);
-  EXPORT ~node_inserter_t();
+  GOTT_EXPORT ~node_inserter_t();
 
 private:
   xany::Xany data;
@@ -63,28 +63,28 @@ private:
  * \param data The node's data.
  * \param tags The nodes's tags.
  */
-EXPORT node_inserter_t S(xany::Xany data, tag_list tags = tag_list());
+GOTT_EXPORT node_inserter_t S(xany::Xany data, tag_list tags = tag_list());
 
 /**
  * Create a leaf node (generator).
  * \param data The node's data.
  * \param tag The nodes's sole tag.
  */
-EXPORT node_inserter_t S(xany::Xany data, std::wstring tag);
+GOTT_EXPORT node_inserter_t S(xany::Xany data, std::wstring tag);
 
 /**
  * Create a node (generator) without data but with children.
  * \param children The node's children in spe.
  * \param tags The node's tags.
  */
-EXPORT node_inserter_t M(nd_list children, tag_list tags = tag_list());
+GOTT_EXPORT node_inserter_t M(nd_list children, tag_list tags = tag_list());
 
 /**
  * Create a node (generator) without data but with children.
  * \param children The node's children in spe.
  * \param tag The node's sole tag.
  */
-EXPORT node_inserter_t M(nd_list children, std::wstring tag);
+GOTT_EXPORT node_inserter_t M(nd_list children, std::wstring tag);
 
 /**
  * Create a node (generator) with data and children.
@@ -92,7 +92,7 @@ EXPORT node_inserter_t M(nd_list children, std::wstring tag);
  * \param children The node's children in spe.
  * \param tags The node's tags.
  */
-EXPORT node_inserter_t MD(xany::Xany data, nd_list children,
+GOTT_EXPORT node_inserter_t MD(xany::Xany data, nd_list children,
                    tag_list tags = tag_list());
 
 /**
@@ -101,21 +101,21 @@ EXPORT node_inserter_t MD(xany::Xany data, nd_list children,
  * \param children The node's children in spe.
  * \param tag The node's sole tag.
  */
-EXPORT node_inserter_t MD(xany::Xany data, nd_list children, std::wstring tag);
+GOTT_EXPORT node_inserter_t MD(xany::Xany data, nd_list children, std::wstring tag);
 
 /**
  * Create a node (generator) without data and with a single child.
  * \param child The node's child in spe.
  * \param tags The node's tags.
  */
-EXPORT node_inserter_t C(node_inserter_t child, tag_list tags = tag_list());
+GOTT_EXPORT node_inserter_t C(node_inserter_t child, tag_list tags = tag_list());
 
 /**
  * Create a node (generator) without data and with a single child.
  * \param child The node's child in spe.
  * \param tag The node's sole tag.
  */
-EXPORT node_inserter_t C(node_inserter_t child, std::wstring tag);
+GOTT_EXPORT node_inserter_t C(node_inserter_t child, std::wstring tag);
 
 }}}}}
 

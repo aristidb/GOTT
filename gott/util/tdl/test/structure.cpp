@@ -27,7 +27,7 @@
 namespace util = gott::util;
 namespace stru = util::tdl::structure;
 namespace cf = stru::cf;
-using util::xany::Xany;
+using gott::xany::Xany;
 
 namespace tut {
 struct structure_basic {

@@ -31,7 +31,7 @@ match_node::match_node(rule_attr const &a, match &m)
 
 bool match_node::play(ev::node const &n) {
   if (expectation() == need) {
-    matcher().direct_structure().data(gott::util::xany::Xany(n.get_data()));
+    matcher().direct_structure().data(gott::xany::Xany(n.get_data()));
 
     be_happy();
     return true;

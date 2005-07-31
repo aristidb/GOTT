@@ -23,8 +23,8 @@
 
 using std::list;
 using std::wstring;
-using gott::util::xany::Xany;
-using gott::util::xany::Xany_cast;
+using gott::xany::Xany;
+using gott::xany::Xany_cast;
 
 namespace schema = gott::util::tdl::schema;
 namespace ev = gott::util::tdl::schema::ev;

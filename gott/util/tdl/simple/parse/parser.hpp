@@ -31,7 +31,7 @@ namespace simple {
 /**
  * The callback interface to parse.
  */
-struct EXPORT parser {
+struct GOTT_EXPORT parser {
   // callbacks
   virtual void begin_parse() = 0;
     ///< Called as soon as the parse has begun.
@@ -75,7 +75,7 @@ struct line_logger {
    */
   virtual void line_position(unsigned line_pos) = 0;
 
-  EXPORT virtual ~line_logger() = 0;
+  GOTT_EXPORT virtual ~line_logger() = 0;
 };
 
 /**
@@ -99,7 +99,7 @@ public:
     boost::function<bool (std::wstring const &cmd, std::wstring const &param)> 
     callback;
 
-  EXPORT meta_parser();
+  GOTT_EXPORT meta_parser();
 
   /**
    * Example handler. Stores the parameters of the latest invocation.
@@ -123,14 +123,14 @@ public:
    * Set the default command handler.
    * \param f The handler to add.
    */
-  void set_default(callback const &f) EXPORT;
+  void set_default(callback const &f) GOTT_EXPORT;
   
   /**
    * Set a specific command handler.
    * \param s The command to invocate this handler on.
    * \param f The handler to add.
    */
-  void set_specific(std::wstring const &s, callback const &f) EXPORT;
+  void set_specific(std::wstring const &s, callback const &f) GOTT_EXPORT;
 
 public:
   /// @internal
@@ -148,7 +148,7 @@ private:
  * \param p The parser callback to notify of tokens.
  * \param l (optional) The line-logger callback.
  */
-EXPORT void parse(std::wistream &s, parser &p, line_logger *l = 0);
+GOTT_EXPORT void parse(std::wistream &s, parser &p, line_logger *l = 0);
 
 /**
  * Parses the meta-data section of a TDL document to a special parser.
@@ -156,7 +156,7 @@ EXPORT void parse(std::wistream &s, parser &p, line_logger *l = 0);
  * \param p The meta-data callback to notify.
  * \param l (optional) The line-logger callback.
  */
-EXPORT void parse_meta(std::wistream &s, meta_parser &p, line_logger *l = 0);
+GOTT_EXPORT void parse_meta(std::wistream &s, meta_parser &p, line_logger *l = 0);
 
 }}}}
 #endif

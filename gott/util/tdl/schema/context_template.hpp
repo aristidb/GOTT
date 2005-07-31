@@ -38,8 +38,8 @@ namespace schema {
  */
 class context_template {
 public:
-  context_template() EXPORT;
-  ~context_template() EXPORT;
+  context_template() GOTT_EXPORT;
+  ~context_template() GOTT_EXPORT;
 
   /**
    * Begins the declaration of a "rule".
@@ -48,7 +48,7 @@ public:
    * \param ra The rule-factory's and later rule's attributes.
    */
   void begin(std::wstring const &id, 
-             rule_attr const &ra = rule_attr()) EXPORT;
+             rule_attr const &ra = rule_attr()) GOTT_EXPORT;
 
   /**
    * Begins the declaration of a "rule".
@@ -58,12 +58,12 @@ public:
    * \param s Repetition definition.
    */
   void begin(std::wstring const &n, rule_attr const &ra, 
-             slotcfg const &s) EXPORT;
+             slotcfg const &s) GOTT_EXPORT;
 
   /**
    * End the declaration of a "rule".
    */
-  void end() EXPORT;
+  void end() GOTT_EXPORT;
 
   typedef unsigned eID; ///< A parameter's ID.
 
@@ -71,14 +71,14 @@ public:
    * Add a parameter to the template.
    * \param id The index of the parameter to add.
    */
-  void param(eID id) EXPORT;
+  void param(eID id) GOTT_EXPORT;
 
   /**
    * Instantiate to a context object.
    * \param params The parameters in a vector, position equals eID.
    * \param cont The context to fill.
    */
-  void instantiate(std::vector<context*> const &params, context &cont) EXPORT;
+  void instantiate(std::vector<context*> const &params, context &cont) GOTT_EXPORT;
 
 private:
   class IMPL;

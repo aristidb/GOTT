@@ -28,7 +28,7 @@ using std::vector;
 using std::pair;
 using boost::intrusive_ptr;
 using boost::scoped_ptr;
-using gott::util::xany::Xany;
+using gott::xany::Xany;
 
 namespace stru = gott::util::tdl::structure;
 using stru::writable_structure;

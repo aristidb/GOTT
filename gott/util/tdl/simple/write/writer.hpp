@@ -30,16 +30,16 @@ namespace simple {
 
 class writer {
 public:
-  EXPORT writer(std::wostream &, unsigned = 4);
-  EXPORT void down();
-  EXPORT void up();
-  EXPORT void node(std::wstring const &content, 
+  GOTT_EXPORT writer(std::wostream &, unsigned = 4);
+  GOTT_EXPORT void down();
+  GOTT_EXPORT void up();
+  GOTT_EXPORT void node(std::wstring const &content, 
                    bool quote = false, 
                    bool block = false);
-  EXPORT void comment(std::wstring const &content, bool on_new_line);
-  EXPORT void end_document();
+  GOTT_EXPORT void comment(std::wstring const &content, bool on_new_line);
+  GOTT_EXPORT void end_document();
 
-  EXPORT class non_conformant_block {};
+  GOTT_EXPORT class non_conformant_block {};
 
 private:
   class IMPL;

@@ -31,7 +31,7 @@ namespace properties {
 namespace detail {
   
 template<class ValueType>
-struct EXPORT abstract_pa {
+struct GOTT_EXPORT abstract_pa {
   virtual void set(ValueType const &) = 0;
   virtual ValueType const &get() const = 0;
   ValueType const &operator() () const { return get(); }

@@ -53,14 +53,14 @@ public:
    * Add another selection to this selection.
    * \param o The selection to add.
    */
-  selection const &operator+=(selection const &o) EXPORT;
+  selection const &operator+=(selection const &o) GOTT_EXPORT;
 
   /**
    * From every iterator, get an index-specific child.
    * \param i The children's index.
    * \return The new selection with the children.
    */
-  selection find(std::size_t i) const EXPORT;
+  selection find(std::size_t i) const GOTT_EXPORT;
 
   /**
    * From every iterator, get a range of index-specific children.
@@ -68,19 +68,19 @@ public:
    * \param stop The children's maximal (inclusive) index.
    * \return The new selection with the children.
    */
-  selection find_range(std::size_t start, std::size_t stop) const EXPORT;
+  selection find_range(std::size_t start, std::size_t stop) const GOTT_EXPORT;
 
   /**
    * Gets all children from the iterators.
    * \return The new selection with the children.
    */
-  selection find_all() const EXPORT;
+  selection find_all() const GOTT_EXPORT;
 
   /** 
    * Gets all children from the iterators with a specific tag.
    * \param tag The tag to search for.
    */
-  selection find_tag(std::wstring const &tag) const EXPORT;
+  selection find_tag(std::wstring const &tag) const GOTT_EXPORT;
 
 private:
   typedef std::vector<Iterator> container;
@@ -94,7 +94,7 @@ public:
   size_type size() const { return impl.size(); }
 
   /// Compare two selections for equality.
-  bool operator==(selection const &) const EXPORT;
+  bool operator==(selection const &) const GOTT_EXPORT;
 
 private:
   container impl;

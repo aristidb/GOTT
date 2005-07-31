@@ -39,7 +39,7 @@ class rule_attr;
  * Used via match::add or via match's constructor. Attention: Those methods
  * require a rule-factory, which in turn will create a rule object.
  */
-class EXPORT rule {
+class GOTT_EXPORT rule {
 public:
 
   /**
@@ -127,7 +127,7 @@ public:
   /**
    * Get the attributes associated with this rule.
    */
-  rule_attr const &attributes() const EXPORT;
+  rule_attr const &attributes() const GOTT_EXPORT;
 
 protected:
   match &matcher();

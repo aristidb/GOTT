@@ -29,7 +29,7 @@ namespace tdl = gott::util::tdl;
 
 namespace {
 struct ignore_struct : tdl::structure::revocable_structure {
-  void data(gott::util::xany::Xany const &) {}
+  void data(gott::xany::Xany const &) {}
   void begin() {}
   void end() {}
   void add_tag(std::wstring const &) {}

@@ -30,7 +30,6 @@
 #include <gott/util/misc/visibility.hpp>
 
 namespace gott {
-namespace util {
 namespace xany {
 
 /**
@@ -47,7 +46,7 @@ namespace xany {
  * @endcode
  */
 struct operations_base {
-  EXPORT virtual ~operations_base() = 0;
+  GOTT_EXPORT virtual ~operations_base() = 0;
 };
 
 template<class T> struct operations;
@@ -196,7 +195,7 @@ T Xany_cast(Xany const &p) {
  * Any equality-comparable Xany-compatible type has this interface in its
  * operations.
  */
-struct EXPORT equality_comparable : virtual operations_base {
+struct GOTT_EXPORT equality_comparable : virtual operations_base {
   virtual bool equals(Xany const &, Xany const &) const = 0;
   virtual ~equality_comparable() = 0;
 };
@@ -215,17 +214,17 @@ template<class T> struct operations : equality_comparer<T> {};
 /**
  * Checks whether two typeless objects are equal.
  */
-EXPORT bool operator==(Xany const &lhs, Xany const &rhs);
+GOTT_EXPORT bool operator==(Xany const &lhs, Xany const &rhs);
 
 /**
  * Checks whether two typeless objects differ.
  */
-EXPORT bool operator!=(Xany const &lhs, Xany const &rhs);
+GOTT_EXPORT bool operator!=(Xany const &lhs, Xany const &rhs);
 
 /**
  * Any printable Xany-compatible type has this interface in its operations.
  */
-struct EXPORT printable : virtual operations_base {
+struct GOTT_EXPORT printable : virtual operations_base {
   virtual void print(std::ostream &, Xany const &) const = 0;
   virtual void print(std::wostream &, Xany const &) const = 0;
   virtual ~printable() = 0;
@@ -255,14 +254,14 @@ operator<<(std::basic_ostream<Ch, ChT> &s, Xany const &v) {
   return s;
 }
 
-#define GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(T) \
+#define GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(T) \
   template<> struct operations<T> : equality_comparer<T>, printer<T> {}
 
-GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(long);
-GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(double);
-GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(std::string);
-GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(std::wstring);
+GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(long);
+GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(double);
+GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(std::string);
+GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(std::wstring);
 
-}}}
+}}
 
 #endif

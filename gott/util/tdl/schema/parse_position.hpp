@@ -41,13 +41,13 @@ public:
 
   typedef std::pair<long, structure::revocable_structure::pth> id;
 
-  id current() EXPORT;
-  id current_readonly() EXPORT;
-  void seek(id const &) EXPORT;
-  void seek_and_forget(id const &) EXPORT;
-  void forget(id const &) EXPORT;
+  id current() GOTT_EXPORT;
+  id current_readonly() GOTT_EXPORT;
+  void seek(id const &) GOTT_EXPORT;
+  void seek_and_forget(id const &) GOTT_EXPORT;
+  void forget(id const &) GOTT_EXPORT;
 
-  struct EXPORT acceptor {
+  struct GOTT_EXPORT acceptor {
     virtual void operator()(ev::token const &) = 0;
   };
 
@@ -60,7 +60,7 @@ public:
   void consume();
   void pass(); 
 
-  bool proceeded(id const &) const EXPORT; // from the unconsumed token
+  bool proceeded(id const &) const GOTT_EXPORT; // from the unconsumed token
 
 #ifdef DEBUG
   void debug_dump() const;
