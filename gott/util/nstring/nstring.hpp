@@ -2,7 +2,7 @@
 // Content: Text storage and manipulation
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,8 @@ public:
   nstring(wchar_t const *, encoding = utf32);
   nstring(std::wstring const &, encoding = utf32);
 
+  ~nstring();
+
   operator std::string() const;
   operator std::wstring() const;
  
@@ -45,6 +47,8 @@ public:
 private:
   class representation;
   representation *data;
+
+  nstring();
 };
 
 nstring operator+(nstring const &, nstring const &);

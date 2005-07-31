@@ -3,7 +3,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
