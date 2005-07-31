@@ -18,32 +18,28 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_NSTRING_ITERATOR_HPP
-#define GOTT_UTIL_NSTRING_ITERATOR_HPP
+#include "nstring.hpp"
+#include "convert.hpp"
 
-#include <cstdint>
-#include <cstddef>
+#include <cstdlib>
+#include <cwchar>
 
-namespace gott {
+using gott::nstring;
 
-typedef std::int8_t utf8_t;
-typedef std::int32_t utf32_t;
+class nstring::representation {
+public:
+  representation(utf8_t *d, std::size_t s) 
+  : ref_count(1), size(s), length(0), data(d) {}
 
-enum encoding {
-  // Full Unicode
-  utf8,
-  utf16be, utf16 = utf16be, utf16le,
-  utf32be, utf32 = utf32be, utf32le,
-  utf7,
-  c99,java,
-  // European
-  ascii,
-  iso8859_1, iso8859_2, iso8859_3, iso8859_4, iso8859_5, iso8859_6, iso8859_7,
-  iso8859_8, iso8859_9, iso8859_10, iso8859_11, iso8859_12, iso8859_13, 
-  iso8859_14, iso8859_15, iso8859_16,
-  NO_ENCODING
+
+  std::size_t ref_count;
+  std::size_t size;
+  std::size_t length;
+  utf8_t *data;
 };
 
-}
+nstring::nstring(char const *in, encoding enc)
+: data(new representation(to_utf8_alloc(in, enc), std::strlen(in))) {}
 
-#endif
+nstring::nstring(wchar_t const *in, encoding enc)
+: data(new representation(to_utf8_alloc(in, enc), std::wcslen(in))) {}
