@@ -18,16 +18,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_NSTRING_ITERATOR_HPP
-#define GOTT_UTIL_NSTRING_ITERATOR_HPP
+#ifndef GOTT_UTIL_NSTRING_TYPES_HPP
+#define GOTT_UTIL_NSTRING_TYPES_HPP
 
-#include <cstdint>
+#include <boost/cstdint.hpp>
 #include <cstddef>
 
 namespace gott {
 
-typedef std::int8_t utf8_t;
-typedef std::int32_t utf32_t;
+typedef uint8_t utf8_t;
+typedef uint32_t utf32_t;
 
 enum encoding {
   // Full Unicode

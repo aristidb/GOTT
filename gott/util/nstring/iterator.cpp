@@ -1,4 +1,4 @@
-// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+﻿// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: Text storage and manipulation
 // Authors: Aristid Breitkreuz
 //
@@ -18,4 +18,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "nstring_buffer.hpp"
+#include "iterator.hpp"
+
+using gott::nstring_iterator;
+
+gott::utf32_t nstring_iterator::operator*() const {
+  if (*current > 0x80)
+    return *current;
+  return 0;
+}

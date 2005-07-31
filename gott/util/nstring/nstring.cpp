@@ -23,6 +23,9 @@
 
 #include <cstdlib>
 #include <cwchar>
+#include <cstring>
+#include <list>
+#include <vector>
 
 using gott::nstring;
 
@@ -31,7 +34,6 @@ public:
   representation(utf8_t *d, std::size_t s) 
   : ref_count(1), size(s), length(0), data(d) {}
 
-
   std::size_t ref_count;
   std::size_t size;
   std::size_t length;
@@ -39,7 +41,34 @@ public:
 };
 
 nstring::nstring(char const *in, encoding enc)
-: data(new representation(to_utf8_alloc(in, enc), std::strlen(in))) {}
+: p(new representation(to_utf8_alloc(in, enc), std::strlen(in))) {}
 
 nstring::nstring(wchar_t const *in, encoding enc)
-: data(new representation(to_utf8_alloc(in, enc), std::wcslen(in))) {}
+: p(new representation(to_utf8_alloc((char const*)in, enc), 
+                          std::wcslen(in))) {}
+
+nstring::nstring(nstring const &o) : p(o.p) {
+  ++p->ref_count;
+}
+
+nstring::~nstring() {
+  if (--p->ref_count == 0)
+    delete p;
+}
+
+nstring::nstring(std::vector<nstring> const &v)
+: p(new representation(0, 0)) {
+  for (std::vector<nstring>::const_iterator it = v.begin(); it != v.end(); ++it)
+    p->size += it->size();
+  utf8_t *current = p->data = new utf8_t[p->size];
+  for (std::vector<nstring>::const_iterator it = v.begin(); it != v.end(); ++it)
+    current = std::copy(it->data(), it->data() + it->size(), current);
+}
+
+gott::utf8_t const *nstring::data() const {
+  return p->data;
+}
+
+std::size_t nstring::size() const {
+  return p->size;
+}

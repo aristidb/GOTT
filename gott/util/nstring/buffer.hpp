@@ -18,33 +18,36 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_NSTRING_ITERATOR_HPP
-#define GOTT_UTIL_NSTRING_ITERATOR_HPP
+#ifndef GOTT_UTIL_NSTRING_BUFFER_HPP
+#define GOTT_UTIL_NSTRING_BUFFER_HPP
 
+#include "nstring.hpp"
 #include "types.hpp"
-#include <iterator>
 
 namespace gott {
 
-class nstring_iterator {
+class nstring_buffer {
 public:
-  typedef utf32_t value_type;
-  typedef utf32_t *pointer;
-  typedef utf32_t &reference;
-  typedef std::ptrdiff_t difference_type;
-  typedef std::input_iterator_tag iterator_category;
+  nstring_buffer();
+  ~nstring_buffer();
 
-  utf32_t operator*() const;
-  nstring_iterator &operator++();
+  utf32_t *begin();
+  utf32_t *end();
+  utf32_t const *begin() const;
+  utf32_t const *end() const;
+  
+  void swap(nstring_buffer &);
 
-  nstring_iterator(utf8_t const *c) : current(c) {}
+  void operator+=(nstring const &);
+  void operator+=(utf32_t const *);
+
+  void append(utf32_t const *, std::size_t);
 
 private:
-  utf8_t const *current;
+  class representation;
+  representation *data;
 };
 
-bool operator==(nstring_iterator const &, nstring_iterator const &);
-bool operator!=(nstring_iterator const &, nstring_iterator const &);
-
 }
+
 #endif

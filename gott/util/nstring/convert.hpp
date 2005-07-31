@@ -18,30 +18,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_NSTRING_NSTRING_BUFFER_HPP
-#define GOTT_UTIL_NSTRING_NSTRING_BUFFER_HPP
+#ifndef GOTT_UTIL_NSTRING_CONVERT_HPP
+#define GOTT_UTIL_NSTRING_CONVERT_HPP
 
-#include "nstring.hpp"
 #include "types.hpp"
 
 namespace gott {
 
-class nstring_buffer {
-public:
-  nstring_buffer();
-  
-  operator nstring();
-
-  void swap(nstring_buffer &);
-
-  void operator+=(nstring const &);
-  void operator+=(utf32_t const *);
-  void operator+=(utf32_t const *, std::size_t);
-
-private:
-  class representation;
-  representation *data;
-};
+utf8_t *to_utf8_alloc(char const *, encoding);
 
 }
 

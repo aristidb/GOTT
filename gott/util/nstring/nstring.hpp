@@ -23,19 +23,29 @@
 
 #include "iterator.hpp"
 
+namespace std {
+  template<class> class allocator;
+  template<class, class> class vector;
+  template<class, class> class list;
+}
+
 namespace gott {
+
+class nstring_buffer;
 
 class nstring {
 public:
   nstring(char const *, encoding = utf8);
-  nstring(std::string const &, encoding = utf8);
   nstring(wchar_t const *, encoding = utf32);
-  nstring(std::wstring const &, encoding = utf32);
+  nstring(nstring_buffer const &);
+  nstring(std::vector<nstring, std::allocator<nstring> > const &);
+  nstring(std::list<nstring, std::allocator<nstring> > const &);
 
+  nstring(nstring const &);
   ~nstring();
 
-  operator std::string() const;
-  operator std::wstring() const;
+  char const *c_str() const;
+  utf8_t const *data() const;
  
   nstring_iterator begin() const;
   nstring_iterator end() const;
@@ -46,7 +56,7 @@ public:
 
 private:
   class representation;
-  representation *data;
+  representation *p;
 
   nstring();
 };
