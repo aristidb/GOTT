@@ -26,9 +26,10 @@
 
 namespace std {
   template<class> class allocator;
+  template<class> class char_traits;
   template<class, class> class vector;
   template<class, class> class list;
-  template<class, class, class> class basic_string;
+  template<class, class> class basic_ostream;
 }
 
 namespace gott {
@@ -66,6 +67,11 @@ private:
 
   GOTT_LOCAL nstring(); // unimplemented
 };
+
+GOTT_EXPORT 
+std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &
+operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &, 
+           nstring const &);
 
 GOTT_EXPORT nstring operator+(nstring const &, nstring const &);
 

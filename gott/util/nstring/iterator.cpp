@@ -23,22 +23,29 @@
 using gott::utf8_iterator;
 
 gott::utf32_t utf8_iterator::operator*() const {
-  if (*current < 0xC0)
-    return *current;
-  else if (*current < 0xE0)
-    return utf32_t(*current & 0x1F) << 6 | utf32_t(current[1] & 0x3F);
-  else if (*current < 0xF0)
-    return utf32_t(*current & 0x0F) << 12 | utf32_t(current[1] & 0x3F) << 6
-            | utf32_t(current[2] & 0x3F);
-  else if (*current < 0xF8)
-    return utf32_t(*current & 0x08) << 18 | utf32_t(current[1] & 0x3F) << 12
-            | utf32_t(current[2] & 0x3F) << 6 | utf32_t(current[3] | 0x3F);
+  utf8_t const mask6 = ~(~utf8_t() << 6);
+  utf8_t const mask5 = ~(~utf8_t() << 5);
+  utf8_t const mask4 = ~(~utf8_t() << 4);
+  if (current[0] < 0xC0)
+    return current[0];
+  else if (current[0] < 0xE0)
+    return (utf32_t(current[0] & mask6) << 6) 
+            | utf32_t(current[1] & mask6);
+  else if (current[0] < 0xF0)
+    return (utf32_t(current[0] & mask5) << 12) 
+            | (utf32_t(current[1] & mask6) << 6)
+            | utf32_t(current[2] & mask6);
+  else if (current[0] < 0xF8)
+    return utf32_t(current[0] & mask4) << 18 
+            | (utf32_t(current[1] & mask6) << 12)
+            | (utf32_t(current[2] & mask6) << 6)
+            | utf32_t(current[3] & mask6);
   return 0;
 }
 
 utf8_iterator &utf8_iterator::operator++() {
   ++current;
-  while (*current > 0x80 && *current < 0xC0)
+  while (*current >= 0x80 && *current < 0xC0)
     ++current;
   return *this;
 }

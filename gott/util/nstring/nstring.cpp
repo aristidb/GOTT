@@ -26,6 +26,7 @@
 #include <cstring>
 #include <list>
 #include <vector>
+#include <ostream>
 
 using gott::nstring;
 
@@ -100,4 +101,10 @@ void nstring::swap(nstring &o) {
 
 void nstring::operator=(nstring const &o) {
   nstring(o).swap(*this);
+}
+
+std::wostream &gott::operator<<(std::wostream &stream, nstring const &s) {
+  for (utf8_iterator it = s.begin(); it != s.end(); ++it)
+    stream << wchar_t(*it);
+  return stream;
 }
