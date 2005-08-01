@@ -26,7 +26,7 @@
 
 namespace gott {
 
-class nstring_iterator {
+class utf8_iterator {
 public:
   typedef utf32_t value_type;
   typedef utf32_t *pointer;
@@ -35,16 +35,16 @@ public:
   typedef std::input_iterator_tag iterator_category;
 
   utf32_t operator*() const;
-  nstring_iterator &operator++();
+  utf8_iterator &operator++();
 
-  nstring_iterator(utf8_t const *c) : current(c) {}
+  utf8_iterator(utf8_t const *c) : current(c) {}
 
 private:
   utf8_t const *current;
 };
 
-bool operator==(nstring_iterator const &, nstring_iterator const &);
-bool operator!=(nstring_iterator const &, nstring_iterator const &);
+bool operator==(utf8_iterator const &, utf8_iterator const &);
+bool operator!=(utf8_iterator const &, utf8_iterator const &);
 
 }
 #endif

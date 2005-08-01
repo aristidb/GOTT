@@ -47,8 +47,8 @@ public:
   char const *c_str() const;
   utf8_t const *data() const;
  
-  nstring_iterator begin() const;
-  nstring_iterator end() const;
+  utf8_iterator begin() const;
+  utf8_iterator end() const;
 
   std::size_t length() const;
 
