@@ -48,3 +48,15 @@ utf8_iterator utf8_iterator::operator++(int) {
   ++*this;
   return tmp;
 }
+
+utf8_iterator::operator utf8_t const *() const {
+  return current;
+}
+
+bool gott::operator==(utf8_iterator const &a, utf8_iterator const &b) {
+  return (utf8_t const *) a == (utf8_t const *) b;
+}
+
+bool gott::operator!=(utf8_iterator const &a, utf8_iterator const &b) {
+  return !(a == b);
+}

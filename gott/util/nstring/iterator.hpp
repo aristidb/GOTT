@@ -39,6 +39,7 @@ public:
   utf8_iterator operator++(int); // postfix
 
   utf8_iterator(utf8_t const *c) : current(c) {}
+  operator utf8_t const *() const;
 
 private:
   utf8_t const *current;

@@ -69,6 +69,25 @@ gott::utf8_t const *nstring::data() const {
   return p->data;
 }
 
+gott::utf8_iterator nstring::begin() const {
+  return p->data;
+}
+
+gott::utf8_iterator nstring::end() const {
+  return p->data + p->size;
+}
+
 std::size_t nstring::size() const {
   return p->size;
+}
+
+std::size_t nstring::length() const {
+  if (!p->length && p->size) {
+    utf8_iterator it = begin();
+    while (it != end()) {
+      ++it;
+      ++p->length;
+    }
+  }
+  return p->length;
 }
