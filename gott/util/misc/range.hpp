@@ -43,6 +43,16 @@ I advanced(I it, S s) {
 }
 
 template<class T, class S>
+T *advanced(T *it, S s) {
+  return it + s;
+}
+
+template<class T, class S>
+T const *advanced(T const *it, S s) {
+  return it + s;
+}
+
+template<class T, class S>
 range_t<T> range(T const &a, S s) {
   return range(a, advanced(a, s));
 }

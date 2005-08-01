@@ -8,6 +8,7 @@ int main() {
   nstring n("Hallo, nstring-Welt!\n", ascii);
   nstring x(n); // fast!
   x = L"Foobar\n";
+  n = x + n;
   wcerr << n << x;
   // Print: ae, euro
   nstring ae_euro("\xc3\xa4 \xe2\x82\xac\n", utf8);

@@ -20,6 +20,7 @@
 
 #include "nstring.hpp"
 #include "convert.hpp"
+#include <gott/util/misc/range.hpp>
 
 #include <cstdlib>
 #include <cwchar>
@@ -34,6 +35,8 @@ class nstring::representation {
 public:
   representation(utf8_t *d, std::size_t s) 
   : ref_count(1), size(s), length(0), data(d) {}
+
+  template<class I> representation(range_t<I> const &);
 
   std::size_t ref_count;
   std::size_t size;
@@ -58,13 +61,24 @@ nstring::~nstring() {
 }
 
 nstring::nstring(std::vector<nstring> const &v)
-: p(new representation(0, 0)) {
-  for (std::vector<nstring>::const_iterator it = v.begin(); it != v.end(); ++it)
-    p->size += it->size();
-  utf8_t *current = p->data = new utf8_t[p->size];
-  for (std::vector<nstring>::const_iterator it = v.begin(); it != v.end(); ++it)
+: p(new representation(range(v))) {}
+
+nstring::nstring(std::list<nstring> const &v)
+: p(new representation(range(v))) {}
+
+nstring::nstring(nstring const *arr, std::size_t len)
+: p(new representation(range(arr, len))) {}
+
+template<class I>
+nstring::representation::representation(range_t<I> const &r) 
+: size(0) {
+  for (I it = r.begin; it != r.end; ++it)
+    size += it->size();
+  utf8_t *current = data = new utf8_t[size];
+  for (I it = r.begin; it != r.end; ++it)
     current = std::copy(it->data(), it->data() + it->size(), current);
 }
+
 
 gott::utf8_t const *nstring::data() const {
   return p->data;
@@ -107,4 +121,9 @@ std::wostream &gott::operator<<(std::wostream &stream, nstring const &s) {
   for (utf8_iterator it = s.begin(); it != s.end(); ++it)
     stream << wchar_t(*it);
   return stream;
+}
+
+nstring gott::operator+(nstring const &a, nstring const &b) {
+  nstring both[] = { a, b };
+  return nstring(both, 2);
 }
