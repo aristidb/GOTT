@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: Text storage and manipulation
 // Authors: Aristid Breitkreuz
 //
