@@ -36,10 +36,15 @@ namespace gott {
 
 class nstring_buffer;
 
+/**
+ * UTF-8 string literals storage class.
+ */
 class GOTT_EXPORT nstring {
 public:
   nstring(char const *, encoding = utf8);
   nstring(wchar_t const *, encoding = utf32);
+  enum literal_tag { utf8_literal };
+  nstring(utf8_t const *, literal_tag);
   nstring(nstring_buffer const &);
   nstring(std::vector<nstring, std::allocator<nstring> > const &);
   nstring(std::list<nstring, std::allocator<nstring> > const &);

@@ -20,8 +20,9 @@
 
 #include "nstring.hpp"
 #include "convert.hpp"
-#include <gott/util/misc/range.hpp>
+#include "util.hpp"
 
+#include <gott/util/misc/range.hpp>
 #include <cstdlib>
 #include <cwchar>
 #include <cstring>
@@ -33,23 +34,32 @@ using gott::nstring;
 
 class nstring::representation {
 public:
-  representation(utf8_t *d, std::size_t s) 
-  : ref_count(1), size(s), length(0), data(d) {}
+  representation(utf8_t const *d, std::size_t s, bool o = true) 
+  : ref_count(1), size(s), length(0), owned(o), data(d) {}
+
+  ~representation() {
+    if (owned) 
+      delete data;
+  }
 
   template<class I> representation(range_t<I> const &);
 
   std::size_t ref_count;
   std::size_t size;
   std::size_t length;
-  utf8_t *data;
+  bool owned;
+  utf8_t const *data;
 };
 
 nstring::nstring(char const *in, encoding enc)
 : p(new representation(to_utf8_alloc(in, enc), std::strlen(in))) {}
 
+nstring::nstring(utf8_t const *in, literal_tag)
+: p(new representation(in, utf8_len(in), false)) {}
+
 nstring::nstring(wchar_t const *in, encoding enc)
 : p(new representation(to_utf8_alloc((char const*)in, enc), 
-                          std::wcslen(in))) {}
+                       std::wcslen(in))) {}
 
 nstring::nstring(nstring const &o) : p(o.p) {
   ++p->ref_count;
@@ -74,7 +84,8 @@ nstring::representation::representation(range_t<I> const &r)
 : size(0) {
   for (I it = r.begin; it != r.end; ++it)
     size += it->size();
-  utf8_t *current = data = new utf8_t[size];
+  utf8_t *current = new utf8_t[size];
+  data = current;
   for (I it = r.begin; it != r.end; ++it)
     current = std::copy(it->data(), it->data() + it->size(), current);
 }
@@ -97,13 +108,9 @@ std::size_t nstring::size() const {
 }
 
 std::size_t nstring::length() const {
-  if (!p->length && p->size) {
-    utf8_iterator it = begin();
-    while (it != end()) {
-      ++it;
+  if (!p->length)
+    for (utf8_iterator it = begin(); it != end(); ++it)
       ++p->length;
-    }
-  }
   return p->length;
 }
 

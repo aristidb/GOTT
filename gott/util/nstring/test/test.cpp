@@ -11,7 +11,8 @@ int main() {
   n = x + n;
   wcerr << n << x;
   // Print: ae, euro
-  nstring ae_euro("\xc3\xa4 \xe2\x82\xac\n", utf8);
+  nstring ae_euro((utf8_t const *)"\xc3\xa4 \xe2\x82\xac\n", 
+                  nstring::utf8_literal);
   wcerr << hex;
   for (utf8_t const *it = ae_euro.data(); *it; ++it)
     wcerr << *it << L' ';

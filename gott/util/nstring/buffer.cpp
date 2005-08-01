@@ -73,7 +73,7 @@ utf32_t const *nstring_buffer::end() const {
 }
 
 void nstring_buffer::operator+=(utf32_t const *x) {
-  append(x, utf32len(x));
+  append(x, utf32_len(x));
 }
 
 void nstring_buffer::operator+=(nstring const &x) {

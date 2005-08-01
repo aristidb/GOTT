@@ -25,7 +25,14 @@
 
 namespace gott {
 
-inline std::size_t utf32len(utf32_t const *s) {
+inline std::size_t utf8_len(utf8_t const *s) {
+  std::size_t result = 0;
+  while (*s++)
+    ++result;
+  return result;
+}
+
+inline std::size_t utf32_len(utf32_t const *s) {
   std::size_t result = 0;
   while (*s++)
     ++result;
