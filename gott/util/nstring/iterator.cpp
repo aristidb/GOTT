@@ -42,3 +42,9 @@ utf8_iterator &utf8_iterator::operator++() {
     ++current;
   return *this;
 }
+
+utf8_iterator utf8_iterator::operator++(int) {
+  utf8_iterator tmp(*this);
+  ++*this;
+  return tmp;
+}

@@ -35,7 +35,8 @@ public:
   typedef std::input_iterator_tag iterator_category;
 
   utf32_t operator*() const;
-  utf8_iterator &operator++();
+  utf8_iterator &operator++(); // prefix
+  utf8_iterator operator++(int); // postfix
 
   utf8_iterator(utf8_t const *c) : current(c) {}
 

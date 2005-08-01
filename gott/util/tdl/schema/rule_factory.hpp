@@ -49,7 +49,7 @@ class GOTT_EXPORT rule_factory {
    * Produce a rule object.
    * \param m The engine to work inside.
    */
-  LOCAL virtual rule *get(match &m) const = 0;
+  GOTT_LOCAL virtual rule *get(match &m) const = 0;
 
   /**
    * Let the produced rule have a/another child.
@@ -57,7 +57,7 @@ class GOTT_EXPORT rule_factory {
    * \param child The rule-factory producing the child.
    * \param repatcher The surrounding repatcher.
    */
-  LOCAL virtual void add(rule_factory const &child) = 0;
+  GOTT_LOCAL virtual void add(rule_factory const &child) = 0;
 
   /**
    * Lets the produced rule have a child in a specific slot.
@@ -66,12 +66,12 @@ class GOTT_EXPORT rule_factory {
    * \param slot The slot to put the child into.
    * \param repatcher The surrounding repatcher.
    */
-  LOCAL virtual void add(rule_factory const &child, unsigned slot);
+  GOTT_LOCAL virtual void add(rule_factory const &child, unsigned slot);
 
   /**
    * Try to cast to a slotcfg-enabled rule-factory.
    */
-  LOCAL with_slotcfg *get_with_slotcfg();
+  GOTT_LOCAL with_slotcfg *get_with_slotcfg();
 
   static const unsigned no_slot = unsigned(-1);
     // signifies that a slot number is no slot

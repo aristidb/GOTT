@@ -22,6 +22,7 @@
 #define GOTT_UTIL_NSTRING_NSTRING_HPP
 
 #include "iterator.hpp"
+#include <gott/util/misc/visibility.hpp>
 
 namespace std {
   template<class> class allocator;
@@ -33,13 +34,14 @@ namespace gott {
 
 class nstring_buffer;
 
-class nstring {
+class GOTT_EXPORT nstring {
 public:
   nstring(char const *, encoding = utf8);
   nstring(wchar_t const *, encoding = utf32);
   nstring(nstring_buffer const &);
   nstring(std::vector<nstring, std::allocator<nstring> > const &);
   nstring(std::list<nstring, std::allocator<nstring> > const &);
+  nstring(nstring const *, std::size_t);
 
   nstring(nstring const &);
   ~nstring();
@@ -58,10 +60,10 @@ private:
   class representation;
   representation *p;
 
-  nstring();
+  GOTT_LOCAL nstring(); // unimplemented
 };
 
-nstring operator+(nstring const &, nstring const &);
+GOTT_EXPORT nstring operator+(nstring const &, nstring const &);
 
 }
 

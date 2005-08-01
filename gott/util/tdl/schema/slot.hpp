@@ -155,7 +155,7 @@ struct GOTT_EXPORT rule_factory::with_slotcfg {
    * \param child The rule-factory producing the child.
    * \param cfg The "repetition definition" of the child.
    */
-  LOCAL
+  GOTT_LOCAL
   virtual void add(rule_factory const &child, slotcfg const &cfg) = 0;
 
   /**
@@ -165,13 +165,13 @@ struct GOTT_EXPORT rule_factory::with_slotcfg {
    * \param slot The slot to put the child into.
    * \param cfg The "repetition definition" of the child.
    */
-  LOCAL
+  GOTT_LOCAL
   virtual void add(rule_factory const&child, unsigned slot, slotcfg const &cfg);
 
-  LOCAL
+  GOTT_LOCAL
   virtual slotcfg::mode accepted_modes() const = 0;
 
-  LOCAL
+  GOTT_LOCAL
   bool supports(slotcfg const &) const;
 
   virtual ~with_slotcfg() = 0;

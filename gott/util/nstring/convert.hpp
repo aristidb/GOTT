@@ -26,6 +26,8 @@
 namespace gott {
 
 utf8_t *to_utf8_alloc(char const *, encoding);
+utf32_t to_utf32_char(char const *, char const *&, encoding);
+utf8_t *to_utf8_alloc(utf32_t const *, encoding);
 
 }
 

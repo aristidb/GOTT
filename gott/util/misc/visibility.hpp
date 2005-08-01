@@ -9,14 +9,14 @@
   #else
     #define GOTT_EXPORT __declspec(dllimport)
   #endif
-  #define LOCAL
+  #define GOTT_LOCAL
 #else
   #ifdef HAVE_VISIBILITY
     #define GOTT_EXPORT __attribute__ ((visibility("default")))
-    #define LOCAL __attribute__ ((visibility("hidden")))
+    #define GOTT_LOCAL __attribute__ ((visibility("hidden")))
   #else
     #define GOTT_EXPORT
-    #define LOCAL
+    #define GOTT_LOCAL
   #endif
 #endif
 

@@ -31,8 +31,8 @@ class GOTT_EXPORT tdl_exception : public std::exception {
   std::string message_narrow;
   std::wstring message_wide;
 public:
-  tdl_exception(std::string const &msg) LOCAL;
-  tdl_exception(std::wstring const &msg) LOCAL;
+  tdl_exception(std::string const &msg) GOTT_LOCAL;
+  tdl_exception(std::wstring const &msg) GOTT_LOCAL;
   ~tdl_exception() throw();
   char const *what() const throw();
 };
@@ -46,13 +46,13 @@ namespace detail { struct stream_position; }
  * Thrown when a rule failed to match and could not be backtracked.
  */
 struct GOTT_EXPORT mismatch : public tdl_exception {
-  LOCAL
+  GOTT_LOCAL
   mismatch(detail::stream_position const &p, std::list<std::wstring> const &);
   ~mismatch() throw();
 };
 
 struct GOTT_EXPORT unregistered_type : public tdl_exception {
-  unregistered_type(std::wstring const &type) LOCAL;
+  unregistered_type(std::wstring const &type) GOTT_LOCAL;
   ~unregistered_type() throw();
 };
 

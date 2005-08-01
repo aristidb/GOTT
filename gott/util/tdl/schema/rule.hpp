@@ -119,7 +119,7 @@ public:
   virtual bool play(ev::child_fail const &);
 
   /// @internal
-  void finish() LOCAL;
+  void finish() GOTT_LOCAL;
 
   virtual ~rule() = 0;
 
