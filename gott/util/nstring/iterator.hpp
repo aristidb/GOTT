@@ -23,10 +23,11 @@
 
 #include "types.hpp"
 #include <iterator>
+#include <gott/util/misc/visibility.hpp>
 
 namespace gott {
 
-class utf8_iterator {
+class GOTT_EXPORT utf8_iterator {
 public:
   typedef utf32_t value_type;
   typedef utf32_t *pointer;
@@ -45,8 +46,8 @@ private:
   utf8_t const *current;
 };
 
-bool operator==(utf8_iterator const &, utf8_iterator const &);
-bool operator!=(utf8_iterator const &, utf8_iterator const &);
+GOTT_EXPORT bool operator==(utf8_iterator const &, utf8_iterator const &);
+GOTT_EXPORT bool operator!=(utf8_iterator const &, utf8_iterator const &);
 
 }
 #endif

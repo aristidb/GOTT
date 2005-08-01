@@ -91,3 +91,13 @@ std::size_t nstring::length() const {
   }
   return p->length;
 }
+
+void nstring::swap(nstring &o) {
+  representation *tmp = p;
+  p = o.p;
+  o.p = tmp;
+}
+
+void nstring::operator=(nstring const &o) {
+  nstring(o).swap(*this);
+}

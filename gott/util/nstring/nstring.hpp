@@ -28,6 +28,7 @@ namespace std {
   template<class> class allocator;
   template<class, class> class vector;
   template<class, class> class list;
+  template<class, class, class> class basic_string;
 }
 
 namespace gott {
@@ -46,7 +47,10 @@ public:
   nstring(nstring const &);
   ~nstring();
 
-  char const *c_str() const;
+  void swap(nstring &other);
+  void operator=(nstring const &other);
+
+  char const *c_str(encoding enc) const;
   utf8_t const *data() const;
  
   utf8_iterator begin() const;
