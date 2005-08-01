@@ -1,0 +1,7 @@
+import glob
+
+Import('env')
+
+env.SharedLibrary('nstring', glob.glob('*.cpp'))
+env.Program('nstring_test', glob.glob('test/*.cpp'), LIBS='nstring', 
+            LIBPATH='#/util/nstring')
