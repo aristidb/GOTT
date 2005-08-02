@@ -41,6 +41,8 @@ class nstring_buffer;
  */
 class GOTT_EXPORT nstring {
 public:
+  typedef utf8_iterator const_iterator;
+
   nstring(char const *, encoding = utf8);
   nstring(wchar_t const *, encoding = utf32);
   enum literal_tag { utf8_literal };
@@ -70,6 +72,8 @@ private:
   class representation;
   representation *p;
 
+  friend bool operator==(nstring const &, nstring const &);
+
   GOTT_LOCAL nstring(); // unimplemented
 };
 
@@ -79,6 +83,9 @@ operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &,
            nstring const &);
 
 GOTT_EXPORT nstring operator+(nstring const &, nstring const &);
+
+GOTT_EXPORT bool operator==(nstring const &, nstring const &);
+GOTT_EXPORT bool operator!=(nstring const &, nstring const &);
 
 }
 

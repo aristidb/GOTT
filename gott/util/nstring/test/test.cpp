@@ -11,6 +11,9 @@ using namespace boost;
 int main() {
   nstring n("Hallo, nstring-Welt!\n", ascii);
   nstring x(n); // fast!
+  wcerr << (x == n) << L' ';
+  wcerr << (x != L"muhkuh") << L' ';
+  wcerr << (x == "Hallo, nstring-Welt!\n") << L'\n';
   x = L"Foobar\n";
   n = x + n;
   wcerr << n << x;
@@ -27,7 +30,7 @@ int main() {
   nstring_buffer b(ae_euro);
   //to_upper(b);
   b[1] = utf32_t(L':');
-  b.erase(b.begin() + 1, b.begin() + 6);
+  b.erase(b.begin() + 2, b.begin() + 6);
   nstring a(b);
   wcerr << a;
   wcerr << L"done\n";

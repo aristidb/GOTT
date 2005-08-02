@@ -63,12 +63,13 @@ void gott::write_utf32_to_utf8(utf32_t ch, utf8_t *&out) {
   }
 }
 
-utf8_t *gott::to_utf8_alloc(char const *in, char const *end, encoding enc) {
+gott::range_t<utf8_t *> 
+gott::to_utf8_alloc(char const *in, char const *end, encoding enc) {
   std::size_t len = utf8_len(in, enc);
   utf8_t *result = new utf8_t[len];
   if (enc == utf8) {
     std::copy(in, in + len, result);
-    return result;
+    return range(result, result + len);
   }
   utf8_t *out = result;
   char const *next;
@@ -77,7 +78,7 @@ utf8_t *gott::to_utf8_alloc(char const *in, char const *end, encoding enc) {
     write_utf32_to_utf8(ch, out);
     in = next;
   }
-  return result;
+  return range(result, out);
 }
 
 std::size_t gott::utf8_len(char const *in, encoding enc) {

@@ -25,7 +25,6 @@
 #include <algorithm>
 
 namespace gott {
-namespace util {
 
 #define GOTT_A_R1(A, R) \
   template<class I1> \
@@ -103,6 +102,6 @@ GOTT_A_R2I_P1(transform, I2)
 #undef GOTT_A_R2I_P1
 #undef GOTT_A_R2I_P01
 
-}}
+}
 
 #endif

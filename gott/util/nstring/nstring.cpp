@@ -24,6 +24,7 @@
 #include "buffer.hpp"
 
 #include <gott/util/misc/range.hpp>
+#include <gott/util/misc/range_algo.hpp>
 #include <cstdlib>
 #include <cwchar>
 #include <cstring>
@@ -38,6 +39,9 @@ class nstring::representation {
 public:
   representation(utf8_t const *d, bool o = true) 
   : ref_count(1), size(utf8_len(d)), length(0), owned(o), data(d) {}
+
+  representation(range_t<utf8_t *> d, bool o = true)
+  : ref_count(1), size(d.end - d.begin), length(0), owned(o), data(d.begin) {}
 
   ~representation() {
     if (owned) 
@@ -89,7 +93,7 @@ nstring::nstring(nstring const *arr, std::size_t len)
 
 template<class I>
 nstring::representation::representation(range_t<I> const &r) 
-: size(0) {
+: ref_count(1), size(0) {
   for (I it = r.begin; it != r.end; ++it)
     size += it->size();
   utf8_t *current = new utf8_t[size];
@@ -138,4 +142,16 @@ std::wostream &gott::operator<<(std::wostream &stream, nstring const &s) {
 nstring gott::operator+(nstring const &a, nstring const &b) {
   nstring both[] = { a, b };
   return nstring(both, 2);
+}
+
+bool gott::operator==(nstring const &a, nstring const &b) {
+  if (a.p == b.p)
+    return true;
+  if (a.size() != b.size())
+    return false;
+  return equal(range(a), range(b));
+}
+
+bool gott::operator!=(nstring const &a, nstring const &b) {
+  return !(a == b);
 }

@@ -22,10 +22,11 @@
 #define GOTT_UTIL_NSTRING_CONVERT_HPP
 
 #include "types.hpp"
+#include <gott/util/misc/range.hpp>
 
 namespace gott {
 
-utf8_t *to_utf8_alloc(char const *, char const *, encoding);
+range_t<utf8_t *> to_utf8_alloc(char const *, char const *, encoding);
 utf32_t to_utf32_char(char const *, char const *&, encoding);
 void write_utf32_to_utf8(utf32_t, utf8_t *&);
 std::size_t utf8_len(char const *, encoding);
