@@ -59,6 +59,7 @@ public:
   void append(utf32_t const *, std::size_t);
 
   iterator erase(iterator, iterator);
+  void insert(iterator, std::size_t);
 
 private:
   class representation;

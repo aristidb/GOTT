@@ -44,7 +44,9 @@ private:
     std::size_t new_size = 1;
     while (new_size < length) 
       new_size <<= 1;
+    utf32_t *old = begin;
     begin = new utf32_t[new_size];
+    std::copy(old, end, begin);
     storage_end = begin + new_size;
   }
 };
@@ -117,4 +119,15 @@ nstring_buffer::iterator nstring_buffer::erase(iterator a, iterator b) {
   while (b != data->end)
     *a++ = *b++;
   return data->end = a;
+}
+
+void nstring_buffer::insert(iterator p, std::size_t len) {
+  if (std::size_t(data->storage_end - data->end) < len) {
+    std::size_t pp = p - data->begin;
+    data->ensure(len);
+    p = data->begin + pp;
+  } else
+    data->end += len;
+  for (iterator it = data->end - 1; it >= p + len; --it)
+    *it = *(it - len);
 }
