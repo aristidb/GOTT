@@ -93,7 +93,7 @@ nstring::nstring(nstring const *arr, std::size_t len)
 
 template<class I>
 nstring::representation::representation(range_t<I> const &r) 
-: ref_count(1), size(0) {
+: ref_count(1), size(0), length(0), owned(true) {
   for (I it = r.begin; it != r.end; ++it)
     size += it->size();
   utf8_t *current = new utf8_t[size];
