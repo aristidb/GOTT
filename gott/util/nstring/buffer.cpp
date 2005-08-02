@@ -32,13 +32,14 @@ public:
   utf32_t *begin, *end, *storage_end;
 
   utf32_t *ensure(std::size_t add_len) {
+    std::size_t old_len = end - begin;
     if (std::size_t(storage_end - end) < add_len)
-      grow(end - begin + add_len);
-    utf32_t *old_end = end;
-    end += add_len;
-    return old_end;
+      grow(old_len + add_len);
+    end = begin + old_len + add_len;
+    return begin + old_len;
   }
-  
+
+private:
   void grow(std::size_t length) {
     std::size_t new_size = 1, tmp = length;
     while (tmp) {
@@ -46,7 +47,6 @@ public:
       tmp >>= 1;
     }
     begin = new utf32_t[new_size];
-    end = begin + length;
     storage_end = begin + new_size;
   }
 };
@@ -55,6 +55,16 @@ nstring_buffer::nstring_buffer()
 : data(new representation) {}
 
 nstring_buffer::~nstring_buffer() { delete data; }
+
+nstring_buffer::nstring_buffer(utf32_t const *x)
+: data(new representation) {
+  *this += x;
+}
+
+nstring_buffer::nstring_buffer(nstring const &x)
+: data(new representation) {
+  *this += x;
+}
 
 utf32_t *nstring_buffer::begin() {
   return data->begin;
@@ -69,7 +79,11 @@ utf32_t const *nstring_buffer::begin() const {
 }
 
 utf32_t const *nstring_buffer::end() const {
-  return data->begin;
+  return data->end;
+}
+
+std::size_t nstring_buffer::size() const {
+  return data->end - data->begin;
 }
 
 void nstring_buffer::operator+=(utf32_t const *x) {

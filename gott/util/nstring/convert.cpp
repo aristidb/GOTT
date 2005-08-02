@@ -63,7 +63,7 @@ void gott::write_utf32_to_utf8(utf32_t ch, utf8_t *&out) {
   }
 }
 
-utf8_t *gott::to_utf8_alloc(char const *in, encoding enc) {
+utf8_t *gott::to_utf8_alloc(char const *in, char const *end, encoding enc) {
   std::size_t len = utf8_len(in, enc);
   utf8_t *result = new utf8_t[len];
   if (enc == utf8) {
@@ -72,7 +72,8 @@ utf8_t *gott::to_utf8_alloc(char const *in, encoding enc) {
   }
   utf8_t *out = result;
   char const *next;
-  while (utf32_t ch = to_utf32_char(in, next, enc)) {
+  utf32_t ch;
+  while (in < end && (ch = to_utf32_char(in, next, enc))) {
     write_utf32_to_utf8(ch, out);
     in = next;
   }

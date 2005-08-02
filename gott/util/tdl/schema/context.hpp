@@ -44,8 +44,6 @@ public:
    * \param rule_id The rule-factory builder's index.
    * \param attr The rule-factory's and later rule's attributes.
    * \param slt (optional) Repetition definition.
-   * \param length The expected number of children. 0 or the nearest value
-   *               if unsure.
    */
   void begin(unsigned rule_id,
              rule_attr const &attr = rule_attr(),
@@ -57,8 +55,6 @@ public:
    * \param name The type's name.
    * \param attr The rule-factory's and later rule's attributes.
    * \param slt (optional) Repetition definition.
-   * \param length The expected number of children. 0 or the nearest value
-   *               if unsure.
    */
   void GOTT_EXPORT begin(std::wstring const &name,
                     rule_attr const &attr = rule_attr(),

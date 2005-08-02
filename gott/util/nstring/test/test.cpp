@@ -1,8 +1,12 @@
 #include <gott/util/nstring/nstring.hpp>
+#include <gott/util/nstring/buffer.hpp>
+#include <boost/algorithm/string.hpp>
 #include <iostream>
+#include <locale>
 
 using namespace std;
 using namespace gott;
+using namespace boost;
 
 int main() {
   nstring n("Hallo, nstring-Welt!\n", ascii);
@@ -20,5 +24,10 @@ int main() {
   for (utf8_iterator it = ae_euro.begin(); it != ae_euro.end(); ++it)
     wcerr << *it << L' ';
   wcerr << L'\n';
-  wcerr << ae_euro;// << x_ae << ae_euro2;
+  nstring_buffer b(ae_euro);
+  //to_upper(b);
+  b.begin()[1] = utf32_t(L':');
+  nstring a(b);
+  wcerr << a;
+  wcerr << L"done\n";
 }

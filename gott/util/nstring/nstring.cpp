@@ -21,6 +21,7 @@
 #include "nstring.hpp"
 #include "convert.hpp"
 #include "util.hpp"
+#include "buffer.hpp"
 
 #include <gott/util/misc/range.hpp>
 #include <cstdlib>
@@ -29,13 +30,14 @@
 #include <list>
 #include <vector>
 #include <ostream>
+#include <boost/bind.hpp>
 
 using gott::nstring;
 
 class nstring::representation {
 public:
-  representation(utf8_t const *d, std::size_t s, bool o = true) 
-  : ref_count(1), size(s), length(0), owned(o), data(d) {}
+  representation(utf8_t const *d, bool o = true) 
+  : ref_count(1), size(utf8_len(d)), length(0), owned(o), data(d) {}
 
   ~representation() {
     if (owned) 
@@ -52,18 +54,24 @@ public:
 };
 
 nstring::nstring(char const *in, encoding enc)
-: p(new representation(to_utf8_alloc(in, enc), std::strlen(in))) {}
+: p(new representation(to_utf8_alloc(in, in + std::strlen(in), enc))) {}
 
 nstring::nstring(utf8_t const *in, literal_tag)
-: p(new representation(in, utf8_len(in), false)) {}
+: p(new representation(in, false)) {}
 
 nstring::nstring(wchar_t const *in, encoding enc)
-: p(new representation(to_utf8_alloc((char const*)in, enc), 
-                       std::wcslen(in))) {}
+: p(new representation(to_utf8_alloc((char const*)in, 
+                                     (char const*)(in+std::wcslen(in)),
+                                     enc))) {}
 
 nstring::nstring(nstring const &o) : p(o.p) {
   ++p->ref_count;
 }
+
+nstring::nstring(nstring_buffer const &b)
+: p(new representation(to_utf8_alloc((char const*)b.begin(), 
+                                     (char const*)b.end(), 
+                                     utf32))) {}
 
 nstring::~nstring() {
   if (--p->ref_count == 0)
@@ -89,7 +97,6 @@ nstring::representation::representation(range_t<I> const &r)
   for (I it = r.begin; it != r.end; ++it)
     current = std::copy(it->data(), it->data() + it->size(), current);
 }
-
 
 gott::utf8_t const *nstring::data() const {
   return p->data;

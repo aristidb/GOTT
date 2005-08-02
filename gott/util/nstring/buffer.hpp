@@ -26,15 +26,25 @@
 
 namespace gott {
 
-class nstring_buffer {
+class GOTT_EXPORT nstring_buffer {
 public:
+  typedef utf32_t value_type;
+  typedef utf32_t *iterator;
+  typedef utf32_t const *const_iterator;
+  typedef std::size_t size_type;
+  typedef std::ptrdiff_t difference_type;
+  
   nstring_buffer();
+  nstring_buffer(nstring const &);
+  nstring_buffer(utf32_t const *);
   ~nstring_buffer();
 
   utf32_t *begin();
   utf32_t *end();
   utf32_t const *begin() const;
   utf32_t const *end() const;
+
+  size_t size() const;
   
   void swap(nstring_buffer &);
 

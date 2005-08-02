@@ -55,7 +55,6 @@ class GOTT_EXPORT rule_factory {
    * Let the produced rule have a/another child.
    * Adds in the default location.
    * \param child The rule-factory producing the child.
-   * \param repatcher The surrounding repatcher.
    */
   GOTT_LOCAL virtual void add(rule_factory const &child) = 0;
 
@@ -64,7 +63,6 @@ class GOTT_EXPORT rule_factory {
    * Slots semantics are optional.
    * \param child The rule-factory producing the child.
    * \param slot The slot to put the child into.
-   * \param repatcher The surrounding repatcher.
    */
   GOTT_LOCAL virtual void add(rule_factory const &child, unsigned slot);
 
