@@ -62,6 +62,16 @@ range_t<T> tail(T const &a, S s) {
   return range(advanced(a, -s), a);
 }
 
+template<class T, std::size_t N>
+range_t<T const *> range(T const (&arr)[N]) {
+  return range(static_cast<T const *>(arr), N);
+}
+
+template<class T, std::size_t N>
+range_t<T *> range(T (&arr)[N]) {
+  return range(static_cast<T *>(arr), N);
+}
+
 template<class T> 
 range_t<typename T::const_iterator> range(T const &c) {
   return range(c.begin(), c.end());

@@ -1,6 +1,7 @@
 #include <gott/util/nstring/nstring.hpp>
 #include <gott/util/nstring/buffer.hpp>
 #include <boost/algorithm/string.hpp>
+#include <gott/util/misc/range_algo.hpp>
 #include <iostream>
 #include <locale>
 #include <iomanip>
@@ -26,7 +27,7 @@ int main() {
   //to_upper(b);
   b[1] = utf32_t(L':');
   b.erase(b.begin() + 2, b.begin() + 6);
-  b.insert(b.begin(), 5);
+  b.insert(b.begin(), range(L"test"));
   wchar_t const *X = L"test ";
   copy(X, X + 5, b.begin());
   nstring a(b);

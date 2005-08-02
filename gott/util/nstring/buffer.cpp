@@ -121,7 +121,7 @@ nstring_buffer::iterator nstring_buffer::erase(iterator a, iterator b) {
   return data->end = a;
 }
 
-void nstring_buffer::insert(iterator p, std::size_t len) {
+nstring_buffer::iterator nstring_buffer::insert(iterator p, std::size_t len) {
   if (std::size_t(data->storage_end - data->end) < len) {
     std::size_t pp = p - data->begin;
     data->ensure(len);
@@ -130,4 +130,12 @@ void nstring_buffer::insert(iterator p, std::size_t len) {
     data->end += len;
   for (iterator it = data->end - 1; it >= p + len; --it)
     *it = *(it - len);
+  return p;
+}
+
+nstring_buffer::iterator 
+nstring_buffer::insert(iterator p, std::size_t n, utf32_t ch) {
+  p = insert(p, n);
+  std::fill(p, p + n, ch);
+  return p;
 }

@@ -26,6 +26,9 @@
 
 namespace gott {
 
+template<class> class range_t;
+template<class I1, class I2> I2 copy(range_t<I1> const &r, I2 x);
+
 class GOTT_EXPORT nstring_buffer {
 public:
   typedef utf32_t value_type;
@@ -52,6 +55,7 @@ public:
 
   void operator+=(nstring const &);
   void operator+=(utf32_t const *);
+  void operator+=(nstring_buffer const &);
 
   utf32_t &operator[](std::size_t);
   utf32_t &at(std::size_t);
@@ -59,7 +63,15 @@ public:
   void append(utf32_t const *, std::size_t);
 
   iterator erase(iterator, iterator);
-  void insert(iterator, std::size_t);
+  iterator insert(iterator, std::size_t);
+  iterator insert(iterator, std::size_t, utf32_t);
+
+  template<class I>
+  iterator insert(iterator o, range_t<I> const &r) {
+    o = insert(o, std::distance(r.begin, r.end));
+    gott::copy(r, o);
+    return o;
+  }
 
 private:
   class representation;
