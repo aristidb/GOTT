@@ -41,11 +41,9 @@ public:
 
 private:
   void grow(std::size_t length) {
-    std::size_t new_size = 1, tmp = length;
-    while (tmp) {
+    std::size_t new_size = 1;
+    while (new_size < length) 
       new_size <<= 1;
-      tmp >>= 1;
-    }
     begin = new utf32_t[new_size];
     storage_end = begin + new_size;
   }
@@ -54,7 +52,20 @@ private:
 nstring_buffer::nstring_buffer()
 : data(new representation) {}
 
+nstring_buffer::nstring_buffer(nstring_buffer const &b) 
+: data(new representation) {
+  append(b.begin(), b.size());
+}
+
 nstring_buffer::~nstring_buffer() { delete data; }
+
+void nstring_buffer::swap(nstring_buffer &o) {
+  std::swap(data, o.data);
+}
+
+void nstring_buffer::operator=(nstring_buffer const &b) {
+  nstring_buffer(b).swap(*this);
+}
 
 nstring_buffer::nstring_buffer(utf32_t const *x)
 : data(new representation) {

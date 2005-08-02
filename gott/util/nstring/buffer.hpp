@@ -35,6 +35,7 @@ public:
   typedef std::ptrdiff_t difference_type;
   
   nstring_buffer();
+  nstring_buffer(nstring_buffer const &);
   nstring_buffer(nstring const &);
   nstring_buffer(utf32_t const *);
   ~nstring_buffer();
@@ -47,6 +48,7 @@ public:
   size_t size() const;
   
   void swap(nstring_buffer &);
+  void operator=(nstring_buffer const &);
 
   void operator+=(nstring const &);
   void operator+=(utf32_t const *);
