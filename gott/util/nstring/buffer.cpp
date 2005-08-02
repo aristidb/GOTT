@@ -97,6 +97,10 @@ std::size_t nstring_buffer::size() const {
   return data->end - data->begin;
 }
 
+utf32_t &nstring_buffer::operator[](std::size_t i) {
+  return data->begin[i];
+}
+
 void nstring_buffer::operator+=(utf32_t const *x) {
   append(x, utf32_len(x));
 }
@@ -107,4 +111,10 @@ void nstring_buffer::operator+=(nstring const &x) {
 
 void nstring_buffer::append(utf32_t const *x, std::size_t add_len) {
   std::copy(x, x + add_len, data->ensure(add_len));
+}
+
+nstring_buffer::iterator nstring_buffer::erase(iterator a, iterator b) {
+  while (b != data->end)
+    *a++ = *b++;
+  return data->end = a;
 }

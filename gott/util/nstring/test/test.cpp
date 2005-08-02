@@ -15,7 +15,7 @@ int main() {
   n = x + n;
   wcerr << n << x;
   // Print: ae, euro
-  nstring ae_euro((utf8_t const *)"\xc3\xa4 \xe2\x82\xac\n", 
+  nstring ae_euro((utf8_t const *)"\xc3\xa4 hohodu \xe2\x82\xac\n", 
                   nstring::utf8_literal);
   wcerr << hex;
   for (utf8_t const *it = ae_euro.data(); *it; ++it)
@@ -26,7 +26,8 @@ int main() {
   wcerr << L'\n';
   nstring_buffer b(ae_euro);
   //to_upper(b);
-  b.begin()[1] = utf32_t(L':');
+  b[1] = utf32_t(L':');
+  b.erase(b.begin() + 1, b.begin() + 6);
   nstring a(b);
   wcerr << a;
   wcerr << L"done\n";

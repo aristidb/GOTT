@@ -53,7 +53,12 @@ public:
   void operator+=(nstring const &);
   void operator+=(utf32_t const *);
 
+  utf32_t &operator[](std::size_t);
+  utf32_t &at(std::size_t);
+
   void append(utf32_t const *, std::size_t);
+
+  iterator erase(iterator, iterator);
 
 private:
   class representation;
