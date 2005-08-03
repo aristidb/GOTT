@@ -29,6 +29,10 @@ template<class T> struct range_t {
   typedef T value_type;
   value_type begin, end;
   range_t(value_type const &a, value_type const &b) : begin(a), end(b) {}
+
+  std::size_t size() const {
+    return std::distance(begin, end);
+  }
 };
 
 template<class T> 

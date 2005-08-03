@@ -41,11 +41,11 @@ public:
   : ref_count(1), size(utf8_len(d)), length(0), owned(o), data(d) {}
 
   representation(range_t<utf8_t *> d, bool o = true)
-  : ref_count(1), size(d.end - d.begin), length(0), owned(o), data(d.begin) {}
+  : ref_count(1), size(d.size()), length(0), owned(o), data(d.begin) {}
 
   representation(range_t<utf8_t const *> const &x)
-  : ref_count(1), size(x.end - x.begin), length(0), owned(true),
-      data(new utf8_t[x.end - x.begin]) {
+  : ref_count(1), size(x.size()), length(0), owned(true),
+      data(new utf8_t[x.size()]) {
     copy(x, const_cast<utf8_t *>(data));
   }
 
