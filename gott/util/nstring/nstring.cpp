@@ -132,8 +132,7 @@ std::size_t nstring::size() const {
 
 std::size_t nstring::length() const {
   if (!p->length)
-    for (utf8_iterator it = begin(); it != end(); ++it)
-      ++p->length;
+    p->length = range(*this).size();
   return p->length;
 }
 
