@@ -17,7 +17,8 @@ int main() {
   wcerr << (x == n) << L' ';
   wcerr << (x != L"muhkuh") << L' ';
   wcerr << (x == "Hallo, nstring-Welt!\n") << L'\n';
-  x = L"Foobar\n";
+  x = L"xxxFoobar\n";
+  x = offset(range(x), 3);
   n = x + n;
   wcerr << n << x;
 

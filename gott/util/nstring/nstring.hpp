@@ -35,6 +35,7 @@ namespace std {
 namespace gott {
 
 class nstring_buffer;
+template<class> class range_t;
 
 /**
  * UTF-8 string literals storage class.
@@ -51,6 +52,8 @@ public:
   nstring(std::vector<nstring, std::allocator<nstring> > const &);
   nstring(std::list<nstring, std::allocator<nstring> > const &);
   nstring(nstring const *, std::size_t);
+  nstring(range_t<utf8_iterator> const &);
+  nstring(range_t<utf8_t const *> const &);
 
   nstring(nstring const &);
   ~nstring();

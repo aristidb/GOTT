@@ -43,6 +43,12 @@ public:
   representation(range_t<utf8_t *> d, bool o = true)
   : ref_count(1), size(d.end - d.begin), length(0), owned(o), data(d.begin) {}
 
+  representation(range_t<utf8_t const *> const &x)
+  : ref_count(1), size(x.end - x.begin), length(0), owned(true),
+      data(new utf8_t[x.end - x.begin]) {
+    copy(x, const_cast<utf8_t *>(data));
+  }
+
   ~representation() {
     if (owned) 
       delete data;
@@ -57,6 +63,15 @@ public:
   utf8_t const *data;
 };
 
+nstring::nstring(nstring const &o) : p(o.p) {
+  ++p->ref_count;
+}
+
+nstring::~nstring() {
+  if (--p->ref_count == 0)
+    delete p;
+}
+
 nstring::nstring(char const *in, encoding enc)
 : p(new representation(to_utf8_alloc(in, in + std::strlen(in), enc))) {}
 
@@ -68,19 +83,16 @@ nstring::nstring(wchar_t const *in, encoding enc)
                                      (char const*)(in+std::wcslen(in)),
                                      enc))) {}
 
-nstring::nstring(nstring const &o) : p(o.p) {
-  ++p->ref_count;
-}
-
 nstring::nstring(nstring_buffer const &b)
 : p(new representation(to_utf8_alloc((char const*)b.begin(), 
                                      (char const*)b.end(), 
                                      utf32))) {}
 
-nstring::~nstring() {
-  if (--p->ref_count == 0)
-    delete p;
-}
+nstring::nstring(range_t<utf8_iterator> const &r)
+: p(new representation(range_t<utf8_t const *>(r.begin, r.end))) {}
+
+nstring::nstring(range_t<utf8_t const *> const &r)
+: p(new representation(r)) {}
 
 nstring::nstring(std::vector<nstring> const &v)
 : p(new representation(range(v))) {}
