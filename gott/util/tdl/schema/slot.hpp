@@ -180,7 +180,8 @@ struct GOTT_EXPORT rule_factory::with_slotcfg {
 namespace detail {
   template<slotcfg::mode A> struct factory_with_slotcfg 
   : public rule_factory, rule_factory::with_slotcfg {
-    void add(rule_factory const &) { 
+    void add(rule_factory const &child) { 
+      (void)child;
       throw std::bad_cast(); 
     }
 

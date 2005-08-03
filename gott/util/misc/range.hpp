@@ -35,6 +35,14 @@ template<class T> struct range_t {
   }
 };
 
+template<class I> I begin(range_t<I> const &x) {
+  return x.begin;
+}
+
+template<class I> I end(range_t<I> const &x) {
+  return x.end;
+}
+
 template<class T> 
 range_t<T> range(T const &a, T const &b) {
   return range_t<T>(a, b);

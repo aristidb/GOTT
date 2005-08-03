@@ -122,6 +122,8 @@ public:
    */
   utf8_iterator end() const;
 
+  operator range_t<utf8_iterator>();
+
   /**
    * Get the number of characters (not bytes) in the string.
    */

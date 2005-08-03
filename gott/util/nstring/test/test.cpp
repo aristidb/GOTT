@@ -25,6 +25,7 @@ int main() {
   nstring ae_euro((utf8_t const *)"\xc3\xa4 hohodu \xe2\x82\xac\n", 
                   nstring::utf8_literal);
   nstring_buffer b(ae_euro);
+  wcerr << (b.size() == ae_euro.length()) << L'\n';
   //to_upper(b);
   b[1] = utf32_t(L':');
   b.erase(b.begin() + 2, b.begin() + 6);

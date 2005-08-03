@@ -126,6 +126,10 @@ gott::utf8_iterator nstring::end() const {
   return p->data + p->size;
 }
 
+nstring::operator range_t<utf8_iterator>() {
+  return range(begin(), end());
+}
+
 std::size_t nstring::size() const {
   return p->size;
 }
