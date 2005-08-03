@@ -27,9 +27,7 @@ int main() {
   //to_upper(b);
   b[1] = utf32_t(L':');
   b.erase(b.begin() + 2, b.begin() + 6);
-  b.insert(b.begin(), range(L"test"));
-  wchar_t const *X = L"test ";
-  copy(X, X + 5, b.begin());
+  b.insert(b.begin(), offset(range(L"test "), 0, -1));
   nstring a(b);
   wcerr << a;
   wcerr << L"\n";

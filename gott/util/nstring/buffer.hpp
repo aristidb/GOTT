@@ -27,7 +27,6 @@
 namespace gott {
 
 template<class> class range_t;
-template<class I1, class I2> I2 copy(range_t<I1> const &r, I2 x);
 
 class GOTT_EXPORT nstring_buffer {
 public:
@@ -69,7 +68,7 @@ public:
   template<class I>
   iterator insert(iterator o, range_t<I> const &r) {
     o = insert(o, std::distance(r.begin, r.end));
-    gott::copy(r, o);
+    std::copy(r.begin, r.end, o);
     return o;
   }
 
