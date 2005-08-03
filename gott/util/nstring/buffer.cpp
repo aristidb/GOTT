@@ -56,7 +56,7 @@ nstring_buffer::nstring_buffer()
 
 nstring_buffer::nstring_buffer(nstring_buffer const &b) 
 : data(new representation) {
-  append(b.begin(), b.size());
+  insert(end(), range(b));
 }
 
 nstring_buffer::~nstring_buffer() { delete data; }
@@ -71,12 +71,12 @@ void nstring_buffer::operator=(nstring_buffer const &b) {
 
 nstring_buffer::nstring_buffer(utf32_t const *x)
 : data(new representation) {
-  *this += x;
+  insert(end(), range(x, utf32_len(x)));
 }
 
 nstring_buffer::nstring_buffer(nstring const &x)
 : data(new representation) {
-  *this += x;
+  insert(end(), range(x));
 }
 
 utf32_t *nstring_buffer::begin() {
@@ -101,18 +101,6 @@ std::size_t nstring_buffer::size() const {
 
 utf32_t &nstring_buffer::operator[](std::size_t i) {
   return data->begin[i];
-}
-
-void nstring_buffer::operator+=(utf32_t const *x) {
-  append(x, utf32_len(x));
-}
-
-void nstring_buffer::operator+=(nstring const &x) {
-  std::copy(x.begin(), x.end(), data->ensure(x.length()));
-}
-
-void nstring_buffer::append(utf32_t const *x, std::size_t add_len) {
-  std::copy(x, x + add_len, data->ensure(add_len));
 }
 
 nstring_buffer::iterator nstring_buffer::erase(iterator a, iterator b) {

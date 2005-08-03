@@ -50,18 +50,14 @@ public:
   size_t size() const;
   
   void swap(nstring_buffer &);
-  void operator=(nstring_buffer const &);
 
-  void operator+=(nstring const &);
-  void operator+=(utf32_t const *);
-  void operator+=(nstring_buffer const &);
+  void operator=(nstring_buffer const &b);
 
   utf32_t &operator[](std::size_t);
   utf32_t &at(std::size_t);
-
-  void append(utf32_t const *, std::size_t);
-
+  
   iterator erase(iterator, iterator);
+
   iterator insert(iterator, std::size_t);
   iterator insert(iterator, std::size_t, utf32_t);
 
