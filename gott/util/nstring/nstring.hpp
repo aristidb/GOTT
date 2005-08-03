@@ -44,31 +44,92 @@ class GOTT_EXPORT nstring {
 public:
   typedef utf8_iterator const_iterator;
 
+  /**
+   * Construct from encoded c-string.
+   */
   nstring(char const *, encoding = utf8);
+  
+  /**
+   * Construct from encoded wide c-string.
+   */
   nstring(wchar_t const *, encoding = utf32);
+  
   enum literal_tag { utf8_literal };
+
+  /**
+   * Construct from UTF8-c-literal. Shares memory.
+   */
   nstring(utf8_t const *, literal_tag);
+
+  /**
+   * Construct from nstring_buffer.
+   */
   nstring(nstring_buffer const &);
+
+  /**
+   * Concatenate.
+   */
   nstring(std::vector<nstring, std::allocator<nstring> > const &);
+
+  /**
+   * Concatenate.
+   */
   nstring(std::list<nstring, std::allocator<nstring> > const &);
+
+  /**
+   * Concatenate.
+   */
   nstring(nstring const *, std::size_t);
+
+  /**
+   * Construct from character range.
+   */
   nstring(range_t<utf8_iterator> const &);
+
+  /**
+   * Construct from character range.
+   */
   nstring(range_t<utf8_t const *> const &);
 
+  /// Copy-Constructor.
   nstring(nstring const &);
+
+  /// Destructor.
   ~nstring();
 
+  /**
+   * Swap with another nstring.
+   */
   void swap(nstring &other);
+
+  /**
+   * Assign from another nstring.
+   */
   void operator=(nstring const &other);
 
-  char const *c_str(encoding enc) const;
+  /**
+   * Get the internal data.
+   */
   utf8_t const *data() const;
  
+  /**
+   * Get an iterator pointing at the first character.
+   */
   utf8_iterator begin() const;
+
+  /**
+   * Get an iterator pointing behind the last character.
+   */
   utf8_iterator end() const;
 
+  /**
+   * Get the number of characters (not bytes) in the string.
+   */
   std::size_t length() const;
 
+  /**
+   * Get the number of bytes the string needs as UTF8-encoded.
+   */
   std::size_t size() const;
 
 private:
@@ -80,14 +141,27 @@ private:
   GOTT_LOCAL nstring(); // unimplemented
 };
 
+/**
+ * Print out a nstring.
+ */
 GOTT_EXPORT 
 std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &
 operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &, 
            nstring const &);
 
+/**
+ * Concatenate two nstrings.
+ */
 GOTT_EXPORT nstring operator+(nstring const &, nstring const &);
 
+/**
+ * Compare two nstrings for equality.
+ */
 GOTT_EXPORT bool operator==(nstring const &, nstring const &);
+
+/**
+ * Compare two nstrings for inequality.
+ */
 GOTT_EXPORT bool operator!=(nstring const &, nstring const &);
 
 }
