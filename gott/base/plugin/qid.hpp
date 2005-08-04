@@ -21,30 +21,16 @@
 #ifndef GOTT_BASE_PLUGIN_QID_HPP
 #define GOTT_BASE_PLUGIN_QID_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
-
 namespace gott {
-namespace base {
 namespace plugin {
 
 class QID {
 public:
-  QID(char const *);
-  QID(wchar_t const *);
-  QID(std::string const &);
-  QID(std::wstring const &);
-
-  QID parent() const;
-
-  QID child(char const *) const;
-  QID child(wchar_t const *) const;
-  QID child(std::string const &) const;
-  QID child(std::wstring const &) const;
 };
 
 bool operator==(QID const &, QID const &);
 bool operator!=(QID const &, QID const &);
 
-}}}
+}}
 
 #endif

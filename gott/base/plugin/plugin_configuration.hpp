@@ -18,25 +18,19 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_BASE_PLUGIN_PLUGIN_HPP
-#define GOTT_BASE_PLUGIN_PLUGIN_HPP
+#ifndef GOTT_BASE_PLUGIN_PLUGIN_CONFIGURATION_HPP
+#define GOTT_BASE_PLUGIN_PLUGIN_CONFIGURATION_HPP
 
 namespace gott {
 namespace plugin {
 
-class system_configuration;
-class plugin_configuration;
 class hook;
 class QID;
 
-class GOTT_EXPORT plugin_base {
+class plugin_configuration {
 public:
-  virtual ~plugin_base() = 0;
-  virtual void add(QID const &point, hook const &extension);
+  hook const &by_qid(QID const &);
 };
-
-typedef plugin_base *(*plugin_builder)(system_configuration &, 
-                                       plugin_configuration const &);
 
 }}
 
