@@ -25,7 +25,6 @@
 #include <boost/cstdint.hpp>
 
 namespace gott {
-namespace util {
 // #ifdef WCHAR_T_IS_UTF32
 
   /// UTF-32 Character Type 
@@ -40,6 +39,6 @@ namespace util {
 // #define GOTT_STR(x) reinterpret_cast<utf32_t const*>(L##x)
 // ...
 // #endif //WCHAR_T_IS_UTF32
-}}
+}
 
 #endif

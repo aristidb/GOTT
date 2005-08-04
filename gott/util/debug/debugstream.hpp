@@ -27,7 +27,6 @@
 #include <gott/util/misc/utf32string.hpp>
 
 namespace gott {
-namespace util {
 namespace debug {
   /** Debug Output Stream
    * \remarks
@@ -36,6 +35,6 @@ namespace debug {
    *      Per default the stream is directed to stdcerr
    */
   extern ::std::basic_ostream<utf32_t> debugstream;
-}}}
+}}
 
 #endif
