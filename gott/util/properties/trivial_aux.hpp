@@ -22,7 +22,6 @@
 #define GOTT_UTIL_PROPERTY_TRIVIAL_AUX_HPP
 
 namespace gott {
-namespace util {
 namespace properties {
 
 struct no_lock {
@@ -64,6 +63,6 @@ struct no_notification {
   void notify(void *) const {}
 };
 
-}}}
+}}
 
 #endif

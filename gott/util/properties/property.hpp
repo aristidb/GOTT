@@ -27,7 +27,6 @@
 #include <gott/util/properties/policy.hpp>
 
 namespace gott {
-namespace util {
 namespace properties {
 
 template<
@@ -191,6 +190,6 @@ private:
   lock_s lock;
 };
 
-}}}
+}}
 
 #endif

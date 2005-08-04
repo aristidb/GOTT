@@ -1,7 +1,7 @@
 #include "property.hpp"
 
 using namespace std;
-using namespace gott::util::properties;
+using namespace gott::properties;
 
 template<int i>
 int add(int x) { return x + i; }

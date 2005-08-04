@@ -25,7 +25,6 @@
 #include <gott/util/properties/policy.hpp>
 
 namespace gott {
-namespace util {
 namespace properties {
 
 namespace detail {
@@ -60,6 +59,6 @@ private:
   boost::shared_ptr<detail::abstract_pa> holder;
 };
 
-}}}
+}}
 
 #endif

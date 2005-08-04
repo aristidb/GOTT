@@ -21,6 +21,9 @@
 #ifndef GOTT_UTIL_PROPERTY_POLICY_HPP
 #define GOTT_UTIL_PROPERTY_POLICY_HPP
 
+namespace gott {
+namespace properties {
+
 template<class T>
 struct policy {
   typedef T class_type;
@@ -34,5 +37,7 @@ struct policy<T &> {
   typedef T &storage;
   typedef T &parameter;
 };
+
+}}
 
 #endif

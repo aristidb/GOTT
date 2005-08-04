@@ -22,7 +22,6 @@
 #define GOTT_UTIL_PROPERTY_EMBEDDED_STORAGE_HPP
 
 namespace gott {
-namespace util {
 namespace properties {
 
 template<class T>
@@ -39,6 +38,6 @@ public:
   T const *get_pointer() const { return &obj; }
 };
 
-}}}
+}}
 
 #endif

@@ -32,7 +32,7 @@ class QID;
 class GOTT_EXPORT plugin_base {
 public:
   virtual ~plugin_base() = 0;
-  virtual void add(QID const &point, hook const &extension);
+  virtual void add(QID const &point, hook const &extension) = 0;
 };
 
 typedef plugin_base *(*plugin_builder)(system_configuration &, 
