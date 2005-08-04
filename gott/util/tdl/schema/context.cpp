@@ -24,9 +24,9 @@
 #include "rule_factory.hpp"
 
 using boost::optional;
-using gott::util::tdl::schema::context;
-using gott::util::tdl::schema::rule;
-using gott::util::tdl::schema::rule_factory;
+using gott::tdl::schema::context;
+using gott::tdl::schema::rule;
+using gott::tdl::schema::rule_factory;
 
 class context::IMPL {
 public:

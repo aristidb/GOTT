@@ -24,7 +24,6 @@
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
@@ -57,6 +56,6 @@ public:
 
 name_manager_t &name_manager();
 
-}}}}
+}}}
 
 #endif

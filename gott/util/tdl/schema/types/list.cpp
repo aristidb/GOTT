@@ -20,8 +20,8 @@
 
 #include "list.hpp"
 
-namespace schema = gott::util::tdl::schema;
-namespace ev = gott::util::tdl::schema::ev;
+namespace schema = gott::tdl::schema;
+namespace ev = gott::tdl::schema::ev;
 using schema::rule;
 using schema::slotcfg;
 using schema::match_list;

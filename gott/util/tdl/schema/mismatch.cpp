@@ -21,7 +21,7 @@
 #include "../exceptions.hpp"
 #include "stream_position.hpp"
 
-namespace schema = gott::util::tdl::schema;
+namespace schema = gott::tdl::schema;
 using schema::mismatch;
 using gott::range;
 

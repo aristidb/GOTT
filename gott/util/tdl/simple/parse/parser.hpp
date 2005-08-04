@@ -24,7 +24,6 @@
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace simple {
 
@@ -158,5 +157,5 @@ GOTT_EXPORT void parse(std::wistream &s, parser &p, line_logger *l = 0);
  */
 GOTT_EXPORT void parse_meta(std::wistream &s, meta_parser &p, line_logger *l = 0);
 
-}}}}
+}}}
 #endif

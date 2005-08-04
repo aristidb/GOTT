@@ -22,7 +22,7 @@
 
 using std::wstring;
 using std::size_t;
-using gott::util::tdl::query::selection;
+using gott::tdl::query::selection;
 
 template<class I>
 void selection<I>::add(I const &x) {

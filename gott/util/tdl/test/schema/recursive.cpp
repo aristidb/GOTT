@@ -24,10 +24,9 @@
 #include <gott/util/tdl/structure/types/enumeration.hpp>
 #include <gott/util/tdl/structure/types/integer.hpp>
 
-namespace util = gott::util;
-namespace schema = util::tdl::schema;
-namespace stru = util::tdl::structure;
-namespace simple = util::tdl::simple;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
 using std::wstring;
 using namespace stru::cf;

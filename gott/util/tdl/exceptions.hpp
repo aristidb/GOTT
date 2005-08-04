@@ -24,7 +24,6 @@
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 
 class GOTT_EXPORT tdl_exception : public std::exception {
@@ -71,6 +70,6 @@ struct GOTT_EXPORT failed_repatch : public tdl_exception {
 };
 
 }
-}}}
+}}
 
 #endif

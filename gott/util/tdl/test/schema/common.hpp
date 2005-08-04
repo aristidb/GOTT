@@ -28,15 +28,15 @@
 
 namespace tut {
 struct schema_basic {
-  gott::util::tdl::structure::tree tree, xp;
-  gott::util::tdl::schema::match match;
-  gott::util::tdl::schema::context context;
+  gott::tdl::structure::tree tree, xp;
+  gott::tdl::schema::match match;
+  gott::tdl::schema::context context;
   std::wstring rest;
   schema_basic() : match(tree) {}
   void run_test(std::wstring const &input) {
     match.add(context.get());
     std::wistringstream stream(input);
-    gott::util::tdl::simple::parse(stream, match, match.get_debug());
+    gott::tdl::simple::parse(stream, match, match.get_debug());
     rest = stream.str().c_str() + stream.tellg();
   }
 };

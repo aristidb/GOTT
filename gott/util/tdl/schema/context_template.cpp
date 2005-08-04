@@ -24,8 +24,8 @@
 using std::wstring;
 using std::vector;
 using boost::static_visitor;
-using gott::util::tdl::schema::context_template;
-using gott::util::tdl::schema::rule;
+using gott::tdl::schema::context_template;
+using gott::tdl::schema::rule;
 
 class context_template::IMPL {
 public:

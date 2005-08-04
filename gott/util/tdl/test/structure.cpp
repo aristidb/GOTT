@@ -24,8 +24,7 @@
 #include <gott/util/tdl/structure/print.hpp>
 #include <gott/util/tut/tut.h>
 
-namespace util = gott::util;
-namespace stru = util::tdl::structure;
+namespace stru = gott::tdl::structure;
 namespace cf = stru::cf;
 using gott::xany::Xany;
 

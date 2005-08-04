@@ -21,10 +21,9 @@
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
 using std::wstring;
 using stru::cf::S;

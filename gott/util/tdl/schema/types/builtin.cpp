@@ -34,7 +34,7 @@ struct builtin_types {
 } auto_reg;
 }
 
-using namespace gott::util::tdl::schema;
+using namespace gott::tdl::schema;
 
 builtin_types::builtin_types() {
   name_manager().add(L"any",            match_any::factory::index());

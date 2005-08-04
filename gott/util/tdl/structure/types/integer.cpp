@@ -21,7 +21,7 @@
 #include "integer.hpp"
 #include <gott/util/tdl/exceptions.hpp>
 
-namespace structure = gott::util::tdl::structure;
+namespace structure = gott::tdl::structure;
 
 using structure::repatch_integer;
 using structure::writable_structure;

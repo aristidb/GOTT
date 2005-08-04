@@ -23,7 +23,7 @@
 #include <gott/util/tut/tut.h>
 
 namespace tut {
-struct spb : gott::util::tdl::simple::parser {
+struct spb : gott::tdl::simple::parser {
   enum event_id { b, e, d, u, n, c };
   typedef std::pair<event_id, std::wstring> event;
   std::vector<event> xp, ev;
@@ -55,7 +55,7 @@ namespace {
 tut::tf spp("simple::parse");
 }
 
-using gott::util::tdl::simple::parse;
+using gott::tdl::simple::parse;
 
 std::ostream &operator<<(std::ostream &o, 
                          std::vector<tut::spb::event> const &e) {

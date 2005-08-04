@@ -24,7 +24,6 @@
 #include "structure.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure {
 
@@ -87,6 +86,6 @@ std::basic_string<Ch> to_string(copyable_structure const &s) {
   return o.str();
 }
 
-}}}}
+}}}
 
 #endif

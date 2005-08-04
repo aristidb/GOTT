@@ -26,8 +26,8 @@ using std::wstring;
 using gott::xany::Xany;
 using gott::xany::Xany_cast;
 
-namespace schema = gott::util::tdl::schema;
-namespace ev = gott::util::tdl::schema::ev;
+namespace schema = gott::tdl::schema;
+namespace ev = gott::tdl::schema::ev;
 using schema::rule;
 using schema::rule_attr;
 using schema::match_named;

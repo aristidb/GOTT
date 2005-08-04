@@ -25,12 +25,12 @@
 
 using std::wstring;
 
-namespace schema = gott::util::tdl::schema;
+namespace schema = gott::tdl::schema;
 using schema::match;
 using schema::rule;
 using schema::rule_attr;
 namespace ev = schema::ev;
-using gott::util::tdl::structure::writable_structure;
+using gott::tdl::structure::writable_structure;
 
 class rule::IMPL {
 public:

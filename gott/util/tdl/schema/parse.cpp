@@ -29,11 +29,11 @@
 using std::wstring;
 using std::list;
 using boost::shared_ptr;
-namespace simple = gott::util::tdl::simple;
-namespace structure = gott::util::tdl::structure;
+namespace simple = gott::tdl::simple;
+namespace structure = gott::tdl::structure;
 
-using gott::util::tdl::schema::match;
-using gott::util::tdl::schema::positioning;
+using gott::tdl::schema::match;
+using gott::tdl::schema::positioning;
 using structure::writable_structure;
 
 class match::IMPL {

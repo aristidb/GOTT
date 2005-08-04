@@ -25,7 +25,7 @@
 #include <gott/util/tdl/schema/context.hpp>
 #include <gott/util/tut/tut.h>
 
-namespace tdl = gott::util::tdl;
+namespace tdl = gott::tdl;
 
 namespace {
 struct ignore_struct : tdl::structure::revocable_structure {

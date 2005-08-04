@@ -24,7 +24,6 @@
 #include "rule.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
@@ -43,6 +42,6 @@ private:
   bool happy;
 };
 
-}}}}
+}}}
 
 #endif

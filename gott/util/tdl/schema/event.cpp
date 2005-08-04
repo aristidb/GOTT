@@ -22,8 +22,8 @@
 #include "parse.hpp"
 #include "rule.hpp"
 
-namespace ev = gott::util::tdl::schema::ev;
-using gott::util::tdl::schema::rule;
+namespace ev = gott::tdl::schema::ev;
+using gott::tdl::schema::rule;
 using std::wostream;
 using boost::static_visitor;
 

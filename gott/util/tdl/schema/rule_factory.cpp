@@ -22,8 +22,8 @@
 #include "slot.hpp"
 
 using std::vector;
-using gott::util::tdl::schema::rule_factory;
-namespace factory_template = gott::util::tdl::schema::factory_template;
+using gott::tdl::schema::rule_factory;
+namespace factory_template = gott::tdl::schema::factory_template;
 
 void rule_factory::add(rule_factory const &f, unsigned) {
   add(f);
@@ -42,7 +42,6 @@ static vbd_t &builders() {
 }
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
@@ -55,4 +54,4 @@ rule_factory *get_factory(unsigned x, rule_attr const &a) {
   return builders().at(x)(a);
 }
 
-}}}}
+}}}

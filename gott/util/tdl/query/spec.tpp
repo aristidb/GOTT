@@ -19,4 +19,4 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "../structure/tree.hpp"
-template class selection<gott::util::tdl::structure::tree::iterator>;
+template class selection<gott::tdl::structure::tree::iterator>;

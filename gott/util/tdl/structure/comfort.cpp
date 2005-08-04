@@ -22,9 +22,9 @@
 #include "structure.hpp"
 
 using gott::xany::Xany;
-namespace cf = gott::util::tdl::structure::cf;
+namespace cf = gott::tdl::structure::cf;
 using cf::node_inserter_t;
-using gott::util::tdl::structure::writable_structure;
+using gott::tdl::structure::writable_structure;
 using boost::bind;
 using boost::ref;
 using std::list;

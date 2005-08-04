@@ -21,7 +21,7 @@
 #include "repatch.hpp"
 #include "../exceptions.hpp"
 
-namespace structure = gott::util::tdl::structure;
+namespace structure = gott::tdl::structure;
 using structure::repatcher;
 using structure::failed_repatch;
 using structure::writable_structure;

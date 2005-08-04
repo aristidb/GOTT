@@ -24,7 +24,6 @@
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure {
 class writable_structure;
@@ -117,6 +116,6 @@ GOTT_EXPORT node_inserter_t C(node_inserter_t child, tag_list tags = tag_list())
  */
 GOTT_EXPORT node_inserter_t C(node_inserter_t child, std::wstring tag);
 
-}}}}}
+}}}}
 
 #endif

@@ -26,7 +26,6 @@
 #include <gott/util/tdl/structure/structure.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure { class repatcher; }
   
@@ -119,5 +118,5 @@ private:
   match();
 };
 
-}}}}
+}}}
 #endif

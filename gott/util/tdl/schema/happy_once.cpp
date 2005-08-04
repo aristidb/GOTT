@@ -20,8 +20,8 @@
 
 #include "happy_once.hpp"
 
-using gott::util::tdl::schema::happy_once;
-using gott::util::tdl::schema::rule;
+using gott::tdl::schema::happy_once;
+using gott::tdl::schema::rule;
 
 happy_once::happy_once(rule_attr const &a, match &m) 
   : rule(a, m), happy(false) {}

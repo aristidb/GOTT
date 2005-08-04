@@ -30,7 +30,7 @@ using std::flush;
 using std::endl;
 using std::wstring;
 
-namespace tdl = gott::util::tdl;
+namespace tdl = gott::tdl;
 using tdl::structure::tree;
 using tdl::structure::writable_structure;
 using tdl::query::selection;

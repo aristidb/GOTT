@@ -21,11 +21,10 @@
 #include "common.hpp"
 #include <gott/util/tdl/structure/types/integer.hpp>
 
-namespace u = gott::util;
-using namespace u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-namespace schema = u::tdl::schema;
+using namespace gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+namespace schema = gott::tdl::schema;
 using gott::xany::Xany;
 using std::wstring;
 using stru::cf::S;

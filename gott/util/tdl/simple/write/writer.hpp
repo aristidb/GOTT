@@ -24,7 +24,6 @@
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace simple {
 
@@ -46,5 +45,6 @@ private:
   boost::scoped_ptr<IMPL> p;
 };
 
-}}}}
+}}}
+
 #endif

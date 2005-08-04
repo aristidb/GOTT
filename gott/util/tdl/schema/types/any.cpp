@@ -21,7 +21,7 @@
 #include "any.hpp"
 
 using std::vector;
-namespace schema = gott::util::tdl::schema;
+namespace schema = gott::tdl::schema;
 namespace ev = schema::ev;
 using schema::match_any;
 using schema::rule;

@@ -25,7 +25,6 @@
 #include "../rule_factory.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
@@ -52,5 +51,5 @@ private:
   wchar_t const *name() const;
 };
 
-}}}}
+}}}
 #endif

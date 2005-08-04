@@ -25,7 +25,6 @@
 #include "rule_factory.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
@@ -326,6 +325,6 @@ private:
 
 }
 
-}}}}
+}}}
 
 #endif

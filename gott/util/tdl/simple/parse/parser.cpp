@@ -22,8 +22,8 @@
 
 using std::wistream;
 using std::wstring;
-using gott::util::tdl::simple::parser;
-using gott::util::tdl::simple::line_logger;
+using gott::tdl::simple::parser;
+using gott::tdl::simple::line_logger;
 
 parser::~parser() {}
 
@@ -106,7 +106,7 @@ class cancellor {};
 
 line_logger::~line_logger() {}
 
-void gott::util::tdl::simple::parse(std::wistream &s, 
+void gott::tdl::simple::parse(std::wistream &s, 
                                     parser &p, line_logger *l) {
   exec_parse x(s, p, l);
   x.run_parse();

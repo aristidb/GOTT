@@ -24,7 +24,6 @@
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace query {
 
@@ -118,6 +117,6 @@ std::basic_ostream<Ch, ChT> &operator<<(std::basic_ostream<Ch, ChT> &s,
   return s << range(x);
 }
 
-}}}}
+}}}
 
 #endif

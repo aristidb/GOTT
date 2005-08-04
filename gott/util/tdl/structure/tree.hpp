@@ -24,7 +24,6 @@
 #include <gott/util/tdl/structure/structure.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure {
 
@@ -212,6 +211,6 @@ inline std::ostream &operator<<(std::ostream &s, tree::iterator const &i) {
   return s << w.str();
 }
 
-}}}}
+}}}
 
 #endif

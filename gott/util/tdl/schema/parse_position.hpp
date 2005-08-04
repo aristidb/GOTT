@@ -26,7 +26,6 @@
 #include <gott/util/tdl/structure/structure.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 
 namespace schema {
@@ -71,6 +70,6 @@ private:
   boost::scoped_ptr<IMPL> p;
 };
 
-}}}}
+}}}
 
 #endif

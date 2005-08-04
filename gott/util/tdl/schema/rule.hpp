@@ -25,7 +25,6 @@
 #include "ev_fwd.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure { class repatcher; }
 
@@ -143,6 +142,6 @@ private:
   rule();
 };
 
-}}}}
+}}}
 
 #endif

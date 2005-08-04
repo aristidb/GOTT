@@ -24,7 +24,6 @@
 #include "structure.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure {
 
@@ -59,6 +58,6 @@ public:
   writable_structure *deferred_write(writable_structure &) const;
 };
 
-}}}}
+}}}
 
 #endif

@@ -25,7 +25,6 @@
 #include "../structure/repatch.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure { class repatcher; }
 
@@ -67,6 +66,6 @@ private:
   boost::shared_ptr<structure::repatcher const> r;
 };
 
-}}}}
+}}}
 
 #endif

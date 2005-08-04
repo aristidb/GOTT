@@ -25,7 +25,6 @@
 #include "../exceptions.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure { class repatcher; }
 
@@ -268,6 +267,6 @@ unsigned add_factory(factory_template::rule_factory_builder x) GOTT_EXPORT;
  */
 rule_factory *get_factory(unsigned x, rule_attr const &a);
 
-}}}}
+}}}
 
 #endif

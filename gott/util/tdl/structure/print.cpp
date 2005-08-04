@@ -24,7 +24,7 @@ using std::wostream;
 using std::wstring;
 using std::list;
 using gott::xany::Xany;
-using gott::util::tdl::structure::direct_print;
+using gott::tdl::structure::direct_print;
 
 class direct_print::IMPL {
 public:

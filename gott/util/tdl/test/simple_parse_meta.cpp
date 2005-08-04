@@ -26,8 +26,8 @@ using std::vector;
 using std::pair;
 using std::ostream;
 using std::wistringstream;
-using gott::util::tdl::simple::meta_parser;
-using gott::util::tdl::simple::parse_meta;
+using gott::tdl::simple::meta_parser;
+using gott::tdl::simple::parse_meta;
 
 namespace tut {
 struct meta_basic {

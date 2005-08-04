@@ -30,7 +30,7 @@ using boost::intrusive_ptr;
 using boost::scoped_ptr;
 using gott::xany::Xany;
 
-namespace stru = gott::util::tdl::structure;
+namespace stru = gott::tdl::structure;
 using stru::writable_structure;
 using stru::revocable_structure;
 using stru::copyable_structure;

@@ -24,7 +24,6 @@
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
@@ -134,6 +133,6 @@ public:
   void print(std::wostream &s) const;
 };
 
-}}}}}
+}}}}
 
 #endif

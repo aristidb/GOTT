@@ -24,7 +24,6 @@
 #include "../repatch.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure {
 
@@ -38,6 +37,6 @@ private:
   std::vector<std::wstring> alternatives;
 };
 
-}}}}
+}}}
 
 #endif

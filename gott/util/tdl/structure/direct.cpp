@@ -23,8 +23,8 @@
 
 using std::wstring;
 using gott::xany::Xany;
-using gott::util::tdl::simple::parser;
-using gott::util::tdl::structure::writable_structure;
+using gott::tdl::simple::parser;
+using gott::tdl::structure::writable_structure;
 
 namespace {
   class my_parser : public parser {
@@ -66,7 +66,7 @@ namespace {
   };
 }
 
-void gott::util::tdl::structure::direct_struc(std::wistream &in, 
+void gott::tdl::structure::direct_struc(std::wistream &in, 
                                               writable_structure &out) {
   my_parser pp(out);
   parser &p = pp;

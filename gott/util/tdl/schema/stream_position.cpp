@@ -20,7 +20,7 @@
 
 #include "stream_position.hpp"
 
-using gott::util::tdl::schema::detail::stream_position;
+using gott::tdl::schema::detail::stream_position;
 
 stream_position::stream_position() 
   : line_new(0), line(0), pos(0), native_end(0), current(0), after(false) {}

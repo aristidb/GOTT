@@ -24,7 +24,6 @@
 #include <gott/util/misc/commonheaders.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure {
 
@@ -116,6 +115,6 @@ public:
  */
 GOTT_EXPORT void direct_struc(std::wistream &stream, writable_structure &structure);
 
-}}}}
+}}}
 
 #endif

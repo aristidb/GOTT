@@ -22,7 +22,6 @@ using std::wostream;
 using std::wstring;
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace simple {
   
@@ -141,4 +140,4 @@ void writer::end_document() {
     p->stream << L'\n';
 }
 
-}}}}
+}}}

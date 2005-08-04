@@ -26,7 +26,6 @@
 #include "slot.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
@@ -174,6 +173,6 @@ inline multi_context_handle cdr(multi_context_handle x) {
   return x->next();
 }
 
-}}}}
+}}}
 
 #endif

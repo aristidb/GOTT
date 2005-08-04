@@ -22,8 +22,8 @@
 
 using std::vector;
 
-namespace schema = gott::util::tdl::schema;
-namespace ev = gott::util::tdl::schema::ev;
+namespace schema = gott::tdl::schema;
+namespace ev = gott::tdl::schema::ev;
 using schema::rule;
 using schema::match_follow_ordered;
 

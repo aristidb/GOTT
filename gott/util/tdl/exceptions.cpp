@@ -20,7 +20,7 @@
 
 #include "exceptions.hpp"
 
-using gott::util::tdl::tdl_exception;
+using gott::tdl::tdl_exception;
 
 tdl_exception::tdl_exception(std::wstring const &msg) : message_wide(msg) {
   std::ostringstream ss;

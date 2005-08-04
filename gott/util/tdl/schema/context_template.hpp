@@ -28,7 +28,6 @@
 #include "slot.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
@@ -85,6 +84,6 @@ private:
   boost::scoped_ptr<IMPL> p;
 };
 
-}}}}
+}}}
 
 #endif

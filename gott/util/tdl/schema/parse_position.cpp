@@ -24,8 +24,8 @@
 
 using std::vector;
 using std::size_t;
-namespace schema = gott::util::tdl::schema;
-namespace structure = gott::util::tdl::structure;
+namespace schema = gott::tdl::schema;
+namespace structure = gott::tdl::structure;
 
 using structure::revocable_structure;
 using schema::positioning;

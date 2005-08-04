@@ -25,7 +25,6 @@
 #include <gott/util/tdl/simple/parse/parser.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 namespace detail {
@@ -42,6 +41,6 @@ struct stream_position : public simple::line_logger {
   bool after;
 };
 
-}}}}}
+}}}}
 
 #endif

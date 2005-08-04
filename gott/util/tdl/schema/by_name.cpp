@@ -22,7 +22,7 @@
 #include "../exceptions.hpp"
 
 using std::wstring;
-namespace tdl = gott::util::tdl;
+namespace tdl = gott::tdl;
 namespace schema = tdl::schema;
 using schema::name_manager_t;
 

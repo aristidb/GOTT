@@ -27,7 +27,6 @@
 #include "../slot.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
@@ -56,6 +55,6 @@ private:
   enum { read_none, read_node, read_down, read_sub, done } state;
 };
   
-}}}}
+}}}
 
 #endif

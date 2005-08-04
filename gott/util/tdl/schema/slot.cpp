@@ -25,7 +25,7 @@ using std::size_t;
 using std::pair;
 using std::make_pair;
 using boost::get;
-namespace schema = gott::util::tdl::schema;
+namespace schema = gott::tdl::schema;
 using schema::rule;
 using schema::rule_factory;
 using schema::slotcfg;
