@@ -190,3 +190,11 @@ int gott::compare(nstring const &a, nstring const &b) {
   
   return *p2 - *p1;
 }
+
+std::size_t 
+hashd::hash<gott::nstring>::operator() (gott::nstring const &s) const {
+  std::size_t result = 0;
+  for (gott::utf8_t const *it = s.begin_raw(); it != s.end_raw(); ++it)
+    result = 5 * result + *it;
+  return result;
+}

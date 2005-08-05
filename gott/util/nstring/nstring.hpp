@@ -24,6 +24,9 @@
 //#include "iterator.hpp"
 #include "types.hpp"
 #include <gott/util/visibility.hpp>
+#define PARAM_HASH_NO_BASIC_STRING
+#include <gott/util/my_hash_map.hpp>
+#undef PARAM_HASH_NO_BASIC_STRING
 
 namespace std {
   template<class> class allocator;
@@ -189,6 +192,12 @@ inline bool operator>=(nstring const &a, nstring const &b) {
   return compare(a, b) >= 0;
 }
 
+}
+
+namespace HH_HASHD {
+template<> struct hash<gott::nstring> {
+  GOTT_EXPORT std::size_t operator() (gott::nstring const &) const;
+};
 }
 
 #endif

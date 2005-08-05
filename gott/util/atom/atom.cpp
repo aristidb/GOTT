@@ -19,13 +19,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "atom.hpp"
-#include <set>
+#include <gott/util/my_hash_map.hpp>
+#include HH_HASH_SET
 
 using gott::atom;
 using gott::nstring;
 
 static nstring atomize(nstring const &n) {
-  static std::set<nstring> table;
+  static hashd::hash_set<nstring> table;
   return *table.insert(n).first;
 }
 
