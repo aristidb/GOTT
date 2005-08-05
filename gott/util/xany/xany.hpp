@@ -27,7 +27,7 @@
 #include <iosfwd>
 #include <gott/util/xany/promote.hpp>
 
-#include <gott/util/misc/visibility.hpp>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
 namespace xany {

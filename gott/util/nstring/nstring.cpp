@@ -23,8 +23,8 @@
 #include "util.hpp"
 #include "buffer.hpp"
 
-#include <gott/util/misc/range.hpp>
-#include <gott/util/misc/range_algo.hpp>
+#include <gott/util/range.hpp>
+#include <gott/util/range_algo.hpp>
 #include <cstdlib>
 #include <cwchar>
 #include <cstring>

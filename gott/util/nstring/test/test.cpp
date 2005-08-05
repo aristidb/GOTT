@@ -1,7 +1,7 @@
 #include <gott/util/nstring/nstring.hpp>
 #include <gott/util/nstring/buffer.hpp>
 #include <boost/algorithm/string.hpp>
-#include <gott/util/misc/range_algo.hpp>
+#include <gott/util/range_algo.hpp>
 #include <iostream>
 #include <locale>
 #include <iomanip>

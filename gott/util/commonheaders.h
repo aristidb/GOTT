@@ -57,10 +57,10 @@
 #include <boost/assign.hpp>
 
 #include <gott/util/xany/xany.hpp>
-#include <gott/util/misc/range_algo.hpp>
-#include <gott/util/misc/my_hash_map.hpp>
-#include <gott/util/misc/visibility.hpp>
-#include <gott/util/misc/autoconv.hpp>
+#include <gott/util/range_algo.hpp>
+#include <gott/util/my_hash_map.hpp>
+#include <gott/util/visibility.hpp>
+#include <gott/util/autoconv.hpp>
 
 #include <gott/util/debug/warnings.hpp>
 #include <gott/util/debug/assert.hpp>

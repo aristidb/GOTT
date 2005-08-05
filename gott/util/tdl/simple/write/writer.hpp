@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_SIMPLE_WRITER_H
 #define GOTT_UTIL_TDL_SIMPLE_WRITER_H
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/commonheaders.hpp>
 
 namespace gott {
 namespace tdl {

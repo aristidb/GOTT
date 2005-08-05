@@ -24,7 +24,7 @@
 #define GOTT_UTIL_DEBUG_DEBUGSTREAM_HPP
 
 #include <iostream>
-#include <gott/util/misc/utf32string.hpp>
+#include <gott/util/nstring/types.hpp>
 
 namespace gott {
 namespace debug {

@@ -22,7 +22,7 @@
 #define GOTT_UTIL_NSTRING_CONVERT_HPP
 
 #include "types.hpp"
-#include <gott/util/misc/range.hpp>
+#include <gott/util/range.hpp>
 
 namespace gott {
 

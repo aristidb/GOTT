@@ -21,7 +21,7 @@
 #ifndef GOTT_TDL_SCHEMA_EVENT_HPP
 #define GOTT_TDL_SCHEMA_EVENT_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/commonheaders.hpp>
 
 namespace gott {
 namespace tdl {

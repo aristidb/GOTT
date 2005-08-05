@@ -22,7 +22,7 @@
 #define GOTT_UTIL_NSTRING_NSTRING_HPP
 
 #include "iterator.hpp"
-#include <gott/util/misc/visibility.hpp>
+#include <gott/util/visibility.hpp>
 
 namespace std {
   template<class> class allocator;

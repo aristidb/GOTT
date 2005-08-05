@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 #define GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/commonheaders.hpp>
 
 namespace gott {
 namespace tdl {

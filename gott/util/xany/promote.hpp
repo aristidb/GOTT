@@ -19,7 +19,7 @@
 #ifndef GOTT_UTIL_XANY_PROMOTE_HPP
 #define GOTT_UTIL_XANY_PROMOTE_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/commonheaders.hpp>
 
 namespace gott {
 namespace xany {

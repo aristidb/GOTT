@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_PARSE_POSITION_HPP
 #define GOTT_UTIL_TDL_SCHEMA_PARSE_POSITION_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/commonheaders.hpp>
 #include "ev_fwd.hpp"
 #include <gott/util/tdl/structure/structure.hpp>
 

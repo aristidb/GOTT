@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_CONTEXT_HPP
 #define GOTT_UTIL_TDL_SCHEMA_CONTEXT_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/commonheaders.hpp>
 #include "rule_factory.hpp"
 #include "slot.hpp"
 

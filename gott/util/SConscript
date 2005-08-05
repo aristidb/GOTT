@@ -1,1 +1,1 @@
-SConscript(dirs = ['tdl', 'xany', 'misc', 'properties', 'debug', 'nstring'])
+SConscript(dirs = ['tdl', 'xany', 'properties', 'debug', 'nstring'])

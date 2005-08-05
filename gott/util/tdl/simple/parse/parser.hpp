@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_SIMPLE_PARSER_H
 #define GOTT_UTIL_TDL_SIMPLE_PARSER_H
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/commonheaders.hpp>
 
 namespace gott {
 namespace tdl {

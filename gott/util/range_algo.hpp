@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_MISC_RANGE_ALGO_HPP
 #define GOTT_UTIL_MISC_RANGE_ALGO_HPP
 
-#include <gott/util/misc/range.hpp>
+#include <gott/util/range.hpp>
 #include <algorithm>
 
 namespace gott {

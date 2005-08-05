@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_PROPERTY_PROPERTY_HPP
 #define GOTT_UTIL_PROPERTY_PROPERTY_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/commonheaders.hpp>
 #include <gott/util/properties/embedded_storage.hpp>
 #include <gott/util/properties/trivial_aux.hpp>
 #include <gott/util/properties/policy.hpp>

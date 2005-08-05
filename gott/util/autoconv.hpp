@@ -19,7 +19,7 @@
 #ifndef GOTT_UTIL_MISC_AUTOCONV_HPP
 #define GOTT_UTIL_MISC_AUTOCONV_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/commonheaders.hpp>
 
 namespace std {
 

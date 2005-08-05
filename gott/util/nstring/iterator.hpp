@@ -23,7 +23,7 @@
 
 #include "types.hpp"
 #include <iterator>
-#include <gott/util/misc/visibility.hpp>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
 

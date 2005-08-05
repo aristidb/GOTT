@@ -26,6 +26,6 @@ namespace gott {
 namespace util {
 namespace debug {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  ::std::basic_ostream<utf32_t> debugstream(std::wcerr.rdbuf());
+  //::std::basic_ostream<utf32_t> debugstream(std::wcerr.rdbuf());
 #endif
 }}}
