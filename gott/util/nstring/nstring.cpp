@@ -165,19 +165,19 @@ nstring gott::operator+(nstring const &a, nstring const &b) {
 }
 
 bool gott::operator==(nstring const &a, nstring const &b) {
-  if (a.p == b.p)
+  if (a.data() == b.data())
     return true;
   if (a.size() != b.size())
     return false;
-  return equal(range(a), range(b));
+  return std::equal(a.begin_raw(), a.end_raw(), b.begin_raw());
 }
 
 int gott::compare(nstring const &a, nstring const &b) {
-  if (a.p == b.p)
+  if (a.data() == b.data())
     return 0;
 
   utf8_t const *p1 = a.begin_raw();
-  utf8_t const *p2 = b.end_raw();
+  utf8_t const *p2 = b.begin_raw();
   for (; p1 != a.end_raw() && p2 != b.end_raw(); ++p1, ++p2)
     if (*p1 != *p2)
       break;

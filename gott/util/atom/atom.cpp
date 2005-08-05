@@ -32,3 +32,7 @@ static nstring atomize(nstring const &n) {
 atom::atom(nstring const &n) : nstring(atomize(n)) {}
 
 atom::~atom() {}
+
+bool gott::operator==(atom const &a, atom const &b) {
+  return a.begin_raw() == b.begin_raw(); // same memory
+}

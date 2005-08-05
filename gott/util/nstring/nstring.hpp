@@ -143,9 +143,6 @@ private:
   class representation;
   representation *p;
 
-  friend bool operator==(nstring const &, nstring const &);
-  friend int compare(nstring const &, nstring const &);
-
   GOTT_LOCAL nstring(); // unimplemented
 };
 

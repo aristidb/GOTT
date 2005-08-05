@@ -31,6 +31,12 @@ public:
   GOTT_EXPORT ~atom();
 };
 
+GOTT_EXPORT bool operator==(atom const &, atom const &);
+
+inline bool operator!=(atom const &a, atom const &b) {
+  return !(a == b);
+}
+
 }
 
 #endif
