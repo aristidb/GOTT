@@ -23,6 +23,7 @@
 
 #include "rule.hpp"
 #include "rule_factory.hpp"
+#include <boost/function.hpp>
 
 namespace gott {
 namespace tdl {

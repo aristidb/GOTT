@@ -23,6 +23,7 @@
 
 #include "rule_attr.hpp"
 #include "../exceptions.hpp"
+#include <vector>
 
 namespace gott {
 namespace tdl {

@@ -21,11 +21,15 @@
 #ifndef GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 #define GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 
-#include <gott/util/commonheaders.hpp>
+#include <string>
+#include <list>
+#include <gott/util/xany/xany.hpp>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
 namespace tdl {
 namespace structure {
+
 class writable_structure;
 
 /**
@@ -33,9 +37,9 @@ class writable_structure;
  */
 namespace cf {
 
-typedef std::list<std::wstring> tag_list;
+typedef std::list<std::wstring, std::allocator<std::wstring> > tag_list;
 class node_inserter_t;
-typedef std::list<node_inserter_t> nd_list;
+typedef std::list<node_inserter_t, std::allocator<node_inserter_t> > nd_list;
 
 /**
  * General concatenateable structure generator.

@@ -21,6 +21,8 @@
 #include "parse_position.hpp"
 #include "event.hpp"
 #include <gott/util/tdl/structure/structure.hpp>
+#include <vector>
+#include <gott/util/debug/assert.hpp>
 
 using std::vector;
 using std::size_t;

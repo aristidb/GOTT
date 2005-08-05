@@ -19,6 +19,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "print.hpp"
+#include <ostream>
+#include <list>
+#include <sstream>
+#include <gott/util/autoconv.hpp>
 
 using std::wostream;
 using std::wstring;
@@ -76,4 +80,18 @@ void direct_print::add_tag(wstring const &s) {
 void direct_print::set_tags(list<wstring> const &l) {
   for (list<wstring>::const_iterator it = l.begin(); it != l.end(); ++it)
     add_tag(*it);
+}
+
+std::wostream &gott::tdl::structure::operator<<(std::wostream &o, 
+                                                copyable_structure const &s) {
+  direct_print p(o);
+  s.copy_to(p);
+  return o;
+}
+
+std::ostream &gott::tdl::structure::operator<<(std::ostream &o, 
+                                               copyable_structure const &s) {
+  std::wostringstream wo;
+  wo << s;
+  return o << wo.str();
 }

@@ -21,7 +21,9 @@
 #ifndef GOTT_UTIL_TDL_EXCEPTIONS_HPP
 #define GOTT_UTIL_TDL_EXCEPTIONS_HPP
 
-#include <gott/util/commonheaders.hpp>
+#include <string>
+#include <list>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
 namespace tdl {

@@ -25,6 +25,9 @@
 #include "stream_position.hpp"
 #include "parse_position.hpp"
 #include "../structure/repatch.hpp"
+#include <gott/util/range_algo.hpp>
+#include <gott/util/autoconv.hpp>
+#include <sstream>
 
 using std::wstring;
 using std::list;

@@ -21,8 +21,8 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_STREAM_POSITION_HPP
 #define GOTT_UTIL_TDL_SCHEMA_STREAM_POSITION_HPP
 
-#include <gott/util/commonheaders.hpp>
 #include <gott/util/tdl/simple/parse/parser.hpp>
+#include <string>
 
 namespace gott {
 namespace tdl {

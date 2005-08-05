@@ -20,6 +20,8 @@
 
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tut/tut.h>
+#include <sstream>
+#include <gott/util/autoconv.hpp>
 
 using std::wstring;
 using std::vector;

@@ -21,7 +21,11 @@
 #ifndef GOTT_UTIL_TDL_SIMPLE_PARSER_H
 #define GOTT_UTIL_TDL_SIMPLE_PARSER_H
 
-#include <gott/util/commonheaders.hpp>
+#include <string>
+#include <gott/util/my_hash_map.hpp>
+#include HH_HASH_MAP
+#include <gott/util/visibility.hpp>
+#include <boost/function.hpp>
 
 namespace gott {
 namespace tdl {

@@ -15,8 +15,8 @@ if debug:
 	cppdef = ['DEBUG']
 else:
 	cppdef = ['NDEBUG']
-caux = ARGUMENTS.get('aux', '')
-cflags += [caux]
+caux = ARGUMENTS.get('aux', '-include fixstl/string.hpp')
+cflags += Split(caux)
 cflagsoverride = ARGUMENTS.get('cfoverride', 0)
 if cflagsoverride:
 	cflags = cflagsoverride

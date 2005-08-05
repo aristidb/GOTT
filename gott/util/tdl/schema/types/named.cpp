@@ -20,6 +20,9 @@
 
 #include "named.hpp"
 #include "../event.hpp"
+#include <gott/util/autoconv.hpp>
+#include <list>
+#include <string>
 
 using std::list;
 using std::wstring;

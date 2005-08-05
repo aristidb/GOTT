@@ -19,6 +19,7 @@
 #ifndef GOTT_TDL_UTIL_XANY_HPP
 #define GOTT_TDL_UTIL_XANY_HPP
 
+#include <string>
 #include <typeinfo>
 #include <algorithm>
 #include <boost/type_traits.hpp>

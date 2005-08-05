@@ -21,7 +21,9 @@
 #ifndef GOTT_UTIL_TDL_QUERY_TDLQUERY_HPP
 #define GOTT_UTIL_TDL_QUERY_TDLQUERY_HPP
 
-#include <gott/util/commonheaders.hpp>
+#include <vector>
+#include <iosfwd>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
 namespace tdl {

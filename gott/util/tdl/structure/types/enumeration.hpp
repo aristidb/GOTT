@@ -22,6 +22,7 @@
 #define GOTT_UTIL_TDL_STRUCTURE_TYPES_ENUMERATION_HPP
 
 #include "../repatch.hpp"
+#include <vector>
 
 namespace gott {
 namespace tdl {

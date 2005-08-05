@@ -1,4 +1,6 @@
 #include "property.hpp"
+#include <iostream>
+#include <gott/util/autoconv.hpp>
 
 using namespace std;
 using namespace gott::properties;

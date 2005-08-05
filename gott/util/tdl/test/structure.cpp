@@ -23,6 +23,7 @@
 #include <gott/util/tdl/structure/comfort.hpp>
 #include <gott/util/tdl/structure/print.hpp>
 #include <gott/util/tut/tut.h>
+#include <gott/util/autoconv.hpp>
 
 namespace stru = gott::tdl::structure;
 namespace cf = stru::cf;

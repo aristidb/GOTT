@@ -21,9 +21,11 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_CONTEXT_HPP
 #define GOTT_UTIL_TDL_SCHEMA_CONTEXT_HPP
 
-#include <gott/util/commonheaders.hpp>
 #include "rule_factory.hpp"
 #include "slot.hpp"
+#include <boost/scoped_ptr.hpp>
+#include <boost/none.hpp>
+#include <boost/optional/optional.hpp>
 
 namespace gott {
 namespace tdl {
@@ -32,7 +34,7 @@ namespace schema {
 /**
  * Memory-owning context class.
  */
-class context : public boost::noncopyable {
+class context {
 public:
   context() GOTT_EXPORT;
   ~context() GOTT_EXPORT;
@@ -87,6 +89,8 @@ public:
   rule_factory const &get() const GOTT_EXPORT;
 
 private:
+  context(context const &);
+
   class IMPL;
   boost::scoped_ptr<IMPL> p;
 };

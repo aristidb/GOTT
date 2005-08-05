@@ -20,6 +20,8 @@
 
 #include "by_name.hpp"
 #include "../exceptions.hpp"
+#include <gott/util/my_hash_map.hpp>
+#include HH_HASH_MAP
 
 using std::wstring;
 namespace tdl = gott::tdl;

@@ -21,9 +21,10 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_PARSE_POSITION_HPP
 #define GOTT_UTIL_TDL_SCHEMA_PARSE_POSITION_HPP
 
-#include <gott/util/commonheaders.hpp>
 #include "ev_fwd.hpp"
 #include <gott/util/tdl/structure/structure.hpp>
+#include <utility>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace tdl {

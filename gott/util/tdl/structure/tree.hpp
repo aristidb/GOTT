@@ -22,6 +22,8 @@
 #define GOTT_UTIL_TDL_STRUCTURE_TREE_HPP
 
 #include <gott/util/tdl/structure/structure.hpp>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace tdl {
@@ -199,17 +201,14 @@ inline bool operator!=(tree const &lhs, tree const &rhs) {
  * \param s The stream to print to.
  * \param i The iterator to print.
  */
-GOTT_EXPORT std::wostream &operator<<(std::wostream &s, tree::iterator const &i);
+GOTT_EXPORT 
+std::wostream &operator<<(std::wostream &s, tree::iterator const &i);
 
 /**
  * Print a tree::iterator to a (normal) stream.
  * @copydoc operator<<(std::wostream &, tree::iterator const &)
  */
-inline std::ostream &operator<<(std::ostream &s, tree::iterator const &i) {
-  std::wostringstream w;
-  w << i;
-  return s << w.str();
-}
+GOTT_EXPORT std::ostream &operator<<(std::ostream &s, tree::iterator const &i);
 
 }}}
 

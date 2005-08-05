@@ -23,6 +23,7 @@
 
 #include "rule.hpp"
 #include "../structure/repatch.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace gott {
 namespace tdl {

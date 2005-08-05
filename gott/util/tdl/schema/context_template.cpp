@@ -20,6 +20,8 @@
 
 #include "context_template.hpp"
 #include "by_name.hpp"
+#include <boost/variant.hpp>
+#include <gott/util/range_algo.hpp>
 
 using std::wstring;
 using std::vector;

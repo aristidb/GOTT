@@ -21,6 +21,8 @@
 #ifndef GOTT_UTIL_DEBUG_ASSERT_HPP
 #define GOTT_UTIL_DEBUG_ASSERT_HPP
 
+#include <iostream>
+
 namespace gott {
 namespace debug {
 

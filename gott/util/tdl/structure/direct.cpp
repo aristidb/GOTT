@@ -20,6 +20,7 @@
 
 #include "structure.hpp"
 #include "../simple/parse/parser.hpp"
+#include <gott/util/autoconv.hpp>
 
 using std::wstring;
 using gott::xany::Xany;

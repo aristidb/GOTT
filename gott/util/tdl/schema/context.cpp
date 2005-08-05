@@ -22,6 +22,8 @@
 #include "slot.hpp"
 #include "by_name.hpp"
 #include "rule_factory.hpp"
+#include <gott/util/range_algo.hpp>
+#include <boost/optional.hpp>
 
 using boost::optional;
 using gott::tdl::schema::context;

@@ -21,6 +21,8 @@
 
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tut/tut.h>
+#include <ostream>
+#include <gott/util/autoconv.hpp>
 
 namespace tut {
 struct spb : gott::tdl::simple::parser {

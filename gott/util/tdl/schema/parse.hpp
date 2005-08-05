@@ -21,9 +21,9 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_PARSE_HPP
 #define GOTT_UTIL_TDL_SCHEMA_PARSE_HPP
 
-#include <gott/util/commonheaders.hpp>
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tdl/structure/structure.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace tdl {

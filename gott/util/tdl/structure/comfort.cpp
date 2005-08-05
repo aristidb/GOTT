@@ -20,6 +20,8 @@
 
 #include "comfort.hpp"
 #include "structure.hpp"
+#include <boost/bind.hpp>
+#include <gott/util/range_algo.hpp>
 
 using gott::xany::Xany;
 namespace cf = gott::tdl::structure::cf;

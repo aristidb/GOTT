@@ -20,6 +20,7 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/structure/types/integer.hpp>
+#include <gott/util/autoconv.hpp>
 
 using namespace gott::tdl::schema;
 namespace stru = gott::tdl::structure;

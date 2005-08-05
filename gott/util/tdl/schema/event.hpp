@@ -21,7 +21,10 @@
 #ifndef GOTT_TDL_SCHEMA_EVENT_HPP
 #define GOTT_TDL_SCHEMA_EVENT_HPP
 
-#include <gott/util/commonheaders.hpp>
+#include <iosfwd>
+#include <string>
+#include <gott/util/visibility.hpp>
+#include <boost/variant.hpp>
 
 namespace gott {
 namespace tdl {

@@ -19,7 +19,9 @@
 #ifndef GOTT_UTIL_MISC_AUTOCONV_HPP
 #define GOTT_UTIL_MISC_AUTOCONV_HPP
 
-#include <gott/util/commonheaders.hpp>
+#include <ostream>
+#include <string>
+#include <gott/util/range.hpp>
 
 namespace std {
 

@@ -22,6 +22,7 @@
 #define GOTT_UTIL_TDL_STRUCTURE_PRINT_HPP
 
 #include "structure.hpp"
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace tdl {
@@ -57,23 +58,15 @@ private:
  * \param o The stream to write to.
  * \param s The structure to print.
  */
-inline 
-std::wostream &operator<<(std::wostream &o, copyable_structure const &s) {
-  direct_print p(o);
-  s.copy_to(p);
-  return o;
-}
+GOTT_EXPORT
+std::wostream &operator<<(std::wostream &o, copyable_structure const &s);
 
 /**
  * Print a (copyable) structure object to a (normal) stream.
  * @copydoc operator<<(std::wostream &, copyable_structure const &)
  */
-inline 
-std::ostream &operator<<(std::ostream &o, copyable_structure const &s) {
-  std::wostringstream wo;
-  wo << s;
-  return o << wo.str();
-}
+GOTT_EXPORT
+std::ostream &operator<<(std::ostream &o, copyable_structure const &s);
 
 /**
  * Convert a (copyable) structure to a string (wide or narrow).

@@ -21,8 +21,8 @@
 #ifndef GOTT_UTIL_PROPERTY_DYNAMIC_PROPERTY_HPP
 #define GOTT_UTIL_PROPERTY_DYNAMIC_PROPERTY_HPP
 
-#include <gott/util/commonheaders.hpp>
 #include <gott/util/properties/policy.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace gott {
 namespace properties {

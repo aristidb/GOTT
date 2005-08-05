@@ -20,6 +20,8 @@
 
 #include "enumeration.hpp"
 #include <gott/util/tdl/exceptions.hpp>
+#include <gott/util/autoconv.hpp>
+#include <gott/util/range_algo.hpp>
 
 namespace structure = gott::tdl::structure;
 
@@ -30,6 +32,9 @@ repatch_enumeration::repatch_enumeration(std::vector<std::wstring> const &x)
 : alternatives(x) {}
 
 repatch_enumeration::~repatch_enumeration() {}
+
+const wchar_t failure_message[] = 
+    L"repatch_enumeration: could not match enumeration";
 
 writable_structure *
 repatch_enumeration::deferred_write(writable_structure &s) const {
@@ -44,10 +49,10 @@ repatch_enumeration::deferred_write(writable_structure &s) const {
         std::wstring input = xany::Xany_cast<std::wstring>(x);
         std::vector<std::wstring>::const_iterator it;
         if ((it = find(range(alternatives), input)) == alternatives.end())
-          throw failed_repatch(L"repatch_enumeration: could not match enumeration");
+          throw failed_repatch(failure_message);
         target.data(xany::Xany(long(it - alternatives.begin())));
       } else
-        throw failed_repatch(L"repatch_enumeration: could not match enumeration");
+        throw failed_repatch(failure_message);
     }
   };
   return new context(s, alternatives);

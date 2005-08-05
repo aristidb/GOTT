@@ -20,6 +20,7 @@
 
 #include "node.hpp"
 #include "../event.hpp"
+#include <gott/util/autoconv.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;

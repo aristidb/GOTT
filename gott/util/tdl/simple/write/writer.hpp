@@ -21,7 +21,9 @@
 #ifndef GOTT_UTIL_TDL_SIMPLE_WRITER_H
 #define GOTT_UTIL_TDL_SIMPLE_WRITER_H
 
-#include <gott/util/commonheaders.hpp>
+#include <gott/util/visibility.hpp>
+#include <iosfwd>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace tdl {

@@ -19,6 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "exceptions.hpp"
+#include <sstream>
+#include <gott/util/autoconv.hpp>
 
 using gott::tdl::tdl_exception;
 

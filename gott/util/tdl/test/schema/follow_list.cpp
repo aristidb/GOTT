@@ -21,6 +21,7 @@
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
 #include <gott/util/tdl/structure/types/integer.hpp>
+#include <gott/util/autoconv.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;

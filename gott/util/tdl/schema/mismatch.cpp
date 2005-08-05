@@ -20,6 +20,9 @@
 
 #include "../exceptions.hpp"
 #include "stream_position.hpp"
+#include <gott/util/range.hpp>
+#include <gott/util/autoconv.hpp>
+#include <sstream>
 
 namespace schema = gott::tdl::schema;
 using schema::mismatch;

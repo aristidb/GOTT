@@ -21,11 +21,12 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_CONTEXT_TEMPLATE_HPP
 #define GOTT_UTIL_TDL_SCHEMA_CONTEXT_TEMPLATE_HPP
 
-#include <gott/util/commonheaders.hpp>
-
 #include "context.hpp"
 #include "rule_attr.hpp"
 #include "slot.hpp"
+
+#include <string>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace tdl {

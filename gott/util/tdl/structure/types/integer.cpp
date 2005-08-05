@@ -20,6 +20,8 @@
 
 #include "integer.hpp"
 #include <gott/util/tdl/exceptions.hpp>
+#include <cwctype>
+#include <gott/util/autoconv.hpp>
 
 namespace structure = gott::tdl::structure;
 
@@ -63,7 +65,7 @@ repatch_integer::deferred_write(writable_structure &s) const {
           return false;
       }
   
-      if (!iswdigit(*it))
+      if (!std::iswdigit(*it))
         return false;
     
 //    if (*it == L'0' && it[1] == L'x')

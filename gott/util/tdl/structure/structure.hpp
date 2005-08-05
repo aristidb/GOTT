@@ -21,7 +21,10 @@
 #ifndef GOTT_UTIL_TDL_STRUC_STRUC_H
 #define GOTT_UTIL_TDL_STRUC_STRUC_H
 
-#include <gott/util/commonheaders.hpp>
+#include <gott/util/visibility.hpp>
+#include <gott/util/xany/xany.hpp>
+#include <list>
+#include <string>
 
 namespace gott {
 namespace tdl {

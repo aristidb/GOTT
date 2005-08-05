@@ -21,6 +21,13 @@
 #include "structure.hpp"
 #include "tree.hpp"
 #include "print.hpp"
+#include <vector>
+#include <gott/util/my_hash_map.hpp>
+#include HH_HASH_MAP
+#include <gott/util/range_algo.hpp>
+#include <boost/bind.hpp>
+#include <sstream>
+#include <gott/util/autoconv.hpp>
 
 using std::list;
 using std::wstring;
@@ -325,6 +332,12 @@ std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
   } x = {p};
   x(i);
   return s;
+}
+
+std::ostream &stru::operator<<(std::ostream &s, tree::iterator const &i) {
+  std::wostringstream w;
+  w << i;
+  return s << w.str();
 }
 
 #ifdef DEBUG

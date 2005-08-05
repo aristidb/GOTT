@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "unordered.hpp"
+#include <gott/util/range_algo.hpp>
 
 using std::vector;
 

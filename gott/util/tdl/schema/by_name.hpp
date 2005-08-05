@@ -21,7 +21,9 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_BY_NAME_HPP
 #define GOTT_UTIL_TDL_SCHEMA_BY_NAME_HPP
 
-#include <gott/util/commonheaders.hpp>
+#include <string>
+#include <boost/scoped_ptr.hpp>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
 namespace tdl {

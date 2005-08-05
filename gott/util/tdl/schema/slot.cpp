@@ -20,6 +20,9 @@
 
 #include "slot.hpp"
 #include "rule.hpp"
+#include <boost/optional.hpp>
+#include <boost/variant.hpp>
+#include <utility>
 
 using std::size_t;
 using std::pair;
