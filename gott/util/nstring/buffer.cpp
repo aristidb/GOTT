@@ -21,7 +21,9 @@
 #include "buffer.hpp"
 #include "convert.hpp"
 #include "util.hpp"
+#include "iterator.hpp"
 #include <algorithm>
+#include <gott/util/range_algo.hpp>
 
 using gott::nstring_buffer;
 using gott::utf32_t;
@@ -56,7 +58,7 @@ nstring_buffer::nstring_buffer()
 
 nstring_buffer::nstring_buffer(nstring_buffer const &b) 
 : data(new representation) {
-  insert(end(), range(b));
+  copy(range(b), insert(end(), b.size()));
 }
 
 nstring_buffer::~nstring_buffer() { delete data; }
@@ -71,12 +73,13 @@ void nstring_buffer::operator=(nstring_buffer const &b) {
 
 nstring_buffer::nstring_buffer(utf32_t const *x)
 : data(new representation) {
-  insert(end(), range(x, utf32_len(x)));
+  range_t<utf32_t const *> r = range(x, utf32_len(x));
+  copy(r, insert(end(), r.size()));
 }
 
 nstring_buffer::nstring_buffer(nstring const &x)
 : data(new representation) {
-  insert(end(), range(x));
+  copy(range(x), insert(end(), x.length()));
 }
 
 utf32_t *nstring_buffer::begin() {

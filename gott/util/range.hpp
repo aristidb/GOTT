@@ -50,18 +50,8 @@ range_t<T> range(T const &a, T const &b) {
 
 template<class I, class S>
 I advanced(I it, S s) {
-  advance(it, s);
+  std::advance(it, s);
   return it;
-}
-
-template<class T, class S>
-T *advanced(T *it, S s) {
-  return it + s;
-}
-
-template<class T, class S>
-T const *advanced(T const *it, S s) {
-  return it + s;
 }
 
 template<class T, class S>
@@ -109,6 +99,11 @@ range_t<T> simply(T const &x) {
   return range(x, x);
 }
 
+}
+
+namespace boost {
+  using gott::begin;
+  using gott::end;
 }
 
 #endif

@@ -56,6 +56,19 @@ utf8_iterator utf8_iterator::operator++(int) {
   return tmp;
 }
 
+utf8_iterator &utf8_iterator::operator--() {
+  while (*current >= 0x80 && *current < 0xC0)
+    --current;
+  --current;
+  return *this;
+}
+
+utf8_iterator utf8_iterator::operator--(int) {
+  utf8_iterator tmp(*this);
+  --*this;
+  return tmp;
+}
+
 utf8_iterator::operator utf8_t const *() const {
   return current;
 }

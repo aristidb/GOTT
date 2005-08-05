@@ -18,52 +18,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_NSTRING_BUFFER_HPP
-#define GOTT_UTIL_NSTRING_BUFFER_HPP
+#ifndef GOTT_UTIL_ATOM_ATOM_HPP
+#define GOTT_UTIL_ATOM_ATOM_HPP
 
-#include "nstring.hpp"
-#include "types.hpp"
+#include <gott/util/nstring/nstring.hpp>
 
 namespace gott {
 
-template<class> class range_t;
-
-class GOTT_EXPORT nstring_buffer {
+class atom : public nstring {
 public:
-  typedef utf32_t value_type;
-  typedef utf32_t *iterator;
-  typedef utf32_t const *const_iterator;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
-  
-  nstring_buffer();
-  nstring_buffer(nstring_buffer const &);
-  nstring_buffer(nstring const &);
-  nstring_buffer(utf32_t const *);
-  ~nstring_buffer();
-
-  utf32_t *begin();
-  utf32_t *end();
-  utf32_t const *begin() const;
-  utf32_t const *end() const;
-
-  size_t size() const;
-  
-  void swap(nstring_buffer &);
-
-  void operator=(nstring_buffer const &b);
-
-  utf32_t &operator[](std::size_t);
-  utf32_t &at(std::size_t);
-  
-  iterator erase(iterator, iterator);
-
-  iterator insert(iterator, std::size_t);
-  iterator insert(iterator, std::size_t, utf32_t);
-
-private:
-  class representation;
-  representation *data;
+  GOTT_EXPORT atom(nstring const &);
+  GOTT_EXPORT ~atom();
 };
 
 }

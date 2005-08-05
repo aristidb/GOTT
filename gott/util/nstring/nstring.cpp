@@ -22,6 +22,7 @@
 #include "convert.hpp"
 #include "util.hpp"
 #include "buffer.hpp"
+#include "iterator.hpp"
 
 #include <gott/util/range.hpp>
 #include <gott/util/range_algo.hpp>
@@ -118,16 +119,20 @@ gott::utf8_t const *nstring::data() const {
   return p->data;
 }
 
-gott::utf8_iterator nstring::begin() const {
+gott::utf8_t const *nstring::begin_raw() const {
   return p->data;
 }
 
-gott::utf8_iterator nstring::end() const {
+gott::utf8_t const *nstring::end_raw() const {
   return p->data + p->size;
 }
 
-nstring::operator range_t<utf8_iterator>() {
-  return range(begin(), end());
+gott::utf8_iterator nstring::begin() const {
+  return begin_raw();
+}
+
+gott::utf8_iterator nstring::end() const {
+  return end_raw();
 }
 
 std::size_t nstring::size() const {
@@ -167,6 +172,21 @@ bool gott::operator==(nstring const &a, nstring const &b) {
   return equal(range(a), range(b));
 }
 
-bool gott::operator!=(nstring const &a, nstring const &b) {
-  return !(a == b);
+int gott::compare(nstring const &a, nstring const &b) {
+  if (a.p == b.p)
+    return 0;
+
+  utf8_t const *p1 = a.begin_raw();
+  utf8_t const *p2 = b.end_raw();
+  for (; p1 != a.end_raw() && p2 != b.end_raw(); ++p1, ++p2)
+    if (*p1 != *p2)
+      break;
+  if (p1 == a.end_raw()) {
+    if (p2 == b.end_raw())
+      return 0;
+    return 1;
+  } else if (p2 == b.end_raw())
+    return -1;
+  
+  return *p2 - *p1;
 }

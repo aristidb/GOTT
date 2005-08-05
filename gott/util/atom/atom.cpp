@@ -18,38 +18,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_NSTRING_ITERATOR_HPP
-#define GOTT_UTIL_NSTRING_ITERATOR_HPP
+#include "atom.hpp"
+#include <set>
 
-#include "types.hpp"
-#include <iterator>
-#include <gott/util/visibility.hpp>
+using gott::atom;
+using gott::nstring;
 
-namespace gott {
-
-class GOTT_EXPORT utf8_iterator {
-public:
-  typedef utf32_t value_type;
-  typedef utf32_t *pointer;
-  typedef utf32_t &reference;
-  typedef std::ptrdiff_t difference_type;
-  typedef std::bidirectional_iterator_tag iterator_category;
-
-  utf32_t operator*() const;
-  utf8_iterator &operator++(); // prefix
-  utf8_iterator operator++(int); // postfix
-  utf8_iterator &operator--(); // prefix
-  utf8_iterator operator--(int); // postfix
-
-  utf8_iterator(utf8_t const *c) : current(c) {}
-  operator utf8_t const *() const;
-
-private:
-  utf8_t const *current;
-};
-
-GOTT_EXPORT bool operator==(utf8_iterator const &, utf8_iterator const &);
-GOTT_EXPORT bool operator!=(utf8_iterator const &, utf8_iterator const &);
-
+static nstring atomize(nstring const &n) {
+  static std::set<nstring> table;
+  return *table.insert(n).first;
 }
-#endif
+
+atom::atom(nstring const &n) : nstring(atomize(n)) {}
+
+atom::~atom() {}

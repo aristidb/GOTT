@@ -1,5 +1,6 @@
 #include <gott/util/nstring/nstring.hpp>
 #include <gott/util/nstring/buffer.hpp>
+#include <gott/util/nstring/iterator.hpp>
 #include <boost/algorithm/string.hpp>
 #include <gott/util/range_algo.hpp>
 #include <iostream>
@@ -17,8 +18,8 @@ int main() {
   wcerr << (x == n) << L' ';
   wcerr << (x != L"muhkuh") << L' ';
   wcerr << (x == "Hallo, nstring-Welt!\n") << L'\n';
-  x = L"xxxFoobar\n";
-  x = offset(range(x), 3);
+  x = L"xxxFoobar\n$";
+  x = offset(range(x), 3, -1);
   n = x + n;
   wcerr << n << x;
 
@@ -29,7 +30,8 @@ int main() {
   //to_upper(b);
   b[1] = utf32_t(L':');
   b.erase(b.begin() + 2, b.begin() + 6);
-  b.insert(b.begin(), offset(range(L"test "), 0, -1));
+  range_t<wchar_t const *> r = offset(range(L"test "), 0, -1);
+  copy(r, b.insert(b.begin(), r.size()));
   nstring a(b);
   wcerr << a;
   wcerr << L"\n";

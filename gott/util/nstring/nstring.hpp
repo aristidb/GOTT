@@ -21,7 +21,8 @@
 #ifndef GOTT_UTIL_NSTRING_NSTRING_HPP
 #define GOTT_UTIL_NSTRING_NSTRING_HPP
 
-#include "iterator.hpp"
+//#include "iterator.hpp"
+#include "types.hpp"
 #include <gott/util/visibility.hpp>
 
 namespace std {
@@ -34,111 +35,116 @@ namespace std {
 
 namespace gott {
 
+class utf8_iterator;
+
 class nstring_buffer;
 template<class> class range_t;
 
 /**
  * UTF-8 string literals storage class.
  */
-class GOTT_EXPORT nstring {
+class nstring {
 public:
   typedef utf8_iterator const_iterator;
 
   /**
    * Construct from encoded c-string.
    */
-  nstring(char const *, encoding = utf8);
+  nstring(char const *, encoding = utf8) GOTT_EXPORT;
   
   /**
    * Construct from encoded wide c-string.
    */
-  nstring(wchar_t const *, encoding = utf32);
+  nstring(wchar_t const *, encoding = utf32) GOTT_EXPORT;
   
   enum literal_tag { utf8_literal };
 
   /**
    * Construct from UTF8-c-literal. Shares memory.
    */
-  nstring(utf8_t const *, literal_tag);
+  nstring(utf8_t const *, literal_tag) GOTT_EXPORT;
 
   /**
    * Construct from nstring_buffer.
    */
-  nstring(nstring_buffer const &);
+  nstring(nstring_buffer const &) GOTT_EXPORT;
 
   /**
    * Concatenate.
    */
-  nstring(std::vector<nstring, std::allocator<nstring> > const &);
+  nstring(std::vector<nstring, std::allocator<nstring> > const &) GOTT_EXPORT;
 
   /**
    * Concatenate.
    */
-  nstring(std::list<nstring, std::allocator<nstring> > const &);
+  nstring(std::list<nstring, std::allocator<nstring> > const &) GOTT_EXPORT;
 
   /**
    * Concatenate.
    */
-  nstring(nstring const *, std::size_t);
+  nstring(nstring const *, std::size_t) GOTT_EXPORT;
 
   /**
    * Construct from character range.
    */
-  nstring(range_t<utf8_iterator> const &);
+  nstring(range_t<utf8_iterator> const &) GOTT_EXPORT;
 
   /**
    * Construct from character range.
    */
-  nstring(range_t<utf8_t const *> const &);
+  nstring(range_t<utf8_t const *> const &) GOTT_EXPORT;
 
   /// Copy-Constructor.
-  nstring(nstring const &);
+  nstring(nstring const &) GOTT_EXPORT;
 
   /// Destructor.
-  ~nstring();
+  ~nstring() GOTT_EXPORT;
 
   /**
    * Swap with another nstring.
    */
-  void swap(nstring &other);
+  void swap(nstring &other) GOTT_EXPORT;
 
   /**
    * Assign from another nstring.
    */
-  void operator=(nstring const &other);
+  void operator=(nstring const &other) GOTT_EXPORT;
 
   /**
    * Get the internal data.
    */
-  utf8_t const *data() const;
+  utf8_t const *data() const GOTT_EXPORT;
+
+  utf8_t const *begin_raw() const GOTT_EXPORT;
+
+  utf8_t const *end_raw() const GOTT_EXPORT;
  
   /**
    * Get an iterator pointing at the first character.
    */
-  utf8_iterator begin() const;
+  utf8_iterator begin() const GOTT_EXPORT;
 
   /**
    * Get an iterator pointing behind the last character.
    */
-  utf8_iterator end() const;
-
-  operator range_t<utf8_iterator>();
+  utf8_iterator end() const GOTT_EXPORT;
 
   /**
    * Get the number of characters (not bytes) in the string.
    */
-  std::size_t length() const;
+  std::size_t length() const GOTT_EXPORT;
 
   /**
    * Get the number of bytes the string needs as UTF8-encoded.
    */
-  std::size_t size() const;
+  std::size_t size() const GOTT_EXPORT;
 
 private:
   class representation;
   representation *p;
 
   friend bool operator==(nstring const &, nstring const &);
+  friend int compare(nstring const &, nstring const &);
 
   GOTT_LOCAL nstring(); // unimplemented
 };
@@ -164,7 +170,27 @@ GOTT_EXPORT bool operator==(nstring const &, nstring const &);
 /**
  * Compare two nstrings for inequality.
  */
-GOTT_EXPORT bool operator!=(nstring const &, nstring const &);
+inline bool operator!=(nstring const &a, nstring const &b) {
+  return !(a == b);
+}
+
+GOTT_EXPORT int compare(nstring const &, nstring const &);
+
+inline bool operator<(nstring const &a, nstring const &b) {
+  return compare(a, b) < 0;
+}
+
+inline bool operator<=(nstring const &a, nstring const &b) {
+  return compare(a, b) <= 0;
+}
+
+inline bool operator>(nstring const &a, nstring const &b) {
+  return compare(a, b) > 0;
+}
+
+inline bool operator>=(nstring const &a, nstring const &b) {
+  return compare(a, b) >= 0;
+}
 
 }
 
