@@ -105,8 +105,8 @@ nstring::nstring(std::vector<nstring> const &v)
 nstring::nstring(std::list<nstring> const &v)
 : p(new representation(range(v), representation::concat)) {}
 
-nstring::nstring(nstring const *arr, std::size_t len)
-: p(new representation(range(arr, len), representation::concat)) {}
+nstring::nstring(range_t<nstring const *> cont)
+: p(new representation(cont, representation::concat)) {}
 
 template<class I>
 nstring::representation::representation(range_t<I> const &r, concatenation_tag) 
@@ -164,8 +164,8 @@ std::wostream &gott::operator<<(std::wostream &stream, nstring const &s) {
 }
 
 nstring gott::operator+(nstring const &a, nstring const &b) {
-  nstring both[] = { a, b };
-  return nstring(both, 2);
+  nstring const both[] = { a, b };
+  return nstring(range(both));
 }
 
 bool gott::operator==(nstring const &a, nstring const &b) {

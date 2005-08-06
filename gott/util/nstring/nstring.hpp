@@ -83,7 +83,7 @@ public:
   /**
    * Concatenate.
    */
-  nstring(nstring const *, std::size_t) GOTT_EXPORT;
+  nstring(range_t<nstring const *>) GOTT_EXPORT;
 
   /**
    * Construct from character range.
