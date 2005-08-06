@@ -30,6 +30,9 @@ template<class T> struct range_t {
   value_type begin, end;
   range_t(value_type const &a, value_type const &b) : begin(a), end(b) {}
 
+  template<class U>
+  range_t(range_t<U> const &o) : begin(o.begin), end(o.end) {}
+
   std::size_t size() const {
     return std::distance(begin, end);
   }
@@ -97,6 +100,19 @@ range_t<T> offset(range_t<T> const &o, S a, S b = S()) {
 template<class T>
 range_t<T> simply(T const &x) {
   return range(x, x);
+}
+
+template<class I, class T>
+range_t<I> value_terminated(I start, T val) {
+  I end = start;
+  while (*end != val)
+    ++end;
+  return range(start, end);
+}
+
+template<class I>
+range_t<I> zero_terminated(I start) {
+  return value_terminated(start, 0);
 }
 
 }

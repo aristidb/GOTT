@@ -19,13 +19,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "../atom.hpp"
+#include <gott/util/range.hpp>
 #include <iostream>
 
 using namespace gott;
 using namespace std;
 
 int main() {
-  atom a("foo");
-  atom b("foo");
+  atom a(zero_terminated("foo"));
+  atom b(zero_terminated("foo"));
   wcerr << (a == b) << endl;
 }

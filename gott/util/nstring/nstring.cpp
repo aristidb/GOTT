@@ -41,10 +41,12 @@ public:
   representation(utf8_t const *d, bool o = true) 
   : ref_count(1), size(utf8_len(d)), length(0), owned(o), data(d) {}
 
-  representation(range_t<utf8_t *> d, bool o = true)
+  representation(range_t<utf8_t const *> d, bool o = true)
   : ref_count(1), size(d.size()), length(0), owned(o), data(d.begin) {}
 
-  representation(range_t<utf8_t const *> const &x)
+  enum foreign_tag { foreign_copy };
+
+  representation(range_t<utf8_t const *> const &x, foreign_tag)
   : ref_count(1), size(x.size()), length(0), owned(true),
       data(new utf8_t[x.size()]) {
     copy(x, const_cast<utf8_t *>(data));
@@ -55,7 +57,9 @@ public:
       delete data;
   }
 
-  template<class I> representation(range_t<I> const &);
+  enum concatenation_tag { concat };
+
+  template<class I> representation(range_t<I> const &, concatenation_tag);
 
   std::size_t ref_count;
   std::size_t size;
@@ -73,15 +77,15 @@ nstring::~nstring() {
     delete p;
 }
 
-nstring::nstring(char const *in, encoding enc)
-: p(new representation(to_utf8_alloc(in, in + std::strlen(in), enc))) {}
+nstring::nstring(range_t<char const *> in, encoding enc)
+: p(new representation(to_utf8_alloc(in.begin, in.end, enc))) {}
 
-nstring::nstring(utf8_t const *in, literal_tag)
+nstring::nstring(range_t<utf8_t const *> in, literal_tag)
 : p(new representation(in, false)) {}
 
-nstring::nstring(wchar_t const *in, encoding enc)
-: p(new representation(to_utf8_alloc((char const*)in, 
-                                     (char const*)(in+std::wcslen(in)),
+nstring::nstring(range_t<wchar_t const *> in, encoding enc)
+: p(new representation(to_utf8_alloc((char const *) in.begin, 
+                                     (char const *) in.end, 
                                      enc))) {}
 
 nstring::nstring(nstring_buffer const &b)
@@ -89,23 +93,23 @@ nstring::nstring(nstring_buffer const &b)
                                      (char const*)b.end(), 
                                      utf32))) {}
 
-nstring::nstring(range_t<utf8_iterator> const &r)
-: p(new representation(range_t<utf8_t const *>(r.begin, r.end))) {}
-
 nstring::nstring(range_t<utf8_t const *> const &r)
-: p(new representation(r)) {}
+: p(new representation(r, representation::foreign_copy)) {}
+
+nstring::nstring(range_t<utf8_iterator> const &r)
+: p(new representation(r, representation::foreign_copy)) {}
 
 nstring::nstring(std::vector<nstring> const &v)
-: p(new representation(range(v))) {}
+: p(new representation(range(v), representation::concat)) {}
 
 nstring::nstring(std::list<nstring> const &v)
-: p(new representation(range(v))) {}
+: p(new representation(range(v), representation::concat)) {}
 
 nstring::nstring(nstring const *arr, std::size_t len)
-: p(new representation(range(arr, len))) {}
+: p(new representation(range(arr, len), representation::concat)) {}
 
 template<class I>
-nstring::representation::representation(range_t<I> const &r) 
+nstring::representation::representation(range_t<I> const &r, concatenation_tag) 
 : ref_count(1), size(0), length(0), owned(true) {
   for (I it = r.begin; it != r.end; ++it)
     size += it->size();

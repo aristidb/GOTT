@@ -13,17 +13,18 @@ using namespace boost;
 
 int main() {
   wcerr.imbue(locale("POSIX"));
-  nstring n("Hallo, nstring-Welt!\n", ascii);
+  nstring n(range("Hallo, nstring-Welt!\n"), ascii);
   nstring x(n); // fast!
   wcerr << (x == n) << L' ';
-  wcerr << (x != L"muhkuh") << L' ';
-  wcerr << (x == "Hallo, nstring-Welt!\n") << L'\n';
-  x = L"xxxFoobar\n$";
+  wcerr << (x != range(L"muhkuh")) << L' ';
+  wcerr << (x == range("Hallo, nstring-Welt!\n")) << L'\n';
+  x = range(L"xxxFoobar\n$");
   x = offset(range(x), 3, -1);
   n = x + n;
   wcerr << n << x;
 
-  nstring ae_euro((utf8_t const *)"\xc3\xa4 hohodu \xe2\x82\xac\n", 
+  static char const ae_euro_lit[] = "\xc3\xa4 hohodu \xe2\x82\xac\n";
+  nstring ae_euro(zero_terminated((utf8_t const *) ae_euro_lit), 
                   nstring::utf8_literal);
   nstring_buffer b(ae_euro);
   wcerr << (b.size() == ae_euro.length()) << L'\n';

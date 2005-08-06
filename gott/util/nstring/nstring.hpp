@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_NSTRING_NSTRING_HPP
 #define GOTT_UTIL_NSTRING_NSTRING_HPP
 
-//#include "iterator.hpp"
+#include "iterator.hpp"
 #include "types.hpp"
 #include <gott/util/visibility.hpp>
 #define PARAM_HASH_NO_BASIC_STRING
@@ -38,8 +38,6 @@ namespace std {
 
 namespace gott {
 
-class utf8_iterator;
-
 class nstring_buffer;
 template<class> class range_t;
 
@@ -53,19 +51,19 @@ public:
   /**
    * Construct from encoded c-string.
    */
-  nstring(char const *, encoding = utf8) GOTT_EXPORT;
+  nstring(range_t<char const *>, encoding = utf8) GOTT_EXPORT;
   
   /**
    * Construct from encoded wide c-string.
    */
-  nstring(wchar_t const *, encoding = utf32) GOTT_EXPORT;
+  nstring(range_t<wchar_t const *>, encoding = utf32) GOTT_EXPORT;
   
   enum literal_tag { utf8_literal };
 
   /**
    * Construct from UTF8-c-literal. Shares memory.
    */
-  nstring(utf8_t const *, literal_tag) GOTT_EXPORT;
+  nstring(range_t<utf8_t const *>, literal_tag) GOTT_EXPORT;
 
   /**
    * Construct from nstring_buffer.
@@ -91,7 +89,7 @@ public:
    * Construct from character range.
    */
   nstring(range_t<utf8_iterator> const &) GOTT_EXPORT;
-
+  
   /**
    * Construct from character range.
    */
