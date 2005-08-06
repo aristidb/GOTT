@@ -21,6 +21,8 @@
 #ifndef GOTT_BASE_PLUGIN_PLUGIN_HPP
 #define GOTT_BASE_PLUGIN_PLUGIN_HPP
 
+#include <gott/util/visibility.hpp>
+
 namespace gott {
 namespace plugin {
 

@@ -21,15 +21,16 @@
 #ifndef GOTT_BASE_PLUGIN_QID_HPP
 #define GOTT_BASE_PLUGIN_QID_HPP
 
+#include <gott/util/atom/atom.hpp>
+
 namespace gott {
 namespace plugin {
 
-class QID {
+class QID : public atom {
 public:
+  QID(atom const &) GOTT_EXPORT;
+  ~QID() GOTT_EXPORT;
 };
-
-bool operator==(QID const &, QID const &);
-bool operator!=(QID const &, QID const &);
 
 }}
 

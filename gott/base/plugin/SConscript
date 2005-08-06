@@ -1,0 +1,5 @@
+import glob
+
+Import('env')
+
+env.SharedLibrary('plugin', glob.glob('*.cpp'))
