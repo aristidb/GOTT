@@ -26,13 +26,10 @@
 
 #include <gott/util/range.hpp>
 #include <gott/util/range_algo.hpp>
-#include <cstdlib>
-#include <cwchar>
 #include <cstring>
 #include <list>
 #include <vector>
 #include <ostream>
-#include <boost/bind.hpp>
 
 using gott::nstring;
 
@@ -78,20 +75,16 @@ nstring::~nstring() {
 }
 
 nstring::nstring(range_t<char const *> in, encoding enc)
-: p(new representation(to_utf8_alloc(in.begin, in.end, enc))) {}
+: p(new representation(to_utf8_alloc(in, enc))) {}
 
 nstring::nstring(range_t<utf8_t const *> in, literal_tag)
 : p(new representation(in, false)) {}
 
 nstring::nstring(range_t<wchar_t const *> in, encoding enc)
-: p(new representation(to_utf8_alloc((char const *) in.begin, 
-                                     (char const *) in.end, 
-                                     enc))) {}
+: p(new representation(to_utf8_alloc(in.cast<char const *>(), enc))) {}
 
 nstring::nstring(nstring_buffer const &b)
-: p(new representation(to_utf8_alloc((char const*)b.begin(), 
-                                     (char const*)b.end(), 
-                                     utf32))) {}
+: p(new representation(to_utf8_alloc(range(b).cast<char const *>(), utf32))) {}
 
 nstring::nstring(range_t<utf8_t const *> const &r)
 : p(new representation(r, representation::foreign_copy)) {}

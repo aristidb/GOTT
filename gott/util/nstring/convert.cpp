@@ -20,7 +20,7 @@
 
 #include "convert.hpp"
 #include "iterator.hpp"
-#include <iostream>
+#include <gott/util/range_algo.hpp>
 
 using gott::utf32_t;
 using gott::utf8_t;
@@ -64,19 +64,18 @@ void gott::write_utf32_to_utf8(utf32_t ch, utf8_t *&out) {
 }
 
 gott::range_t<utf8_t *> 
-gott::to_utf8_alloc(char const *in, char const *end, encoding enc) {
-  std::size_t len = utf8_len(in, enc);
+gott::to_utf8_alloc(range_t<char const *> in, encoding enc) {
+  std::size_t len = in.size();
   utf8_t *result = new utf8_t[len];
   if (enc == utf8) {
-    std::copy(in, in + len, result);
+    copy(in, result);
     return range(result, result + len);
   }
   utf8_t *out = result;
-  char const *next;
-  utf32_t ch;
-  while (in < end && (ch = to_utf32_char(in, next, enc))) {
-    write_utf32_to_utf8(ch, out);
-    in = next;
+  char const *current = in.begin, *next;
+  while (current < in.end) {
+    write_utf32_to_utf8(to_utf32_char(current, next, enc), out);
+    current = next;
   }
   return range(result, out);
 }

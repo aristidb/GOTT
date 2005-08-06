@@ -33,6 +33,11 @@ template<class T> struct range_t {
   template<class U>
   range_t(range_t<U> const &o) : begin(o.begin), end(o.end) {}
 
+  template<class U>
+  range_t<U> cast() const {
+    return range_t<U>(U(begin), U(end));
+  }
+
   std::size_t size() const {
     return std::distance(begin, end);
   }
