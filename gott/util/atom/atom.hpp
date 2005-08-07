@@ -27,6 +27,7 @@ namespace gott {
 
 class atom : public nstring {
 public:
+  GOTT_EXPORT atom(atom const &);
   GOTT_EXPORT atom(nstring const &);
   GOTT_EXPORT ~atom();
 };

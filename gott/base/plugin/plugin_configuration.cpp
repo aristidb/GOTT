@@ -32,6 +32,6 @@ plugin_configuration::plugin_configuration() : p(new IMPL) {}
 
 plugin_configuration::~plugin_configuration() {}
 
-hook const &plugin_configuration::by_qid(QID const &) const {
+hook const &plugin_configuration::find_hook(QID const &) const {
   throw 0;
 }

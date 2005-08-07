@@ -32,6 +32,8 @@ static nstring atomize(nstring const &n) {
 
 atom::atom(nstring const &n) : nstring(atomize(n)) {}
 
+atom::atom(atom const &o) : nstring(o) {}
+
 atom::~atom() {}
 
 bool gott::operator==(atom const &a, atom const &b) {
