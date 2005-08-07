@@ -24,7 +24,7 @@ if cflagsoverride:
 env = Environment(
 		  CXX = cxx, 
 		  CCFLAGS = cflags, 
-		  CPPPATH=['#/..'], 
+		  CPPPATH=['#/..', '#/contrib/ntl'], 
 		  CPPDEFINES=cppdef)
 
 Export('env')
@@ -32,4 +32,4 @@ conf = SConscript('configure/SConscript')
 env = conf.Finish()
 
 SConscript(dirs = ['util', 'base',
-		   'tools/autobuild'])
+		   'tools/autobuild', 'contrib/ntl'])
