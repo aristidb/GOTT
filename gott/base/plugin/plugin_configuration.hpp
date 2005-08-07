@@ -35,7 +35,9 @@ public:
   plugin_configuration() GOTT_EXPORT;
   ~plugin_configuration() GOTT_EXPORT;
 
-  hook const &by_qid(QID const &) const GOTT_EXPORT;
+  void add_hook(QID const &, hook const &);
+  hook const &find_hook(QID const &) const GOTT_EXPORT;
+
 private:
   class IMPL;
   boost::scoped_ptr<IMPL> p;
