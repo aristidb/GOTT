@@ -25,6 +25,7 @@ env = Environment(
 		  CXX = cxx, 
 		  CCFLAGS = cflags, 
 		  CPPPATH=['#/..', '#/contrib/ntl'], 
+      LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/atom #/util/nstring #/base/plugin'),
 		  CPPDEFINES=cppdef)
 
 Export('env')
