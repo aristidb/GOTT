@@ -19,9 +19,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "plugin_configuration.hpp"
+#include <boost/variant.hpp>
+#include <gott/util/my_hash_map.hpp>
+#include HH_HASH_MAP
 
 using gott::plugin::plugin_configuration;
 using gott::plugin::hook;
+using gott::xany::Xany;
 
 class plugin_configuration::IMPL {
 public:
@@ -32,6 +36,18 @@ plugin_configuration::plugin_configuration() : p(new IMPL) {}
 
 plugin_configuration::~plugin_configuration() {}
 
+void plugin_configuration::add_hook(QID const &, hook const &) {
+  throw 0;
+}
+
 hook const &plugin_configuration::find_hook(QID const &) const {
+  throw 0;
+}
+
+void plugin_configuration::add_param(QID const &, Xany const &) {
+  throw 0;
+}
+
+Xany const &plugin_configuration::find_param(QID const &) const {
   throw 0;
 }

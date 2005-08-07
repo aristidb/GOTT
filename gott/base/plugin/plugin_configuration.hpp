@@ -25,6 +25,8 @@
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
+namespace xany { class Xany; }
+
 namespace plugin {
 
 class hook;
@@ -35,7 +37,10 @@ public:
   plugin_configuration() GOTT_EXPORT;
   ~plugin_configuration() GOTT_EXPORT;
 
-  void add_hook(QID const &, hook const &);
+  void add_param(QID const &, xany::Xany const &) GOTT_EXPORT;
+  xany::Xany const &find_param(QID const &) const GOTT_EXPORT;
+
+  void add_hook(QID const &, hook const &) GOTT_EXPORT;
   hook const &find_hook(QID const &) const GOTT_EXPORT;
 
 private:
