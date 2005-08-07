@@ -40,4 +40,14 @@ inline bool operator!=(atom const &a, atom const &b) {
 
 }
 
+#define PARAM_NO_BASIC_STRING
+#include <gott/util/my_hash_map.hpp>
+#undef PARAM_NO_BASIC_STRING
+
+namespace HH_HASHD {
+template<> struct hash<gott::atom> {
+  std::size_t operator() (gott::atom const &) const;
+};
+}
+
 #endif

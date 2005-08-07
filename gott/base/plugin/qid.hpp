@@ -34,4 +34,8 @@ public:
 
 }}
 
+namespace HH_HASHD {
+template<> struct hash<gott::plugin::QID> : hash<gott::atom> {};
+}
+
 #endif

@@ -19,35 +19,40 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "plugin_configuration.hpp"
+#include "qid.hpp"
 #include <boost/variant.hpp>
 #include <gott/util/my_hash_map.hpp>
 #include HH_HASH_MAP
+#include <gott/util/xany/xany.hpp>
 
 using gott::plugin::plugin_configuration;
 using gott::plugin::hook;
 using gott::xany::Xany;
+using boost::variant;
 
 class plugin_configuration::IMPL {
 public:
+  typedef hashd::hash_map<QID, variant<Xany, hook const *> > mapping;
 
+  mapping parameters;
 };
 
 plugin_configuration::plugin_configuration() : p(new IMPL) {}
 
 plugin_configuration::~plugin_configuration() {}
 
-void plugin_configuration::add_hook(QID const &, hook const &) {
-  throw 0;
+void plugin_configuration::add_hook(QID const &id, hook const &h) {
+  p->parameters[id] = &h;
 }
 
-hook const &plugin_configuration::find_hook(QID const &) const {
-  throw 0;
+hook const &plugin_configuration::find_hook(QID const &id) const {
+  return *boost::get<hook const *>(p->parameters[id]);
 }
 
-void plugin_configuration::add_param(QID const &, Xany const &) {
-  throw 0;
+void plugin_configuration::add_param(QID const &id, Xany const &pp) {
+  p->parameters[id] = pp;
 }
 
-Xany const &plugin_configuration::find_param(QID const &) const {
-  throw 0;
+Xany const &plugin_configuration::find_param(QID const &id) const {
+  return boost::get<Xany>(p->parameters[id]);
 }
