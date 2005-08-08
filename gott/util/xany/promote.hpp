@@ -19,7 +19,11 @@
 #ifndef GOTT_UTIL_XANY_PROMOTE_HPP
 #define GOTT_UTIL_XANY_PROMOTE_HPP
 
+#include <gott/util/nstring/stl.hpp>
+
 namespace gott {
+class nstring;
+
 namespace xany {
 
 /**
@@ -46,7 +50,7 @@ struct standard_promote {
   typedef New type;
   class reference {
   public:
-    operator Old() { return static_cast<Old>(ref_val); }
+    operator Old() const { return static_cast<Old>(ref_val); }
     reference operator=(Old const &new_val) {
       ref_val = new_val;
       return *this;
@@ -84,13 +88,51 @@ GOTT_XANY_DECLARE_PROMOTER(unsigned int, unsigned long);
 
 GOTT_XANY_DECLARE_PROMOTER(float, double);
 
-GOTT_XANY_DECLARE_PROMOTER(char const *, std::string);
-GOTT_XANY_DECLARE_PROMOTER(char *, std::string);
-GOTT_XANY_ARRAY_PROMOTER(char, std::string);
+GOTT_XANY_DECLARE_PROMOTER(char const *, nstring);
+GOTT_XANY_DECLARE_PROMOTER(char *, nstring);
 
-GOTT_XANY_DECLARE_PROMOTER(wchar_t const *, std::wstring);
-GOTT_XANY_DECLARE_PROMOTER(wchar_t *, std::wstring);
-GOTT_XANY_ARRAY_PROMOTER(wchar_t, std::wstring);
+GOTT_XANY_DECLARE_PROMOTER(wchar_t const *, nstring);
+GOTT_XANY_DECLARE_PROMOTER(wchar_t *, nstring);
+
+template<>
+struct promote<std::string> {
+  typedef nstring type;
+  class reference {
+  public:
+    reference(nstring &r) : ref_val(r) {}
+    operator std::string() const { return to_string(ref_val); }
+    reference operator=(std::string const &s) {
+      ref_val = to_nstring(s);
+      return *this;
+    }
+
+  private:
+    nstring &ref_val;
+  };
+
+  static nstring get(std::string const &s) { return to_nstring(s); }
+  static reference get_back(nstring &s) { return s; }
+};
+
+template<>
+struct promote<std::wstring> {
+  typedef nstring type;
+  class reference {
+  public:
+    reference(nstring &r) : ref_val(r) {}
+    operator std::wstring() const { return to_wstring(ref_val); }
+    reference operator=(std::wstring const &s) {
+      ref_val = to_nstring(s);
+      return *this;
+    }
+
+  private:
+    nstring &ref_val;
+  };
+
+  static nstring get(std::wstring const &s) { return to_nstring(s); }
+  static reference get_back(nstring &s) { return s; }
+};
 
 }}
 

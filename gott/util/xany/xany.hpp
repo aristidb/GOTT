@@ -19,7 +19,7 @@
 #ifndef GOTT_TDL_UTIL_XANY_HPP
 #define GOTT_TDL_UTIL_XANY_HPP
 
-#include <string>
+#include <gott/util/nstring/nstring.hpp>
 #include <typeinfo>
 #include <algorithm>
 #include <boost/type_traits.hpp>
@@ -68,7 +68,7 @@ public:
    * Constructs a typeless object from data.
    * \param v The data to save.
    */
-  template<class T> explicit Xany(T const &v)
+  template<class T> explicit Xany(T v)
     : place(new holder<typename promote<T>::type>(promote<T>::get(v))) {}
 
   ~Xany() { 
@@ -260,8 +260,7 @@ operator<<(std::basic_ostream<Ch, ChT> &s, Xany const &v) {
 
 GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(long);
 GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(double);
-GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(std::string);
-GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(std::wstring);
+GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(nstring);
 
 }}
 

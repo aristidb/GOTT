@@ -35,7 +35,7 @@ class nstring;
  * \param enc The encoding of the resulting string.
  * \return The encoded STL-string.
  */
-std::string to_string(nstring const &str, encoding enc) GOTT_EXPORT;
+std::string to_string(nstring const &str, encoding enc = utf8) GOTT_EXPORT;
 
 /**
  * Convert a nstring to a STL-wide-string with a specific encoding.
@@ -43,7 +43,7 @@ std::string to_string(nstring const &str, encoding enc) GOTT_EXPORT;
  * \param enc The encoding of the resulting string.
  * \return The encoded STL-wide-string.
  */
-std::wstring to_wstring(nstring const &str, encoding enc) GOTT_EXPORT;
+std::wstring to_wstring(nstring const &str, encoding enc = utf32) GOTT_EXPORT;
 
 /**
  * Convert a STL-string with given encoding to a nstring.
@@ -51,7 +51,7 @@ std::wstring to_wstring(nstring const &str, encoding enc) GOTT_EXPORT;
  * \param enc The encoding of @p str.
  * \return The decoded nstring.
  */
-nstring to_nstring(std::string const &str, encoding enc) GOTT_EXPORT;
+nstring to_nstring(std::string const &str, encoding enc = utf8) GOTT_EXPORT;
 
 /**
  * Convert a STL-wide-string with given encoding to a nstring.
@@ -59,7 +59,7 @@ nstring to_nstring(std::string const &str, encoding enc) GOTT_EXPORT;
  * \param enc The encoding of @p str.
  * \return The decoded nstring.
  */
-nstring to_nstring(std::wstring const &str, encoding enc) GOTT_EXPORT;
+nstring to_nstring(std::wstring const &str, encoding enc = utf32) GOTT_EXPORT;
 
 }
 

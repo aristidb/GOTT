@@ -42,7 +42,7 @@ rule_attr match_named::attributes(wstring const &s, bool cc) {
 match_named::match_named(rule_factory const &s, rule_attr const &a, 
                          match &m) 
 : rule(a, m), sub(s), state(read_none) {
-  if (a.user().type() != typeid(wstring))
+  if (!a.user().compatible<wstring>())
     throw std::bad_exception();
 }
 

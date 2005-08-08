@@ -45,111 +45,111 @@ template<class> class range_t;
 /**
  * UTF-8 string literals storage class.
  */
-class nstring {
+class GOTT_EXPORT nstring {
 public:
   typedef utf8_iterator const_iterator;
 
   /**
    * Construct from encoded string.
    */
-  nstring(range_t<char const *>, encoding = utf8) GOTT_EXPORT;
+  nstring(range_t<char const *>, encoding = utf8);
 
   /**
    * Construct from encoded c-string.
    */
-  nstring(char const *, encoding = utf8) GOTT_EXPORT;
+  nstring(char const *, encoding = utf8);
 
   /**
    * Construct from encoded wide string.
    */
-  nstring(range_t<wchar_t const *>, encoding = utf32) GOTT_EXPORT;
+  nstring(range_t<wchar_t const *>, encoding = utf32);
 
   /**
    * Construct from encoded wide c-string.
    */
-  nstring(wchar_t const *, encoding = utf32) GOTT_EXPORT;
+  nstring(wchar_t const *, encoding = utf32);
   
   enum literal_tag { utf8_literal };
 
   /**
    * Construct from UTF8-c-literal. Shares memory.
    */
-  nstring(range_t<utf8_t const *>, literal_tag) GOTT_EXPORT;
+  nstring(range_t<utf8_t const *>, literal_tag);
 
   /**
    * Construct from nstring_buffer.
    */
-  nstring(nstring_buffer const &) GOTT_EXPORT;
+  nstring(nstring_buffer const &);
 
   /**
    * Concatenate.
    */
-  nstring(std::vector<nstring, std::allocator<nstring> > const &) GOTT_EXPORT;
+  nstring(std::vector<nstring, std::allocator<nstring> > const &);
 
   /**
    * Concatenate.
    */
-  nstring(std::list<nstring, std::allocator<nstring> > const &) GOTT_EXPORT;
+  nstring(std::list<nstring, std::allocator<nstring> > const &);
 
   /**
    * Concatenate.
    */
-  nstring(range_t<nstring const *>) GOTT_EXPORT;
+  nstring(range_t<nstring const *>);
 
   /**
    * Construct from character range.
    */
-  nstring(range_t<utf8_iterator> const &) GOTT_EXPORT;
+  nstring(range_t<utf8_iterator> const &);
   
   /**
    * Construct from character range.
    */
-  nstring(range_t<utf8_t const *> const &) GOTT_EXPORT;
+  nstring(range_t<utf8_t const *> const &);
 
   /// Copy-Constructor.
-  nstring(nstring const &) GOTT_EXPORT;
+  nstring(nstring const &);
 
   /// Destructor.
-  ~nstring() GOTT_EXPORT;
+  ~nstring();
 
   /**
    * Swap with another nstring.
    */
-  void swap(nstring &other) GOTT_EXPORT;
+  void swap(nstring &other);
 
   /**
    * Assign from another nstring.
    */
-  void operator =(nstring const &other) GOTT_EXPORT;
+  void operator =(nstring const &other);
 
   /**
    * Get the internal data.
    */
-  utf8_t const *data() const GOTT_EXPORT;
+  utf8_t const *data() const;
 
-  utf8_t const *begin_raw() const GOTT_EXPORT;
+  utf8_t const *begin_raw() const;
 
-  utf8_t const *end_raw() const GOTT_EXPORT;
+  utf8_t const *end_raw() const;
  
   /**
    * Get an iterator pointing at the first character.
    */
-  utf8_iterator begin() const GOTT_EXPORT;
+  utf8_iterator begin() const;
 
   /**
    * Get an iterator pointing behind the last character.
    */
-  utf8_iterator end() const GOTT_EXPORT;
+  utf8_iterator end() const;
 
   /**
    * Get the number of characters (not bytes) in the string.
    */
-  std::size_t length() const GOTT_EXPORT;
+  std::size_t length() const;
 
   /**
    * Get the number of bytes the string needs as UTF8-encoded.
    */
-  std::size_t size() const GOTT_EXPORT;
+  std::size_t size() const;
 
 private:
   class representation;
@@ -157,6 +157,14 @@ private:
 
   GOTT_LOCAL nstring(); // unimplemented
 };
+
+/**
+ * Print out a nstring.
+ */
+GOTT_EXPORT 
+std::basic_ostream<char, std::char_traits<char> > &
+operator<<(std::basic_ostream<char, std::char_traits<char> > &, 
+           nstring const &);
 
 /**
  * Print out a nstring.
