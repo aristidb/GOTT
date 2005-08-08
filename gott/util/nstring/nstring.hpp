@@ -172,20 +172,48 @@ inline bool operator!=(nstring const &a, nstring const &b) {
   return !(a == b);
 }
 
-GOTT_EXPORT int compare(nstring const &, nstring const &);
+/**
+ * Compare two nstrings lexicographically.
+ * \param a,b Strings to be compared.
+ * \return 
+ *   - == 0 : Both strings are equal.
+ *   -  < 0 : @p a is lexicographically smaller than @p b.
+ *   -  > 0 : @p a is lexicographically greater than @p b.
+ */
+GOTT_EXPORT int compare(nstring const &a, nstring const &b);
 
+/**
+ * Compare two nstrings lexicographically,
+ * \param a,b Strings to be compared.
+ * \return Whether @p a is smaller than @p b.
+ */
 inline bool operator<(nstring const &a, nstring const &b) {
   return compare(a, b) < 0;
 }
 
+/**
+ * Compare two nstrings lexicographically,
+ * \param a,b Strings to be compared.
+ * \return Whether @p a is smaller than or equal to @p b.
+ */
 inline bool operator<=(nstring const &a, nstring const &b) {
   return compare(a, b) <= 0;
 }
 
+/**
+ * Compare two nstrings lexicographically,
+ * \param a,b Strings to be compared.
+ * \return Whether @p a is greater than @p b.
+ */
 inline bool operator>(nstring const &a, nstring const &b) {
   return compare(a, b) > 0;
 }
 
+/**
+ * Compare two nstrings lexicographically,
+ * \param a,b Strings to be compared.
+ * \return Whether @p a is greater than or equal to @p b.
+ */
 inline bool operator>=(nstring const &a, nstring const &b) {
   return compare(a, b) >= 0;
 }

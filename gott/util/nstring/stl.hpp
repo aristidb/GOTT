@@ -28,11 +28,37 @@ namespace gott {
 
 class nstring;
 
-std::string to_string(nstring const &, encoding);
-std::wstring to_wstring(nstring const &, encoding);
+/**
+ * Convert a nstring to a STL-string with a specific encoding.
+ * \param str The string to convert.
+ * \param enc The encoding of the resulting string.
+ * \return The encoded STL-string.
+ */
+std::string to_string(nstring const &str, encoding enc);
 
-nstring to_nstring(std::string const &, encoding);
-nstring to_nstring(std::wstring const &, encoding);
+/**
+ * Convert a nstring to a STL-wide-string with a specific encoding.
+ * \param str The string to convert.
+ * \param enc The encoding of the resulting string.
+ * \return The encoded STL-wide-string.
+ */
+std::wstring to_wstring(nstring const &str, encoding enc);
+
+/**
+ * Convert a STL-string with given encoding to a nstring.
+ * \param str The encoded STL-string.
+ * \param enc The encoding of @p str.
+ * \return The decoded nstring.
+ */
+nstring to_nstring(std::string const &str, encoding enc);
+
+/**
+ * Convert a STL-wide-string with given encoding to a nstring.
+ * \param str The encoded STL-wide-string.
+ * \param enc The encoding of @p str.
+ * \return The decoded nstring.
+ */
+nstring to_nstring(std::wstring const &str, encoding enc);
 
 }
 

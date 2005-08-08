@@ -28,6 +28,9 @@ namespace gott {
 
 template<class> class range_t;
 
+/**
+ * Buffer for editable UTF32-strings.
+ */
 class GOTT_EXPORT nstring_buffer {
 public:
   typedef utf32_t value_type;
@@ -36,31 +39,86 @@ public:
   typedef std::size_t size_type;
   typedef std::ptrdiff_t difference_type;
   
+  /**
+   * Construct empty buffer.
+   */
   nstring_buffer();
+
+  /// Copy-Constructor.
   nstring_buffer(nstring_buffer const &);
+
+  /**
+   * Construct buffer from nstring.
+   */
   nstring_buffer(nstring const &);
-  nstring_buffer(utf32_t const *);
+  
+  /**
+   * Construct buffer from string.
+   */
+  nstring_buffer(range_t<utf32_t const *> const &);
+
+  /// Destructor.
   ~nstring_buffer();
 
-  utf32_t *begin();
-  utf32_t *end();
-  utf32_t const *begin() const;
-  utf32_t const *end() const;
+  /**
+   * Return an iterator pointing to the beginning of the represented string.
+   */
+  iterator begin();
 
+  /**
+   * Return an iterator pointing after the end of the represented string.
+   */
+  iterator end();
+  
+  /**
+   * Return an iterator pointing to the beginning of the represented string.
+   */
+  const_iterator begin() const;
+
+  /**
+   * Return an iterator pointing after the end of the represented string.
+   */ 
+  const_iterator end() const;
+
+  /**
+   * Return the size (and length) of the represented string.
+   */
   size_t size() const;
   
+  /**
+   * Swap contents with another buffer.
+   */
   void swap(nstring_buffer &);
 
+  /**
+   * Assign another buffers contents to this buffer.
+   */
   void operator=(nstring_buffer const &b);
 
+  /**
+   * Return the character at a certain position of the buffer.
+   */
   utf32_t &operator[](std::size_t);
+
+  /**
+   * Return the character at a certain position of the buffer.
+   */
   utf32_t &at(std::size_t);
   
-  iterator erase(iterator, iterator);
+  /**
+   * Erase a range from the buffer.
+   * \param r The range to erase.
+   */
+  void erase(range_t<iterator> const &r);
 
-  iterator insert(iterator, std::size_t);
-  iterator insert(iterator, std::size_t, utf32_t);
-
+  /**
+   * Insert space of specified length before a specified iterator.
+   * \param pos The iterator to insert before.
+   * \param len The size of the inserted chunk.
+   * \return The inserted chunk.
+   */
+  range_t<iterator> insert(iterator pos, std::size_t len);
+  
 private:
   class representation;
   representation *data;

@@ -26,15 +26,81 @@
 
 namespace gott {
 
-range_t<utf8_t *> to_utf8_alloc(range_t<char const *> const &, encoding);
-range_t<char *> to_enc_alloc(range_t<utf8_t const *> const &, encoding);
-utf32_t to_utf32_char(char const *, char const *&, encoding);
-void write_utf32_to_utf8(utf32_t, utf8_t *&);
-void write_utf32_to_enc(utf32_t, char *&, encoding);
-std::size_t utf8_len(range_t<char const *> const &, encoding);
-std::size_t utf32_len(char const *, encoding);
-std::size_t utf8_len(utf32_t);
-std::size_t enc_len(utf32_t, encoding);
+/**
+ * Allocate and fill a buffer containing the UTF8 representation of the
+ * encoded input string.
+ * \param in The encoded input string.
+ * \param enc The encoding of @p in.
+ * \return The newly allocated UTF8 buffer.
+ */
+range_t<utf8_t *> to_utf8_alloc(range_t<char const *> const &in, encoding enc);
+
+/**
+ * Allocate and fill a buffer containing the encoded representation of the
+ * UTF8 input string.
+ * \param in The UTF8 input string.
+ * \param enc The encoding of the output string.
+ * \return The newly allocated buffer.
+ */
+range_t<char *> to_enc_alloc(range_t<utf8_t const *> const &in, encoding enc);
+
+/**
+ * Convert a single encoded character to UTF32.
+ * \param mbc The encoded character.
+ * \param[out] end Pointer to after the encoded character.
+ * \param enc The encoding of the input character.
+ * \return The decoded character.
+ */
+utf32_t to_utf32_char(char const *mbc, char const *&end, encoding enc);
+
+/**
+ * Write a UTF32 character to a UTF8 buffer.
+ * \param ch The input UTF8 character.
+ * \param out The pointer to the memory to be written to. 
+ *            Will point to after the character.
+ */
+void write_utf32_to_utf8(utf32_t ch, utf8_t *&out);
+
+/**
+ * Write a UTF32 character to a buffer of arbitrary encoding.
+ * \param ch The input UTF8 character.
+ * \param out The pointer to the memory to be written to. 
+ *            Will point to after the character.
+ * \param enc The encoding of @p out.
+ */
+void write_utf32_to_enc(utf32_t ch, char *&out, encoding enc);
+
+/**
+ * Calculate the size of an encoded string if written as UTF8.
+ * \param str The input encoded string.
+ * \param enc The encoding of @p str.
+ * \return The length of the hypothetical UTF8 string.
+ */
+std::size_t utf8_len(range_t<char const *> const &str, encoding enc);
+
+/**
+ * Calculate the size of an encoded string if written as UTF32.
+ * \param str The input encoded string.
+ * \param enc The encoding of @p str.
+ * \return The length of the hypothetical UTF32 string.
+ */
+std::size_t utf32_len(range_t<char const *> const &str, encoding enc);
+
+/**
+ * Calculate the size of a single UTF32 character if written as UTF8.
+ * \param ch The UTF32 character.
+ * \return The size of the UTF8 character.
+ */
+std::size_t utf8_len(utf32_t ch);
+
+/**
+ * Calculate the size of a single UTF32 character if written in an
+ * arbitrary encoding.
+ * \param ch The UTF32 character.
+ * \param enc The desired encoding.
+ * \return The size of the encoded character.
+ */
+std::size_t enc_len(utf32_t ch, encoding enc);
 
 }
 

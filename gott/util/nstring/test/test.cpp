@@ -30,7 +30,7 @@ int main() {
   wcerr << (b.size() == ae_euro.length()) << L'\n';
   //to_upper(b);
   b[1] = utf32_t(L':');
-  b.erase(b.begin() + 2, b.begin() + 6);
+  b.erase(range(b.begin() + 2, 4));
   range_t<wchar_t const *> r = offset(range(L"test "), 0, -1);
   copy(r, b.insert(b.begin(), r.size()));
   nstring a(b);

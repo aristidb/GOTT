@@ -20,7 +20,6 @@
 
 #include "buffer.hpp"
 #include "convert.hpp"
-#include "util.hpp"
 #include "iterator.hpp"
 #include <algorithm>
 #include <gott/util/range_algo.hpp>
@@ -36,12 +35,11 @@ public:
   
   utf32_t *begin, *end, *storage_end;
 
-  utf32_t *ensure(std::size_t add_len) {
+  void ensure(std::size_t add_len) {
     std::size_t old_len = end - begin;
     if (std::size_t(storage_end - end) < add_len)
       grow(old_len + add_len);
     end = begin + old_len + add_len;
-    return begin + old_len;
   }
 
 private:
@@ -51,7 +49,7 @@ private:
       new_size <<= 1;
     utf32_t *old = begin;
     begin = new utf32_t[new_size];
-    std::copy(old, end, begin);
+    copy(range(old, end), begin);
     delete [] old;
     storage_end = begin + new_size;
   }
@@ -75,10 +73,9 @@ void nstring_buffer::operator=(nstring_buffer const &b) {
   nstring_buffer(b).swap(*this);
 }
 
-nstring_buffer::nstring_buffer(utf32_t const *x)
+nstring_buffer::nstring_buffer(range_t<utf32_t const *> const &x)
 : data(new representation) {
-  range_t<utf32_t const *> r = range(x, utf32_len(x));
-  copy(r, insert(end(), r.size()));
+  copy(x, insert(end(), x.size()));
 }
 
 nstring_buffer::nstring_buffer(nstring const &x)
@@ -110,13 +107,17 @@ utf32_t &nstring_buffer::operator[](std::size_t i) {
   return data->begin[i];
 }
 
-nstring_buffer::iterator nstring_buffer::erase(iterator a, iterator b) {
+void nstring_buffer::erase(range_t<iterator> const &r) {
+  iterator a = r.begin;
+  iterator b = r.end;
+
   while (b != data->end)
     *a++ = *b++;
-  return data->end = a;
+  data->end = a;
 }
 
-nstring_buffer::iterator nstring_buffer::insert(iterator p, std::size_t len) {
+gott::range_t<nstring_buffer::iterator>
+nstring_buffer::insert(iterator p, std::size_t len) {
   if (std::size_t(data->storage_end - data->end) < len) {
     std::size_t pp = p - data->begin;
     data->ensure(len);
@@ -125,12 +126,6 @@ nstring_buffer::iterator nstring_buffer::insert(iterator p, std::size_t len) {
     data->end += len;
   for (iterator it = data->end - 1; it >= p + len; --it)
     *it = *(it - len);
-  return p;
+  return range(p, len);
 }
 
-nstring_buffer::iterator 
-nstring_buffer::insert(iterator p, std::size_t n, utf32_t ch) {
-  p = insert(p, n);
-  std::fill(p, p + n, ch);
-  return p;
-}

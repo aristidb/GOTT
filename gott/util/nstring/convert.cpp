@@ -106,16 +106,16 @@ std::size_t gott::utf8_len(range_t<char const *> const &in, encoding enc) {
   }
 }
 
-std::size_t gott::utf32_len(char const *s, encoding enc) {
+std::size_t gott::utf32_len(range_t<char const *> const &s, encoding enc) {
   switch (enc) {
   case ascii:
   case iso8859_1: case iso8859_2: case iso8859_3: case iso8859_4:
   case iso8859_5: case iso8859_6: case iso8859_7: case iso8859_8:
   case iso8859_9: case iso8859_10: case iso8859_11: case iso8859_12:
   case iso8859_13: case iso8859_14: case iso8859_15: case iso8859_16:
-    return strlen(s);
-  case utf32: case utf32le:
-    return wcslen((wchar_t const *) s);
+    return s.size();
+  case utf32be: case utf32le:
+    return s.cast<wchar_t const *>().size();
   default:
     throw 0;
   }

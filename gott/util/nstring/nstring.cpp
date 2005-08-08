@@ -20,7 +20,6 @@
 
 #include "nstring.hpp"
 #include "convert.hpp"
-#include "util.hpp"
 #include "buffer.hpp"
 #include "iterator.hpp"
 
@@ -35,9 +34,6 @@ using gott::nstring;
 
 class nstring::representation {
 public:
-  representation(utf8_t const *d, bool o = true) 
-  : ref_count(1), size(utf8_len(d)), length(0), owned(o), data(d) {}
-
   representation(range_t<utf8_t const *> d, bool o = true)
   : ref_count(1), size(d.size()), length(0), owned(o), data(d.begin) {}
 
