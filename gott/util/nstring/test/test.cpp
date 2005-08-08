@@ -18,8 +18,8 @@ int main() {
   wcerr << (x == n) << L' ';
   wcerr << (x != range(L"muhkuh")) << L' ';
   wcerr << (x == range("Hallo, nstring-Welt!\n")) << L'\n';
-  x = range(L"xxxFoobar\n$");
-  x = offset(range(x), 3, -1);
+  x = zero_terminated(range(L"xxxFoobar\n$"));
+  x = offset(range(x), 3, -2);
   n = x + n;
   wcerr << n << x;
 
