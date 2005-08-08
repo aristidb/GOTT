@@ -23,6 +23,7 @@
 
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
+#include "../happy_once.hpp"
 
 namespace gott {
 namespace tdl {
@@ -30,7 +31,7 @@ namespace schema {
 
 // Matcher document
 // Matches a whole tdl document that contains the given sub-type
-class match_document : public rule {
+class match_document : public happy_once {
 public:
   typedef factory_template::onechild<match_document> factory;
   match_document(rule_factory const &, rule_attr const &, match &);
@@ -40,9 +41,7 @@ public:
 private:
   rule_factory const &sub;
   enum { first, begun_parse, opened, closed } state;
-  bool happy;
 
-  expect expectation() const;
   bool play(ev::begin_parse const &);
   bool play(ev::down const &);
   bool play(ev::up const &);

@@ -24,6 +24,7 @@
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
 #include "../parse_position.hpp"
+#include "../happy_once.hpp"
 
 namespace gott {
 namespace tdl {
@@ -31,7 +32,7 @@ namespace schema {
 
 // Matcher any
 // Matches the first applicable of an arbitrary number of rules.
-class match_any : public rule {
+class match_any : public happy_once {
 public:
   typedef factory_template::manychildren<match_any> factory;
   match_any(std::vector<rule_factory const *> const &, 
@@ -44,9 +45,7 @@ private:
   std::vector<rule_factory const *> v;
   std::vector<rule_factory const *>::iterator pos;
   positioning::id begin;
-  bool happy;
 
-  expect expectation() const;
   bool play(ev::child_fail const &);
   bool play(ev::child_succeed const &);
   wchar_t const *name() const;
