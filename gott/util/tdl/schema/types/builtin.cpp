@@ -27,6 +27,7 @@
 #include "ordered.hpp"
 #include "node.hpp"
 #include "unordered.hpp"
+#include <gott/util/nstring/nstring.hpp>
 
 namespace {
 struct builtin_types {
@@ -37,12 +38,12 @@ struct builtin_types {
 using namespace gott::tdl::schema;
 
 builtin_types::builtin_types() {
-  name_manager().add(L"any",            match_any::factory::index());
-  name_manager().add(L"document",       match_document::factory::index());
-  name_manager().add(L"follow",         match_follow_ordered::factory::index());
-  name_manager().add(L"list",           match_list::factory::index());
-  name_manager().add(L"named",          match_named::factory::index());
-  name_manager().add(L"ordered",        match_ordered::factory::index());
-  name_manager().add(L"node",           match_node::factory::index());
-  name_manager().add(L"unordered",      match_unordered::factory::index());
+  name_manager().add("any", match_any::factory::index());
+  name_manager().add("document", match_document::factory::index());
+  name_manager().add("follow", match_follow_ordered::factory::index());
+  name_manager().add("list", match_list::factory::index());
+  name_manager().add("named", match_named::factory::index());
+  name_manager().add("ordered", match_ordered::factory::index());
+  name_manager().add("node", match_node::factory::index());
+  name_manager().add("unordered", match_unordered::factory::index());
 }

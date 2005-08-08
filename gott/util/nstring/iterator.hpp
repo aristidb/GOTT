@@ -89,5 +89,7 @@ GOTT_EXPORT bool operator==(utf8_iterator const &, utf8_iterator const &);
  */
 GOTT_EXPORT bool operator!=(utf8_iterator const &, utf8_iterator const &);
 
+GOTT_EXPORT bool operator<(utf8_iterator const &, utf8_iterator const &);
+
 }
 #endif

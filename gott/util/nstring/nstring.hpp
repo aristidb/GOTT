@@ -27,6 +27,7 @@
 #define PARAM_HASH_NO_BASIC_STRING
 #include <gott/util/my_hash_map.hpp>
 #undef PARAM_HASH_NO_BASIC_STRING
+#include <gott/util/range.hpp>
 
 namespace std {
   template<class> class allocator;
@@ -49,14 +50,24 @@ public:
   typedef utf8_iterator const_iterator;
 
   /**
-   * Construct from encoded c-string.
+   * Construct from encoded string.
    */
   nstring(range_t<char const *>, encoding = utf8) GOTT_EXPORT;
-  
+
+  /**
+   * Construct from encoded c-string.
+   */
+  nstring(char const *, encoding = utf8) GOTT_EXPORT;
+
+  /**
+   * Construct from encoded wide string.
+   */
+  nstring(range_t<wchar_t const *>, encoding = utf32) GOTT_EXPORT;
+
   /**
    * Construct from encoded wide c-string.
    */
-  nstring(range_t<wchar_t const *>, encoding = utf32) GOTT_EXPORT;
+  nstring(wchar_t const *, encoding = utf32) GOTT_EXPORT;
   
   enum literal_tag { utf8_literal };
 

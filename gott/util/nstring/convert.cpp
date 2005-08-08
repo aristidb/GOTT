@@ -174,12 +174,12 @@ gott::to_enc_alloc(range_t<utf8_t const *> const &in_, encoding enc) {
   range_t<utf8_iterator> in = in_.cast<utf8_iterator>();
 
   std::size_t len = 0;
-  for (utf8_iterator it = in.begin; it != in.end; ++it)
+  for (utf8_iterator it = in.begin; it < in.end; ++it)
     len += enc_len(*it, enc);
 
   char *result = new char[len];
   char *out = result;
-  for (utf8_iterator it = in.begin; it != in.end; ++it)
+  for (utf8_iterator it = in.begin; it < in.end; ++it)
     write_utf32_to_enc(*it, out, enc);
   return range(result, out);
 }

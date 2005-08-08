@@ -80,3 +80,7 @@ bool gott::operator==(utf8_iterator const &a, utf8_iterator const &b) {
 bool gott::operator!=(utf8_iterator const &a, utf8_iterator const &b) {
   return !(a == b);
 }
+
+bool gott::operator<(utf8_iterator const &a, utf8_iterator const &b) {
+  return (utf8_t const *) a < (utf8_t const *) b;
+}

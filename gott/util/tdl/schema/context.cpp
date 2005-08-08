@@ -24,6 +24,7 @@
 #include "rule_factory.hpp"
 #include <gott/util/range_algo.hpp>
 #include <boost/optional.hpp>
+#include <gott/util/nstring/nstring.hpp>
 
 using boost::optional;
 using gott::tdl::schema::context;
@@ -56,7 +57,7 @@ public:
 context::context() : p(new IMPL) {}
 context::~context() {}
 
-void context::begin(std::wstring const &n, rule_attr const &a,
+void context::begin(nstring const &n, rule_attr const &a,
                     optional<slotcfg> const &c) {
   begin(name_manager().get(n), a, c);
 }
@@ -128,7 +129,7 @@ void context::IMPL::add_enc_slotted(rule_factory const *f, slotcfg const &c,
   if (c.get_mode() == slotcfg::one)
     return org.back()->add(*f);
 
-  static unsigned const list_id = name_manager().get(L"list");
+  static unsigned const list_id = name_manager().get("list");
   begin(list_id, rule_attr(false), e);
     add_child(f, c);
   end();

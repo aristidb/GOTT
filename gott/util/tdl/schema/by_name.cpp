@@ -20,8 +20,11 @@
 
 #include "by_name.hpp"
 #include "../exceptions.hpp"
+#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/nstring/stl.hpp>
 #include <gott/util/my_hash_map.hpp>
 #include HH_HASH_MAP
+#include <iostream>
 
 using std::wstring;
 namespace tdl = gott::tdl;
@@ -35,7 +38,7 @@ name_manager_t &schema::name_manager() {
 
 class name_manager_t::IMPL {
 public:
-  hashd::hash_map<wstring, unsigned> items;
+  hashd::hash_map<nstring, unsigned> items;
 };
 
 name_manager_t::name_manager_t() : p(new IMPL) {
@@ -44,13 +47,13 @@ name_manager_t::name_manager_t() : p(new IMPL) {
 name_manager_t::~name_manager_t() {
 }
 
-void name_manager_t::add(wstring const &name, unsigned id) {
+void name_manager_t::add(nstring const &name, unsigned id) {
   p->items.insert(std::make_pair(name, id));
 }
 
-unsigned name_manager_t::get(wstring const &name) const {
-  hashd::hash_map<wstring, unsigned>::const_iterator it = p->items.find(name);
+unsigned name_manager_t::get(nstring const &name) const {
+  hashd::hash_map<nstring, unsigned>::const_iterator it = p->items.find(name);
   if (it == p->items.end())
-    throw unregistered_type(name);
+    throw unregistered_type(to_wstring(name, utf32));
   return it->second;
 }

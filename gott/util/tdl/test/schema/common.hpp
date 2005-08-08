@@ -24,6 +24,7 @@
 #include <gott/util/tdl/structure/tree.hpp>
 #include <gott/util/tdl/structure/comfort.hpp>
 #include <gott/util/tdl/structure/print.hpp>
+#include <gott/util/nstring/nstring.hpp>
 #include <gott/util/tut/tut.h>
 
 namespace tut {

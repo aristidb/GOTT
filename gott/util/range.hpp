@@ -187,40 +187,11 @@ range_t<I> value_terminated(I start, T val) {
 }
 
 /**
- * Return a the value-terminated subrange from another range.
- * Searches the terminating value from the end backwards.
- */
-template<class I, class T>
-range_t<I> value_terminated_back(range_t<I> r, T val) {
-  while (*r.end == val)
-    --r.end;
-  return r;
-}
-
-/**
  * Return a range from a zero-terminated sequence.
  */
 template<class I>
 range_t<I> zero_terminated(I start) {
   return value_terminated(start, 0);
-}
-
-/**
- * Return a range from a zero-terminated sequence.
- * Searches the terminating value from the end backwards.
- */
-template<class I>
-range_t<I> zero_terminated_back(range_t<I> const &r) {
-  return value_terminated_back(r, 0);
-}
-
-/**
- * Return a range from a zero-terminated array sequence.
- * Searches the terminating value from the end backwards.
- */
-template<class T, std::size_t N>
-range_t<T const *> zero_terminated_back(T const (&arr)[N]) {
-  return zero_terminated_back(range(arr));
 }
 
 }

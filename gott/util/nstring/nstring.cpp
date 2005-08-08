@@ -73,11 +73,18 @@ nstring::~nstring() {
 nstring::nstring(range_t<char const *> in, encoding enc)
 : p(new representation(to_utf8_alloc(in, enc))) {}
 
+nstring::nstring(char const *in, encoding enc)
+: p(new representation(to_utf8_alloc(zero_terminated(in), enc))) {}
+
 nstring::nstring(range_t<utf8_t const *> in, literal_tag)
 : p(new representation(in, false)) {}
 
 nstring::nstring(range_t<wchar_t const *> in, encoding enc)
 : p(new representation(to_utf8_alloc(in.cast<char const *>(), enc))) {}
+
+nstring::nstring(wchar_t const *in, encoding enc)
+: p(new representation(to_utf8_alloc(zero_terminated(in).cast<char const *>(),
+        enc))) {}
 
 nstring::nstring(nstring_buffer const &b)
 : p(new representation(to_utf8_alloc(range(b).cast<char const *>(), utf32))) {}

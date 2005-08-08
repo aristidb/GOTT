@@ -24,6 +24,7 @@
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tdl/schema/context.hpp>
 #include <gott/util/tut/tut.h>
+#include <gott/util/nstring/nstring.hpp>
 
 namespace tdl = gott::tdl;
 
@@ -49,7 +50,7 @@ struct test_base {
   test_base() 
   : match(no_stru), pos(match.pos()), parse(match) {
     tdl::schema::context c;
-    c.begin(L"document");
+    c.begin("document");
     c.end();
     match.add(c.get());
   }

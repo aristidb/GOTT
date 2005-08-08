@@ -21,11 +21,12 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_BY_NAME_HPP
 #define GOTT_UTIL_TDL_SCHEMA_BY_NAME_HPP
 
-#include <string>
 #include <boost/scoped_ptr.hpp>
 #include <gott/util/visibility.hpp>
 
 namespace gott {
+class nstring;
+
 namespace tdl {
 namespace schema {
 
@@ -43,14 +44,14 @@ public:
    * \param name The name to find the type with.
    * \param type The type's id (see get_factory()).
    */
-  GOTT_EXPORT void add(std::wstring const &name, unsigned type);
+  GOTT_EXPORT void add(nstring const &name, unsigned type);
 
   /**
    * Get a type from the database.
    * \param name The type's name.
    * \return The type's id  (see get_factory()).
    */
-  GOTT_EXPORT unsigned get(std::wstring const &name) const;
+  GOTT_EXPORT unsigned get(nstring const &name) const;
 
   class IMPL;
   boost::scoped_ptr<IMPL> p;

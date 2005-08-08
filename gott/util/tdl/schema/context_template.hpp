@@ -29,6 +29,8 @@
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
+class nstring;
+
 namespace tdl {
 namespace schema {
 
@@ -47,17 +49,17 @@ public:
    * \param id The type's name.
    * \param ra The rule-factory's and later rule's attributes.
    */
-  void begin(std::wstring const &id, 
+  void begin(nstring const &id, 
              rule_attr const &ra = rule_attr()) GOTT_EXPORT;
 
   /**
    * Begins the declaration of a "rule".
    * @see context::begin
-   * \param n The type's name.
+   * \param id The type's name.
    * \param ra The rule-factory's and later rule's attributes.
    * \param s Repetition definition.
    */
-  void begin(std::wstring const &n, rule_attr const &ra, 
+  void begin(nstring const &id, rule_attr const &ra, 
              slotcfg const &s) GOTT_EXPORT;
 
   /**
