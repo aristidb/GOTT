@@ -25,15 +25,30 @@
 
 namespace gott {
 
+/**
+ * Atom class.
+ * Atoms are strings with fast comparison and fast hashing but slow constructor.
+ */
 class atom : public nstring {
 public:
+  /// Copy-Constructor (fast).
   GOTT_EXPORT atom(atom const &);
+
+  /// Constructor (slow).
   GOTT_EXPORT atom(nstring const &);
+
+  /// Destructor.
   GOTT_EXPORT ~atom();
 };
 
+/**
+ * Compare two atoms for equality (fast).
+ */
 GOTT_EXPORT bool operator==(atom const &, atom const &);
 
+/**
+ * Compare two atoms for inequality (fast).
+ */
 inline bool operator!=(atom const &a, atom const &b) {
   return !(a == b);
 }
