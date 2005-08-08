@@ -18,24 +18,34 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_NSTRING_CONVERT_HPP
-#define GOTT_UTIL_NSTRING_CONVERT_HPP
-
-#include "types.hpp"
+#include "stl.hpp"
+#include "nstring.hpp"
+#include "convert.hpp"
 #include <gott/util/range.hpp>
 
-namespace gott {
+using gott::nstring;
+using std::string;
+using std::wstring;
 
-range_t<utf8_t *> to_utf8_alloc(range_t<char const *> const &, encoding);
-range_t<char *> to_enc_alloc(range_t<utf8_t const *> const &, encoding);
-utf32_t to_utf32_char(char const *, char const *&, encoding);
-void write_utf32_to_utf8(utf32_t, utf8_t *&);
-void write_utf32_to_enc(utf32_t, char *&, encoding);
-std::size_t utf8_len(range_t<char const *> const &, encoding);
-std::size_t utf32_len(char const *, encoding);
-std::size_t utf8_len(utf32_t);
-std::size_t enc_len(utf32_t, encoding);
-
+string gott::to_string(nstring const &str, encoding enc) {
+  range_t<char const *> out = to_enc_alloc(range(str), enc);
+  string result(out.begin, out.end);
+  delete [] out.begin;
+  return result;
 }
 
-#endif
+wstring gott::to_wstring(nstring const &str, encoding enc) {
+  range_t<char const *> precast_out = to_enc_alloc(range(str), enc);
+  range_t<wchar_t const *> out = precast_out.cast<wchar_t const *>();
+  wstring result(out.begin, out.end);
+  delete [] out.begin;
+  return result;
+}
+
+nstring gott::to_nstring(string const &str, encoding enc) {
+  return nstring(range(&str[0], &str[str.length()]), enc);
+}
+
+nstring gott::to_nstring(wstring const &str, encoding enc) {
+  return nstring(range(&str[0], &str[str.length()]), enc);
+}

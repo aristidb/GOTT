@@ -18,23 +18,21 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_NSTRING_CONVERT_HPP
-#define GOTT_UTIL_NSTRING_CONVERT_HPP
+#ifndef GOTT_UTIL_NSTRING_STL_HPP
+#define GOTT_UTIL_NSTRING_STL_HPP
 
 #include "types.hpp"
-#include <gott/util/range.hpp>
+#include <string>
 
 namespace gott {
 
-range_t<utf8_t *> to_utf8_alloc(range_t<char const *> const &, encoding);
-range_t<char *> to_enc_alloc(range_t<utf8_t const *> const &, encoding);
-utf32_t to_utf32_char(char const *, char const *&, encoding);
-void write_utf32_to_utf8(utf32_t, utf8_t *&);
-void write_utf32_to_enc(utf32_t, char *&, encoding);
-std::size_t utf8_len(range_t<char const *> const &, encoding);
-std::size_t utf32_len(char const *, encoding);
-std::size_t utf8_len(utf32_t);
-std::size_t enc_len(utf32_t, encoding);
+class nstring;
+
+std::string to_string(nstring const &, encoding);
+std::wstring to_wstring(nstring const &, encoding);
+
+nstring to_nstring(std::string const &, encoding);
+nstring to_nstring(std::wstring const &, encoding);
 
 }
 
