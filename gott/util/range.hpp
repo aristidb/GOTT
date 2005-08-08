@@ -207,10 +207,20 @@ range_t<I> zero_terminated(I start) {
 
 /**
  * Return a range from a zero-terminated sequence.
+ * Searches the terminating value from the end backwards.
  */
 template<class I>
 range_t<I> zero_terminated_back(range_t<I> const &r) {
-  return value_terminated(r, 0);
+  return value_terminated_back(r, 0);
+}
+
+/**
+ * Return a range from a zero-terminated array sequence.
+ * Searches the terminating value from the end backwards.
+ */
+template<class T, std::size_t N>
+range_t<T const *> zero_terminated_back(T const (&arr)[N]) {
+  return zero_terminated_back(range(arr));
 }
 
 }

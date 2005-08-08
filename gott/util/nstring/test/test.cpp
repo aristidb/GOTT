@@ -18,7 +18,7 @@ int main() {
   wcerr << (x == n) << L' ';
   wcerr << (x != range(L"muhkuh")) << L' ';
   wcerr << (x == range("Hallo, nstring-Welt!\n")) << L'\n';
-  x = zero_terminated_back(range(L"xxxFoobar\n$"));
+  x = zero_terminated_back(L"xxxFoobar\n$");
   x = offset(range(x), 3, -2);
   n = x + n;
   wcerr << n << x;
@@ -31,7 +31,7 @@ int main() {
   //to_upper(b);
   b[1] = utf32_t(L':');
   b.erase(range(b.begin() + 2, 4));
-  range_t<wchar_t const *> r = offset(range(L"test "), 0, -1);
+  range_t<wchar_t const *> r = zero_terminated_back(L"test ");
   copy(r, b.insert(b.begin(), r.size()));
   nstring a(b);
   wcerr << a;
