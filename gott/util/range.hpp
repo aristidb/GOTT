@@ -191,7 +191,7 @@ range_t<I> value_terminated(I start, T val) {
  * Searches the terminating value from the end backwards.
  */
 template<class I, class T>
-range_t<I> value_terminated(range_t<I> r, T val) {
+range_t<I> value_terminated_back(range_t<I> r, T val) {
   while (*r.end == val)
     --r.end;
   return r;
@@ -209,7 +209,7 @@ range_t<I> zero_terminated(I start) {
  * Return a range from a zero-terminated sequence.
  */
 template<class I>
-range_t<I> zero_terminated(range_t<I> const &r) {
+range_t<I> zero_terminated_back(range_t<I> const &r) {
   return value_terminated(r, 0);
 }
 
