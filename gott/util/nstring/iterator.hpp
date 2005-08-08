@@ -27,6 +27,9 @@
 
 namespace gott {
 
+/**
+ * Iterator for full character steps over a (constant!) UTF8 string.
+ */
 class GOTT_EXPORT utf8_iterator {
 public:
   typedef utf32_t value_type;
@@ -35,20 +38,55 @@ public:
   typedef std::ptrdiff_t difference_type;
   typedef std::bidirectional_iterator_tag iterator_category;
 
+  /**
+   * Return the character at the current position as UTF32.
+   */
   utf32_t operator*() const;
-  utf8_iterator &operator++(); // prefix
-  utf8_iterator operator++(int); // postfix
-  utf8_iterator &operator--(); // prefix
-  utf8_iterator operator--(int); // postfix
 
+  /**
+   * Increment the position by a full character step. Prefix variant.
+   */
+  utf8_iterator &operator++();
+
+  /**
+   * Increment the position by a full character step. Postfix variant.
+   * \param IGNORE Supplied by compiler.
+   */
+  utf8_iterator operator++(int IGNORE);
+
+  /**
+   * Decrement the position by a full character step. Prefix variant.
+   */
+  utf8_iterator &operator--();
+
+  /**
+   * Decrement the position by a full character step. Postfix variant.
+   * \param IGNORE Supplied by compiler.
+   */
+  utf8_iterator operator--(int IGNORE); // postfix
+
+  /**
+   * Construct from pointer to UTF8-formatted memory.
+   */
   utf8_iterator(utf8_t const *c) : current(c) {}
+
+  /**
+   * Retrieve the current memory position.
+   */
   operator utf8_t const *() const;
 
 private:
   utf8_t const *current;
 };
 
+/**
+ * Compare two utf8_iterators for equality.
+ */
 GOTT_EXPORT bool operator==(utf8_iterator const &, utf8_iterator const &);
+
+/**
+ * Compare two utf8_iterators for inequality.
+ */
 GOTT_EXPORT bool operator!=(utf8_iterator const &, utf8_iterator const &);
 
 }

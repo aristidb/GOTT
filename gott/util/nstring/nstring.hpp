@@ -109,7 +109,7 @@ public:
   /**
    * Assign from another nstring.
    */
-  void operator=(nstring const &other) GOTT_EXPORT;
+  void operator =(nstring const &other) GOTT_EXPORT;
 
   /**
    * Get the internal data.
@@ -158,7 +158,7 @@ operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &,
 /**
  * Concatenate two nstrings.
  */
-GOTT_EXPORT nstring operator+(nstring const &, nstring const &);
+GOTT_EXPORT nstring operator +(nstring const &, nstring const &);
 
 /**
  * Compare two nstrings for equality.
