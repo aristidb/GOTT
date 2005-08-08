@@ -51,7 +51,7 @@ public:
 
   ~representation() {
     if (owned) 
-      delete data;
+      delete [] data;
   }
 
   enum concatenation_tag { concat };

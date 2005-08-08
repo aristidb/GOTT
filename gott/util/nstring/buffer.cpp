@@ -31,6 +31,9 @@ using gott::utf32_t;
 class nstring_buffer::representation {
 public:
   representation() : begin(0), end(0), storage_end(0) {}
+
+  ~representation() { delete [] begin; }
+  
   utf32_t *begin, *end, *storage_end;
 
   utf32_t *ensure(std::size_t add_len) {
@@ -49,6 +52,7 @@ private:
     utf32_t *old = begin;
     begin = new utf32_t[new_size];
     std::copy(old, end, begin);
+    delete [] old;
     storage_end = begin + new_size;
   }
 };
