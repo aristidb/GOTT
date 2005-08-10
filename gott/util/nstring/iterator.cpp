@@ -44,9 +44,9 @@ gott::utf32_t utf8_iterator::operator*() const {
 }
 
 utf8_iterator &utf8_iterator::operator++() {
-  ++current;
-  while (*current >= 0x80 && *current < 0xC0)
-    ++current;
+  if (*current++ >= 0xC0)
+    while (*current >= 0x80 && *current < 0xC0)
+      ++current;
   return *this;
 }
 
