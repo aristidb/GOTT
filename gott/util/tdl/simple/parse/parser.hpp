@@ -21,13 +21,14 @@
 #ifndef GOTT_UTIL_TDL_SIMPLE_PARSER_H
 #define GOTT_UTIL_TDL_SIMPLE_PARSER_H
 
-#include <string>
 #include <gott/util/my_hash_map.hpp>
 #include HH_HASH_MAP
 #include <gott/util/visibility.hpp>
 #include <boost/function.hpp>
 
 namespace gott {
+class nstring;
+
 namespace tdl {
 namespace simple {
 
@@ -42,10 +43,10 @@ struct GOTT_EXPORT parser {
   virtual void down() = 0;
     ///< Called when we open a new sub-layer.
  
-  virtual void node(std::wstring const &content) = 0;
+  virtual void node(nstring const &content) = 0;
     ///< Called when a node has been read.
 
-  virtual void comment(std::wstring const &content, bool on_new_line) = 0;
+  virtual void comment(nstring const &content, bool on_new_line) = 0;
     ///< Called when a comment has been read.
 
   virtual void up() = 0;

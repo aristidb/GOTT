@@ -20,7 +20,7 @@
 
 #include "structure.hpp"
 #include "../simple/parse/parser.hpp"
-#include <gott/util/autoconv.hpp>
+#include <gott/util/nstring/nstring.hpp>
 
 using std::wstring;
 using gott::xany::Xany;
@@ -34,7 +34,7 @@ namespace {
 
     void begin_parse() {}
     void end_parse() {}
-    void comment(wstring const &, bool) {}
+    void comment(gott::nstring const &, bool) {}
 
     void down() {
       if (!data)
@@ -51,7 +51,7 @@ namespace {
       s.end();
     }
 
-    void node(wstring const &x) {
+    void node(gott::nstring const &x) {
       if (data)
         s.end();
   

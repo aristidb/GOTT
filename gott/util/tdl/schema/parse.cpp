@@ -134,8 +134,8 @@ void match::down() {
   pIMPL->handle_token(ev::down());
 }
 
-void match::node(wstring const &s) {
-  pIMPL->handle_token(ev::node(to_nstring(s)));
+void match::node(nstring const &s) {
+  pIMPL->handle_token(ev::node(s));
 }
 
 void match::up() {
@@ -146,7 +146,7 @@ void match::end_parse() {
   pIMPL->handle_token(ev::end_parse());
 }
 
-void match::comment(wstring const &, bool) {}
+void match::comment(nstring const &, bool) {}
 
 // Implementation
 

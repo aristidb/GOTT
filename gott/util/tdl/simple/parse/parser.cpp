@@ -20,9 +20,12 @@
 
 #include "parser.hpp"
 #include <boost/algorithm/string.hpp>
+#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/nstring/stl.hpp>
 
 using std::wistream;
 using std::wstring;
+using gott::to_nstring;
 using gott::tdl::simple::parser;
 using gott::tdl::simple::line_logger;
 
@@ -172,7 +175,7 @@ void exec_parse::normal_line(wstring const &s) {
       ln.new_char();
       ln.start_token();
       ln.end_token(y);
-      parse.comment(y, empty);
+      parse.comment(to_nstring(y), empty);
       break;
     }
 
@@ -188,7 +191,7 @@ void exec_parse::normal_line(wstring const &s) {
       break;
     }
     
-    parse.node(read_string(pos, s.end()));
+    parse.node(to_nstring(read_string(pos, s.end())));
     started_document = true;
 
     skip_whitespace(pos, s.end());
@@ -214,7 +217,7 @@ bool exec_parse::empty_line() {
     stream.get();
     wstring s;
     getline(stream, s);
-    parse.comment(s, true);
+    parse.comment(to_nstring(s), true);
     return true;
   }
   
@@ -254,7 +257,7 @@ void exec_parse::block() {
       break;
   } while (stream);
 
-  parse.node(str);
+  parse.node(to_nstring(str));
 
   restore_indent(old_indent);
 }

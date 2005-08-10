@@ -106,10 +106,10 @@ public:
 private:
   void begin_parse();
   void down();
-  void node(std::wstring const &);
+  void node(nstring const &);
   void up();
   void end_parse();
-  void comment(std::wstring const &, bool);
+  void comment(nstring const &, bool);
 
 private:
   class IMPL;
