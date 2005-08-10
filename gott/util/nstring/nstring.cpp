@@ -158,13 +158,13 @@ void nstring::operator=(nstring const &o) {
 }
 
 std::ostream &gott::operator<<(std::ostream &stream, nstring const &s) {
-  for (utf8_t const *it = s.begin_raw(); it != s.end_raw(); ++it)
+  for (utf8_t const *it = s.begin_raw(); it < s.end_raw(); ++it)
     stream << char(*it);
   return stream;
 }
 
 std::wostream &gott::operator<<(std::wostream &stream, nstring const &s) {
-  for (utf8_iterator it = s.begin(); it != s.end(); ++it)
+  for (utf8_iterator it = s.begin(); it < s.end(); ++it)
     stream << wchar_t(*it);
   return stream;
 }

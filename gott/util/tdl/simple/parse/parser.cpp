@@ -25,6 +25,7 @@
 
 using std::wistream;
 using std::wstring;
+using gott::nstring;
 using gott::to_nstring;
 using gott::tdl::simple::parser;
 using gott::tdl::simple::line_logger;
@@ -65,7 +66,7 @@ struct internal_line_logger {
   
   void start_token() { rp = p; }
   
-  void end_token(std::wstring const &n) {
+  void end_token(nstring const &n) {
     if (ref)
       ref->token(rp, p, n);
   }
@@ -171,11 +172,11 @@ void exec_parse::normal_line(wstring const &s) {
     skip_whitespace(pos, s.end());
   
     if (*pos == L'#') {
-      wstring y(++pos, s.end());
+      nstring y(to_nstring(wstring(++pos, s.end())));
       ln.new_char();
       ln.start_token();
       ln.end_token(y);
-      parse.comment(to_nstring(y), empty);
+      parse.comment(y, empty);
       break;
     }
 
@@ -289,7 +290,7 @@ wstring exec_parse::read_quoted(wstring::const_iterator &it,
 
   ln.add_char(it - start + 1);
 
-  ln.end_token(wstring(start - 1, ++it));
+  ln.end_token(to_nstring(wstring(start - 1, ++it)));
   
   wstring s(start, it - 1);
   boost::algorithm::replace_all(s, L"\"\"", L"\"");
@@ -326,7 +327,7 @@ wstring exec_parse::read_paren(wstring::const_iterator &it,
       balance(c);
     }
   }
-  ln.end_token(result);
+  ln.end_token(to_nstring(result));
   return result;
 }
 
@@ -346,7 +347,7 @@ wstring exec_parse::read_string(wstring::const_iterator &it,
   ln.add_char(it - start);
 
   wstring out(start, it);
-  ln.end_token(out);
+  ln.end_token(to_nstring(out));
   return out;
 }
 

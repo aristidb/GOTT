@@ -27,7 +27,7 @@ stream_position::stream_position()
 
 void stream_position::start_line() { ++line_new; }
 
-void stream_position::token(unsigned p, unsigned e, std::wstring const &w) {
+void stream_position::token(unsigned p, unsigned e, nstring const &w) {
   pos = p;
   native_end = e;
   tok = w;

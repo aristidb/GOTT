@@ -70,7 +70,7 @@ struct line_logger {
    * \param end The first line position after the token.
    * \param nd The token itself.
    */
-  virtual void token(unsigned start, unsigned end, std::wstring const &nd) = 0;
+  virtual void token(unsigned start, unsigned end, nstring const &nd) = 0;
 
   /**
    * Called whenever a different line position is reached.
