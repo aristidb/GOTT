@@ -21,10 +21,9 @@
 #ifndef GOTT_UTIL_TDL_SIMPLE_PARSER_H
 #define GOTT_UTIL_TDL_SIMPLE_PARSER_H
 
-#include <gott/util/my_hash_map.hpp>
-#include HH_HASH_MAP
 #include <gott/util/visibility.hpp>
 #include <boost/function.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 class nstring;
@@ -100,29 +99,12 @@ public:
    * \return The success of the handler.
    */
   typedef 
-    boost::function<bool (std::wstring const &cmd, std::wstring const &param)> 
+    boost::function<bool (nstring const &cmd, nstring const &param)> 
     callback;
 
   GOTT_EXPORT meta_parser();
+  GOTT_EXPORT ~meta_parser();
 
-  /**
-   * Example handler. Stores the parameters of the latest invocation.
-   */
-  class store_one_param {
-  public:
-    /// The "function content".
-    bool operator() (std::wstring const &, std::wstring const &p) { 
-      x = p; 
-      return true;
-    }
-
-    /// The stored parameters.
-    std::wstring const &data() const { return x; }
-
-  private:
-    std::wstring x;
-  };
-  
   /**
    * Set the default command handler.
    * \param f The handler to add.
@@ -134,16 +116,15 @@ public:
    * \param s The command to invocate this handler on.
    * \param f The handler to add.
    */
-  void set_specific(std::wstring const &s, callback const &f) GOTT_EXPORT;
+  void set_specific(nstring const &s, callback const &f) GOTT_EXPORT;
 
 public:
   /// @internal
-  void exec(std::wstring const &line);
+  void exec(nstring const &line);
 
 private:
-  callback def;
-  typedef hashd::hash_map<std::wstring, callback> cb_t;
-  cb_t cb;
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
 };
 
 /**

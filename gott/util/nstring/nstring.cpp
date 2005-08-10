@@ -70,6 +70,10 @@ nstring::~nstring() {
     delete p;
 }
 
+nstring::nstring()
+: p(new representation(offset(range("").cast<utf8_t const *>(), 0, -1), 
+                       false)) {}
+
 nstring::nstring(range_t<char const *> in, encoding enc)
 : p(new representation(to_utf8_alloc(in, enc))) {}
 

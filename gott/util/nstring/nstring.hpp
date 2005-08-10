@@ -50,6 +50,11 @@ public:
   typedef utf8_iterator const_iterator;
 
   /**
+   * Construct empty string
+   */
+  nstring();
+
+  /**
    * Construct from encoded string.
    */
   nstring(range_t<char const *>, encoding = utf8);
@@ -154,8 +159,6 @@ public:
 private:
   class representation;
   representation *p;
-
-  GOTT_LOCAL nstring(); // unimplemented
 };
 
 /**

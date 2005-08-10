@@ -70,14 +70,6 @@ public:
   void end() GOTT_EXPORT;
 
   /**
-   * A little convenience wrapper around begin.
-   */
-  template<class T>
-  void begin_t(rule_attr const &attr, unsigned c = 0) {
-    begin(T::factory::index(), attr, c);
-  }
-
-  /**
    * Add a reference to another context as a "rule".
    * The context must be fully initialized and filled.
    * The added context is not owned.

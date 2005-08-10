@@ -21,7 +21,8 @@
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tut/tut.h>
 #include <sstream>
-#include <gott/util/autoconv.hpp>
+#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/nstring/stl.hpp>
 
 using std::wstring;
 using std::vector;
@@ -30,21 +31,22 @@ using std::ostream;
 using std::wistringstream;
 using gott::tdl::simple::meta_parser;
 using gott::tdl::simple::parse_meta;
+using gott::nstring;
 
 namespace tut {
 struct meta_basic {
   meta_parser parser;
-  wstring data, rest;
-  vector<pair<wstring, wstring> > xp, ev;
-  bool operator() (wstring const &cmd, wstring const &param) {
-    ev.push_back(pair<wstring,wstring>(cmd, param));
+  nstring data, rest;
+  vector<pair<nstring, nstring> > xp, ev;
+  bool operator() (nstring const &cmd, nstring const &param) {
+    ev.push_back(pair<nstring,nstring>(cmd, param));
     return true;
   }
-  void expect(wstring const &cmd, wstring const &param = L"") {
-    xp.push_back(pair<wstring,wstring>(cmd, param));
+  void expect(nstring const &cmd, nstring const &param = L"") {
+    xp.push_back(pair<nstring,nstring>(cmd, param));
   }
   void run_test() {
-    wistringstream x(data);
+    wistringstream x(to_wstring(data));
     parse_meta(x, parser);
     rest = x.str().c_str() + x.tellg();
   }
@@ -55,8 +57,8 @@ typedef test_group<meta_basic> tf;
 typedef tf::object object;
 }
 
-ostream &operator<<(ostream &o, vector<pair<wstring,wstring> > const &v) {
-  for (vector<pair<wstring,wstring> >::const_iterator it = v.begin();
+ostream &operator<<(ostream &o, vector<pair<nstring,nstring> > const &v) {
+  for (vector<pair<nstring,nstring> >::const_iterator it = v.begin();
        it != v.end(); ++it) {
     o << it->first << "::";
     o << it->second << '\n';
@@ -85,7 +87,7 @@ void object::test<2>(int) {
   expect(L"real", L"kluft");
   ensure_equals("multi-line declaration", ev, xp);
   ensure_equals("multi-line declaration rest", rest, 
-                L"   \n       \n\n#?delta_x yz");
+                nstring(L"   \n       \n\n#?delta_x yz"));
 }
 
 template<> template<>
@@ -95,7 +97,7 @@ void object::test<3>(int) {
   expect(L"a");
   expect(L"", L"b");
   ensure_equals("multi-line #2", ev, xp);
-  ensure_equals("multi-line #2 rest", rest, L"#\n#?c");
+  ensure_equals("multi-line #2 rest", rest, nstring(L"#\n#?c"));
 }
 
 template<> template<>
