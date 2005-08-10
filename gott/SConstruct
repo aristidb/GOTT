@@ -1,6 +1,6 @@
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
 cflags = Split(ARGUMENTS.get('cflags', '-Wall -Wextra -Werror -Winvalid-pch'))
-release = int(ARGUMENTS.get('release', 0))
+release = int(ARGUMENTS.get('release', 1))
 if release:
 	debug = 0
 	opt = ['-O3']

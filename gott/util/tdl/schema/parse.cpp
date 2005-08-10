@@ -28,6 +28,7 @@
 #include <gott/util/range_algo.hpp>
 #include <gott/util/autoconv.hpp>
 #include <sstream>
+#include <gott/util/nstring/stl.hpp>
 
 using std::wstring;
 using std::list;
@@ -134,7 +135,7 @@ void match::down() {
 }
 
 void match::node(wstring const &s) {
-  pIMPL->handle_token(ev::node(s));
+  pIMPL->handle_token(ev::node(to_nstring(s)));
 }
 
 void match::up() {

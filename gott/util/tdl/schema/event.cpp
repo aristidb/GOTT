@@ -85,9 +85,9 @@ void ev::child_fail::print(wostream &s) const {
   s << L"notify:child_fail";
 }
 
-ev::node::node(std::wstring const &s) : data(s) {}
+ev::node::node(nstring const &s) : data(s) {}
 
-std::wstring const &ev::node::get_data() const { return data; }
+gott::nstring const &ev::node::get_data() const { return data; }
 
 namespace {
   struct token_visitor : public static_visitor<ev::token const &> {

@@ -20,9 +20,8 @@
 
 #include "named.hpp"
 #include "../event.hpp"
-#include <gott/util/autoconv.hpp>
+#include <gott/util/nstring/nstring.hpp>
 #include <list>
-#include <string>
 
 using std::list;
 using std::wstring;
@@ -42,7 +41,7 @@ rule_attr match_named::attributes(wstring const &s, bool cc) {
 match_named::match_named(rule_factory const &s, rule_attr const &a, 
                          match &m) 
 : rule(a, m), sub(s), state(read_none) {
-  if (!a.user().compatible<wstring>())
+  if (!a.user().compatible<nstring>())
     throw std::bad_exception();
 }
 
@@ -50,7 +49,7 @@ bool match_named::play(ev::node const &n) {
   if (state != read_none)
     return false;
 
-  if (n.get_data() == Xany_cast<wstring>(rule::attributes().user())) {
+  if (n.get_data() == Xany_cast<nstring>(rule::attributes().user())) {
     state = read_node;
     return true;
   }
