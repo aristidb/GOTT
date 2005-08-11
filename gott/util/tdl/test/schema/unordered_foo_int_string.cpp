@@ -27,6 +27,7 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
+using gott::nstring;
 using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
@@ -39,7 +40,7 @@ struct schema_unordered_foo_integer_string : tut::schema_basic {
     context.begin(L"document");
       context.begin(L"unordered");
         context.begin(L"node", RA(L"foo", true, 
-               new stru::repatch_enumeration(std::vector<wstring>(1, L"foo"))));
+               new stru::repatch_enumeration(std::vector<nstring>(1, L"foo"))));
         context.end();
         context.begin(L"node", RA(true, new stru::repatch_integer()));
         context.end();

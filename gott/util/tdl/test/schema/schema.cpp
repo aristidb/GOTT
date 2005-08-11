@@ -28,6 +28,7 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
+using gott::nstring;
 using std::wstring;
 using namespace stru::cf;
 using schema::slotcfg;
@@ -78,7 +79,7 @@ struct Schema : tut::schema_basic {
     document.begin(L"list", ra(L"type-declarations"));
       document.begin(L"ordered", ra(L"type-declaration"));
         document.begin(L"node", rule_attr(L"export", true,
-             new stru::repatch_enumeration(std::vector<wstring>(1, L"export"))),
+             new stru::repatch_enumeration(std::vector<nstring>(1, L"export"))),
              slotcfg(slotcfg::optional));
         document.end();
 
@@ -103,7 +104,7 @@ struct Schema : tut::schema_basic {
   void qualified(schema::context_template &document) {
      document.begin(L"follow", ra(L"qualified-type-definition"));
        {
-         std::vector<wstring> choice(2);
+         std::vector<nstring> choice(2);
          choice[0] = L"enclosed"; choice[1] = L"flat";
          document.begin(L"node", rule_attr(L"coat", true,
                                         new stru::repatch_enumeration(choice)));
@@ -144,7 +145,7 @@ struct Schema : tut::schema_basic {
     document.begin(L"any", ra(L"slot-specification"),
                    slotcfg(slotcfg::optional));
       {
-        std::vector<wstring> single(4);
+        std::vector<nstring> single(4);
         single[0] = L"one";  single[1] = L"optional";
         single[2] = L"list"; single[3] = L"some";
         document.begin(L"node", rule_attr(L"slot", true, 

@@ -23,6 +23,7 @@
 
 #include "../repatch.hpp"
 #include <vector>
+#include <gott/util/nstring/nstring.hpp>
 
 namespace gott {
 namespace tdl {
@@ -30,12 +31,12 @@ namespace structure {
 
 class GOTT_EXPORT repatch_enumeration : public repatcher {
 public:
-  repatch_enumeration(std::vector<std::wstring> const &);
+  repatch_enumeration(std::vector<nstring> const &);
   ~repatch_enumeration();
   writable_structure *deferred_write(writable_structure &) const;
 
 private:
-  std::vector<std::wstring> alternatives;
+  std::vector<nstring> alternatives;
 };
 
 }}}

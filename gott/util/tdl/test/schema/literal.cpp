@@ -26,6 +26,7 @@ namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
 using std::wstring;
+using gott::nstring;
 using stru::cf::S;
 using stru::cf::C;
 using schema::rule_attr;
@@ -33,9 +34,9 @@ using schema::rule_attr;
 namespace {
 struct schema_literal : tut::schema_basic {
   schema_literal() {
-    context.begin(L"document");
-      context.begin(L"node", rule_attr(L"foobar", true, 
-            new stru::repatch_enumeration(std::vector<wstring>(1, L"foobar"))));
+    context.begin("document");
+      context.begin("node", rule_attr(L"foobar", true, 
+             new stru::repatch_enumeration(std::vector<nstring>(1, "foobar"))));
       context.end();
     context.end();
   }
@@ -55,7 +56,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"foobar");
-  C(S(Xany(0), L"foobar")).write_to(xp);
+  C(S(Xany(0), "foobar")).write_to(xp);
   ensure_equals("single foobar entity", tree, xp);
 }
 
