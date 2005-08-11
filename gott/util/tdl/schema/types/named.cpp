@@ -24,7 +24,7 @@
 #include <list>
 
 using std::list;
-using std::wstring;
+
 using gott::xany::Xany;
 using gott::xany::Xany_cast;
 

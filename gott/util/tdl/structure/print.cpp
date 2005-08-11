@@ -26,7 +26,7 @@
 #include <gott/util/autoconv.hpp>
 
 using std::wostream;
-using std::wstring;
+
 using std::list;
 using gott::xany::Xany;
 using gott::tdl::structure::direct_print;

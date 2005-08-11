@@ -24,7 +24,7 @@
 #include <gott/util/nstring/nstring.hpp>
 #include <gott/util/nstring/stl.hpp>
 
-using std::wstring;
+
 using std::vector;
 using std::pair;
 using std::ostream;

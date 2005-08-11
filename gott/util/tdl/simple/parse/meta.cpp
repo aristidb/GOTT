@@ -25,7 +25,7 @@
 #include HH_HASH_MAP
 
 using std::wistream;
-using std::wstring;
+
 using gott::tdl::simple::meta_parser;
 
 void gott::tdl::simple::parse_meta(std::wistream &in, meta_parser &p, 
@@ -43,7 +43,7 @@ void gott::tdl::simple::parse_meta(std::wistream &in, meta_parser &p,
         break;
       }
       in.get();
-      wstring s;
+      std::wstring s;
       getline(in, s);
       p.exec(to_nstring(s));
     }

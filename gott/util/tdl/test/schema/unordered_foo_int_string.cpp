@@ -28,7 +28,7 @@ namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
 using gott::nstring;
-using std::wstring;
+
 using stru::cf::S;
 using stru::cf::C;
 

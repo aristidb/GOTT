@@ -26,7 +26,7 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
-using std::wstring;
+
 using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
@@ -106,7 +106,7 @@ void object::test<5>(int t) {
   run_test(w.str());
   stru::cf::nd_list c;
   for (int i = 0; i < n; ++i)
-    c.push_back(S(Xany(wstring(1, L'A'+i)), L"el"));
+    c.push_back(S(Xany(std::wstring(1, L'A'+i)), L"el"));
   C(M(c)).write_to(xp);
   ensure_equals("many", tree, xp);
 }

@@ -28,7 +28,7 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
-using std::wstring;
+
 using namespace stru::cf;
 using schema::slotcfg;
 using schema::rule_attr;

@@ -23,7 +23,7 @@
 #include <boost/variant.hpp>
 #include <gott/util/range_algo.hpp>
 
-using std::wstring;
+
 using std::vector;
 using boost::static_visitor;
 using gott::tdl::schema::context_template;
