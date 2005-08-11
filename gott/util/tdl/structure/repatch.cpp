@@ -31,7 +31,7 @@ using structure::repatch_nothing;
 repatcher::repatcher() {}
 repatcher::~repatcher() {}
 
-failed_repatch::failed_repatch(std::wstring const &s) : tdl_exception(s) {}
+failed_repatch::failed_repatch(nstring const &s) : tdl_exception(s) {}
 failed_repatch::~failed_repatch() throw() {}
 
 simple_repatcher_context::~simple_repatcher_context() {}
@@ -48,11 +48,11 @@ void simple_repatcher_context::data(xany::Xany const &x) {
   target.data(x);
 }
 
-void simple_repatcher_context::add_tag(std::wstring const &s) {
+void simple_repatcher_context::add_tag(nstring const &s) {
   target.add_tag(s);
 }
 
-void simple_repatcher_context::set_tags(std::list<std::wstring> const &l) {
+void simple_repatcher_context::set_tags(std::list<nstring> const &l) {
   target.set_tags(l);
 }
 

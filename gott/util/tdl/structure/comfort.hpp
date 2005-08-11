@@ -27,6 +27,8 @@
 #include <gott/util/visibility.hpp>
 
 namespace gott {
+class nstring;
+
 namespace tdl {
 namespace structure {
 
@@ -37,9 +39,9 @@ class writable_structure;
  */
 namespace cf {
 
-typedef std::list<std::wstring, std::allocator<std::wstring> > tag_list;
+typedef std::list<nstring> tag_list;
 class node_inserter_t;
-typedef std::list<node_inserter_t, std::allocator<node_inserter_t> > nd_list;
+typedef std::list<node_inserter_t> nd_list;
 
 /**
  * General concatenateable structure generator.
@@ -66,28 +68,32 @@ private:
  * \param data The node's data.
  * \param tags The nodes's tags.
  */
-GOTT_EXPORT node_inserter_t S(xany::Xany data, tag_list tags = tag_list());
+GOTT_EXPORT 
+node_inserter_t S(xany::Xany const &data, tag_list const &tags = tag_list());
 
 /**
  * Create a leaf node (generator).
  * \param data The node's data.
  * \param tag The nodes's sole tag.
  */
-GOTT_EXPORT node_inserter_t S(xany::Xany data, std::wstring tag);
+GOTT_EXPORT 
+node_inserter_t S(xany::Xany const &data, nstring const &tag);
 
 /**
  * Create a node (generator) without data but with children.
  * \param children The node's children in spe.
  * \param tags The node's tags.
  */
-GOTT_EXPORT node_inserter_t M(nd_list children, tag_list tags = tag_list());
+GOTT_EXPORT 
+node_inserter_t M(nd_list const &children, tag_list const &tags = tag_list());
 
 /**
  * Create a node (generator) without data but with children.
  * \param children The node's children in spe.
  * \param tag The node's sole tag.
  */
-GOTT_EXPORT node_inserter_t M(nd_list children, std::wstring tag);
+GOTT_EXPORT 
+node_inserter_t M(nd_list const &children, nstring const &tag);
 
 /**
  * Create a node (generator) with data and children.
@@ -95,8 +101,9 @@ GOTT_EXPORT node_inserter_t M(nd_list children, std::wstring tag);
  * \param children The node's children in spe.
  * \param tags The node's tags.
  */
-GOTT_EXPORT node_inserter_t MD(xany::Xany data, nd_list children,
-                   tag_list tags = tag_list());
+GOTT_EXPORT 
+node_inserter_t MD(xany::Xany const &data, nd_list const &children,
+                   tag_list const &tags = tag_list());
 
 /**
  * Create a node (generator) with data and children.
@@ -104,21 +111,26 @@ GOTT_EXPORT node_inserter_t MD(xany::Xany data, nd_list children,
  * \param children The node's children in spe.
  * \param tag The node's sole tag.
  */
-GOTT_EXPORT node_inserter_t MD(xany::Xany data, nd_list children, std::wstring tag);
+GOTT_EXPORT 
+node_inserter_t MD(xany::Xany const &data, nd_list const &children, 
+                   nstring const &tag);
 
 /**
  * Create a node (generator) without data and with a single child.
  * \param child The node's child in spe.
  * \param tags The node's tags.
  */
-GOTT_EXPORT node_inserter_t C(node_inserter_t child, tag_list tags = tag_list());
+GOTT_EXPORT 
+node_inserter_t C(node_inserter_t const &child, 
+                  tag_list const &tags = tag_list());
 
 /**
  * Create a node (generator) without data and with a single child.
  * \param child The node's child in spe.
  * \param tag The node's sole tag.
  */
-GOTT_EXPORT node_inserter_t C(node_inserter_t child, std::wstring tag);
+GOTT_EXPORT 
+node_inserter_t C(node_inserter_t const &child, nstring const &tag);
 
 }}}}
 

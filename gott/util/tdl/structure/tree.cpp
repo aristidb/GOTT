@@ -28,14 +28,15 @@
 #include <boost/bind.hpp>
 #include <sstream>
 #include <gott/util/autoconv.hpp>
+#include <gott/util/nstring/nstring.hpp>
 
 using std::list;
-using std::wstring;
 using std::vector;
 using std::pair;
 using boost::intrusive_ptr;
 using boost::scoped_ptr;
 using gott::xany::Xany;
+using gott::nstring;
 
 namespace stru = gott::tdl::structure;
 using stru::writable_structure;
@@ -65,7 +66,7 @@ public:
 struct tree::node {
   size_t use_count;
   Xany data;
-  list<wstring> tags;
+  list<nstring> tags;
   intrusive_ptr<node> child0, lastchild, dad, sibling, last;
   size_t size;
   IMPL::tag ttag;
@@ -75,7 +76,7 @@ struct tree::node {
 
   class index {
     typedef vector<intrusive_ptr<node> > v_pn;
-    typedef hashd::hash_multimap<wstring, intrusive_ptr<node> > hmm_spn;
+    typedef hashd::hash_multimap<nstring, intrusive_ptr<node> > hmm_spn;
     
     v_pn by_no;
     hmm_spn by_name;
@@ -100,7 +101,7 @@ struct tree::node {
     }
 
     void add_entry(intrusive_ptr<node> const &x) {
-      for (list<wstring>::iterator i =x->tags.begin(); i != x->tags.end(); ++i)
+      for (list<nstring>::iterator i =x->tags.begin(); i != x->tags.end(); ++i)
         by_name.insert(hmm_spn::value_type(*i, x));
     }
 
@@ -108,7 +109,7 @@ struct tree::node {
       return by_no[i];
     }
 
-    tag_range_type with_name(wstring const &n) {
+    tag_range_type with_name(nstring const &n) {
       return by_name.equal_range(n);
     }
   };
@@ -181,11 +182,11 @@ void tree::data(Xany const &x) {
   p->pos->data = x;
 }
 
-void tree::add_tag(wstring const &s) {
+void tree::add_tag(nstring const &s) {
   p->pos->tags.push_back(s);
 }
 
-void tree::set_tags(list<wstring> const &l) {
+void tree::set_tags(list<nstring> const &l) {
   p->pos->tags = l;
 }
 
@@ -233,7 +234,7 @@ tree::iterator tree::iterator::up() const { return n->dad; }
 tree::iterator tree::iterator::next() const { return n->sibling; }
 
 Xany const &tree::iterator::get_data() const { return n->data; }
-list<wstring> const &tree::iterator::get_tags() const { return n->tags; }
+list<nstring> const &tree::iterator::get_tags() const { return n->tags; }
 
 tree::iterator tree::get_root() const { return p->root; }
 
@@ -251,7 +252,7 @@ public:
     : range(r), pos(r.first), valid(true) {}
 };
 
-tree::tagged_iterator tree::iterator::with_tag(wstring const &s) const {
+tree::tagged_iterator tree::iterator::with_tag(nstring const &s) const {
   if (!n->indx)
     n->indx.reset(new tree::node::index(n));
   n->indx->build_all();
@@ -365,7 +366,7 @@ void tree::dump(wostream &stream) {
 
       out << L'(' << p->ttag << L')';
       out << L" : ";
-      for (list<wstring>::iterator it = p->tags.begin(); 
+      for (list<nstring>::iterator it = p->tags.begin(); 
            it != p->tags.end(); ++it)
         out << *it << L' ';
       out << L"{\n";

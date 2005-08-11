@@ -21,21 +21,27 @@
 #ifndef GOTT_UTIL_TDL_EXCEPTIONS_HPP
 #define GOTT_UTIL_TDL_EXCEPTIONS_HPP
 
-#include <string>
 #include <list>
 #include <gott/util/visibility.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
+class nstring;
+
 namespace tdl {
 
 class GOTT_EXPORT tdl_exception : public std::exception {
-  std::string message_narrow;
-  std::wstring message_wide;
 public:
-  tdl_exception(std::string const &msg) GOTT_LOCAL;
-  tdl_exception(std::wstring const &msg) GOTT_LOCAL;
+  tdl_exception(nstring const &msg) GOTT_LOCAL;
+  tdl_exception(tdl_exception const &) GOTT_LOCAL;
   ~tdl_exception() throw();
   char const *what() const throw();
+
+private:
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
+
+  tdl_exception() GOTT_LOCAL;
 };
 
 namespace schema {
@@ -48,17 +54,17 @@ namespace detail { struct stream_position; }
  */
 struct GOTT_EXPORT mismatch : public tdl_exception {
   GOTT_LOCAL
-  mismatch(detail::stream_position const &p, std::list<std::wstring> const &);
+  mismatch(detail::stream_position const &p, std::list<nstring> const &);
   ~mismatch() throw();
 };
 
 struct GOTT_EXPORT unregistered_type : public tdl_exception {
-  unregistered_type(std::wstring const &type) GOTT_LOCAL;
+  unregistered_type(nstring const &type) GOTT_LOCAL;
   ~unregistered_type() throw();
 };
 
 struct GOTT_EXPORT dont_accept : public tdl_exception {
-  dont_accept(std::wstring const &desc);
+  dont_accept(nstring const &desc);
   ~dont_accept() throw();
 };
 
@@ -67,7 +73,7 @@ struct GOTT_EXPORT dont_accept : public tdl_exception {
 namespace structure {
 
 struct GOTT_EXPORT failed_repatch : public tdl_exception {
-  failed_repatch(std::wstring const &desc);
+  failed_repatch(nstring const &desc);
   ~failed_repatch() throw();
 };
 

@@ -33,8 +33,8 @@ struct ignore_struct : tdl::structure::revocable_structure {
   void data(gott::xany::Xany const &) {}
   void begin() {}
   void end() {}
-  void add_tag(std::wstring const &) {}
-  void set_tags(std::list<std::wstring> const &) {}
+  void add_tag(gott::nstring const &) {}
+  void set_tags(std::list<gott::nstring> const &) {}
 
   pth point() { return pth(); }
   void revert(pth const &) {}

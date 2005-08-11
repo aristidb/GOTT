@@ -21,12 +21,10 @@
 #include "by_name.hpp"
 #include "../exceptions.hpp"
 #include <gott/util/nstring/nstring.hpp>
-#include <gott/util/nstring/stl.hpp>
 #include <gott/util/my_hash_map.hpp>
 #include HH_HASH_MAP
 #include <iostream>
 
-using std::wstring;
 namespace tdl = gott::tdl;
 namespace schema = tdl::schema;
 using schema::name_manager_t;
@@ -54,6 +52,6 @@ void name_manager_t::add(nstring const &name, unsigned id) {
 unsigned name_manager_t::get(nstring const &name) const {
   hashd::hash_map<nstring, unsigned>::const_iterator it = p->items.find(name);
   if (it == p->items.end())
-    throw unregistered_type(to_wstring(name, utf32));
+    throw unregistered_type(name);
   return it->second;
 }

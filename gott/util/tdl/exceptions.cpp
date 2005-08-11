@@ -19,25 +19,26 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "exceptions.hpp"
-#include <sstream>
-#include <gott/util/autoconv.hpp>
+#include <gott/util/range_algo.hpp>
+#include <gott/util/nstring/nstring.hpp>
 
 using gott::tdl::tdl_exception;
 
-tdl_exception::tdl_exception(std::wstring const &msg) : message_wide(msg) {
-  std::ostringstream ss;
-  ss << message_wide;
-  message_narrow = ss.str();
-}
+class tdl_exception::IMPL {
+public:
+  IMPL(nstring const &s) : msg(new char[s.size() + 1]) {
+    copy(s.raw().cast<char const *>(), msg);
+    msg[s.size()] = '\0';
+  }
+  ~IMPL() throw() { delete msg; }
+  char *msg;
+};
 
-tdl_exception::tdl_exception(std::string const &msg) : message_narrow(msg) {
-  std::wostringstream ss;
-  ss << message_narrow;
-  message_wide = ss.str();
-}
+tdl_exception::tdl_exception(nstring const &msg)
+: p(new IMPL(msg)) {}
 
 tdl_exception::~tdl_exception() throw() {}
 
 char const *tdl_exception::what() const throw() {
-  return message_narrow.c_str();
+  return p->msg;
 }

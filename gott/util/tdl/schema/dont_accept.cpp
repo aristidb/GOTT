@@ -19,10 +19,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "../exceptions.hpp"
+#include <gott/util/nstring/nstring.hpp>
 
 using gott::tdl::schema::dont_accept;
+using gott::nstring;
 
-dont_accept::dont_accept(std::wstring const &desc) 
-  : tdl_exception(L"Don't accept" + ((desc == L"" ? L"" : L": ") + desc)) {}
+static nstring pizza(nstring const &x) {
+  nstring const components[] = { "Don't accept", (x == "") ? "" : ": ", x };
+  return nstring(gott::range(components));
+}
+
+dont_accept::dont_accept(nstring const &desc) 
+  : tdl_exception(pizza(desc)) {}
 
 dont_accept::~dont_accept() throw() {}

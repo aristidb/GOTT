@@ -30,7 +30,6 @@ using gott::tdl::structure::writable_structure;
 using boost::bind;
 using boost::ref;
 using std::list;
-using std::wstring;
 
 node_inserter_t::node_inserter_t(Xany const &d, nd_list const &c, 
                                  tag_list const &t)
@@ -46,34 +45,36 @@ void node_inserter_t::write_to(writable_structure &o) const {
   o.end();
 }
 
-node_inserter_t cf::S(xany::Xany data, tag_list tags) {
+node_inserter_t cf::S(xany::Xany const &data, tag_list const &tags) {
   return node_inserter_t(data, nd_list(), tags);
 }
 
-node_inserter_t cf::S(xany::Xany data, wstring tag) {
+node_inserter_t cf::S(xany::Xany const &data, nstring const &tag) {
   return node_inserter_t(data, nd_list(), tag_list(1, tag));
 }
 
-node_inserter_t cf::M(nd_list children, tag_list tags) {
+node_inserter_t cf::M(nd_list const &children, tag_list const &tags) {
   return node_inserter_t(Xany(), children, tags);
 }
 
-node_inserter_t cf::M(nd_list children, wstring tag) {
+node_inserter_t cf::M(nd_list const &children, nstring const &tag) {
   return node_inserter_t(Xany(), children, tag_list(1, tag));
 }
 
-node_inserter_t cf::MD(xany::Xany data, nd_list children, tag_list tags) {
+node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children, 
+                       tag_list const &tags) {
   return node_inserter_t(data, children, tags);
 }
 
-node_inserter_t cf::MD(xany::Xany data, nd_list children, wstring tag) {
+node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children, 
+                       nstring const &tag) {
   return node_inserter_t(data, children, tag_list(1, tag));
 }
 
-node_inserter_t cf::C(node_inserter_t child, tag_list tags) {
+node_inserter_t cf::C(node_inserter_t const &child, tag_list const &tags) {
   return node_inserter_t(Xany(), nd_list(1, child), tags);
 }
 
-node_inserter_t cf::C(node_inserter_t child, wstring tag) {
+node_inserter_t cf::C(node_inserter_t const &child, nstring const &tag) {
   return node_inserter_t(Xany(), nd_list(1, child), tag_list(1, tag));
 }

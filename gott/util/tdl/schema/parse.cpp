@@ -30,9 +30,9 @@
 #include <sstream>
 #include <gott/util/nstring/stl.hpp>
 
-using std::wstring;
 using std::list;
 using boost::shared_ptr;
+using gott::nstring;
 namespace simple = gott::tdl::simple;
 namespace structure = gott::tdl::structure;
 
@@ -89,7 +89,7 @@ public:
   Stack parse;
   std::list<shared_ptr<rule> > shadow;
 
-  static std::wstring get_name(shared_ptr<rule> const &);
+  static nstring get_name(shared_ptr<rule> const &);
 };
 
 match::match(structure::revocable_structure &p) : pIMPL(new IMPL(p, *this)) {}
@@ -253,12 +253,12 @@ void match::IMPL::fail_rule() {
 }
 
 void match::IMPL::fail_all() {
-  std::list<wstring> names;
+  std::list<nstring> names;
   transform(range(shadow), simply(std::back_inserter(names)), get_name);
   throw mismatch(ln, names);
 }
 
-wstring match::IMPL::get_name(shared_ptr<rule> const &rp) {
+nstring match::IMPL::get_name(shared_ptr<rule> const &rp) {
   std::wostringstream out;
   out << rp->name();
   if (!rp->attributes().tags().empty()) {
@@ -266,5 +266,5 @@ wstring match::IMPL::get_name(shared_ptr<rule> const &rp) {
     print_separated(out, range(rp->attributes().tags()), L",");
     out << L')';
   }
-  return out.str();
+  return to_nstring(out.str());
 }

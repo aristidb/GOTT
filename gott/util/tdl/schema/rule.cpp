@@ -24,8 +24,7 @@
 #include "event.hpp"
 #include <gott/util/range_algo.hpp>
 #include <boost/bind.hpp>
-
-using std::wstring;
+#include <gott/util/nstring/stl.hpp>
 
 namespace schema = gott::tdl::schema;
 using schema::match;
@@ -52,9 +51,9 @@ public:
 
 private:
   void add_tags() {
-    void (writable_structure::*add)(wstring const &) =
-      &writable_structure::add_tag;
-    for_each(range(attrib.tags()), bind(add, &cont->direct_structure(), _1));
+    for (std::list<std::wstring>::const_iterator it = attrib.tags().begin();
+         it != attrib.tags().end(); ++it)
+      cont->direct_structure().add_tag(to_nstring(*it));
   }
 
   void start_structure() {

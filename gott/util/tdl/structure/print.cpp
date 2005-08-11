@@ -22,6 +22,7 @@
 #include <ostream>
 #include <list>
 #include <sstream>
+#include <gott/util/nstring/nstring.hpp>
 #include <gott/util/autoconv.hpp>
 
 using std::wostream;
@@ -68,7 +69,7 @@ void direct_print::data(Xany const &x) {
   p->line_ended = false;
 }
 
-void direct_print::add_tag(wstring const &s) {
+void direct_print::add_tag(nstring const &s) {
   if (p->tag_printed)
     p->out << L", ";
   else
@@ -77,8 +78,8 @@ void direct_print::add_tag(wstring const &s) {
   p->tag_printed = true;
 }
 
-void direct_print::set_tags(list<wstring> const &l) {
-  for (list<wstring>::const_iterator it = l.begin(); it != l.end(); ++it)
+void direct_print::set_tags(list<nstring> const &l) {
+  for (list<nstring>::const_iterator it = l.begin(); it != l.end(); ++it)
     add_tag(*it);
 }
 

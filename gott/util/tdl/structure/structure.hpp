@@ -24,9 +24,10 @@
 #include <gott/util/visibility.hpp>
 #include <gott/util/xany/xany.hpp>
 #include <list>
-#include <string>
 
 namespace gott {
+class nstring;
+
 namespace tdl {
 namespace structure {
 
@@ -57,13 +58,13 @@ public:
    * Add a tag to the node.
    * \param t The tag to add.
    */
-  virtual void add_tag(std::wstring const &t) = 0;
+  virtual void add_tag(nstring const &t) = 0;
 
   /**
    * Set a node's tags. Must not be called after add_tag.
    * \param t All the tags to add.
    */
-  virtual void set_tags(std::list<std::wstring> const &t) = 0;
+  virtual void set_tags(std::list<nstring> const &t) = 0;
 
   GOTT_EXPORT virtual ~writable_structure() = 0;
 };

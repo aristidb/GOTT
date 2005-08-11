@@ -22,14 +22,16 @@
 #include "stream_position.hpp"
 #include <gott/util/range.hpp>
 #include <gott/util/autoconv.hpp>
+#include <gott/util/nstring/stl.hpp>
 #include <sstream>
 
 namespace schema = gott::tdl::schema;
 using schema::mismatch;
 using gott::range;
+using gott::nstring;
 
-static std::wstring build_string(schema::detail::stream_position const &p,
-                                 std::list<std::wstring> const &t) {
+static nstring build_string(schema::detail::stream_position const &p,
+                            std::list<nstring> const &t) {
   std::wostringstream o;
   o << p.line << L':' << p.pos+1 << L" : mismatch in ";
   print_separated(o, range(t), L">");
@@ -38,11 +40,11 @@ static std::wstring build_string(schema::detail::stream_position const &p,
   else
     o << L" at token ";
   o << p.tok;
-  return o.str();
+  return gott::to_nstring(o.str());
 }
 
 mismatch::mismatch(detail::stream_position const &p, 
-                   std::list<std::wstring> const &t)
+                   std::list<nstring> const &t)
 : tdl_exception(build_string(p, t)) {}
 
 mismatch::~mismatch() throw() {}

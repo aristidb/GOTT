@@ -47,8 +47,8 @@ public:
   void begin();
   void end();
   void data(xany::Xany const &x);
-  void add_tag(std::wstring const &t);
-  void set_tags(std::list<std::wstring> const &t);
+  void add_tag(nstring const &t);
+  void set_tags(std::list<nstring> const &t);
 };
 
 class GOTT_EXPORT repatch_nothing : public repatcher {

@@ -1,12 +1,12 @@
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
 cflags = Split(ARGUMENTS.get('cflags', '-Wall -Wextra -Werror -Winvalid-pch'))
-release = int(ARGUMENTS.get('release', 1))
+release = int(ARGUMENTS.get('release', 0))
 if release:
 	debug = 0
 	opt = ['-O3']
 else:
 	debug = 1
-	opt = ['-O1']
+	opt = ['-O0']
 debug = int(ARGUMENTS.get('debug', debug))
 opt = ARGUMENTS.get('opt', opt)
 cflags += [opt]

@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_STRUCTURE_TREE_HPP
 #define GOTT_UTIL_TDL_STRUCTURE_TREE_HPP
 
-#include <gott/util/tdl/structure/structure.hpp>
+#include "structure.hpp"
 #include <boost/intrusive_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -61,7 +61,7 @@ public: // Iterators
      * Gets children by tag.
      * \param tag The tag to search for.
      */
-    GOTT_EXPORT tagged_iterator with_tag(std::wstring const &tag) const;
+    GOTT_EXPORT tagged_iterator with_tag(nstring const &tag) const;
     
     /**
      * Gets the first child.
@@ -87,7 +87,7 @@ public: // Iterators
     /**
      * Gets all tags.
      */
-    GOTT_EXPORT std::list<std::wstring> const &get_tags() const;
+    GOTT_EXPORT std::list<nstring> const &get_tags() const;
 
     /**
      * Checks whether the iterator is valid.
@@ -152,8 +152,8 @@ public: // Iterators
 
 private: // Inherited interface
   // Don't call these directly (exported symbols for no use is nothing I like)
-  void add_tag(std::wstring const &);
-  void set_tags(std::list<std::wstring> const &);
+  void add_tag(nstring const &);
+  void set_tags(std::list<nstring> const &);
   void data(xany::Xany const &);
   void begin();
   void end();

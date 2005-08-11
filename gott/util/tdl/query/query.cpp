@@ -20,9 +20,9 @@
 
 #include "query.hpp"
 
-using std::wstring;
 using std::size_t;
 using gott::tdl::query::selection;
+using gott::nstring;
 
 template<class I>
 void selection<I>::add(I const &x) {
@@ -47,7 +47,7 @@ void selection<I>::add_wrange(I const &x, size_t a, size_t b) {
 }
 
 template<class I>
-void selection<I>::add_wtag(I const &x, wstring const &s) {
+void selection<I>::add_wtag(I const &x, nstring const &s) {
   for (typename I::tagged i = x.with_tag(s); i; ++i)
     impl.push_back(i.get());
 }
@@ -83,7 +83,7 @@ selection<I> selection<I>::find_all() const {
 }
 
 template<class I>
-selection<I> selection<I>::find_tag(wstring const &s) const {
+selection<I> selection<I>::find_tag(nstring const &s) const {
   selection tmp;
   for (const_iterator it = impl.begin(); it != impl.end(); ++it)
     tmp.add_wtag(*it, s);

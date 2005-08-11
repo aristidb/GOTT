@@ -135,6 +135,10 @@ public:
   utf8_t const *begin_raw() const;
 
   utf8_t const *end_raw() const;
+
+  range_t<utf8_t const *> raw() const {
+    return range(begin_raw(), end_raw());
+  }
  
   /**
    * Get an iterator pointing at the first character.
