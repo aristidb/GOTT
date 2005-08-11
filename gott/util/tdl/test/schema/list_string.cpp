@@ -26,10 +26,7 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
-using std::wstring;
-using stru::cf::S;
-using stru::cf::C;
-using stru::cf::M;
+using namespace stru::cf;
 using schema::slotcfg;
 
 typedef schema::rule_attr RA;
@@ -39,7 +36,7 @@ struct schema_list_string : tut::schema_basic {
   schema_list_string() {
     context.begin(L"document");
       context.begin(L"list");
-        context.begin(L"node", RA(wstring(L"el")), slotcfg(slotcfg::list));
+        context.begin(L"node", RA(L"el"), slotcfg(slotcfg::list));
         context.end();
       context.end();
     context.end();
@@ -60,9 +57,9 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z");
-  stru::cf::nd_list c;
+  nd_list c;
   for (wchar_t ch = 'a'; ch <= 'z'; ++ch)
-    c.push_back(S(Xany(wstring(1,ch)), L"el"));
+    c.push_back(S(Xany(std::wstring(1,ch)), "el"));
   C(M(c)).write_to(xp);
   ensure_equals("alphabet", tree, xp);
 }

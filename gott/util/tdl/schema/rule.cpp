@@ -51,9 +51,9 @@ public:
 
 private:
   void add_tags() {
-    for (std::list<std::wstring>::const_iterator it = attrib.tags().begin();
+    for (std::list<nstring>::const_iterator it = attrib.tags().begin();
          it != attrib.tags().end(); ++it)
-      cont->direct_structure().add_tag(to_nstring(*it));
+      cont->direct_structure().add_tag(*it);
   }
 
   void start_structure() {

@@ -37,11 +37,11 @@ typedef schema::rule_attr RA;
 namespace {
 struct schema_follow_then_list : tut::schema_basic {
   schema_follow_then_list() {
-    context.begin(L"document", RA(wstring(L"doc")));
-      context.begin(L"follow", RA(wstring(L"foll")));
-        context.begin(L"node", RA(wstring(L"s")));
+    context.begin("document", RA("doc"));
+      context.begin("follow", RA("foll"));
+        context.begin("node", RA("s"));
         context.end();
-        context.begin(L"node", RA(L"i", true, new stru::repatch_integer()), 
+        context.begin("node", RA("i", true, new stru::repatch_integer()), 
                       slotcfg(slotcfg::list));
         context.end();
       context.end();

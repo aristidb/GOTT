@@ -37,12 +37,12 @@ namespace {
 struct schema_list_int_then_string : tut::schema_basic {
   schema_list_int_then_string() {
     context.begin(L"document");
-      context.begin(L"ordered", RA(wstring(L"ord")));
-        context.begin(L"list", RA(wstring(L"list")));
+      context.begin(L"ordered", RA(L"ord"));
+        context.begin(L"list", RA(L"list"));
           context.begin(L"node", RA(L"int", true, new stru::repatch_integer()));
           context.end();
         context.end();
-        context.begin(L"node", RA(wstring(L"string")));
+        context.begin(L"node", RA(L"string"));
         context.end();
       context.end();
     context.end();

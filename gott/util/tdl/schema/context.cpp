@@ -130,7 +130,7 @@ void context::IMPL::add_enc_slotted(rule_factory const *f, slotcfg const &c,
     return org.back()->add(*f);
 
   static unsigned const list_id = name_manager().get("list");
-  begin(list_id, rule_attr(false), e);
+  begin(list_id, rule_attr(rule_attr::simple, false), e);
     add_child(f, c);
   end();
 }

@@ -1,21 +1,21 @@
 // Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
-// Content: TDL Testing
+// Content: TD Testing
 // Authors: Aristid Breitkreuz
 //
 // This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// modify it under the terms of the GNU esser General Public
+// icense as published by the Free Software Foundation; either
+// version 2.1 of the icense, or (at your option) any later version.
 //
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// MERCHANTABIITY or FITNESS FOR A PARTICUAR PURPOSE.  See the GNU
+// esser General Public icense for more details.
 //
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
+// You should have received a copy of the GNU esser General Public
+// icense along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
@@ -36,8 +36,8 @@ using schema::rule_attr;
 
 using schema::match_named;
 
-rule_attr ra(wchar_t const *t) { 
-  return rule_attr(wstring(t)); 
+rule_attr ra(char const *t) { 
+  return rule_attr(t); 
 }
 
 namespace {
@@ -47,8 +47,8 @@ struct Schema : tut::schema_basic {
   Schema() {
     schema::context_template document, type;
 
-    document.begin(L"document");
-      document.begin(L"ordered", ra(L"tdl-schema"));
+    document.begin("document");
+      document.begin("ordered", ra("tdl-schema"));
         module_id(document);
       
         type_declarations(document);
@@ -63,12 +63,12 @@ struct Schema : tut::schema_basic {
   }
 
   void module_id(schema::context_template &document) {
-    document.begin(L"named", match_named::attributes(L"module"));
-      document.begin(L"follow", rule_attr(false));
-        document.begin(L"node", ra(L"module-id"));
+    document.begin("named", match_named::attributes("module"));
+      document.begin("follow", rule_attr(rule_attr::simple, false));
+        document.begin("node", ra("module-id"));
         document.end();
 
-        document.begin(L"node", ra(L"version-spec"), 
+        document.begin("node", ra("version-spec"), 
                        slotcfg(slotcfg::range, 1, 2));
         document.end();
       document.end();
@@ -76,20 +76,20 @@ struct Schema : tut::schema_basic {
   }
 
   void type_declarations(schema::context_template &document) {
-    document.begin(L"list", ra(L"type-declarations"));
-      document.begin(L"ordered", ra(L"type-declaration"));
-        document.begin(L"node", rule_attr(L"export", true,
-             new stru::repatch_enumeration(std::vector<nstring>(1, L"export"))),
+    document.begin("list", ra("type-declarations"));
+      document.begin("ordered", ra("type-declaration"));
+        document.begin("node", rule_attr("export", true,
+             new stru::repatch_enumeration(std::vector<nstring>(1, "export"))),
              slotcfg(slotcfg::optional));
         document.end();
 
-        document.begin(L"named", match_named::attributes(L"type", false));
-          document.begin(L"ordered", rule_attr(false));
-            document.begin(L"follow", rule_attr(L"T1", false, 0));
-              document.begin(L"node", ra(L"name"));
+        document.begin("named", match_named::attributes("type", false));
+          document.begin("ordered", rule_attr(rule_attr::simple, false));
+            document.begin("follow", rule_attr("T1", false, 0));
+              document.begin("node", ra("name"));
               document.end();
 
-              document.begin(L"node", ra(L"parameter"), 
+              document.begin("node", ra("parameter"), 
                              slotcfg(slotcfg::list));
               document.end();
             document.end();
@@ -102,25 +102,25 @@ struct Schema : tut::schema_basic {
   }
 
   void qualified(schema::context_template &document) {
-     document.begin(L"follow", ra(L"qualified-type-definition"));
+     document.begin("follow", ra("qualified-type-definition"));
        {
          std::vector<nstring> choice(2);
-         choice[0] = L"enclosed"; choice[1] = L"flat";
-         document.begin(L"node", rule_attr(L"coat", true,
+         choice[0] = "enclosed"; choice[1] = "flat";
+         document.begin("node", rule_attr("coat", true,
                                         new stru::repatch_enumeration(choice)));
          document.end();
        }
 
-       document.begin(L"follow", 
-                      rule_attr(false));
-         document.begin(L"named", 
-                        match_named::attributes(L":", false),
+       document.begin("follow", 
+                      rule_attr(rule_attr::simple, false));
+         document.begin("named", 
+                        match_named::attributes(":", false),
                         slotcfg(slotcfg::optional));
-           document.begin(L"node", ra(L"tag")); 
+           document.begin("node", ra("tag")); 
            document.end();
          document.end();
 
-         document.begin(L"follow", ra(L"type-definition"));
+         document.begin("follow", ra("type-definition"));
            slot(document);
            normal_type(document);
          document.end();
@@ -129,26 +129,26 @@ struct Schema : tut::schema_basic {
   }
 
   void normal_type(schema::context_template &document) {
-    document.begin(L"follow", ra(L"normal-type"));
-      document.begin(L"node", ra(L"type"));
+    document.begin("follow", ra("normal-type"));
+      document.begin("node", ra("type"));
       document.end();
 
-      document.begin(L"any", ra(L"parameters"), slotcfg(slotcfg::list));
+      document.begin("any", ra("parameters"), slotcfg(slotcfg::list));
         document.param(0);
-        //document.begin(L"node");
+        //document.begin("node");
         //document.end();
       document.end();
     document.end();
   }
 
   void slot(schema::context_template &document) {
-    document.begin(L"any", ra(L"slot-specification"),
+    document.begin("any", ra("slot-specification"),
                    slotcfg(slotcfg::optional));
       {
         std::vector<nstring> single(4);
-        single[0] = L"one";  single[1] = L"optional";
-        single[2] = L"list"; single[3] = L"some";
-        document.begin(L"node", rule_attr(L"slot", true, 
+        single[0] = "one";  single[1] = "optional";
+        single[2] = "list"; single[3] = "some";
+        document.begin("node", rule_attr("slot", true, 
                                         new stru::repatch_enumeration(single)));
         document.end();
       }

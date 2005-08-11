@@ -42,7 +42,7 @@ struct schema_unordered_foo_integer_string : tut::schema_basic {
         context.begin(L"node", RA(L"foo", true, 
                new stru::repatch_enumeration(std::vector<nstring>(1, L"foo"))));
         context.end();
-        context.begin(L"node", RA(true, new stru::repatch_integer()));
+        context.begin(L"node", RA(RA::simple,true,new stru::repatch_integer()));
         context.end();
         context.begin(L"node");
         context.end();

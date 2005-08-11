@@ -35,8 +35,8 @@ typedef stru::repatch_integer I;
 namespace {
 struct schema_follow_integer_integer : tut::schema_basic {
   schema_follow_integer_integer() {
-    context.begin(L"document", RA(wstring(L"doc")));
-      context.begin(L"follow", RA(wstring(L"foll")));
+    context.begin(L"document", RA(L"doc"));
+      context.begin(L"follow", RA(L"foll"));
         context.begin(L"node", RA(L"int1", true, new I()));
         context.end();
         context.begin(L"node", RA(L"int2", true, new I()));

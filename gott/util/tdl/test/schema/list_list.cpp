@@ -27,7 +27,6 @@ namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 namespace schema = gott::tdl::schema;
 using gott::xany::Xany;
-using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
 
@@ -36,14 +35,14 @@ struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() {
     context.begin(L"document");
       context.begin(L"ordered");
-        context.begin(L"list", rule_attr(wstring(L"s")));
-          context.begin(L"list", rule_attr(wstring(L"t")));
+        context.begin(L"list", rule_attr(L"s"));
+          context.begin(L"list", rule_attr(L"t"));
             context.begin(L"node", 
                     rule_attr(L"ii", true, new stru::repatch_integer()));
             ;context.end();
           ;context.end();
         ;context.end();
-        context.begin(L"node", rule_attr(wstring(L"xx")));
+        context.begin(L"node", rule_attr("xx"));
       ;context.end();
     ;context.end();
   }

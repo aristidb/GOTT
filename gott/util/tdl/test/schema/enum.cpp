@@ -37,7 +37,7 @@ struct schema_enumeration : tut::schema_basic {
     context.begin(L"document");
       vector<gott::nstring> v(3);
       v[0] = L"first"; v[1] = L"second"; v[2] = L"third";
-      context.begin(L"node", rule_attr(std::list<std::wstring>(), true, Xany(),
+      context.begin(L"node", rule_attr(std::list<gott::nstring>(), true, Xany(),
                                        new repatch_enumeration(v)));
       context.end();
     context.end();

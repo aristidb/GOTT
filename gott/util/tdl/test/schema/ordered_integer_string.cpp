@@ -38,7 +38,7 @@ struct schema_ordered_integer_string : tut::schema_basic {
     context.begin(L"document");
       context.begin(L"ordered");
         context.begin(L"node", 
-             schema::rule_attr(true, new stru::repatch_integer()));
+             RA(RA::simple, true, new stru::repatch_integer()));
         context.end();
         context.begin(L"node");
         context.end();

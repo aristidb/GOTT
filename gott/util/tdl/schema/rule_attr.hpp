@@ -24,6 +24,7 @@
 #include "rule.hpp"
 #include "../structure/repatch.hpp"
 #include <boost/shared_ptr.hpp>
+#include <gott/util/nstring/nstring.hpp>
 
 namespace gott {
 namespace tdl {
@@ -35,26 +36,28 @@ namespace schema {
 // Defines the user-supplyable rule_attr for a rule
 class rule_attr {
 public:
-  explicit rule_attr(bool cc = true, structure::repatcher const *rr = 0) 
+  enum simple_tag { simple };
+  explicit rule_attr(simple_tag = simple, bool cc = true, 
+      structure::repatcher const *rr = 0) 
   : c(cc), r(rr) {}
 
-  explicit rule_attr(std::list<std::wstring> const &l, bool cc = true, 
+  explicit rule_attr(std::list<nstring> const &l, bool cc = true, 
       structure::repatcher const *rr = 0)
   : c(cc), t(l), r(rr) {}
 
-  explicit rule_attr(std::wstring const &s, bool cc = true, 
+  explicit rule_attr(nstring const &s, bool cc = true, 
       structure::repatcher const *rr = 0)
   : c(cc), t(1, s), r(rr) {}
 
-  explicit rule_attr(std::list<std::wstring> const &l, bool cc, 
+  explicit rule_attr(std::list<nstring> const &l, bool cc, 
                      xany::Xany const &x, structure::repatcher const *rr = 0)
   : c(cc), t(l), u(x), r(rr) {}
 
   bool coat() const { return c; }
   void set_coat(bool x) { c = x; }
 
-  std::list<std::wstring> const &tags() const { return t; }
-  void add_tag(std::wstring const &x) { t.push_back(x); }
+  std::list<nstring> const &tags() const { return t; }
+  void add_tag(nstring const &x) { t.push_back(x); }
 
   xany::Xany const &user() const { return u; }
 
@@ -62,7 +65,7 @@ public:
 
 private:
   bool c;
-  std::list<std::wstring> t;
+  std::list<nstring> t;
   xany::Xany u;
   boost::shared_ptr<structure::repatcher const> r;
 };

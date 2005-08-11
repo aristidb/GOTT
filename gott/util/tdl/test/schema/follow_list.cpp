@@ -42,7 +42,7 @@ struct schema_follow_list : tut::schema_basic {
         context.begin(L"node", RA(L"i", true, new stru::repatch_integer()), 
                       slotcfg(slotcfg::list));
         context.end();
-        context.begin(L"node", RA(wstring(L"s")));
+        context.begin(L"node", RA(L"s"));
         context.end();
       context.end();
     context.end();

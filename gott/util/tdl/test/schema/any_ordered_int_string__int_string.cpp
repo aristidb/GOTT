@@ -26,7 +26,6 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
-using std::wstring;
 using stru::cf::S;
 using stru::cf::C;
 
@@ -40,12 +39,12 @@ struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {
         context.begin(L"ordered");
           context.begin(L"node", RA(L"int", true, new stru::repatch_integer()));
           context.end();
-          context.begin(L"node", RA(wstring(L"string")));
+          context.begin(L"node", RA(L"string"));
           context.end();
         context.end();
         context.begin(L"node", RA(L"int2", true, new stru::repatch_integer()));
         context.end();
-        context.begin(L"node", RA(wstring(L"string2")));
+        context.begin(L"node", RA(L"string2"));
         context.end();
       context.end();
     context.end();

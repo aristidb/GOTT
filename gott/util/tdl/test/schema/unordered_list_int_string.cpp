@@ -38,7 +38,7 @@ struct schema_unordered_list_integer_string : tut::schema_basic {
   schema_unordered_list_integer_string() {
     context.begin(L"document");
       context.begin(L"unordered");
-        context.begin(L"node", RA(true, new stru::repatch_integer()), 
+        context.begin(L"node", RA(RA::simple,true,new stru::repatch_integer()),
                       schema::slotcfg(schema::slotcfg::list));
         context.end();
         context.begin(L"node");

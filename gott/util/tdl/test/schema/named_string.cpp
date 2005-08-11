@@ -35,9 +35,9 @@ typedef schema::rule_attr RA;
 namespace {
 struct schema_named_string : tut::schema_basic {
   schema_named_string() {
-    context.begin(L"document", RA(wstring(L"doc")));
+    context.begin(L"document", RA(L"doc"));
       context.begin(L"named", schema::match_named::attributes(L"ND"));
-        context.begin(L"node", RA(wstring(L"S")));
+        context.begin(L"node", RA(L"S"));
         context.end();
       context.end();
     context.end();

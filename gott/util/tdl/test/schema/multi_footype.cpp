@@ -42,7 +42,7 @@ struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() {
     schema::context_template document, footype, multi;
 
-    document.begin(L"document", RA(wstring(L"--doc--")));
+    document.begin(L"document", RA(L"--doc--"));
       document.param(0);
     document.end();
 
@@ -50,9 +50,9 @@ struct schema_multi_footype : tut::schema_basic {
       footype.param(1);
     footype.end();
 
-    multi.begin(L"unordered", RA(wstring(L"--unordered--")));
+    multi.begin(L"unordered", RA(L"--unordered--"));
       multi.begin(L"named", schema::match_named::attributes(L"plugin"));
-        multi.begin(L"node", RA(wstring(L"plugin-data")), 
+        multi.begin(L"node", RA(L"plugin-data"), 
                     slotcfg(slotcfg::list));
         multi.end();
       multi.end();
