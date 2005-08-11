@@ -102,5 +102,5 @@ int main(int argc, const char *argv[])
 }
 
 #ifndef NO_CONT_CPP_INCLUDE
-#include <src/cont.cpp>
+#include <src/Cont.cpp>
 #endif
