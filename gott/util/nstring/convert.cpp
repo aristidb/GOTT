@@ -171,6 +171,12 @@ gott::to_utf8_alloc(range_t<char const *> const &in, encoding enc) {
 
 gott::range_t<char *>
 gott::to_enc_alloc(range_t<utf8_t const *> const &in_, encoding enc) {
+  if (enc == utf8) {
+    utf8_t *result = new utf8_t[in_.size()];
+    copy(in_, result);
+    return range(result, in_.size()).cast<char *>();
+  }
+
   range_t<utf8_iterator> in = in_.cast<utf8_iterator>();
 
   std::size_t len = 0;

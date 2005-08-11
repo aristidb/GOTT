@@ -136,6 +136,7 @@ public:
 
   utf8_t const *end_raw() const;
 
+  GOTT_LOCAL
   range_t<utf8_t const *> raw() const {
     return range(begin_raw(), end_raw());
   }
