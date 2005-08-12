@@ -24,6 +24,7 @@
 #include "structure.hpp"
 #include <boost/intrusive_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <list>
 
 namespace gott {
 namespace tdl {

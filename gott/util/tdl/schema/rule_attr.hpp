@@ -25,6 +25,7 @@
 #include "../structure/repatch.hpp"
 #include <boost/shared_ptr.hpp>
 #include <gott/util/nstring/nstring.hpp>
+#include <list>
 
 namespace gott {
 namespace tdl {

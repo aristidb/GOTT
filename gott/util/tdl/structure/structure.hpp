@@ -23,7 +23,6 @@
 
 #include <gott/util/visibility.hpp>
 #include <gott/util/xany/xany.hpp>
-#include <list>
 
 namespace gott {
 class nstring;
@@ -111,7 +110,8 @@ public:
  * \param stream The stream to read from.
  * \param structure The structure to fill.
  */
-GOTT_EXPORT void direct_struc(std::wistream &stream, writable_structure &structure);
+GOTT_EXPORT 
+void direct_struc(std::wistream &stream, writable_structure &structure);
 
 }}}
 

@@ -20,7 +20,6 @@
 
 #include "print.hpp"
 #include <ostream>
-#include <list>
 #include <sstream>
 #include <gott/util/nstring/nstring.hpp>
 #include <gott/util/autoconv.hpp>
@@ -76,11 +75,6 @@ void direct_print::add_tag(nstring const &s) {
     p->out << L" : ";
   p->out << s;
   p->tag_printed = true;
-}
-
-void direct_print::set_tags(list<nstring> const &l) {
-  for (list<nstring>::const_iterator it = l.begin(); it != l.end(); ++it)
-    add_tag(*it);
 }
 
 std::wostream &gott::tdl::structure::operator<<(std::wostream &o, 

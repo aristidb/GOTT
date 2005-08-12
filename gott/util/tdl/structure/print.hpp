@@ -47,7 +47,6 @@ private:
   void end();
   void data(xany::Xany const &);
   void add_tag(nstring const &);
-  void set_tags(std::list<nstring> const &);
 
   class IMPL;
   boost::scoped_ptr<IMPL> p;
