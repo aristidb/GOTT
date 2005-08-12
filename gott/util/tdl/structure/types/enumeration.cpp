@@ -28,7 +28,7 @@ namespace structure = gott::tdl::structure;
 using structure::repatch_enumeration;
 using structure::writable_structure;
 
-repatch_enumeration::repatch_enumeration(std::vector<nstring> const &x) 
+repatch_enumeration::repatch_enumeration(Vector<nstring> pick_ &x) 
 : alternatives(x) {}
 
 repatch_enumeration::~repatch_enumeration() {}
@@ -39,15 +39,15 @@ const wchar_t failure_message[] =
 writable_structure *
 repatch_enumeration::deferred_write(writable_structure &s) const {
   struct context : simple_repatcher_context {
-    std::vector<nstring> const &alternatives;
+    Vector<nstring> const &alternatives;
 
-    context(writable_structure &s, std::vector<nstring> const &a) 
+    context(writable_structure &s, Vector<nstring> const &a) 
     : simple_repatcher_context(s), alternatives(a) {}
 
     void data(xany::Xany const &x) {
       if (x.compatible<std::wstring>()) {
         nstring input = xany::Xany_cast<nstring>(x);
-        std::vector<nstring>::const_iterator it;
+        Vector<nstring>::const_iterator it;
         if ((it = find(range(alternatives), input)) == alternatives.end())
           throw failed_repatch(failure_message);
         target.data(xany::Xany(long(it - alternatives.begin())));

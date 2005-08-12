@@ -54,7 +54,8 @@ struct recursive : tut::schema_basic {
       type.end();
     type.end();
 
-    std::vector<schema::context*> cc(1, &rec);
+    Vector<schema::context*> cc;
+    cc.Add(&rec);
     type.instantiate(cc, rec);
     document.instantiate(cc, context);
   }

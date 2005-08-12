@@ -41,14 +41,14 @@ public:
     >
     factory;
 
-  match_follow_ordered(std::vector<element> const &, rule_attr const &, 
+  match_follow_ordered(Vector<element> const &, rule_attr const &, 
                        match &);
   ~match_follow_ordered();
 
-  static bool accept_empty(std::vector<element> const &);
+  static bool accept_empty(Vector<element> const &);
   
 private:
-  struct active_element {
+  struct active_element : Moveable<active_element> {
     rule_factory const *generator;
     slotcfg slot;
     bool rest_accept_empty;
@@ -60,7 +60,7 @@ private:
   void init_rest_accept_empty();
   bool search_insertible() const;
 
-  typedef std::vector<active_element> container;
+  typedef Vector<active_element> container;
   container children;
   mutable container::iterator pos;
   int opened;

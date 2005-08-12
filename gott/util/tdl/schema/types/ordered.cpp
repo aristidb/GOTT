@@ -20,14 +20,14 @@
 
 #include "ordered.hpp"
 
-using std::vector;
+
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
 using schema::rule;
 using schema::match_ordered;
 
-match_ordered::match_ordered(vector<rule_factory const *> const &r, 
+match_ordered::match_ordered(Vector<rule_factory const *> const &r, 
                              rule_attr const &a, match &m)
 : happy_once(a, m), subrules(r), pos(subrules.begin()) {
   if (pos != subrules.end())
@@ -46,9 +46,9 @@ bool match_ordered::play(ev::child_succeed const &) {
   return true;
 }
 
-bool match_ordered::accept_empty(vector<rule_factory const *> const &children) {
+bool match_ordered::accept_empty(Vector<rule_factory const *> const &children) {
   bool accept = true;
-  for (vector<rule_factory const *>::const_iterator it = children.begin(); 
+  for (Vector<rule_factory const *>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
     accept &= (*it)->accept_empty();
   return accept;

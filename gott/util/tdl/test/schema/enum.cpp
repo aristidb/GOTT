@@ -25,7 +25,7 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
-using std::vector;
+
 using stru::cf::S;
 using stru::cf::C;
 using schema::rule_attr;
@@ -34,11 +34,11 @@ using stru::repatch_enumeration;
 namespace {
 struct schema_enumeration : tut::schema_basic {
   schema_enumeration() {
-    context.begin(L"document");
-      vector<gott::nstring> v(3);
-      v[0] = L"first"; v[1] = L"second"; v[2] = L"third";
-      context.begin(L"node", rule_attr(std::list<gott::nstring>(), true, Xany(),
-                                       new repatch_enumeration(v)));
+    context.begin("document");
+      Vector<gott::nstring> v;
+      v.Add("first"); v.Add("second"); v.Add("third");
+      context.begin("node", rule_attr(Vector<gott::nstring>(), true, Xany(),
+                                      new repatch_enumeration(v)));
       context.end();
     context.end();
   }

@@ -31,7 +31,7 @@ using gott::range;
 using gott::nstring;
 
 static nstring build_string(schema::detail::stream_position const &p,
-                            std::list<nstring> const &t) {
+                            Vector<nstring> const &t) {
   std::wostringstream o;
   o << p.line << L':' << p.pos+1 << L" : mismatch in ";
   print_separated(o, range(t), L">");
@@ -44,7 +44,7 @@ static nstring build_string(schema::detail::stream_position const &p,
 }
 
 mismatch::mismatch(detail::stream_position const &p, 
-                   std::list<nstring> const &t)
+                   Vector<nstring> const &t)
 : tdl_exception(build_string(p, t)) {}
 
 mismatch::~mismatch() throw() {}

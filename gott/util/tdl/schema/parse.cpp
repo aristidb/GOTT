@@ -75,9 +75,11 @@ public:
   match &ref;
   detail::stream_position ln;
 
-  struct entry {
+  struct entry : Moveable<entry> {
     shared_ptr<rule> the_rule;
     shared_ptr<writable_structure> structure;
+
+    entry() {}
 
     entry(shared_ptr<rule> const &r, shared_ptr<writable_structure> s = 0)
       : the_rule(r), structure(s) {}
@@ -85,12 +87,14 @@ public:
     operator shared_ptr<rule>() { return the_rule; }
   };
 
-  typedef list<entry> Stack;
+  typedef Vector<entry> Stack;
   Stack parse;
-  std::list<shared_ptr<rule> > shadow;
+  Vector<shared_ptr<rule> > shadow;
 
   static nstring get_name(shared_ptr<rule> const &);
 };
+
+NTL_MOVEABLE(shared_ptr<gott::tdl::schema::rule>);
 
 match::match(structure::revocable_structure &p) : pIMPL(new IMPL(p, *this)) {}
 
@@ -154,7 +158,7 @@ match::IMPL::IMPL(structure::revocable_structure &p, match &r)
   : base_struc(p), pos(base_struc), ref(r) {}
 
 shared_ptr<writable_structure> const&match::IMPL::direct_structure_non_base() {
-  if (parse.empty()) {
+  if (parse.IsEmpty()) {
     static shared_ptr<writable_structure> nothing;
     return nothing;
   }
@@ -163,11 +167,11 @@ shared_ptr<writable_structure> const&match::IMPL::direct_structure_non_base() {
 
 void match::IMPL::add(rule_factory const &f) {
   shared_ptr<writable_structure> struc = direct_structure_non_base();
-  Stack::iterator it = --parse.end();
+  entry &e = parse.Add();
   shared_ptr<rule> x(f.get(ref));
+  e = entry(x, struc);
   if (structure::repatcher const *r = x->attributes().repatcher())
     struc.reset(r->deferred_write(struc ? *struc : base_struc));
-  parse.insert(++it, entry(x, struc));
 }
 
 template<class T>
@@ -193,9 +197,9 @@ void match::IMPL::replay_buffer() {
 
 template<bool tok>
 void match::IMPL::handle_event(ev::event const &e) {
-  if (parse.empty()) 
+  if (parse.IsEmpty()) 
     fail_all();
-  while (!parse.empty()) 
+  while (!parse.IsEmpty()) 
     if (handle_rule<tok>(e)) 
       break;
 }
@@ -239,29 +243,30 @@ void match::IMPL::succeed_rule() {
   parse.back().the_rule->finish();
   parse.pop_back();
 
-  if (!parse.empty())
+  if (!parse.IsEmpty())
     handle_event<false>(ev::child_succeed());
 }
 
 void match::IMPL::fail_rule() {
   parse.pop_back();
 
-  if (!parse.empty())
+  if (!parse.IsEmpty())
     handle_event<false>(ev::child_fail());
   else
     fail_all();
 }
 
 void match::IMPL::fail_all() {
-  std::list<nstring> names;
-  transform(range(shadow), simply(std::back_inserter(names)), get_name);
+  Vector<nstring> names;
+  names.AddN(shadow.GetCount());
+  transform(range(shadow), range(names), get_name);
   throw mismatch(ln, names);
 }
 
 nstring match::IMPL::get_name(shared_ptr<rule> const &rp) {
   std::wostringstream out;
   out << rp->name();
-  if (!rp->attributes().tags().empty()) {
+  if (rp->attributes().tags().GetCount() > 0) {
     out << L'(';
     print_separated(out, range(rp->attributes().tags()), L",");
     out << L')';

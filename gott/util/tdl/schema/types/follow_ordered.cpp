@@ -20,17 +20,19 @@
 
 #include "follow_ordered.hpp"
 
-using std::vector;
+
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
 using schema::rule;
 using schema::match_follow_ordered;
 
-match_follow_ordered::match_follow_ordered(std::vector<element> const &c, 
+match_follow_ordered::match_follow_ordered(Vector<element> const &c, 
     rule_attr const &a, match &m)
-: rule(a, m), children(c.begin(), c.end()), pos(children.begin()), 
-    opened(0), saw_up(false), last(m.pos().current()) {
+: rule(a, m), opened(0), saw_up(false), last(m.pos().current()) {
+  for (Vector<element>::const_iterator it = c.begin(); it != c.end(); ++it)
+    children.Add(*it);
+  pos = children.begin();
   init_rest_accept_empty();
   if (expectation() == nothing)
     return;
@@ -40,11 +42,18 @@ match_follow_ordered::match_follow_ordered(std::vector<element> const &c,
 
 void match_follow_ordered::init_rest_accept_empty() {
   bool rest_accept_empty = true;
+#if 0
   for (container::reverse_iterator it = children.rbegin(); 
        it != children.rend(); ++it) {
     it->rest_accept_empty = rest_accept_empty;
     rest_accept_empty &= it->generator->accept_empty();
   }
+#else
+  for (int i = children.GetCount() - 1; i >= 0; --i) {
+    children[i].rest_accept_empty = rest_accept_empty;
+    rest_accept_empty &= children[i].generator->accept_empty();
+  }
+#endif
 }
 
 match_follow_ordered::~match_follow_ordered() {}
@@ -104,9 +113,9 @@ rule::expect match_follow_ordered::expectation() const {
   return need;
 }
 
-bool match_follow_ordered::accept_empty(vector<element> const &children) {
+bool match_follow_ordered::accept_empty(Vector<element> const &children) {
   bool accept = true;
-  for (vector<element>::const_iterator it = children.begin(); 
+  for (Vector<element>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
     accept &= it->second.prefix_optional() || it->first->accept_empty();
   return accept;

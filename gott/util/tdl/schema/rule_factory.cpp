@@ -21,7 +21,7 @@
 #include "rule_factory.hpp"
 #include "slot.hpp"
 
-using std::vector;
+
 using gott::tdl::schema::rule_factory;
 namespace factory_template = gott::tdl::schema::factory_template;
 
@@ -35,7 +35,8 @@ rule_factory::with_slotcfg *rule_factory::get_with_slotcfg() {
   return dynamic_cast<with_slotcfg *>(this);
 }
 
-typedef vector<factory_template::rule_factory_builder> vbd_t;
+typedef Vector<factory_template::rule_factory_builder> vbd_t;
+
 static vbd_t &builders() {
   static vbd_t v;
   return v;
@@ -51,7 +52,7 @@ unsigned add_factory(factory_template::rule_factory_builder x) {
 }
 
 rule_factory *get_factory(unsigned x, rule_attr const &a) {
-  return builders().at(x)(a);
+  return builders()[x](a);
 }
 
 }}}

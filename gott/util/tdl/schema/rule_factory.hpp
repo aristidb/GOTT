@@ -23,7 +23,6 @@
 
 #include "rule_attr.hpp"
 #include "../exceptions.hpp"
-#include <vector>
 
 namespace gott {
 namespace tdl {
@@ -85,7 +84,7 @@ class GOTT_EXPORT rule_factory {
  */
 namespace factory_template {
 
-typedef std::vector<rule_factory const *> container;
+typedef Vector<rule_factory const *> container;
 
 typedef
   rule_factory *(*rule_factory_builder)(rule_attr const &);
@@ -217,13 +216,13 @@ public:
   }
 
   void add(rule_factory const &child, unsigned slot) {
-    if (sub.size() <= slot)
-      sub.resize(slot + 1);
+    if (unsigned(sub.GetCount()) <= slot)
+      sub.SetCount(slot + 1);
     sub[slot] = &child;
   }
 
   rule *get(match &m) const {
-    return new T(sub, attrib, m);
+    return new T(container(sub, 1), attrib, m);
   }
 
   static unsigned index() {

@@ -36,7 +36,7 @@ struct schema_literal : tut::schema_basic {
   schema_literal() {
     context.begin("document");
       context.begin("node", rule_attr(L"foobar", true, 
-             new stru::repatch_enumeration(std::vector<nstring>(1, "foobar"))));
+             new stru::repatch_enumeration(Vector<nstring>() | "foobar")));
       context.end();
     context.end();
   }

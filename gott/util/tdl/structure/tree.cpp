@@ -21,7 +21,6 @@
 #include "structure.hpp"
 #include "tree.hpp"
 #include "print.hpp"
-#include <vector>
 #include <gott/util/my_hash_map.hpp>
 #include HH_HASH_MAP
 #include <gott/util/range_algo.hpp>
@@ -31,7 +30,7 @@
 #include <gott/util/nstring/nstring.hpp>
 
 using std::list;
-using std::vector;
+
 using std::pair;
 using boost::intrusive_ptr;
 using boost::scoped_ptr;
@@ -63,10 +62,12 @@ public:
   bool del_since(boost::intrusive_ptr<node> &, tag);
 };
 
+NTL_MOVEABLE(intrusive_ptr<tree::node>);
+
 struct tree::node {
   size_t use_count;
   Xany data;
-  list<nstring> tags;
+  Vector<nstring> tags;
   intrusive_ptr<node> child0, lastchild, dad, sibling, last;
   size_t size;
   IMPL::tag ttag;
@@ -75,7 +76,7 @@ struct tree::node {
   scoped_ptr<index> indx;
 
   class index {
-    typedef vector<intrusive_ptr<node> > v_pn;
+    typedef Vector<intrusive_ptr<node> > v_pn;
     typedef hashd::hash_multimap<nstring, intrusive_ptr<node> > hmm_spn;
     
     v_pn by_no;
@@ -91,9 +92,9 @@ struct tree::node {
 
     void build_all() {
       if (!built) {
-        by_no.reserve(parent->size);
+        by_no.Reserve(parent->size);
         for (intrusive_ptr<node> i = parent->child0; i; i = i->sibling) {
-          by_no.push_back(i);
+          by_no.Add(i);
           add_entry(i);
         }
         built = true;
@@ -101,7 +102,7 @@ struct tree::node {
     }
 
     void add_entry(intrusive_ptr<node> const &x) {
-      for (list<nstring>::iterator i =x->tags.begin(); i != x->tags.end(); ++i)
+      for (Vector<nstring>::iterator i =x->tags.begin(); i != x->tags.end();++i)
         by_name.insert(hmm_spn::value_type(*i, x));
     }
 
@@ -186,10 +187,6 @@ void tree::add_tag(nstring const &s) {
   p->pos->tags.push_back(s);
 }
 
-void tree::set_tags(list<nstring> const &l) {
-  p->pos->tags = l;
-}
-
 revocable_structure::pth tree::point() {
   p->tagpos[++p->current_tag] = p->pos;
   return p->current_tag;
@@ -234,7 +231,7 @@ tree::iterator tree::iterator::up() const { return n->dad; }
 tree::iterator tree::iterator::next() const { return n->sibling; }
 
 Xany const &tree::iterator::get_data() const { return n->data; }
-list<nstring> const &tree::iterator::get_tags() const { return n->tags; }
+Vector<nstring> const &tree::iterator::get_tags() const { return n->tags; }
 
 tree::iterator tree::get_root() const { return p->root; }
 
@@ -303,7 +300,7 @@ bool tree::operator==(tree const &o) const {
 bool tree::node::equals(node const &o) const {
   if (data != o.data) 
     return false;
-  if (tags.size() != o.tags.size())
+  if (tags.GetCount() != o.tags.GetCount())
     return false;
   if (!equal(range(tags), range(o.tags)))
     return false;
@@ -325,7 +322,7 @@ std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
     void operator() (tree::iterator const &x) {
       p.begin();
         p.data(x.get_data());
-        for (list<nstring>::const_iterator it = x.get_tags().begin();
+        for (Vector<nstring>::const_iterator it = x.get_tags().begin();
              it != x.get_tags().end(); ++it)
           p.add_tag(*it);
         for (tree::iterator i = x.first_child(); i; i = i.next())
@@ -368,7 +365,7 @@ void tree::dump(wostream &stream) {
 
       out << L'(' << p->ttag << L')';
       out << L" : ";
-      for (list<nstring>::iterator it = p->tags.begin(); 
+      for (Vector<nstring>::iterator it = p->tags.begin(); 
            it != p->tags.end(); ++it)
         out << *it << L' ';
       out << L"{\n";

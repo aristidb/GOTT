@@ -24,7 +24,7 @@
 #include <gott/util/range_algo.hpp>
 
 
-using std::vector;
+
 using boost::static_visitor;
 using gott::tdl::schema::context_template;
 using gott::tdl::schema::rule;
@@ -46,10 +46,12 @@ public:
   struct entry_end {};
   typedef boost::variant<eID, entry_begin, entry_end> job;
   struct visitor;
-  typedef std::vector<job> book;
+  typedef Vector<job> book;
 
   book var;
 };
+
+NTL_MOVEABLE(context_template::IMPL::job);
 
 context_template::context_template() : p(new IMPL) {}
 context_template::~context_template() {}
@@ -73,9 +75,9 @@ void context_template::param(eID x) {
 }
 
 struct context_template::IMPL::visitor : public static_visitor<>  {
-  visitor(vector<context*> const &vv, context &oo) : v(vv), o(oo) {}
+  visitor(Vector<context*> const &vv, context &oo) : v(vv), o(oo) {}
 
-  vector<context*> const &v;
+  Vector<context*> const &v;
   context &o;
 
   void operator() (entry_begin const &b) {
@@ -91,7 +93,7 @@ struct context_template::IMPL::visitor : public static_visitor<>  {
   }
 };
 
-void context_template::instantiate(vector<context*> const &v, context &c) {
+void context_template::instantiate(Vector<context*> const &v, context &c) {
   IMPL::visitor w(v, c);
   for_each(range(p->var), apply_visitor(w));
 }

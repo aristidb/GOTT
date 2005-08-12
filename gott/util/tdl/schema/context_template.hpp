@@ -80,7 +80,7 @@ public:
    * \param params The parameters in a vector, position equals eID.
    * \param cont The context to fill.
    */
-  void instantiate(std::vector<context*> const &params, context &cont) GOTT_EXPORT;
+  void instantiate(Vector<context*> const &params, context &cont) GOTT_EXPORT;
 
 private:
   class IMPL;

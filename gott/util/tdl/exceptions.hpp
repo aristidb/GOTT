@@ -21,9 +21,9 @@
 #ifndef GOTT_UTIL_TDL_EXCEPTIONS_HPP
 #define GOTT_UTIL_TDL_EXCEPTIONS_HPP
 
-#include <list>
 #include <gott/util/visibility.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <ntl.h>
 
 namespace gott {
 class nstring;
@@ -54,7 +54,7 @@ namespace detail { struct stream_position; }
  */
 struct GOTT_EXPORT mismatch : public tdl_exception {
   GOTT_LOCAL
-  mismatch(detail::stream_position const &p, std::list<nstring> const &);
+  mismatch(detail::stream_position const &p, Vector<nstring> const &);
   ~mismatch() throw();
 };
 

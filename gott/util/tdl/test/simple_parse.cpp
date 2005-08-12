@@ -30,7 +30,7 @@ namespace tut {
 struct spb : gott::tdl::simple::parser {
   enum event_id { b, e, d, u, n, c };
   typedef std::pair<event_id, nstring> event;
-  std::vector<event> xp, ev;
+  Vector<event> xp, ev;
 
   void begin_parse() { ev.push_back(event(b, L"")); }
   void end_parse() { ev.push_back(event(e, L"")); }
@@ -55,6 +55,8 @@ typedef test_group<spb> tf;
 typedef tf::object object;
 }
 
+NTL_MOVEABLE(tut::spb::event);
+
 namespace {
 tut::tf spp("simple::parse");
 }
@@ -62,9 +64,9 @@ tut::tf spp("simple::parse");
 using gott::tdl::simple::parse;
 
 std::ostream &operator<<(std::ostream &o, 
-                         std::vector<tut::spb::event> const &e) {
+                         Vector<tut::spb::event> const &e) {
   o << '\n';
-  for (std::vector<tut::spb::event>::const_iterator it = e.begin(); 
+  for (Vector<tut::spb::event>::const_iterator it = e.begin(); 
        it != e.end(); ++it) 
     o << "bedunc"[it->first] << it->second << ' ';
   o << '\n';

@@ -24,8 +24,6 @@
 #include <gott/util/nstring/nstring.hpp>
 #include <gott/util/nstring/stl.hpp>
 
-
-using std::vector;
 using std::pair;
 using std::ostream;
 using std::wistringstream;
@@ -33,11 +31,14 @@ using gott::tdl::simple::meta_parser;
 using gott::tdl::simple::parse_meta;
 using gott::nstring;
 
+typedef pair<nstring, nstring> twostring;
+NTL_MOVEABLE(twostring);
+
 namespace tut {
 struct meta_basic {
   meta_parser parser;
   nstring data, rest;
-  vector<pair<nstring, nstring> > xp, ev;
+  Vector<pair<nstring, nstring> > xp, ev;
   bool operator() (nstring const &cmd, nstring const &param) {
     ev.push_back(pair<nstring,nstring>(cmd, param));
     return true;
@@ -57,8 +58,8 @@ typedef test_group<meta_basic> tf;
 typedef tf::object object;
 }
 
-ostream &operator<<(ostream &o, vector<pair<nstring,nstring> > const &v) {
-  for (vector<pair<nstring,nstring> >::const_iterator it = v.begin();
+ostream &operator<<(ostream &o, Vector<pair<nstring,nstring> > const &v) {
+  for (Vector<pair<nstring,nstring> >::const_iterator it = v.begin();
        it != v.end(); ++it) {
     o << it->first << "::";
     o << it->second << '\n';

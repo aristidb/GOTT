@@ -66,9 +66,9 @@ struct schema_multi_footype : tut::schema_basic {
       multi.end();
     multi.end();
 
-    std::vector<schema::context*> v(2);
+    Vector<schema::context*> v;
     for (size_t i = 0; i < 2; ++i)
-      v[i] = &c[i];
+      v.Add() = &c[i];
 
     multi.instantiate(v, c[1]);
     footype.instantiate(v, c[0]);

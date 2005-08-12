@@ -38,14 +38,14 @@ public:
             slotcfg::one,
             slotcfg::all>
           factory;
-  match_unordered(std::vector<element> const &, rule_attr const &, 
+  match_unordered(Vector<element> const &, rule_attr const &, 
                   match &);
   ~match_unordered();
 
-  static bool accept_empty(std::vector<element> const &);
+  static bool accept_empty(Vector<element> const &);
 
 private:
-  typedef std::list<element> list_t;
+  typedef Vector<element> list_t;
   list_t children;
   list_t::iterator pos;
   positioning::id last;

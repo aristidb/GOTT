@@ -24,7 +24,7 @@
 #include "structure.hpp"
 #include <boost/intrusive_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <list>
+#include <ntl.h>
 
 namespace gott {
 namespace tdl {
@@ -34,6 +34,7 @@ namespace structure {
  * The default implementation of the (whole) structure concept.
  */
 class tree : public revocable_structure, public copyable_structure {
+public: // unfortunately
   struct node;
 
 public: // Iterators
@@ -43,7 +44,7 @@ public: // Iterators
    * The default iterator.
    * Corresponds to a node in the tree.
    */
-  class iterator {
+  class iterator : Moveable<iterator> {
   public:
     typedef size_t size_type;
     
@@ -88,7 +89,7 @@ public: // Iterators
     /**
      * Gets all tags.
      */
-    GOTT_EXPORT std::list<nstring> const &get_tags() const;
+    GOTT_EXPORT Vector<nstring> const &get_tags() const;
 
     /**
      * Checks whether the iterator is valid.
@@ -154,7 +155,6 @@ public: // Iterators
 private: // Inherited interface
   // Don't call these directly (exported symbols for no use is nothing I like)
   void add_tag(nstring const &);
-  void set_tags(std::list<nstring> const &);
   void data(xany::Xany const &);
   void begin();
   void end();

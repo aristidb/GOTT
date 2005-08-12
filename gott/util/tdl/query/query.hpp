@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_QUERY_TDLQUERY_HPP
 #define GOTT_UTIL_TDL_QUERY_TDLQUERY_HPP
 
-#include <vector>
+#include <ntl.h>
 #include <iosfwd>
 #include <gott/util/visibility.hpp>
 
@@ -35,6 +35,9 @@ namespace query {
  * A set of iterators of a structure::tree::iterator compatible type.
  */
 template<class Iterator> class selection {
+private:
+  typedef Vector<Iterator> container;
+
 public:
   /// Create an empty selection.
   selection() {}
@@ -43,7 +46,7 @@ public:
    * Create a selection with a single element.
    * \param i The selection's content.
    */
-  explicit selection(Iterator const &i) : impl(1, i) {}
+  explicit selection(Iterator const &i) : impl(container() << i) {}
 
   /**
    * Create a selection from a STL-compatible iterator range.
@@ -85,8 +88,6 @@ public:
    */
   selection find_tag(nstring const &tag) const GOTT_EXPORT;
 
-private:
-  typedef std::vector<Iterator> container;
 public:
   typedef typename container::iterator iterator;
   typedef typename container::const_iterator const_iterator;
@@ -94,7 +95,7 @@ public:
 
   const_iterator begin() const { return impl.begin(); }
   const_iterator end() const { return impl.end(); }
-  size_type size() const { return impl.size(); }
+  size_type size() const { return impl.GetCount(); }
 
   /// Compare two selections for equality.
   bool operator==(selection const &) const GOTT_EXPORT;

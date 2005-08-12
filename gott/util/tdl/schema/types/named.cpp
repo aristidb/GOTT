@@ -35,7 +35,7 @@ using schema::rule_attr;
 using schema::match_named;
 
 rule_attr match_named::attributes(nstring const &s, bool cc) {
-  return rule_attr(std::list<nstring>(1, s), cc, Xany(s));
+  return rule_attr(Vector<nstring>() << s, cc, Xany(s));
 }
 
 match_named::match_named(rule_factory const &s, rule_attr const &a, 

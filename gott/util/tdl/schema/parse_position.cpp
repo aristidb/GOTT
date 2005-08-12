@@ -21,10 +21,9 @@
 #include "parse_position.hpp"
 #include "event.hpp"
 #include <gott/util/tdl/structure/structure.hpp>
-#include <vector>
+#include <ntl.h>
 #include <gott/util/debug/assert.hpp>
 
-using std::vector;
 using std::size_t;
 namespace schema = gott::tdl::schema;
 namespace structure = gott::tdl::structure;
@@ -34,7 +33,7 @@ using schema::positioning;
 
 class positioning::IMPL {
 public:
-  typedef vector<ev::token_t> buffer_t;
+  typedef Vector<ev::token_t> buffer_t;
 
   revocable_structure &struc;
 
@@ -60,7 +59,7 @@ positioning::~positioning() {}
 template<class T>
 void positioning::add(T const &t) {
   p->unconsumed = p->buffer.size();
-  p->buffer.push_back(t);
+  p->buffer.Add(t);
   p->in_pass = false;
 }
 
@@ -114,7 +113,7 @@ void positioning::replay(acceptor &acc) {
     for (p->unconsumed = p->consumed + 1;
          p->unconsumed < long(p->buffer.size());
          ++p->unconsumed) {
-      acc(get(p->buffer[p->unconsumed]));
+      acc(get(p->buffer[int(p->unconsumed)])); // NTL-Vector::operator[](int)
       if (p->replay)
         break;
 

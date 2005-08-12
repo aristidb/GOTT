@@ -277,10 +277,12 @@ private:
   rule_attr attrib;
 };
 
+typedef std::pair<rule_factory const *, slotcfg> scfg_element;
+
 template<class T, slotcfg::simple_mode Def, slotcfg::mode Accepted>
 class slotcfg_manychildren : public detail::factory_with_slotcfg<Accepted> {
 public:
-  typedef std::pair<rule_factory const *, slotcfg> element;
+  typedef scfg_element element;
   
   slotcfg_manychildren(rule_attr const &a) : attrib(a) {}
 
@@ -297,13 +299,13 @@ public:
   }
 
   void add(rule_factory const &child, unsigned slot, slotcfg const &cfg) {
-    if (sub.size() <= slot)
-      sub.resize(slot);
+    if (unsigned(sub.GetCount()) <= slot)
+      sub.SetCount(slot + 1);
     sub[slot] = element(&child, cfg);
   }
 
   rule *get(match &m) const {
-    return new T(sub, attrib, m);
+    return new T(Vector<element>(sub, 1), attrib, m);
   }
 
   static unsigned index() {
@@ -320,12 +322,14 @@ public:
   }
   
 private:
-  std::vector<element> sub;
+  Vector<element> sub;
   rule_attr attrib;
 };
 
 }
 
 }}}
+
+NTL_MOVEABLE(gott::tdl::schema::factory_template::scfg_element);
 
 #endif

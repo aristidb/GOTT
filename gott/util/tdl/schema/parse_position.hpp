@@ -73,4 +73,6 @@ private:
 
 }}}
 
+NTL_MOVEABLE(gott::tdl::schema::positioning::id);
+
 #endif

@@ -20,13 +20,13 @@
 
 #include "any.hpp"
 
-using std::vector;
+
 namespace schema = gott::tdl::schema;
 namespace ev = schema::ev;
 using schema::match_any;
 using schema::rule;
 
-match_any::match_any(vector<rule_factory const *> const &vv,
+match_any::match_any(Vector<rule_factory const *> const &vv,
                      rule_attr const &a, match &m) 
 : happy_once(a, m), v(vv), pos(v.begin()) {
   if (pos != v.end()) {
@@ -55,8 +55,8 @@ bool match_any::play(ev::child_succeed const &) {
   return true;
 }
 
-bool match_any::accept_empty(vector<rule_factory const *> const &choices) {
-  for (vector<rule_factory const *>::const_iterator it = choices.begin(); 
+bool match_any::accept_empty(Vector<rule_factory const *> const &choices) {
+  for (Vector<rule_factory const *>::const_iterator it = choices.begin(); 
        it != choices.end(); ++it)
     if ((*it)->accept_empty())
       return true;

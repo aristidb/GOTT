@@ -57,7 +57,8 @@ struct Schema : tut::schema_basic {
 
     qualified(type);
 
-    std::vector<schema::context*> cc(1, &rec);
+    Vector<schema::context*> cc;
+    cc.Add(&rec);
     type.instantiate(cc, rec);
     document.instantiate(cc, context);
   }
@@ -79,7 +80,7 @@ struct Schema : tut::schema_basic {
     document.begin("list", ra("type-declarations"));
       document.begin("ordered", ra("type-declaration"));
         document.begin("node", rule_attr("export", true,
-             new stru::repatch_enumeration(std::vector<nstring>(1, "export"))),
+             new stru::repatch_enumeration(Vector<nstring>() | "export")),
              slotcfg(slotcfg::optional));
         document.end();
 
@@ -104,8 +105,8 @@ struct Schema : tut::schema_basic {
   void qualified(schema::context_template &document) {
      document.begin("follow", ra("qualified-type-definition"));
        {
-         std::vector<nstring> choice(2);
-         choice[0] = "enclosed"; choice[1] = "flat";
+         Vector<nstring> choice;
+         choice.Add("enclosed"); choice.Add("flat");
          document.begin("node", rule_attr("coat", true,
                                         new stru::repatch_enumeration(choice)));
          document.end();
@@ -145,9 +146,9 @@ struct Schema : tut::schema_basic {
     document.begin("any", ra("slot-specification"),
                    slotcfg(slotcfg::optional));
       {
-        std::vector<nstring> single(4);
-        single[0] = "one";  single[1] = "optional";
-        single[2] = "list"; single[3] = "some";
+        Vector<nstring> single;
+        single.Add("one");  single.Add("optional");
+        single.Add("list"); single.Add("some");
         document.begin("node", rule_attr("slot", true, 
                                         new stru::repatch_enumeration(single)));
         document.end();
@@ -165,7 +166,9 @@ typedef tf::object object;
 }
 
 namespace {
+#if 0
   tut::tf Tschema("schema::$schema");
+#endif
 }
 
 #define IGNORE_ERRORS

@@ -33,10 +33,10 @@ using gott::tdl::schema::rule_factory;
 
 class context::IMPL {
 public:
-  typedef std::vector<rule_factory *> container;
+  typedef Vector<rule_factory *> container;
   container pool;
   rule_factory const *first;
-  std::list<rule_factory *> org;
+  Vector<rule_factory *> org;
 
   void begin(unsigned, rule_attr const &, optional<slotcfg> const &);
   void end();
@@ -101,7 +101,7 @@ void context::IMPL::add_owned(rule_factory *f, optional<slotcfg> const &c) {
 
 void context::IMPL::add_child(rule_factory const *f, 
                               optional<slotcfg> const &c) {
-  if (!org.empty())
+  if (org.GetCount() > 0)
     if (!c)
       org.back()->add(*f);
     else

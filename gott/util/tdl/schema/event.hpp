@@ -25,6 +25,7 @@
 #include <gott/util/nstring/nstring.hpp>
 #include <gott/util/visibility.hpp>
 #include <boost/variant.hpp>
+#include <ntl.h>
 
 namespace gott {
 namespace tdl {
@@ -115,6 +116,8 @@ public:
 };
 
 typedef boost::variant<begin_parse, down, node, up, end_parse> token_t;
+
+NTL_MOVEABLE(token_t);
 
 token const &get(token_t const &);
 

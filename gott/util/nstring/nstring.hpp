@@ -28,6 +28,7 @@
 #include <gott/util/my_hash_map.hpp>
 #undef PARAM_HASH_NO_BASIC_STRING
 #include <gott/util/range.hpp>
+#include <ntl.h>
 
 namespace std {
   template<class> class allocator;
@@ -47,7 +48,7 @@ template<class> class range_t;
 /**
  * UTF-8 string literals storage class.
  */
-class GOTT_EXPORT nstring {
+class GOTT_EXPORT nstring : Moveable<nstring> {
 public:
   typedef utf8_iterator const_iterator;
 

@@ -32,15 +32,15 @@ namespace schema {
 class match_ordered : public happy_once {
 public:
   typedef factory_template::manychildren<match_ordered> factory;
-  match_ordered(std::vector<rule_factory const *> const &r, 
+  match_ordered(Vector<rule_factory const *> const &r, 
                 rule_attr const &, match &);
   ~match_ordered();
 
-  static bool accept_empty(std::vector<rule_factory const *> const &r);
+  static bool accept_empty(Vector<rule_factory const *> const &r);
 
 private:
-  std::vector<rule_factory const *> subrules;
-  std::vector<rule_factory const *>::iterator pos;
+  Vector<rule_factory const *> subrules;
+  Vector<rule_factory const *>::iterator pos;
 
   bool play(ev::child_succeed const &);
   wchar_t const *name() const;

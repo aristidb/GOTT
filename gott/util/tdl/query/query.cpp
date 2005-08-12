@@ -26,35 +26,33 @@ using gott::nstring;
 
 template<class I>
 void selection<I>::add(I const &x) {
-  impl.reserve(impl.size() + x.size());
   for (I i = x.first_child(); i; i = i.next())
-    impl.push_back(i);
+    impl.Add(i);
 }
 
 template<class I>
 void selection<I>::add_windex(I const &x, size_t i) {
   if (x.size() > i)
-    impl.push_back(x[i]);
+    impl.Add(x[i]);
 }
 
 template<class I>
 void selection<I>::add_wrange(I const &x, size_t a, size_t b) {
   size_t end = std::min(b, x.size());
   
-  impl.reserve(impl.size() + (end - a));
   for (; a < end; ++a)
-    impl.push_back(x[a]);
+    impl.Add(x[a]);
 }
 
 template<class I>
 void selection<I>::add_wtag(I const &x, nstring const &s) {
   for (typename I::tagged i = x.with_tag(s); i; ++i)
-    impl.push_back(i.get());
+    impl.Add(i.get());
 }
 
 template<class I> 
 selection<I> const &selection<I>::operator+=(selection const &b) {
-  impl.insert(impl.end(), b.impl.begin(), b.impl.end());
+  impl.Append(b.impl);
   return *this;
 }
 
