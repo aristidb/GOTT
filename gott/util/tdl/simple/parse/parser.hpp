@@ -133,7 +133,8 @@ private:
  * \param p The parser callback to notify of tokens.
  * \param l (optional) The line-logger callback.
  */
-GOTT_EXPORT void parse(std::wistream &s, parser &p, line_logger *l = 0);
+GOTT_EXPORT 
+void parse(std::wistream &s, parser &p, line_logger *l = 0);
 
 /**
  * Parses the meta-data section of a TDL document to a special parser.
@@ -141,7 +142,8 @@ GOTT_EXPORT void parse(std::wistream &s, parser &p, line_logger *l = 0);
  * \param p The meta-data callback to notify.
  * \param l (optional) The line-logger callback.
  */
-GOTT_EXPORT void parse_meta(std::wistream &s, meta_parser &p, line_logger *l = 0);
+GOTT_EXPORT 
+void parse_meta(std::wistream &s, meta_parser &p, line_logger *l = 0);
 
 }}}
 #endif
