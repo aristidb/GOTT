@@ -39,6 +39,8 @@ namespace std {
 
 namespace gott {
 
+template<class> struct thunk_t;
+
 class nstring_buffer;
 template<class> class range_t;
 
@@ -73,6 +75,11 @@ public:
    * Construct from encoded wide c-string.
    */
   nstring(wchar_t const *, encoding = utf32);
+
+  /**
+   * Construct nstring from thunk.
+   */
+  nstring(thunk_t<utf8_t> &);
   
   enum literal_tag { utf8_literal };
 

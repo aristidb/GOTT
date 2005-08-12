@@ -30,6 +30,7 @@ struct thunk_t {
   virtual ~thunk_t() {}
   virtual bool done() const = 0;
   virtual Out call() = 0;
+  virtual std::size_t size() const = 0;
 };
 
 template<class Out, class In, class Context>
@@ -46,8 +47,8 @@ struct integer_to_string {};
 template<class Out, class Int>
 struct concrete_thunk_t<Out, Int, integer_to_digits> : thunk_t<Out> {
   concrete_thunk_t(Int const &v, integer_to_digits) : data(v), div(1) {
-      while (div <= data)
-        div *= 10;
+    while (div <= data)
+      div *= 10;
   }
   
   Int data;
@@ -60,6 +61,16 @@ struct concrete_thunk_t<Out, Int, integer_to_digits> : thunk_t<Out> {
   Out call() {
     div /= 10;
     return (data / div) % 10;
+  }
+
+  std::size_t size() const {
+    Int x = div;
+    std::size_t sz = Int();
+    while (div > Int()) {
+      x /= 10;
+      ++sz;
+    }
+    return sz;
   }
 };
 
@@ -75,7 +86,11 @@ struct concrete_thunk_t<CharType, Int, integer_to_string> : thunk_t<CharType> {
   }
 
   CharType call() {
-    return '0' + helper.call();
+    return CharType('0' + helper.call());
+  }
+
+  std::size_t size() const {
+    return helper.size();
   }
 };
 

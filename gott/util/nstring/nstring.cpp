@@ -25,7 +25,7 @@
 
 #include <gott/util/range.hpp>
 #include <gott/util/range_algo.hpp>
-#include <cstring>
+#include <gott/util/thunk.hpp>
 #include <list>
 #include <vector>
 #include <ostream>
@@ -79,6 +79,14 @@ nstring::nstring(range_t<char const *> in, encoding enc)
 
 nstring::nstring(char const *in, encoding enc)
 : p(new representation(to_utf8_alloc(zero_terminated(in), enc))) {}
+
+nstring::nstring(thunk_t<utf8_t> &thk) : p(0) {
+  std::size_t len = thk.size();
+  utf8_t *buf = new utf8_t[len];
+  for (std::size_t i = 0; i < len; ++i)
+    buf[i] = thk.call();
+  p = new representation(range(buf, len));
+}
 
 nstring::nstring(range_t<utf8_t const *> in, literal_tag)
 : p(new representation(in, false)) {}
