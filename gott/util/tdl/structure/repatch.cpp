@@ -52,10 +52,6 @@ void simple_repatcher_context::add_tag(nstring const &s) {
   target.add_tag(s);
 }
 
-void simple_repatcher_context::set_tags(std::list<nstring> const &l) {
-  target.set_tags(l);
-}
-
 repatch_nothing::repatch_nothing() {}
 repatch_nothing::~repatch_nothing() {}
 

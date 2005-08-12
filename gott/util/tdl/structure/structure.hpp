@@ -60,12 +60,6 @@ public:
    */
   virtual void add_tag(nstring const &t) = 0;
 
-  /**
-   * Set a node's tags. Must not be called after add_tag.
-   * \param t All the tags to add.
-   */
-  virtual void set_tags(std::list<nstring> const &t) = 0;
-
   GOTT_EXPORT virtual ~writable_structure() = 0;
 };
 

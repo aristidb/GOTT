@@ -40,7 +40,8 @@ node_inserter_t::~node_inserter_t() {}
 void node_inserter_t::write_to(writable_structure &o) const {
   o.begin();
     o.data(data);
-    o.set_tags(tags);
+    for (list<nstring>::const_iterator it=tags.begin(); it != tags.end(); ++it)
+      o.add_tag(*it);
     for_each(range(children), bind(&node_inserter_t::write_to, _1, ref(o)));
   o.end();
 }

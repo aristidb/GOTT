@@ -325,7 +325,9 @@ std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
     void operator() (tree::iterator const &x) {
       p.begin();
         p.data(x.get_data());
-        p.set_tags(x.get_tags());
+        for (list<nstring>::const_iterator it = x.get_tags().begin();
+             it != x.get_tags().end(); ++it)
+          p.add_tag(*it);
         for (tree::iterator i = x.first_child(); i; i = i.next())
           this->operator()(i);
       p.end();
