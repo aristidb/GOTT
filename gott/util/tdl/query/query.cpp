@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "query.hpp"
+#include <algorithm>
 
 using std::size_t;
 using gott::tdl::query::selection;

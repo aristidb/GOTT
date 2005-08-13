@@ -1,6 +1,6 @@
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
 cflags = Split(ARGUMENTS.get('cflags', '-Wall -Wextra -Werror -Winvalid-pch'))
-release = int(ARGUMENTS.get('release', 0))
+release = int(ARGUMENTS.get('release', 1))
 if release:
 	debug = 0
 	opt = ['-O3']
@@ -15,18 +15,18 @@ if debug:
 	cppdef = ['DEBUG']
 else:
 	cppdef = ['NDEBUG']
-caux = ARGUMENTS.get('aux', '-include fixstl/string.hpp')
+caux = ARGUMENTS.get('aux')
 cflags += Split(caux)
 cflagsoverride = ARGUMENTS.get('cfoverride', 0)
 if cflagsoverride:
 	cflags = cflagsoverride
 
 env = Environment(
-		  CXX = cxx, 
-		  CCFLAGS = cflags, 
-		  CPPPATH=['#/..', '#/contrib/ntl'], 
-      LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/atom #/util/nstring #/base/plugin'),
-		  CPPDEFINES=cppdef)
+  CXX = cxx, 
+  CCFLAGS = cflags, 
+  CPPPATH=['#/..', '#/contrib/ntl'], 
+  LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/atom #/util/nstring #/base/plugin'),
+  CPPDEFINES=cppdef)
 
 Export('env')
 conf = SConscript('configure/SConscript')

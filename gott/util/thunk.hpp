@@ -22,6 +22,7 @@
 #define GOTT_UTIL_THUNK_HPP
 
 #include <gott/util/visibility.hpp>
+#include <cstddef>
 
 namespace gott {
 
