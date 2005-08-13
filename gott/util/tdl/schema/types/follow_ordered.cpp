@@ -42,18 +42,10 @@ match_follow_ordered::match_follow_ordered(Vector<element> const &c,
 
 void match_follow_ordered::init_rest_accept_empty() {
   bool rest_accept_empty = true;
-#if 0
-  for (container::reverse_iterator it = children.rbegin(); 
-       it != children.rend(); ++it) {
-    it->rest_accept_empty = rest_accept_empty;
-    rest_accept_empty &= it->generator->accept_empty();
-  }
-#else
   for (int i = children.GetCount() - 1; i >= 0; --i) {
     children[i].rest_accept_empty = rest_accept_empty;
     rest_accept_empty &= children[i].generator->accept_empty();
   }
-#endif
 }
 
 match_follow_ordered::~match_follow_ordered() {}

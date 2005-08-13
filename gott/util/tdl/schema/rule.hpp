@@ -118,6 +118,11 @@ public:
    */
   virtual bool play(ev::child_fail const &);
 
+  /**
+   * Called for undifferentiated events.
+   */
+  virtual bool play_other();
+
   /// @internal
   void finish() GOTT_LOCAL;
 

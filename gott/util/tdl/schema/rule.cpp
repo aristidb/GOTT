@@ -75,11 +75,13 @@ rule::~rule() {}
 rule_attr const &rule::attributes() const { return pIMPL->attrib; }
 match &rule::matcher() { return *pIMPL->cont; }
 
-bool rule::play(ev::begin_parse const &) { return false; }
-bool rule::play(ev::down const &) { return false; }
-bool rule::play(ev::up const &) { return false; }
-bool rule::play(ev::end_parse const &) { return false; }
-bool rule::play(ev::node const &) { return false; }
+bool rule::play(ev::begin_parse const &) { return play_other(); }
+bool rule::play(ev::down const &) { return play_other(); }
+bool rule::play(ev::up const &) { return play_other(); }
+bool rule::play(ev::end_parse const &) { return play_other(); }
+bool rule::play(ev::node const &) { return play_other(); }
 
-bool rule::play(ev::child_succeed const &) { return false; }
-bool rule::play(ev::child_fail const &) { return false; }
+bool rule::play(ev::child_succeed const &) { return play_other(); }
+bool rule::play(ev::child_fail const &) { return play_other(); }
+
+bool rule::play_other() { return false; }

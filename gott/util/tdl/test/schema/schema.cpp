@@ -90,8 +90,9 @@ struct Schema : tut::schema_basic {
               document.begin("node", ra("name"));
               document.end();
 
-              document.begin("node", ra("parameter"), 
-                             slotcfg(slotcfg::list));
+              document.begin("list", rule_attr(rule_attr::simple, false));
+                document.begin("node", ra("parameter")); 
+                document.end();
               document.end();
             document.end();
 
@@ -166,12 +167,10 @@ typedef tf::object object;
 }
 
 namespace {
-#if 1
   tut::tf Tschema("schema::$schema");
-#endif
 }
 
-#define IGNORE_ERRORS
+//#define IGNORE_ERRORS
 
 namespace tut {
 template<> template<>
@@ -182,7 +181,10 @@ void object::test<1>(int) {
        "export\n"
        "type\n"
        "  anything\n"
-       "  optional follow string, anything\n"
+       "  optional\n"
+       "    follow\n"
+       "      string\n"
+       "      anything\n"
   );
   S(Xany()).write_to(xp);
   ensure_equals(tree, xp);

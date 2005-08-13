@@ -57,6 +57,8 @@ private:
       : generator(e.first), slot(e.second) {}
   };
 
+  // TODO: down without element replay.???
+
   void init_rest_accept_empty();
   bool search_insertible() const;
 
