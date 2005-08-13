@@ -40,7 +40,7 @@ node_inserter_t::~node_inserter_t() {}
 void node_inserter_t::write_to(writable_structure &o) const {
   o.begin();
     o.data(data);
-    for (list<nstring>::const_iterator it=tags.begin(); it != tags.end(); ++it)
+    for (tag_list::const_iterator it=tags.begin(); it != tags.end(); ++it)
       o.add_tag(*it);
     for_each(range(children), bind(&node_inserter_t::write_to, _1, ref(o)));
   o.end();
@@ -51,7 +51,7 @@ node_inserter_t cf::S(xany::Xany const &data, tag_list const &tags) {
 }
 
 node_inserter_t cf::S(xany::Xany const &data, nstring const &tag) {
-  return node_inserter_t(data, nd_list(), tag_list(1, tag));
+  return node_inserter_t(data, nd_list(), tag_list() << tag);
 }
 
 node_inserter_t cf::M(nd_list const &children, tag_list const &tags) {
@@ -59,7 +59,7 @@ node_inserter_t cf::M(nd_list const &children, tag_list const &tags) {
 }
 
 node_inserter_t cf::M(nd_list const &children, nstring const &tag) {
-  return node_inserter_t(Xany(), children, tag_list(1, tag));
+  return node_inserter_t(Xany(), children, tag_list() << tag);
 }
 
 node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children, 
@@ -69,13 +69,13 @@ node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children,
 
 node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children, 
                        nstring const &tag) {
-  return node_inserter_t(data, children, tag_list(1, tag));
+  return node_inserter_t(data, children, tag_list() << tag);
 }
 
 node_inserter_t cf::C(node_inserter_t const &child, tag_list const &tags) {
-  return node_inserter_t(Xany(), nd_list(1, child), tags);
+  return node_inserter_t(Xany(), nd_list() << child, tags);
 }
 
 node_inserter_t cf::C(node_inserter_t const &child, nstring const &tag) {
-  return node_inserter_t(Xany(), nd_list(1, child), tag_list(1, tag));
+  return node_inserter_t(Xany(), nd_list() << child, tag_list() << tag);
 }

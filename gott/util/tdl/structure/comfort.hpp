@@ -21,8 +21,7 @@
 #ifndef GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 #define GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 
-#include <string>
-#include <list>
+#include <ntl.h>
 #include <gott/util/xany/xany.hpp>
 #include <gott/util/visibility.hpp>
 
@@ -39,14 +38,14 @@ class writable_structure;
  */
 namespace cf {
 
-typedef std::list<nstring> tag_list;
+typedef Vector<nstring> tag_list;
 class node_inserter_t;
-typedef std::list<node_inserter_t> nd_list;
+typedef Array<node_inserter_t> nd_list;
 
 /**
  * General concatenateable structure generator.
  */
-class node_inserter_t {
+class node_inserter_t : Moveable<node_inserter_t> {
 public:
   /**
    * Actually writes the structure in spe.
