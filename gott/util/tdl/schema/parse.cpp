@@ -27,8 +27,10 @@
 #include "../structure/repatch.hpp"
 #include <gott/util/range_algo.hpp>
 #include <gott/util/autoconv.hpp>
-#include <sstream>
 #include <gott/util/nstring/stl.hpp>
+#include <gott/util/debug/assert.hpp>
+
+#include <iostream> //DEBUG
 
 using std::list;
 using boost::shared_ptr;
@@ -167,11 +169,13 @@ shared_ptr<writable_structure> const&match::IMPL::direct_structure_non_base() {
 
 void match::IMPL::add(rule_factory const &f) {
   shared_ptr<writable_structure> struc = direct_structure_non_base();
-  entry &e = parse.Add();
-  shared_ptr<rule> x(f.get(ref));
-  e = entry(x, struc);
-  if (structure::repatcher const *r = x->attributes().repatcher())
+  int current = parse.GetCount();
+  parse.Add();
+  shared_ptr<rule> the_rule(f.get(ref));
+  if (structure::repatcher const *r = the_rule->attributes().repatcher())
     struc.reset(r->deferred_write(struc ? *struc : base_struc));
+  parse[current] = entry(the_rule, struc);
+  GOTT_ASSERT_1(parse[current].the_rule, nonnull(), "Acquired rule");
 }
 
 template<class T>
@@ -264,12 +268,18 @@ void match::IMPL::fail_all() {
 }
 
 nstring match::IMPL::get_name(shared_ptr<rule> const &rp) {
-  std::wostringstream out;
-  out << rp->name();
+  static nstring const s_open("("), s_close(")"), sep(",");
+  Vector<nstring> out;
+  out.Add(rp->name());
   if (rp->attributes().tags().GetCount() > 0) {
-    out << L'(';
-    print_separated(out, range(rp->attributes().tags()), L",");
-    out << L')';
+    out.Add(s_open);
+    range_t<nstring const *> r = range(rp->attributes().tags());
+    out.Add(*r.begin);
+    for (nstring const *it = r.begin + 1; it != r.end; ++it) {
+      out.Add(sep);
+      out.Add(*it);
+    }
+    out.Add(s_close);
   }
-  return to_nstring(out.str());
+  return nstring(range(out).cast<nstring const *>());
 }

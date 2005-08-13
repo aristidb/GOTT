@@ -166,7 +166,7 @@ typedef tf::object object;
 }
 
 namespace {
-#if 0
+#if 1
   tut::tf Tschema("schema::$schema");
 #endif
 }

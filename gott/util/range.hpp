@@ -68,6 +68,28 @@ template<class T> struct range_t {
   }
 };
 
+
+/**
+ * Compare two ranges for element-by-element equality.
+ */
+template<class T, class U>
+bool operator==(range_t<T> a, range_t<U> b) {
+  if (a.size() != b.size())
+    return false;
+  for (; a.begin != a.end; ++a.begin, ++b.begin)
+    if (*a.begin != *b.begin)
+      return false;
+  return true;
+}
+
+/**
+ * Compare two ranges for element-by-element inequality.
+ */
+template<class T, class U>
+bool operator!=(range_t<T> const &a, range_t<U> const &b) {
+  return !(a == b);
+}
+
 /**
  * Return the begin of a range.
  * @see range_t::begin

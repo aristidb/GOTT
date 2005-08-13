@@ -106,6 +106,11 @@ basic_ostream<Ch,CT> &operator<<(basic_ostream<Ch,CT> &s,
   return s;
 }
 
+template<class T, class U, class Ch, class CT>
+basic_ostream<Ch,CT> &operator<<(basic_ostream<Ch,CT> &s, pair<T,U> const &p) {
+  return s << p.first << ',' << p.second;
+}
+
 }
 
 #endif

@@ -24,8 +24,8 @@
 #include <iostream>
 
 namespace gott {
-namespace debug {
 
+namespace x__assert {
 template<class T, class U>
 void fail(int line, char const *file, char const *lhs, char const *rhs,
           char const *message, T const &lhs_v, U const &rhs_v) {
@@ -55,10 +55,19 @@ void assert_2(T const &lhs, U const &rhs, F function,
     fail(line, file, lhs_name, rhs_name, message, lhs, rhs);
 }
 
+}
+
 struct equals {
   template<class T, class U>
-  bool operator() (T const &a, U const &b) {
+  bool operator() (T const &a, U const &b) const {
     return a == b;
+  }
+};
+
+struct nonnull {
+  template<class T>
+  bool operator() (T const &v) const {
+    return v != 0;
   }
 };
 
@@ -66,16 +75,16 @@ struct equals {
 // syntax error.
 #if defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ < 4
   #define GOTT_ASSERT_1(x, f, m) \
-    gott::debug::assert_1((x), f,__LINE__,__FILE__,#x,m)
+    gott::x__assert::assert_1((x), f,__LINE__,__FILE__,#x,m)
   #define GOTT_ASSERT_2(x, y, f, m) \
-    gott::debug::assert_2((x),(y), f,__LINE__,__FILE__,#x,#y,m)
+    gott::x__assert::assert_2((x),(y), f,__LINE__,__FILE__,#x,#y,m)
 #else
   #define GOTT_ASSERT_1(x, f, m) \
-    gott::debug::assert_1((x),(f),__LINE__,__FILE__,#x,m)
+    gott::x__assert::assert_1((x),(f),__LINE__,__FILE__,#x,m)
   #define GOTT_ASSERT_2(x, y, f, m) \
-    gott::debug::assert_2((x),(y),(f),__LINE__,__FILE__,#x,#y,m)
+    gott::x__assert::assert_2((x),(y),(f),__LINE__,__FILE__,#x,#y,m)
 #endif  
 
-}}
+}
 
 #endif

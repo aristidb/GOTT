@@ -23,6 +23,7 @@
 #include <gott/util/tut/tut.h>
 #include <ostream>
 #include <gott/util/nstring/nstring.hpp>
+#include <gott/util/autoconv.hpp>
 
 using gott::nstring;
 
@@ -81,7 +82,7 @@ void object::test<1>(int) {
   std::wistringstream data(L"");
   parse(data, *this);
   B(); D(); U(); E();
-  ensure_equals("empty", ev, xp);
+  ensure_equals("empty", range(ev), range(xp));
 }
 
 // Very simple document
@@ -90,7 +91,7 @@ void object::test<2>(int) {
   std::wistringstream data(L"hallodu");
   parse(data, *this);
   B(); D(); N(L"hallodu"); U(); E();
-  ensure_equals("single-word", ev, xp);
+  ensure_equals("single-word", range(ev), range(xp));
 }
 
 // One-line document with more than one element
@@ -99,7 +100,7 @@ void object::test<3>(int) {
   std::wistringstream data(L"  hallodu, foobar zulu");
   parse(data, *this);
   B(); D(); N(L"hallodu"); N(L"foobar"); D(); N(L"zulu"); U(); U(); E();
-  ensure_equals("multiple-word", ev, xp);
+  ensure_equals("multiple-word", range(ev), range(xp));
 }
 
 // Empty multi-line document with funny spaces
@@ -108,7 +109,7 @@ void object::test<4>(int) {
   std::wistringstream data(L"\n\n          \n     \n\n\n");
   parse(data, *this);
   B(); D(); U(); E();
-  ensure_equals("quasi-empty", ev, xp);
+  ensure_equals("quasi-empty", range(ev), range(xp));
 }
 
 // Two simple documents
@@ -121,7 +122,7 @@ void object::test<5>(int) {
   B(); D(); N(L"foobar"); U(); E();
   B(); D(); N(L"zumwinkel"); U(); E();
 
-  ensure_equals("dual stream #1", ev, xp);
+  ensure_equals("dual stream #1", range(ev), range(xp));
 }
 
 // Indentation
@@ -131,7 +132,7 @@ void object::test<6>(int) {
   parse(data, *this);
   B(); D(); N(L"fobar"); U(); E();
 
-  ensure_equals("indented #1", ev, xp);
+  ensure_equals("indented #1", range(ev), range(xp));
 }
 
 // Indentation #2 (reduced)
@@ -141,7 +142,7 @@ void object::test<7>(int) {
   parse(data, *this);
   B(); D(); N(L"x"); U(); E();
 
-  ensure_equals("indented #2", ev, xp);
+  ensure_equals("indented #2", range(ev), range(xp));
 }
 
 
@@ -152,7 +153,7 @@ void object::test<8>(int) {
   parse(data, *this);
   B(); D(); C(L"__ mycomment,", true); U(); E();
 
-  ensure_equals("own-line comment", ev, xp);
+  ensure_equals("own-line comment", range(ev), range(xp));
 }
 
 // Newlined char
@@ -162,7 +163,7 @@ void object::test<9>(int) {
   parse(data, *this);
   B(); D(); N(L"a"); U(); E();
 
-  ensure_equals("newlined char", ev, xp);
+  ensure_equals("newlined char", range(ev), range(xp));
 }
 
 // Wiki test #1
@@ -199,7 +200,7 @@ a\n\
     U();
   E();
 
-  ensure_equals("wiki test #1", ev, xp);
+  ensure_equals("wiki test #1", range(ev), range(xp));
 }
 
 // Wiki test #2
@@ -240,7 +241,7 @@ type multi\n\
     U();
   U(); E();
 
-  ensure_equals("wiki test #2", ev, xp);
+  ensure_equals("wiki test #2", range(ev), range(xp));
 }
 
 // Wiki test #3
@@ -278,7 +279,7 @@ RIPPED:   T");
     }
   U(); E();
 
-  ensure_equals("wiki test #3", ev, xp);
+  ensure_equals("wiki test #3", range(ev), range(xp));
 }
 
 // Old CVS #1
@@ -313,7 +314,7 @@ a `\n\
     N(L"a"); D(); N(L"ahllo\n du\n"); N(L"pferd"); U();
   U(); E();
 
-  ensure_equals("Old CVS test #1", ev, xp);
+  ensure_equals("Old CVS test #1", range(ev), range(xp));
 }
 
 // Simple block test
@@ -333,7 +334,7 @@ a `\n\
     U();
   U(); E();
 
-  ensure_equals("simple block", ev, xp);
+  ensure_equals("simple block", range(ev), range(xp));
 }
 
 template<> template<>

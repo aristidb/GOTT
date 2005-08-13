@@ -21,9 +21,6 @@
 #include "named.hpp"
 #include "../event.hpp"
 #include <gott/util/nstring/nstring.hpp>
-#include <list>
-
-using std::list;
 
 using gott::xany::Xany;
 using gott::xany::Xany_cast;

@@ -23,6 +23,7 @@
 #include <sstream>
 #include <gott/util/nstring/nstring.hpp>
 #include <gott/util/nstring/stl.hpp>
+#include <gott/util/autoconv.hpp>
 
 using std::pair;
 using std::ostream;
@@ -78,7 +79,7 @@ void object::test<1>(int) {
   data = L"#?foobar qulux-dei zql";
   run_test();
   expect(L"foobar", L"qulux-dei zql");
-  ensure_equals("simple meta declaration", ev, xp);
+  ensure_equals("simple meta declaration", range(ev), range(xp));
 }
 
 template<> template<>
@@ -86,7 +87,7 @@ void object::test<2>(int) {
   data = L"\n\n\n\n#?real     kluft\n\n\n\n\n   \n       \n\n#?delta_x yz";
   run_test();
   expect(L"real", L"kluft");
-  ensure_equals("multi-line declaration", ev, xp);
+  ensure_equals("multi-line declaration", range(ev), range(xp));
   ensure_equals("multi-line declaration rest", rest, 
                 nstring(L"   \n       \n\n#?delta_x yz"));
 }
@@ -97,7 +98,7 @@ void object::test<3>(int) {
   run_test();
   expect(L"a");
   expect(L"", L"b");
-  ensure_equals("multi-line #2", ev, xp);
+  ensure_equals("multi-line #2", range(ev), range(xp));
   ensure_equals("multi-line #2 rest", rest, nstring(L"#\n#?c"));
 }
 
