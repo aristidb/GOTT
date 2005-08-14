@@ -51,15 +51,13 @@ private:
   struct active_element : Moveable<active_element> {
     rule_factory const *generator;
     slotcfg slot;
-    bool rest_accept_empty;
+    bool accept_empty, rest_accept_empty;
     
     active_element(element const &e) 
       : generator(e.first), slot(e.second) {}
   };
 
-  // TODO: down without element replay.???
-
-  void init_rest_accept_empty();
+  void init_accept_empty();
   bool search_insertible() const;
 
   typedef Vector<active_element> container;
@@ -68,6 +66,7 @@ private:
   int opened;
   bool saw_up;
   positioning::id last;
+  bool unhappy;
 
   expect expectation() const;
   bool play(ev::child_succeed const &);

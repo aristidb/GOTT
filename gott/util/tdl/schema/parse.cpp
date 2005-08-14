@@ -30,8 +30,6 @@
 #include <gott/util/nstring/stl.hpp>
 #include <gott/util/debug/assert.hpp>
 
-#include <iostream> //DEBUG
-
 using std::list;
 using boost::shared_ptr;
 using gott::nstring;
@@ -54,14 +52,12 @@ public:
   void replay_buffer();
 
   void handle_tevent(ev::token_t const &);
-  template<bool tok>
-  void handle_event(ev::event const &);
+  void handle_event(ev::event const &, bool token);
   bool try_play(ev::event const &, rule &r);
-  template<bool tok>
-  bool handle_rule(ev::event const &);
+  bool handle_rule(ev::event const &, bool token);
 
-  bool consume_event();
-  bool pass_event();
+  bool consume_event(bool token);
+  bool pass_event(bool token);
 
   void succeed_rule();
   void fail_rule();
@@ -100,9 +96,9 @@ NTL_MOVEABLE(shared_ptr<gott::tdl::schema::rule>);
 
 match::match(structure::revocable_structure &p) : pIMPL(new IMPL(p, *this)) {}
 
-match::match(rule_factory const &f, structure::revocable_structure &p)
+match::match(rule_factory const &rf, structure::revocable_structure &p)
 : pIMPL(new IMPL(p, *this)) {
-  pIMPL->add(f);
+  pIMPL->add(rf);
 }
 
 match::~match() {}
@@ -159,7 +155,7 @@ void match::comment(nstring const &, bool) {}
 match::IMPL::IMPL(structure::revocable_structure &p, match &r)
   : base_struc(p), pos(base_struc), ref(r) {}
 
-shared_ptr<writable_structure> const&match::IMPL::direct_structure_non_base() {
+shared_ptr<writable_structure> const &match::IMPL::direct_structure_non_base() {
   if (parse.IsEmpty()) {
     static shared_ptr<writable_structure> nothing;
     return nothing;
@@ -168,22 +164,26 @@ shared_ptr<writable_structure> const&match::IMPL::direct_structure_non_base() {
 }
 
 void match::IMPL::add(rule_factory const &f) {
-  shared_ptr<writable_structure> struc = direct_structure_non_base();
   int current = parse.GetCount();
   parse.Add();
+
   shared_ptr<rule> the_rule(f.get(ref));
+  GOTT_ASSERT_1(the_rule, nonnull(), "Acquired rule");
+
+  shared_ptr<writable_structure> struc = direct_structure_non_base();
   if (structure::repatcher const *r = the_rule->attributes().repatcher())
     struc.reset(r->deferred_write(struc ? *struc : base_struc));
+
   parse[current] = entry(the_rule, struc);
-  GOTT_ASSERT_1(parse[current].the_rule, nonnull(), "Acquired rule");
 }
 
 template<class T>
 void match::IMPL::handle_token(T const &e) {
   shadow.clear();
   copy(range(parse), std::back_inserter(shadow));
+
   pos.add(e);
-  handle_event<true>(e);
+  handle_event(e, true);
   while (pos.want_replay())
     replay_buffer();
 }
@@ -192,30 +192,28 @@ void match::IMPL::replay_buffer() {
   struct acc : positioning::acceptor {
     match::IMPL *tt;
     void operator() (ev::token const &t) {
-      tt->handle_event<true>(t);
+      tt->handle_event(t, true);
     }
     acc(match::IMPL *t) : tt(t) {}
   } a(this);
   pos.replay(a);
 }
 
-template<bool tok>
-void match::IMPL::handle_event(ev::event const &e) {
+void match::IMPL::handle_event(ev::event const &event, bool token) {
   if (parse.IsEmpty()) 
     fail_all();
   while (!parse.IsEmpty()) 
-    if (handle_rule<tok>(e)) 
+    if (handle_rule(event, token)) 
       break;
 }
 
-template<bool tok> 
-bool match::IMPL::handle_rule(ev::event const &event) {
+bool match::IMPL::handle_rule(ev::event const &event, bool token) {
   if (try_play(event, *parse.back().the_rule)) {
-    if (tok) pos.consume();
-    return consume_event();
+    if (token) pos.consume();
+    return consume_event(token);
   } else {
-    if (tok) pos.pass();
-    return pass_event();
+    if (token) pos.pass();
+    return pass_event(token);
   }
 }
 
@@ -227,13 +225,13 @@ bool match::IMPL::try_play(ev::event const &event, rule &current) {
   }
 }
 
-bool match::IMPL::consume_event() {
+bool match::IMPL::consume_event(bool) {
   if (parse.back().the_rule->expectation() == rule::nothing)
     succeed_rule();
   return true;
 }
 
-bool match::IMPL::pass_event() {
+bool match::IMPL::pass_event(bool) {
   if (parse.back().the_rule->expectation() == rule::need) {
     fail_rule();
     return true;
@@ -248,14 +246,14 @@ void match::IMPL::succeed_rule() {
   parse.pop_back();
 
   if (!parse.IsEmpty())
-    handle_event<false>(ev::child_succeed());
+    handle_event(ev::child_succeed(), false);
 }
 
 void match::IMPL::fail_rule() {
   parse.pop_back();
 
   if (!parse.IsEmpty())
-    handle_event<false>(ev::child_fail());
+    handle_event(ev::child_fail(), false);
   else
     fail_all();
 }

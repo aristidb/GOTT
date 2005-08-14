@@ -20,8 +20,6 @@
 
 #include "follow_ordered.hpp"
 
-
-
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
 using schema::rule;
@@ -29,22 +27,25 @@ using schema::match_follow_ordered;
 
 match_follow_ordered::match_follow_ordered(Vector<element> const &c, 
     rule_attr const &a, match &m)
-: rule(a, m), opened(0), saw_up(false), last(m.pos().current()) {
+: rule(a, m), opened(0), saw_up(false), last(m.pos().current()), 
+    unhappy(false) {
   for (Vector<element>::const_iterator it = c.begin(); it != c.end(); ++it)
     children.Add(*it);
   pos = children.begin();
-  init_rest_accept_empty();
+  init_accept_empty();
   if (expectation() == nothing)
     return;
   last = matcher().pos().current();
   matcher().add(*pos->generator);
 }
 
-void match_follow_ordered::init_rest_accept_empty() {
+void match_follow_ordered::init_accept_empty() {
   bool rest_accept_empty = true;
   for (int i = children.GetCount() - 1; i >= 0; --i) {
-    children[i].rest_accept_empty = rest_accept_empty;
-    rest_accept_empty &= children[i].generator->accept_empty();
+    active_element &e = children[i];
+    e.rest_accept_empty = rest_accept_empty;
+    e.accept_empty = e.generator->accept_empty();
+    rest_accept_empty &= (e.slot.prefix_optional() || e.accept_empty);
   }
 }
 
@@ -53,31 +54,36 @@ match_follow_ordered::~match_follow_ordered() {}
 bool match_follow_ordered::play(ev::child_succeed const &) {
   if (matcher().pos().proceeded(last)) {
     pos->slot.add();
-  } else if (search_insertible()) {
+  } else {
+    ++pos; // don't repeat empty
+    if (!search_insertible())
+      return true;
     last = matcher().pos().current();
     matcher().add(*pos->generator);
-  } else
-    return false;
+  }
   return true;
 }
 
 bool match_follow_ordered::play(ev::child_fail const &) {
+  bool unhappy_delayed = !pos->accept_empty;
   ++pos; // Skip the undoable
-  if (!search_insertible())
+  if (!search_insertible()) {
+    unhappy = unhappy_delayed;
+    matcher().pos().seek(last);
     return false;
+  }
   matcher().pos().seek(last);
   matcher().add(*pos->generator);
   return true;
 }
 
 bool match_follow_ordered::play(ev::down const &) {
-  if (!saw_up && search_insertible()) {
-    ++opened;
-    last = matcher().pos().current();
-    matcher().add(*pos->generator);
-    return true;
-  } else 
+  if (saw_up || !search_insertible())
     return false;
+  ++opened;
+  last = matcher().pos().current();
+  matcher().add(*pos->generator);
+  return true;
 }
 
 bool match_follow_ordered::play(ev::up const &) {
@@ -96,12 +102,15 @@ bool match_follow_ordered::search_insertible() const {
 }
 
 rule::expect match_follow_ordered::expectation() const {
-  if (opened != 0)
+  if (unhappy) 
+    return need;
+  if (opened != 0) 
     return need; 
-  if (!search_insertible())
-    return nothing; 
-  if (pos->slot.expectation() != need && pos->rest_accept_empty) 
-    return maybe; 
+  if (!search_insertible()) 
+    return nothing;
+  if (pos->rest_accept_empty)
+    if (pos->slot.expectation() != need || pos->accept_empty) 
+      return maybe;
   return need;
 }
 
@@ -114,6 +123,5 @@ bool match_follow_ordered::accept_empty(Vector<element> const &children) {
 }
 
 wchar_t const *match_follow_ordered::name() const {
-//  return L"follow_ordered";
   return L"follow";
 }

@@ -29,12 +29,13 @@ namespace x__assert {
 template<class T, class U>
 void fail(int line, char const *file, char const *lhs, char const *rhs,
           char const *message, T const &lhs_v, U const &rhs_v) {
-  std::cerr << "Assertion failed in " << file << ':' << line << '\n';
-  std::cerr << "Message: " << message << '\n';
+  std::wcout << "Assertion failed in " << file << ':' << line << '\n';
+  std::wcout << "Message: " << message << '\n';
   if (lhs)
-    std::cerr << lhs << ": " << lhs_v << '\n';
+    std::wcout << lhs << ": " << lhs_v << '\n';
   if (rhs)
-    std::cerr << rhs << ": " << rhs_v << '\n';
+    std::wcout << rhs << ": " << rhs_v << '\n';
+  std::wcout << std::flush;
 }
 
 template<class T, class F>
