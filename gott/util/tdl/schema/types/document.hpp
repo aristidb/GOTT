@@ -47,7 +47,7 @@ private:
   bool play(ev::up const &);
   bool play(ev::end_parse const &);
   bool play(ev::child_succeed const &);
-  wchar_t const *name() const;
+  nstring name() const;
 };
 
 }}}

@@ -128,6 +128,6 @@ bool match_follow_ordered::accept_empty(Vector<element> const &children) {
   return accept;
 }
 
-wchar_t const *match_follow_ordered::name() const {
-  return L"follow";
+gott::nstring match_follow_ordered::name() const {
+  return "follow";
 }

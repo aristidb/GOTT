@@ -73,7 +73,7 @@ private:
   bool play(ev::child_fail const &);
   bool play(ev::down const &);
   bool play(ev::up const &);
-  wchar_t const *name() const;
+  nstring name() const;
 };
 
 }}}

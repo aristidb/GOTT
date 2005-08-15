@@ -48,7 +48,7 @@ private:
 
   bool play(ev::child_fail const &);
   bool play(ev::child_succeed const &);
-  wchar_t const *name() const;
+  nstring name() const;
 };
 
 }}}

@@ -84,6 +84,6 @@ rule::expect match_named::expectation() const {
   return state == done ? nothing : need;
 }
 
-wchar_t const *match_named::name() const {
-  return L"named";
+gott::nstring match_named::name() const {
+  return "named";
 }

@@ -39,6 +39,6 @@ bool match_node::play(ev::node const &n) {
   return true;
 }
 
-wchar_t const *match_node::name() const {
-  return L"node";
+gott::nstring match_node::name() const {
+  return "node";
 }

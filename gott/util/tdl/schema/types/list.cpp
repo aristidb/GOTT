@@ -75,6 +75,6 @@ rule::expect match_list::expectation() const {
   return cfg.expectation();
 }
 
-wchar_t const *match_list::name() const {
+gott::nstring match_list::name() const {
   return L"list";
 }

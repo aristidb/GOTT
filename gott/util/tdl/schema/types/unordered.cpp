@@ -85,6 +85,6 @@ bool match_unordered::accept_empty(Vector<element> const &children) {
   return accept;
 }
 
-wchar_t const *match_unordered::name() const {
+gott::nstring match_unordered::name() const {
   return L"unordered";
 }

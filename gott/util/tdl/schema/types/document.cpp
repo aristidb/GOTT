@@ -64,6 +64,6 @@ bool match_document::play(ev::child_succeed const &) {
   return true;
 }
 
-wchar_t const *match_document::name() const {
-  return L"document";
+gott::nstring match_document::name() const {
+  return "document";
 }
