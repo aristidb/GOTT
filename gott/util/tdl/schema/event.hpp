@@ -56,7 +56,7 @@ public:
    * Meant for debugging purposes.
    * \param s The stream to write to.
    */
-  virtual void print(std::wostream &s) const = 0;
+  virtual void print(std::ostream &s) const = 0;
 
   virtual ~event() = 0;
 };
@@ -64,7 +64,7 @@ public:
 /**
  * Print an event to a stream.
  */
-inline std::wostream &operator<<(std::wostream &s, event const &e) {
+inline std::ostream &operator<<(std::ostream &s, event const &e) {
   e.print(s);
   return s;
 }
@@ -77,14 +77,14 @@ class token : public event {
 class begin_parse : public token {
 public:
   bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  void print(std::ostream &s) const;
 };
 
 /// The event class for the simple::parser::down token.
 class down : public token {
 public:
   bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  void print(std::ostream &s) const;
 };
 
 /// The event class for the simple::parser::node token.
@@ -95,7 +95,7 @@ public:
     // construct a node with the given data
 
   bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  void print(std::ostream &s) const;
 
   nstring const &get_data() const GOTT_EXPORT;
     // get the data of this node-event
@@ -105,14 +105,14 @@ public:
 class up : public token {
 public:
   bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  void print(std::ostream &s) const;
 };
 
 /// The event class for the simple::parser::end_parse token.
 class end_parse : public token {
 public:
   bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  void print(std::ostream &s) const;
 };
 
 typedef boost::variant<begin_parse, down, node, up, end_parse> token_t;
@@ -129,14 +129,14 @@ class notification : public event {
 class child_succeed : public notification {
 public:
   bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  void print(std::ostream &s) const;
 };
 
 /// The event class for a failed child.
 class child_fail : public notification {
 public:
   bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  void print(std::ostream &s) const;
 };
 
 }}}}

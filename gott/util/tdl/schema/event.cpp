@@ -24,7 +24,7 @@
 
 namespace ev = gott::tdl::schema::ev;
 using gott::tdl::schema::rule;
-using std::wostream;
+using std::ostream;
 using boost::static_visitor;
 
 ev::event::~event() {}
@@ -57,32 +57,32 @@ bool ev::child_fail::play(rule &r) const {
   return r.play(*this);
 }
 
-void ev::begin_parse::print(wostream &s) const {
-  s << L"token:begin_parse";
+void ev::begin_parse::print(ostream &s) const {
+  s << "token:begin_parse";
 }
 
-void ev::node::print(wostream &s) const {
-  s << L"token:node{" << data << L"}";
+void ev::node::print(ostream &s) const {
+  s << "token:node{" << data << "}";
 }
 
-void ev::down::print(wostream &s) const {
-  s << L"token:down";
+void ev::down::print(ostream &s) const {
+  s << "token:down";
 }
 
-void ev::up::print(wostream &s) const {
-  s << L"token:up";
+void ev::up::print(ostream &s) const {
+  s << "token:up";
 }
 
-void ev::end_parse::print(wostream &s) const {
-  s << L"token:end_parse";
+void ev::end_parse::print(ostream &s) const {
+  s << "token:end_parse";
 }
 
-void ev::child_succeed::print(wostream &s) const {
-  s << L"notify:child_succeed";
+void ev::child_succeed::print(ostream &s) const {
+  s << "notify:child_succeed";
 }
 
-void ev::child_fail::print(wostream &s) const {
-  s << L"notify:child_fail";
+void ev::child_fail::print(ostream &s) const {
+  s << "notify:child_fail";
 }
 
 ev::node::node(nstring const &s) : data(s) {}

@@ -175,7 +175,6 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  try {
   run_test(
       L"module anything 0.0\n"
        "export\n"
@@ -188,17 +187,10 @@ void object::test<1>(int) {
   );
   S(Xany()).write_to(xp);
   ensure_equals(tree, xp);
-  } catch (schema::mismatch const &m) {
-#ifndef IGNORE_ERRORS
-    std::cout << tree << std::endl;
-    throw;
-#endif
-  }
 }
 
 template<> template<>
 void object::test<2>(int) {
-  try {
   run_test(
       L"module anything 0.0\n"
        "export\n"
@@ -208,12 +200,6 @@ void object::test<2>(int) {
   );
   S(Xany()).write_to(xp);
   ensure_equals(tree, xp);
-  } catch (schema::mismatch const &m) {
-#ifndef IGNORE_ERRORS
-    std::cout << tree << std::endl;
-    throw;
-#endif
-  }
 }
 
 template<> template<>

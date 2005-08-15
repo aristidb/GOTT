@@ -65,10 +65,12 @@ bool match_follow_ordered::play(ev::child_succeed const &) {
 }
 
 bool match_follow_ordered::play(ev::child_fail const &) {
-  bool unhappy_delayed = !pos->accept_empty;
+  bool this_flee = !pos->accept_empty;
+  unhappy |= this_flee && pos->slot.expectation() == need;
   ++pos; // Skip the undoable
   if (!search_insertible()) {
-    unhappy = unhappy_delayed;
+    if (!this_flee)
+      return true;
     matcher().pos().seek(last);
     return false;
   }
@@ -105,7 +107,7 @@ rule::expect match_follow_ordered::expectation() const {
   if (unhappy) 
     return need;
   if (opened != 0) 
-    return need; 
+    return need;
   if (!search_insertible()) 
     return nothing;
   if (pos->rest_accept_empty)

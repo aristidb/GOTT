@@ -30,12 +30,10 @@
 #include <gott/util/nstring/stl.hpp>
 #include <gott/util/debug/assert.hpp>
 
-using std::list;
 using boost::shared_ptr;
 using gott::nstring;
 namespace simple = gott::tdl::simple;
 namespace structure = gott::tdl::structure;
-
 using gott::tdl::schema::match;
 using gott::tdl::schema::positioning;
 using structure::writable_structure;
