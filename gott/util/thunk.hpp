@@ -23,6 +23,7 @@
 
 #include <gott/util/visibility.hpp>
 #include <cstddef>
+#include <memory>
 
 namespace gott {
 
@@ -38,8 +39,9 @@ template<class Out, class In, class Context>
 struct concrete_thunk_t;
 
 template<class Out, class Context, class In>
-thunk_t<Out> *thunk(In const &data, Context con = Context()) {
-  return new concrete_thunk_t<Out, In, Context>(data, con);
+std::auto_ptr<thunk_t<Out> > thunk(In const &data, Context con = Context()) {
+  return std::auto_ptr<thunk_t<Out> >(
+      new concrete_thunk_t<Out, In, Context>(data, con));
 }
 
 struct integer_to_digits {};
@@ -60,17 +62,18 @@ struct concrete_thunk_t<Out, Int, integer_to_digits> : thunk_t<Out> {
   }
 
   Out call() {
-    div /= 10;
+    if (div > 1)
+      div /= 10;
     return (data / div) % 10;
   }
 
   std::size_t size() const {
-    Int x = div;
-    std::size_t sz = Int();
-    while (div > Int()) {
-      x /= 10;
+    Int x = 1;
+    std::size_t sz = 0;
+    do {
       ++sz;
-    }
+      x *= 10;
+    } while (x <= data);
     return sz;
   }
 };

@@ -20,73 +20,71 @@
 
 #include "print.hpp"
 #include <ostream>
-#include <sstream>
 #include <gott/util/nstring/nstring.hpp>
-#include <gott/util/autoconv.hpp>
 
-using std::wostream;
-
-using std::list;
+using std::basic_ostream;
 using gott::xany::Xany;
 using gott::tdl::structure::direct_print;
 
-class direct_print::IMPL {
+template<class C>
+class direct_print<C>::IMPL {
 public:
-  IMPL(wostream &o, unsigned s)
+  IMPL(basic_ostream<C> &o, unsigned s)
   : out(o), level(-s), step(s), line_ended(true), tag_printed(false) {}
   
-  wostream &out;
+  basic_ostream<C> &out;
   unsigned level;
   unsigned const step;
   bool line_ended, tag_printed;    
 };
 
-direct_print::direct_print(wostream &o, unsigned s) 
+template<class C>
+direct_print<C>::direct_print(basic_ostream<C> &o, unsigned s) 
 : p(new IMPL(o, s)) {}
 
-direct_print::~direct_print() {}
+template<class C> direct_print<C>::~direct_print() {}
 
-void direct_print::begin() {
+template<class C> void direct_print<C>::begin() {
   p->level += p->step;
   if (!p->line_ended)
-    p->out << L'\n';
+    p->out << '\n';
   p->line_ended = true;
 }
 
-void direct_print::end() {
+template<class C> void direct_print<C>::end() {
   p->level -= p->step;
 }
 
-void direct_print::data(Xany const &x) {
+template<class C> void direct_print<C>::data(Xany const &x) {
   for (unsigned i = 0; i < p->level; ++i)
-    p->out << L' ';
+    p->out << ' ';
   if (x.empty())
-    p->out << L'-';
+    p->out << '-';
   else
     p->out << x;
   p->tag_printed = false;
   p->line_ended = false;
 }
 
-void direct_print::add_tag(nstring const &s) {
+template<class C> void direct_print<C>::add_tag(nstring const &s) {
   if (p->tag_printed)
-    p->out << L", ";
+    p->out << ", ";
   else
-    p->out << L" : ";
+    p->out << " : ";
   p->out << s;
   p->tag_printed = true;
 }
 
-std::wostream &gott::tdl::structure::operator<<(std::wostream &o, 
-                                                copyable_structure const &s) {
-  direct_print p(o);
+std::ostream &gott::tdl::structure::operator<<(std::ostream &o, 
+                                               copyable_structure const &s) {
+  direct_print<char> p(o);
   s.copy_to(p);
   return o;
 }
 
-std::ostream &gott::tdl::structure::operator<<(std::ostream &o, 
-                                               copyable_structure const &s) {
-  std::wostringstream wo;
-  wo << s;
-  return o << wo.str();
+std::wostream &gott::tdl::structure::operator<<(std::wostream &o, 
+                                                copyable_structure const &s) {
+  direct_print<wchar_t> p(o);
+  s.copy_to(p);
+  return o;
 }

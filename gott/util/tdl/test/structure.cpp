@@ -24,6 +24,7 @@
 #include <gott/util/tdl/structure/print.hpp>
 #include <gott/util/tut/tut.h>
 #include <gott/util/autoconv.hpp>
+#include <sstream>
 
 namespace stru = gott::tdl::structure;
 namespace cf = stru::cf;
@@ -114,8 +115,11 @@ void object::test<5>(int) {
     w.end();
   w.end();
 
-  ensure_equals("stringified tree", stru::to_string<wchar_t>(p1),
-      L"-\n    8899.2\n        77 : --!");
+  std::ostringstream strm;
+  stru::direct_print<char> o(strm);
+  p1.copy_to(o);
+  ensure_equals("stringified tree", strm.str(),
+      "-\n    8899.2\n        77 : --!");
 }
 
 template<> template<>

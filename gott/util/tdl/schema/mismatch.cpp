@@ -23,24 +23,37 @@
 #include <gott/util/range.hpp>
 #include <gott/util/autoconv.hpp>
 #include <gott/util/nstring/stl.hpp>
-#include <sstream>
+#include <gott/util/thunk.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace schema = gott::tdl::schema;
 using schema::mismatch;
 using gott::range;
 using gott::nstring;
+using gott::thunk_t;
+using gott::thunk;
+using gott::integer_to_string;
 
 static nstring build_string(schema::detail::stream_position const &p,
                             Vector<nstring> const &t) {
-  std::wostringstream o;
-  o << p.line << L':' << p.pos+1 << L" : mismatch in ";
-  print_separated(o, range(t), L">");
+  Vector<nstring> out;
+  out.Add(*thunk<gott::utf8_t, integer_to_string>(p.line));
+  out.Add(":");
+  out.Add(*thunk<gott::utf8_t, integer_to_string>(p.pos + 1));
+  out.Add(" : mismatch in ");
+  gott::range_t<nstring const *> tg = range(t);
+  if (tg.begin != tg.end)
+    out.Add(*tg.begin++);
+  for (; tg.begin != tg.end; ++tg.begin) {
+    out.Add(">");
+    out.Add(*tg.begin);
+  }
   if (p.line_new > p.line || p.current > p.native_end)
-    o << L" after token ";
+    out.Add(" after token ");
   else
-    o << L" at token ";
-  o << p.tok;
-  return o.str();
+    out.Add(" at token ");
+  out.Add(p.tok);
+  return range(out).cast<nstring const *>();
 }
 
 mismatch::mismatch(detail::stream_position const &p, 

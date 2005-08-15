@@ -202,14 +202,10 @@ inline bool operator!=(tree const &lhs, tree const &rhs) {
  * \param s The stream to print to.
  * \param i The iterator to print.
  */
-GOTT_EXPORT 
-std::wostream &operator<<(std::wostream &s, tree::iterator const &i);
-
-/**
- * Print a tree::iterator to a (normal) stream.
- * @copydoc operator<<(std::wostream &, tree::iterator const &)
- */
-GOTT_EXPORT std::ostream &operator<<(std::ostream &s, tree::iterator const &i);
+template<class Ch>
+std::basic_ostream<Ch> &
+operator<<(std::basic_ostream<Ch> &s, tree::iterator const &i)
+GOTT_EXPORT;
 
 }}}
 

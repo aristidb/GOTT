@@ -315,8 +315,10 @@ bool tree::node::equals(node const &o) const {
   return !(p || q);
 }
 
-std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
-  direct_print p(s);
+template<class Ch>
+std::basic_ostream<Ch> &
+stru::operator<<(std::basic_ostream<Ch> &s, tree::iterator const &i) {
+  direct_print<Ch> p(s);
   struct printer {
     writable_structure &p;
     void operator() (tree::iterator const &x) {
@@ -326,7 +328,7 @@ std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
              it != x.get_tags().end(); ++it)
           p.add_tag(*it);
         for (tree::iterator i = x.first_child(); i; i = i.next())
-          this->operator()(i);
+          operator()(i);
       p.end();
     }
   } x = {p};
@@ -334,11 +336,8 @@ std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
   return s;
 }
 
-std::ostream &stru::operator<<(std::ostream &s, tree::iterator const &i) {
-  std::wostringstream w;
-  w << i;
-  return s << w.str();
-}
+template std::ostream&stru::operator<<(std::ostream &, tree::iterator const &);
+template std::wostream&stru::operator<<(std::wostream&,tree::iterator const &);
 
 #ifdef DEBUG
 #include <iostream>

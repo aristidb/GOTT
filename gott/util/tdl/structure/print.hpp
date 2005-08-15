@@ -32,6 +32,7 @@ namespace structure {
  * A structure writer callback directly writing to a stream. Does not support
  * backtracking, of course.
  */
+template<class Ch>
 class direct_print : public writable_structure {
 public:
   /**
@@ -39,7 +40,7 @@ public:
    * \param out The stream to write to.
    * \param step The indentation width.
    */
-  GOTT_EXPORT direct_print(std::wostream &out, unsigned step = 4);
+  GOTT_EXPORT direct_print(std::basic_ostream<Ch> &out, unsigned step = 4);
   GOTT_EXPORT ~direct_print();
 
 private:
@@ -66,17 +67,6 @@ std::wostream &operator<<(std::wostream &o, copyable_structure const &s);
  */
 GOTT_EXPORT
 std::ostream &operator<<(std::ostream &o, copyable_structure const &s);
-
-/**
- * Convert a (copyable) structure to a string (wide or narrow).
- * \param s The structure to convert.
- */
-template<class Ch>
-std::basic_string<Ch> to_string(copyable_structure const &s) {
-  std::basic_ostringstream<Ch> o;
-  o << s;
-  return o.str();
-}
 
 }}}
 
