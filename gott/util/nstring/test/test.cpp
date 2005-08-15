@@ -26,7 +26,7 @@ int main() {
   nstring ae_euro(zero_terminated((utf8_t const *) ae_euro_lit), 
                   nstring::utf8_literal);
   nstring_buffer b(ae_euro);
-  cerr << (b.size() == ae_euro.length()) << L'\n';
+  cerr << (b.size() == ae_euro.length()) << '\n';
   //to_upper(b);
   b[1] = utf32_t(L':');
   b.erase(range(b.begin() + 2, 4));
