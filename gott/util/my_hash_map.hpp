@@ -45,7 +45,7 @@ template<class C,class CT,class A> struct hash<std::basic_string<C,CT,A> > {
   std::size_t operator() (string_t const &a) const {
     size_t x = 0;
     for (typename string_t::const_iterator it = a.begin(); it != a.end(); ++it)
-      x = 5*x + *it;
+      x = 5*x + *it; // TODO: compare 31*x+*it
     return x;
   }
 };

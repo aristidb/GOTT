@@ -230,6 +230,6 @@ std::size_t
 hashd::hash<gott::string>::operator() (gott::string const &s) const {
   std::size_t result = 0;
   for (gott::utf8_t const *it = s.begin_raw(); it != s.end_raw(); ++it)
-    result = 5 * result + *it;
+    result = 5 * result + *it; // TODO: compare 31*result+*it
   return result;
 }
