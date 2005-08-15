@@ -36,6 +36,9 @@ namespace std {
   template<class, class> class vector;
   template<class, class> class list;
   template<class, class> class basic_ostream;
+  template<class, class, class> class basic_string;
+  typedef basic_string<char, char_traits<char>, allocator<char> > string;
+  typedef basic_string<wchar_t,char_traits<wchar_t>,allocator<wchar_t> >wstring;
 }
 
 namespace gott {
@@ -81,6 +84,28 @@ public:
    * Construct nstring from thunk.
    */
   nstring(thunk_t<utf8_t> &);
+
+  /**
+   * Construct nstring from std::string.
+   */
+  nstring(std::string const &, encoding = utf8);
+
+  /**
+   * Construct nstring from std::wstring.
+   */
+  nstring(std::wstring const &, encoding = utf32);
+
+  /**
+   * Construct std::string from nstring using unicode encoding.
+   * Use to_string if you need a different encoding.
+   */
+  operator std::string() const;
+
+  /**
+   * Construct std::wstring from nstring using unicode encoding.
+   * Use to_wstring if you need a different encoding.
+   */
+  operator std::wstring() const;
   
   enum literal_tag { utf8_literal };
 

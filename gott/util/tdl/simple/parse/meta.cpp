@@ -45,7 +45,7 @@ void gott::tdl::simple::parse_meta(std::wistream &in, meta_parser &p,
       in.get();
       std::wstring s;
       getline(in, s);
-      p.exec(to_nstring(s));
+      p.exec(s);
     }
   }
 }

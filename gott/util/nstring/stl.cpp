@@ -41,11 +41,3 @@ wstring gott::to_wstring(nstring const &str, encoding enc) {
   delete [] out.begin;
   return result;
 }
-
-nstring gott::to_nstring(string const &str, encoding enc) {
-  return nstring(range(&str[0], &str[str.length()]), enc);
-}
-
-nstring gott::to_nstring(wstring const &str, encoding enc) {
-  return nstring(range(&str[0], &str[str.length()]), enc);
-}

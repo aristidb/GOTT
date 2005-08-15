@@ -19,8 +19,6 @@
 #ifndef GOTT_UTIL_XANY_PROMOTE_HPP
 #define GOTT_UTIL_XANY_PROMOTE_HPP
 
-#include <gott/util/nstring/stl.hpp>
-
 namespace gott {
 class nstring;
 
@@ -100,9 +98,9 @@ struct promote<std::string> {
   class reference {
   public:
     reference(nstring &r) : ref_val(r) {}
-    operator std::string() const { return to_string(ref_val); }
+    operator std::string() const { return ref_val; }
     reference operator=(std::string const &s) {
-      ref_val = to_nstring(s);
+      ref_val = s;
       return *this;
     }
 
@@ -110,7 +108,7 @@ struct promote<std::string> {
     nstring &ref_val;
   };
 
-  static nstring get(std::string const &s) { return to_nstring(s); }
+  static nstring get(std::string const &s) { return s; }
   static reference get_back(nstring &s) { return s; }
 };
 
@@ -120,9 +118,9 @@ struct promote<std::wstring> {
   class reference {
   public:
     reference(nstring &r) : ref_val(r) {}
-    operator std::wstring() const { return to_wstring(ref_val); }
+    operator std::wstring() const { return ref_val; }
     reference operator=(std::wstring const &s) {
-      ref_val = to_nstring(s);
+      ref_val = s;
       return *this;
     }
 
@@ -130,7 +128,7 @@ struct promote<std::wstring> {
     nstring &ref_val;
   };
 
-  static nstring get(std::wstring const &s) { return to_nstring(s); }
+  static nstring get(std::wstring const &s) { return s; }
   static reference get_back(nstring &s) { return s; }
 };
 

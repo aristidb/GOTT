@@ -22,6 +22,7 @@
 #include "convert.hpp"
 #include "buffer.hpp"
 #include "iterator.hpp"
+#include "stl.hpp"
 
 #include <gott/util/range.hpp>
 #include <gott/util/range_algo.hpp>
@@ -29,6 +30,7 @@
 #include <list>
 #include <vector>
 #include <ostream>
+#include <string>
 
 using gott::nstring;
 
@@ -79,6 +81,13 @@ nstring::nstring(range_t<char const *> in, encoding enc)
 
 nstring::nstring(char const *in, encoding enc)
 : p(new representation(to_utf8_alloc(zero_terminated(in), enc))) {}
+
+nstring::nstring(std::string const &s, encoding enc)
+: p(new representation(to_utf8_alloc(range(&s[0], s.length()), enc))) {}
+
+nstring::nstring(std::wstring const &s, encoding enc)
+: p(new representation(
+      to_utf8_alloc(range(&s[0], s.length()).cast<char const*>(), enc))) {}
 
 nstring::nstring(thunk_t<utf8_t> &thk) : p(0) {
   std::size_t len = thk.size();
@@ -163,6 +172,14 @@ void nstring::swap(nstring &o) {
 
 void nstring::operator=(nstring const &o) {
   nstring(o).swap(*this);
+}
+
+nstring::operator std::string() const {
+  return to_string(*this);
+}
+
+nstring::operator std::wstring() const {
+  return to_wstring(*this);
 }
 
 std::ostream &gott::operator<<(std::ostream &stream, nstring const &s) {

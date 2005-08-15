@@ -40,7 +40,7 @@ static nstring build_string(schema::detail::stream_position const &p,
   else
     o << L" at token ";
   o << p.tok;
-  return gott::to_nstring(o.str());
+  return o.str();
 }
 
 mismatch::mismatch(detail::stream_position const &p, 
