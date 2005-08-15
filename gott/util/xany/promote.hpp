@@ -88,49 +88,11 @@ GOTT_XANY_DECLARE_PROMOTER(float, double);
 
 GOTT_XANY_DECLARE_PROMOTER(char const *, nstring);
 GOTT_XANY_DECLARE_PROMOTER(char *, nstring);
+GOTT_XANY_DECLARE_PROMOTER(std::string, nstring);
 
 GOTT_XANY_DECLARE_PROMOTER(wchar_t const *, nstring);
 GOTT_XANY_DECLARE_PROMOTER(wchar_t *, nstring);
-
-template<>
-struct promote<std::string> {
-  typedef nstring type;
-  class reference {
-  public:
-    reference(nstring &r) : ref_val(r) {}
-    operator std::string() const { return ref_val; }
-    reference operator=(std::string const &s) {
-      ref_val = s;
-      return *this;
-    }
-
-  private:
-    nstring &ref_val;
-  };
-
-  static nstring get(std::string const &s) { return s; }
-  static reference get_back(nstring &s) { return s; }
-};
-
-template<>
-struct promote<std::wstring> {
-  typedef nstring type;
-  class reference {
-  public:
-    reference(nstring &r) : ref_val(r) {}
-    operator std::wstring() const { return ref_val; }
-    reference operator=(std::wstring const &s) {
-      ref_val = s;
-      return *this;
-    }
-
-  private:
-    nstring &ref_val;
-  };
-
-  static nstring get(std::wstring const &s) { return s; }
-  static reference get_back(nstring &s) { return s; }
-};
+GOTT_XANY_DECLARE_PROMOTER(std::wstring, nstring);
 
 }}
 
