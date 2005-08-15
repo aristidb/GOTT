@@ -29,7 +29,7 @@ using namespace stru::cf;
 
 typedef schema::rule_attr RA;
 typedef stru::repatch_enumeration E;
-typedef Vector<gott::nstring> VN;
+typedef Vector<gott::string> VN;
 
 namespace {
 struct schema_multi_follow : tut::schema_basic {

@@ -26,7 +26,7 @@ namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
 
-using gott::nstring;
+using gott::string;
 using stru::cf::S;
 using stru::cf::C;
 using schema::rule_attr;
@@ -36,7 +36,7 @@ struct schema_literal : tut::schema_basic {
   schema_literal() {
     context.begin("document");
       context.begin("node", rule_attr(L"foobar", true, 
-             new stru::repatch_enumeration(Vector<nstring>() | "foobar")));
+             new stru::repatch_enumeration(Vector<string>() | "foobar")));
       context.end();
     context.end();
   }

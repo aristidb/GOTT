@@ -22,23 +22,23 @@
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tut/tut.h>
 #include <ostream>
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 #include <gott/util/autoconv.hpp>
 
-using gott::nstring;
+using gott::string;
 
 namespace tut {
 struct spb : gott::tdl::simple::parser {
   enum event_id { b, e, d, u, n, c };
-  typedef std::pair<event_id, nstring> event;
+  typedef std::pair<event_id, string> event;
   Vector<event> xp, ev;
 
   void begin_parse() { ev.push_back(event(b, L"")); }
   void end_parse() { ev.push_back(event(e, L"")); }
   void down() { ev.push_back(event(d, L"")); }
   void up() { ev.push_back(event(u, L"")); }
-  void node(nstring const &w) { ev.push_back(event(n, w)); }
-  void comment(nstring const &w, bool nl) { 
+  void node(string const &w) { ev.push_back(event(n, w)); }
+  void comment(string const &w, bool nl) { 
     ev.push_back(event(c, (nl ? L"\n" : L"") + w)); 
   }
 
@@ -46,8 +46,8 @@ struct spb : gott::tdl::simple::parser {
   void E() { xp.push_back(event(e, L"")); }
   void D() { xp.push_back(event(d, L"")); }
   void U() { xp.push_back(event(u, L"")); }
-  void N(nstring const &w) { xp.push_back(event(n, w)); }
-  void C(nstring const &w, bool nl) { 
+  void N(string const &w) { xp.push_back(event(n, w)); }
+  void C(string const &w, bool nl) { 
     xp.push_back(event(c, (nl ? L"\n" : L"") + w)); 
   }
 };
@@ -264,7 +264,7 @@ ARTIST:   \"Kathy Mattea\"\n\
 RATING:   7\n\
 RIPPED:   T");
   parse(data, *this);
-  nstring dataset[3][4] = {
+  string dataset[3][4] = {
     {L"Home",  L"Dixie Chicks", L"9", L"T"},
     {L"Fly",   L"Dixie Chicks", L"8", L"T"},
     {L"Roses", L"Kathy Mattea", L"7", L"T"}

@@ -40,7 +40,7 @@ repatch_integer::deferred_write(writable_structure &s) const {
       if (x.compatible<long>())
         target.data(x);
       else if (x.compatible<std::wstring>()) {
-        nstring input = xany::Xany_cast<nstring>(x);
+        string input = xany::Xany_cast<string>(x);
         long result;
         if (!is_integer(input, result))
           throw failed_repatch(L"repatch_integer: could not match integer");
@@ -49,11 +49,11 @@ repatch_integer::deferred_write(writable_structure &s) const {
         throw failed_repatch(L"repatch_integer: could not match integer");
     }
 
-    bool is_integer(nstring const &s, long &val) {
+    bool is_integer(string const &s, long &val) {
       long sign = 1;
       val = 0;
   
-      nstring::const_iterator it = s.begin();
+      string::const_iterator it = s.begin();
   
       if (it == s.end())
         return false;

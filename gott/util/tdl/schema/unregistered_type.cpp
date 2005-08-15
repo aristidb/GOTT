@@ -19,18 +19,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "../exceptions.hpp"
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 
-using gott::nstring;
+using gott::string;
 using gott::tdl::tdl_exception;
 using gott::tdl::schema::unregistered_type;
 
-static nstring pizza(nstring const &type) {
-  nstring const components[] = { "Type ", type, " not found in database" };
-  return nstring(range(components));
+static string pizza(string const &type) {
+  string const components[] = { "Type ", type, " not found in database" };
+  return string(range(components));
 }
 
-unregistered_type::unregistered_type(nstring const &type)
+unregistered_type::unregistered_type(string const &type)
   : tdl_exception(pizza(type)) {}
 
 unregistered_type::~unregistered_type() throw() {}

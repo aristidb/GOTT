@@ -22,7 +22,7 @@
 #define GOTT_TDL_SCHEMA_EVENT_HPP
 
 #include <iosfwd>
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 #include <gott/util/visibility.hpp>
 #include <boost/variant.hpp>
 #include <ntl.h>
@@ -89,15 +89,15 @@ public:
 
 /// The event class for the simple::parser::node token.
 class node : public token {
-  nstring data;
+  string data;
 public:
-  node(nstring const &);
+  node(string const &);
     // construct a node with the given data
 
   bool play(rule &r) const;
   void print(std::ostream &s) const;
 
-  nstring const &get_data() const GOTT_EXPORT;
+  string const &get_data() const GOTT_EXPORT;
     // get the data of this node-event
 };
 

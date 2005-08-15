@@ -25,7 +25,7 @@
 #include <gott/util/xany/xany.hpp>
 
 namespace gott {
-class nstring;
+class string;
 
 namespace tdl {
 namespace structure {
@@ -57,7 +57,7 @@ public:
    * Add a tag to the node.
    * \param t The tag to add.
    */
-  virtual void add_tag(nstring const &t) = 0;
+  virtual void add_tag(string const &t) = 0;
 
   GOTT_EXPORT virtual ~writable_structure() = 0;
 };

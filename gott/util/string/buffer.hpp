@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_NSTRING_BUFFER_HPP
 #define GOTT_UTIL_NSTRING_BUFFER_HPP
 
-#include "nstring.hpp"
+#include "string.hpp"
 #include "types.hpp"
 
 namespace gott {
@@ -31,7 +31,7 @@ template<class> class range_t;
 /**
  * Buffer for editable UTF32-strings.
  */
-class GOTT_EXPORT nstring_buffer {
+class GOTT_EXPORT string_buffer {
 public:
   typedef utf32_t value_type;
   typedef utf32_t *iterator;
@@ -42,23 +42,23 @@ public:
   /**
    * Construct empty buffer.
    */
-  nstring_buffer();
+  string_buffer();
 
   /// Copy-Constructor.
-  nstring_buffer(nstring_buffer const &);
+  string_buffer(string_buffer const &);
 
   /**
-   * Construct buffer from nstring.
+   * Construct buffer from string.
    */
-  nstring_buffer(nstring const &);
+  string_buffer(string const &);
   
   /**
    * Construct buffer from string.
    */
-  nstring_buffer(range_t<utf32_t const *> const &);
+  string_buffer(range_t<utf32_t const *> const &);
 
   /// Destructor.
-  ~nstring_buffer();
+  ~string_buffer();
 
   /**
    * Return an iterator pointing to the beginning of the represented string.
@@ -88,12 +88,12 @@ public:
   /**
    * Swap contents with another buffer.
    */
-  void swap(nstring_buffer &);
+  void swap(string_buffer &);
 
   /**
    * Assign another buffers contents to this buffer.
    */
-  void operator=(nstring_buffer const &b);
+  void operator=(string_buffer const &b);
 
   /**
    * Return the character at a certain position of the buffer.

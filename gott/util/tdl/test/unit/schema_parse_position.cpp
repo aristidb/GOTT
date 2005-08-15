@@ -24,7 +24,7 @@
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tdl/schema/context.hpp>
 #include <gott/util/tut/tut.h>
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 
 namespace tdl = gott::tdl;
 
@@ -33,7 +33,7 @@ struct ignore_struct : tdl::structure::revocable_structure {
   void data(gott::xany::Xany const &) {}
   void begin() {}
   void end() {}
-  void add_tag(gott::nstring const &) {}
+  void add_tag(gott::string const &) {}
 
   pth point() { return pth(); }
   void revert(pth const &) {}

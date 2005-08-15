@@ -20,13 +20,13 @@
 
 #include "exceptions.hpp"
 #include <gott/util/range_algo.hpp>
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 
 using gott::tdl::tdl_exception;
 
 class tdl_exception::IMPL {
 public:
-  IMPL(nstring const &s) : msg(new char[s.size() + 1]) {
+  IMPL(string const &s) : msg(new char[s.size() + 1]) {
     copy(s.raw().cast<char const *>(), msg);
     msg[s.size()] = '\0';
   }
@@ -34,7 +34,7 @@ public:
   char *msg;
 };
 
-tdl_exception::tdl_exception(nstring const &msg)
+tdl_exception::tdl_exception(string const &msg)
 : p(new IMPL(msg)) {}
 
 tdl_exception::~tdl_exception() throw() {}

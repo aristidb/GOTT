@@ -20,12 +20,12 @@
 
 #include "parser.hpp"
 #include <boost/algorithm/string.hpp>
-#include <gott/util/nstring/nstring.hpp>
-#include <gott/util/nstring/stl.hpp>
+#include <gott/util/string/string.hpp>
+#include <gott/util/string/stl.hpp>
 
 using std::wistream;
 using std::wstring;
-using gott::nstring;
+using gott::string;
 using gott::tdl::simple::parser;
 using gott::tdl::simple::line_logger;
 
@@ -65,7 +65,7 @@ struct internal_line_logger {
   
   void start_token() { rp = p; }
   
-  void end_token(nstring const &n) {
+  void end_token(string const &n) {
     if (ref)
       ref->token(rp, p, n);
   }
@@ -171,7 +171,7 @@ void exec_parse::normal_line(wstring const &s) {
     skip_whitespace(pos, s.end());
   
     if (*pos == L'#') {
-      nstring y(wstring(++pos, s.end()));
+      string y(wstring(++pos, s.end()));
       ln.new_char();
       ln.start_token();
       ln.end_token(y);

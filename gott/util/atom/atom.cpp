@@ -23,16 +23,16 @@
 #include HH_HASH_SET
 
 using gott::atom;
-using gott::nstring;
+using gott::string;
 
-static nstring atomize(nstring const &n) {
-  static hashd::hash_set<nstring> table;
+static string atomize(string const &n) {
+  static hashd::hash_set<string> table;
   return *table.insert(n).first;
 }
 
-atom::atom(nstring const &n) : nstring(atomize(n)) {}
+atom::atom(string const &n) : string(atomize(n)) {}
 
-atom::atom(atom const &o) : nstring(o) {}
+atom::atom(atom const &o) : string(o) {}
 
 atom::~atom() {}
 

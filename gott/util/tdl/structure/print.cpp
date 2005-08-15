@@ -20,7 +20,7 @@
 
 #include "print.hpp"
 #include <ostream>
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 
 using std::basic_ostream;
 using gott::xany::Xany;
@@ -66,7 +66,7 @@ template<class C> void direct_print<C>::data(Xany const &x) {
   p->line_ended = false;
 }
 
-template<class C> void direct_print<C>::add_tag(nstring const &s) {
+template<class C> void direct_print<C>::add_tag(string const &s) {
   if (p->tag_printed)
     p->out << ", ";
   else

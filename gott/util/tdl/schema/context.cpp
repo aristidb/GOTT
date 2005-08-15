@@ -24,7 +24,7 @@
 #include "rule_factory.hpp"
 #include <gott/util/range_algo.hpp>
 #include <boost/optional.hpp>
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 
 using boost::optional;
 using gott::tdl::schema::context;
@@ -57,7 +57,7 @@ public:
 context::context() : p(new IMPL) {}
 context::~context() {}
 
-void context::begin(nstring const &n, rule_attr const &a,
+void context::begin(string const &n, rule_attr const &a,
                     optional<slotcfg> const &c) {
   begin(name_manager().get(n), a, c);
 }

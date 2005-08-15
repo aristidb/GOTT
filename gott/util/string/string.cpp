@@ -18,7 +18,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "nstring.hpp"
+#include "string.hpp"
 #include "convert.hpp"
 #include "buffer.hpp"
 #include "iterator.hpp"
@@ -32,9 +32,9 @@
 #include <ostream>
 #include <string>
 
-using gott::nstring;
+using gott::string;
 
-class nstring::representation {
+class string::representation {
 public:
   representation(range_t<utf8_t const *> d, bool o = true)
   : ref_count(1), size(d.size()), length(0), owned(o), data(d.begin) {}
@@ -63,33 +63,33 @@ public:
   utf8_t const *data;
 };
 
-nstring::nstring(nstring const &o) : p(o.p) {
+string::string(string const &o) : p(o.p) {
   ++p->ref_count;
 }
 
-nstring::~nstring() {
+string::~string() {
   if (--p->ref_count == 0)
     delete p;
 }
 
-nstring::nstring()
+string::string()
 : p(new representation(offset(range("").cast<utf8_t const *>(), 0, -1), 
                        false)) {}
 
-nstring::nstring(range_t<char const *> in, encoding enc)
+string::string(range_t<char const *> in, encoding enc)
 : p(new representation(to_utf8_alloc(in, enc))) {}
 
-nstring::nstring(char const *in, encoding enc)
+string::string(char const *in, encoding enc)
 : p(new representation(to_utf8_alloc(zero_terminated(in), enc))) {}
 
-nstring::nstring(std::string const &s, encoding enc)
+string::string(std::string const &s, encoding enc)
 : p(new representation(to_utf8_alloc(range(&s[0], s.length()), enc))) {}
 
-nstring::nstring(std::wstring const &s, encoding enc)
+string::string(std::wstring const &s, encoding enc)
 : p(new representation(
       to_utf8_alloc(range(&s[0], s.length()).cast<char const*>(), enc))) {}
 
-nstring::nstring(thunk_t<utf8_t> &thk) : p(0) {
+string::string(thunk_t<utf8_t> &thk) : p(0) {
   std::size_t len = thk.size();
   utf8_t *buf = new utf8_t[len];
   for (std::size_t i = 0; i < len; ++i)
@@ -97,36 +97,36 @@ nstring::nstring(thunk_t<utf8_t> &thk) : p(0) {
   p = new representation(range(buf, len));
 }
 
-nstring::nstring(range_t<utf8_t const *> in, literal_tag)
+string::string(range_t<utf8_t const *> in, literal_tag)
 : p(new representation(in, false)) {}
 
-nstring::nstring(range_t<wchar_t const *> in, encoding enc)
+string::string(range_t<wchar_t const *> in, encoding enc)
 : p(new representation(to_utf8_alloc(in.cast<char const *>(), enc))) {}
 
-nstring::nstring(wchar_t const *in, encoding enc)
+string::string(wchar_t const *in, encoding enc)
 : p(new representation(to_utf8_alloc(zero_terminated(in).cast<char const *>(),
         enc))) {}
 
-nstring::nstring(nstring_buffer const &b)
+string::string(string_buffer const &b)
 : p(new representation(to_utf8_alloc(range(b).cast<char const *>(), utf32))) {}
 
-nstring::nstring(range_t<utf8_t const *> const &r)
+string::string(range_t<utf8_t const *> const &r)
 : p(new representation(r, representation::foreign_copy)) {}
 
-nstring::nstring(range_t<utf8_iterator> const &r)
+string::string(range_t<utf8_iterator> const &r)
 : p(new representation(r, representation::foreign_copy)) {}
 
-nstring::nstring(std::vector<nstring> const &v)
+string::string(std::vector<string> const &v)
 : p(new representation(range(v), representation::concat)) {}
 
-nstring::nstring(std::list<nstring> const &v)
+string::string(std::list<string> const &v)
 : p(new representation(range(v), representation::concat)) {}
 
-nstring::nstring(range_t<nstring const *> cont)
+string::string(range_t<string const *> cont)
 : p(new representation(cont, representation::concat)) {}
 
 template<class I>
-nstring::representation::representation(range_t<I> const &r, concatenation_tag) 
+string::representation::representation(range_t<I> const &r, concatenation_tag) 
 : ref_count(1), size(0), length(0), owned(true) {
   for (I it = r.begin; it != r.end; ++it)
     size += it->size();
@@ -136,70 +136,70 @@ nstring::representation::representation(range_t<I> const &r, concatenation_tag)
     current = std::copy(it->data(), it->data() + it->size(), current);
 }
 
-gott::utf8_t const *nstring::data() const {
+gott::utf8_t const *string::data() const {
   return p->data;
 }
 
-gott::utf8_t const *nstring::begin_raw() const {
+gott::utf8_t const *string::begin_raw() const {
   return p->data;
 }
 
-gott::utf8_t const *nstring::end_raw() const {
+gott::utf8_t const *string::end_raw() const {
   return p->data + p->size;
 }
 
-gott::utf8_iterator nstring::begin() const {
+gott::utf8_iterator string::begin() const {
   return begin_raw();
 }
 
-gott::utf8_iterator nstring::end() const {
+gott::utf8_iterator string::end() const {
   return end_raw();
 }
 
-std::size_t nstring::size() const {
+std::size_t string::size() const {
   return p->size;
 }
 
-std::size_t nstring::length() const {
+std::size_t string::length() const {
   if (!p->length)
     p->length = range(*this).size();
   return p->length;
 }
 
-void nstring::swap(nstring &o) {
+void string::swap(string &o) {
   std::swap(p, o.p);
 }
 
-void nstring::operator=(nstring const &o) {
-  nstring(o).swap(*this);
+void string::operator=(string const &o) {
+  string(o).swap(*this);
 }
 
-nstring::operator std::string() const {
+string::operator std::string() const {
   return to_string(*this);
 }
 
-nstring::operator std::wstring() const {
+string::operator std::wstring() const {
   return to_wstring(*this);
 }
 
-std::ostream &gott::operator<<(std::ostream &stream, nstring const &s) {
+std::ostream &gott::operator<<(std::ostream &stream, string const &s) {
   for (utf8_t const *it = s.begin_raw(); it < s.end_raw(); ++it)
     stream << char(*it);
   return stream;
 }
 
-std::wostream &gott::operator<<(std::wostream &stream, nstring const &s) {
+std::wostream &gott::operator<<(std::wostream &stream, string const &s) {
   for (utf8_iterator it = s.begin(); it < s.end(); ++it)
     stream << wchar_t(*it);
   return stream;
 }
 
-nstring gott::operator+(nstring const &a, nstring const &b) {
-  nstring const both[] = { a, b };
-  return nstring(range(both));
+string gott::operator+(string const &a, string const &b) {
+  string const both[] = { a, b };
+  return string(range(both));
 }
 
-bool gott::operator==(nstring const &a, nstring const &b) {
+bool gott::operator==(string const &a, string const &b) {
   if (a.data() == b.data())
     return true;
   if (a.size() != b.size())
@@ -207,7 +207,7 @@ bool gott::operator==(nstring const &a, nstring const &b) {
   return std::equal(a.begin_raw(), a.end_raw(), b.begin_raw());
 }
 
-int gott::compare(nstring const &a, nstring const &b) {
+int gott::compare(string const &a, string const &b) {
   if (a.data() == b.data())
     return 0;
 
@@ -227,7 +227,7 @@ int gott::compare(nstring const &a, nstring const &b) {
 }
 
 std::size_t 
-hashd::hash<gott::nstring>::operator() (gott::nstring const &s) const {
+hashd::hash<gott::string>::operator() (gott::string const &s) const {
   std::size_t result = 0;
   for (gott::utf8_t const *it = s.begin_raw(); it != s.end_raw(); ++it)
     result = 5 * result + *it;

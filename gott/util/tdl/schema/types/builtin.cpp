@@ -27,7 +27,7 @@
 #include "ordered.hpp"
 #include "node.hpp"
 #include "unordered.hpp"
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 
 namespace {
 struct builtin_types {

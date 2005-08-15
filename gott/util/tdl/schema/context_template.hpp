@@ -29,7 +29,7 @@
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
-class nstring;
+class string;
 
 namespace tdl {
 namespace schema {
@@ -49,7 +49,7 @@ public:
    * \param id The type's name.
    * \param ra The rule-factory's and later rule's attributes.
    */
-  void begin(nstring const &id, 
+  void begin(string const &id, 
              rule_attr const &ra = rule_attr()) GOTT_EXPORT;
 
   /**
@@ -59,7 +59,7 @@ public:
    * \param ra The rule-factory's and later rule's attributes.
    * \param s Repetition definition.
    */
-  void begin(nstring const &id, rule_attr const &ra, 
+  void begin(string const &id, rule_attr const &ra, 
              slotcfg const &s) GOTT_EXPORT;
 
   /**

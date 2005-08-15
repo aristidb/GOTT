@@ -27,11 +27,11 @@
 #include "../structure/repatch.hpp"
 #include <gott/util/range_algo.hpp>
 #include <gott/util/autoconv.hpp>
-#include <gott/util/nstring/stl.hpp>
+#include <gott/util/string/stl.hpp>
 #include <gott/util/debug/assert.hpp>
 
 using boost::shared_ptr;
-using gott::nstring;
+using gott::string;
 namespace simple = gott::tdl::simple;
 namespace structure = gott::tdl::structure;
 using gott::tdl::schema::match;
@@ -87,7 +87,7 @@ public:
   Stack parse;
   Vector<shared_ptr<rule> > shadow;
 
-  static nstring get_name(shared_ptr<rule> const &);
+  static string get_name(shared_ptr<rule> const &);
 };
 
 NTL_MOVEABLE(shared_ptr<gott::tdl::schema::rule>);
@@ -134,7 +134,7 @@ void match::down() {
   pIMPL->handle_token(ev::down());
 }
 
-void match::node(nstring const &s) {
+void match::node(string const &s) {
   pIMPL->handle_token(ev::node(s));
 }
 
@@ -146,7 +146,7 @@ void match::end_parse() {
   pIMPL->handle_token(ev::end_parse());
 }
 
-void match::comment(nstring const &, bool) {}
+void match::comment(string const &, bool) {}
 
 // Implementation
 
@@ -257,25 +257,25 @@ void match::IMPL::fail_rule() {
 }
 
 void match::IMPL::fail_all() {
-  Vector<nstring> names;
+  Vector<string> names;
   names.AddN(shadow.GetCount());
   transform(range(shadow), range(names), get_name);
   throw mismatch(ln, names);
 }
 
-nstring match::IMPL::get_name(shared_ptr<rule> const &rp) {
-  static nstring const s_open("("), s_close(")"), sep(",");
-  Vector<nstring> out;
+string match::IMPL::get_name(shared_ptr<rule> const &rp) {
+  static string const s_open("("), s_close(")"), sep(",");
+  Vector<string> out;
   out.Add(rp->name());
   if (rp->attributes().tags().GetCount() > 0) {
     out.Add(s_open);
-    range_t<nstring const *> r = range(rp->attributes().tags());
+    range_t<string const *> r = range(rp->attributes().tags());
     out.Add(*r.begin);
-    for (nstring const *it = r.begin + 1; it != r.end; ++it) {
+    for (string const *it = r.begin + 1; it != r.end; ++it) {
       out.Add(sep);
       out.Add(*it);
     }
     out.Add(s_close);
   }
-  return nstring(range(out).cast<nstring const *>());
+  return string(range(out).cast<string const *>());
 }

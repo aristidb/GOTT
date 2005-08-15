@@ -50,7 +50,7 @@ node_inserter_t cf::S(xany::Xany const &data, tag_list const &tags) {
   return node_inserter_t(data, nd_list(), tags);
 }
 
-node_inserter_t cf::S(xany::Xany const &data, nstring const &tag) {
+node_inserter_t cf::S(xany::Xany const &data, string const &tag) {
   return node_inserter_t(data, nd_list(), tag_list() << tag);
 }
 
@@ -58,7 +58,7 @@ node_inserter_t cf::M(nd_list const &children, tag_list const &tags) {
   return node_inserter_t(Xany(), children, tags);
 }
 
-node_inserter_t cf::M(nd_list const &children, nstring const &tag) {
+node_inserter_t cf::M(nd_list const &children, string const &tag) {
   return node_inserter_t(Xany(), children, tag_list() << tag);
 }
 
@@ -68,7 +68,7 @@ node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children,
 }
 
 node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children, 
-                       nstring const &tag) {
+                       string const &tag) {
   return node_inserter_t(data, children, tag_list() << tag);
 }
 
@@ -76,6 +76,6 @@ node_inserter_t cf::C(node_inserter_t const &child, tag_list const &tags) {
   return node_inserter_t(Xany(), nd_list() << child, tags);
 }
 
-node_inserter_t cf::C(node_inserter_t const &child, nstring const &tag) {
+node_inserter_t cf::C(node_inserter_t const &child, string const &tag) {
   return node_inserter_t(Xany(), nd_list() << child, tag_list() << tag);
 }

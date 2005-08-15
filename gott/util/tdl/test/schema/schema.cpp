@@ -28,7 +28,7 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
-using gott::nstring;
+using gott::string;
 
 using namespace stru::cf;
 using schema::slotcfg;
@@ -80,7 +80,7 @@ struct Schema : tut::schema_basic {
     document.begin("list", ra("type-declarations"));
       document.begin("ordered", ra("type-declaration"));
         document.begin("node", rule_attr("export", true,
-             new stru::repatch_enumeration(Vector<nstring>() | "export")),
+             new stru::repatch_enumeration(Vector<string>() | "export")),
              slotcfg(slotcfg::optional));
         document.end();
 
@@ -106,7 +106,7 @@ struct Schema : tut::schema_basic {
   void qualified(schema::context_template &document) {
      document.begin("follow", ra("qualified-type-definition"));
        {
-         Vector<nstring> choice;
+         Vector<string> choice;
          choice.Add("enclosed"); choice.Add("flat");
          document.begin("node", rule_attr("coat", true,
                                         new stru::repatch_enumeration(choice)));
@@ -147,7 +147,7 @@ struct Schema : tut::schema_basic {
     document.begin("any", ra("slot-specification"),
                    slotcfg(slotcfg::optional));
       {
-        Vector<nstring> single;
+        Vector<string> single;
         single.Add("one");  single.Add("optional");
         single.Add("list"); single.Add("some");
         document.begin("node", rule_attr("slot", true, 

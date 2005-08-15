@@ -26,7 +26,7 @@
 #include <gott/util/visibility.hpp>
 
 namespace gott {
-class nstring;
+class string;
 
 namespace tdl {
 namespace structure {
@@ -38,7 +38,7 @@ class writable_structure;
  */
 namespace cf {
 
-typedef Vector<nstring> tag_list;
+typedef Vector<string> tag_list;
 class node_inserter_t;
 typedef Array<node_inserter_t> nd_list;
 
@@ -76,7 +76,7 @@ node_inserter_t S(xany::Xany const &data, tag_list const &tags = tag_list());
  * \param tag The nodes's sole tag.
  */
 GOTT_EXPORT 
-node_inserter_t S(xany::Xany const &data, nstring const &tag);
+node_inserter_t S(xany::Xany const &data, string const &tag);
 
 /**
  * Create a node (generator) without data but with children.
@@ -92,7 +92,7 @@ node_inserter_t M(nd_list const &children, tag_list const &tags = tag_list());
  * \param tag The node's sole tag.
  */
 GOTT_EXPORT 
-node_inserter_t M(nd_list const &children, nstring const &tag);
+node_inserter_t M(nd_list const &children, string const &tag);
 
 /**
  * Create a node (generator) with data and children.
@@ -112,7 +112,7 @@ node_inserter_t MD(xany::Xany const &data, nd_list const &children,
  */
 GOTT_EXPORT 
 node_inserter_t MD(xany::Xany const &data, nd_list const &children, 
-                   nstring const &tag);
+                   string const &tag);
 
 /**
  * Create a node (generator) without data and with a single child.
@@ -129,7 +129,7 @@ node_inserter_t C(node_inserter_t const &child,
  * \param tag The node's sole tag.
  */
 GOTT_EXPORT 
-node_inserter_t C(node_inserter_t const &child, nstring const &tag);
+node_inserter_t C(node_inserter_t const &child, string const &tag);
 
 }}}}
 

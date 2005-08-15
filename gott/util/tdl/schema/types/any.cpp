@@ -64,6 +64,6 @@ bool match_any::accept_empty(Vector<rule_factory const *> const &choices) {
   return false;
 }
 
-gott::nstring match_any::name() const {
+gott::string match_any::name() const {
   return "any";
 }

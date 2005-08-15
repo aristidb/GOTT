@@ -22,26 +22,26 @@
 #include "stream_position.hpp"
 #include <gott/util/range.hpp>
 #include <gott/util/autoconv.hpp>
-#include <gott/util/nstring/stl.hpp>
+#include <gott/util/string/stl.hpp>
 #include <gott/util/thunk.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace schema = gott::tdl::schema;
 using schema::mismatch;
 using gott::range;
-using gott::nstring;
+using gott::string;
 using gott::thunk_t;
 using gott::thunk;
 using gott::integer_to_string;
 
-static nstring build_string(schema::detail::stream_position const &p,
-                            Vector<nstring> const &t) {
-  Vector<nstring> out;
+static string build_string(schema::detail::stream_position const &p,
+                            Vector<string> const &t) {
+  Vector<string> out;
   out.Add(*thunk<gott::utf8_t, integer_to_string>(p.line));
   out.Add(":");
   out.Add(*thunk<gott::utf8_t, integer_to_string>(p.pos + 1));
   out.Add(" : mismatch in ");
-  gott::range_t<nstring const *> tg = range(t);
+  gott::range_t<string const *> tg = range(t);
   if (tg.begin != tg.end)
     out.Add(*tg.begin++);
   for (; tg.begin != tg.end; ++tg.begin) {
@@ -53,11 +53,11 @@ static nstring build_string(schema::detail::stream_position const &p,
   else
     out.Add(" at token ");
   out.Add(p.tok);
-  return range(out).cast<nstring const *>();
+  return range(out).cast<string const *>();
 }
 
 mismatch::mismatch(detail::stream_position const &p, 
-                   Vector<nstring> const &t)
+                   Vector<string> const &t)
 : tdl_exception(build_string(p, t)) {}
 
 mismatch::~mismatch() throw() {}

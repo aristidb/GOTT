@@ -56,12 +56,12 @@ NTL_MOVEABLE(context_template::IMPL::job);
 context_template::context_template() : p(new IMPL) {}
 context_template::~context_template() {}
 
-void context_template::begin(nstring const &type, 
+void context_template::begin(string const &type, 
                              rule_attr const &attr) {
   p->var.push_back(IMPL::entry_begin(name_manager().get(type), attr));
 }
 
-void context_template::begin(nstring const &type, rule_attr const &attr,
+void context_template::begin(string const &type, rule_attr const &attr,
                              slotcfg const &scfg) {
   p->var.push_back(IMPL::entry_begin(name_manager().get(type), attr, scfg));
 }

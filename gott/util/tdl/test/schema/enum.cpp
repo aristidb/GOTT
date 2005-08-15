@@ -35,9 +35,9 @@ namespace {
 struct schema_enumeration : tut::schema_basic {
   schema_enumeration() {
     context.begin("document");
-      Vector<gott::nstring> v;
+      Vector<gott::string> v;
       v.Add("first"); v.Add("second"); v.Add("third");
-      context.begin("node", rule_attr(Vector<gott::nstring>(), true, Xany(),
+      context.begin("node", rule_attr(Vector<gott::string>(), true, Xany(),
                                       new repatch_enumeration(v)));
       context.end();
     context.end();

@@ -26,7 +26,7 @@
 #include <gott/util/visibility.hpp>
 
 namespace gott {
-class nstring;
+class string;
 
 namespace tdl {
 namespace structure { class repatcher; }
@@ -70,7 +70,7 @@ public:
   /**
    * A nice name for the rule.
    */
-  virtual nstring name() const = 0;
+  virtual string name() const = 0;
 
   // Event handlers
   // Tokens

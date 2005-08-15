@@ -22,7 +22,7 @@
 #define GOTT_UTIL_TDL_SCHEMA_STREAM_POSITION_HPP
 
 #include <gott/util/tdl/simple/parse/parser.hpp>
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 
 namespace gott {
 namespace tdl {
@@ -32,12 +32,12 @@ namespace detail {
 struct stream_position : public simple::line_logger {
   stream_position();
   void start_line();
-  void token(unsigned start, unsigned end, nstring const &nd);
+  void token(unsigned start, unsigned end, string const &nd);
   void line_position(unsigned line_pos);
 
   unsigned line_new, line, pos;
   unsigned native_end, current;
-  nstring tok;
+  string tok;
   bool after;
 };
 

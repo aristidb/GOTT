@@ -25,7 +25,7 @@
 #include <gott/util/visibility.hpp>
 
 namespace gott {
-class nstring;
+class string;
 
 namespace tdl {
 namespace schema {
@@ -44,14 +44,14 @@ public:
    * \param name The name to find the type with.
    * \param type The type's id (see get_factory()).
    */
-  GOTT_EXPORT void add(nstring const &name, unsigned type);
+  GOTT_EXPORT void add(string const &name, unsigned type);
 
   /**
    * Get a type from the database.
    * \param name The type's name.
    * \return The type's id  (see get_factory()).
    */
-  GOTT_EXPORT unsigned get(nstring const &name) const;
+  GOTT_EXPORT unsigned get(string const &name) const;
 
   class IMPL;
   boost::scoped_ptr<IMPL> p;

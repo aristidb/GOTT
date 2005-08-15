@@ -63,7 +63,7 @@ public: // Iterators
      * Gets children by tag.
      * \param tag The tag to search for.
      */
-    GOTT_EXPORT tagged_iterator with_tag(nstring const &tag) const;
+    GOTT_EXPORT tagged_iterator with_tag(string const &tag) const;
     
     /**
      * Gets the first child.
@@ -89,7 +89,7 @@ public: // Iterators
     /**
      * Gets all tags.
      */
-    GOTT_EXPORT Vector<nstring> const &get_tags() const;
+    GOTT_EXPORT Vector<string> const &get_tags() const;
 
     /**
      * Checks whether the iterator is valid.
@@ -154,7 +154,7 @@ public: // Iterators
 
 private: // Inherited interface
   // Don't call these directly (exported symbols for no use is nothing I like)
-  void add_tag(nstring const &);
+  void add_tag(string const &);
   void data(xany::Xany const &);
   void begin();
   void end();

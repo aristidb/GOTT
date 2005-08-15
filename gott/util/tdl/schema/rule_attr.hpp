@@ -24,7 +24,7 @@
 #include "rule.hpp"
 #include "../structure/repatch.hpp"
 #include <boost/shared_ptr.hpp>
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 #include <ntl.h>
 
 namespace gott {
@@ -42,15 +42,15 @@ public:
       structure::repatcher const *rr = 0) 
   : c(cc), r(rr) {}
 
-  explicit rule_attr(Vector<nstring> const &l, bool cc = true, 
+  explicit rule_attr(Vector<string> const &l, bool cc = true, 
       structure::repatcher const *rr = 0)
   : c(cc), t(l), r(rr) {}
 
-  explicit rule_attr(nstring const &s, bool cc = true, 
+  explicit rule_attr(string const &s, bool cc = true, 
       structure::repatcher const *rr = 0)
-  : c(cc), t(Vector<nstring>() << s), r(rr) {}
+  : c(cc), t(Vector<string>() << s), r(rr) {}
 
-  explicit rule_attr(Vector<nstring> const &l, bool cc, 
+  explicit rule_attr(Vector<string> const &l, bool cc, 
                      xany::Xany const &x, structure::repatcher const *rr = 0)
   : c(cc), t(l), u(x), r(rr) {}
 
@@ -60,8 +60,8 @@ public:
   bool coat() const { return c; }
   void set_coat(bool x) { c = x; }
 
-  Vector<nstring> const &tags() const { return t; }
-  void add_tag(nstring const &x) { t.push_back(x); }
+  Vector<string> const &tags() const { return t; }
+  void add_tag(string const &x) { t.push_back(x); }
 
   xany::Xany const &user() const { return u; }
 
@@ -69,7 +69,7 @@ public:
 
 private:
   bool c;
-  Vector<nstring> t;
+  Vector<string> t;
   xany::Xany u;
   boost::shared_ptr<structure::repatcher const> r;
 };

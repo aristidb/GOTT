@@ -28,7 +28,7 @@
 #include <boost/optional/optional.hpp>
 
 namespace gott {
-class nstring;
+class string;
 
 namespace tdl {
 namespace schema {
@@ -59,7 +59,7 @@ public:
    * \param attr The rule-factory's and later rule's attributes.
    * \param slt (optional) Repetition definition.
    */
-  void GOTT_EXPORT begin(nstring const &name,
+  void GOTT_EXPORT begin(string const &name,
                     rule_attr const &attr = rule_attr(),
                     boost::optional<slotcfg> const &slt = boost::none);
 

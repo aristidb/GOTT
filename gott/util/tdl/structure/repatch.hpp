@@ -47,7 +47,7 @@ public:
   void begin();
   void end();
   void data(xany::Xany const &x);
-  void add_tag(nstring const &t);
+  void add_tag(string const &t);
 };
 
 class GOTT_EXPORT repatch_nothing : public repatcher {

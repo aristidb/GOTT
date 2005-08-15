@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_ATOM_ATOM_HPP
 #define GOTT_UTIL_ATOM_ATOM_HPP
 
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 
 namespace gott {
 
@@ -29,13 +29,13 @@ namespace gott {
  * Atom class.
  * Atoms are strings with fast comparison and fast hashing but slow constructor.
  */
-class atom : public nstring {
+class atom : public string {
 public:
   /// Copy-Constructor (fast).
   GOTT_EXPORT atom(atom const &);
 
   /// Constructor (slow).
-  GOTT_EXPORT atom(nstring const &);
+  GOTT_EXPORT atom(string const &);
 
   /// Destructor.
   GOTT_EXPORT ~atom();

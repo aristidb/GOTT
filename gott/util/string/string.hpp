@@ -45,64 +45,64 @@ namespace gott {
 
 template<class> struct thunk_t;
 
-class nstring_buffer;
+class string_buffer;
 template<class> class range_t;
 
 /**
  * UTF-8 string literals storage class.
  */
-class GOTT_EXPORT nstring : Moveable<nstring> {
+class GOTT_EXPORT string : Moveable<string> {
 public:
   typedef utf8_iterator const_iterator;
 
   /**
    * Construct empty string
    */
-  nstring();
+  string();
 
   /**
    * Construct from encoded string.
    */
-  nstring(range_t<char const *>, encoding = utf8);
+  string(range_t<char const *>, encoding = utf8);
 
   /**
    * Construct from encoded c-string.
    */
-  nstring(char const *, encoding = utf8);
+  string(char const *, encoding = utf8);
 
   /**
    * Construct from encoded wide string.
    */
-  nstring(range_t<wchar_t const *>, encoding = utf32);
+  string(range_t<wchar_t const *>, encoding = utf32);
 
   /**
    * Construct from encoded wide c-string.
    */
-  nstring(wchar_t const *, encoding = utf32);
+  string(wchar_t const *, encoding = utf32);
 
   /**
-   * Construct nstring from thunk.
+   * Construct string from thunk.
    */
-  nstring(thunk_t<utf8_t> &);
+  string(thunk_t<utf8_t> &);
 
   /**
-   * Construct nstring from std::string.
+   * Construct string from std::string.
    */
-  nstring(std::string const &, encoding = utf8);
+  string(std::string const &, encoding = utf8);
 
   /**
-   * Construct nstring from std::wstring.
+   * Construct string from std::wstring.
    */
-  nstring(std::wstring const &, encoding = utf32);
+  string(std::wstring const &, encoding = utf32);
 
   /**
-   * Construct std::string from nstring using unicode encoding.
+   * Construct std::string from string using unicode encoding.
    * Use to_string if you need a different encoding.
    */
   operator std::string() const;
 
   /**
-   * Construct std::wstring from nstring using unicode encoding.
+   * Construct std::wstring from string using unicode encoding.
    * Use to_wstring if you need a different encoding.
    */
   operator std::wstring() const;
@@ -112,53 +112,53 @@ public:
   /**
    * Construct from UTF8-c-literal. Shares memory.
    */
-  nstring(range_t<utf8_t const *>, literal_tag);
+  string(range_t<utf8_t const *>, literal_tag);
 
   /**
-   * Construct from nstring_buffer.
+   * Construct from string_buffer.
    */
-  nstring(nstring_buffer const &);
-
-  /**
-   * Concatenate.
-   */
-  nstring(std::vector<nstring, std::allocator<nstring> > const &);
+  string(string_buffer const &);
 
   /**
    * Concatenate.
    */
-  nstring(std::list<nstring, std::allocator<nstring> > const &);
+  string(std::vector<string, std::allocator<string> > const &);
 
   /**
    * Concatenate.
    */
-  nstring(range_t<nstring const *>);
+  string(std::list<string, std::allocator<string> > const &);
+
+  /**
+   * Concatenate.
+   */
+  string(range_t<string const *>);
 
   /**
    * Construct from character range.
    */
-  nstring(range_t<utf8_iterator> const &);
+  string(range_t<utf8_iterator> const &);
   
   /**
    * Construct from character range.
    */
-  nstring(range_t<utf8_t const *> const &);
+  string(range_t<utf8_t const *> const &);
 
   /// Copy-Constructor.
-  nstring(nstring const &);
+  string(string const &);
 
   /// Destructor.
-  ~nstring();
+  ~string();
 
   /**
-   * Swap with another nstring.
+   * Swap with another string.
    */
-  void swap(nstring &other);
+  void swap(string &other);
 
   /**
-   * Assign from another nstring.
+   * Assign from another string.
    */
-  void operator =(nstring const &other);
+  void operator =(string const &other);
 
   /**
    * Get the internal data.
@@ -200,89 +200,89 @@ private:
 };
 
 /**
- * Print out a nstring.
+ * Print out a string.
  */
 GOTT_EXPORT 
 std::basic_ostream<char, std::char_traits<char> > &
 operator<<(std::basic_ostream<char, std::char_traits<char> > &, 
-           nstring const &);
+           string const &);
 
 /**
- * Print out a nstring.
+ * Print out a string.
  */
 GOTT_EXPORT 
 std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &
 operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &, 
-           nstring const &);
+           string const &);
 
 /**
- * Concatenate two nstrings.
+ * Concatenate two strings.
  */
-GOTT_EXPORT nstring operator +(nstring const &, nstring const &);
+GOTT_EXPORT string operator +(string const &, string const &);
 
 /**
- * Compare two nstrings for equality.
+ * Compare two strings for equality.
  */
-GOTT_EXPORT bool operator==(nstring const &, nstring const &);
+GOTT_EXPORT bool operator==(string const &, string const &);
 
 /**
- * Compare two nstrings for inequality.
+ * Compare two strings for inequality.
  */
-inline bool operator!=(nstring const &a, nstring const &b) {
+inline bool operator!=(string const &a, string const &b) {
   return !(a == b);
 }
 
 /**
- * Compare two nstrings lexicographically.
+ * Compare two strings lexicographically.
  * \param a,b Strings to be compared.
  * \return 
  *   - == 0 : Both strings are equal.
  *   -  < 0 : @p a is lexicographically smaller than @p b.
  *   -  > 0 : @p a is lexicographically greater than @p b.
  */
-GOTT_EXPORT int compare(nstring const &a, nstring const &b);
+GOTT_EXPORT int compare(string const &a, string const &b);
 
 /**
- * Compare two nstrings lexicographically,
+ * Compare two strings lexicographically,
  * \param a,b Strings to be compared.
  * \return Whether @p a is smaller than @p b.
  */
-inline bool operator<(nstring const &a, nstring const &b) {
+inline bool operator<(string const &a, string const &b) {
   return compare(a, b) < 0;
 }
 
 /**
- * Compare two nstrings lexicographically,
+ * Compare two strings lexicographically,
  * \param a,b Strings to be compared.
  * \return Whether @p a is smaller than or equal to @p b.
  */
-inline bool operator<=(nstring const &a, nstring const &b) {
+inline bool operator<=(string const &a, string const &b) {
   return compare(a, b) <= 0;
 }
 
 /**
- * Compare two nstrings lexicographically,
+ * Compare two strings lexicographically,
  * \param a,b Strings to be compared.
  * \return Whether @p a is greater than @p b.
  */
-inline bool operator>(nstring const &a, nstring const &b) {
+inline bool operator>(string const &a, string const &b) {
   return compare(a, b) > 0;
 }
 
 /**
- * Compare two nstrings lexicographically,
+ * Compare two strings lexicographically,
  * \param a,b Strings to be compared.
  * \return Whether @p a is greater than or equal to @p b.
  */
-inline bool operator>=(nstring const &a, nstring const &b) {
+inline bool operator>=(string const &a, string const &b) {
   return compare(a, b) >= 0;
 }
 
 }
 
 namespace HH_HASHD {
-template<> struct hash<gott::nstring> {
-  GOTT_EXPORT std::size_t operator() (gott::nstring const &) const;
+template<> struct hash<gott::string> {
+  GOTT_EXPORT std::size_t operator() (gott::string const &) const;
 };
 }
 

@@ -20,7 +20,7 @@
 
 #include "named.hpp"
 #include "../event.hpp"
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 
 using gott::xany::Xany;
 using gott::xany::Xany_cast;
@@ -31,14 +31,14 @@ using schema::rule;
 using schema::rule_attr;
 using schema::match_named;
 
-rule_attr match_named::attributes(nstring const &s, bool cc) {
-  return rule_attr(Vector<nstring>() << s, cc, Xany(s));
+rule_attr match_named::attributes(string const &s, bool cc) {
+  return rule_attr(Vector<string>() << s, cc, Xany(s));
 }
 
 match_named::match_named(rule_factory const &s, rule_attr const &a, 
                          match &m) 
 : rule(a, m), sub(s), state(read_none) {
-  if (!a.user().compatible<nstring>())
+  if (!a.user().compatible<string>())
     throw std::bad_exception();
 }
 
@@ -46,7 +46,7 @@ bool match_named::play(ev::node const &n) {
   if (state != read_none)
     return false;
 
-  if (n.get_data() == Xany_cast<nstring>(rule::attributes().user())) {
+  if (n.get_data() == Xany_cast<string>(rule::attributes().user())) {
     state = read_node;
     return true;
   }
@@ -84,6 +84,6 @@ rule::expect match_named::expectation() const {
   return state == done ? nothing : need;
 }
 
-gott::nstring match_named::name() const {
+gott::string match_named::name() const {
   return "named";
 }

@@ -26,7 +26,7 @@
 #include <gott/util/visibility.hpp>
 
 namespace gott {
-class nstring;
+class string;
 
 namespace tdl {
 namespace query {
@@ -86,7 +86,7 @@ public:
    * Gets all children from the iterators with a specific tag.
    * \param tag The tag to search for.
    */
-  selection find_tag(nstring const &tag) const GOTT_EXPORT;
+  selection find_tag(string const &tag) const GOTT_EXPORT;
 
 public:
   typedef typename container::iterator iterator;
@@ -106,7 +106,7 @@ private:
   void add(Iterator const &);
   void add_windex(Iterator const &, std::size_t);
   void add_wrange(Iterator const &, std::size_t, std::size_t);
-  void add_wtag(Iterator const &, nstring const &);
+  void add_wtag(Iterator const &, string const &);
 };
 
 /// Checks whether two selections differ.

@@ -24,7 +24,7 @@
 #include "event.hpp"
 #include <gott/util/range_algo.hpp>
 #include <boost/bind.hpp>
-#include <gott/util/nstring/stl.hpp>
+#include <gott/util/string/stl.hpp>
 
 namespace schema = gott::tdl::schema;
 using schema::match;
@@ -51,7 +51,7 @@ public:
 
 private:
   void add_tags() {
-    for (Vector<nstring>::const_iterator it = attrib.tags().begin();
+    for (Vector<string>::const_iterator it = attrib.tags().begin();
          it != attrib.tags().end(); ++it)
       cont->direct_structure().add_tag(*it);
   }

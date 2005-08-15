@@ -34,7 +34,7 @@ namespace schema {
 class match_named : public rule {
 public:
   static GOTT_EXPORT
-  rule_attr attributes(nstring const &s, bool cc = true);
+  rule_attr attributes(string const &s, bool cc = true);
   
   typedef factory_template::onechild<match_named> factory;
   match_named(rule_factory const &, rule_attr const &, match &);
@@ -48,7 +48,7 @@ private:
   bool play(ev::up const &);
   bool play(ev::child_succeed const &);
   bool play(ev::child_fail const &);
-  nstring name() const;
+  string name() const;
   
   rule_factory const &sub;
 

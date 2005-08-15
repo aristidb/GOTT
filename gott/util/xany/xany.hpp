@@ -19,7 +19,7 @@
 #ifndef GOTT_TDL_UTIL_XANY_HPP
 #define GOTT_TDL_UTIL_XANY_HPP
 
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 #include <typeinfo>
 #include <algorithm>
 #include <boost/type_traits.hpp>
@@ -260,7 +260,7 @@ operator<<(std::basic_ostream<Ch, ChT> &s, Xany const &v) {
 
 GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(long);
 GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(double);
-GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(nstring);
+GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(string);
 
 }}
 

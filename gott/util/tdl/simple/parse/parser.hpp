@@ -26,7 +26,7 @@
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
-class nstring;
+class string;
 
 namespace tdl {
 namespace simple {
@@ -42,10 +42,10 @@ struct GOTT_EXPORT parser {
   virtual void down() = 0;
     ///< Called when we open a new sub-layer.
  
-  virtual void node(nstring const &content) = 0;
+  virtual void node(string const &content) = 0;
     ///< Called when a node has been read.
 
-  virtual void comment(nstring const &content, bool on_new_line) = 0;
+  virtual void comment(string const &content, bool on_new_line) = 0;
     ///< Called when a comment has been read.
 
   virtual void up() = 0;
@@ -70,7 +70,7 @@ struct line_logger {
    * \param end The first line position after the token.
    * \param nd The token itself.
    */
-  virtual void token(unsigned start, unsigned end, nstring const &nd) = 0;
+  virtual void token(unsigned start, unsigned end, string const &nd) = 0;
 
   /**
    * Called whenever a different line position is reached.
@@ -99,7 +99,7 @@ public:
    * \return The success of the handler.
    */
   typedef 
-    boost::function<bool (nstring const &cmd, nstring const &param)> 
+    boost::function<bool (string const &cmd, string const &param)> 
     callback;
 
   GOTT_EXPORT meta_parser();
@@ -116,11 +116,11 @@ public:
    * \param s The command to invocate this handler on.
    * \param f The handler to add.
    */
-  void set_specific(nstring const &s, callback const &f) GOTT_EXPORT;
+  void set_specific(string const &s, callback const &f) GOTT_EXPORT;
 
 public:
   /// @internal
-  void exec(nstring const &line);
+  void exec(string const &line);
 
 private:
   class IMPL;

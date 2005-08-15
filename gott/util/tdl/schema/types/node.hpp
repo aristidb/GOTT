@@ -38,7 +38,7 @@ public:
   
 private:
   bool play(ev::node const &);
-  nstring name() const;
+  string name() const;
 };
 
 }}}

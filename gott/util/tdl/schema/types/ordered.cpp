@@ -52,6 +52,6 @@ bool match_ordered::accept_empty(Vector<rule_factory const *> const &children) {
   return accept;
 }
 
-gott::nstring match_ordered::name() const {
+gott::string match_ordered::name() const {
   return "ordered";
 }

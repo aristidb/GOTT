@@ -19,8 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "parser.hpp"
-#include <gott/util/nstring/nstring.hpp>
-#include <gott/util/nstring/stl.hpp>
+#include <gott/util/string/string.hpp>
+#include <gott/util/string/stl.hpp>
 #include <gott/util/my_hash_map.hpp>
 #include HH_HASH_MAP
 
@@ -50,7 +50,7 @@ void gott::tdl::simple::parse_meta(std::wistream &in, meta_parser &p,
   }
 }
 
-static bool pass(gott::nstring const &, gott::nstring const &) {
+static bool pass(gott::string const &, gott::string const &) {
   return false;
 }
 
@@ -59,7 +59,7 @@ public:
   IMPL() : def(pass) {}
 
   callback def;
-  typedef hashd::hash_map<nstring, callback> cb_t;
+  typedef hashd::hash_map<string, callback> cb_t;
   cb_t cb;
 };
 
@@ -68,16 +68,16 @@ meta_parser::meta_parser() : p(new IMPL) {
 
 meta_parser::~meta_parser() {}
 
-void meta_parser::exec(nstring const &line) {
-  nstring::const_iterator start = line.begin(), pos = start;
+void meta_parser::exec(string const &line) {
+  string::const_iterator start = line.begin(), pos = start;
   for (; pos != line.end(); ++pos)
     if (*pos == L' ')
       break;
   
-  nstring cmd(range(start, pos));
+  string cmd(range(start, pos));
   while (*pos == L' ' && ++pos != line.end())
     ;
-  nstring param(range(pos, line.end()));
+  string param(range(pos, line.end()));
 
   IMPL::cb_t::const_iterator it = p->cb.find(cmd);
 
@@ -92,6 +92,6 @@ void meta_parser::set_default(callback const &f) {
   p->def = f;
 }
 
-void meta_parser::set_specific(nstring const &cmd, callback const &f) {
+void meta_parser::set_specific(string const &cmd, callback const &f) {
   p->cb.insert(make_pair(cmd, f));
 }

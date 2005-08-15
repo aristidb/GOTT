@@ -20,7 +20,7 @@
 
 #include "by_name.hpp"
 #include "../exceptions.hpp"
-#include <gott/util/nstring/nstring.hpp>
+#include <gott/util/string/string.hpp>
 #include <gott/util/my_hash_map.hpp>
 #include HH_HASH_MAP
 #include <iostream>
@@ -36,7 +36,7 @@ name_manager_t &schema::name_manager() {
 
 class name_manager_t::IMPL {
 public:
-  hashd::hash_map<nstring, unsigned> items;
+  hashd::hash_map<string, unsigned> items;
 };
 
 name_manager_t::name_manager_t() : p(new IMPL) {
@@ -45,12 +45,12 @@ name_manager_t::name_manager_t() : p(new IMPL) {
 name_manager_t::~name_manager_t() {
 }
 
-void name_manager_t::add(nstring const &name, unsigned id) {
+void name_manager_t::add(string const &name, unsigned id) {
   p->items.insert(std::make_pair(name, id));
 }
 
-unsigned name_manager_t::get(nstring const &name) const {
-  hashd::hash_map<nstring, unsigned>::const_iterator it = p->items.find(name);
+unsigned name_manager_t::get(string const &name) const {
+  hashd::hash_map<string, unsigned>::const_iterator it = p->items.find(name);
   if (it == p->items.end())
     throw unregistered_type(name);
   return it->second;

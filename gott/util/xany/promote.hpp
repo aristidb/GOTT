@@ -20,7 +20,7 @@
 #define GOTT_UTIL_XANY_PROMOTE_HPP
 
 namespace gott {
-class nstring;
+class string;
 
 namespace xany {
 
@@ -86,13 +86,13 @@ GOTT_XANY_DECLARE_PROMOTER(unsigned int, unsigned long);
 
 GOTT_XANY_DECLARE_PROMOTER(float, double);
 
-GOTT_XANY_DECLARE_PROMOTER(char const *, nstring);
-GOTT_XANY_DECLARE_PROMOTER(char *, nstring);
-GOTT_XANY_DECLARE_PROMOTER(std::string, nstring);
+GOTT_XANY_DECLARE_PROMOTER(char const *, string);
+GOTT_XANY_DECLARE_PROMOTER(char *, string);
+GOTT_XANY_DECLARE_PROMOTER(std::string, string);
 
-GOTT_XANY_DECLARE_PROMOTER(wchar_t const *, nstring);
-GOTT_XANY_DECLARE_PROMOTER(wchar_t *, nstring);
-GOTT_XANY_DECLARE_PROMOTER(std::wstring, nstring);
+GOTT_XANY_DECLARE_PROMOTER(wchar_t const *, string);
+GOTT_XANY_DECLARE_PROMOTER(wchar_t *, string);
+GOTT_XANY_DECLARE_PROMOTER(std::wstring, string);
 
 }}
 

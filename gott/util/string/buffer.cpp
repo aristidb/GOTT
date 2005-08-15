@@ -24,10 +24,10 @@
 #include <algorithm>
 #include <gott/util/range_algo.hpp>
 
-using gott::nstring_buffer;
+using gott::string_buffer;
 using gott::utf32_t;
 
-class nstring_buffer::representation {
+class string_buffer::representation {
 public:
   representation() : begin(0), end(0), storage_end(0) {}
 
@@ -55,59 +55,59 @@ private:
   }
 };
 
-nstring_buffer::nstring_buffer()
+string_buffer::string_buffer()
 : data(new representation) {}
 
-nstring_buffer::nstring_buffer(nstring_buffer const &b) 
+string_buffer::string_buffer(string_buffer const &b) 
 : data(new representation) {
   copy(range(b), insert(end(), b.size()));
 }
 
-nstring_buffer::~nstring_buffer() { delete data; }
+string_buffer::~string_buffer() { delete data; }
 
-void nstring_buffer::swap(nstring_buffer &o) {
+void string_buffer::swap(string_buffer &o) {
   std::swap(data, o.data);
 }
 
-void nstring_buffer::operator=(nstring_buffer const &b) {
-  nstring_buffer(b).swap(*this);
+void string_buffer::operator=(string_buffer const &b) {
+  string_buffer(b).swap(*this);
 }
 
-nstring_buffer::nstring_buffer(range_t<utf32_t const *> const &x)
+string_buffer::string_buffer(range_t<utf32_t const *> const &x)
 : data(new representation) {
   copy(x, insert(end(), x.size()));
 }
 
-nstring_buffer::nstring_buffer(nstring const &x)
+string_buffer::string_buffer(string const &x)
 : data(new representation) {
   copy(range(x), insert(end(), x.length()));
 }
 
-utf32_t *nstring_buffer::begin() {
+utf32_t *string_buffer::begin() {
   return data->begin;
 }
 
-utf32_t *nstring_buffer::end() {
+utf32_t *string_buffer::end() {
   return data->end;
 }
 
-utf32_t const *nstring_buffer::begin() const {
+utf32_t const *string_buffer::begin() const {
   return data->begin;
 }
 
-utf32_t const *nstring_buffer::end() const {
+utf32_t const *string_buffer::end() const {
   return data->end;
 }
 
-std::size_t nstring_buffer::size() const {
+std::size_t string_buffer::size() const {
   return data->end - data->begin;
 }
 
-utf32_t &nstring_buffer::operator[](std::size_t i) {
+utf32_t &string_buffer::operator[](std::size_t i) {
   return data->begin[i];
 }
 
-void nstring_buffer::erase(range_t<iterator> const &r) {
+void string_buffer::erase(range_t<iterator> const &r) {
   iterator a = r.begin;
   iterator b = r.end;
 
@@ -116,8 +116,8 @@ void nstring_buffer::erase(range_t<iterator> const &r) {
   data->end = a;
 }
 
-gott::range_t<nstring_buffer::iterator>
-nstring_buffer::insert(iterator p, std::size_t len) {
+gott::range_t<string_buffer::iterator>
+string_buffer::insert(iterator p, std::size_t len) {
   if (std::size_t(data->storage_end - data->end) < len) {
     std::size_t pp = p - data->begin;
     data->ensure(len);

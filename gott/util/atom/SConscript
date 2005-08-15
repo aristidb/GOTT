@@ -3,5 +3,4 @@ import glob
 Import('env')
 
 env.SharedLibrary('atom', glob.glob('*.cpp'))
-env.Program('atom_test', glob.glob('test/*.cpp'), LIBS=['nstring', 'atom'], 
-            LIBPATH=['#/util/nstring', '#/util/atom'])
+env.Program('atom_test', glob.glob('test/*.cpp'), LIBS=['string', 'atom']) 
