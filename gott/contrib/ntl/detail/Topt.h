@@ -359,7 +359,6 @@ template <class T> inline const T& ntl_max(const T& a, const T& b) { return a > 
 	typedef T             value_type; \
 	typedef ConstIterator const_iterator; \
 	typedef const T&      const_reference; \
-	typedef const T&      const_reference; \
 	typedef int           size_type; \
 	typedef int           difference_type; \
 	const_iterator        begin() const          { return B::Begin(); } \
@@ -370,7 +369,6 @@ template <class T> inline const T& ntl_max(const T& a, const T& b) { return a > 
 #define STL_BI_COMPATIBILITY(C) \
 	typedef T             value_type; \
 	typedef ConstIterator const_iterator; \
-	typedef const T&      const_reference; \
 	typedef const T&      const_reference; \
 	typedef int           size_type; \
 	typedef int           difference_type; \
@@ -387,7 +385,6 @@ template <class T> inline const T& ntl_max(const T& a, const T& b) { return a > 
 	typedef T             value_type; \
 	typedef ConstIterator const_iterator; \
 	typedef const T&      const_reference; \
-	typedef const T&      const_reference; \
 	typedef int           size_type; \
 	typedef int           difference_type; \
 	const_iterator        begin() const          { return B::Begin(); } \
@@ -402,7 +399,6 @@ template <class T> inline const T& ntl_max(const T& a, const T& b) { return a > 
 #define STL_VECTOR_COMPATIBILITY(C) \
 	typedef T             value_type; \
 	typedef ConstIterator const_iterator; \
-	typedef const T&      const_reference; \
 	typedef const T&      const_reference; \
 	typedef int           size_type; \
 	typedef int           difference_type; \
