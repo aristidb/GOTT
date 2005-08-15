@@ -14,9 +14,9 @@ using namespace boost;
 int main() {
   nstring n(range("Hallo, nstring-Welt!\n"), ascii);
   nstring x(n); // fast!
-  cerr << (x == n) << L' ';
-  cerr << (x != range(L"muhkuh")) << L' ';
-  cerr << (x == range("Hallo, nstring-Welt!\n")) << L'\n';
+  cerr << (x == n) << ' ';
+  cerr << (x != range(L"muhkuh")) << ' ';
+  cerr << (x == range("Hallo, nstring-Welt!\n")) << '\n';
   x = zero_terminated(L"xxxFoobar\n$");
   x = offset(range(x), 3, -1);
   n = x + n;
