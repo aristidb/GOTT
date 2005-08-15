@@ -20,8 +20,6 @@
 
 #include "ordered.hpp"
 
-
-
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
 using schema::rule;

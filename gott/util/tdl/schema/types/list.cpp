@@ -35,7 +35,8 @@ match_list::match_list(rule_factory const &r, slotcfg const &c,
 }
 
 match_list::~match_list() {
-  matcher().pos().forget(last);
+  if (expectation() != nothing)
+    matcher().pos().forget(last);
 }
 
 bool match_list::play(ev::child_fail const &) {
@@ -53,8 +54,8 @@ bool match_list::play(ev::child_succeed const &) {
 bool match_list::full() {
   cfg.add();
 
+  matcher().pos().forget(last);
   if (expectation() != nothing) {
-    matcher().pos().forget(last);
     last = matcher().pos().current();
     matcher().add(sub);
   }

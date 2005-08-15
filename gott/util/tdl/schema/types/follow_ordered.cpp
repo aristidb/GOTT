@@ -49,7 +49,9 @@ void match_follow_ordered::init_accept_empty() {
   }
 }
 
-match_follow_ordered::~match_follow_ordered() {}
+match_follow_ordered::~match_follow_ordered() {
+  matcher().pos().forget(last);
+}
 
 bool match_follow_ordered::play(ev::child_succeed const &) {
   if (matcher().pos().proceeded(last)) {
@@ -58,6 +60,7 @@ bool match_follow_ordered::play(ev::child_succeed const &) {
     ++pos; // don't repeat empty
     if (!search_insertible())
       return true;
+    matcher().pos().forget(last);
     last = matcher().pos().current();
     matcher().add(*pos->generator);
   }
@@ -83,6 +86,7 @@ bool match_follow_ordered::play(ev::down const &) {
   if (saw_up || !search_insertible())
     return false;
   ++opened;
+  matcher().pos().forget(last);
   last = matcher().pos().current();
   matcher().add(*pos->generator);
   return true;

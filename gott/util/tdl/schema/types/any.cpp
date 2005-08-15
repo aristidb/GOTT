@@ -20,7 +20,6 @@
 
 #include "any.hpp"
 
-
 namespace schema = gott::tdl::schema;
 namespace ev = schema::ev;
 using schema::match_any;
@@ -36,7 +35,8 @@ match_any::match_any(Vector<rule_factory const *> const &vv,
 }
 
 match_any::~match_any() {
-  matcher().pos().forget(begin);
+  if (expectation() != nothing)
+    matcher().pos().forget(begin);
 }
 
 bool match_any::play(ev::child_fail const &) {
@@ -51,6 +51,7 @@ bool match_any::play(ev::child_fail const &) {
 }
 
 bool match_any::play(ev::child_succeed const &) {
+  matcher().pos().forget(begin);
   be_happy();
   return true;
 }

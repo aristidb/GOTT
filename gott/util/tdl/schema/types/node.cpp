@@ -31,14 +31,12 @@ match_node::match_node(rule_attr const &a, match &m)
 : happy_once(a, m) {}
 
 bool match_node::play(ev::node const &n) {
-  if (expectation() == need) {
-    matcher().direct_structure().data(gott::xany::Xany(n.get_data()));
+  if (expectation() != need)
+    return false;
 
-    be_happy();
-    return true;
-  }
-
-  return false;
+  matcher().direct_structure().data(gott::xany::Xany(n.get_data()));
+  be_happy();
+  return true;
 }
 
 wchar_t const *match_node::name() const {

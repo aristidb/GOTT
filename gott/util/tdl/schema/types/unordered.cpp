@@ -21,8 +21,6 @@
 #include "unordered.hpp"
 #include <gott/util/range_algo.hpp>
 
-
-
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
 using schema::rule;
