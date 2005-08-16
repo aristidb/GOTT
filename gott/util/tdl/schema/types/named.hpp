@@ -24,6 +24,7 @@
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
 #include "../rule_attr.hpp"
+#include "../happy_once.hpp"
 #include "follow_ordered.hpp"
 #include "node.hpp"
 
@@ -31,7 +32,7 @@ namespace gott {
 namespace tdl {
 namespace schema {
 
-class match_named : public rule {
+class match_named : public happy_once {
 public:
   static GOTT_EXPORT
   rule_attr attributes(string const &s, bool cc = true);
@@ -45,9 +46,9 @@ public:
 
 private:
   virtual string name() const;
-  expect expectation() const;
   match_follow_ordered::factory outer;
   match_node::factory inner_name;
+  bool play(ev::child_succeed const &);
 };
   
 }}}

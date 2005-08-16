@@ -38,7 +38,7 @@ rule_attr match_named::attributes(string const &s, bool cc) {
 
 match_named::match_named(rule_factory const &s, rule_attr const &a, 
                          match &m) 
-: rule(a, m), outer(rule_attr(rule_attr::simple, false)),
+: happy_once(a, m), outer(rule_attr(rule_attr::simple, false)),
   inner_name(rule_attr(rule_attr::simple, false, 
         new structure::repatch_enumeration(
           Vector<string>() << Xany_cast<string>(a.user())))) {
@@ -49,8 +49,9 @@ match_named::match_named(rule_factory const &s, rule_attr const &a,
 
 match_named::~match_named() {}
 
-rule::expect match_named::expectation() const {
-  return nothing;
+bool match_named::play(ev::child_succeed const &) {
+  be_happy();
+  return true;
 }
 
 gott::string match_named::name() const {

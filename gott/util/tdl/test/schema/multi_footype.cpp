@@ -30,8 +30,7 @@ namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
 
-using stru::cf::S;
-using stru::cf::C;
+using namespace stru::cf;
 using schema::slotcfg;
 
 typedef schema::rule_attr RA;
@@ -94,18 +93,19 @@ void object::test<1>(int) {
     fail("empty");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "0:1 : mismatch in document(--doc--)>named(a) after token ");
+      "0:1 : mismatch in document(--doc--)>named(a)>follow>node after token ");
   }
 }
 
 template<> template<>
 void object::test<2>(int) {
   run_test(L"a\n plugin x\n sum 7\n 77");
-  stru::cf::nd_list c;
-  c.push_back(C(S(Xany(L"x"), L"plugin-data"), L"plugin"));
-  c.push_back(C(S(Xany(7), L"sum-data"), L"sum"));
-  c.push_back(S(Xany(77), L"--other--"));
-  C(C(M(c, L"--unordered--"), L"a"), L"--doc--").write_to(xp);
+  nd_list c;
+  c.push_back(MD(Xany(0), nd_list() << S(Xany("x"), "plugin-data"), "plugin"));
+  c.push_back(MD(Xany(0), nd_list() << S(Xany(7), "sum-data"), "sum"));
+  c.push_back(S(Xany(77), "--other--"));
+  C(MD(Xany(0), nd_list() << M(c, "--unordered--"), "a"), "--doc--")
+    .write_to(xp);
   ensure_equals("simple", tree, xp);
 }
 
@@ -119,7 +119,7 @@ void object::test<3>(int) {
       " plugin\n"
       "                     x,y,z\n"
   );
-  stru::cf::nd_list c, p;
+  nd_list c, p;
   p.push_back(S(Xany(L"x"), L"plugin-data"));
   p.push_back(S(Xany(L"y"), L"plugin-data"));
   p.push_back(S(Xany(L"z"), L"plugin-data"));
@@ -141,7 +141,7 @@ void object::test<4>(int) {
       " plugin\n"
       "                     x,y,z\n"
   );
-  stru::cf::nd_list c, p;
+  nd_list c, p;
   p.push_back(S(Xany(L"x"), L"plugin-data"));
   p.push_back(S(Xany(L"y"), L"plugin-data"));
   p.push_back(S(Xany(L"z"), L"plugin-data"));
@@ -166,7 +166,7 @@ void object::test<5>(int) {
       "                     x,y,z\n"
       " -1234"
   );
-  stru::cf::nd_list c, p;
+  nd_list c, p;
   p.push_back(S(Xany(L"x"), L"plugin-data"));
   p.push_back(S(Xany(L"y"), L"plugin-data"));
   p.push_back(S(Xany(L"z"), L"plugin-data"));

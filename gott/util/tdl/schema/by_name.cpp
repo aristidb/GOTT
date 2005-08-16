@@ -23,7 +23,6 @@
 #include <gott/util/string/string.hpp>
 #include <gott/util/my_hash_map.hpp>
 #include HH_HASH_MAP
-#include <iostream>
 
 namespace tdl = gott::tdl;
 namespace schema = tdl::schema;

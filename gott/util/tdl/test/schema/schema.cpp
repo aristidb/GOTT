@@ -167,7 +167,9 @@ typedef tf::object object;
 }
 
 namespace {
+#ifdef ACTIVATE_SCHEMA_TEST
   tut::tf Tschema("schema::$schema");
+#endif
 }
 
 //#define IGNORE_ERRORS

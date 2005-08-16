@@ -6,17 +6,17 @@
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// License as published by the Free Software Foundafterion; either
+// version 2.1 of the License, or (after your option) any lafterer version.
 //
-// This library is distributed in the hope that it will be useful,
+// This library is distributed in the hope thafter it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundafterion, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
 #include <gott/util/tdl/schema/types/named.hpp>
@@ -27,8 +27,7 @@ namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
 
-using stru::cf::S;
-using stru::cf::C;
+using namespace stru::cf;
 
 typedef schema::rule_attr RA;
 
@@ -58,8 +57,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"ND\n zz");
-  stru::cf::nd_list c;
-  C(C(S(Xany(L"zz"), L"S"), L"ND"), L"doc").write_to(xp);
+  C(MD(Xany(0), nd_list() << S(Xany(L"zz"), L"S"), L"ND"), L"doc").write_to(xp);
   ensure_equals("single follow_integer_integer entity", tree, xp);
 }
 
@@ -70,7 +68,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND) at token d7");
+        "1:1 : mismatch in document(doc)>named(ND)>follow after token d7");
   }
 }
 
@@ -81,7 +79,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "0:1 : mismatch in document(doc)>named(ND) after token ");
+       "0:1 : mismatch in document(doc)>named(ND)>follow>node after token ");
   }
 }
 
@@ -92,7 +90,7 @@ void object::test<4>(int) {
     fail("non-followed string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:4 : mismatch in document(doc)>named(ND) at token foo");
+        "1:4 : mismatch in document(doc)>named(ND)>follow at token foo");
   }
 }
 
@@ -103,7 +101,7 @@ void object::test<5>(int) {
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND) at token 4");
+        "1:1 : mismatch in document(doc)>named(ND)>follow after token 4");
   }
 }
 
@@ -114,7 +112,7 @@ void object::test<6>(int) {
     fail("nonsense");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND) at token 4");
+        "1:1 : mismatch in document(doc)>named(ND)>follow after token 4");
   }
 }
 
@@ -125,7 +123,7 @@ void object::test<7>(int) {
     fail("just label");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND) after token ND");
+        "1:1 : mismatch in document(doc)>named(ND)>follow after token ND");
   }
 }
 
