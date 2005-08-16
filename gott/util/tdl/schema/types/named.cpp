@@ -21,6 +21,7 @@
 #include "named.hpp"
 #include "../event.hpp"
 #include <gott/util/string/string.hpp>
+#include <gott/util/tdl/structure/types/enumeration.hpp>
 
 using gott::xany::Xany;
 using gott::xany::Xany_cast;
@@ -37,51 +38,19 @@ rule_attr match_named::attributes(string const &s, bool cc) {
 
 match_named::match_named(rule_factory const &s, rule_attr const &a, 
                          match &m) 
-: rule(a, m), sub(s), state(read_none) {
-  if (!a.user().compatible<string>())
-    throw std::bad_exception();
+: rule(a, m), outer(rule_attr(rule_attr::simple, false)),
+  inner_name(rule_attr(rule_attr::simple, false, 
+        new structure::repatch_enumeration(
+          Vector<string>() << Xany_cast<string>(a.user())))) {
+  outer.add(inner_name);
+  outer.add(s);
+  matcher().add(outer);
 }
 
-bool match_named::play(ev::node const &n) {
-  if (state != read_none)
-    return false;
-
-  if (n.get_data() == Xany_cast<string>(rule::attributes().user())) {
-    state = read_node;
-    return true;
-  }
-  
-  return false;
-}
-
-bool match_named::play(ev::down const &) {
-  if (state == read_node) {
-    state = read_down;
-    matcher().add(sub);
-    return true;
-  }
-  return false;
-}
-
-bool match_named::play(ev::child_succeed const &) {
-  state = read_sub;
-  return true;
-}
-
-bool match_named::play(ev::child_fail const &) {
-  return false;
-}
-
-bool match_named::play(ev::up const &) {
-  if (state == read_sub) {
-    state = done;
-    return true;
-  }
-  return false;
-}
+match_named::~match_named() {}
 
 rule::expect match_named::expectation() const {
-  return state == done ? nothing : need;
+  return nothing;
 }
 
 gott::string match_named::name() const {

@@ -24,13 +24,13 @@
 #include "../parse.hpp"
 #include "../rule_factory.hpp"
 #include "../rule_attr.hpp"
-#include "../slot.hpp"
+#include "follow_ordered.hpp"
+#include "node.hpp"
 
 namespace gott {
 namespace tdl {
 namespace schema {
 
-// TODO: deal with empty contents
 class match_named : public rule {
 public:
   static GOTT_EXPORT
@@ -39,20 +39,15 @@ public:
   typedef factory_template::onechild<match_named> factory;
   match_named(rule_factory const &, rule_attr const &, match &);
 
+  ~match_named();
+
   static bool accept_empty(bool) { return false; }
 
 private:
+  virtual string name() const;
   expect expectation() const;
-  bool play(ev::node const &);
-  bool play(ev::down const &);
-  bool play(ev::up const &);
-  bool play(ev::child_succeed const &);
-  bool play(ev::child_fail const &);
-  string name() const;
-  
-  rule_factory const &sub;
-
-  enum { read_none, read_node, read_down, read_sub, done } state;
+  match_follow_ordered::factory outer;
+  match_node::factory inner_name;
 };
   
 }}}
