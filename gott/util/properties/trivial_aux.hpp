@@ -26,6 +26,9 @@ namespace properties {
 
 struct no_lock {
   typedef no_lock read_lock, write_lock, read_write_lock;
+
+  static void begin(no_lock &) {}
+  static void end(no_lock &) {}
 };
 
 template<class ValueType, class Storage>

@@ -36,6 +36,8 @@ public:
 
   T *get_pointer() { return &obj; }
   T const *get_pointer() const { return &obj; }
+  void finish_pointer(T *) {}
+  void finish_pointer(T const *) const {}
 };
 
 }}

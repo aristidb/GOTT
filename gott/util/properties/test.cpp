@@ -28,20 +28,21 @@ public:
 };
 
 int main() {
-  property<int> p;
+  concrete_property<int> p;
   p.set(4);
   p.apply_change(add<2>);
   *p.read_write() -= 2;
   
-  property<property<int> > x(p);
+  concrete_property<concrete_property<int> > x(p);
   cout << x.read()->get() << endl;
   
-  property<string, test_observe> w("Hallo");
+  concrete_property<string, test_observe> w("Hallo");
   w.read_write()->append(" Welt!");
   cout << w.get() << endl;
 
   vobserve V;
-  property<int, vobserve &> q(44, V);
+  concrete_property<int, vobserve &> q(44, V);
+  property<int> &ref = q;
   srand(time(NULL));
-  q.apply_write(rand);
+  ref.apply_write(rand);
 }

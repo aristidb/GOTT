@@ -38,6 +38,10 @@ struct policy<T &> {
   typedef T &parameter;
 };
 
+template<class T>
+struct base {
+};
+
 }}
 
 #endif
