@@ -33,6 +33,7 @@
 #include <string>
 
 using gott::string;
+using gott::range_t;
 
 class string::representation {
 public:
@@ -133,27 +134,15 @@ string::representation::representation(range_t<I> const &r, concatenation_tag)
   utf8_t *current = new utf8_t[size];
   data = current;
   for (I it = r.begin; it != r.end; ++it)
-    current = std::copy(it->data(), it->data() + it->size(), current);
+    current = copy(it->as_utf8(), current);
 }
 
-gott::utf8_t const *string::data() const {
-  return p->data;
+range_t<gott::utf8_t const *> string::as_utf8() const {
+  return range(p->data, p->size);
 }
 
-gott::utf8_t const *string::begin_raw() const {
-  return p->data;
-}
-
-gott::utf8_t const *string::end_raw() const {
-  return p->data + p->size;
-}
-
-gott::utf8_iterator string::begin() const {
-  return begin_raw();
-}
-
-gott::utf8_iterator string::end() const {
-  return end_raw();
+range_t<gott::utf8_iterator> string::as_utf32() const {
+  return as_utf8().cast<utf8_iterator>();
 }
 
 std::size_t string::size() const {
@@ -162,7 +151,7 @@ std::size_t string::size() const {
 
 std::size_t string::length() const {
   if (!p->length)
-    p->length = range(*this).size();
+    p->length = as_utf32().size();
   return p->length;
 }
 
@@ -183,13 +172,13 @@ string::operator std::wstring() const {
 }
 
 std::ostream &gott::operator<<(std::ostream &stream, string const &s) {
-  for (utf8_t const *it = s.begin_raw(); it < s.end_raw(); ++it)
+  for (utf8_t const *it = s.as_utf8().begin; it < s.as_utf8().end; ++it)
     stream << char(*it);
   return stream;
 }
 
 std::wostream &gott::operator<<(std::wostream &stream, string const &s) {
-  for (utf8_iterator it = s.begin(); it < s.end(); ++it)
+  for (utf8_iterator it = s.as_utf32().begin; it < s.as_utf32().end; ++it)
     stream << wchar_t(*it);
   return stream;
 }
@@ -200,27 +189,25 @@ string gott::operator+(string const &a, string const &b) {
 }
 
 bool gott::operator==(string const &a, string const &b) {
-  if (a.data() == b.data())
+  if (a.as_utf8().begin == b.as_utf8().begin)
     return true;
-  if (a.size() != b.size())
-    return false;
-  return std::equal(a.begin_raw(), a.end_raw(), b.begin_raw());
+  return a.as_utf8() == b.as_utf8();
 }
 
 int gott::compare(string const &a, string const &b) {
-  if (a.data() == b.data())
+  if (a.as_utf8().begin == b.as_utf8().begin)
     return 0;
 
-  utf8_t const *p1 = a.begin_raw();
-  utf8_t const *p2 = b.begin_raw();
-  for (; p1 != a.end_raw() && p2 != b.end_raw(); ++p1, ++p2)
+  utf8_t const *p1 = a.as_utf8().begin;
+  utf8_t const *p2 = b.as_utf8().begin;
+  for (; p1 != a.as_utf8().end && p2 != b.as_utf8().end; ++p1, ++p2)
     if (*p1 != *p2)
       break;
-  if (p1 == a.end_raw()) {
-    if (p2 == b.end_raw())
+  if (p1 == a.as_utf8().end) {
+    if (p2 == b.as_utf8().end)
       return 0;
     return 1;
-  } else if (p2 == b.end_raw())
+  } else if (p2 == b.as_utf8().end)
     return -1;
   
   return *p2 - *p1;
@@ -229,7 +216,7 @@ int gott::compare(string const &a, string const &b) {
 std::size_t 
 hashd::hash<gott::string>::operator() (gott::string const &s) const {
   std::size_t result = 0;
-  for (gott::utf8_t const *it = s.begin_raw(); it != s.end_raw(); ++it)
+  for (gott::utf8_t const *it = s.as_utf8().begin; it != s.as_utf8().end; ++it)
     result = 5 * result + *it; // TODO: compare 31*result+*it
   return result;
 }

@@ -27,7 +27,7 @@ using gott::tdl::tdl_exception;
 class tdl_exception::IMPL {
 public:
   IMPL(string const &s) : msg(new char[s.size() + 1]) {
-    copy(s.raw().cast<char const *>(), msg);
+    copy(s.as_utf8().cast<char const *>(), msg);
     msg[s.size()] = '\0';
   }
   ~IMPL() throw() { delete msg; }

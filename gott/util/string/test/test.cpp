@@ -19,7 +19,7 @@ int main() {
   cerr << (x != range(L"muhkuh")) << ' ';
   cerr << (x == range("Hallo, string-Welt!\n")) << '\n';
   x = zero_terminated(L"xxxFoobar\n$");
-  x = offset(range(x), 3, -1);
+  x = offset(x.as_utf32(), 3, -1);
   n = x + n;
   cerr << n << x;
 

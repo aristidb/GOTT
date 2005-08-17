@@ -53,7 +53,8 @@ template<class> class range_t;
  */
 class GOTT_EXPORT string : Moveable<string> {
 public:
-  typedef utf8_iterator const_iterator;
+  typedef range_t<utf8_t const *> utf8_range;
+  typedef range_t<utf8_iterator> utf32_range;
 
   /**
    * Construct empty string
@@ -161,28 +162,14 @@ public:
   void operator =(string const &other);
 
   /**
-   * Get the internal data.
+   * Get the internally used UTF8 string.
    */
-  utf8_t const *data() const;
-
-  utf8_t const *begin_raw() const;
-
-  utf8_t const *end_raw() const;
-
-  GOTT_LOCAL
-  range_t<utf8_t const *> raw() const {
-    return range(begin_raw(), end_raw());
-  }
- 
-  /**
-   * Get an iterator pointing at the first character.
-   */
-  utf8_iterator begin() const;
+  range_t<utf8_t const *> as_utf8() const;
 
   /**
-   * Get an iterator pointing behind the last character.
+   * Access the string as UTF32.
    */
-  utf8_iterator end() const;
+  range_t<utf8_iterator> as_utf32() const;
 
   /**
    * Get the number of characters (not bytes) in the string.

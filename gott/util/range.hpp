@@ -66,6 +66,13 @@ template<class T> struct range_t {
   std::size_t size() const {
     return std::distance(begin, end);
   }
+
+  /**
+   * Check if the range is empty.
+   */
+  bool empty() const {
+    return begin == end;
+  }
 };
 
 
@@ -74,6 +81,8 @@ template<class T> struct range_t {
  */
 template<class T, class U>
 bool operator==(range_t<T> a, range_t<U> b) {
+  if (a.begin == b.begin)
+    return a.end == b.end;
   if (a.size() != b.size())
     return false;
   for (; a.begin != a.end; ++a.begin, ++b.begin)

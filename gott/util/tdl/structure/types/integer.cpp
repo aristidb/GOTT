@@ -53,29 +53,26 @@ repatch_integer::deferred_write(writable_structure &s) const {
       long sign = 1;
       val = 0;
   
-      string::const_iterator it = s.begin();
+      string::utf32_range rng = s.as_utf32();
   
-      if (it == s.end())
+      if (rng.empty())
         return false;
 
-      if (*it == L'-') {
-        ++it;
+      if (*rng.begin == L'-') {
+        ++rng.begin;
         sign = -1;
-        if (it == s.end())
+        if (rng.empty())
           return false;
       }
   
-      if (!std::iswdigit(*it))
+      if (!std::iswdigit(*rng.begin))
         return false;
     
 //    if (*it == L'0' && it[1] == L'x')
 //      return is_hex(it + 2, s.end(), v, sign)
 
-      for (; it != s.end() && std::iswdigit(*it); ++it)
-        val = val * 10 + (*it - L'0');
-
-      if (it != s.end())
-        return false;
+      for (; !rng.empty() && std::iswdigit(*rng.begin); ++rng.begin)
+        val = val * 10 + (*rng.begin - L'0');
 
       val *= sign;
       return true;

@@ -68,16 +68,17 @@ meta_parser::meta_parser() : p(new IMPL) {
 
 meta_parser::~meta_parser() {}
 
-void meta_parser::exec(string const &line) {
-  string::const_iterator start = line.begin(), pos = start;
-  for (; pos != line.end(); ++pos)
+void meta_parser::exec(string const &line_) {
+  string::utf32_range line = line_.as_utf32();
+  utf8_iterator pos = line.begin;
+  for (; pos != line.end; ++pos)
     if (*pos == L' ')
       break;
   
-  string cmd(range(start, pos));
-  while (*pos == L' ' && ++pos != line.end())
+  string cmd(range(line.begin, pos));
+  while (*pos == L' ' && ++pos != line.end)
     ;
-  string param(range(pos, line.end()));
+  string param(range(pos, line.end));
 
   IMPL::cb_t::const_iterator it = p->cb.find(cmd);
 

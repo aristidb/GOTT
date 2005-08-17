@@ -37,9 +37,9 @@ atom::atom(atom const &o) : string(o) {}
 atom::~atom() {}
 
 bool gott::operator==(atom const &a, atom const &b) {
-  return a.begin_raw() == b.begin_raw(); // same memory
+  return a.as_utf8().begin == b.as_utf8().begin; // same memory
 }
 
 std::size_t hashd::hash<atom>::operator() (atom const &a) const {
-  return std::size_t(a.begin_raw());
+  return std::size_t(a.as_utf8().begin);
 }

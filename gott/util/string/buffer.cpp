@@ -80,7 +80,7 @@ string_buffer::string_buffer(range_t<utf32_t const *> const &x)
 
 string_buffer::string_buffer(string const &x)
 : data(new representation) {
-  copy(range(x), insert(end(), x.length()));
+  copy(x.as_utf32(), insert(end(), x.length()));
 }
 
 utf32_t *string_buffer::begin() {
