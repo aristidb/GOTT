@@ -23,6 +23,7 @@
 
 #include "iterator.hpp"
 #include "types.hpp"
+#include "stl.hpp"
 #include <gott/util/visibility.hpp>
 #define PARAM_HASH_NO_BASIC_STRING
 #include <gott/util/my_hash_map.hpp>
@@ -100,13 +101,17 @@ public:
    * Construct std::string from string using unicode encoding.
    * Use to_string if you need a different encoding.
    */
-  operator std::string() const;
+  operator std::string() const {
+    return to_string(*this);
+  }
 
   /**
    * Construct std::wstring from string using unicode encoding.
    * Use to_wstring if you need a different encoding.
    */
-  operator std::wstring() const;
+  operator std::wstring() const {
+    return to_wstring(*this);
+  }
   
   enum literal_tag { utf8_literal };
 
@@ -159,7 +164,9 @@ public:
   /**
    * Assign from another string.
    */
-  void operator =(string const &other);
+  void operator=(string other) GOTT_LOCAL {
+    other.swap(*this);
+  }
 
   /**
    * Get the internally used UTF8 string.
@@ -169,7 +176,9 @@ public:
   /**
    * Access the string as UTF32.
    */
-  range_t<utf8_iterator> as_utf32() const;
+  range_t<utf8_iterator> as_utf32() const GOTT_LOCAL {
+    return as_utf8().cast<utf8_iterator>();
+  }
 
   /**
    * Get the number of characters (not bytes) in the string.
@@ -179,7 +188,9 @@ public:
   /**
    * Get the number of bytes the string needs as UTF8-encoded.
    */
-  std::size_t size() const;
+  std::size_t size() const GOTT_LOCAL {
+    return as_utf8().size();
+  }
 
 private:
   class representation;
@@ -205,7 +216,10 @@ operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &,
 /**
  * Concatenate two strings.
  */
-GOTT_EXPORT string operator +(string const &, string const &);
+GOTT_LOCAL inline string operator +(string const &a, string const &b) {
+  string const arr[2] = {a, b};
+  return range(arr);
+}
 
 /**
  * Compare two strings for equality.

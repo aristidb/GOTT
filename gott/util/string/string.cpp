@@ -141,14 +141,6 @@ range_t<gott::utf8_t const *> string::as_utf8() const {
   return range(p->data, p->size);
 }
 
-range_t<gott::utf8_iterator> string::as_utf32() const {
-  return as_utf8().cast<utf8_iterator>();
-}
-
-std::size_t string::size() const {
-  return p->size;
-}
-
 std::size_t string::length() const {
   if (!p->length)
     p->length = as_utf32().size();
@@ -157,18 +149,6 @@ std::size_t string::length() const {
 
 void string::swap(string &o) {
   std::swap(p, o.p);
-}
-
-void string::operator=(string const &o) {
-  string(o).swap(*this);
-}
-
-string::operator std::string() const {
-  return to_string(*this);
-}
-
-string::operator std::wstring() const {
-  return to_wstring(*this);
 }
 
 std::ostream &gott::operator<<(std::ostream &stream, string const &s) {
@@ -181,11 +161,6 @@ std::wostream &gott::operator<<(std::wostream &stream, string const &s) {
   for (utf8_iterator it = s.as_utf32().begin; it < s.as_utf32().end; ++it)
     stream << wchar_t(*it);
   return stream;
-}
-
-string gott::operator+(string const &a, string const &b) {
-  string const both[] = { a, b };
-  return string(range(both));
 }
 
 bool gott::operator==(string const &a, string const &b) {
