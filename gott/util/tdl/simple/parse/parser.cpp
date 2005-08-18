@@ -110,8 +110,8 @@ class cancellor {};
 
 line_logger::~line_logger() {}
 
-void parser::parse(std::wistream &s, line_logger *l) {
-  exec_parse x(s, *this, l);
+void parser::parse(std::wistream &s) {
+  exec_parse x(s, *this, ll);
   x.run_parse();
 }
 

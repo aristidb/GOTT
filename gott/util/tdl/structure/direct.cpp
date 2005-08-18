@@ -62,7 +62,7 @@ namespace {
     }
 
   public:
-    my_parser(writable_structure &ss) : s(ss), data(false) {}
+    my_parser(writable_structure &ss) : parser(0), s(ss), data(false) {}
     virtual ~my_parser() {}
   };
 }

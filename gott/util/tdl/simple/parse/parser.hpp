@@ -37,6 +37,13 @@ class line_logger;
  */
 class GOTT_EXPORT parser {
 public:
+  /**
+   * Parse a TDL document. Does not treat the meta-data section specifically.
+   * \param s The stream to read a document from.
+   */
+  void parse(std::wistream &s);
+
+public:
   // callbacks
   virtual void begin_parse() = 0;
     ///< Called as soon as the parse has begun.
@@ -58,13 +65,12 @@ public:
 
   virtual ~parser() = 0;
 
-public:
-  /**
-   * Parse a TDL document. Does not treat the meta-data section specifically.
-   * \param s The stream to read a document from.
-   * \param l (optional) The line-logger callback.
-   */
-  void parse(std::wistream &s, line_logger *l = 0);
+protected:
+  GOTT_LOCAL parser(line_logger *l) : ll(l) {}
+  GOTT_LOCAL void set_line_logger(line_logger *l) { ll = l; }
+  
+private:
+  line_logger *ll;
 };
 
 }}}

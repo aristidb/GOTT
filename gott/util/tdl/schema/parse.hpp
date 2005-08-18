@@ -69,7 +69,8 @@ public:
    * \param rf The rule-factory specifying the document type.
    * \param tree The tree to write to.
    */
-  match(rule_factory const &rf, structure::revocable_structure &tree) GOTT_EXPORT;
+  GOTT_EXPORT
+  match(rule_factory const &rf, structure::revocable_structure &tree);
 
   ~match() GOTT_EXPORT;
 

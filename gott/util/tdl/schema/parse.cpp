@@ -94,10 +94,14 @@ public:
 
 NTL_MOVEABLE(shared_ptr<gott::tdl::schema::rule>);
 
-match::match(structure::revocable_structure &p) : pIMPL(new IMPL(p, *this)) {}
+match::match(structure::revocable_structure &p) 
+: parser(0), pIMPL(new IMPL(p, *this)) {
+  set_line_logger(get_debug());
+}
 
 match::match(rule_factory const &rf, structure::revocable_structure &p)
-: pIMPL(new IMPL(p, *this)) {
+: parser(0), pIMPL(new IMPL(p, *this)) {
+  set_line_logger(get_debug());
   pIMPL->add(rf);
 }
 
