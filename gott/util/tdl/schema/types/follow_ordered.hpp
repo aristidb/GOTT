@@ -21,7 +21,7 @@
 #ifndef GOTT_TDL_SCHEMA_FOLLOW_ORDERED_HPP
 #define GOTT_TDL_SCHEMA_FOLLOW_ORDERED_HPP
 
-#include "../parse.hpp"
+#include "../match.hpp"
 #include "../rule_factory.hpp"
 #include "../slot.hpp"
 #include "../parse_position.hpp"

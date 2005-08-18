@@ -20,7 +20,7 @@
 
 #include "rule.hpp"
 #include "rule_attr.hpp"
-#include "parse.hpp"
+#include "match.hpp"
 #include "event.hpp"
 #include <gott/util/range_algo.hpp>
 #include <boost/bind.hpp>

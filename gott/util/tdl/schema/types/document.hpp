@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_DOCUMENT_HPP
 #define GOTT_UTIL_TDL_SCHEMA_DOCUMENT_HPP
 
-#include "../parse.hpp"
+#include "../match.hpp"
 #include "../rule_factory.hpp"
 #include "../happy_once.hpp"
 

@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "event.hpp"
-#include "parse.hpp"
+#include "match.hpp"
 #include "rule.hpp"
 
 namespace ev = gott::tdl::schema::ev;
