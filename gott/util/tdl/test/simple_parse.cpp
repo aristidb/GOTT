@@ -62,8 +62,6 @@ namespace {
 tut::tf spp("simple::parse");
 }
 
-using gott::tdl::simple::parse;
-
 std::ostream &operator<<(std::ostream &o, 
                          Vector<tut::spb::event> const &e) {
   o << '\n';
@@ -80,7 +78,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   std::wistringstream data(L"");
-  parse(data, *this);
+  parse(data);
   B(); D(); U(); E();
   ensure_equals("empty", range(ev), range(xp));
 }
@@ -89,7 +87,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   std::wistringstream data(L"hallodu");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"hallodu"); U(); E();
   ensure_equals("single-word", range(ev), range(xp));
 }
@@ -98,7 +96,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   std::wistringstream data(L"  hallodu, foobar zulu");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"hallodu"); N(L"foobar"); D(); N(L"zulu"); U(); U(); E();
   ensure_equals("multiple-word", range(ev), range(xp));
 }
@@ -107,7 +105,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   std::wistringstream data(L"\n\n          \n     \n\n\n");
-  parse(data, *this);
+  parse(data);
   B(); D(); U(); E();
   ensure_equals("quasi-empty", range(ev), range(xp));
 }
@@ -116,8 +114,8 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   std::wistringstream data(L"\n\n\nfoobar      \n***\n  zumwinkel");
-  parse(data, *this);
-  parse(data, *this);
+  parse(data);
+  parse(data);
 
   B(); D(); N(L"foobar"); U(); E();
   B(); D(); N(L"zumwinkel"); U(); E();
@@ -129,7 +127,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   std::wistringstream data(L"\n\n  \n       fobar\n");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"fobar"); U(); E();
 
   ensure_equals("indented #1", range(ev), range(xp));
@@ -139,7 +137,7 @@ void object::test<6>(int) {
 template<> template<>
 void object::test<7>(int) {
   std::wistringstream data(L"\n  x");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"x"); U(); E();
 
   ensure_equals("indented #2", range(ev), range(xp));
@@ -150,7 +148,7 @@ void object::test<7>(int) {
 template<> template<>
 void object::test<8>(int) {
   std::wistringstream data(L"\n\n#__ mycomment,\n");
-  parse(data, *this);
+  parse(data);
   B(); D(); C(L"__ mycomment,", true); U(); E();
 
   ensure_equals("own-line comment", range(ev), range(xp));
@@ -160,7 +158,7 @@ void object::test<8>(int) {
 template<> template<>
 void object::test<9>(int) {
   std::wistringstream data(L"\na");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"a"); U(); E();
 
   ensure_equals("newlined char", range(ev), range(xp));
@@ -182,7 +180,7 @@ a\n\
     7\n\
   -2\n"
   );
-  parse(data, *this);
+  parse(data);
   
   B();
     D();
@@ -221,7 +219,7 @@ type multi\n\
        named sum integer (> 0)\n\
        $ list integer"
   );
-  parse(data, *this);
+  parse(data);
   B(); D();
     N(L"module"); D(); N(L"foo"); U();
     N(L"schema"); D(); N(L"footype"); U();
@@ -263,7 +261,7 @@ TITLE:    Roses\n\
 ARTIST:   \"Kathy Mattea\"\n\
 RATING:   7\n\
 RIPPED:   T");
-  parse(data, *this);
+  parse(data);
   string dataset[3][4] = {
     {L"Home",  L"Dixie Chicks", L"9", L"T"},
     {L"Fly",   L"Dixie Chicks", L"8", L"T"},
@@ -303,7 +301,7 @@ a `\n\
    du\n\
  pferd\n"
   );
-  parse(data, *this);
+  parse(data);
   B(); D();
     N(L"a"); N(L"b"); D(); 
       N(L"c"); N(L"d"); C(L"comment", false); N(L"J");
@@ -326,7 +324,7 @@ a `\n\
   du\n\
  pferd\n"
   );
-  parse(data, *this);
+  parse(data);
   B(); D();
     N(L"a"); 
     D(); 

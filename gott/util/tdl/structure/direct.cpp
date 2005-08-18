@@ -69,7 +69,5 @@ namespace {
 
 void gott::tdl::structure::direct_struc(std::wistream &in, 
                                               writable_structure &out) {
-  my_parser pp(out);
-  parser &p = pp;
-  parse(in, p);
+  my_parser(out).parse(in);
 }

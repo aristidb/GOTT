@@ -37,7 +37,7 @@ struct schema_basic {
   void run_test(std::wstring const &input) {
     match.add(context.get());
     std::wistringstream stream(input);
-    gott::tdl::simple::parse(stream, match, match.get_debug());
+    match.parse(stream, match.get_debug());
     rest = stream.str().c_str() + stream.tellg();
   }
 };

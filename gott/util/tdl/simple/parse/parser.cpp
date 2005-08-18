@@ -19,9 +19,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "parser.hpp"
+#include "line_logger.hpp"
 #include <boost/algorithm/string.hpp>
 #include <gott/util/string/string.hpp>
-#include <gott/util/string/stl.hpp>
 
 using std::wistream;
 using std::wstring;
@@ -110,9 +110,8 @@ class cancellor {};
 
 line_logger::~line_logger() {}
 
-void gott::tdl::simple::parse(std::wistream &s, 
-                                    parser &p, line_logger *l) {
-  exec_parse x(s, p, l);
+void parser::parse(std::wistream &s, line_logger *l) {
+  exec_parse x(s, *this, l);
   x.run_parse();
 }
 

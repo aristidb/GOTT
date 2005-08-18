@@ -18,7 +18,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "parser.hpp"
+#include "meta.hpp"
 #include <gott/util/string/string.hpp>
 #include <gott/util/string/stl.hpp>
 #include <gott/util/my_hash_map.hpp>
@@ -28,8 +28,26 @@ using std::wistream;
 
 using gott::tdl::simple::meta_parser;
 
-void gott::tdl::simple::parse_meta(std::wistream &in, meta_parser &p, 
-                                         line_logger *) {
+static bool pass(gott::string const &, gott::string const &) {
+  return false;
+}
+
+class meta_parser::IMPL {
+public:
+  IMPL() : def(pass) {}
+
+  callback def;
+  typedef hashd::hash_map<string, callback> cb_t;
+  cb_t cb;
+  void exec(string const &);
+};
+
+meta_parser::meta_parser() : p(new IMPL) {
+}
+
+meta_parser::~meta_parser() {}
+
+void meta_parser::parse(std::wistream &in, line_logger *) {
   while (in) {
     if (in.peek() != L'#') {
       if (in.peek() != L'\n')
@@ -45,30 +63,12 @@ void gott::tdl::simple::parse_meta(std::wistream &in, meta_parser &p,
       in.get();
       std::wstring s;
       getline(in, s);
-      p.exec(s);
+      p->exec(s);
     }
   }
 }
 
-static bool pass(gott::string const &, gott::string const &) {
-  return false;
-}
-
-class meta_parser::IMPL {
-public:
-  IMPL() : def(pass) {}
-
-  callback def;
-  typedef hashd::hash_map<string, callback> cb_t;
-  cb_t cb;
-};
-
-meta_parser::meta_parser() : p(new IMPL) {
-}
-
-meta_parser::~meta_parser() {}
-
-void meta_parser::exec(string const &line_) {
+void meta_parser::IMPL::exec(string const &line_) {
   string::utf32_range line = line_.as_utf32();
   utf8_iterator pos = line.begin;
   for (; pos != line.end; ++pos)
@@ -80,13 +80,13 @@ void meta_parser::exec(string const &line_) {
     ;
   string param(range(pos, line.end));
 
-  IMPL::cb_t::const_iterator it = p->cb.find(cmd);
+  IMPL::cb_t::const_iterator it = cb.find(cmd);
 
-  if (it == p->cb.end())
-    p->def(cmd, param);
+  if (it == cb.end())
+    def(cmd, param);
   else
     if (!it->second(cmd, param))
-      p->def(cmd, param);
+      def(cmd, param);
 }
 
 void meta_parser::set_default(callback const &f) {

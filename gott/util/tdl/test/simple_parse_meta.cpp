@@ -18,7 +18,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <gott/util/tdl/simple/parse/parser.hpp>
+#include <gott/util/tdl/simple/parse/meta.hpp>
 #include <gott/util/tut/tut.h>
 #include <sstream>
 #include <gott/util/string/string.hpp>
@@ -29,7 +29,6 @@ using std::pair;
 using std::ostream;
 using std::wistringstream;
 using gott::tdl::simple::meta_parser;
-using gott::tdl::simple::parse_meta;
 using gott::string;
 
 typedef pair<string, string> twostring;
@@ -48,8 +47,8 @@ struct meta_basic {
     xp.push_back(pair<string,string>(cmd, param));
   }
   void run_test() {
-    wistringstream x(to_wstring(data));
-    parse_meta(x, parser);
+    wistringstream x(data);
+    parser.parse(x);
     rest = x.str().c_str() + x.tellg();
   }
   meta_basic() { parser.set_default(boost::ref(*this)); }
