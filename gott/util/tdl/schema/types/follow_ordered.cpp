@@ -56,6 +56,8 @@ match_follow_ordered::~match_follow_ordered() {
 bool match_follow_ordered::play(ev::child_succeed const &) {
   if (matcher().pos().proceeded(last)) {
     pos->slot.add();
+    matcher().pos().forget(last);
+    last = matcher().pos().current();
   } else {
     ++pos; // don't repeat empty
     if (!search_insertible())
@@ -67,18 +69,23 @@ bool match_follow_ordered::play(ev::child_succeed const &) {
   return true;
 }
 
+#include <iostream>
+
 bool match_follow_ordered::play(ev::child_fail const &) {
   bool this_flee = !pos->accept_empty;
   unhappy |= this_flee && pos->slot.expectation() == need;
-  ++pos; // Skip the undoable
-  if (!search_insertible()) {
+  ++pos;
+  if (unhappy || !search_insertible()) {
     if (!this_flee)
       return true;
     matcher().pos().seek(last);
     return false;
   }
   matcher().pos().seek(last);
-  matcher().add(*pos->generator);
+  if (--opened < 0) {
+    opened = 0;
+    matcher().add(*pos->generator);
+  }
   return true;
 }
 
@@ -86,8 +93,6 @@ bool match_follow_ordered::play(ev::down const &) {
   if (saw_up || !search_insertible())
     return false;
   ++opened;
-  matcher().pos().forget(last);
-  last = matcher().pos().current();
   matcher().add(*pos->generator);
   return true;
 }

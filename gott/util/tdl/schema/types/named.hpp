@@ -46,6 +46,7 @@ public:
 
 private:
   virtual string name() const;
+  string tag;
   match_follow_ordered::factory outer;
   match_node::factory inner_name;
   bool play(ev::child_succeed const &);

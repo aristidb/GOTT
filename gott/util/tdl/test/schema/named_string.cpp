@@ -68,7 +68,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND)>follow after token d7");
+        "1:1 : mismatch in document(doc)>named(ND)>follow>node at token d7");
   }
 }
 
@@ -101,7 +101,7 @@ void object::test<5>(int) {
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND)>follow after token 4");
+        "1:1 : mismatch in document(doc)>named(ND)>follow>node at token 4");
   }
 }
 
@@ -112,7 +112,7 @@ void object::test<6>(int) {
     fail("nonsense");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND)>follow after token 4");
+        "1:1 : mismatch in document(doc)>named(ND)>follow>node at token 4");
   }
 }
 

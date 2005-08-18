@@ -38,10 +38,11 @@ rule_attr match_named::attributes(string const &s, bool cc) {
 
 match_named::match_named(rule_factory const &s, rule_attr const &a, 
                          match &m) 
-: happy_once(a, m), outer(rule_attr(rule_attr::simple, false)),
+: happy_once(a, m), 
+  tag(Xany_cast<string>(a.user())),
+  outer(rule_attr(rule_attr::simple, false)),
   inner_name(rule_attr(rule_attr::simple, false, 
-        new structure::repatch_enumeration(
-          Vector<string>() << Xany_cast<string>(a.user())))) {
+        new structure::repatch_enumeration(Vector<string>() << tag))) {
   outer.add(inner_name);
   outer.add(s);
   matcher().add(outer);

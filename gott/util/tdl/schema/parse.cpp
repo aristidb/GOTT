@@ -198,6 +198,10 @@ void match::IMPL::replay_buffer() {
 }
 
 void match::IMPL::handle_event(ev::event const &event, bool token) {
+#ifdef VERBOSE
+  std::cout << event << '{' << std::endl;
+  struct close { ~close() { std::cout << '}' << std::endl; } } x; (void)x;
+#endif
   if (parse.IsEmpty()) 
     fail_all();
   while (!parse.IsEmpty()) 
@@ -206,6 +210,10 @@ void match::IMPL::handle_event(ev::event const &event, bool token) {
 }
 
 bool match::IMPL::handle_rule(ev::event const &event, bool token) {
+#ifdef VERBOSE
+  std::cout << get_name(parse.back()) << '{' << std::endl;
+  struct close { ~close() { std::cout << '}' << std::endl; } } x; (void)x;
+#endif
   if (try_play(event, *parse.back().the_rule)) {
     if (token) pos.consume();
     return consume_event(token);
