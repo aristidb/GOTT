@@ -166,6 +166,8 @@ typedef test_group<Schema> tf;
 typedef tf::object object;
 }
 
+#define ACTIVATE_SCHEMA_TEST
+
 namespace {
 #ifdef ACTIVATE_SCHEMA_TEST
   tut::tf Tschema("schema::$schema");
