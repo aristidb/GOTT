@@ -30,6 +30,8 @@
 #include <gott/util/string/stl.hpp>
 #include <gott/util/debug/assert.hpp>
 
+//#define VERBOSE
+
 using boost::shared_ptr;
 using gott::string;
 namespace simple = gott::tdl::simple;

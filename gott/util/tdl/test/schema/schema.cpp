@@ -109,14 +109,15 @@ struct Schema : tut::schema_basic {
          Vector<string> choice;
          choice.Add("enclosed"); choice.Add("flat");
          document.begin("node", rule_attr("coat", true,
-                                        new stru::repatch_enumeration(choice)));
+                                        new stru::repatch_enumeration(choice)),
+                        slotcfg(slotcfg::optional));
          document.end();
        }
 
        document.begin("follow", 
                       rule_attr(rule_attr::simple, false));
          document.begin("named", 
-                        match_named::attributes(":", false),
+                        match_named::attributes(":"),
                         slotcfg(slotcfg::optional));
            document.begin("node", ra("tag")); 
            document.end();
@@ -136,7 +137,9 @@ struct Schema : tut::schema_basic {
       document.end();
 
       document.begin("any", ra("parameters"), slotcfg(slotcfg::list));
-        document.param(0);
+        document.begin("list", ra("children"));
+          document.param(0);
+        document.end();
         //document.begin("node");
         //document.end();
       document.end();
@@ -189,7 +192,50 @@ void object::test<1>(int) {
        "      string\n"
        "      anything\n"
   );
-  S(Xany()).write_to(xp);
+  C(
+    M(
+      nd_list() <<
+      MD(Xany(0),
+        nd_list() << S(Xany("anything"), "module-id")
+          << S(Xany("0.0"), "version-spec")
+        , "module") <<
+        C(
+          MD(Xany(0),
+            nd_list() <<
+            S(Xany(0), "export") <<
+            S(Xany("anything"), "name") <<
+            C(
+              M(
+                nd_list() <<
+                C(
+                  S(Xany(1), "slot"),
+                "slot-specification") <<
+                M(
+                  nd_list() <<
+                  S(Xany("follow"), "type") <<
+                  C(
+                    M(
+                      nd_list() <<
+                      C(
+                        C(
+                          C( S(Xany("string"), "type"), "normal-type"),
+                        "type-definition"),
+                      "qualified-type-definition") <<
+                      C(
+                        C(
+                          C( S(Xany("anything"), "type"), "normal-type"),
+                        "type-definition"),
+                      "qualified-type-definition"),
+                    "children"),
+                  "parameters"),
+                "normal-type"),
+              "type-definition"),
+            "qualified-type-definition"),
+            tag_list() << "type-declaration" << "type" << "T1"
+          )
+        , "type-declarations")
+      , "tdl-schema")
+  ).write_to(xp);
   ensure_equals(tree, xp);
 }
 
@@ -202,7 +248,52 @@ void object::test<2>(int) {
        "  anything param1,param2\n"
        "  optional follow string, anything\n"
   );
-  S(Xany()).write_to(xp);
+  C(
+    M(
+      nd_list() <<
+      MD(Xany(0),
+        nd_list() << S(Xany("anything"), "module-id")
+          << S(Xany("0.0"), "version-spec")
+        , "module") <<
+        C(
+          MD(Xany(0),
+            nd_list() <<
+            S(Xany(0), "export") <<
+            S(Xany("anything"), "name") <<
+            S(Xany("param1"), "parameter") <<
+            S(Xany("param2"), "parameter") <<
+            C(
+              M(
+                nd_list() <<
+                C(
+                  S(Xany(1), "slot"),
+                "slot-specification") <<
+                M(
+                  nd_list() <<
+                  S(Xany("follow"), "type") <<
+                  C(
+                    M(
+                      nd_list() <<
+                      C(
+                        C(
+                          C( S(Xany("string"), "type"), "normal-type"),
+                        "type-definition"),
+                      "qualified-type-definition") <<
+                      C(
+                        C(
+                          C( S(Xany("anything"), "type"), "normal-type"),
+                        "type-definition"),
+                      "qualified-type-definition"),
+                    "children"),
+                  "parameters"),
+                "normal-type"),
+              "type-definition"),
+            "qualified-type-definition"),
+            tag_list() << "type-declaration" << "type" << "T1"
+          )
+        , "type-declarations")
+      , "tdl-schema")
+  ).write_to(xp);
   ensure_equals(tree, xp);
 }
 
