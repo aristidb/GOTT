@@ -108,8 +108,13 @@ public:
   /**
    * Erase a range from the buffer.
    * \param r The range to erase.
+   * \return Iterator pointing just after the erased range.
    */
-  void erase(range_t<iterator> const &r);
+  iterator erase(range_t<iterator> const &r);
+
+  iterator erase(iterator i1, iterator i2) {
+    return erase(range(i1, i2));
+  }
 
   /**
    * Insert space of specified length before a specified iterator.
@@ -118,7 +123,29 @@ public:
    * \return The inserted chunk.
    */
   range_t<iterator> insert(iterator pos, std::size_t len);
-  
+
+  template<class I>
+  GOTT_LOCAL
+  void insert(iterator pos, I a, I b) {
+    std::copy(a, b, insert(pos, std::distance(a, b)).begin);
+  }
+
+  /**
+   * Append space of specified length.
+   * \param len The size of the appended chunk.
+   * \return The appended chunk.
+   */
+  range_t<iterator> append(std::size_t len);
+
+  /**
+   * Append a string.
+   */
+  void operator+=(string const &s);
+
+  void operator+=(utf32_t ch) GOTT_LOCAL {
+    *append(1).begin = ch;
+  }
+
 private:
   class representation;
   representation *data;

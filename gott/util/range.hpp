@@ -30,6 +30,9 @@ namespace gott {
  */
 template<class T> struct range_t {
   typedef T value_type;
+
+  typedef T iterator;
+  typedef T const_iterator;
   
   /**
    * Iterator to start of the range.
