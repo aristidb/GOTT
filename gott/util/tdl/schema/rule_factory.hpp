@@ -39,7 +39,7 @@ class slotcfg;
  * way to do so.
  */
 class GOTT_EXPORT rule_factory {
-  public:   
+public:   
   struct with_slotcfg;
 
   virtual bool accept_empty() const = 0;
@@ -77,6 +77,10 @@ class GOTT_EXPORT rule_factory {
     //      passed this is undefined!
 
   virtual ~rule_factory() = 0;
+
+  rule_attr attributes;
+
+  GOTT_LOCAL rule_factory(rule_attr const &a) : attributes(a) {}
 };
 
 /**
@@ -114,7 +118,7 @@ template<class T> struct enreg;
 
 template<class T> class nochild : public rule_factory {
 public:
-  nochild(rule_attr const &a) : attrib(a) {}
+  nochild(rule_attr const &a) : rule_factory(a) {}
 
   bool accept_empty() const {
     return T::accept_empty();
@@ -125,7 +129,7 @@ public:
   }
 
   rule *get(match &m) const {
-    return new T(attrib, m);
+    return new T(attributes, m);
   }
 
   static unsigned index() {
@@ -136,21 +140,18 @@ public:
   static rule_factory *build(rule_attr const &a) {
     return new nochild(a);
   }
-
-private:
-  rule_attr attrib;
 };
 
 template<class T> class onechild : public rule_factory {
 public:
-  onechild(rule_attr const &a) : attrib(a) {}
+  onechild(rule_attr const &a) : rule_factory(a) {}
 
   void add(rule_factory const &child) {
     sub = &child;
   }
 
   rule *get(match &m) const {
-    return new T(*sub, attrib, m);
+    return new T(*sub, attributes, m);
   }
 
   static unsigned index() {
@@ -168,12 +169,11 @@ public:
 
 private:
   rule_factory const *sub;
-  rule_attr attrib;
 };
 
 template<class T, unsigned N> class somechildren : public rule_factory {
 public:
-  somechildren(rule_attr const &a) : pos(0), attrib(a) {}
+  somechildren(rule_attr const &a) : rule_factory(a), pos(0) {}
 
   void add(rule_factory const &child) {
     sub[pos++] = &child;
@@ -185,7 +185,7 @@ public:
   }
 
   rule *get(match &m) const {
-    return new T(sub, attrib, m);
+    return new T(sub, attributes, m);
   }
 
   static unsigned index() {
@@ -204,12 +204,11 @@ public:
 private:
   rule_factory const *sub[N];
   unsigned pos;
-  rule_attr attrib;
 };
 
 template<class T> class manychildren : public rule_factory {
 public:
-  manychildren(rule_attr const &a) : attrib(a) {}
+  manychildren(rule_attr const &a) : rule_factory(a) {}
 
   void add(rule_factory const &child) {
     sub.push_back(&child);
@@ -222,7 +221,7 @@ public:
   }
 
   rule *get(match &m) const {
-    return new T(container(sub, 1), attrib, m);
+    return new T(container(sub, 1), attributes, m);
   }
 
   static unsigned index() {
@@ -240,7 +239,6 @@ public:
 
 private:
   container sub;
-  rule_attr attrib;
 };
 
 // A rule_factory will want to enregister itself (add_factory) 

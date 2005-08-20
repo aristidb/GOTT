@@ -85,3 +85,12 @@ bool rule::play(ev::child_succeed const &) { return play_other(); }
 bool rule::play(ev::child_fail const &) { return play_other(); }
 
 bool rule::play_other() { return false; }
+
+std::ostream &schema::operator<<(std::ostream &s, rule_attr const &a) {
+  s << '(' << (a.coat() ? "coat" : "flat");
+  s << ",tags:" << range(a.tags());
+  if (dynamic_cast<xany::printable const *>(&a.user().get_operations()))
+    s << ",user:" << a.user();
+  s << ",repatcher:" << a.repatcher() << ')';
+  return s;
+}

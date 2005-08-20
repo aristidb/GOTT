@@ -52,6 +52,8 @@ struct operations_base {
 
 template<class T> struct operations;
 
+template<> struct operations<void> : operations_base {};
+
 /**
  * Typeless objects.
  * Has two special features:
@@ -76,8 +78,7 @@ public:
   }
 
   /// Copy constructor.
-  Xany(Xany const &o)
-    : place(o.place ? o.place->clone() : 0) {}
+  Xany(Xany const &o) : place(o.place ? o.place->clone() : 0) {}
 
   /**
    * Swaps the object's contents with another object.
@@ -113,6 +114,10 @@ public:
    * \return A basetype reference to the operations.
    */
   operations_base const &get_operations() const { 
+    if (!place) {
+      static operations<void> nothing;
+      return nothing;
+    }
     return place->get_operations();
   }
 

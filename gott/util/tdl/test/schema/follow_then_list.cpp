@@ -111,6 +111,17 @@ void object::test<5>(int) {
 
 template<> template<>
 void object::test<6>(int) {
+  run_test(L"x 1 2 3");
+  C(M(stru::cf::nd_list() 
+        << S(Xany("x"), "s") 
+        << S(Xany(1), "i")
+        << S(Xany(2), "i")
+        << S(Xany(3), "i"), "foll"), "doc").write_to(xp);
+  ensure_equals("multiple", tree, xp);
+}
+
+template<> template<>
+void object::test<7>(int) {
   no_test();
 }
 

@@ -186,6 +186,9 @@ namespace detail {
     }
 
     slotcfg::mode accepted_modes() const { return A; }
+
+    factory_with_slotcfg(rule_attr const &a)
+    : rule_factory(a) {}
   };
 }
 
@@ -194,7 +197,8 @@ namespace factory_template {
 template<class T, slotcfg::simple_mode Def, slotcfg::mode Accepted> 
 struct slotcfg_onechild : public detail::factory_with_slotcfg<Accepted> {
 public:
-  slotcfg_onechild(rule_attr const &a) : attrib(a) {}
+  slotcfg_onechild(rule_attr const &a) 
+  : detail::factory_with_slotcfg<Accepted>(a) {}
   
   void add(rule_factory const &child) { 
     sub = &child;
@@ -207,7 +211,7 @@ public:
   }
   
   rule *get(match &m) const {
-    return new T(*sub, scfg, attrib, m);
+    return new T(*sub, scfg, this->attributes, m);
   }
 
   static unsigned index() {
@@ -226,13 +230,13 @@ public:
 private:
   rule_factory const *sub;
   slotcfg scfg;
-  rule_attr attrib;
 };
 
 template<class T, unsigned N, slotcfg::simple_mode Def, slotcfg::mode Accepted>
 class slotcfg_somechildren : public detail::factory_with_slotcfg<Accepted> {
 public:
-  slotcfg_somechildren(rule_attr const &a) : pos(0), attrib(a) {}
+  slotcfg_somechildren(rule_attr const &a) : 
+  detail::factory_with_slotcfg<Accepted>(a), pos(0) {}
 
   void add(rule_factory const &child) { 
     add(child, slotcfg(Def));
@@ -254,7 +258,7 @@ public:
   }
 
   rule *get(match &m) const {
-    return new T(sub, scfg, attrib, m);
+    return new T(sub, scfg, this->attributes, m);
   }
 
   static unsigned index() {
@@ -274,7 +278,6 @@ private:
   rule_factory const *sub[N];
   unsigned pos;
   slotcfg scfg[N];
-  rule_attr attrib;
 };
 
 typedef std::pair<rule_factory const *, slotcfg> scfg_element;
@@ -284,7 +287,8 @@ class slotcfg_manychildren : public detail::factory_with_slotcfg<Accepted> {
 public:
   typedef scfg_element element;
   
-  slotcfg_manychildren(rule_attr const &a) : attrib(a) {}
+  slotcfg_manychildren(rule_attr const &a)
+  : detail::factory_with_slotcfg<Accepted>(a) {}
 
   void add(rule_factory const &child) {
     add(child, slotcfg(Def));
@@ -305,7 +309,7 @@ public:
   }
 
   rule *get(match &m) const {
-    return new T(Vector<element>(sub, 1), attrib, m);
+    return new T(Vector<element>(sub, 1), this->attributes, m);
   }
 
   static unsigned index() {
@@ -323,7 +327,6 @@ public:
   
 private:
   Vector<element> sub;
-  rule_attr attrib;
 };
 
 }

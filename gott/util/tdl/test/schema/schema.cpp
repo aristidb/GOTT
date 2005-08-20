@@ -41,6 +41,7 @@ rule_attr ra(char const *t) {
 }
 
 namespace {
+
 struct Schema : tut::schema_basic {
   schema::context rec;
   
@@ -136,12 +137,18 @@ struct Schema : tut::schema_basic {
       document.begin("node", ra("type"));
       document.end();
 
-      document.begin("any", ra("parameters"), slotcfg(slotcfg::list));
-        document.begin("list", ra("children"));
+      document.begin("ordered", ra("parameters"));
+        document.begin("follow", rule_attr(rule_attr::simple, false));
+          document.begin("named", match_named::attributes("@"), 
+                         slotcfg(slotcfg::list));
+            document.begin("node", rule_attr(rule_attr::simple, false));
+            document.end();
+          document.end();
+        document.end();
+        document.begin("ordered", rule_attr(rule_attr::simple, false),
+                       slotcfg(slotcfg::list));
           document.param(0);
         document.end();
-        //document.begin("node");
-        //document.end();
       document.end();
     document.end();
   }
@@ -213,8 +220,7 @@ void object::test<1>(int) {
                 M(
                   nd_list() <<
                   S(Xany("follow"), "type") <<
-                  C(
-                    M(
+                  M(
                       nd_list() <<
                       C(
                         C(
@@ -226,7 +232,6 @@ void object::test<1>(int) {
                           C( S(Xany("anything"), "type"), "normal-type"),
                         "type-definition"),
                       "qualified-type-definition"),
-                    "children"),
                   "parameters"),
                 "normal-type"),
               "type-definition"),
@@ -271,8 +276,7 @@ void object::test<2>(int) {
                 M(
                   nd_list() <<
                   S(Xany("follow"), "type") <<
-                  C(
-                    M(
+                  M(
                       nd_list() <<
                       C(
                         C(
@@ -284,7 +288,6 @@ void object::test<2>(int) {
                           C( S(Xany("anything"), "type"), "normal-type"),
                         "type-definition"),
                       "qualified-type-definition"),
-                    "children"),
                   "parameters"),
                 "normal-type"),
               "type-definition"),
@@ -299,6 +302,23 @@ void object::test<2>(int) {
 
 template<> template<>
 void object::test<3>(int) {
+  try {
+  run_test(
+    L"module param SOMEVERSION\n"
+     "type\n"
+     "  some\n"
+     "  list\n"
+     "    @ p1 @ p2 @ p3\n"
+     "    string\n"
+  );
+  } catch (...) {
+    std::cout << std::endl << tree << std::endl;
+    throw;
+  }
+}
+
+template<> template<>
+void object::test<4>(int) {
   no_test();
 }
 

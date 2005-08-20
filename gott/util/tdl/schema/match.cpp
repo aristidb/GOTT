@@ -157,7 +157,7 @@ void match::comment(string const &, bool) {}
 // Implementation
 
 match::IMPL::IMPL(structure::revocable_structure &p, match &r)
-  : base_struc(p), pos(base_struc), ref(r) {}
+: base_struc(p), pos(base_struc), ref(r) {}
 
 shared_ptr<writable_structure> const &match::IMPL::direct_structure_non_base() {
   if (parse.IsEmpty()) {
@@ -168,17 +168,20 @@ shared_ptr<writable_structure> const &match::IMPL::direct_structure_non_base() {
 }
 
 void match::IMPL::add(rule_factory const &f) {
+  shared_ptr<writable_structure> struc = direct_structure_non_base();
+
+  if (structure::repatcher const *r = f.attributes.repatcher())
+    struc.reset(r->deferred_write(struc ? *struc : base_struc));
+
   int current = parse.GetCount();
-  parse.Add();
+  parse.Add().structure = struc;
 
   shared_ptr<rule> the_rule(f.get(ref));
   GOTT_ASSERT_1(the_rule, nonnull(), "Acquired rule");
+  GOTT_ASSERT_2(the_rule->attributes(), f.attributes, 
+      std::equal_to<rule_attr>(), "Rule attributes");
 
-  shared_ptr<writable_structure> struc = direct_structure_non_base();
-  if (structure::repatcher const *r = the_rule->attributes().repatcher())
-    struc.reset(r->deferred_write(struc ? *struc : base_struc));
-
-  parse[current] = entry(the_rule, struc);
+  parse[current].the_rule = the_rule;
 }
 
 template<class T>
@@ -280,6 +283,10 @@ void match::IMPL::fail_all() {
 string match::IMPL::get_name(shared_ptr<rule> const &rp) {
   static string const s_open("("), s_close(")"), sep(",");
   Vector<string> out;
+  out.Reserve(1 + 
+      (rp->attributes().tags().GetCount() > 0 
+       ? 1 + rp->attributes().tags().GetCount() * 2
+       : 0));
   out.Add(rp->name());
   if (rp->attributes().tags().GetCount() > 0) {
     out.Add(s_open);

@@ -25,6 +25,7 @@
 #include "../structure/repatch.hpp"
 #include <boost/shared_ptr.hpp>
 #include <gott/util/string/string.hpp>
+#include <iosfwd>
 #include <ntl.h>
 
 namespace gott {
@@ -67,12 +68,18 @@ public:
 
   structure::repatcher const *repatcher() const { return r.get(); }
 
+  bool operator==(rule_attr const &o) const {
+    return c == o.c && range(t) == range(o.t) && u == o.u && r == o.r;
+  }
+
 private:
   bool c;
   Vector<string> t;
   xany::Xany u;
   boost::shared_ptr<structure::repatcher const> r;
 };
+
+GOTT_EXPORT std::ostream &operator<<(std::ostream &s, rule_attr const &a);
 
 }}}
 
