@@ -123,6 +123,17 @@ void object::test<6>(int) {
 
 template<> template<>
 void object::test<7>(int) {
+  run_test(L"1 2 3 4 5 6 7 8 9 10 foo");
+  stru::cf::nd_list c;
+  for (int i = 1; i <= 10; ++i)
+    c.Add(S(Xany(i), "i"));
+  c.Add(S(Xany("foo"), "s"));
+  C(M(c)).write_to(xp);
+  ensure_equals(tree, xp);
+}
+
+template<> template<>
+void object::test<8>(int) {
   no_test();
 }
 
