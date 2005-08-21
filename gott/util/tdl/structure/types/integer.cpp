@@ -21,7 +21,6 @@
 #include "integer.hpp"
 #include <gott/util/tdl/exceptions.hpp>
 #include <cwctype>
-#include <gott/util/autoconv.hpp>
 
 namespace structure = gott::tdl::structure;
 
@@ -43,10 +42,10 @@ repatch_integer::deferred_write(writable_structure &s) const {
         string input = xany::Xany_cast<string>(x);
         long result;
         if (!is_integer(input, result))
-          throw failed_repatch(L"repatch_integer: could not match integer");
+          throw failed_repatch("repatch_integer: could not match integer");
         target.data(xany::Xany(result));
       } else
-        throw failed_repatch(L"repatch_integer: could not match integer");
+        throw failed_repatch("repatch_integer: could not match integer");
     }
 
     bool is_integer(string const &s, long &val) {

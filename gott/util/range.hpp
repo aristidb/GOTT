@@ -22,6 +22,7 @@
 #define GOTT_UTIL_MISC_RANGE_HPP
 
 #include <iterator>
+#include <iosfwd>
 
 namespace gott {
 
@@ -100,6 +101,16 @@ bool operator==(range_t<T> a, range_t<U> b) {
 template<class T, class U>
 bool operator!=(range_t<T> const &a, range_t<U> const &b) {
   return !(a == b);
+}
+
+template<class Ch, class ChT, class T>
+std::basic_ostream<Ch, ChT> &
+operator<<(std::basic_ostream<Ch, ChT> &s, range_t<T> const &r) {
+  T i = r.begin;
+  s << *i++;
+  for (; i != r.end; ++i)
+    s << ' ' << *i;
+  return s;
 }
 
 /**

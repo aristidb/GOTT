@@ -20,7 +20,6 @@
 
 #include "enumeration.hpp"
 #include <gott/util/tdl/exceptions.hpp>
-#include <gott/util/autoconv.hpp>
 #include <gott/util/range_algo.hpp>
 
 namespace structure = gott::tdl::structure;
@@ -33,8 +32,8 @@ repatch_enumeration::repatch_enumeration(Vector<string> pick_ &x)
 
 repatch_enumeration::~repatch_enumeration() {}
 
-const wchar_t failure_message[] = 
-    L"repatch_enumeration: could not match enumeration";
+const char failure_message[] = 
+    "repatch_enumeration: could not match enumeration";
 
 writable_structure *
 repatch_enumeration::deferred_write(writable_structure &s) const {

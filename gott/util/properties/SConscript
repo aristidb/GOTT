@@ -1,2 +1,2 @@
 Import('env')
-env.Program('test.cpp')
+env.Program('test.cpp', LIBS='string')

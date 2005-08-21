@@ -20,7 +20,7 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/structure/types/integer.hpp>
-#include <gott/util/autoconv.hpp>
+#include <gott/util/string/string.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -86,7 +86,7 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
         "0:1 : mismatch in document>ordered(ord)>list(list)>node(int)"
         " after token ");
   }
@@ -98,7 +98,7 @@ void object::test<4>(int) {
     run_test(L"foo bar");
     fail("following");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document after token foo");
   }
 }
@@ -109,7 +109,7 @@ void object::test<5>(int) {
     run_test(L"4");
     fail("just integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document>ordered(ord)>list(list)>node(int)"
         " after token 4");
   }
@@ -122,7 +122,7 @@ void object::test<6>(int) {
     fail("too many strings");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch in document at token y");
+        gott::string(mm.what()), "1:5 : mismatch in document at token y");
   }
 }
 

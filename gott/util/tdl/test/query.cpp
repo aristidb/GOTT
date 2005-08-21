@@ -25,12 +25,10 @@
 #include <gott/util/tdl/structure/comfort.hpp>
 #include <gott/util/tut/tut.h>
 #include <gott/util/range.hpp>
-#include <gott/util/autoconv.hpp>
 
 using std::wcout;
 using std::flush;
 using std::endl;
-
 
 namespace tdl = gott::tdl;
 using tdl::structure::tree;

@@ -20,11 +20,13 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/structure/types/integer.hpp>
-#include <gott/util/autoconv.hpp>
+#include <gott/util/string/string.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
+
+using gott::string;
 using gott::xany::Xany;
 using stru::cf::S;
 using stru::cf::C;
@@ -85,7 +87,7 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()),
+    ensure_equals("correct error", string(mm.what()),
         "0:1 : mismatch in document>any>ordered>node(int) after token ");
   }
 }
@@ -97,7 +99,7 @@ void object::test<4>(int) {
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document after token foo");
+        string(mm.what()), "1:1 : mismatch in document after token foo");
   }
 }
 
@@ -114,7 +116,7 @@ void object::test<6>(int) {
     run_test(L"4,x,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch in document at token y");
+        string(mm.what()), "1:5 : mismatch in document at token y");
   }
 }
 
@@ -124,7 +126,7 @@ void object::test<7>(int) {
     run_test(L"732 bar");
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()),
+    ensure_equals("correct error", string(mm.what()),
        "1:1 : mismatch in document>any>ordered>node(string) after token 732");
   }
 }

@@ -20,24 +20,8 @@
 #define GOTT_UTIL_MISC_AUTOCONV_HPP
 
 #include <ostream>
-#include <string>
-#include <gott/util/range.hpp>
 
 namespace std {
-
-// "Fix" basic_ostream::operator<<(void*)
-template<class C, class CT>
-void operator<<(basic_ostream<C, CT> &, void *) {}
-
-struct print_ptr {
-  void *data;
-  print_ptr(void *p) : data(p) {}
-};
-
-template<class C, class CT>
-basic_ostream<C, CT> &operator<<(basic_ostream<C, CT> &s, print_ptr const &p) {
-  return s.operator<<(p.data);
-}
 
 inline ostream &operator<<(ostream &o, wchar_t const *in) {
   typedef codecvt<wchar_t, char, mbstate_t> CCV;
@@ -49,66 +33,6 @@ inline ostream &operator<<(ostream &o, wchar_t const *in) {
   char *out_n = 0;
   c.out(st, in, in + l, in_n, &out[0], &out[0] + out.length(), out_n);
   return o << out;
-}
-
-inline ostream &operator<<(ostream &o, wstring const &x) {
-  return o << x.c_str();
-}
-
-inline wostream &operator<<(wostream &o, string const &x) {
-  return o << x.c_str();
-}
-
-template<class T, class C>
-struct element_separator {
-};
-
-template<class T>
-struct element_separator<T, char> {
-  static char const *sep() { return " "; }
-};
-
-template<class T>
-struct element_separator<T, wchar_t> {
-  static wchar_t const *sep() { return L" "; }
-};
-
-template<> struct element_separator<char, char> {
-  static char const *sep() { return ""; }
-};
-
-template<> struct element_separator<wchar_t, char> {
-  static char const *sep() { return ""; }
-};
-
-template<> struct element_separator<char, wchar_t> {
-  static wchar_t const *sep() { return L""; }
-};
-
-template<> struct element_separator<wchar_t, wchar_t> {
-  static wchar_t const *sep() { return L""; }
-};
-
-template<class Ch, class CT, class T>
-void print_separated(basic_ostream<Ch,CT> &s, gott::range_t<T> const &x,
-                     Ch const *sep) {
-  T i = x.begin;
-  s << *i++;
-  for (; i != x.end; ++i)
-    s << sep << *i;
-}
-
-template<class Ch, class CT, class T>
-basic_ostream<Ch,CT> &operator<<(basic_ostream<Ch,CT> &s, 
-                                 gott::range_t<T> const &x) {
-  print_separated(s, x, 
-      element_separator<typename iterator_traits<T>::value_type, Ch>::sep());
-  return s;
-}
-
-template<class T, class U, class Ch, class CT>
-basic_ostream<Ch,CT> &operator<<(basic_ostream<Ch,CT> &s, pair<T,U> const &p) {
-  return s << p.first << ',' << p.second;
 }
 
 }

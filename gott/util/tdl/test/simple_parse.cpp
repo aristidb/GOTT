@@ -23,7 +23,6 @@
 #include <gott/util/tut/tut.h>
 #include <ostream>
 #include <gott/util/string/string.hpp>
-#include <gott/util/autoconv.hpp>
 
 using gott::string;
 
@@ -64,14 +63,8 @@ namespace {
 tut::tf spp("simple::parse");
 }
 
-std::ostream &operator<<(std::ostream &o, 
-                         Vector<tut::spb::event> const &e) {
-  o << '\n';
-  for (Vector<tut::spb::event>::const_iterator it = e.begin(); 
-       it != e.end(); ++it) 
-    o << "bedunc"[it->first] << it->second << ' ';
-  o << '\n';
-  return o;
+std::ostream &operator<<(std::ostream &o, tut::spb::event const &e) {
+  return o << "bedunc"[e.first] << e.second << ' ';
 }
 
 namespace tut {

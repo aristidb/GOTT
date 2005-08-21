@@ -23,7 +23,6 @@
 #include <gott/util/tdl/schema/slot.hpp>
 #include <gott/util/tdl/schema/types/named.hpp>
 #include <gott/util/tdl/structure/types/integer.hpp>
-#include <gott/util/autoconv.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -92,7 +91,7 @@ void object::test<1>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()),
+    ensure_equals("correct error", gott::string(m.what()),
       "0:1 : mismatch in document(--doc--)>named(a)>follow>node after token ");
   }
 }

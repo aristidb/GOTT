@@ -20,7 +20,6 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/structure/types/integer.hpp>
-#include <gott/util/autoconv.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -75,7 +74,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>ordered>node at token d7");
+        gott::string(mm.what()), "1:1 : mismatch in document>ordered>node at token d7");
   }
 }
 
@@ -86,7 +85,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch in document>ordered>node after token ");
+        gott::string(mm.what()), "0:1 : mismatch in document>ordered>node after token ");
   }
 }
 
@@ -97,7 +96,7 @@ void object::test<4>(int) {
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>ordered>node at token foo");
+        gott::string(mm.what()), "1:1 : mismatch in document>ordered>node at token foo");
   }
 }
 
@@ -108,7 +107,7 @@ void object::test<5>(int) {
     fail("just integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>ordered>node after token 4");
+        gott::string(mm.what()), "1:1 : mismatch in document>ordered>node after token 4");
   }
 }
 
@@ -118,7 +117,7 @@ void object::test<6>(int) {
     run_test(L"4,x,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch in document at token y");
+        gott::string(mm.what()), "1:5 : mismatch in document at token y");
   }
 }
 
@@ -129,7 +128,7 @@ void object::test<7>(int) {
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch in document>ordered>node after token 732");
+        gott::string(mm.what()), "1:1 : mismatch in document>ordered>node after token 732");
   }
 }
 

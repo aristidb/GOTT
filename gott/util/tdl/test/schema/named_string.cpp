@@ -20,7 +20,6 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/schema/types/named.hpp>
-#include <gott/util/autoconv.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -67,7 +66,7 @@ void object::test<2>(int) {
     run_test(L"d7");
     fail("just string");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document(doc)>named(ND)>follow>node at token d7");
   }
 }
@@ -78,7 +77,7 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
        "0:1 : mismatch in document(doc)>named(ND)>follow>node after token ");
   }
 }
@@ -89,7 +88,7 @@ void object::test<4>(int) {
     run_test(L"ND,foo");
     fail("non-followed string");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
         "1:4 : mismatch in document(doc)>named(ND)>follow at token foo");
   }
 }
@@ -100,7 +99,7 @@ void object::test<5>(int) {
     run_test(L"4");
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document(doc)>named(ND)>follow>node at token 4");
   }
 }
@@ -111,7 +110,7 @@ void object::test<6>(int) {
     run_test(L"4 99,y");
     fail("nonsense");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document(doc)>named(ND)>follow>node at token 4");
   }
 }
@@ -122,7 +121,7 @@ void object::test<7>(int) {
     run_test(L"ND");
     fail("just label");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document(doc)>named(ND)>follow after token ND");
   }
 }

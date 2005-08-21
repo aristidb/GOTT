@@ -21,7 +21,6 @@
 #include "../exceptions.hpp"
 #include "stream_position.hpp"
 #include <gott/util/range.hpp>
-#include <gott/util/autoconv.hpp>
 #include <gott/util/string/stl.hpp>
 #include <gott/util/thunk.hpp>
 #include <boost/scoped_ptr.hpp>

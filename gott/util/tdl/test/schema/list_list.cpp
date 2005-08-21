@@ -20,7 +20,6 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/structure/types/integer.hpp>
-#include <gott/util/autoconv.hpp>
 
 using namespace gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -98,7 +97,7 @@ void object::test<4>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()),
+    ensure_equals("correct error", gott::string(m.what()),
        "0:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
        " after token ");
   }
@@ -110,7 +109,7 @@ void object::test<5>(int) {
     run_test(L"44");
     fail("should be greedy");
   } catch (schema::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()),
+    ensure_equals("correct error", gott::string(m.what()),
         "1:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
         " after token 44");
   }

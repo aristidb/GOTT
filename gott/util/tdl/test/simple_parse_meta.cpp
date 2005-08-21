@@ -23,7 +23,6 @@
 #include <sstream>
 #include <gott/util/string/string.hpp>
 #include <gott/util/string/stl.hpp>
-#include <gott/util/autoconv.hpp>
 
 using std::pair;
 using std::ostream;
@@ -58,13 +57,8 @@ typedef test_group<meta_basic> tf;
 typedef tf::object object;
 }
 
-ostream &operator<<(ostream &o, Vector<pair<string,string> > const &v) {
-  for (Vector<pair<string,string> >::const_iterator it = v.begin();
-       it != v.end(); ++it) {
-    o << it->first << "::";
-    o << it->second << '\n';
-  }
-  return o;
+ostream &operator<<(ostream &o, pair<string,string> const &x) {
+  return o << x.first << "::" << x.second << '\n';
 }
 
 namespace {

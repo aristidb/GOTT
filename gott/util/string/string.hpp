@@ -25,9 +25,7 @@
 #include "types.hpp"
 #include "stl.hpp"
 #include <gott/util/visibility.hpp>
-#define PARAM_HASH_NO_BASIC_STRING
 #include <gott/util/my_hash_map.hpp>
-#undef PARAM_HASH_NO_BASIC_STRING
 #include <gott/util/range.hpp>
 #include <ntl.h>
 

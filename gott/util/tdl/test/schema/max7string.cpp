@@ -16,7 +16,6 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
-#include <gott/util/autoconv.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -88,7 +87,7 @@ void object::test<8>(int n) {
     fail("too many");
   } catch(schema::mismatch const &m) {
     ensure_equals("correct error", m.what(), 
-                  std::string("1:15 : mismatch in document at token 7"));
+                  gott::string("1:15 : mismatch in document at token 7"));
   }
 }
 
@@ -98,7 +97,7 @@ void object::test<15>(int) {
     run_test(L"1 2 3");
     fail("going down");
   } catch (schema::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()),
+    ensure_equals("correct error", gott::string(m.what()),
                   "1:1 : mismatch in document>list>node(el) after token 1");
   }
 }

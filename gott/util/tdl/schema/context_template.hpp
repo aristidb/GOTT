@@ -25,7 +25,6 @@
 #include "rule_attr.hpp"
 #include "slot.hpp"
 
-#include <string>
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {

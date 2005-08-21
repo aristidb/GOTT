@@ -19,7 +19,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
-#include <gott/util/autoconv.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -71,7 +70,7 @@ void object::test<3>(int) {
     run_test(L"foo bar");
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()),  
+    ensure_equals("correct error", gott::string(mm.what()),  
                   "1:1 : mismatch in document(doc) after token foo");
   }
 }
@@ -82,7 +81,7 @@ void object::test<4>(int) {
     run_test(L"foo\nbar");
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
+    ensure_equals("correct error", gott::string(mm.what()), 
                   "2:1 : mismatch in document(doc) at token bar");
   }
 }

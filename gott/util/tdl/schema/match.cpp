@@ -26,7 +26,6 @@
 #include "parse_position.hpp"
 #include "../structure/repatch.hpp"
 #include <gott/util/range_algo.hpp>
-#include <gott/util/autoconv.hpp>
 #include <gott/util/string/stl.hpp>
 #include <gott/util/debug/assert.hpp>
 
