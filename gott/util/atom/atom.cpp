@@ -20,13 +20,13 @@
 
 #include "atom.hpp"
 #include <gott/util/my_hash_map.hpp>
-#include HH_HASH_SET
+#include GOTT_HASH_SET
 
 using gott::atom;
 using gott::string;
 
 static string atomize(string const &n) {
-  static hashd::hash_set<string> table;
+  static GOTT_NSHASH::hash_set<string> table;
   return *table.insert(n).first;
 }
 
@@ -40,6 +40,6 @@ bool gott::operator==(atom const &a, atom const &b) {
   return a.as_utf8().begin == b.as_utf8().begin; // same memory
 }
 
-std::size_t hashd::hash<atom>::operator() (atom const &a) const {
+std::size_t GOTT_NSHASH::GOTT_HASH_CLASS<atom>::operator()(atom const &a) const{
   return std::size_t(a.as_utf8().begin);
 }

@@ -22,17 +22,18 @@
 #include "qid.hpp"
 #include <boost/variant.hpp>
 #include <gott/util/my_hash_map.hpp>
-#include HH_HASH_MAP
+#include GOTT_HASH_MAP
 #include <gott/util/xany/xany.hpp>
 
 using gott::plugin::plugin_configuration;
 using gott::plugin::hook;
+using gott::plugin::QID;
 using gott::xany::Xany;
 using boost::variant;
 
 class plugin_configuration::IMPL {
 public:
-  typedef hashd::hash_map<QID, variant<Xany, hook const *> > mapping;
+  typedef GOTT_NSHASH::hash_map<QID, variant<Xany, hook const *> > mapping;
 
   mapping parameters;
 };

@@ -22,7 +22,7 @@
 #include "tree.hpp"
 #include "print.hpp"
 #include <gott/util/my_hash_map.hpp>
-#include HH_HASH_MAP
+#include GOTT_HASH_MAP
 #include <gott/util/range_algo.hpp>
 #include <boost/bind.hpp>
 #include <sstream>
@@ -57,7 +57,7 @@ public:
   static boost::intrusive_ptr<node> erase(boost::intrusive_ptr<node>);
   boost::intrusive_ptr<node> root, pos;
   tag current_tag;
-  hashd::hash_map<tag, boost::intrusive_ptr<node> > tagpos;
+  GOTT_NSHASH::hash_map<tag, boost::intrusive_ptr<node> > tagpos;
 
   bool del_since(boost::intrusive_ptr<node> &, tag);
 };
@@ -77,7 +77,7 @@ struct tree::node {
 
   class index {
     typedef Vector<intrusive_ptr<node> > v_pn;
-    typedef hashd::hash_multimap<string, intrusive_ptr<node> > hmm_spn;
+    typedef GOTT_NSHASH::hash_multimap<string, intrusive_ptr<node> > hmm_spn;
     
     v_pn by_no;
     hmm_spn by_name;

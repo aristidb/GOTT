@@ -34,8 +34,9 @@ public:
 
 }}
 
-namespace HH_HASHD {
-template<> struct hash<gott::plugin::QID> : hash<gott::atom> {};
+namespace GOTT_NSHASH {
+template<> struct GOTT_HASH_CLASS<gott::plugin::QID> 
+  : GOTT_HASH_CLASS<gott::atom> {};
 }
 
 #endif

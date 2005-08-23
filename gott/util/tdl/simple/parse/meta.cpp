@@ -22,10 +22,9 @@
 #include <gott/util/string/string.hpp>
 #include <gott/util/string/stl.hpp>
 #include <gott/util/my_hash_map.hpp>
-#include HH_HASH_MAP
+#include GOTT_HASH_MAP
 
 using std::wistream;
-
 using gott::tdl::simple::meta_parser;
 
 static bool pass(gott::string const &, gott::string const &) {
@@ -37,7 +36,7 @@ public:
   IMPL() : def(pass) {}
 
   callback def;
-  typedef hashd::hash_map<string, callback> cb_t;
+  typedef GOTT_NSHASH::hash_map<string, callback> cb_t;
   cb_t cb;
   void exec(string const &);
 };

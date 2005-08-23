@@ -28,17 +28,25 @@
 #include <gott/util/my_hash_map.hpp>
 #include <gott/util/range.hpp>
 #include <ntl.h>
+#include <iosfwd>
 
+#ifdef _MSC_VER
+#include <string>
+#include <vector>
+#include <list>
+#include <ostream>
+#include <gott/util/thunk.hpp>
+#else
 namespace std {
   template<class> class allocator;
   template<class> class char_traits;
   template<class, class> class vector;
   template<class, class> class list;
-  template<class, class> class basic_ostream;
   template<class, class, class> class basic_string;
   typedef basic_string<char, char_traits<char>, allocator<char> > string;
   typedef basic_string<wchar_t,char_traits<wchar_t>,allocator<wchar_t> >wstring;
 }
+#endif
 
 namespace gott {
 
@@ -279,8 +287,8 @@ inline bool operator>=(string const &a, string const &b) {
 
 }
 
-namespace HH_HASHD {
-template<> struct hash<gott::string> {
+namespace GOTT_NSHASH {
+template<> struct GOTT_HASH_CLASS<gott::string> : GOTT_HASH_BASE<gott::string> {
   GOTT_EXPORT std::size_t operator() (gott::string const &) const;
 };
 }
