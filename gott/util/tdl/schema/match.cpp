@@ -29,7 +29,7 @@
 #include <gott/util/string/stl.hpp>
 #include <gott/util/debug/assert.hpp>
 
-//#define VERBOSE
+#define VERBOSE
 
 using boost::shared_ptr;
 using gott::string;

@@ -40,13 +40,16 @@ rule_attr ra(char const *t) {
   return rule_attr(t); 
 }
 
+const int TYPE = 0;
+const int PARAM = 1;
+
 namespace {
 
 struct Schema : tut::schema_basic {
-  schema::context rec;
+  schema::context rec, param;
   
   Schema() {
-    schema::context_template document, type;
+    schema::context_template document, type, p;
 
     document.begin("document");
       document.begin("ordered", ra("tdl-schema"));
@@ -58,8 +61,12 @@ struct Schema : tut::schema_basic {
 
     qualified(type);
 
+    parameters(p);
+
     Vector<schema::context*> cc;
     cc.Add(&rec);
+    cc.Add(&param);
+    p.instantiate(cc, param);
     type.instantiate(cc, rec);
     document.instantiate(cc, context);
   }
@@ -97,7 +104,7 @@ struct Schema : tut::schema_basic {
               document.end();
             document.end();
 
-            document.param(0);
+            document.param(TYPE);
           document.end();
         document.end();
       document.end();
@@ -138,34 +145,37 @@ struct Schema : tut::schema_basic {
       document.end();
 
       document.begin("ordered", ra("parameters"));
-        document.begin("follow", rule_attr(rule_attr::simple, false));
-          document.begin("named", match_named::attributes("@"), 
-                         slotcfg(slotcfg::list));
-            document.begin("node", rule_attr(rule_attr::simple, false));
-            document.end();
-          document.end();
-        document.end();
+        document.param(PARAM);
         document.begin("ordered", rule_attr(rule_attr::simple, false),
                        slotcfg(slotcfg::list));
-          document.param(0);
+          document.param(TYPE);
+        document.end();
+      document.end();
+    document.end();
+  }
+
+  void parameters(schema::context_template &document) {
+    document.begin("follow", rule_attr(rule_attr::simple, false));
+      document.begin("named", match_named::attributes("@"), 
+                     slotcfg(slotcfg::list));
+        document.begin("node", rule_attr(rule_attr::simple, false));
         document.end();
       document.end();
     document.end();
   }
 
   void slot(schema::context_template &document) {
-    document.begin("any", ra("slot-specification"),
-                   slotcfg(slotcfg::optional));
+    document.begin("any", ra("slot-specification"), slotcfg(slotcfg::optional));
       {
-        Vector<string> single;
-        single.Add("one");  single.Add("optional");
-        single.Add("list"); single.Add("some");
-        document.begin("node", rule_attr("slot", true, 
-                                        new stru::repatch_enumeration(single)));
-        document.end();
+      Vector<string> single;
+      single.Add("one");  single.Add("optional");
+      single.Add("list"); single.Add("some");
+      document.begin("node", rule_attr("slot", true, 
+                                       new stru::repatch_enumeration(single)));
+      document.end();
       }
 
-      // ...
+    // ...
     document.end();
   }
 };
@@ -307,7 +317,7 @@ void object::test<3>(int) {
     L"module param SOMEVERSION\n"
      "type\n"
      "  some\n"
-     "  list\n"
+     "  ordered\n"
      "    @ p1 @ p2 @ p3\n"
      "    string\n"
   );
