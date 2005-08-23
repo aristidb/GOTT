@@ -43,8 +43,6 @@ def CheckOptimization(context):
 	context.Result(result)
 	return result
 
-Import('debug')
-
 def CheckDebug(context):
 	context.Message('Checking if compiler supports gcc-style debug flags... ')
 	lastCCFLAGS = context.env['CCFLAGS'][:]
@@ -67,6 +65,7 @@ conf = Configure(env, custom_tests = tests)
 conf.Optimization()
 conf.Warnings()
 conf.CompilerVisibility()
+Import('debug')
 if debug == 1:
 	conf.Debug()
 
