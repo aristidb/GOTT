@@ -336,8 +336,10 @@ stru::operator<<(std::basic_ostream<Ch> &s, tree::iterator const &i) {
   return s;
 }
 
-template std::ostream&stru::operator<<(std::ostream &, tree::iterator const &);
-template std::wostream&stru::operator<<(std::wostream&,tree::iterator const &);
+template std::ostream &
+  stru::operator<< <char>(std::ostream &, tree::iterator const &);
+template std::wostream &
+  stru::operator<< <wchar_t>(std::wostream&,tree::iterator const &);
 
 #ifdef DEBUG
 #include <iostream>

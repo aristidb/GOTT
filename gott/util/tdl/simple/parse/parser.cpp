@@ -293,8 +293,9 @@ string exec_parse::read_quoted(string::utf8_range &unread) {
 
   ln.end_token(range(whole.begin - 1, ++unread.begin));
   
-  gott::string_buffer s(string(range(whole.begin, unread.begin - 1)));
-  boost::algorithm::replace_all(s, string("\"\"").as_utf32(), string("\"").as_utf32());
+  gott::string_buffer s = string(range(whole.begin, unread.begin - 1));
+  static const string two_quote("\"\""), one_quote("\"");
+  boost::algorithm::replace_all(s, two_quote.as_utf32(), one_quote.as_utf32());
  
   return s;
 }
@@ -318,7 +319,7 @@ string exec_parse::read_paren(string::utf8_range &unread) {
   for (; !unread.empty() && !balance; ++unread.begin) 
     balance(*unread.begin);
 
-  gott::string_buffer result(string(range(whole.begin, unread.begin)));
+  gott::string_buffer result = string(range(whole.begin, unread.begin));
   if (unread.empty() && !balance) { // multi-line
     result += L'\n';
     wchar_t c;

@@ -78,8 +78,11 @@ public:
 
     entry() {}
 
-    entry(shared_ptr<rule> const &r, shared_ptr<writable_structure> s = 0)
-      : the_rule(r), structure(s) {}
+    entry(shared_ptr<rule> const &r)
+    : the_rule(r) {}
+
+    entry(shared_ptr<rule> const &r, shared_ptr<writable_structure> const &s)
+    : the_rule(r), structure(s) {}
 
     operator shared_ptr<rule>() { return the_rule; }
   };

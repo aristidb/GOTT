@@ -81,8 +81,8 @@ public:
    */
   void instantiate(Vector<context*> const &params, context &cont) GOTT_EXPORT;
 
-private:
   class IMPL;
+private:
   boost::scoped_ptr<IMPL> p;
 };
 

@@ -21,6 +21,7 @@
 #include "iterator.hpp"
 
 using gott::utf8_iterator;
+using gott::utf8_t;
 
 gott::utf32_t utf8_iterator::operator*() const {
   utf8_t const mask6 = ~(~utf8_t() << 6);
