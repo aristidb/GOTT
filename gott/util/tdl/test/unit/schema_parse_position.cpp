@@ -65,7 +65,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   parse.begin_parse();
-  ensure_equals("first token index", pos.current().first, 0U);
+  ensure_equals("first token index", pos.current().first, 0);
 }
 
 template<> template<>
