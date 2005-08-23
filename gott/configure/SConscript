@@ -1,5 +1,5 @@
 def CheckCompilerVisibility(context):
-	context.Message('Checking if compiler supports visibility attributes...')
+	context.Message('Checking if compiler supports visibility attributes... ')
 	lastCPPDEF = context.env['CPPDEFINES'][:]
 	lastCCFLAGS = context.env['CCFLAGS'][:]
 	
@@ -13,10 +13,62 @@ def CheckCompilerVisibility(context):
 	context.Result(result)
 	return result
 
+def CheckWarnings(context):
+	context.Message('Checking if compiler supports gcc-style warnings... ')
+	lastCCFLAGS = context.env['CCFLAGS'][:]
+
+	context.env.Append(CCFLAGS = Split('-Wall -W -Werror'))
+
+	result = context.TryCompile("int global;\n", '.cpp')
+	if not result:
+		context.env.Replace(CCFLAGS = lastCCFLAGS)
+	context.Result(result)
+	return result
+
+Import('optimize')
+
+def CheckOptimization(context):
+	context.Message('Checking if compiler supports gcc-style optimization levels... ')
+	lastCCFLAGS = context.env['CCFLAGS'][:]
+
+	if optimize == 'full':
+		level = '-O3'
+	elif optimize == 'none':
+		level = '-O0'
+
+	context.env.Append(CCFLAGS = level)
+	result = context.TryCompile("void func() {}\n", '.cpp')
+	if not result:
+		context.env.Replace(CCFLAGS = lastCCFLAGS)
+	context.Result(result)
+	return result
+
+Import('debug')
+
+def CheckDebug(context):
+	context.Message('Checking if compiler supports gcc-style debug flags... ')
+	lastCCFLAGS = context.env['CCFLAGS'][:]
+	context.env.Append(CCFLAGS = ['-g','-ggdb3'])
+	result = context.TryCompile("void func() {}\n", '.cpp')
+	if not result:
+		context.env.Replace(CCFLAGS = lastCCFLAGS)
+	context.Result(result)
+	return result
+
 print 'Configuration...'
 Import('env')
-conf = Configure(env, custom_tests = {'CheckCompilerVisibility': CheckCompilerVisibility})
-conf.CheckCompilerVisibility()
+tests =	{
+	'CompilerVisibility': CheckCompilerVisibility,
+	'Warnings': CheckWarnings,
+	'Optimization': CheckOptimization,
+	'Debug': CheckDebug
+}
+conf = Configure(env, custom_tests = tests)
+conf.Optimization()
+conf.Warnings()
+conf.CompilerVisibility()
+if debug == 1:
+	conf.Debug()
 
 Return('conf')
 print 'Finished configuration'
