@@ -31,8 +31,8 @@
 
 //#define VERBOSE
 
-using boost::shared_ptr;
 using gott::string;
+using boost::shared_ptr;
 namespace simple = gott::tdl::simple;
 namespace structure = gott::tdl::structure;
 using gott::tdl::schema::match;
@@ -65,7 +65,7 @@ public:
 
   structure::revocable_structure &base_struc;
 
-  shared_ptr<writable_structure> const &direct_structure_non_base();
+  shared_ptr<writable_structure> direct_structure_non_base();
   
   positioning pos;
 
@@ -73,28 +73,32 @@ public:
   detail::stream_position ln;
 
   struct entry : Moveable<entry> {
-    shared_ptr<rule> the_rule;
+    rule *the_rule;
     shared_ptr<writable_structure> structure;
 
     entry() {}
 
-    entry(shared_ptr<rule> const &r)
-    : the_rule(r) {}
+    entry(entry pick_ &o) : the_rule(o.the_rule), structure(o.structure) {
+      entry &x = const_cast<entry &>(o);
+      x.the_rule = 0;
+      x.structure.reset();
+    }
 
-    entry(shared_ptr<rule> const &r, shared_ptr<writable_structure> const &s)
-    : the_rule(r), structure(s) {}
+    ~entry() {
+      delete the_rule;
+    }
 
-    operator shared_ptr<rule>() { return the_rule; }
+    entry(rule *r) : the_rule(r) {}
+
+    entry(rule *r, shared_ptr<writable_structure> const &s) : the_rule(r), structure(s) {}
   };
 
   typedef Vector<entry> Stack;
   Stack parse;
-  Vector<shared_ptr<rule> > shadow;
+  Vector<string> shadow_names;
 
-  static string get_name(shared_ptr<rule> const &);
+  static string get_name(rule const &);
 };
-
-NTL_MOVEABLE(shared_ptr<gott::tdl::schema::rule>);
 
 match::match(structure::revocable_structure &p) 
 : parser(0), pIMPL(new IMPL(p, *this)) {
@@ -118,7 +122,7 @@ structure::revocable_structure &match::revocable_structure() const {
 }
 
 structure::writable_structure &match::direct_structure() const {
-  shared_ptr<writable_structure> const &s = pIMPL->direct_structure_non_base();
+  shared_ptr<writable_structure> s = pIMPL->direct_structure_non_base();
   if (s)
     return *s;
   return pIMPL->base_struc;
@@ -161,11 +165,9 @@ void match::comment(string const &, bool) {}
 match::IMPL::IMPL(structure::revocable_structure &p, match &r)
 : base_struc(p), pos(base_struc), ref(r) {}
 
-shared_ptr<writable_structure> const &match::IMPL::direct_structure_non_base() {
-  if (parse.IsEmpty()) {
-    static shared_ptr<writable_structure> nothing;
-    return nothing;
-  }
+shared_ptr<writable_structure> match::IMPL::direct_structure_non_base() {
+  if (parse.IsEmpty()) 
+    return shared_ptr<writable_structure>();
   return parse.back().structure;
 }
 
@@ -178,7 +180,7 @@ void match::IMPL::add(rule_factory const &f) {
   int current = parse.GetCount();
   parse.Add().structure = struc;
 
-  shared_ptr<rule> the_rule(f.get(ref));
+  rule *the_rule(f.get(ref));
   GOTT_ASSERT_1(the_rule, nonnull(), "Acquired rule");
   GOTT_ASSERT_2(the_rule->attributes(), f.attributes, 
       std::equal_to<rule_attr>(), "Rule attributes");
@@ -188,8 +190,10 @@ void match::IMPL::add(rule_factory const &f) {
 
 template<class T>
 void match::IMPL::handle_token(T const &e) {
-  shadow.clear();
-  copy(range(parse), std::back_inserter(shadow));
+  shadow_names.clear();
+  range_t<Stack::iterator> in = range(parse);
+  while (!in.empty())
+    shadow_names.Add(get_name(*in.begin++->the_rule));
 
   pos.add(e);
   handle_event(e, true);
@@ -282,23 +286,20 @@ void match::IMPL::fail_rule() {
 }
 
 void match::IMPL::fail_all() {
-  Vector<string> names;
-  names.AddN(shadow.GetCount());
-  transform(range(shadow), range(names), get_name);
-  throw mismatch(ln, names);
+  throw mismatch(ln, shadow_names);
 }
 
-string match::IMPL::get_name(shared_ptr<rule> const &rp) {
+string match::IMPL::get_name(rule const &rl) {
   static string const s_open("("), s_close(")"), sep(",");
   Vector<string> out;
   out.Reserve(1 + 
-      (rp->attributes().tags().GetCount() > 0 
-       ? 1 + rp->attributes().tags().GetCount() * 2
+      (rl.attributes().tags().GetCount() > 0 
+       ? 1 + rl.attributes().tags().GetCount() * 2
        : 0));
-  out.Add(rp->name());
-  if (rp->attributes().tags().GetCount() > 0) {
+  out.Add(rl.name());
+  if (rl.attributes().tags().GetCount() > 0) {
     out.Add(s_open);
-    range_t<string const *> r = range(rp->attributes().tags());
+    range_t<string const *> r = range(rl.attributes().tags());
     out.Add(*r.begin);
     for (string const *it = r.begin + 1; it != r.end; ++it) {
       out.Add(sep);
