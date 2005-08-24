@@ -243,12 +243,18 @@ bool match::IMPL::try_play(ev::event const &event, rule &current) {
 }
 
 bool match::IMPL::consume_event(bool) {
+#ifdef VERBOSE
+  std::cout << "consume" << std::endl;
+#endif
   if (parse.back().the_rule->expectation() == rule::nothing)
     succeed_rule();
   return true;
 }
 
 bool match::IMPL::pass_event(bool) {
+#ifdef VERBOSE
+  std::cout << "pass" << std::endl;
+#endif
   if (parse.back().the_rule->expectation() == rule::need) {
     fail_rule();
     return true;
