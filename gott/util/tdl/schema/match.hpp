@@ -23,6 +23,7 @@
 
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tdl/structure/structure.hpp>
+#include <gott/util/tdl/schema/ev_fwd.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
@@ -96,6 +97,11 @@ public:
    * Return a reference to the back-tracking and book-keeping sub-engine.
    */
   positioning &pos() const GOTT_EXPORT;
+
+  /**
+   * Tell the current rules that tokens are still to be read.
+   */
+  void parental_requirement(ev::event const &, unsigned) GOTT_EXPORT;
 
 public:
   /**

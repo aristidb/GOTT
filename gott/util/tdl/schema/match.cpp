@@ -63,6 +63,8 @@ public:
 
   void fail_all();
 
+  void parental_requirement(ev::event const &, unsigned);
+
   structure::revocable_structure &base_struc;
 
   shared_ptr<writable_structure> direct_structure_non_base();
@@ -134,6 +136,10 @@ simple::line_logger *match::get_debug() const {
 
 positioning &match::pos() const {
   return pIMPL->pos;
+}
+
+void match::parental_requirement(ev::event const &event, unsigned count) {
+  pIMPL->parental_requirement(event, count);
 }
 
 // Parser forwarding
@@ -287,6 +293,15 @@ void match::IMPL::fail_rule() {
 
 void match::IMPL::fail_all() {
   throw mismatch(ln, shadow_names);
+}
+
+void match::IMPL::parental_requirement(ev::event const &event, unsigned count) {
+  while (!parse.IsEmpty()) {
+    if (parse.back().the_rule->miss_events(event, count))
+      return;
+    parse.pop_back();
+  }
+  fail_all();
 }
 
 string match::IMPL::get_name(rule const &rl) {

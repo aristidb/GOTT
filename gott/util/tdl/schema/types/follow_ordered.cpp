@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "follow_ordered.hpp"
+#include "../event.hpp"
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
@@ -49,8 +50,12 @@ void match_follow_ordered::init_accept_empty() {
   }
 }
 
+#include <iostream>
+
 match_follow_ordered::~match_follow_ordered() {
   matcher().pos().forget(last);
+  if (opened) 
+    matcher().parental_requirement(ev::up(), opened);
 }
 
 bool match_follow_ordered::play(ev::child_succeed const &) {
@@ -68,8 +73,6 @@ bool match_follow_ordered::play(ev::child_succeed const &) {
   }
   return true;
 }
-
-#include <iostream>
 
 bool match_follow_ordered::play(ev::child_fail const &) {
   bool this_flee = !pos->accept_empty;

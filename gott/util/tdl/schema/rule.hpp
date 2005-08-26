@@ -125,6 +125,12 @@ public:
    */
   virtual bool play_other();
 
+  /**
+   * Called if some event(s) is/are required by a rule but not immediately 
+   * found.
+   */
+  virtual bool miss_events(ev::event const &, unsigned);
+
   /// @internal
   void finish() GOTT_LOCAL;
 
