@@ -58,6 +58,8 @@ public:
    */
   virtual void print(std::ostream &s) const = 0;
 
+  virtual event *clone() const = 0;
+
   virtual ~event() = 0;
 };
 
@@ -78,6 +80,7 @@ class begin_parse : public token {
 public:
   bool play(rule &r) const;
   void print(std::ostream &s) const;
+  event *clone() const { return new begin_parse; }
 };
 
 /// The event class for the simple::parser::down token.
@@ -85,6 +88,7 @@ class down : public token {
 public:
   bool play(rule &r) const;
   void print(std::ostream &s) const;
+  event *clone() const { return new down; }
 };
 
 /// The event class for the simple::parser::node token.
@@ -96,6 +100,7 @@ public:
 
   bool play(rule &r) const;
   void print(std::ostream &s) const;
+  event *clone() const { return new node(*this); }
 
   string const &get_data() const GOTT_EXPORT;
     // get the data of this node-event
@@ -106,6 +111,7 @@ class up : public token {
 public:
   bool play(rule &r) const;
   void print(std::ostream &s) const;
+  event *clone() const { return new up; }
 };
 
 /// The event class for the simple::parser::end_parse token.
@@ -113,6 +119,7 @@ class end_parse : public token {
 public:
   bool play(rule &r) const;
   void print(std::ostream &s) const;
+  event *clone() const { return new end_parse; }
 };
 
 typedef boost::variant<begin_parse, down, node, up, end_parse> token_t;
@@ -130,6 +137,7 @@ class child_succeed : public notification {
 public:
   bool play(rule &r) const;
   void print(std::ostream &s) const;
+  event *clone() const { return new child_succeed; }
 };
 
 /// The event class for a failed child.
@@ -137,6 +145,7 @@ class child_fail : public notification {
 public:
   bool play(rule &r) const;
   void print(std::ostream &s) const;
+  event *clone() const { return new child_fail; }
 };
 
 }}}}

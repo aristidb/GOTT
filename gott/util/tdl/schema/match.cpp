@@ -28,6 +28,7 @@
 #include <gott/util/range_algo.hpp>
 #include <gott/util/string/stl.hpp>
 #include <gott/util/debug/assert.hpp>
+#include <boost/optional.hpp>
 
 //#define VERBOSE
 
@@ -64,6 +65,21 @@ public:
   void fail_all();
 
   void parental_requirement(ev::event const &, unsigned);
+  void real_parental_requirement();
+  struct deferred_miss {
+    deferred_miss(ev::event const &e, unsigned c) 
+    : event(e.clone()), count(c) {}
+
+    deferred_miss(deferred_miss pick_ &o)
+    : event(o.event), count(o.count) {
+      const_cast<deferred_miss &>(o).event = 0;
+    }
+    ~deferred_miss() { delete event; }
+
+    ev::event *event;
+    unsigned count;
+  };
+  boost::optional<deferred_miss> miss;
 
   structure::revocable_structure &base_struc;
 
@@ -92,7 +108,8 @@ public:
 
     entry(rule *r) : the_rule(r) {}
 
-    entry(rule *r, shared_ptr<writable_structure> const &s) : the_rule(r), structure(s) {}
+    entry(rule *r, shared_ptr<writable_structure> const &s) 
+    : the_rule(r), structure(s) {}
   };
 
   typedef Vector<entry> Stack;
@@ -201,6 +218,11 @@ void match::IMPL::handle_token(T const &e) {
   while (!in.empty())
     shadow_names.Add(get_name(*in.begin++->the_rule));
 
+  if (miss) {    
+    real_parental_requirement();
+    miss.reset();
+  }
+  
   pos.add(e);
   handle_event(e, true);
   while (pos.want_replay())
@@ -296,9 +318,15 @@ void match::IMPL::fail_all() {
 }
 
 void match::IMPL::parental_requirement(ev::event const &event, unsigned count) {
-  // TODO FIXME COMPLETELY WRONG
-  for (int i = 0; i < parse.GetCount(); ++i)
-    if (parse[i].the_rule->miss_events(event, count))
+  miss = deferred_miss(event, count);
+}
+
+void match::IMPL::real_parental_requirement() {
+  Stack::iterator it = parse.end();
+  if (it == parse.begin())
+    fail_all();
+  while (--it != parse.begin())
+    if (it->the_rule->miss_events(*miss->event, miss->count))
       return;
   fail_all();
 }
