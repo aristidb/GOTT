@@ -296,11 +296,9 @@ void match::IMPL::fail_all() {
 }
 
 void match::IMPL::parental_requirement(ev::event const &event, unsigned count) {
-  while (!parse.IsEmpty()) {
-    if (parse.back().the_rule->miss_events(event, count))
+  for (int i = 0; i < parse.GetCount(); ++i)
+    if (parse[i].the_rule->miss_events(event, count))
       return;
-    parse.pop_back();
-  }
   fail_all();
 }
 

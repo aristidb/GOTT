@@ -133,7 +133,7 @@ gott::string match_follow_ordered::name() const {
 match_follow_ordered::~match_follow_ordered() {
   matcher().pos().forget(last);
   if (expectation() != need && opened > 0) 
-    matcher().parental_requirement(ev::up(), opened + 1);
+    matcher().parental_requirement(ev::up(), opened);
 }
 
 bool match_follow_ordered::miss_events(ev::event const &event, unsigned count) {
