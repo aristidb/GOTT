@@ -296,6 +296,7 @@ void match::IMPL::fail_all() {
 }
 
 void match::IMPL::parental_requirement(ev::event const &event, unsigned count) {
+  // TODO FIXME COMPLETELY WRONG
   for (int i = 0; i < parse.GetCount(); ++i)
     if (parse[i].the_rule->miss_events(event, count))
       return;
