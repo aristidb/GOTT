@@ -37,7 +37,7 @@ def CheckOptimization(context):
 		level = '-O0'
 
 	context.env.Append(CCFLAGS = level)
-	result = context.TryCompile("void func() {}\n", '.cpp')
+	result = context.TryLink("int main() {}\n", '.cpp')
 	if not result:
 		context.env.Replace(CCFLAGS = lastCCFLAGS)
 	context.Result(result)
