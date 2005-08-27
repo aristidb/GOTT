@@ -258,9 +258,7 @@ template<> template<>
 void object::test<2>(int) {
   run_test(
       L"module anything 0.0\n"
-       "export\n"
-       "type\n"
-       "  anything param1,param2\n"
+       "export, type anything param1,param2\n"
        "  optional follow string, anything\n"
   );
   C(
@@ -312,7 +310,6 @@ void object::test<2>(int) {
 
 template<> template<>
 void object::test<3>(int) {
-  try {
   run_test(
     L"module param SOMEVERSION\n"
      "type\n"
@@ -321,10 +318,46 @@ void object::test<3>(int) {
      "    @ p1 @ p2 @ p3\n"
      "    string\n"
   );
-  } catch (...) {
-    std::cout << std::endl << tree << std::endl;
-    throw;
-  }
+
+  C(
+    M(
+      nd_list() <<
+      MD(Xany(0),
+        nd_list() << S(Xany("param"), "module-id")
+          << S(Xany("SOMEVERSION"), "version-spec")
+        , "module") <<
+        C(
+          MD(Xany(0),
+            nd_list() <<
+            S(Xany("some"), "name") <<
+            C(
+              M(
+                nd_list() <<
+                M(
+                  nd_list() <<
+                  S(Xany("ordered"), "type") <<
+                  M(
+                      nd_list() <<
+                      S(Xany("p1"), "@") <<
+                      S(Xany("p2"), "@") <<
+                      S(Xany("p3"), "@") <<
+                      C(
+                        C(
+                          C( S(Xany("string"), "type"), "normal-type"),
+                        "type-definition"),
+                      "qualified-type-definition"),
+                  "parameters"),
+                "normal-type"),
+              "type-definition"),
+            "qualified-type-definition"),
+            tag_list() << "type-declaration" << "type" << "T1"
+          )
+        , "type-declarations")
+      , "tdl-schema")
+  ).write_to(xp);
+
+  
+  ensure_equals(tree, xp);
 }
 
 template<> template<>
