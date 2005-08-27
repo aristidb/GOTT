@@ -73,6 +73,7 @@ private:
   bool play(ev::child_fail const &);
   bool play(ev::down const &);
   bool play(ev::up const &);
+  bool miss_events(ev::event const &, unsigned);
   string name() const;
 };
 

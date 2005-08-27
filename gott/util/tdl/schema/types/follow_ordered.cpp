@@ -50,14 +50,6 @@ void match_follow_ordered::init_accept_empty() {
   }
 }
 
-#include <iostream>
-
-match_follow_ordered::~match_follow_ordered() {
-  matcher().pos().forget(last);
-  if (opened) 
-    matcher().parental_requirement(ev::up(), opened);
-}
-
 bool match_follow_ordered::play(ev::child_succeed const &) {
   if (matcher().pos().proceeded(last)) {
     pos->slot.add();
@@ -136,4 +128,17 @@ bool match_follow_ordered::accept_empty(Vector<element> const &children) {
 
 gott::string match_follow_ordered::name() const {
   return "follow";
+}
+
+match_follow_ordered::~match_follow_ordered() {
+  matcher().pos().forget(last);
+  if (expectation() != need && opened > 0) 
+    matcher().parental_requirement(ev::up(), opened + 1);
+}
+
+bool match_follow_ordered::miss_events(ev::event const &event, unsigned count) {
+  if (typeid(event) != typeid(ev::up))
+    return false;
+  opened += count;
+  return true;
 }

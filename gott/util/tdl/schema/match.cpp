@@ -232,7 +232,7 @@ void match::IMPL::handle_event(ev::event const &event, bool token) {
 
 bool match::IMPL::handle_rule(ev::event const &event, bool token) {
 #ifdef VERBOSE
-  std::cout << get_name(parse.back()) << '{' << std::endl;
+  std::cout << get_name(*parse.back().the_rule) << '{' << std::endl;
   struct close { ~close() { std::cout << '}' << std::endl; } } x; (void)x;
 #endif
   if (try_play(event, *parse.back().the_rule)) {
