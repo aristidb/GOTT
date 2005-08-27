@@ -1,6 +1,7 @@
 import glob
 
 Import('env')
+Import('shrd')
 
-env.SharedLibrary('string', glob.glob('*.cpp'))
+shrd.SharedLibrary('string', glob.glob('*.cpp'))
 env.Program('string_test', glob.glob('test/*.cpp'), LIBS='string')

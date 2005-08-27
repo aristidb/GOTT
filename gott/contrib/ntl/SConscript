@@ -1,2 +1,2 @@
-Import('env')
-env.SharedLibrary('ntl', 'src/Cont.cpp')
+Import('shrd')
+shrd.SharedLibrary('ntl', 'src/Cont.cpp')

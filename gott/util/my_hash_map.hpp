@@ -1,5 +1,3 @@
-// This file is in the public domain.
-
 #ifndef GOTT_UTIL_MY_HASH_MAP
 #define GOTT_UTIL_MY_HASH_MAP
 

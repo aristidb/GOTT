@@ -39,5 +39,11 @@ Export('debug')
 
 conf = SConscript('configure/SConscript')
 env = conf.Finish()
+
+shrd = env.Copy()
+shrd.Append(CPPDEFINES = 'BUILDING_DLL')
+
+Export('shrd')
+
 SConscript(dirs = ['util', 'base',
 		   'tools/autobuild', 'contrib/ntl'])

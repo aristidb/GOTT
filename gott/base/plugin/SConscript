@@ -1,5 +1,5 @@
 import glob
 
-Import('env')
+Import('shrd')
 
-env.SharedLibrary('plugin', glob.glob('*.cpp'))
+shrd.SharedLibrary('plugin', glob.glob('*.cpp'))

@@ -1,5 +1,3 @@
-// This file is in the public domain.
-
 #ifndef GOTT_UTIL_VISIBILITY_HPP
 #define GOTT_UTIL_VISIBILITY_HPP
 

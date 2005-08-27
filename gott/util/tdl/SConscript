@@ -2,6 +2,7 @@ import os
 import glob
 
 Import('env')
+Import('shrd')
 
 source_files = []
 for root, dirs, _ in os.walk('.'):
@@ -11,7 +12,7 @@ for root, dirs, _ in os.walk('.'):
 		dirs.remove('test')
 	source_files += glob.glob(root + '/*.cpp')
 
-env.SharedLibrary('tdl', source_files)
+shrd.SharedLibrary('tdl', source_files)
 
 module_test_obj = [
     'test/test_tut.cpp', 
