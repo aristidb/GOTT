@@ -25,7 +25,6 @@
 #include "types.hpp"
 #include "stl.hpp"
 #include <gott/util/visibility.hpp>
-#include <gott/util/my_hash_map.hpp>
 #include <gott/util/range.hpp>
 #include <ntl.h>
 #include <iosfwd>
@@ -287,10 +286,10 @@ inline bool operator>=(string const &a, string const &b) {
 
 }
 
-namespace GOTT_NSHASH {
-template<> struct GOTT_HASH_CLASS<gott::string> : GOTT_HASH_BASE<gott::string> {
-  GOTT_EXPORT std::size_t operator() (gott::string const &) const;
-};
+template<>
+inline unsigned GetHashValue(gott::string const &s) {
+  gott::range_t<gott::utf8_t const *> r = s.as_utf8();
+  return memhash(r.begin, r.size());
 }
 
 #endif

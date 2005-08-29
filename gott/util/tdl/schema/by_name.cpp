@@ -21,8 +21,6 @@
 #include "by_name.hpp"
 #include "../exceptions.hpp"
 #include <gott/util/string/string.hpp>
-#include <gott/util/my_hash_map.hpp>
-#include GOTT_HASH_MAP
 
 namespace tdl = gott::tdl;
 namespace schema = tdl::schema;
@@ -35,7 +33,7 @@ name_manager_t &schema::name_manager() {
 
 class name_manager_t::IMPL {
 public:
-  typedef GOTT_NSHASH::hash_map<string, unsigned> mapping; 
+  typedef VectorMap<string, unsigned> mapping; 
   mapping items;
 };
 
@@ -46,12 +44,12 @@ name_manager_t::~name_manager_t() {
 }
 
 void name_manager_t::add(string const &name, unsigned id) {
-  p->items.insert(std::make_pair(name, id));
+  p->items.Add(name, id);
 }
 
 unsigned name_manager_t::get(string const &name) const {
-  IMPL::mapping::const_iterator it = p->items.find(name);
-  if (it == p->items.end())
+  int i = p->items.Find(name);
+  if (i < 0)
     throw unregistered_type(name);
-  return it->second;
+  return p->items[i];
 }

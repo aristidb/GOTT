@@ -21,7 +21,7 @@ module_test_obj = [
     'test/structure.cpp',
     'test/query.cpp'
   ] + glob.glob('test/schema/*.cpp')
-env.Program('module_test', module_test_obj, LIBS=['xany', 'string', 'tdl'])
+env.Program('module_test', module_test_obj, LIBS=['ntl', 'xany', 'string', 'tdl'])
 
 unit_test_obj = glob.glob('test/unit/*.cpp')
-env.Program('unit_test', unit_test_obj, LIBS=['xany', 'string', 'tdl'])
+env.Program('unit_test', unit_test_obj, LIBS=['ntl', 'xany', 'string', 'tdl'])

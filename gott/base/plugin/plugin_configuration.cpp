@@ -21,8 +21,6 @@
 #include "plugin_configuration.hpp"
 #include "qid.hpp"
 #include <boost/variant.hpp>
-#include <gott/util/my_hash_map.hpp>
-#include GOTT_HASH_MAP
 #include <gott/util/xany/xany.hpp>
 
 using gott::plugin::plugin_configuration;
@@ -33,27 +31,30 @@ using boost::variant;
 
 class plugin_configuration::IMPL {
 public:
-  typedef GOTT_NSHASH::hash_map<QID, variant<Xany, hook const *> > mapping;
+  typedef variant<Xany, hook const *> entry;
+  typedef VectorMap<QID, entry> mapping;
 
   mapping parameters;
 };
+
+NTL_MOVEABLE(plugin_configuration::IMPL::entry);
 
 plugin_configuration::plugin_configuration() : p(new IMPL) {}
 
 plugin_configuration::~plugin_configuration() {}
 
 void plugin_configuration::add_hook(QID const &id, hook const &h) {
-  p->parameters[id] = &h;
+  p->parameters.Add(id, &h);
 }
 
 hook const &plugin_configuration::find_hook(QID const &id) const {
-  return *boost::get<hook const *>(p->parameters[id]);
+  return *boost::get<hook const *>(p->parameters.Get(id));
 }
 
 void plugin_configuration::add_param(QID const &id, Xany const &pp) {
-  p->parameters[id] = pp;
+  p->parameters.Add(id, pp);
 }
 
 Xany const &plugin_configuration::find_param(QID const &id) const {
-  return boost::get<Xany>(p->parameters[id]);
+  return boost::get<Xany>(p->parameters.Get(id));
 }

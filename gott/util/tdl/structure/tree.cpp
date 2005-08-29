@@ -21,8 +21,6 @@
 #include "structure.hpp"
 #include "tree.hpp"
 #include "print.hpp"
-#include <gott/util/my_hash_map.hpp>
-#include GOTT_HASH_MAP
 #include <gott/util/range_algo.hpp>
 #include <boost/bind.hpp>
 #include <sstream>
@@ -57,7 +55,7 @@ public:
   static boost::intrusive_ptr<node> erase(boost::intrusive_ptr<node>);
   boost::intrusive_ptr<node> root, pos;
   tag current_tag;
-  GOTT_NSHASH::hash_map<tag, boost::intrusive_ptr<node> > tagpos;
+  VectorMap<tag, boost::intrusive_ptr<node> > tagpos;
 
   bool del_since(boost::intrusive_ptr<node> &, tag);
 };
@@ -77,7 +75,7 @@ struct tree::node {
 
   class index {
     typedef Vector<intrusive_ptr<node> > v_pn;
-    typedef GOTT_NSHASH::hash_multimap<string, intrusive_ptr<node> > hmm_spn;
+    typedef VectorMap<string, intrusive_ptr<node> > hmm_spn;
     
     v_pn by_no;
     hmm_spn by_name;
@@ -85,8 +83,9 @@ struct tree::node {
     bool built;
 
   public:
-    typedef hmm_spn::const_iterator tag_position;
-    typedef pair<tag_position, tag_position> tag_range_type;
+    typedef hmm_spn const *tag_container_ptr;
+    typedef int tag_position;
+    typedef pair<tag_container_ptr, tag_position> tag_range_type;
     
     index(intrusive_ptr<node> const &n) : parent(n), built(false) {}
 
@@ -102,8 +101,8 @@ struct tree::node {
     }
 
     void add_entry(intrusive_ptr<node> const &x) {
-      for (Vector<string>::iterator i =x->tags.begin(); i != x->tags.end();++i)
-        by_name.insert(hmm_spn::value_type(*i, x));
+      for (Vector<string>::iterator i= x->tags.begin(); i != x->tags.end();++i)
+        by_name.Add(*i, x);
     }
 
     intrusive_ptr<node> get_at(size_t i) {
@@ -111,7 +110,7 @@ struct tree::node {
     }
 
     tag_range_type with_name(string const &n) {
-      return by_name.equal_range(n);
+      return tag_range_type(&by_name, by_name.Find(n));
     }
   };
   
@@ -188,17 +187,17 @@ void tree::add_tag(string const &s) {
 }
 
 revocable_structure::pth tree::point() {
-  p->tagpos[++p->current_tag] = p->pos;
+  p->tagpos.Add(++p->current_tag, p->pos);
   return p->current_tag;
 }
 
 void tree::revert(revocable_structure::pth const &mp) {
   p->del_since(p->root, mp);
-  p->pos = p->tagpos[mp];
+  p->pos = p->tagpos.Get(mp);
 }
 
 void tree::get_rid_of(revocable_structure::pth const &x) {
-  p->tagpos.erase(p->tagpos.find(x));
+  p->tagpos.RemoveKey(x);
 }
 
 bool tree::IMPL::del_since(intrusive_ptr<node> &n, tag t) {
@@ -242,11 +241,9 @@ bool tree::iterator::contents_equal(iterator const &o) const {
 class tree::tagged_iterator::IMPL {
 public:
   tree::node::index::tag_range_type range;
-  tree::node::index::tag_position pos;
-  bool valid;
 
   IMPL(tree::node::index::tag_range_type const &r) 
-    : range(r), pos(r.first), valid(true) {}
+    : range(r) {}
 };
 
 tree::tagged_iterator tree::iterator::with_tag(string const &s) const {
@@ -263,16 +260,15 @@ tree::tagged_iterator::tagged_iterator(tagged_iterator const &o)
 tree::tagged_iterator::~tagged_iterator() {}
 
 void tree::tagged_iterator::operator++() {
-  if (++pIMPL->pos == pIMPL->range.second)
-    pIMPL->valid = false;
+  pIMPL->range.second = pIMPL->range.first->FindNext(pIMPL->range.second);
 }
 
 tree::tagged_iterator::operator bool() const {
-  return pIMPL->valid;
+  return pIMPL->range.second > 0;
 }
 
 tree::iterator tree::tagged_iterator::get() const {
-  return pIMPL->pos->second;
+  return (*pIMPL->range.first)[pIMPL->range.second];
 }
 
 void tree::copy_to(writable_structure &target) const {

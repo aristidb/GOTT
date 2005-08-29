@@ -13,9 +13,13 @@
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 
+// Changes (C) 2005 Aristid Breitkreuz, LGPL 2.1
+
 enum { UNSIGNED_HIBIT = 0x80000000 };
 
-class HashBase : Moveable<HashBase> {
+#include <gott/util/visibility.hpp>
+
+class GOTT_EXPORT HashBase : Moveable<HashBase> {
 	struct Link : Moveable<Link> {
 		int   next;
 		int   prev;

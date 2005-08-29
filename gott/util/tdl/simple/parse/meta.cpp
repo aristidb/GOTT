@@ -21,8 +21,6 @@
 #include "meta.hpp"
 #include <gott/util/string/string.hpp>
 #include <gott/util/string/stl.hpp>
-#include <gott/util/my_hash_map.hpp>
-#include GOTT_HASH_MAP
 
 using std::wistream;
 using gott::tdl::simple::meta_parser;
@@ -31,12 +29,14 @@ static bool pass(gott::string const &, gott::string const &) {
   return false;
 }
 
+NTL_MOVEABLE(meta_parser::callback);
+
 class meta_parser::IMPL {
 public:
   IMPL() : def(pass) {}
 
   callback def;
-  typedef GOTT_NSHASH::hash_map<string, callback> cb_t;
+  typedef VectorMap<string, callback> cb_t;
   cb_t cb;
   void exec(string const &);
 };
@@ -79,13 +79,10 @@ void meta_parser::IMPL::exec(string const &line_) {
     ;
   string param(range(pos, line.end));
 
-  IMPL::cb_t::const_iterator it = cb.find(cmd);
+  int i = cb.Find(cmd);
 
-  if (it == cb.end())
+  if (i < 0 || !cb[i](cmd, param))
     def(cmd, param);
-  else
-    if (!it->second(cmd, param))
-      def(cmd, param);
 }
 
 void meta_parser::set_default(callback const &f) {
@@ -93,5 +90,5 @@ void meta_parser::set_default(callback const &f) {
 }
 
 void meta_parser::set_specific(string const &cmd, callback const &f) {
-  p->cb.insert(make_pair(cmd, f));
+  p->cb.Add(cmd, f);
 }

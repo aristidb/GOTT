@@ -13,6 +13,10 @@
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 
+// Changes (C) 2005 Aristid Breitkreuz, LGPL 2.1
+
+#include <gott/util/visibility.hpp>
+
 template <class T>
 inline void Swap(T& a, T& b) { T tmp = a; a = b; b = tmp; }
 
@@ -300,9 +304,9 @@ public:
 	IIterator(V& _cont, int ii) : cont(&_cont), ii(ii) {}
 };
 
-int Pow2Bound(int i);
+GOTT_EXPORT int Pow2Bound(int i);
 
-unsigned memhash(const void *ptr, size_t size);
+GOTT_EXPORT unsigned memhash(const void *ptr, size_t size);
 
 inline unsigned GetHashValue0(const void *ptr)  { return (unsigned)(size_t) ptr; }
 inline unsigned GetHashValue0(char a)           { return (unsigned)a; }
@@ -316,7 +320,7 @@ inline unsigned GetHashValue0(long a)           { return (unsigned)a; }
 inline unsigned GetHashValue0(unsigned long a)  { return (unsigned)a; }
 inline unsigned GetHashValue0(bool a)           { return (unsigned)a; }
 
-unsigned GetHashValue0(const double& a);
+GOTT_EXPORT unsigned GetHashValue0(const double& a);
 
 template <class T>
 inline unsigned GetHashValue(const T& ptr) { return GetHashValue0(ptr); }
@@ -325,7 +329,7 @@ struct CombineHash {
 	unsigned hash;
 
 public:
-	CombineHash& Put(unsigned h) { hash = ((hash << 4) + hash) ^ h; return *this; }
+	CombineHash& Put(unsigned h) { hash = ((hash << 4) + hash) ^ h; return *this;}
 
 	operator unsigned() const    { return hash; }
 

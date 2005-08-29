@@ -19,15 +19,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "atom.hpp"
-#include <gott/util/my_hash_map.hpp>
-#include GOTT_HASH_SET
 
 using gott::atom;
 using gott::string;
 
 static string atomize(string const &n) {
-  static GOTT_NSHASH::hash_set<string> table;
-  return *table.insert(n).first;
+  static Index<string> table;
+  return table[table.FindAdd(n)];
 }
 
 atom::atom(string const &n) : string(atomize(n)) {}
@@ -40,6 +38,3 @@ bool gott::operator==(atom const &a, atom const &b) {
   return a.as_utf8().begin == b.as_utf8().begin; // same memory
 }
 
-std::size_t GOTT_NSHASH::GOTT_HASH_CLASS<atom>::operator()(atom const &a) const{
-  return std::size_t(a.as_utf8().begin);
-}

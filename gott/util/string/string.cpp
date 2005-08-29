@@ -188,10 +188,3 @@ int gott::compare(string const &a, string const &b) {
   return *p2 - *p1;
 }
 
-std::size_t GOTT_NSHASH::GOTT_HASH_CLASS<gott::string>::operator() 
-    (gott::string const &s) const {
-  std::size_t result = 0;
-  for (gott::utf8_t const *it = s.as_utf8().begin; it != s.as_utf8().end; ++it)
-    result = 5 * result + *it; // TODO: compare 31*result+*it
-  return result;
-}

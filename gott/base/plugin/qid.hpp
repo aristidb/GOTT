@@ -26,7 +26,7 @@
 namespace gott {
 namespace plugin {
 
-class QID : public atom {
+class QID : public atom, Moveable<QID> {
 public:
   QID(atom const &) GOTT_EXPORT;
   ~QID() GOTT_EXPORT;
@@ -34,9 +34,9 @@ public:
 
 }}
 
-namespace GOTT_NSHASH {
-template<> struct GOTT_HASH_CLASS<gott::plugin::QID> 
-  : GOTT_HASH_CLASS<gott::atom> {};
+template<>
+inline unsigned GetHashValue(gott::plugin::QID const &q) {
+  return GetHashValue((gott::atom &) q);
 }
 
 #endif

@@ -29,7 +29,7 @@ namespace gott {
  * Atom class.
  * Atoms are strings with fast comparison and fast hashing but slow constructor.
  */
-class atom : public string {
+class atom : public string, Moveable<atom> {
 public:
   /// Copy-Constructor (fast).
   GOTT_EXPORT atom(atom const &);
@@ -55,14 +55,9 @@ inline bool operator!=(atom const &a, atom const &b) {
 
 }
 
-#define PARAM_NO_BASIC_STRING
-#include <gott/util/my_hash_map.hpp>
-#undef PARAM_NO_BASIC_STRING
-
-namespace GOTT_NSHASH {
-template<> struct GOTT_HASH_CLASS<gott::atom> : GOTT_HASH_BASE<gott::atom> {
-  std::size_t operator() (gott::atom const &) const;
-};
+template<>
+inline unsigned GetHashValue(gott::atom const &a) {
+  return GetHashValue(a.as_utf8().begin);
 }
 
 #endif

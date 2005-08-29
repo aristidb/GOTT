@@ -13,11 +13,19 @@
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 
+// Changes (C) 2005 Aristid Breitkreuz, LPGL 2.1
+
 #include <ntl.h>
+
+#include <gott/util/visibility.hpp>
 
 #ifdef _MSC_VER
 #pragma inline_depth(255)
 #pragma optimize("t", on)
+#endif
+
+#ifdef HAVE_VISIBILITY
+#pragma GCC visibility push(default)
 #endif
 
 int Pow2Bound(int i)
@@ -323,3 +331,8 @@ unsigned GetHashValue0(const double& d)
 {
 	return memhash(&d, sizeof(double));
 }
+
+#ifdef HAVE_VISIBILITY
+#pragma GCC visibility push(default)
+#endif
+
