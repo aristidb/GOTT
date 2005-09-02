@@ -355,13 +355,91 @@ void object::test<3>(int) {
         , "type-declarations")
       , "tdl-schema")
   ).write_to(xp);
-
-  
   ensure_equals(tree, xp);
 }
 
 template<> template<>
 void object::test<4>(int) {
+  run_test(L""
+"module foo 1.0\n"
+"\n"
+"export\n"
+"type footype\n"
+"     named a\n"
+"           multi\n"
+"\n"
+"type multi\n"
+"     unordered\n"
+"       list named plugin, list string\n"
+"       named sum, integer @(> 0)\n"
+"       list integer\n"
+  );
+  S(Xany()).write_to(xp);
+  ensure_equals(tree, xp);
+}
+
+template<> template<>
+void object::test<5>(int) {
+  run_test(L""
+"#?schema tdl-schema 0.0\n"
+"\n"
+"module anything 1.0 1.0\n"
+"\n"
+"export\n"
+"type anything\n"
+"  optional follow string, anything\n"
+  );
+  S(Xany()).write_to(xp);
+  ensure_equals(tree, xp);
+}
+
+template<> template<>
+void object::test<6>(int) {
+  run_test(L""
+"#?schema tdl-schema\n"
+"\n"
+"module songDB 1.0\n"
+"\n"
+"export, type songDB\n"
+"  list songInfo\n"
+"\n"
+"type songInfo\n"
+"  ordered\n"
+"    named TITLE:, string\n"
+"    named ARTIST:, string\n"
+"    named RATING:, integer @(>= 0) @(<= 10)\n"
+"    named RIPPED:, enumeration @ T, F\n"
+  );
+  S(Xany()).write_to(xp);
+  ensure_equals(tree, xp);
+}
+
+template<> template<>
+void object::test<7>(int) {
+  run_test(L""
+"module vehicles <>\n"
+"export,\n"
+"type vehicles\n"
+"  named vehicles\n"
+"     unordered\n"
+"        list named car, data\n"
+"        list named bike, data\n"
+"type data\n"
+"  ordered\n"
+"    named weight, integer @(>= 0)\n"
+"    named size, integer @(>= 0)\n"
+"    optional named description, string\n"
+"    optional\n"
+"      ordered\n"
+"        literal ---\n"
+"        : notes list string"
+  );
+  S(Xany()).write_to(xp);
+  ensure_equals(tree, xp);
+}
+
+template<> template<>
+void object::test<8>(int) {
   no_test();
 }
 
