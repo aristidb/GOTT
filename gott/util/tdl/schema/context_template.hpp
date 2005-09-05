@@ -36,6 +36,8 @@ namespace schema {
 /**
  * Chainable context producer. Stores the data necessary to construct a context
  * and can take contexts as "arguments", hence context_<b>template</b>.
+ *
+ * TODO: Necessary?
  */
 class context_template {
 public:

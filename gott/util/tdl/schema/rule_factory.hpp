@@ -37,6 +37,9 @@ class slotcfg;
  * Rule-factory interface.
  * Classes implementing this can produce rule objects and are the standardized
  * way to do so.
+ *
+ * TODO: Fast and owning. Do we need multiple kinds of rule_factory?
+ * TODO: Is a more statically typed design reasonable?
  */
 class GOTT_EXPORT rule_factory {
 public:   

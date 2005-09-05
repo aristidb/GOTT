@@ -53,6 +53,8 @@ class rule_factory;
  *   std::wcout << m.what() << std::endl;
  * }
  * @endcode
+ *
+ * TODO: Split?!
  */
 class match : public simple::parser {
   class IMPL;

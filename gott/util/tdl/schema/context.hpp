@@ -35,6 +35,7 @@ namespace schema {
 
 /**
  * Memory-owning context class.
+ * TODO: Get rid of.
  */
 class context {
 public:
