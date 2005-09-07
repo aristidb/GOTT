@@ -22,7 +22,7 @@
 #define GOTT_UTIL_TDL_SCHEMA_ANY_HPP
 
 #include "../match.hpp"
-#include "../rule_factory.hpp"
+#include "../rule.hpp"
 #include "../parse_position.hpp"
 #include "../happy_once.hpp"
 
@@ -34,7 +34,6 @@ namespace schema {
 // Matches the first applicable of an arbitrary number of rules.
 class match_any : public happy_once {
 public:
-  typedef factory_template::manychildren<match_any> factory;
   match_any(Vector<rule_factory const *> const &, 
             rule_attr const &, match &m);
   ~match_any();

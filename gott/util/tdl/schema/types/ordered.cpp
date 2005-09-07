@@ -22,7 +22,7 @@
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
-using schema::rule;
+using schema::item;
 using schema::match_ordered;
 
 match_ordered::match_ordered(Vector<rule_factory const *> const &r, 
@@ -48,7 +48,7 @@ bool match_ordered::accept_empty(Vector<rule_factory const *> const &children) {
   bool accept = true;
   for (Vector<rule_factory const *>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
-    accept &= (*it)->accept_empty();
+    ;//FIXME accept &= (*it)->accept_empty();
   return accept;
 }
 

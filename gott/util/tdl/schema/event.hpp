@@ -31,7 +31,7 @@ namespace gott {
 namespace tdl {
 namespace schema {
 
-class rule;
+class item;
 
 /**
  * Schema events. Interesting for rule-writers.
@@ -44,11 +44,11 @@ namespace ev {
 class event {
 public:
   /**
-   * Notify a rule of this event.
-   * Calls rule::play with a reference to *this.
-   * \param r The rule to notify.
+   * Notify a item of this event.
+   * Calls item::play with a reference to *this.
+   * \param r The item to notify.
    */
-  virtual bool play(rule &r) const = 0;
+  virtual bool play(item &r) const = 0;
 
   /**
    * @internal
@@ -78,7 +78,7 @@ class token : public event {
 /// The event class for the simple::parser::begin_parse token.
 class begin_parse : public token {
 public:
-  bool play(rule &r) const;
+  bool play(item &r) const;
   void print(std::ostream &s) const;
   event *clone() const { return new begin_parse; }
 };
@@ -86,7 +86,7 @@ public:
 /// The event class for the simple::parser::down token.
 class down : public token {
 public:
-  bool play(rule &r) const;
+  bool play(item &r) const;
   void print(std::ostream &s) const;
   event *clone() const { return new down; }
 };
@@ -98,7 +98,7 @@ public:
   node(string const &);
     // construct a node with the given data
 
-  bool play(rule &r) const;
+  bool play(item &r) const;
   void print(std::ostream &s) const;
   event *clone() const { return new node(*this); }
 
@@ -109,7 +109,7 @@ public:
 /// The event class for the simple::parser::up token.
 class up : public token {
 public:
-  bool play(rule &r) const;
+  bool play(item &r) const;
   void print(std::ostream &s) const;
   event *clone() const { return new up; }
 };
@@ -117,7 +117,7 @@ public:
 /// The event class for the simple::parser::end_parse token.
 class end_parse : public token {
 public:
-  bool play(rule &r) const;
+  bool play(item &r) const;
   void print(std::ostream &s) const;
   event *clone() const { return new end_parse; }
 };
@@ -135,7 +135,7 @@ class notification : public event {
 /// The event class for a succeeded child.
 class child_succeed : public notification {
 public:
-  bool play(rule &r) const;
+  bool play(item &r) const;
   void print(std::ostream &s) const;
   event *clone() const { return new child_succeed; }
 };
@@ -143,7 +143,7 @@ public:
 /// The event class for a failed child.
 class child_fail : public notification {
 public:
-  bool play(rule &r) const;
+  bool play(item &r) const;
   void print(std::ostream &s) const;
   event *clone() const { return new child_fail; }
 };

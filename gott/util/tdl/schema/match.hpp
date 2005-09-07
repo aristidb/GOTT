@@ -78,7 +78,7 @@ public:
   ~match() GOTT_EXPORT;
 
   /**
-   * Tells the engine to match next a rule specified by a rule-factory.
+   * Tells the engine to match next a item specified by a rule-factory.
    * \param rf The rule-factory specifying the to-be-added rule.
    */
   void add(rule_factory const &rf) GOTT_EXPORT;

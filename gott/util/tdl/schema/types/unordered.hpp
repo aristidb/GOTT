@@ -22,7 +22,7 @@
 #define GOTT_UTIL_TDL_SCHEMA_UNORDERED_HPP
 
 #include "../match.hpp"
-#include "../rule_factory.hpp"
+#include "../rule.hpp"
 #include "../parse_position.hpp"
 #include "../slot.hpp"
 
@@ -30,14 +30,15 @@ namespace gott {
 namespace tdl {
 namespace schema {
 
-class match_unordered : public rule {
-  typedef std::pair<rule_factory const *, slotcfg> element;
+class match_unordered : public item {
+  struct element : Moveable<element> {
+    rule_factory const *first;
+    slotcfg second;
+
+    element() {} // dumb default constructor
+    element(rule_factory const *f, slotcfg const &s) : first(f), second(s) {}
+  };
 public:
-  typedef factory_template::slotcfg_manychildren<
-            match_unordered,
-            slotcfg::one,
-            slotcfg::all>
-          factory;
   match_unordered(Vector<element> const &, rule_attr const &, 
                   match &);
   ~match_unordered();

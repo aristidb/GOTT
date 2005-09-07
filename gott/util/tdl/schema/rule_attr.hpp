@@ -23,6 +23,7 @@
 
 #include "rule.hpp"
 #include "../structure/repatch.hpp"
+#include "slot.hpp"
 #include <boost/shared_ptr.hpp>
 #include <gott/util/string/string.hpp>
 #include <iosfwd>
@@ -34,7 +35,7 @@ namespace structure { class repatcher; }
 
 namespace schema {
 
-// Class rule::rule_attr
+// Class rule_attr
 // Defines the user-supplyable rule_attr for a rule
 class rule_attr {
 public:
@@ -52,8 +53,9 @@ public:
   : c(cc), t(Vector<string>() << s), r(rr) {}
 
   explicit rule_attr(Vector<string> const &l, bool cc, 
-                     xany::Xany const &x, structure::repatcher const *rr = 0)
-  : c(cc), t(l), u(x), r(rr) {}
+                     xany::Xany const &x, structure::repatcher const *rr = 0,
+                     slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
+  : c(cc), t(l), u(x), r(rr), i(I), o(O) {}
 
   rule_attr(rule_attr const &o)
   : c(o.c), t(o.t, 1), u(o.u), r(o.r) {}
@@ -72,11 +74,21 @@ public:
     return c == o.c && range(t) == range(o.t) && u == o.u && r == o.r;
   }
 
+  slotcfg const &inner() const {
+    return i;
+  }
+
+  slotcfg const &outer() const {
+    return o;
+  }
+
 private:
   bool c;
   Vector<string> t;
   xany::Xany u;
   boost::shared_ptr<structure::repatcher const> r;
+  slotcfg i;
+  slotcfg o;
 };
 
 GOTT_EXPORT std::ostream &operator<<(std::ostream &s, rule_attr const &a);

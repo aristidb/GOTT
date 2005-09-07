@@ -22,7 +22,7 @@
 #define GOTT_UTIL_TDL_SCHEMA_LIST_HPP
 
 #include "../match.hpp"
-#include "../rule_factory.hpp"
+#include "../rule.hpp"
 #include "../slot.hpp"
 #include "../parse_position.hpp"
 
@@ -30,13 +30,8 @@ namespace gott {
 namespace tdl {
 namespace schema {
 
-class match_list : public rule {
+class match_list : public item {
 public:
-  typedef factory_template::slotcfg_onechild<match_list, 
-                                             slotcfg::list, 
-                                             slotcfg::all>
-          factory;
-
   match_list(rule_factory const &, slotcfg const &, rule_attr const &,
                   match &);
   ~match_list();

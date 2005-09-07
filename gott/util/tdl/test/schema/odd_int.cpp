@@ -31,11 +31,11 @@ using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
-using schema::rule;
+using schema::item;
 using schema::rule_attr;
 
-rule::expect odd(std::size_t c) {
-  return c % 2 ? rule::maybe : rule::need;
+item::expect odd(std::size_t c) {
+  return c % 2 ? item::maybe : item::need;
 }
 
 namespace {

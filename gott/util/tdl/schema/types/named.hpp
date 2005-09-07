@@ -22,7 +22,7 @@
 #define GOTT_UTIL_TDL_SCHEMA_NAMED_HPP
 
 #include "../match.hpp"
-#include "../rule_factory.hpp"
+#include "../rule.hpp"
 #include "../rule_attr.hpp"
 #include "../happy_once.hpp"
 #include "follow_ordered.hpp"
@@ -37,7 +37,6 @@ public:
   static GOTT_EXPORT
   rule_attr attributes(string const &s, bool cc = true);
   
-  typedef factory_template::onechild<match_named> factory;
   match_named(rule_factory const &, rule_attr const &, match &);
 
   ~match_named();
@@ -47,8 +46,8 @@ public:
 private:
   virtual string name() const;
   string tag;
-  match_follow_ordered::factory outer;
-  match_node::factory inner_name;
+  //match_follow_ordered::factory outer;
+  //match_node::factory inner_name;
   bool play(ev::child_succeed const &);
 };
   

@@ -20,40 +20,40 @@
 
 #include "event.hpp"
 #include "match.hpp"
-#include "rule.hpp"
+#include "item.hpp"
 
 namespace ev = gott::tdl::schema::ev;
-using gott::tdl::schema::rule;
+using gott::tdl::schema::item;
 using std::ostream;
 using boost::static_visitor;
 
 ev::event::~event() {}
 
-bool ev::begin_parse::play(rule &r) const {
+bool ev::begin_parse::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::node::play(rule &r) const {
+bool ev::node::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::down::play(rule &r) const {
+bool ev::down::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::up::play(rule &r) const { 
+bool ev::up::play(item &r) const { 
   return r.play(*this);
 }
 
-bool ev::end_parse::play(rule &r) const {
+bool ev::end_parse::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::child_succeed::play(rule &r) const {
+bool ev::child_succeed::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::child_fail::play(rule &r) const {
+bool ev::child_fail::play(item &r) const {
   return r.play(*this);
 }
 

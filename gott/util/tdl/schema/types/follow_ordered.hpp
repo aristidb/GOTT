@@ -22,7 +22,7 @@
 #define GOTT_TDL_SCHEMA_FOLLOW_ORDERED_HPP
 
 #include "../match.hpp"
-#include "../rule_factory.hpp"
+#include "../rule.hpp"
 #include "../slot.hpp"
 #include "../parse_position.hpp"
 
@@ -30,17 +30,9 @@ namespace gott {
 namespace tdl {
 namespace schema {
 
-class match_follow_ordered : public rule {
+class match_follow_ordered : public item {
   typedef std::pair<rule_factory const *, slotcfg> element;
 public:
-  typedef 
-    factory_template::slotcfg_manychildren<
-      match_follow_ordered, 
-      slotcfg::one,
-      slotcfg::all
-    >
-    factory;
-
   match_follow_ordered(Vector<element> const &, rule_attr const &, 
                        match &);
   ~match_follow_ordered();

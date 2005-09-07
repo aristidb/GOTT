@@ -23,7 +23,7 @@
 namespace schema = gott::tdl::schema;
 namespace ev = schema::ev;
 using schema::match_any;
-using schema::rule;
+using schema::item;
 
 match_any::match_any(Vector<rule_factory const *> const &vv,
                      rule_attr const &a, match &m) 
@@ -59,8 +59,8 @@ bool match_any::play(ev::child_succeed const &) {
 bool match_any::accept_empty(Vector<rule_factory const *> const &choices) {
   for (Vector<rule_factory const *>::const_iterator it = choices.begin(); 
        it != choices.end(); ++it)
-    if ((*it)->accept_empty())
-      return true;
+    ;/*FIXME if ((*it)->accept_empty())
+      return true;*/
   return false;
 }
 

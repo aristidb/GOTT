@@ -22,13 +22,13 @@
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
-using schema::rule;
+using schema::item;
 using schema::slotcfg;
 using schema::match_list;
 
 match_list::match_list(rule_factory const &r, slotcfg const &c,
                                  rule_attr const &a, match &m)
-: rule(a, m), sub(r), cfg(c) {
+: item(a, m), sub(r), cfg(c) {
   last = m.pos().current();
   if (accept_more(expectation()))
     matcher().add(sub);
@@ -71,7 +71,7 @@ bool match_list::empty() {
   return true;
 }
 
-rule::expect match_list::expectation() const {
+item::expect match_list::expectation() const {
   return cfg.expectation();
 }
 

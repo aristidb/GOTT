@@ -22,7 +22,7 @@
 #define GOTT_UTIL_TDL_SCHEMA_DOCUMENT_HPP
 
 #include "../match.hpp"
-#include "../rule_factory.hpp"
+#include "../rule.hpp"
 #include "../happy_once.hpp"
 
 namespace gott {
@@ -33,7 +33,6 @@ namespace schema {
 // Matches a whole tdl document that contains the given sub-type
 class match_document : public happy_once {
 public:
-  typedef factory_template::onechild<match_document> factory;
   match_document(rule_factory const &, rule_attr const &, match &);
 
   static bool accept_empty(...) { return false; }

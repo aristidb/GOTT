@@ -21,14 +21,13 @@
 #include "context.hpp"
 #include "slot.hpp"
 #include "by_name.hpp"
-#include "rule_factory.hpp"
+#include "rule.hpp"
 #include <gott/util/range_algo.hpp>
 #include <boost/optional.hpp>
 #include <gott/util/string/string.hpp>
 
 using boost::optional;
 using gott::tdl::schema::context;
-using gott::tdl::schema::rule;
 using gott::tdl::schema::rule_factory;
 
 class context::IMPL {
@@ -81,7 +80,8 @@ rule_factory const &context::get() const {
 
 void context::IMPL::begin(unsigned i, rule_attr const &a,
                           optional<slotcfg> const &c) {
-  rule_factory *f = get_factory(i, a);
+  (void)i;(void)a;
+  rule_factory *f = 0;//FIXME get_factory(i, a);
   pool.push_back(f);
   add_owned(f, c);
 }
@@ -103,7 +103,7 @@ void context::IMPL::add_child(rule_factory const *f,
                               optional<slotcfg> const &c) {
   if (org.GetCount() > 0)
     if (!c)
-      org.back()->add(*f);
+      ;//FIXME org.back()->add(*f);
     else
       add_slotted(f, c.get());
   else
@@ -111,7 +111,9 @@ void context::IMPL::add_child(rule_factory const *f,
 }
 
 void context::IMPL::add_slotted(rule_factory const *f, slotcfg const &c) {
-  rule_factory::with_slotcfg *w = org.back()->get_with_slotcfg();
+  (void)f; (void)c;
+  /* FIXME
+  rule_factory::with_slotcfg *w = 0; org.back()->get_with_slotcfg();
 
   if (!w)
     return add_enc_slotted(f, c);
@@ -122,12 +124,13 @@ void context::IMPL::add_slotted(rule_factory const *f, slotcfg const &c) {
     add_enc_slotted(f, c.no_optional(), slotcfg(slotcfg::optional));
   else
     add_enc_slotted(f, c);
+  */
 }
 
 void context::IMPL::add_enc_slotted(rule_factory const *f, slotcfg const &c,
                                     optional<slotcfg> const &e) {
   if (c.get_mode() == slotcfg::one)
-    return org.back()->add(*f);
+    ;//FIXME return org.back()->add(*f);
 
   static unsigned const list_id = name_manager().get("list");
   begin(list_id, rule_attr(rule_attr::simple, false), e);

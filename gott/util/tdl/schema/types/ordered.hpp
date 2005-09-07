@@ -22,7 +22,7 @@
 #define GOTT_UTIL_TDL_SCHEMA_ORDERED_HPP
 
 #include "../match.hpp"
-#include "../rule_factory.hpp"
+#include "../rule.hpp"
 #include "../happy_once.hpp"
 
 namespace gott {
@@ -31,7 +31,6 @@ namespace schema {
 
 class match_ordered : public happy_once {
 public:
-  typedef factory_template::manychildren<match_ordered> factory;
   match_ordered(Vector<rule_factory const *> const &r, 
                 rule_attr const &, match &);
   ~match_ordered();

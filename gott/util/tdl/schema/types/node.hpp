@@ -22,7 +22,7 @@
 #define GOTT_UTIL_TDL_SCHEMA_STRING_HPP
 
 #include "../match.hpp"
-#include "../rule_factory.hpp"
+#include "../rule.hpp"
 #include "../happy_once.hpp"
 
 namespace gott {
@@ -31,7 +31,6 @@ namespace schema {
 
 class match_node : public happy_once {
 public:
-  typedef factory_template::nochild<match_node> factory;
   match_node(rule_attr const &, match &);
 
   static bool accept_empty() { return false; }

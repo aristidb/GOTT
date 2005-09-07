@@ -25,7 +25,6 @@
 
 using boost::static_visitor;
 using gott::tdl::schema::context_template;
-using gott::tdl::schema::rule;
 
 class context_template::IMPL {
 public:

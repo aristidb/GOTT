@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "match.hpp"
-#include "rule_factory.hpp"
+#include "rule.hpp"
 #include "event.hpp"
 #include "../exceptions.hpp"
 #include "stream_position.hpp"
@@ -53,14 +53,14 @@ public:
 
   void handle_tevent(ev::token_t const &);
   void handle_event(ev::event const &, bool token);
-  bool try_play(ev::event const &, rule &r);
-  bool handle_rule(ev::event const &, bool token);
+  bool try_play(ev::event const &, item &r);
+  bool handle_item(ev::event const &, bool token);
 
   bool consume_event(bool token);
   bool pass_event(bool token);
 
-  void succeed_rule();
-  void fail_rule();
+  void succeed_item();
+  void fail_item();
 
   void fail_all();
 
@@ -91,32 +91,32 @@ public:
   detail::stream_position ln;
 
   struct entry : Moveable<entry> {
-    rule *the_rule;
+    item *the_item;
     shared_ptr<writable_structure> structure;
 
     entry() {}
 
-    entry(entry pick_ &o) : the_rule(o.the_rule), structure(o.structure) {
+    entry(entry pick_ &o) : the_item(o.the_item), structure(o.structure) {
       entry &x = const_cast<entry &>(o);
-      x.the_rule = 0;
+      x.the_item = 0;
       x.structure.reset();
     }
 
     ~entry() {
-      delete the_rule;
+      delete the_item;
     }
 
-    entry(rule *r) : the_rule(r) {}
+    entry(item *r) : the_item(r) {}
 
-    entry(rule *r, shared_ptr<writable_structure> const &s) 
-    : the_rule(r), structure(s) {}
+    entry(item *r, shared_ptr<writable_structure> const &s) 
+    : the_item(r), structure(s) {}
   };
 
   typedef Vector<entry> Stack;
   Stack parse;
   Vector<string> shadow_names;
 
-  static string get_name(rule const &);
+  static string get_name(item const &);
 };
 
 match::match(structure::revocable_structure &p) 
@@ -194,21 +194,21 @@ shared_ptr<writable_structure> match::IMPL::direct_structure_non_base() {
   return parse.back().structure;
 }
 
-void match::IMPL::add(rule_factory const &f) {
+void match::IMPL::add(rule_factory const &f) {(void)f;
   shared_ptr<writable_structure> struc = direct_structure_non_base();
 
-  if (structure::repatcher const *r = f.attributes.repatcher())
-    struc.reset(r->deferred_write(struc ? *struc : base_struc));
+/*  FIXME if (structure::repatcher const *r = f.attributes.repatcher())
+    struc.reset(r->deferred_write(struc ? *struc : base_struc));*/
 
   int current = parse.GetCount();
   parse.Add().structure = struc;
 
-  rule *the_rule(f.get(ref));
-  GOTT_ASSERT_1(the_rule, nonnull(), "Acquired rule");
-  GOTT_ASSERT_2(the_rule->attributes(), f.attributes, 
-      std::equal_to<rule_attr>(), "Rule attributes");
+  item *the_item;// FIXME (f.get(ref));
+  GOTT_ASSERT_1(the_item, nonnull(), "Acquired rule");
+  /*GOTT_ASSERT_2(the_item->attributes(), f.attributes, 
+      std::equal_to<rule_attr>(), "Rule attributes");*/
 
-  parse[current].the_rule = the_rule;
+  parse[current].the_item = the_item;
 }
 
 template<class T>
@@ -216,7 +216,7 @@ void match::IMPL::handle_token(T const &e) {
   shadow_names.clear();
   range_t<Stack::iterator> in = range(parse);
   while (!in.empty())
-    shadow_names.Add(get_name(*in.begin++->the_rule));
+    shadow_names.Add(get_name(*in.begin++->the_item));
 
   if (miss) {    
     real_parental_requirement();
@@ -248,16 +248,16 @@ void match::IMPL::handle_event(ev::event const &event, bool token) {
   if (parse.IsEmpty()) 
     fail_all();
   while (!parse.IsEmpty()) 
-    if (handle_rule(event, token)) 
+    if (handle_item(event, token)) 
       break;
 }
 
-bool match::IMPL::handle_rule(ev::event const &event, bool token) {
+bool match::IMPL::handle_item(ev::event const &event, bool token) {
 #ifdef VERBOSE
-  std::cout << get_name(*parse.back().the_rule) << '{' << std::endl;
+  std::cout << get_name(*parse.back().the_item) << '{' << std::endl;
   struct close { ~close() { std::cout << '}' << std::endl; } } x; (void)x;
 #endif
-  if (try_play(event, *parse.back().the_rule)) {
+  if (try_play(event, *parse.back().the_item)) {
     if (token) pos.consume();
     return consume_event(token);
   } else {
@@ -266,7 +266,7 @@ bool match::IMPL::handle_rule(ev::event const &event, bool token) {
   }
 }
 
-bool match::IMPL::try_play(ev::event const &event, rule &current) {
+bool match::IMPL::try_play(ev::event const &event, item &current) {
   try {
     return event.play(current);
   } catch (structure::failed_repatch &) {
@@ -278,8 +278,8 @@ bool match::IMPL::consume_event(bool) {
 #ifdef VERBOSE
   std::cout << "consume" << std::endl;
 #endif
-  if (parse.back().the_rule->expectation() == rule::nothing)
-    succeed_rule();
+  if (parse.back().the_item->expectation() == item::nothing)
+    succeed_item();
   return true;
 }
 
@@ -287,24 +287,24 @@ bool match::IMPL::pass_event(bool) {
 #ifdef VERBOSE
   std::cout << "pass" << std::endl;
 #endif
-  if (parse.back().the_rule->expectation() == rule::need) {
-    fail_rule();
+  if (parse.back().the_item->expectation() == item::need) {
+    fail_item();
     return true;
   } else {
-    succeed_rule();
+    succeed_item();
     return pos.want_replay();
   }
 }
 
-void match::IMPL::succeed_rule() {
-  parse.back().the_rule->finish();
+void match::IMPL::succeed_item() {
+  parse.back().the_item->finish();
   parse.pop_back();
 
   if (!parse.IsEmpty())
     handle_event(ev::child_succeed(), false);
 }
 
-void match::IMPL::fail_rule() {
+void match::IMPL::fail_item() {
   parse.pop_back();
 
   if (!parse.IsEmpty())
@@ -326,12 +326,12 @@ void match::IMPL::real_parental_requirement() {
   if (it == parse.begin())
     fail_all();
   while (--it != parse.begin())
-    if (it->the_rule->miss_events(*miss->event, miss->count))
+    if (it->the_item->miss_events(*miss->event, miss->count))
       return;
   fail_all();
 }
 
-string match::IMPL::get_name(rule const &rl) {
+string match::IMPL::get_name(item const &rl) {
   static string const s_open("("), s_close(")"), sep(",");
   Vector<string> out;
   out.Reserve(1 + 

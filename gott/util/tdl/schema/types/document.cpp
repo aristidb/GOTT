@@ -22,7 +22,7 @@
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
-using schema::rule;
+using schema::item;
 using schema::match_document;
 
 match_document::match_document(rule_factory const &sr, 

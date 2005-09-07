@@ -21,16 +21,16 @@
 #include "happy_once.hpp"
 
 using gott::tdl::schema::happy_once;
-using gott::tdl::schema::rule;
+using gott::tdl::schema::item;
 
 happy_once::happy_once(rule_attr const &a, match &m) 
-  : rule(a, m), happy(false) {}
+  : item(a, m), happy(false) {}
 happy_once::~happy_once() {}
 
 void happy_once::be_happy() { 
   happy = true; 
 }
 
-rule::expect happy_once::expectation() const {
+item::expect happy_once::expectation() const {
   return happy ? nothing : need;
 }

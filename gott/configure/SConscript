@@ -33,11 +33,9 @@ def CheckOptimization(context):
 
 	if optimize == 'full':
 		level = '-O3'
-	elif optimize == 'none':
-		level = '-O0'
 
 	context.env.Append(CCFLAGS = level)
-	result = context.TryLink("int main() {}\n", '.cpp')
+	result = context.TryLink("#ifdef __OPTIMIZE__\nint main() {}\n#endif\n", '.cpp')
 	if not result:
 		context.env.Replace(CCFLAGS = lastCCFLAGS)
 	context.Result(result)
@@ -62,7 +60,8 @@ tests =	{
 	'Debug': CheckDebug
 }
 conf = Configure(env, custom_tests = tests)
-conf.Optimization()
+if optimize != 'none':
+	conf.Optimization()
 conf.Warnings()
 conf.CompilerVisibility()
 Import('debug')

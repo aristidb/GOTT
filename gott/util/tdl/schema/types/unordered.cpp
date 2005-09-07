@@ -23,12 +23,12 @@
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
-using schema::rule;
+using schema::item;
 using schema::match_unordered;
 
 match_unordered::match_unordered(Vector<element> const &r, 
                                  rule_attr const &a, match &m) 
-: rule(a, m), last(m.pos().current()), all_happy(true) {
+: item(a, m), last(m.pos().current()), all_happy(true) {
   copy(range(r), std::back_inserter(children));
 
   pos = children.begin();
@@ -43,7 +43,7 @@ match_unordered::~match_unordered() {
 
 bool match_unordered::play(ev::child_succeed const &) {
   pos->second.add();
-  if (pos->second.expectation() == rule::nothing) 
+  if (pos->second.expectation() == item::nothing) 
     children.Remove(pos - children.begin());
 
   if (!children.IsEmpty()) {
@@ -71,7 +71,7 @@ bool match_unordered::play(ev::child_fail const &) {
   return true;
 }
 
-rule::expect match_unordered::expectation() const {
+item::expect match_unordered::expectation() const {
   if (children.IsEmpty() && all_happy)
     return nothing;
   return need;
@@ -81,7 +81,7 @@ bool match_unordered::accept_empty(Vector<element> const &children) {
   bool accept = true;
   for (Vector<element>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
-    accept &= it->second.prefix_optional() || it->first->accept_empty();
+    ;//FIXME accept &= it->second.prefix_optional() || it->first->accept_empty();
   return accept;
 }
 

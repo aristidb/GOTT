@@ -21,8 +21,7 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_SLOT_HPP
 #define GOTT_UTIL_TDL_SCHEMA_SLOT_HPP
 
-#include "rule.hpp"
-#include "rule_factory.hpp"
+#include "item.hpp"
 #include <boost/function.hpp>
 
 namespace gott {
@@ -96,9 +95,9 @@ public:
   /**
    * The callback specifying whether to accept or not.
    * \param items The number of items.
-   * \return See rule::expect.
+   * \return See item::expect.
    */
-  typedef boost::function<rule::expect (std::size_t items)> callback;
+  typedef boost::function<item::expect (std::size_t items)> callback;
 
   /**
    * Initialize a slotcfg object accepting one child.
@@ -137,202 +136,14 @@ public:
   /// Cancel a sequence.
   void cancel() GOTT_EXPORT;
   /// Accept or not.
-  rule::expect expectation() const GOTT_EXPORT;
+  item::expect expectation() const GOTT_EXPORT;
 
 private:
   class IMPL;
   boost::scoped_ptr<IMPL> p;
 };
 
-/**
- * A rule-factory supporting slotcfg-objects. Accessed via 
- * rule_factory::get_with_slotcfg.
- */
-struct GOTT_EXPORT rule_factory::with_slotcfg {
-  /**
-   * Let the produced rule have a/another child.
-   * Adds in the default location.
-   * \param child The rule-factory producing the child.
-   * \param cfg The "repetition definition" of the child.
-   */
-  GOTT_LOCAL
-  virtual void add(rule_factory const &child, slotcfg const &cfg) = 0;
-
-  /**
-   * Lets the produced rule have a child in a specific slot.
-   * Slots semantics are optional. 
-   * \param child The rule-factory producing the child.
-   * \param slot The slot to put the child into.
-   * \param cfg The "repetition definition" of the child.
-   */
-  GOTT_LOCAL
-  virtual void add(rule_factory const&child, unsigned slot, slotcfg const &cfg);
-
-  GOTT_LOCAL
-  virtual slotcfg::mode accepted_modes() const = 0;
-
-  GOTT_LOCAL
-  bool supports(slotcfg const &) const;
-
-  virtual ~with_slotcfg() = 0;
-};
-
-namespace detail {
-  template<slotcfg::mode A> struct factory_with_slotcfg 
-  : public rule_factory, rule_factory::with_slotcfg {
-    void add(rule_factory const &child) { 
-      (void)child;
-      throw std::bad_cast(); 
-    }
-
-    slotcfg::mode accepted_modes() const { return A; }
-
-    factory_with_slotcfg(rule_attr const &a)
-    : rule_factory(a) {}
-  };
-}
-
-namespace factory_template {
-
-template<class T, slotcfg::simple_mode Def, slotcfg::mode Accepted> 
-struct slotcfg_onechild : public detail::factory_with_slotcfg<Accepted> {
-public:
-  slotcfg_onechild(rule_attr const &a) 
-  : detail::factory_with_slotcfg<Accepted>(a) {}
-  
-  void add(rule_factory const &child) { 
-    sub = &child;
-    scfg = slotcfg(Def);
-  }
-
-  void add(rule_factory const &child, slotcfg const &cfg) { 
-    sub = &child; 
-    scfg = cfg;
-  }
-  
-  rule *get(match &m) const {
-    return new T(*sub, scfg, this->attributes, m);
-  }
-
-  static unsigned index() {
-    static enreg<slotcfg_onechild> e;
-    return e.val;
-  }
-
-  static rule_factory *build(rule_attr const &a) {
-    return new slotcfg_onechild(a);
-  }
-
-  bool accept_empty() const {
-    return T::accept_empty(scfg.prefix_optional() || sub->accept_empty());
-  }
-
-private:
-  rule_factory const *sub;
-  slotcfg scfg;
-};
-
-template<class T, unsigned N, slotcfg::simple_mode Def, slotcfg::mode Accepted>
-class slotcfg_somechildren : public detail::factory_with_slotcfg<Accepted> {
-public:
-  slotcfg_somechildren(rule_attr const &a) : 
-  detail::factory_with_slotcfg<Accepted>(a), pos(0) {}
-
-  void add(rule_factory const &child) { 
-    add(child, slotcfg(Def));
-  }
-
-  void add(rule_factory const &child, unsigned slot) {
-    add(child, slot, slotcfg(Def));
-  }
-
-  void add(rule_factory const &child, slotcfg const &cfg) {
-    sub[pos] = child;
-    scfg[pos] = cfg;
-    ++pos;
-  }
-
-  void add(rule_factory const &child, unsigned slot, slotcfg const &cfg) {
-    pos = slot;
-    add(child, cfg);
-  }
-
-  rule *get(match &m) const {
-    return new T(sub, scfg, this->attributes, m);
-  }
-
-  static unsigned index() {
-    static enreg<slotcfg_somechildren> e; 
-    return e.val;
-  }
-
-  static rule_factory *build(rule_attr const &a) {
-    return new slotcfg_somechildren(a);
-  }
-
-  bool accept_empty() const {
-    return T::accept_empty(sub, scfg);
-  }
-
-private:
-  rule_factory const *sub[N];
-  unsigned pos;
-  slotcfg scfg[N];
-};
-
-typedef std::pair<rule_factory const *, slotcfg> scfg_element;
-
-template<class T, slotcfg::simple_mode Def, slotcfg::mode Accepted>
-class slotcfg_manychildren : public detail::factory_with_slotcfg<Accepted> {
-public:
-  typedef scfg_element element;
-  
-  slotcfg_manychildren(rule_attr const &a)
-  : detail::factory_with_slotcfg<Accepted>(a) {}
-
-  void add(rule_factory const &child) {
-    add(child, slotcfg(Def));
-  }
-
-  void add(rule_factory const &child, unsigned slot) {
-    add(child, slot, slotcfg(Def));
-  }
-
-  void add(rule_factory const &child, slotcfg const &cfg) {
-    sub.push_back(element(&child, cfg));
-  }
-
-  void add(rule_factory const &child, unsigned slot, slotcfg const &cfg) {
-    if (unsigned(sub.GetCount()) <= slot)
-      sub.SetCount(slot + 1);
-    sub[slot] = element(&child, cfg);
-  }
-
-  rule *get(match &m) const {
-    return new T(Vector<element>(sub, 1), this->attributes, m);
-  }
-
-  static unsigned index() {
-    static enreg<slotcfg_manychildren> e;
-    return e.val;
-  }
-
-  static rule_factory *build(rule_attr const &a) {
-    return new slotcfg_manychildren(a);
-  }
-
-  bool accept_empty() const {
-    return T::accept_empty(sub);
-  }
-  
-private:
-  Vector<element> sub;
-};
-
-}
-
 }}}
 
-NTL_MOVEABLE(gott::tdl::schema::factory_template::scfg_element);
 
 #endif

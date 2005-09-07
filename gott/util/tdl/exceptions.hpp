@@ -50,7 +50,7 @@ namespace detail { struct stream_position; }
 
 /**
  * Schema mismatch exception.
- * Thrown when a rule failed to match and could not be backtracked.
+ * Thrown when a item failed to match and could not be backtracked.
  */
 struct GOTT_EXPORT mismatch : public tdl_exception {
   GOTT_LOCAL

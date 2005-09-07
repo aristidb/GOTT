@@ -29,7 +29,7 @@ namespace schema {
 
 class rule_attr;
 
-class GOTT_EXPORT happy_once : public rule {
+class GOTT_EXPORT happy_once : public item {
 public:
   happy_once(rule_attr const &a, match &m);
   ~happy_once();

@@ -23,12 +23,12 @@
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
-using schema::rule;
+using schema::item;
 using schema::match_follow_ordered;
 
 match_follow_ordered::match_follow_ordered(Vector<element> const &c, 
     rule_attr const &a, match &m)
-: rule(a, m), opened(0), saw_up(false), last(m.pos().current()), 
+: item(a, m), opened(0), saw_up(false), last(m.pos().current()), 
     unhappy(false) {
   for (Vector<element>::const_iterator it = c.begin(); it != c.end(); ++it)
     children.Add(*it);
@@ -45,7 +45,7 @@ void match_follow_ordered::init_accept_empty() {
   for (int i = children.GetCount() - 1; i >= 0; --i) {
     active_element &e = children[i];
     e.rest_accept_empty = rest_accept_empty;
-    e.accept_empty = e.generator->accept_empty();
+    //FIXME e.accept_empty = e.generator->accept_empty();
     rest_accept_empty &= (e.slot.prefix_optional() || e.accept_empty);
   }
 }
@@ -107,7 +107,7 @@ bool match_follow_ordered::search_insertible() const {
   return pos != children.end();
 }
 
-rule::expect match_follow_ordered::expectation() const {
+item::expect match_follow_ordered::expectation() const {
   if (unhappy) 
     return need;
   if (!search_insertible()) 
@@ -122,7 +122,7 @@ bool match_follow_ordered::accept_empty(Vector<element> const &children) {
   bool accept = true;
   for (Vector<element>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
-    accept &= it->second.prefix_optional() || it->first->accept_empty();
+    ;//FIXME accept &= it->second.prefix_optional() || it->first->accept_empty();
   return accept;
 }
 

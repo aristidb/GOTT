@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_CONTEXT_HPP
 #define GOTT_UTIL_TDL_SCHEMA_CONTEXT_HPP
 
-#include "rule_factory.hpp"
+#include "rule.hpp"
 #include "slot.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/none.hpp>
