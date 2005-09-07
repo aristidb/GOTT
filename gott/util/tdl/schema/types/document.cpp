@@ -25,7 +25,7 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_document;
 
-match_document::match_document(rule_factory const &sr, 
+match_document::match_document(rule const &sr, 
                                rule_attr const &a, match &m)
 : happy_once(a, m), sub(sr), state(first) {}
 

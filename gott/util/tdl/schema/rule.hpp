@@ -35,7 +35,7 @@ class slotcfg;
 /**
  * Rule-factory to produce item objects.
  */
-class GOTT_EXPORT rule_factory {
+class GOTT_EXPORT rule {
 public:
   
 };

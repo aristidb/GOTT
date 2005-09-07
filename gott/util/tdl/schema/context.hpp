@@ -81,7 +81,7 @@ public:
   /**
    * Instantiate the context.
    */
-  rule_factory const &get() const GOTT_EXPORT;
+  rule const &get() const GOTT_EXPORT;
 
 private:
   context(context const &);

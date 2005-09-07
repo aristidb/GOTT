@@ -44,7 +44,7 @@ class match::IMPL {
 public:
   IMPL(structure::revocable_structure &x, match &r);
 
-  void add(rule_factory const &);
+  void add(rule const &);
 
   template<class T>
   void handle_token(T const &);
@@ -124,7 +124,7 @@ match::match(structure::revocable_structure &p)
   set_line_logger(get_debug());
 }
 
-match::match(rule_factory const &rf, structure::revocable_structure &p)
+match::match(rule const &rf, structure::revocable_structure &p)
 : parser(0), pIMPL(new IMPL(p, *this)) {
   set_line_logger(get_debug());
   pIMPL->add(rf);
@@ -132,7 +132,7 @@ match::match(rule_factory const &rf, structure::revocable_structure &p)
 
 match::~match() {}
 
-void match::add(rule_factory const &rf) {
+void match::add(rule const &rf) {
   pIMPL->add(rf);
 }
 
@@ -194,7 +194,7 @@ shared_ptr<writable_structure> match::IMPL::direct_structure_non_base() {
   return parse.back().structure;
 }
 
-void match::IMPL::add(rule_factory const &f) {(void)f;
+void match::IMPL::add(rule const &f) {(void)f;
   shared_ptr<writable_structure> struc = direct_structure_non_base();
 
 /*  FIXME if (structure::repatcher const *r = f.attributes.repatcher())

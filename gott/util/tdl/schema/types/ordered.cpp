@@ -25,7 +25,7 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_ordered;
 
-match_ordered::match_ordered(Vector<rule_factory const *> const &r, 
+match_ordered::match_ordered(Vector<rule const *> const &r, 
                              rule_attr const &a, match &m)
 : happy_once(a, m), subrules(r), pos(subrules.begin()) {
   if (pos != subrules.end())
@@ -44,9 +44,9 @@ bool match_ordered::play(ev::child_succeed const &) {
   return true;
 }
 
-bool match_ordered::accept_empty(Vector<rule_factory const *> const &children) {
+bool match_ordered::accept_empty(Vector<rule const *> const &children) {
   bool accept = true;
-  for (Vector<rule_factory const *>::const_iterator it = children.begin(); 
+  for (Vector<rule const *>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
     ;//FIXME accept &= (*it)->accept_empty();
   return accept;

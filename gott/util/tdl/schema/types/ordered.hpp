@@ -31,15 +31,15 @@ namespace schema {
 
 class match_ordered : public happy_once {
 public:
-  match_ordered(Vector<rule_factory const *> const &r, 
+  match_ordered(Vector<rule const *> const &r, 
                 rule_attr const &, match &);
   ~match_ordered();
 
-  static bool accept_empty(Vector<rule_factory const *> const &r);
+  static bool accept_empty(Vector<rule const *> const &r);
 
 private:
-  Vector<rule_factory const *> subrules;
-  Vector<rule_factory const *>::iterator pos;
+  Vector<rule const *> subrules;
+  Vector<rule const *>::iterator pos;
 
   bool play(ev::child_succeed const &);
   string name() const;

@@ -25,7 +25,7 @@ namespace ev = schema::ev;
 using schema::match_any;
 using schema::item;
 
-match_any::match_any(Vector<rule_factory const *> const &vv,
+match_any::match_any(Vector<rule const *> const &vv,
                      rule_attr const &a, match &m) 
 : happy_once(a, m), v(vv), pos(v.begin()) {
   if (pos != v.end()) {
@@ -56,8 +56,8 @@ bool match_any::play(ev::child_succeed const &) {
   return true;
 }
 
-bool match_any::accept_empty(Vector<rule_factory const *> const &choices) {
-  for (Vector<rule_factory const *>::const_iterator it = choices.begin(); 
+bool match_any::accept_empty(Vector<rule const *> const &choices) {
+  for (Vector<rule const *>::const_iterator it = choices.begin(); 
        it != choices.end(); ++it)
     ;/*FIXME if ((*it)->accept_empty())
       return true;*/

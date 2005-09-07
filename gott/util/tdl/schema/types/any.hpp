@@ -34,15 +34,15 @@ namespace schema {
 // Matches the first applicable of an arbitrary number of rules.
 class match_any : public happy_once {
 public:
-  match_any(Vector<rule_factory const *> const &, 
+  match_any(Vector<rule const *> const &, 
             rule_attr const &, match &m);
   ~match_any();
 
-  static bool accept_empty(Vector<rule_factory const *> const &);
+  static bool accept_empty(Vector<rule const *> const &);
 
 private:
-  Vector<rule_factory const *> v;
-  Vector<rule_factory const *>::iterator pos;
+  Vector<rule const *> v;
+  Vector<rule const *>::iterator pos;
   positioning::id begin;
 
   bool play(ev::child_fail const &);

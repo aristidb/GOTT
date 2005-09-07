@@ -26,7 +26,7 @@ using schema::item;
 using schema::slotcfg;
 using schema::match_list;
 
-match_list::match_list(rule_factory const &r, slotcfg const &c,
+match_list::match_list(rule const &r, slotcfg const &c,
                                  rule_attr const &a, match &m)
 : item(a, m), sub(r), cfg(c) {
   last = m.pos().current();
