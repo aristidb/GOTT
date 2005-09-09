@@ -19,6 +19,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "rule.hpp"
-#include "slot.hpp"
+#include "rule_attr.hpp"
 
+using gott::tdl::schema::rule_t;
 
+class rule_t::IMPL {
+public:
+  item_constructor con;
+  rule_attr attr;
+  Vector<rule_t> children;
+
+  IMPL(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
+  : con(t), attr(a), children(c) {}
+};
+
+rule_t::rule_t(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
+: p(new IMPL(t, a, c)) {}
+rule_t::rule_t(rule_t const &o) : p(o.p) {}
+rule_t::~rule_t() {}

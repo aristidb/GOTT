@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <gott/util/tdl/schema/match.hpp>
-#include <gott/util/tdl/schema/context.hpp>
+#include <gott/util/tdl/schema/rule.hpp>
 #include <gott/util/tdl/exceptions.hpp>
 #include <gott/util/tdl/structure/tree.hpp>
 #include <gott/util/tdl/structure/comfort.hpp>
@@ -31,11 +31,11 @@ namespace tut {
 struct schema_basic {
   gott::tdl::structure::tree tree, xp;
   gott::tdl::schema::match match;
-  gott::tdl::schema::context context;
+  gott::tdl::schema::rule_t grammar;
   std::wstring rest;
-  schema_basic() : match(tree) {}
+  schema_basic(gott::tdl::schema::rule_t const &r) : match(tree), grammar(r) {}
   void run_test(std::wstring const &input) {
-    match.add(context.get());
+    match.add(grammar);
     std::wistringstream stream(input);
     match.parse(stream);
     rest = stream.str().c_str() + stream.tellg();

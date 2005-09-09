@@ -33,12 +33,12 @@ namespace schema {
 // Matches a whole tdl document that contains the given sub-type
 class match_document : public happy_once {
 public:
-  match_document(rule const &, rule_attr const &, match &);
+  match_document(rule_t const &, rule_attr const &, match &);
 
   static bool accept_empty(...) { return false; }
   
 private:
-  rule const &sub;
+  rule_t const &sub;
   enum { first, begun_parse, opened, closed } state;
 
   bool play(ev::begin_parse const &);

@@ -21,24 +21,48 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_RULE_HPP
 #define GOTT_UTIL_TDL_SCHEMA_RULE_HPP
 
-#include "rule_attr.hpp"
-#include "../exceptions.hpp"
+#include <boost/shared_ptr.hpp>
+#include <gott/util/visibility.hpp>
+#include <ntl.h>
 
 namespace gott {
 namespace tdl {
-
 namespace schema {
 
+class rule_attr;
+class item;
+class rule_t;
 class match;
-class slotcfg;
+
+template<class T>
+item *
+construct_item(rule_attr const &att, Vector<rule_t> const&children, match &m) {
+  return new T(att, children, m);
+}
+
+typedef 
+item (*item_constructor)(rule_attr const &, Vector<rule_t> const &, match &);
 
 /**
  * Rule-factory to produce item objects.
  */
-class GOTT_EXPORT rule {
+class GOTT_EXPORT rule_t : Moveable<rule_t> {
 public:
-  
+  rule_t(item_constructor, rule_attr const &, Vector<rule_t> pick_ &);
+  rule_t(rule_t const &);
+  ~rule_t();
+
+  item *get(match &);
+
+private:
+  class IMPL;
+  boost::shared_ptr<IMPL const> p;
 };
+
+template<class T>
+rule_t rule(rule_attr const &a, Vector<rule_t> const &c) {
+  return rule_t(construct_item<T>, a, c);
+}
 
 }}}
 

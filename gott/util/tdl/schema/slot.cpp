@@ -30,7 +30,7 @@ using std::make_pair;
 using boost::get;
 namespace schema = gott::tdl::schema;
 using schema::item;
-using schema::rule;
+using schema::rule_t;
 using schema::slotcfg;
 
 class slotcfg::IMPL {

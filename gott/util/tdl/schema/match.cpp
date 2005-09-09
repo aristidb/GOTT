@@ -20,6 +20,8 @@
 
 #include "match.hpp"
 #include "rule.hpp"
+#include "item.hpp"
+#include "rule_attr.hpp"
 #include "event.hpp"
 #include "../exceptions.hpp"
 #include "stream_position.hpp"
@@ -29,6 +31,7 @@
 #include <gott/util/string/stl.hpp>
 #include <gott/util/debug/assert.hpp>
 #include <boost/optional.hpp>
+#include <boost/shared_ptr.hpp>
 
 //#define VERBOSE
 
@@ -44,7 +47,7 @@ class match::IMPL {
 public:
   IMPL(structure::revocable_structure &x, match &r);
 
-  void add(rule const &);
+  void add(rule_t const &);
 
   template<class T>
   void handle_token(T const &);
@@ -124,7 +127,7 @@ match::match(structure::revocable_structure &p)
   set_line_logger(get_debug());
 }
 
-match::match(rule const &rf, structure::revocable_structure &p)
+match::match(rule_t const &rf, structure::revocable_structure &p)
 : parser(0), pIMPL(new IMPL(p, *this)) {
   set_line_logger(get_debug());
   pIMPL->add(rf);
@@ -132,7 +135,7 @@ match::match(rule const &rf, structure::revocable_structure &p)
 
 match::~match() {}
 
-void match::add(rule const &rf) {
+void match::add(rule_t const &rf) {
   pIMPL->add(rf);
 }
 
@@ -194,7 +197,7 @@ shared_ptr<writable_structure> match::IMPL::direct_structure_non_base() {
   return parse.back().structure;
 }
 
-void match::IMPL::add(rule const &f) {(void)f;
+void match::IMPL::add(rule_t const &f) {(void)f;
   shared_ptr<writable_structure> struc = direct_structure_non_base();
 
 /*  FIXME if (structure::repatcher const *r = f.attributes.repatcher())
@@ -204,7 +207,7 @@ void match::IMPL::add(rule const &f) {(void)f;
   parse.Add().structure = struc;
 
   item *the_item;// FIXME (f.get(ref));
-  GOTT_ASSERT_1(the_item, nonnull(), "Acquired rule");
+  GOTT_ASSERT_1(the_item, nonnull(), "Acquired rule_t");
   /*GOTT_ASSERT_2(the_item->attributes(), f.attributes, 
       std::equal_to<rule_attr>(), "Rule attributes");*/
 

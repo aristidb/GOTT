@@ -31,18 +31,18 @@ namespace tdl {
 namespace schema {
 
 // Matcher any
-// Matches the first applicable of an arbitrary number of rules.
+// Matches the first applicable of an arbitrary number of rule_ts.
 class match_any : public happy_once {
 public:
-  match_any(Vector<rule const *> const &, 
+  match_any(Vector<rule_t const *> const &, 
             rule_attr const &, match &m);
   ~match_any();
 
-  static bool accept_empty(Vector<rule const *> const &);
+  static bool accept_empty(Vector<rule_t const *> const &);
 
 private:
-  Vector<rule const *> v;
-  Vector<rule const *>::iterator pos;
+  Vector<rule_t const *> v;
+  Vector<rule_t const *>::iterator pos;
   positioning::id begin;
 
   bool play(ev::child_fail const &);

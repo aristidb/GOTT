@@ -36,7 +36,7 @@ namespace structure { class repatcher; }
 namespace schema {
 
 // Class rule_attr
-// Defines the user-supplyable rule_attr for a rule
+// Defines the user-supplyable rule_attr for a rule_t
 class rule_attr {
 public:
   enum simple_tag { simple };

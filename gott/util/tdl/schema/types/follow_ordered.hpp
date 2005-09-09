@@ -31,7 +31,7 @@ namespace tdl {
 namespace schema {
 
 class match_follow_ordered : public item {
-  typedef std::pair<rule const *, slotcfg> element;
+  typedef std::pair<rule_t const *, slotcfg> element;
 public:
   match_follow_ordered(Vector<element> const &, rule_attr const &, 
                        match &);
@@ -41,7 +41,7 @@ public:
   
 private:
   struct active_element : Moveable<active_element> {
-    rule const *generator;
+    rule_t const *generator;
     slotcfg slot;
     bool accept_empty, rest_accept_empty;
     

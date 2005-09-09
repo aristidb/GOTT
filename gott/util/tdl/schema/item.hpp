@@ -37,9 +37,9 @@ class match;
 class rule_attr;
 
 /**
- * The base class of the implementation of a rule-matcher object.
+ * The base class of the implementation of a rule_t-matcher object.
  * Used via match::add or via match's constructor. Attention: Those methods
- * require a rule-factory, which in turn will create a item object.
+ * require a rule_t-factory, which in turn will create a item object.
  */
 class GOTT_EXPORT item {
 public:
@@ -68,7 +68,7 @@ public:
   virtual expect expectation() const = 0;
 
   /**
-   * A nice name for the rule.
+   * A nice name for the rule_t.
    */
   virtual string name() const = 0;
 
@@ -138,7 +138,7 @@ public:
 
   // Properties
   /**
-   * Get the attributes associated with this rule.
+   * Get the attributes associated with this rule_t.
    */
   rule_attr const &attributes() const GOTT_EXPORT;
 

@@ -33,7 +33,7 @@ namespace structure { class repatcher; }
 namespace schema {
 
 class positioning;
-class rule;
+class rule_t;
 
 /**
  * TDL schema matching engine.
@@ -68,20 +68,20 @@ public:
 
   /**
    * Constructs a new match object writing to a tree/something matching a 
-   * document specified by a rule-factory.
-   * \param rf The rule-factory specifying the document type.
+   * document specified by a rule_t-factory.
+   * \param rf The rule_t-factory specifying the document type.
    * \param tree The tree to write to.
    */
   GOTT_EXPORT
-  match(rule const &rf, structure::revocable_structure &tree);
+  match(rule_t const &rf, structure::revocable_structure &tree);
 
   ~match() GOTT_EXPORT;
 
   /**
-   * Tells the engine to match next a item specified by a rule-factory.
-   * \param rf The rule-factory specifying the to-be-added rule.
+   * Tells the engine to match next a item specified by a rule_t-factory.
+   * \param rf The rule_t-factory specifying the to-be-added rule_t.
    */
-  void add(rule const &rf) GOTT_EXPORT;
+  void add(rule_t const &rf) GOTT_EXPORT;
 
   /**
    * Return a reference to the tree the engine writes to.
@@ -101,7 +101,7 @@ public:
   positioning &pos() const GOTT_EXPORT;
 
   /**
-   * Tell the current rules that tokens are still to be read.
+   * Tell the current rule_ts that tokens are still to be read.
    */
   void parental_requirement(ev::event const &, unsigned) GOTT_EXPORT;
 

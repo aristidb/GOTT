@@ -21,7 +21,7 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_HAPPY_ONCE_HPP
 #define GOTT_UTIL_TDL_SCHEMA_HAPPY_ONCE_HPP
 
-#include "rule.hpp"
+#include "item.hpp"
 
 namespace gott {
 namespace tdl {

@@ -32,11 +32,11 @@ namespace schema {
 
 class match_unordered : public item {
   struct element : Moveable<element> {
-    rule const *first;
+    rule_t const *first;
     slotcfg second;
 
     element() {} // dumb default constructor
-    element(rule const *f, slotcfg const &s) : first(f), second(s) {}
+    element(rule_t const *f, slotcfg const &s) : first(f), second(s) {}
   };
 public:
   match_unordered(Vector<element> const &, rule_attr const &, 

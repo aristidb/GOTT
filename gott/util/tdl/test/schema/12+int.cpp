@@ -32,19 +32,20 @@ using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
 typedef schema::rule_attr RA;
+using schema::rule_t;
+using schema::rule;
 
 namespace {
 struct schema_12plus_int : tut::schema_basic {
-  schema_12plus_int() {
-    context.begin(L"document");
-      context.begin(L"list");
-        context.begin(L"node", 
-                      RA(L"el", true, new stru::repatch_integer()), 
-                      slotcfg(slotcfg::minimum, 12));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_12plus_int() 
+   : tut::schema_basic(
+       rule<document_p>(RA(),
+         Vector<rule_t>() <<
+         rule<list_p>(RA(),
+           Vector<rule_t>() <<
+           rule<node_p>(
+             RA(L"el", true, new stru::repatch_integer()), 
+                      slotcfg(slotcfg::minimum, 12))))) {}
 };
 }
 

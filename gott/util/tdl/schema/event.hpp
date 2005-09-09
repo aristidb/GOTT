@@ -34,7 +34,7 @@ namespace schema {
 class item;
 
 /**
- * Schema events. Interesting for rule-writers.
+ * Schema events. Interesting for rule_t-writers.
  */
 namespace ev {
 
