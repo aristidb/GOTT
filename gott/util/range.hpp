@@ -21,8 +21,10 @@
 #ifndef GOTT_UTIL_MISC_RANGE_HPP
 #define GOTT_UTIL_MISC_RANGE_HPP
 
+#ifndef NO_STDLIB
 #include <iterator>
 #include <iosfwd>
+#endif
 
 namespace gott {
 
@@ -68,7 +70,11 @@ template<class T> struct range_t {
    * Return the size of the range.
    */
   std::size_t size() const {
+#ifndef NO_STDLIB
     return std::distance(begin, end);
+#else
+    return end - begin;
+#endif
   }
 
   /**
@@ -103,6 +109,7 @@ bool operator!=(range_t<T> const &a, range_t<U> const &b) {
   return !(a == b);
 }
 
+#ifndef NO_STDLIB
 template<class Ch, class ChT, class T>
 std::basic_ostream<Ch, ChT> &
 operator<<(std::basic_ostream<Ch, ChT> &s, range_t<T> const &r) {
@@ -112,6 +119,7 @@ operator<<(std::basic_ostream<Ch, ChT> &s, range_t<T> const &r) {
     s << ' ' << *i;
   return s;
 }
+#endif
 
 /**
  * Return the begin of a range.
@@ -142,7 +150,11 @@ range_t<T> range(T const &a, T const &b) {
  */
 template<class I, class S>
 I advanced(I it, S s) {
+#ifndef NO_STDLIB
   std::advance(it, s);
+#else
+  return it + s;
+#endif
   return it;
 }
 

@@ -22,15 +22,19 @@
 #include "convert.hpp"
 #include "buffer.hpp"
 #include "iterator.hpp"
+#ifndef NO_STDLIB
 #include "stl.hpp"
+#endif
 
 #include <gott/util/range.hpp>
 #include <gott/util/range_algo.hpp>
 #include <gott/util/thunk.hpp>
+#ifndef NO_STDLIB
 #include <list>
 #include <vector>
 #include <ostream>
 #include <string>
+#endif
 
 using gott::string;
 using gott::range_t;
@@ -83,12 +87,14 @@ string::string(range_t<char const *> in, encoding enc)
 string::string(char const *in, encoding enc)
 : p(new representation(to_utf8_alloc(zero_terminated(in), enc))) {}
 
+#ifndef NO_STDLIB
 string::string(std::string const &s, encoding enc)
 : p(new representation(to_utf8_alloc(range(&s[0], s.length()), enc))) {}
 
 string::string(std::wstring const &s, encoding enc)
 : p(new representation(
       to_utf8_alloc(range(&s[0], s.length()).cast<char const*>(), enc))) {}
+#endif
 
 string::string(thunk_t<utf8_t> &thk) : p(0) {
   std::size_t len = thk.size();
@@ -117,11 +123,13 @@ string::string(range_t<utf8_t const *> const &r)
 string::string(range_t<utf8_iterator> const &r)
 : p(new representation(r, representation::foreign_copy)) {}
 
+#ifndef NO_STDLIB
 string::string(std::vector<string> const &v)
 : p(new representation(range(v), representation::concat)) {}
 
 string::string(std::list<string> const &v)
 : p(new representation(range(v), representation::concat)) {}
+#endif
 
 string::string(range_t<string const *> cont)
 : p(new representation(cont, representation::concat)) {}
@@ -151,6 +159,7 @@ void string::swap(string &o) {
   std::swap(p, o.p);
 }
 
+#ifndef NO_STDLIB
 std::ostream &gott::operator<<(std::ostream &stream, string const &s) {
   for (utf8_t const *it = s.as_utf8().begin; it < s.as_utf8().end; ++it)
     stream << char(*it);
@@ -162,6 +171,7 @@ std::wostream &gott::operator<<(std::wostream &stream, string const &s) {
     stream << wchar_t(*it);
   return stream;
 }
+#endif
 
 bool gott::operator==(string const &a, string const &b) {
   if (a.as_utf8().begin == b.as_utf8().begin)

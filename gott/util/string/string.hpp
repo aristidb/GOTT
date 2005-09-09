@@ -26,7 +26,12 @@
 #include "stl.hpp"
 #include <gott/util/visibility.hpp>
 #include <gott/util/range.hpp>
+
+#ifndef NO_NTL
 #include <ntl.h>
+#endif
+
+#ifndef NO_STDLIB
 #include <iosfwd>
 
 #ifdef _MSC_VER
@@ -45,6 +50,7 @@ namespace std {
   typedef basic_string<char, char_traits<char>, allocator<char> > string;
   typedef basic_string<wchar_t,char_traits<wchar_t>,allocator<wchar_t> >wstring;
 }
+#endif
 #endif
 
 namespace gott {
@@ -92,6 +98,7 @@ public:
    */
   string(thunk_t<utf8_t> &);
 
+#ifndef NO_STDLIB
   /**
    * Construct string from std::string.
    */
@@ -117,6 +124,7 @@ public:
   operator std::wstring() const {
     return to_wstring(*this);
   }
+#endif
   
   enum literal_tag { utf8_literal };
 
@@ -130,6 +138,7 @@ public:
    */
   string(string_buffer const &);
 
+#ifndef NO_STDLIB
   /**
    * Concatenate.
    */
@@ -139,6 +148,7 @@ public:
    * Concatenate.
    */
   string(std::list<string, std::allocator<string> > const &);
+#endif
 
   /**
    * Concatenate.
@@ -202,6 +212,7 @@ private:
   representation *p;
 };
 
+#ifndef NO_STDLIB
 /**
  * Print out a string.
  */
@@ -217,6 +228,7 @@ GOTT_EXPORT
 std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &
 operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &, 
            string const &);
+#endif
 
 /**
  * Concatenate two strings.
@@ -286,10 +298,12 @@ inline bool operator>=(string const &a, string const &b) {
 
 }
 
+#ifndef NO_NTL
 template<>
 inline unsigned GetHashValue(gott::string const &s) {
   gott::range_t<gott::utf8_t const *> r = s.as_utf8();
   return memhash(r.begin, r.size());
 }
+#endif
 
 #endif
