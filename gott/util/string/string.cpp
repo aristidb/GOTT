@@ -156,7 +156,9 @@ std::size_t string::length() const {
 }
 
 void string::swap(string &o) {
-  std::swap(p, o.p);
+  representation *tmp = p;
+  p = o.p;
+  o.p = tmp;
 }
 
 #ifndef NO_STDLIB

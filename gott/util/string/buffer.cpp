@@ -21,8 +21,10 @@
 #include "buffer.hpp"
 #include "convert.hpp"
 #include "iterator.hpp"
+#ifndef NO_STDLIB
 #include <algorithm>
 #include <gott/util/range_algo.hpp>
+#endif
 
 using gott::string_buffer;
 using gott::utf32_t;
@@ -60,7 +62,8 @@ string_buffer::string_buffer()
 
 string_buffer::string_buffer(string_buffer const &b) 
 : data(new representation) {
-  copy(range(b), insert(end(), b.size()));
+  range_t<const_iterator> r = range(b);
+  insert(end(), r.begin, r.end);
 }
 
 string_buffer::~string_buffer() { delete data; }

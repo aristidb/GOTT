@@ -127,7 +127,14 @@ public:
   template<class I>
   GOTT_LOCAL
   void insert(iterator pos, I a, I b) {
-    std::copy(a, b, insert(pos, std::distance(a, b)).begin);
+#ifndef NO_STDLIB
+    std::size_t len = std::distance(a, b);
+#else
+    std::size_t len = b - a;
+#endif
+    iterator out = insert(pos, len).begin;
+    while (a != b)
+      *out++ = *a++;
   }
 
   /**

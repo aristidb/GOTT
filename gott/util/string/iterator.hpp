@@ -22,7 +22,9 @@
 #define GOTT_UTIL_NSTRING_ITERATOR_HPP
 
 #include "types.hpp"
+#ifndef NO_STDLIB
 #include <iterator>
+#endif
 #include <gott/util/visibility.hpp>
 
 namespace gott {
@@ -30,40 +32,87 @@ namespace gott {
 /**
  * Iterator for full character steps over a (constant!) UTF8 string.
  */
-class GOTT_EXPORT utf8_iterator {
+class utf8_iterator {
 public:
   typedef utf32_t value_type;
   typedef utf32_t *pointer;
   typedef utf32_t &reference;
   typedef std::ptrdiff_t difference_type;
+#ifndef NO_STDLIB
   typedef std::bidirectional_iterator_tag iterator_category;
+#endif
 
   /**
    * Return the character at the current position as UTF32.
    */
-  utf32_t operator*() const;
+  utf32_t operator*() const {
+    utf8_t const mask6 = ~(~utf8_t() << 6);
+    utf8_t const mask5 = ~(~utf8_t() << 5);
+    utf8_t const mask4 = ~(~utf8_t() << 4);
+    if (current[0] < 0xC0)
+      return current[0];
+    else if (current[0] < 0xE0)
+      return (utf32_t(current[0] & mask6) << 6) 
+              | utf32_t(current[1] & mask6);
+    else if (current[0] < 0xF0)
+      return (utf32_t(current[0] & mask5) << 12) 
+              | (utf32_t(current[1] & mask6) << 6)
+              | utf32_t(current[2] & mask6);
+    else if (current[0] < 0xF8)
+      return utf32_t(current[0] & mask4) << 18 
+              | (utf32_t(current[1] & mask6) << 12)
+              | (utf32_t(current[2] & mask6) << 6)
+              | utf32_t(current[3] & mask6);
+    return 0;
+  }
 
   /**
    * Increment the position by a full character step. Prefix variant.
    */
-  utf8_iterator &operator++();
+  utf8_iterator &operator++() {
+    if (*current++ >= 0xC0)
+      while (*current >= 0x80 && *current < 0xC0)
+        ++current;
+    return *this;
+  }
 
   /**
    * Increment the position by a full character step. Postfix variant.
    * \param IGNORE Supplied by compiler.
    */
-  utf8_iterator operator++(int IGNORE);
+  utf8_iterator operator++(int IGNORE) {
+    utf8_iterator tmp(*this);
+    ++*this;
+    return tmp;
+  }
 
   /**
    * Decrement the position by a full character step. Prefix variant.
    */
-  utf8_iterator &operator--();
+  utf8_iterator &operator--() {
+    while (*current >= 0x80 && *current < 0xC0)
+      --current;
+    --current;
+    return *this;
+  }
 
   /**
    * Decrement the position by a full character step. Postfix variant.
    * \param IGNORE Supplied by compiler.
    */
-  utf8_iterator operator--(int IGNORE); // postfix
+  utf8_iterator operator--(int IGNORE) {
+    utf8_iterator tmp(*this);
+    --*this;
+    return tmp;
+  }
+
+  utf8_iterator &operator+=(std::size_t len);
+
+  utf8_iterator operator+(std::size_t len) const {
+    utf8_iterator tmp(*this);
+    tmp += len;
+    return tmp;
+  }
 
   /**
    * Construct from pointer to UTF8-formatted memory.
@@ -73,7 +122,7 @@ public:
   /**
    * Retrieve the current memory position.
    */
-  operator utf8_t const *() const;
+  operator utf8_t const *() const GOTT_LOCAL { return current; }
 
 private:
   utf8_t const *current;
@@ -82,14 +131,20 @@ private:
 /**
  * Compare two utf8_iterators for equality.
  */
-GOTT_EXPORT bool operator==(utf8_iterator const &, utf8_iterator const &);
+inline bool operator==(utf8_iterator const &a, utf8_iterator const &b) {
+  return (utf8_t const *) a == (utf8_t const *) b;
+}
 
 /**
  * Compare two utf8_iterators for inequality.
  */
-GOTT_EXPORT bool operator!=(utf8_iterator const &, utf8_iterator const &);
+inline bool operator!=(utf8_iterator const &a, utf8_iterator const &b) {
+  return !(a == b);
+}
 
-GOTT_EXPORT bool operator<(utf8_iterator const &, utf8_iterator const &);
+inline bool operator<(utf8_iterator const &a, utf8_iterator const &b) {
+  return (utf8_t const *) a < (utf8_t const *) b;
+}
 
 }
 #endif
