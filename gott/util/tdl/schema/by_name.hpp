@@ -23,6 +23,7 @@
 
 #include <boost/scoped_ptr.hpp>
 #include <gott/util/visibility.hpp>
+#include <gott/util/tdl/schema/rule.hpp>
 
 namespace gott {
 class string;
@@ -33,31 +34,33 @@ namespace schema {
 /**
  * Manages all named (native) schema types.
  */
-class name_manager_t {
-  name_manager_t();
-  ~name_manager_t();
-  friend name_manager_t &name_manager();
+class by_name_t {
+  by_name_t();
+  ~by_name_t();
+  friend by_name_t &by_name();
 
 public:
   /**
    * Add a type to the database.
    * \param name The name to find the type with.
-   * \param type The type's id (see get_factory()).
+   * \param type The type.
    */
-  GOTT_EXPORT void add(string const &name, unsigned type);
+  GOTT_EXPORT void add(string const &name, item_constructor tpye);
 
   /**
    * Get a type from the database.
    * \param name The type's name.
-   * \return The type's id  (see get_factory()).
+   * \return The type.
    */
-  GOTT_EXPORT unsigned get(string const &name) const;
+  GOTT_EXPORT 
+  rule_t get(string const &name, rule_attr const &att, 
+             Vector<rule_t> pick_ &children) const;
 
   class IMPL;
   boost::scoped_ptr<IMPL> p;
 };
 
-name_manager_t &name_manager();
+GOTT_EXPORT by_name_t &by_name();
 
 }}}
 

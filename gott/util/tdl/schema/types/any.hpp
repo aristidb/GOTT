@@ -22,7 +22,6 @@
 #define GOTT_UTIL_TDL_SCHEMA_ANY_HPP
 
 #include "../match.hpp"
-#include "../rule.hpp"
 #include "../parse_position.hpp"
 #include "../happy_once.hpp"
 
