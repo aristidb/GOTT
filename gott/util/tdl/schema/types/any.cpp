@@ -25,12 +25,11 @@ namespace ev = schema::ev;
 using schema::match_any;
 using schema::item;
 
-match_any::match_any(Vector<rule_t const *> const &vv,
-                     rule_attr const &a, match &m) 
+match_any::match_any(rule_attr const &a, Vector<rule_t> const &vv, match &m) 
 : happy_once(a, m), v(vv), pos(v.begin()) {
   if (pos != v.end()) {
     begin = matcher().pos().current();
-    matcher().add(**pos);
+    matcher().add(*pos);
   }
 }
 
@@ -43,7 +42,7 @@ bool match_any::play(ev::child_fail const &) {
   matcher().pos().seek(begin);
   
   if (++pos != v.end()) {
-    matcher().add(**pos);
+    matcher().add(*pos);
     return true;
   }
 

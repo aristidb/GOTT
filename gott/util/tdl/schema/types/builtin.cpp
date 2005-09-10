@@ -37,13 +37,15 @@ struct builtin_types {
 
 using namespace gott::tdl::schema;
 
+#define REG(t) by_name().add<match_##t>(#t)
+
 builtin_types::builtin_types() {
-/*  name_manager().add("any", match_any::factory::index());
-  name_manager().add("document", match_document::factory::index());
-  name_manager().add("follow", match_follow_ordered::factory::index());
-  name_manager().add("list", match_list::factory::index());
-  name_manager().add("named", match_named::factory::index());
-  name_manager().add("ordered", match_ordered::factory::index());
-  name_manager().add("node", match_node::factory::index());
-  name_manager().add("unordered", match_unordered::factory::index());*/
+  REG(any);
+  REG(document);
+  by_name().add<match_follow_ordered>("follow");
+  REG(list);
+  REG(named);
+  REG(ordered);
+  REG(node);
+  REG(unordered);
 }

@@ -26,10 +26,10 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_unordered;
 
-match_unordered::match_unordered(Vector<element> const &r, 
-                                 rule_attr const &a, match &m) 
+match_unordered::match_unordered(rule_attr const &a, Vector<rule_t> const &r,
+                                 match &m) 
 : item(a, m), last(m.pos().current()), all_happy(true) {
-  copy(range(r), std::back_inserter(children));
+  (void)r;//FIXME copy(range(r), std::back_inserter(children));
 
   pos = children.begin();
 

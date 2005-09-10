@@ -39,8 +39,7 @@ class match_unordered : public item {
     element(rule_t const *f, slotcfg const &s) : first(f), second(s) {}
   };
 public:
-  match_unordered(Vector<element> const &, rule_attr const &, 
-                  match &);
+  match_unordered(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_unordered();
 
   static bool accept_empty(Vector<element> const &);

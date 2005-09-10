@@ -19,6 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "list.hpp"
+#include "../rule_attr.hpp"
+#include <gott/util/debug/assert.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
@@ -26,9 +28,9 @@ using schema::item;
 using schema::slotcfg;
 using schema::match_list;
 
-match_list::match_list(rule_t const &r, slotcfg const &c,
-                                 rule_attr const &a, match &m)
-: item(a, m), sub(r), cfg(c) {
+match_list::match_list(rule_attr const &a, Vector<rule_t> const &r, match &m)
+: item(a, m), sub(r[0]), cfg(r[0].attributes().outer()) {
+  GOTT_ASSERT_2(r.GetCount(), 1, std::equal_to<int>(), "1 child");
   last = m.pos().current();
   if (accept_more(expectation()))
     matcher().add(sub);

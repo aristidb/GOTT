@@ -41,7 +41,7 @@ construct_item(rule_attr const &att, Vector<rule_t> const&children, match &m) {
 }
 
 typedef 
-item (*item_constructor)(rule_attr const &, Vector<rule_t> const &, match &);
+item *(*item_constructor)(rule_attr const &, Vector<rule_t> const &, match &);
 
 /**
  * Rule-factory to produce item objects.
@@ -52,7 +52,8 @@ public:
   rule_t(rule_t const &);
   ~rule_t();
 
-  item *get(match &);
+  item *get(match &) const;
+  rule_attr const &attributes() const;
 
 private:
   class IMPL;

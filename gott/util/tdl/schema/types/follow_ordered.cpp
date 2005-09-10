@@ -26,12 +26,12 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_follow_ordered;
 
-match_follow_ordered::match_follow_ordered(Vector<element> const &c, 
-    rule_attr const &a, match &m)
+match_follow_ordered::match_follow_ordered(rule_attr const &a, 
+                                           Vector<rule_t> const &c, match &m)
 : item(a, m), opened(0), saw_up(false), last(m.pos().current()), 
     unhappy(false) {
-  for (Vector<element>::const_iterator it = c.begin(); it != c.end(); ++it)
-    children.Add(*it);
+  for (Vector<rule_t>::const_iterator it = c.begin(); it != c.end(); ++it)
+    ;//FIXME children.Add(*it);
   pos = children.begin();
   init_accept_empty();
   if (expectation() == nothing)

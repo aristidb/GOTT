@@ -24,6 +24,7 @@
 #include "../match.hpp"
 #include "../parse_position.hpp"
 #include "../happy_once.hpp"
+#include "../rule.hpp"
 
 namespace gott {
 namespace tdl {
@@ -33,15 +34,14 @@ namespace schema {
 // Matches the first applicable of an arbitrary number of rule_ts.
 class match_any : public happy_once {
 public:
-  match_any(Vector<rule_t const *> const &, 
-            rule_attr const &, match &m);
+  match_any(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_any();
 
   static bool accept_empty(Vector<rule_t const *> const &);
 
 private:
-  Vector<rule_t const *> v;
-  Vector<rule_t const *>::iterator pos;
+  Vector<rule_t> v;
+  Vector<rule_t>::iterator pos;
   positioning::id begin;
 
   bool play(ev::child_fail const &);

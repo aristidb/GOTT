@@ -32,8 +32,7 @@ namespace schema {
 
 class match_list : public item {
 public:
-  match_list(rule_t const &, slotcfg const &, rule_attr const &,
-                  match &);
+  match_list(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_list();
 
   static bool accept_empty(bool x) { return x; }

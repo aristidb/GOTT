@@ -25,11 +25,10 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_ordered;
 
-match_ordered::match_ordered(Vector<rule_t const *> const &r, 
-                             rule_attr const &a, match &m)
-: happy_once(a, m), subrule_ts(r), pos(subrule_ts.begin()) {
-  if (pos != subrule_ts.end())
-    matcher().add(**pos);
+match_ordered::match_ordered(rule_attr const &a, Vector<rule_t> const&r,match&m)
+: happy_once(a, m), subrules(r), pos(subrules.begin()) {
+  if (pos != subrules.end())
+    matcher().add(*pos);
   else
     be_happy();
 }
@@ -37,16 +36,16 @@ match_ordered::match_ordered(Vector<rule_t const *> const &r,
 match_ordered::~match_ordered() {}
 
 bool match_ordered::play(ev::child_succeed const &) {
-  if (++pos != subrule_ts.end()) 
-    matcher().add(**pos);
+  if (++pos != subrules.end()) 
+    matcher().add(*pos);
   else 
     be_happy();
   return true;
 }
 
-bool match_ordered::accept_empty(Vector<rule_t const *> const &children) {
+bool match_ordered::accept_empty(Vector<rule_t> const &children) {
   bool accept = true;
-  for (Vector<rule_t const *>::const_iterator it = children.begin(); 
+  for (Vector<rule_t>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
     ;//FIXME accept &= (*it)->accept_empty();
   return accept;

@@ -37,7 +37,7 @@ public:
   static GOTT_EXPORT
   rule_attr attributes(string const &s, bool cc = true);
   
-  match_named(rule_t const &, rule_attr const &, match &);
+  match_named(rule_attr const &, Vector<rule_t> const &, match &);
 
   ~match_named();
 

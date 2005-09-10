@@ -33,8 +33,7 @@ namespace schema {
 class match_follow_ordered : public item {
   typedef std::pair<rule_t const *, slotcfg> element;
 public:
-  match_follow_ordered(Vector<element> const &, rule_attr const &, 
-                       match &);
+  match_follow_ordered(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_follow_ordered();
 
   static bool accept_empty(Vector<element> const &);

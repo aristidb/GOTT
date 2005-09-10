@@ -36,8 +36,7 @@ rule_attr match_named::attributes(string const &s, bool cc) {
   return rule_attr(Vector<string>() << s, cc, Xany(s));
 }
 
-match_named::match_named(rule_t const &s, rule_attr const &a, 
-                         match &m) 
+match_named::match_named(rule_attr const &a, Vector<rule_t> const &s, match &m) 
 : happy_once(a, m), 
   tag(Xany_cast<string>(a.user()))//,
   //FIXME outer(rule_attr(rule_attr::simple, false)),

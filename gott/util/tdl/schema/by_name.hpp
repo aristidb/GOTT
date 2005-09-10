@@ -47,6 +47,12 @@ public:
    */
   GOTT_EXPORT void add(string const &name, item_constructor tpye);
 
+  template<class T>
+  void add(string const &name) {
+    item_constructor type = &construct_item<T>;
+    add(name, type);
+  }
+
   /**
    * Get a type from the database.
    * \param name The type's name.
