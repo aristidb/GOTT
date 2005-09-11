@@ -197,19 +197,19 @@ shared_ptr<writable_structure> match::IMPL::direct_structure_non_base() {
   return parse.back().structure;
 }
 
-void match::IMPL::add(rule_t const &f) {(void)f;
+void match::IMPL::add(rule_t const &f) {
   shared_ptr<writable_structure> struc = direct_structure_non_base();
 
-/*  FIXME if (structure::repatcher const *r = f.attributes.repatcher())
-    struc.reset(r->deferred_write(struc ? *struc : base_struc));*/
+  if (structure::repatcher const *r = f.attributes().repatcher())
+    struc.reset(r->deferred_write(struc ? *struc : base_struc));
 
   int current = parse.GetCount();
   parse.Add().structure = struc;
 
-  item *the_item;// FIXME (f.get(ref));
+  item *the_item = f.get(ref);
   GOTT_ASSERT_1(the_item, nonnull(), "Acquired rule_t");
-  /*GOTT_ASSERT_2(the_item->attributes(), f.attributes, 
-      std::equal_to<rule_attr>(), "Rule attributes");*/
+  GOTT_ASSERT_2(the_item->attributes(), f.attributes(), 
+      std::equal_to<rule_attr>(), "Rule attributes");
 
   parse[current].the_item = the_item;
 }
