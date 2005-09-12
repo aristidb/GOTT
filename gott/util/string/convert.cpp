@@ -33,7 +33,7 @@ utf32_t gott::to_utf32_char(char const *mbc, char const *&end, encoding enc) {
   case utf8: {
     utf8_iterator it((utf8_t const *) mbc);
     utf8_iterator next = it;
-    end = (char const *) (utf8_t const *) ++next;
+    end = (char const *) (++next).ptr();
     return *it;
   }
   case utf32:

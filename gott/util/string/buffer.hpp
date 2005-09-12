@@ -149,6 +149,11 @@ public:
    */
   void operator+=(string const &s);
 
+  /**
+   * Append a string_buffer.
+   */
+  void operator+=(string_buffer const &sb);
+
   void operator+=(utf32_t ch) GOTT_LOCAL {
     *append(1).begin = ch;
   }

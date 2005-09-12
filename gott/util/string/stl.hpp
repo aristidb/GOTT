@@ -18,6 +18,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef NO_STDLIB
 #ifndef GOTT_UTIL_NSTRING_STL_HPP
 #define GOTT_UTIL_NSTRING_STL_HPP
 
@@ -54,4 +55,5 @@ std::wstring to_wstring(string const &str, encoding enc = utf32) GOTT_EXPORT;
 
 }
 
+#endif
 #endif

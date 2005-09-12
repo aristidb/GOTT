@@ -18,6 +18,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef NO_STDLIB
 #include "stl.hpp"
 #include "string.hpp"
 #include "convert.hpp"
@@ -39,3 +40,4 @@ std::wstring gott::to_wstring(string const &str, encoding enc) {
   delete [] out.begin;
   return result;
 }
+#endif

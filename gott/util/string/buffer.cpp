@@ -51,7 +51,9 @@ private:
       new_size <<= 1;
     utf32_t *old = begin;
     begin = new utf32_t[new_size];
-    copy(range(old, end), begin);
+    utf32_t *out = begin;
+    for (utf32_t *pos = old; pos != end; ++pos)
+      *out++ = *pos;
     delete [] old;
     storage_end = begin + new_size;
   }
@@ -62,14 +64,15 @@ string_buffer::string_buffer()
 
 string_buffer::string_buffer(string_buffer const &b) 
 : data(new representation) {
-  range_t<const_iterator> r = range(b);
-  insert(end(), r.begin, r.end);
+  *this += b;
 }
 
 string_buffer::~string_buffer() { delete data; }
 
 void string_buffer::swap(string_buffer &o) {
-  std::swap(data, o.data);
+  representation *tmp = data;
+  data = o.data;
+  o.data = tmp;
 }
 
 void string_buffer::operator=(string_buffer const &b) {
@@ -78,12 +81,12 @@ void string_buffer::operator=(string_buffer const &b) {
 
 string_buffer::string_buffer(range_t<utf32_t const *> const &x)
 : data(new representation) {
-  copy(x, insert(end(), x.size()));
+  insert(end(), x.begin, x.end);
 }
 
 string_buffer::string_buffer(string const &x)
 : data(new representation) {
-  copy(x.as_utf32(), insert(end(), x.length()));
+  *this += x;
 }
 
 utf32_t *string_buffer::begin() {
@@ -138,5 +141,12 @@ gott::range_t<string_buffer::iterator> string_buffer::append(std::size_t len) {
 }
 
 void string_buffer::operator+=(string const &s) {
-  copy(s.as_utf32(), append(s.length()));
+  utf8_iterator in = s.as_utf32().begin;
+  for (iterator pos = append(s.length()).begin; pos != end(); ++pos)
+    *pos = *in++;
+}
+
+void string_buffer::operator+=(string_buffer const &sb) {
+  range_t<const_iterator> r = range(sb);
+  insert(end(), r.begin, r.end);
 }

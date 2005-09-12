@@ -121,7 +121,8 @@ string::string(range_t<utf8_t const *> const &r)
 : p(new representation(r, representation::foreign_copy)) {}
 
 string::string(range_t<utf8_iterator> const &r)
-: p(new representation(r, representation::foreign_copy)) {}
+: p(new representation(r.call<utf8_t const *>(&utf8_iterator::ptr), 
+      representation::foreign_copy)) {}
 
 #ifndef NO_STDLIB
 string::string(std::vector<string> const &v)

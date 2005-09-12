@@ -66,6 +66,11 @@ template<class T> struct range_t {
     return range_t<U>(U(begin), U(end));
   }
 
+  template<class Result, class U> 
+  range_t<Result> call(U method) const {
+    return range_t<Result>((begin.*method)(), (end.*method)());
+  }
+
   /**
    * Return the size of the range.
    */
@@ -152,10 +157,10 @@ template<class I, class S>
 I advanced(I it, S s) {
 #ifndef NO_STDLIB
   std::advance(it, s);
+  return it;
 #else
   return it + s;
 #endif
-  return it;
 }
 
 /**

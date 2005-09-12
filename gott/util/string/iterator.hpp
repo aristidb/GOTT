@@ -80,7 +80,7 @@ public:
    * Increment the position by a full character step. Postfix variant.
    * \param IGNORE Supplied by compiler.
    */
-  utf8_iterator operator++(int IGNORE) {
+  utf8_iterator operator++(int) {
     utf8_iterator tmp(*this);
     ++*this;
     return tmp;
@@ -100,17 +100,47 @@ public:
    * Decrement the position by a full character step. Postfix variant.
    * \param IGNORE Supplied by compiler.
    */
-  utf8_iterator operator--(int IGNORE) {
+  utf8_iterator operator--(int) {
     utf8_iterator tmp(*this);
     --*this;
     return tmp;
   }
 
-  utf8_iterator &operator+=(std::size_t len);
+  utf8_iterator &operator+=(std::size_t len) {
+    while (len--)
+      ++*this;
+    return *this;
+  }
 
-  utf8_iterator operator+(std::size_t len) const {
+  utf8_iterator &operator+=(long len) {
+    if (len > 0)
+      *this += std::size_t(len);
+    else
+      *this -= -len;
+    return *this;
+  }
+
+  template<class I>
+  utf8_iterator &operator+=(I len) {
+    return *this += long(len);
+  }
+
+  template<class I>
+  utf8_iterator operator+(I len) const {
     utf8_iterator tmp(*this);
     tmp += len;
+    return tmp;
+  }
+
+  utf8_iterator &operator-=(std::size_t len) {
+    while (len--)
+      --*this;
+    return *this;
+  }
+
+  utf8_iterator operator-(std::size_t len) const {
+    utf8_iterator tmp(*this);
+    tmp -= len;
     return tmp;
   }
 
@@ -122,7 +152,7 @@ public:
   /**
    * Retrieve the current memory position.
    */
-  operator utf8_t const *() const GOTT_LOCAL { return current; }
+  utf8_t const *ptr() const { return current; }
 
 private:
   utf8_t const *current;
@@ -131,19 +161,34 @@ private:
 /**
  * Compare two utf8_iterators for equality.
  */
-inline bool operator==(utf8_iterator const &a, utf8_iterator const &b) {
-  return (utf8_t const *) a == (utf8_t const *) b;
+inline bool operator==(utf8_iterator a, utf8_iterator b) {
+  return a.ptr() == b.ptr();
 }
 
 /**
  * Compare two utf8_iterators for inequality.
  */
-inline bool operator!=(utf8_iterator const &a, utf8_iterator const &b) {
+inline bool operator!=(utf8_iterator a, utf8_iterator b) {
   return !(a == b);
 }
 
-inline bool operator<(utf8_iterator const &a, utf8_iterator const &b) {
-  return (utf8_t const *) a < (utf8_t const *) b;
+inline bool operator<(utf8_iterator a, utf8_iterator b) {
+  return a.ptr() < b.ptr();
+}
+
+inline bool operator>(utf8_iterator a, utf8_iterator b) {
+  return a.ptr() > b.ptr();
+}
+
+inline std::ptrdiff_t operator-(utf8_iterator a, utf8_iterator b) {
+  if (a < b)
+    return -(b - a);
+  std::ptrdiff_t result = 0;
+  while (a > b) {
+    --a;
+    ++result;
+  }
+  return result;
 }
 
 }
