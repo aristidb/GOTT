@@ -26,6 +26,8 @@
 #include <ntl.h>
 
 namespace gott {
+class string;
+
 namespace tdl {
 namespace schema {
 
@@ -64,6 +66,9 @@ template<class T>
 rule_t rule(rule_attr const &a, Vector<rule_t> const &c = Vector<rule_t>()) {
   return rule_t(construct_item<T>, a, c);
 }
+
+rule_t rule(string const &name, rule_attr const &a, Vector<rule_t> const &c =
+    Vector<rule_t>()) GOTT_EXPORT;
 
 }}}
 

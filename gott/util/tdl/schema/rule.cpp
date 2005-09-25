@@ -20,20 +20,39 @@
 
 #include "rule.hpp"
 #include "rule_attr.hpp"
+#include <boost/variant.hpp>
 
 using gott::tdl::schema::rule_t;
+using gott::tdl::schema::rule_attr;
 
 class rule_t::IMPL {
 public:
-  item_constructor con;
-  rule_attr attr;
-  Vector<rule_t> children;
+  struct immediate {
+    item_constructor con;
+    rule_attr attr;
+    Vector<rule_t> children;
+
+    immediate(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
+    : con(t), attr(a), children(c) {}
+  };
+
+  boost::variant<immediate, rule_t *> data;
 
   IMPL(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
-  : con(t), attr(a), children(c) {}
+  : data(immediate(t, a, c)) {}
 };
 
 rule_t::rule_t(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
 : p(new IMPL(t, a, c)) {}
 rule_t::rule_t(rule_t const &o) : p(o.p) {}
 rule_t::~rule_t() {}
+
+rule_attr const &rule_t::attributes() const {
+  switch (p->data.which()) {
+  case 0:
+    return boost::get<IMPL::immediate>(p->data).attr;
+  case 1:
+    return boost::get<rule_t *>(p->data)->attributes();
+  };
+  throw "ouch, nah";
+}

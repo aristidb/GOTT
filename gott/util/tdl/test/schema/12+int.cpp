@@ -26,6 +26,7 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
+using gott::string;
 
 using stru::cf::S;
 using stru::cf::C;
@@ -38,14 +39,15 @@ using schema::rule;
 namespace {
 struct schema_12plus_int : tut::schema_basic {
   schema_12plus_int() 
-   : tut::schema_basic(
-       rule<document_p>(RA(),
-         Vector<rule_t>() <<
-         rule<list_p>(RA(),
+  : tut::schema_basic(
+      rule("document", RA(),
+        Vector<rule_t>() <<
+         rule("list", RA(),
            Vector<rule_t>() <<
-           rule<node_p>(
-             RA(L"el", true, new stru::repatch_integer()), 
-                      slotcfg(slotcfg::minimum, 12))))) {}
+           rule("node",
+             RA(Vector<string>() << "el", true, new stru::repatch_integer(), 
+                slotcfg(), slotcfg(slotcfg::minimum, 12))))))
+  {}
 };
 }
 

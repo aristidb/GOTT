@@ -20,6 +20,7 @@
 
 #include <gott/util/tdl/schema/match.hpp>
 #include <gott/util/tdl/schema/rule.hpp>
+#include <gott/util/tdl/schema/rule_attr.hpp>
 #include <gott/util/tdl/exceptions.hpp>
 #include <gott/util/tdl/structure/tree.hpp>
 #include <gott/util/tdl/structure/comfort.hpp>
