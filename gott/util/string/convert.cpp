@@ -156,7 +156,9 @@ gott::to_utf8_alloc(range_t<char const *> const &in, encoding enc) {
   utf8_t *result = new utf8_t[len];
 
   if (enc == utf8) {
-    copy(in, result);
+    utf8_t *out = result;
+    for (char const *it = in.begin; it != in.end; ++it)
+      *out++ = *it;
     return range(result, result + len);
   }
 
@@ -172,8 +174,9 @@ gott::to_utf8_alloc(range_t<char const *> const &in, encoding enc) {
 gott::range_t<char *>
 gott::to_enc_alloc(range_t<utf8_t const *> const &in_, encoding enc) {
   if (enc == utf8) {
-    utf8_t *result = new utf8_t[in_.size()];
-    copy(in_, result);
+    utf8_t *result = new utf8_t[in_.size()], *out = result;
+    for (utf8_t const *it = in_.begin; it != in_.end; ++it)
+      *out++ = *it;
     return range(result, in_.size()).cast<char *>();
   }
 

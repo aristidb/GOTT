@@ -49,7 +49,9 @@ public:
   representation(range_t<utf8_t const *> const &x, foreign_tag)
   : ref_count(1), size(x.size()), length(0), owned(true),
       data(new utf8_t[x.size()]) {
-    copy(x, const_cast<utf8_t *>(data));
+    utf8_t *out = const_cast<utf8_t *>(data);
+    for (utf8_t const *it = x.begin; it != x.end; ++it)
+      *out++ = *it;
   }
 
   ~representation() {
@@ -142,8 +144,11 @@ string::representation::representation(range_t<I> const &r, concatenation_tag)
     size += it->size();
   utf8_t *current = new utf8_t[size];
   data = current;
-  for (I it = r.begin; it != r.end; ++it)
-    current = copy(it->as_utf8(), current);
+  for (I it = r.begin; it != r.end; ++it) {
+    utf8_range r = it->as_utf8();
+    while (!r.empty())
+      *current++ = *r.begin++;
+  }
 }
 
 range_t<gott::utf8_t const *> string::as_utf8() const {

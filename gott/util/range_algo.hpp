@@ -22,7 +22,10 @@
 #define GOTT_UTIL_MISC_RANGE_ALGO_HPP
 
 #include <gott/util/range.hpp>
+
+#ifndef NO_STDLIB
 #include <algorithm>
+#endif
 
 namespace gott {
 
@@ -75,6 +78,7 @@ namespace gott {
   GOTT_A_R2I(A, R) \
   GOTT_A_R2I_P1(A, R)
 
+#ifndef NO_STDLIB
 GOTT_A_R1_P1(for_each, I2)
 GOTT_A_R1_P1(find, I1)
 GOTT_A_R1_P1(find_if, I1)
@@ -91,6 +95,7 @@ GOTT_A_R2I(copy, I2)
 GOTT_A_R2I(copy_backward, I2)
 GOTT_A_R2I(swap_ranges, I2)
 GOTT_A_R2I_P1(transform, I2)
+#endif //NO_STDLIB
 
 #undef GOTT_A_R1
 #undef GOTT_A_R1_P1

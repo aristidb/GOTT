@@ -25,7 +25,8 @@ using gott::string;
 
 static string atomize(string const &n) {
   static Index<string> table;
-  return table[table.FindAdd(n)];
+  int pos = table.FindAdd(n);
+  return table[pos];
 }
 
 atom::atom(string const &n) : string(atomize(n)) {}

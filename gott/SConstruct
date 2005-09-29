@@ -13,9 +13,9 @@ else:
 debug = int(ARGUMENTS.get('debug', debug))
 
 if debug == 1:
-	cppdef = ['DEBUG']
+	cppdef += ['DEBUG']
 elif debug == -1:
-	cppdef = ['NDEBUG']
+	cppdef += ['NDEBUG']
 
 optimize = ARGUMENTS.get('optimize', optimize)
 
@@ -30,7 +30,7 @@ env = Environment(
   CXX = cxx, 
   CCFLAGS = cflags, 
   CPPPATH=['#/..', '#/contrib/ntl'], 
-  LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/atom #/util/string #/base/plugin'),
+  LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/string #/base/plugin'),
   CPPDEFINES=cppdef)
 
 Export('env')

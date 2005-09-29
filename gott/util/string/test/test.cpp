@@ -1,6 +1,7 @@
 #include <gott/util/string/string.hpp>
 #include <gott/util/string/buffer.hpp>
 #include <gott/util/string/iterator.hpp>
+#include <gott/util/string/atom.hpp>
 #include <boost/algorithm/string.hpp>
 #include <gott/util/range_algo.hpp>
 #include <iostream>
@@ -22,11 +23,11 @@ void print(string const &n) {
 }
 
 int main() {
-  string n(range("Hallo, string-Welt!\n"), ascii);
+  string n(zero_terminated("Hallo, string-Welt!\n"), ascii);
   string x(n); // fast!
   cerr << (x == n) << ' ';
-  cerr << (x != range(L"muhkuh")) << ' ';
-  cerr << (x == range("Hallo, string-Welt!\n")) << '\n';
+  cerr << (x != L"muhkuh") << ' ';
+  cerr << (x == L"Hallo, string-Welt!\n") << '\n';
   x = zero_terminated(L"xxxFoobar\n$");
   x = offset(x.as_utf32(), 3, -1);
   n = x + n;
@@ -41,6 +42,14 @@ int main() {
   b[1] = utf32_t(L':');
   b.erase(range(b.begin() + 2, 4));
   range_t<wchar_t const *> r = zero_terminated(L"test ");
+#ifdef NO_STDLIB
+  std::copy(r.begin, r.end, b.insert(b.begin(), r.size()).begin);
+#else
   copy(r, b.insert(b.begin(), r.size()));
+#endif
   print(string(b));
+
+  atom A(offset(n.as_utf32(), x.length()));
+  atom B(string(zero_terminated("Hallo, string-Welt!\n").cast<utf8_t const *>(), string::utf8_literal));
+  cerr << (A == B) << '\n';
 }
