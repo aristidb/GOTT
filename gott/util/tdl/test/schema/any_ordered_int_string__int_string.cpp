@@ -30,27 +30,25 @@ using gott::string;
 using gott::xany::Xany;
 using stru::cf::S;
 using stru::cf::C;
+using schema::rule_t;
 
 typedef schema::rule_attr RA;
 
 namespace {
 struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {
-   schema_any_ordered_integer_string__integer_string() {
-    context.begin(L"document");
-      context.begin(L"any");
-        context.begin(L"ordered");
-          context.begin(L"node", RA(L"int", true, new stru::repatch_integer()));
-          context.end();
-          context.begin(L"node", RA(L"string"));
-          context.end();
-        context.end();
-        context.begin(L"node", RA(L"int2", true, new stru::repatch_integer()));
-        context.end();
-        context.begin(L"node", RA(L"string2"));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_any_ordered_integer_string__integer_string()
+  : tut::schema_basic(
+      rule("document", RA(),
+        Vector<rule_t>() <<
+         rule("any", RA(),
+           Vector<rule_t>() <<
+           rule("ordered", RA(),
+             Vector<rule_t>() <<
+             rule("node", RA("int", true, new stru::repatch_integer())) <<
+             rule("node", RA("string"))) <<
+           rule("node", RA("int2", true, new stru::repatch_integer())) <<
+           rule("node", RA("string2")))))
+  {}
 };
 }
 
