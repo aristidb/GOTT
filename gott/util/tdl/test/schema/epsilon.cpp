@@ -30,19 +30,20 @@ using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
+using schema::rule_t;
 
 typedef schema::rule_attr RA;
 
 namespace {
 struct schema_epsilon : tut::schema_basic {
-  schema_epsilon() {
-    context.begin(L"document");
-      context.begin(L"list");
-        context.begin(L"node", RA(), slotcfg(slotcfg::exact, 0));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_epsilon()
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("list", RA(), Vector<rule_t>() <<
+          rule("node", 
+            RA(Vector<gott::string>(), true, Xany(), 0,
+               slotcfg(), slotcfg(slotcfg::exact, 0))))))
+  {}
 };
 }
 
