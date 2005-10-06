@@ -29,31 +29,26 @@ using gott::string;
 using schema::slotcfg;
 
 using namespace stru::cf;
-
+using schema::rule_t;
 typedef schema::rule_attr RA;
 typedef stru::repatch_integer I;
 
 namespace {
 struct schema_ffxy : tut::schema_basic {
-  schema_ffxy() {
-    context.begin("document");
-      context.begin("ordered");
-        context.begin("follow");
-          context.begin("ordered");
-            context.begin("follow", RA("o"));
-              context.begin("follow", RA("xy"), slotcfg(slotcfg::list));
-                context.begin("node", RA("int1", true, new I()));
-                context.end();
-                context.begin("node", RA("int2", true, new I()));
-                context.end();
-              context.end();
-            context.end();
-            context.begin("node");
-          context.end();
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_ffxy() 
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("ordered", RA(), Vector<rule_t>() <<
+          rule("follow", RA(), Vector<rule_t>() <<
+            rule("ordered", RA(), Vector<rule_t>() <<
+              rule("follow", RA("o"), Vector<rule_t>() <<
+                rule("follow", 
+                  RA(Vector<string>() << "xy", true, Xany(), 0,
+                     slotcfg(), slotcfg(slotcfg::list)),
+                  Vector<rule_t>() <<
+                    rule("node", RA("int1", true, new I())) <<
+                    rule("node", RA("int2", true, new I())))) <<
+              rule("node", RA())))))) {}
 
   void run(string prefix, int n) {
     string test_data = prefix;

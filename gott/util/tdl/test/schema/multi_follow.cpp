@@ -25,33 +25,30 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
+using gott::string;
 using namespace stru::cf;
-
+using schema::rule_t;
+using schema::slotcfg;
 typedef schema::rule_attr RA;
 typedef stru::repatch_enumeration E;
 typedef Vector<gott::string> VN;
+#define L(i) \
+  RA(Vector<string>() << #i, true, Xany(), new E(VN() << #i), \
+     slotcfg(), slotcfg(slotcfg::optional))
 
 namespace {
+
 struct schema_multi_follow : tut::schema_basic {
-  schema_multi_follow() {
-    schema::slotcfg o(schema::slotcfg::optional);
-    context.begin("document");
-      context.begin("follow", RA("outer"));
-        context.begin("follow", RA("inner1"));
-          context.begin("node", RA("1", true, new E(VN() << "1")), o);
-          context.end();
-          context.begin("node", RA("2", true, new E(VN() << "2")), o);
-          context.end();
-        context.end();
-        context.begin("follow", RA("inner2"));
-          context.begin("node", RA("3", true, new E(VN() << "3")), o);
-          context.end();
-          context.begin("node", RA("4", true, new E(VN() << "4")), o);
-          context.end();
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_multi_follow() 
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("follow", RA("outer"), Vector<rule_t>() <<
+          rule("follow", RA("inner1"), Vector<rule_t>() <<
+            rule("node", L(1)) <<
+            rule("node", L(2))) <<
+          rule("follow", RA("inner2"), Vector<rule_t>() <<
+            rule("node", L(3)) <<
+            rule("node", L(4)))))) {}
 };
 }
 

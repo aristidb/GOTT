@@ -26,25 +26,23 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
+using gott::string;
 
 using stru::cf::S;
 using stru::cf::C;
-
+using schema::rule_t;
+using schema::slotcfg;
 typedef schema::rule_attr RA;
 
 namespace {
 struct schema_unordered_list_integer_string : tut::schema_basic {
-  schema_unordered_list_integer_string() {
-    context.begin(L"document");
-      context.begin(L"unordered");
-        context.begin(L"node", RA(RA::simple,true,new stru::repatch_integer()),
-                      schema::slotcfg(schema::slotcfg::list));
-        context.end();
-        context.begin(L"node");
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_unordered_list_integer_string()
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("node",
+          RA(Vector<string>()<<"node",true,Xany(),new stru::repatch_integer(),
+             slotcfg(), slotcfg(slotcfg::list))) <<
+        rule("node", RA()))) {}
 };
 }
 

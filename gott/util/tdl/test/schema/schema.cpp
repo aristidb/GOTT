@@ -1,3 +1,4 @@
+#if 0
 // Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: TD Testing
 // Authors: Aristid Breitkreuz
@@ -445,3 +446,4 @@ void object::test<8>(int) {
 
 // further tests
 }
+#endif

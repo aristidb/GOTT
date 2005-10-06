@@ -26,26 +26,24 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
+using gott::string;
 
 using stru::cf::S;
 using stru::cf::C;
 using schema::slotcfg;
-
+using schema::rule_t;
 typedef schema::rule_attr RA;
 
 namespace {
 struct schema_follow_list : tut::schema_basic {
-  schema_follow_list() {
-    context.begin(L"document");
-      context.begin(L"follow");
-        context.begin(L"node", RA(L"i", true, new stru::repatch_integer()), 
-                      slotcfg(slotcfg::list));
-        context.end();
-        context.begin(L"node", RA(L"s"));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_follow_list() 
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("follow", RA(), Vector<rule_t>() <<
+          rule("node", 
+            RA(Vector<string>() << "i",true,Xany(),new stru::repatch_integer(),
+               slotcfg(), slotcfg(slotcfg::list))) <<
+          rule("node", RA("s"))))) {}
 };
 }
 
