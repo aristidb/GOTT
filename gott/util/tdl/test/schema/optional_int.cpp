@@ -26,25 +26,28 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
+using gott::string;
 
 using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
+using schema::rule_t;
 
 typedef schema::rule_attr RA;
 
 namespace {
 struct schema_optional_int : tut::schema_basic {
-  schema_optional_int() {
-    context.begin(L"document");
-      context.begin(L"list");
-        context.begin(L"node", RA(L"el", true, new stru::repatch_integer()),
-                      slotcfg(slotcfg::optional));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_optional_int() 
+  : tut::schema_basic(
+      rule("document", RA(),
+        Vector<rule_t>() <<
+         rule("list", RA(),
+           Vector<rule_t>() <<
+           rule("node",
+             RA(Vector<string>() << "el", true, Xany(), 
+                new stru::repatch_integer(), 
+                slotcfg(), slotcfg(slotcfg::optional)))))) {}
 };
 }
 

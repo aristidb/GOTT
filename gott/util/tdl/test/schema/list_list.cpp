@@ -21,30 +21,31 @@
 #include "common.hpp"
 #include <gott/util/tdl/structure/types/integer.hpp>
 
+
 using namespace gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
-namespace schema = gott::tdl::schema;
 using gott::xany::Xany;
+using gott::string;
 using stru::cf::S;
 using stru::cf::C;
 
 namespace {
 struct schema_multi_footype : tut::schema_basic {
-  schema_multi_footype() {
-    context.begin(L"document");
-      context.begin(L"ordered");
-        context.begin(L"list", rule_attr(L"s"));
-          context.begin(L"list", rule_attr(L"t"));
-            context.begin(L"node", 
-                    rule_attr(L"ii", true, new stru::repatch_integer()));
-            ;context.end();
-          ;context.end();
-        ;context.end();
-        context.begin(L"node", rule_attr("xx"));
-      ;context.end();
-    ;context.end();
-  }
+  schema_multi_footype() 
+  : tut::schema_basic(
+    rule("document", rule_attr(), Vector<rule_t>() <<
+      rule("ordered", rule_attr(), Vector<rule_t>() <<
+        rule("list", rule_attr("s"), Vector<rule_t>() <<
+          rule("list", 
+            rule_attr(Vector<string>() << "t", true, Xany(), 0,
+              slotcfg(), slotcfg(slotcfg::list)),
+            Vector<rule_t>() <<
+            rule("node",
+              rule_attr(Vector<string>() << "ii", true, Xany(), 
+                new stru::repatch_integer(),
+                slotcfg(), slotcfg(slotcfg::list))))) <<
+        rule("node", rule_attr("xx"))))) {}
 };
 }
 
@@ -54,7 +55,7 @@ typedef tf::object object;
 }
 
 namespace {
-  tut::tf multi_footype_test("schema::list_list");
+  tut::tf multi_footype_test("list_list");
 }
 
 namespace tut {
@@ -96,7 +97,7 @@ void object::test<4>(int) {
   try {
     run_test(L"");
     fail("empty");
-  } catch (schema::mismatch const &m) {
+  } catch (mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
        "0:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
        " after token ");
@@ -108,7 +109,7 @@ void object::test<5>(int) {
   try {
     run_test(L"44");
     fail("should be greedy");
-  } catch (schema::mismatch const &m) {
+  } catch (mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
         "1:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
         " after token 44");

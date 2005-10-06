@@ -32,12 +32,10 @@ typedef schema::rule_attr RA;
 
 namespace {
 struct schema_integer : tut::schema_basic {
-  schema_integer() {
-    context.begin(L"document");
-      context.begin(L"node", RA(L"i", true, new stru::repatch_integer()));
-      context.end();
-    context.end();
-  }
+  schema_integer() 
+  : tut::schema_basic(
+      rule("document", RA(), Vector<schema::rule_t>() <<
+        rule("node", RA("i", true, new stru::repatch_integer())))) {}
 };
 }
 

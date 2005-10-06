@@ -31,19 +31,16 @@ using stru::cf::C;
 
 typedef schema::rule_attr RA;
 typedef stru::repatch_integer I;
+using schema::rule_t;
 
 namespace {
 struct schema_follow_integer_integer : tut::schema_basic {
-  schema_follow_integer_integer() {
-    context.begin(L"document", RA(L"doc"));
-      context.begin(L"follow", RA(L"foll"));
-        context.begin(L"node", RA(L"int1", true, new I()));
-        context.end();
-        context.begin(L"node", RA(L"int2", true, new I()));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_follow_integer_integer() 
+  : tut::schema_basic(
+      rule("document", RA("doc"), Vector<rule_t>() <<
+        rule("follow", RA("foll"), Vector<rule_t>() <<
+          rule("node", RA("int1", true, new I())) <<
+          rule("node", RA("int2", true, new I()))))) {}
 };
 }
 

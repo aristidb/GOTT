@@ -30,12 +30,10 @@ using stru::cf::C;
 
 namespace {
 struct schema_string : tut::schema_basic {
-  schema_string() {
-    context.begin(L"document", schema::rule_attr("doc"));
-      context.begin(L"node");
-      context.end();
-    context.end();
-  }
+  schema_string() 
+  : tut::schema_basic(
+      rule("document", schema::rule_attr("doc"), Vector<schema::rule_t>() <<
+        rule("node", schema::rule_attr()))) {}
 };
 }
 

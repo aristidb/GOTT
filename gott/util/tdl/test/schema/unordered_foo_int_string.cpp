@@ -30,24 +30,19 @@ using gott::string;
 
 using stru::cf::S;
 using stru::cf::C;
-
+using schema::rule_t;
 typedef schema::rule_attr RA;
 
 namespace {
 struct schema_unordered_foo_integer_string : tut::schema_basic {
-  schema_unordered_foo_integer_string() {
-    context.begin(L"document");
-      context.begin(L"unordered");
-        context.begin(L"node", RA(L"foo", true, 
-               new stru::repatch_enumeration(Vector<string>() | "foo")));
-        context.end();
-        context.begin(L"node", RA(RA::simple,true,new stru::repatch_integer()));
-        context.end();
-        context.begin(L"node");
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_unordered_foo_integer_string() 
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("unordered", RA(), Vector<rule_t>() <<
+          rule("node", RA("foo", true, 
+               new stru::repatch_enumeration(Vector<string>() | "foo"))) <<
+          rule("node", RA(RA::simple, true, new stru::repatch_integer())) <<
+          rule("node", RA())))) {}
 };
 }
 

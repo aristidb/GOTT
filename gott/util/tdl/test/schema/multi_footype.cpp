@@ -1,3 +1,4 @@
+#if 0
 // Copyright (C) 2004-2005 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
@@ -19,7 +20,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
-#include <gott/util/tdl/schema/context_template.hpp>
 #include <gott/util/tdl/schema/slot.hpp>
 #include <gott/util/tdl/schema/types/named.hpp>
 #include <gott/util/tdl/structure/types/integer.hpp>
@@ -190,3 +190,4 @@ void object::test<6>(int) {
 
 // further tests
 }
+#endif

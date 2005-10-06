@@ -25,25 +25,21 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
+using gott::string;
 
 using stru::cf::S;
 using stru::cf::C;
-
+using schema::rule_t;
 typedef schema::rule_attr RA;
 
 namespace {
 struct schema_ordered_string_integer : tut::schema_basic {
-  schema_ordered_string_integer() {
-    context.begin(L"document");
-      context.begin(L"ordered");
-        context.begin(L"node");
-        context.end();
-        context.begin(L"node", 
-             schema::rule_attr(L"i", true, new stru::repatch_integer()));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_ordered_string_integer()
+ : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("ordered", RA(), Vector<rule_t>() <<
+         rule("node", RA()) <<
+         rule("node", RA(RA::simple, true, new stru::repatch_integer()))))) {}
 };
 }
 

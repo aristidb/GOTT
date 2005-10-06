@@ -29,17 +29,15 @@ using gott::xany::Xany;
 using namespace stru::cf;
 
 typedef schema::rule_attr RA;
+using schema::rule_t;
 
 namespace {
 struct schema_named_string : tut::schema_basic {
-  schema_named_string() {
-    context.begin(L"document", RA(L"doc"));
-      context.begin(L"named", schema::match_named::attributes(L"ND"));
-        context.begin(L"node", RA(L"S"));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_named_string() 
+  : tut::schema_basic(
+      rule("document", RA("doc"), Vector<rule_t>() <<
+        rule("named", schema::match_named::attributes("ND"), Vector<rule_t>()<<
+          rule("node", RA("S"))))) {}
 };
 }
 

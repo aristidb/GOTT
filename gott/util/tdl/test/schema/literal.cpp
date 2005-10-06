@@ -33,13 +33,12 @@ using schema::rule_attr;
 
 namespace {
 struct schema_literal : tut::schema_basic {
-  schema_literal() {
-    context.begin("document");
-      context.begin("node", rule_attr(L"foobar", true, 
-             new stru::repatch_enumeration(Vector<string>() | "foobar")));
-      context.end();
-    context.end();
-  }
+  schema_literal() 
+  : tut::schema_basic(
+      rule("document", rule_attr(), Vector<schema::rule_t>() <<
+        rule("node", 
+          rule_attr(L"foobar", true, 
+            new stru::repatch_enumeration(Vector<string>() | "foobar"))))) {}
 };
 }
 

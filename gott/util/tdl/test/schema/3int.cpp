@@ -47,8 +47,7 @@ struct schema_3int : tut::schema_basic {
            rule("node",
              RA(Vector<string>() << "el", true, Xany(), 
                 new stru::repatch_integer(), 
-                slotcfg(), slotcfg(slotcfg::exact, 3))))))
-  {}
+                slotcfg(), slotcfg(slotcfg::exact, 3)))))) {}
 };
 }
 
