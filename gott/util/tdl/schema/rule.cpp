@@ -41,16 +41,27 @@ public:
     : con(t), attr(a), children(c) {}
   };
 
-  boost::variant<immediate, rule_t *> data;
+  boost::variant<immediate, rule_t const *> data;
 
   IMPL(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
   : data(immediate(t, a, c)) {}
+
+  IMPL(rule_t const *p)
+  : data(p) {}
 };
 
 rule_t::rule_t(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
 : p(new IMPL(t, a, c)) {}
+
 rule_t::rule_t(rule_t const &o) : p(o.p) {}
+
+rule_t::rule_t(rule_t const *ptr) : p(new IMPL(ptr)) {}
+
 rule_t::~rule_t() {}
+
+void rule_t::operator=(rule_t const &o) {
+  p = o.p;
+}
 
 item *rule_t::get(match &m) const {
   switch (p->data.which()) {

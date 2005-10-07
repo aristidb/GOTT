@@ -52,7 +52,10 @@ class GOTT_EXPORT rule_t : Moveable<rule_t> {
 public:
   rule_t(item_constructor, rule_attr const &, Vector<rule_t> pick_ &);
   rule_t(rule_t const &);
+  rule_t(rule_t const *);
   ~rule_t();
+
+  void operator=(rule_t const &);
 
   item *get(match &) const;
   rule_attr const &attributes() const;
