@@ -20,10 +20,15 @@
 
 #include "rule.hpp"
 #include "rule_attr.hpp"
+#include "by_name.hpp"
+#include "item.hpp"
+#include "match.hpp"
 #include <boost/variant.hpp>
 
-using gott::tdl::schema::rule_t;
-using gott::tdl::schema::rule_attr;
+namespace sh = gott::tdl::schema;
+using sh::rule_t;
+using sh::rule_attr;
+using sh::item;
 
 class rule_t::IMPL {
 public:
@@ -47,12 +52,27 @@ rule_t::rule_t(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
 rule_t::rule_t(rule_t const &o) : p(o.p) {}
 rule_t::~rule_t() {}
 
+item *rule_t::get(match &m) const {
+  switch (p->data.which()) {
+  case 0: // immediate
+    { IMPL::immediate &imm = boost::get<IMPL::immediate &>(p->data);
+      return imm.con(imm.attr, imm.children, m); }
+  case 1: // indirect
+    return boost::get<rule_t *>(p->data)->get(m);
+  }
+  throw (void*)0; // never happen
+}
+
+rule_t sh::rule(string const &id, rule_attr const &a, Vector<rule_t> pick_ &c) {
+  return by_name().get(id, a, c);
+}
+
 rule_attr const &rule_t::attributes() const {
   switch (p->data.which()) {
-  case 0:
+  case 0: // immediate
     return boost::get<IMPL::immediate>(p->data).attr;
-  case 1:
+  case 1: // indirect
     return boost::get<rule_t *>(p->data)->attributes();
   };
-  throw "ouch, nah";
+  throw (void*)0; // never happen
 }

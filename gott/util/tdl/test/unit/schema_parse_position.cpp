@@ -20,9 +20,10 @@
 
 #include <gott/util/tdl/schema/match.hpp>
 #include <gott/util/tdl/schema/parse_position.hpp>
+#include <gott/util/tdl/schema/rule.hpp>
+#include <gott/util/tdl/schema/rule_attr.hpp>
 #include <gott/util/tdl/structure/structure.hpp>
 #include <gott/util/tdl/simple/parse/parser.hpp>
-#include <gott/util/tdl/schema/context.hpp>
 #include <gott/util/tut/tut.h>
 #include <gott/util/string/string.hpp>
 
@@ -48,10 +49,7 @@ struct test_base {
 
   test_base() 
   : match(no_stru), pos(match.pos()), parse(match) {
-    tdl::schema::context c;
-    c.begin("document");
-    c.end();
-    match.add(c.get());
+    match.add(tdl::schema::rule("document", tdl::schema::rule_attr()));
   }
 };
 
