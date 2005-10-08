@@ -39,6 +39,9 @@ public:
 
     immediate(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
     : con(t), attr(a), children(c) {}
+
+    immediate(immediate const &o)
+    : con(o.con), attr(o.attr), children(o.children, 1) {}
   };
 
   boost::variant<immediate, rule_t const *> data;
@@ -66,7 +69,7 @@ void rule_t::operator=(rule_t const &o) {
 item *rule_t::get(match &m) const {
   switch (p->data.which()) {
   case 0: // immediate
-    { IMPL::immediate &imm = boost::get<IMPL::immediate &>(p->data);
+    { IMPL::immediate const &imm = boost::get<IMPL::immediate>(p->data);
       return imm.con(imm.attr, imm.children, m); }
   case 1: // indirect
     return boost::get<rule_t *>(p->data)->get(m);

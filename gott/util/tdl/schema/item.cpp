@@ -69,8 +69,8 @@ item::item(rule_attr const &a, match &m)
 void item::finish() {
   pIMPL->end_structure();
 }
-#include <iostream>
-item::~item() { std::cerr << "destroy " << this << std::endl; }
+
+item::~item() {}
 
 rule_attr const &item::attributes() const { return pIMPL->attrib; }
 match &item::matcher() { return *pIMPL->cont; }

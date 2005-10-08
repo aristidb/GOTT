@@ -44,7 +44,7 @@ def CheckOptimization(context):
 def CheckDebug(context):
 	context.Message('Checking if compiler supports gcc-style debug flags... ')
 	lastCCFLAGS = context.env['CCFLAGS'][:]
-	context.env.Append(CCFLAGS = ['-g','-ggdb3'])
+	context.env.Append(CCFLAGS = ['-g'])
 	result = context.TryCompile("void func() {}\n", '.cpp')
 	if not result:
 		context.env.Replace(CCFLAGS = lastCCFLAGS)

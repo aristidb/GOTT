@@ -22,6 +22,7 @@
 #include "../event.hpp"
 #include <gott/util/string/string.hpp>
 #include <gott/util/tdl/structure/types/enumeration.hpp>
+#include <gott/util/debug/assert.hpp>
 
 using gott::xany::Xany;
 using gott::xany::Xany_cast;
@@ -38,14 +39,13 @@ rule_attr match_named::attributes(string const &s, bool cc) {
 
 match_named::match_named(rule_attr const &a, Vector<rule_t> const &s, match &m) 
 : happy_once(a, m), 
-  tag(Xany_cast<string>(a.user()))//,
-  //FIXME outer(rule_attr(rule_attr::simple, false)),
-  /*inner_name(rule_attr(rule_attr::simple, false, 
-        new structure::repatch_enumeration(Vector<string>() << tag)))*/ {
-          (void)s;
-  //outer.add(inner_name);
-  //outer.add(s);
-  //matcher().add(outer);
+  tag(Xany_cast<string>(a.user())),
+  rewritten(
+      rule("follow", rule_attr(rule_attr::simple, false), Vector<rule_t>() <<
+        rule("node", rule_attr(rule_attr::simple, false, 
+          new structure::repatch_enumeration(Vector<string>() << tag))) <<
+        &s[0])) {
+  GOTT_ASSERT_2(s.GetCount(), 1, std::equal_to<int>(), "one parameter");
 }
 
 match_named::~match_named() {}
