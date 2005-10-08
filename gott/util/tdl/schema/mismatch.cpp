@@ -52,7 +52,7 @@ static string build_string(schema::detail::stream_position const &p,
   else
     out.Add(" at token ");
   out.Add(p.tok);
-  return range(out).cast<string const *>();
+  return string(range(out).cast<string const *>(), string::concatenate);
 }
 
 mismatch::mismatch(detail::stream_position const &p, 

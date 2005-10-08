@@ -26,7 +26,7 @@ using gott::string;
 
 static string pizza(string const &x) {
   string const components[] = { "Don't accept", (x == "") ? "" : ": ", x };
-  return string(gott::range(components));
+  return string(gott::range(components), string::concatenate);
 }
 
 dont_accept::dont_accept(string const &desc) 

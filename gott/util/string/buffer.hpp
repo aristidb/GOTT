@@ -21,17 +21,21 @@
 #ifndef GOTT_UTIL_NSTRING_BUFFER_HPP
 #define GOTT_UTIL_NSTRING_BUFFER_HPP
 
-#include "string.hpp"
 #include "types.hpp"
+#include <gott/util/visibility.hpp>
+#include <gott/util/range.hpp>
+#ifndef NO_STDLIB
+#include <stdexcept>
+#endif
 
 namespace gott {
-
+class string;
 template<class> class range_t;
 
 /**
  * Buffer for editable UTF32-strings.
  */
-class GOTT_EXPORT string_buffer {
+class string_buffer {
 public:
   typedef utf32_t value_type;
   typedef utf32_t *iterator;
@@ -42,75 +46,104 @@ public:
   /**
    * Construct empty buffer.
    */
-  string_buffer();
+  string_buffer() GOTT_EXPORT;
 
   /// Copy-Constructor.
-  string_buffer(string_buffer const &);
+  string_buffer(string_buffer const &b) : data(0) {
+    string_buffer empty;
+    this->swap(empty);
+    *this += b;
+  }
 
   /**
    * Construct buffer from string.
    */
-  string_buffer(string const &);
+  string_buffer(string const &x) : data(0) {
+    string_buffer empty;
+    this->swap(empty);
+    *this += x;
+  }
   
   /**
    * Construct buffer from string.
    */
-  string_buffer(range_t<utf32_t const *> const &);
+  string_buffer(range_t<utf32_t const *> const &x) : data(0) {
+    string_buffer empty;
+    this->swap(empty);
+    insert(end(), x.begin, x.end);
+  }
 
   /// Destructor.
-  ~string_buffer();
+  ~string_buffer() GOTT_EXPORT;
 
   /**
    * Return an iterator pointing to the beginning of the represented string.
    */
-  iterator begin();
+  iterator begin() { 
+    return const_cast<iterator>(((string_buffer const *)this)->begin());
+  }
 
   /**
    * Return an iterator pointing after the end of the represented string.
    */
-  iterator end();
+  iterator end() {
+    return const_cast<iterator>(((string_buffer const *)this)->end());
+  }
   
   /**
    * Return an iterator pointing to the beginning of the represented string.
    */
-  const_iterator begin() const;
+  const_iterator begin() const GOTT_EXPORT;
 
   /**
    * Return an iterator pointing after the end of the represented string.
    */ 
-  const_iterator end() const;
+  const_iterator end() const GOTT_EXPORT;
 
   /**
    * Return the size (and length) of the represented string.
    */
-  size_t size() const;
+  size_t size() const GOTT_EXPORT;
   
   /**
    * Swap contents with another buffer.
    */
-  void swap(string_buffer &);
+  void swap(string_buffer &o) {
+    representation *tmp = data;
+    data = o.data;
+    o.data = tmp;
+  }
 
   /**
    * Assign another buffers contents to this buffer.
    */
-  void operator=(string_buffer const &b);
+  void operator=(string_buffer const &b) {
+    string_buffer(b).swap(*this);
+  }
 
   /**
    * Return the character at a certain position of the buffer.
    */
-  utf32_t &operator[](std::size_t);
+  utf32_t &operator[](std::size_t i) {
+    return begin()[i];
+  }
 
+#ifndef NO_STDLIB
   /**
    * Return the character at a certain position of the buffer.
    */
-  utf32_t &at(std::size_t);
+  utf32_t &at(std::size_t i) {
+    if (i > size())
+      throw std::out_of_range("string_buffer::at: index out of bounds");
+  }
+#endif
   
   /**
    * Erase a range from the buffer.
    * \param r The range to erase.
    * \return Iterator pointing just after the erased range.
    */
-  iterator erase(range_t<iterator> const &r);
+  iterator erase(range_t<iterator> const &r) GOTT_EXPORT;
 
   iterator erase(iterator i1, iterator i2) {
     return erase(range(i1, i2));
@@ -122,10 +155,9 @@ public:
    * \param len The size of the inserted chunk.
    * \return The inserted chunk.
    */
-  range_t<iterator> insert(iterator pos, std::size_t len);
+  range_t<iterator> insert(iterator pos, std::size_t len) GOTT_EXPORT;
 
   template<class I>
-  GOTT_LOCAL
   void insert(iterator pos, I a, I b) {
 #ifndef NO_STDLIB
     std::size_t len = std::distance(a, b);
@@ -142,17 +174,19 @@ public:
    * \param len The size of the appended chunk.
    * \return The appended chunk.
    */
-  range_t<iterator> append(std::size_t len);
+  range_t<iterator> append(std::size_t len) {
+    return insert(end(), len);
+  }
 
   /**
    * Append a string.
    */
-  void operator+=(string const &s);
+  void operator+=(string const &s) GOTT_EXPORT;
 
   /**
    * Append a string_buffer.
    */
-  void operator+=(string_buffer const &sb);
+  void operator+=(string_buffer const &sb) GOTT_EXPORT;
 
   void operator+=(utf32_t ch) GOTT_LOCAL {
     *append(1).begin = ch;

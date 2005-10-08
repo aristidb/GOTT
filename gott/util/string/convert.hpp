@@ -23,6 +23,7 @@
 
 #include "types.hpp"
 #include <gott/util/range.hpp>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
 
@@ -33,6 +34,7 @@ namespace gott {
  * \param enc The encoding of @p in.
  * \return The newly allocated UTF8 buffer.
  */
+GOTT_EXPORT
 range_t<utf8_t *> to_utf8_alloc(range_t<char const *> const &in, encoding enc);
 
 /**
@@ -42,6 +44,7 @@ range_t<utf8_t *> to_utf8_alloc(range_t<char const *> const &in, encoding enc);
  * \param enc The encoding of the output string.
  * \return The newly allocated buffer.
  */
+GOTT_EXPORT
 range_t<char *> to_enc_alloc(range_t<utf8_t const *> const &in, encoding enc);
 
 /**
@@ -51,6 +54,7 @@ range_t<char *> to_enc_alloc(range_t<utf8_t const *> const &in, encoding enc);
  * \param enc The encoding of the input character.
  * \return The decoded character.
  */
+GOTT_EXPORT
 utf32_t to_utf32_char(char const *mbc, char const *&end, encoding enc);
 
 /**
@@ -59,6 +63,7 @@ utf32_t to_utf32_char(char const *mbc, char const *&end, encoding enc);
  * \param out The pointer to the memory to be written to. 
  *            Will point to after the character.
  */
+GOTT_EXPORT
 void write_utf32_to_utf8(utf32_t ch, utf8_t *&out);
 
 /**
@@ -68,6 +73,7 @@ void write_utf32_to_utf8(utf32_t ch, utf8_t *&out);
  *            Will point to after the character.
  * \param enc The encoding of @p out.
  */
+GOTT_EXPORT
 void write_utf32_to_enc(utf32_t ch, char *&out, encoding enc);
 
 /**
@@ -76,6 +82,7 @@ void write_utf32_to_enc(utf32_t ch, char *&out, encoding enc);
  * \param enc The encoding of @p str.
  * \return The length of the hypothetical UTF8 string.
  */
+GOTT_EXPORT
 std::size_t utf8_len(range_t<char const *> const &str, encoding enc);
 
 /**
@@ -84,6 +91,7 @@ std::size_t utf8_len(range_t<char const *> const &str, encoding enc);
  * \param enc The encoding of @p str.
  * \return The length of the hypothetical UTF32 string.
  */
+GOTT_EXPORT
 std::size_t utf32_len(range_t<char const *> const &str, encoding enc);
 
 /**
@@ -91,6 +99,7 @@ std::size_t utf32_len(range_t<char const *> const &str, encoding enc);
  * \param ch The UTF32 character.
  * \return The size of the UTF8 character.
  */
+GOTT_EXPORT
 std::size_t utf8_len(utf32_t ch);
 
 /**
@@ -100,6 +109,7 @@ std::size_t utf8_len(utf32_t ch);
  * \param enc The desired encoding.
  * \return The size of the encoded character.
  */
+GOTT_EXPORT
 std::size_t enc_len(utf32_t ch, encoding enc);
 
 }

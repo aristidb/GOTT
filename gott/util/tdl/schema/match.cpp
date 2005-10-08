@@ -352,5 +352,5 @@ string match::IMPL::get_name(item const &rl) {
     }
     out.Add(s_close);
   }
-  return string(range(out).cast<string const *>());
+  return string(range(out).cast<string const *>(), string::concatenate);
 }

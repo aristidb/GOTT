@@ -21,6 +21,7 @@
 #include "buffer.hpp"
 #include "convert.hpp"
 #include "iterator.hpp"
+#include "string.hpp"
 #ifndef NO_STDLIB
 #include <algorithm>
 #include <gott/util/range_algo.hpp>
@@ -62,40 +63,7 @@ private:
 string_buffer::string_buffer()
 : data(new representation) {}
 
-string_buffer::string_buffer(string_buffer const &b) 
-: data(new representation) {
-  *this += b;
-}
-
 string_buffer::~string_buffer() { delete data; }
-
-void string_buffer::swap(string_buffer &o) {
-  representation *tmp = data;
-  data = o.data;
-  o.data = tmp;
-}
-
-void string_buffer::operator=(string_buffer const &b) {
-  string_buffer(b).swap(*this);
-}
-
-string_buffer::string_buffer(range_t<utf32_t const *> const &x)
-: data(new representation) {
-  insert(end(), x.begin, x.end);
-}
-
-string_buffer::string_buffer(string const &x)
-: data(new representation) {
-  *this += x;
-}
-
-utf32_t *string_buffer::begin() {
-  return data->begin;
-}
-
-utf32_t *string_buffer::end() {
-  return data->end;
-}
 
 utf32_t const *string_buffer::begin() const {
   return data->begin;
@@ -107,10 +75,6 @@ utf32_t const *string_buffer::end() const {
 
 std::size_t string_buffer::size() const {
   return data->end - data->begin;
-}
-
-utf32_t &string_buffer::operator[](std::size_t i) {
-  return data->begin[i];
 }
 
 string_buffer::iterator string_buffer::erase(range_t<iterator> const &r) {
@@ -134,10 +98,6 @@ string_buffer::insert(iterator p, std::size_t len) {
   for (iterator it = data->end - 1; it >= p + len; --it)
     *it = *(it - len);
   return range(p, len);
-}
-
-gott::range_t<string_buffer::iterator> string_buffer::append(std::size_t len) {
-  return insert(end(), len);
 }
 
 void string_buffer::operator+=(string const &s) {

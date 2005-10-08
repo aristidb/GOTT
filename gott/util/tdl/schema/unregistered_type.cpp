@@ -27,7 +27,7 @@ using gott::tdl::schema::unregistered_type;
 
 static string pizza(string const &type) {
   string const components[] = { "Type ", type, " not found in database" };
-  return string(range(components));
+  return string(range(components), string::concatenate);
 }
 
 unregistered_type::unregistered_type(string const &type)

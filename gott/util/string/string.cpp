@@ -19,8 +19,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "string.hpp"
-#include "convert.hpp"
-#include "buffer.hpp"
 #include "iterator.hpp"
 #ifndef NO_STDLIB
 #include "stl.hpp"
@@ -59,10 +57,6 @@ public:
       delete [] data;
   }
 
-  enum concatenation_tag { concat };
-
-  template<class I> representation(range_t<I> const &, concatenation_tag);
-
   std::size_t ref_count;
   std::size_t size;
   std::size_t length;
@@ -79,24 +73,13 @@ string::~string() {
     delete p;
 }
 
-string::string()
-: p(new representation(offset(range("").cast<utf8_t const *>(), 0, -1), 
-                       false)) {}
+void string::set_up(range_t<utf8_t const *> const &d, bool o) {
+  p = new representation(d, o);
+}
 
-string::string(range_t<char const *> in, encoding enc)
-: p(new representation(to_utf8_alloc(in, enc))) {}
-
-string::string(char const *in, encoding enc)
-: p(new representation(to_utf8_alloc(zero_terminated(in), enc))) {}
-
-#ifndef NO_STDLIB
-string::string(std::string const &s, encoding enc)
-: p(new representation(to_utf8_alloc(range(&s[0], s.length()), enc))) {}
-
-string::string(std::wstring const &s, encoding enc)
-: p(new representation(
-      to_utf8_alloc(range(&s[0], s.length()).cast<char const*>(), enc))) {}
-#endif
+void string::foreign(range_t<utf8_t const *> const &d) {
+  p = new representation(d, representation::foreign_copy);
+}
 
 string::string(thunk_t<utf8_t> &thk) : p(0) {
   std::size_t len = thk.size();
@@ -104,51 +87,6 @@ string::string(thunk_t<utf8_t> &thk) : p(0) {
   for (std::size_t i = 0; i < len; ++i)
     buf[i] = thk.call();
   p = new representation(range(buf, len));
-}
-
-string::string(range_t<utf8_t const *> in, literal_tag)
-: p(new representation(in, false)) {}
-
-string::string(range_t<wchar_t const *> in, encoding enc)
-: p(new representation(to_utf8_alloc(in.cast<char const *>(), enc))) {}
-
-string::string(wchar_t const *in, encoding enc)
-: p(new representation(to_utf8_alloc(zero_terminated(in).cast<char const *>(),
-        enc))) {}
-
-string::string(string_buffer const &b)
-: p(new representation(to_utf8_alloc(range(b).cast<char const *>(), utf32))) {}
-
-string::string(range_t<utf8_t const *> const &r)
-: p(new representation(r, representation::foreign_copy)) {}
-
-string::string(range_t<utf8_iterator> const &r)
-: p(new representation(r.call<utf8_t const *>(&utf8_iterator::ptr), 
-      representation::foreign_copy)) {}
-
-#ifndef NO_STDLIB
-string::string(std::vector<string> const &v)
-: p(new representation(range(v), representation::concat)) {}
-
-string::string(std::list<string> const &v)
-: p(new representation(range(v), representation::concat)) {}
-#endif
-
-string::string(range_t<string const *> cont)
-: p(new representation(cont, representation::concat)) {}
-
-template<class I>
-string::representation::representation(range_t<I> const &r, concatenation_tag) 
-: ref_count(1), size(0), length(0), owned(true) {
-  for (I it = r.begin; it != r.end; ++it)
-    size += it->size();
-  utf8_t *current = new utf8_t[size];
-  data = current;
-  for (I it = r.begin; it != r.end; ++it) {
-    utf8_range r = it->as_utf8();
-    while (!r.empty())
-      *current++ = *r.begin++;
-  }
 }
 
 range_t<gott::utf8_t const *> string::as_utf8() const {
@@ -159,12 +97,6 @@ std::size_t string::length() const {
   if (!p->length)
     p->length = as_utf32().size();
   return p->length;
-}
-
-void string::swap(string &o) {
-  representation *tmp = p;
-  p = o.p;
-  o.p = tmp;
 }
 
 #ifndef NO_STDLIB
