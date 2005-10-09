@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,63 +20,70 @@
 
 #include "rule.hpp"
 #include "rule_attr.hpp"
-#include "parse.hpp"
-#include "event.hpp"
+#include "by_name.hpp"
+#include "item.hpp"
+#include "match.hpp"
+#include <boost/variant.hpp>
 
-using std::wstring;
+namespace sh = gott::tdl::schema;
+using sh::rule_t;
+using sh::rule_attr;
+using sh::item;
 
-namespace schema = gott::util::tdl::schema;
-using schema::match;
-using schema::rule;
-namespace ev = gott::util::tdl::schema::ev;
-using gott::util::tdl::structure::writable_structure;
-
-class rule::IMPL {
+class rule_t::IMPL {
 public:
-  match *cont;
-  attributes attrib;
+  struct immediate {
+    item_constructor con;
+    rule_attr attr;
+    Vector<rule_t> children;
 
-  IMPL(match &m, attributes const &a) : cont(&m), attrib(a) {
-    start_structure();
-    add_tags();
-  }
+    immediate(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
+    : con(t), attr(a), children(c) {}
+  };
 
-  void end_structure() {
-    if (attrib.coat())
-      cont->structure().end();
-  }
+  boost::variant<immediate, rule_t const *> data;
 
-private:
-  void add_tags() {
-    void (writable_structure::*add)(wstring const &) =
-      &writable_structure::add_tag;
-    for_each(range(attrib.tags()), bind(add, &cont->structure(), _1));
-  }
+  IMPL(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
+  : data(immediate(t, a, c)) {}
 
-  void start_structure() {
-    if (attrib.coat())
-      cont->structure().begin();
-  }
+  IMPL(rule_t const *p)
+  : data(p) {}
 };
 
-rule::rule(expect e, attributes a, match &m) 
-: expectation(e), pIMPL(new IMPL(m, a)) {
+rule_t::rule_t(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
+: p(new IMPL(t, a, c)) {}
+
+rule_t::rule_t(rule_t const &o) : p(o.p) {}
+
+rule_t::rule_t(rule_t const *ptr) : p(new IMPL(ptr)) {}
+
+rule_t::~rule_t() {}
+
+void rule_t::operator=(rule_t const &o) {
+  p = o.p;
 }
 
-void rule::finish() {
-  pIMPL->end_structure();
+item *rule_t::get(match &m) const {
+  switch (p->data.which()) {
+  case 0: // immediate
+    { IMPL::immediate &imm = boost::get<IMPL::immediate &>(p->data);
+      return imm.con(imm.attr, imm.children, m); }
+  case 1: // indirect
+    return boost::get<rule_t *>(p->data)->get(m);
+  }
+  throw (void*)0; // never happen
 }
 
-rule::~rule() { delete pIMPL; }
+rule_t sh::rule(string const &id, rule_attr const &a, Vector<rule_t> pick_ &c) {
+  return by_name().get(id, a, c);
+}
 
-rule::attributes const &rule::get_attributes() const { return pIMPL->attrib; }
-match &rule::matcher() { return *pIMPL->cont; }
-
-bool rule::play(ev::begin_parse const &) { return false; }
-bool rule::play(ev::down const &) { return false; }
-bool rule::play(ev::up const &) { return false; }
-bool rule::play(ev::end_parse const &) { return false; }
-bool rule::play(ev::node const &) { return false; }
-
-bool rule::play(ev::child_succeed const &) { return false; }
-bool rule::play(ev::child_fail const &) { return false; }
+rule_attr const &rule_t::attributes() const {
+  switch (p->data.which()) {
+  case 0: // immediate
+    return boost::get<IMPL::immediate>(p->data).attr;
+  case 1: // indirect
+    return boost::get<rule_t *>(p->data)->attributes();
+  };
+  throw (void*)0; // never happen
+}

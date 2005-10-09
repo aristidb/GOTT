@@ -1,2 +1,2 @@
-Import('env')
-env.SharedLibrary('xany', 'xany.cpp')
+Import('shrd')
+shrd.SharedLibrary('xany', 'xany.cpp')

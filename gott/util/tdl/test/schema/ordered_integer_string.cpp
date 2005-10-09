@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,30 +19,28 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::wstring;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+using gott::string;
+
 using stru::cf::S;
 using stru::cf::C;
-
-typedef schema::rule::attributes RA;
+using schema::rule_t;
+using schema::rule;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_ordered_integer_string : tut::schema_basic {
-  schema_ordered_integer_string() {
-    context.begin(L"document", RA(wstring(L"doc")));
-      context.begin(L"ordered", RA(wstring(L"ord")));
-        context.begin(L"integer", RA(wstring(L"int")));
-        context.end();
-        context.begin(L"string", RA(wstring(L"string")));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_ordered_integer_string() 
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("ordered", RA(), Vector<rule_t>() <<
+          rule("node", RA(RA::simple, true, new stru::repatch_integer())) <<
+          rule("node", RA())))) {}
 };
 }
 
@@ -60,9 +58,9 @@ template<> template<>
 void object::test<1>(int) {
   run_test(L"4\nx");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(4), L"int"));
-  c.push_back(S(Xany(L"x"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  c.push_back(S(Xany(4)));
+  c.push_back(S(Xany(L"x")));
+  C(M(c)).write_to(xp);
   ensure_equals("single ordered_integer_string entity", tree, xp);
 }
 
@@ -73,7 +71,7 @@ void object::test<2>(int) {
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token d7");
+        gott::string(mm.what()), "1:1 : mismatch in document>ordered>node at token d7");
   }
 }
 
@@ -84,7 +82,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch after token ");
+        gott::string(mm.what()), "0:1 : mismatch in document>ordered>node after token ");
   }
 }
 
@@ -95,7 +93,7 @@ void object::test<4>(int) {
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token foo");
+        gott::string(mm.what()), "1:1 : mismatch in document>ordered>node at token foo");
   }
 }
 
@@ -106,7 +104,7 @@ void object::test<5>(int) {
     fail("just integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 4");
+        gott::string(mm.what()), "1:1 : mismatch in document>ordered>node after token 4");
   }
 }
 
@@ -116,7 +114,7 @@ void object::test<6>(int) {
     run_test(L"4,x,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch at token y");
+        gott::string(mm.what()), "1:5 : mismatch in document at token y");
   }
 }
 
@@ -127,7 +125,7 @@ void object::test<7>(int) {
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 732");
+        gott::string(mm.what()), "1:1 : mismatch in document>ordered>node after token 732");
   }
 }
 

@@ -31,7 +31,7 @@ tracefilter::tracefilter(int timeoffset, TracefilterFlags flags)
   if (timeoffset > 0)
     filteroffset = (timeoffset * CLOCKS_PER_SEC)/1000;
   else
-    filteroffset = -1;
+    filteroffset = clock_t(-1);
 }
 
 std::wstring tracefilter::operator () (clock_t requesttime) {

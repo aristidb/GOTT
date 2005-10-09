@@ -1,4 +1,4 @@
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,30 +17,31 @@
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::wstring;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+using gott::string;
+
 using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
+using schema::rule_t;
 
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_max7string : tut::schema_basic {
-  schema_max7string() {
-    context.begin(L"document");
-      context.begin(L"list");
-        context.begin(L"string",
-                      RA(wstring(L"el")), slotcfg(slotcfg::maximum, 7));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_max7string() 
+  : tut::schema_basic(
+      rule("document", RA(),
+        Vector<rule_t>() <<
+         rule("list", RA(),
+           Vector<rule_t>() <<
+           rule("node",
+             RA(Vector<string>() << "el", true, Xany(), 0, 
+                slotcfg(), slotcfg(slotcfg::maximum, 7)))))) {}
 };
 }
 
@@ -89,7 +90,7 @@ void object::test<8>(int n) {
     fail("too many");
   } catch(schema::mismatch const &m) {
     ensure_equals("correct error", m.what(), 
-                  std::string("1:15 : mismatch at token 7"));
+                  gott::string("1:15 : mismatch in document at token 7"));
   }
 }
 
@@ -99,8 +100,8 @@ void object::test<15>(int) {
     run_test(L"1 2 3");
     fail("going down");
   } catch (schema::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch after token 1");
+    ensure_equals("correct error", gott::string(m.what()),
+                  "1:1 : mismatch in document>list>node(el) after token 1");
   }
 }
 

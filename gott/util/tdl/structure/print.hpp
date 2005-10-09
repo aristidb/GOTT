@@ -2,7 +2,7 @@
 // Content: TDL Data Structures
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,9 +22,9 @@
 #define GOTT_UTIL_TDL_STRUCTURE_PRINT_HPP
 
 #include "structure.hpp"
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace structure {
 
@@ -32,6 +32,7 @@ namespace structure {
  * A structure writer callback directly writing to a stream. Does not support
  * backtracking, of course.
  */
+template<class Ch>
 class direct_print : public writable_structure {
 public:
   /**
@@ -39,20 +40,17 @@ public:
    * \param out The stream to write to.
    * \param step The indentation width.
    */
-  EXPORT direct_print(std::wostream &out, unsigned step = 4);
-  EXPORT ~direct_print();
+  GOTT_EXPORT direct_print(std::basic_ostream<Ch> &out, unsigned step = 4);
+  GOTT_EXPORT ~direct_print();
 
 private:
   void begin();
   void end();
   void data(xany::Xany const &);
-  void add_tag(std::wstring const &);
-  void set_tags(std::list<std::wstring> const &);
+  void add_tag(string const &);
 
-  std::wostream &out;
-  unsigned level;
-  unsigned const step;
-  bool line_ended, tag_printed;
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
 };
 
 /**
@@ -60,35 +58,16 @@ private:
  * \param o The stream to write to.
  * \param s The structure to print.
  */
-inline 
-std::wostream &operator<<(std::wostream &o, copyable_structure const &s) {
-  direct_print p(o);
-  s.copy_to(p);
-  return o;
-}
+GOTT_EXPORT
+std::wostream &operator<<(std::wostream &o, copyable_structure const &s);
 
 /**
  * Print a (copyable) structure object to a (normal) stream.
  * @copydoc operator<<(std::wostream &, copyable_structure const &)
  */
-inline 
-std::ostream &operator<<(std::ostream &o, copyable_structure const &s) {
-  std::wostringstream wo;
-  wo << s;
-  return o << wo.str();
-}
+GOTT_EXPORT
+std::ostream &operator<<(std::ostream &o, copyable_structure const &s);
 
-/**
- * Convert a (copyable) structure to a string (wide or narrow).
- * \param s The structure to convert.
- */
-template<class Ch>
-std::basic_string<Ch> to_string(copyable_structure const &s) {
-  std::basic_ostringstream<Ch> o;
-  o << s;
-  return o.str();
-}
-
-}}}}
+}}}
 
 #endif

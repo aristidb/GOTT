@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,118 +21,58 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_RULE_HPP
 #define GOTT_UTIL_TDL_SCHEMA_RULE_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
-#include "ev_fwd.hpp"
+#include <boost/shared_ptr.hpp>
+#include <gott/util/visibility.hpp>
+#include <ntl.h>
 
 namespace gott {
-namespace util {
+class string;
+
 namespace tdl {
 namespace schema {
 
+class rule_attr;
+class item;
+class rule_t;
 class match;
 
+template<class T>
+item *
+construct_item(rule_attr const &att, Vector<rule_t> const&children, match &m) {
+  return new T(att, children, m);
+}
+
+typedef 
+item *(*item_constructor)(rule_attr const &, Vector<rule_t> const &, match &);
+
 /**
- * The base class of the implementation of a rule-matcher object.
- * Used via match::add or via match's constructor. Attention: Those methods
- * require a rule-factory, which in turn will create a rule object.
+ * Rule-factory to produce item objects.
  */
-class EXPORT rule {
+class GOTT_EXPORT rule_t : Moveable<rule_t> {
 public:
-  struct factory;
-  class attributes;
+  rule_t(item_constructor, rule_attr const &, Vector<rule_t> pick_ &);
+  rule_t(rule_t const &);
+  rule_t(rule_t const *);
+  ~rule_t();
 
-  /**
-   * The possible expectations of a living rule object.
-   */
-  enum expect {
-    /// Expect nothing (when finished or empty).
-    nothing = 1,
-    /// Maybe accept something (when optionally accepting more).
-    maybe = 2,
-    /// Need input.
-    need = -3,
-    /// Never occurs (I hope). 
-    over_filled = -4
-  };
+  void operator=(rule_t const &);
 
-  /**
-   * Returns the current expectation.
-   */
-  LOCAL expect expects() const { return expectation; }
-
-  // Event handlers
-  // Tokens
-  /**
-   * Tries to accept an ev:begin_parse token. Adjusts expectation.
-   * Default implementation: Do nothing.
-   * \return
-   *   - \c true on success
-   *   - \c false on failure
-   */
-  virtual bool play(ev::begin_parse const &);
-
-  /**
-   * Tries to accept an ev::down token.
-   * @copydoc play(ev::begin_parse const &)
-   */
-  virtual bool play(ev::down const &);
-
-  /**
-   * Tries to accept an ev::node token.
-   * @copydoc play(ev::begin_parse const &)
-   */
-  virtual bool play(ev::node const &);
-
-  /**
-   * Tries to accept an ev::up token.
-   * @copydoc play(ev::begin_parse const &)
-   */
-  virtual bool play(ev::up const &);
-
-  /**
-   * Tries to accept an ev::end_parse token.
-   * @copydoc play(ev::begin_parse const &)
-   */
-  virtual bool play(ev::end_parse const &);
-
-  // Notifications
-  /**
-   * Tries to accept an ev::child_succeed event.
-   * @copydoc play(ev::begin_parse const &)
-   */
-  virtual bool play(ev::child_succeed const &);
-  
-  /**
-   * Tries to accept an ev::child_fail event.
-   * @copydoc play(ev::begin_parse const &)
-   */
-  virtual bool play(ev::child_fail const &);
-
-  /// @internal
-  void finish() LOCAL;
-
-  virtual ~rule() = 0;
-
-  // Properties
-  /**
-   * Get the attributes associated with this rule.
-   */
-  attributes const &get_attributes() const;
-
-protected:
-  match &matcher();
-    // return a reference to the match-object that embedded us
-
-  rule(expect e, attributes a, match &m);
-    // an implementation must supply attributes and its initial expectation
-
-  expect expectation;
+  item *get(match &) const;
+  rule_attr const &attributes() const;
 
 private:
   class IMPL;
-  IMPL *pIMPL;
+  boost::shared_ptr<IMPL const> p;
 };
 
-}}}}
+template<class T>
+rule_t rule(rule_attr const &a, Vector<rule_t> const &c = Vector<rule_t>()) {
+  return rule_t(construct_item<T>, a, c);
+}
+
+rule_t rule(string const &name, rule_attr const &a, Vector<rule_t> const &c =
+    Vector<rule_t>()) GOTT_EXPORT;
+
+}}}
 
 #endif

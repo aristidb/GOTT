@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "../exceptions.hpp"
+#include <gott/util/string/string.hpp>
 
-using gott::util::tdl::tdl_exception;
-using gott::util::tdl::schema::unregistered_type;
+using gott::string;
+using gott::tdl::tdl_exception;
+using gott::tdl::schema::unregistered_type;
 
-unregistered_type::unregistered_type(std::wstring const &type)
-  : tdl_exception(L"Type " + type + L" not found in database") {}
+static string pizza(string const &type) {
+  string const components[] = { "Type ", type, " not found in database" };
+  return string(range(components), string::concatenate);
+}
+
+unregistered_type::unregistered_type(string const &type)
+  : tdl_exception(pizza(type)) {}
 
 unregistered_type::~unregistered_type() throw() {}

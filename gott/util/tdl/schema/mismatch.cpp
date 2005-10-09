@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,23 +19,44 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "../exceptions.hpp"
-#include "position.hpp"
+#include "stream_position.hpp"
+#include <gott/util/range.hpp>
+#include <gott/util/string/stl.hpp>
+#include <gott/util/thunk.hpp>
+#include <boost/scoped_ptr.hpp>
 
-namespace schema = gott::util::tdl::schema;
+namespace schema = gott::tdl::schema;
 using schema::mismatch;
+using gott::range;
+using gott::string;
+using gott::thunk_t;
+using gott::thunk;
+using gott::integer_to_string;
 
-static std::wstring build_string(schema::detail::line_pos const &p) {
-  std::wostringstream o;
-  o << p.line << ':' << p.pos+1 << " : mismatch ";
+static string build_string(schema::detail::stream_position const &p,
+                            Vector<string> const &t) {
+  Vector<string> out;
+  out.Add(*thunk<gott::utf8_t, integer_to_string>(p.line));
+  out.Add(":");
+  out.Add(*thunk<gott::utf8_t, integer_to_string>(p.pos + 1));
+  out.Add(" : mismatch in ");
+  gott::range_t<string const *> tg = range(t);
+  if (tg.begin != tg.end)
+    out.Add(*tg.begin++);
+  for (; tg.begin != tg.end; ++tg.begin) {
+    out.Add(">");
+    out.Add(*tg.begin);
+  }
   if (p.line_new > p.line || p.current > p.native_end)
-    o << "after";
+    out.Add(" after token ");
   else
-    o << "at";
-  o << " token " << p.tok;
-  return o.str();
+    out.Add(" at token ");
+  out.Add(p.tok);
+  return string(range(out).cast<string const *>(), string::concatenate);
 }
 
-mismatch::mismatch(detail::line_pos const &p) : tdl_exception(build_string(p)) 
-  {}
+mismatch::mismatch(detail::stream_position const &p, 
+                   Vector<string> const &t)
+: tdl_exception(build_string(p, t)) {}
 
 mismatch::~mismatch() throw() {}

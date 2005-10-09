@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,23 +20,20 @@
 
 #include "common.hpp"
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::wstring;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+
 using stru::cf::S;
 using stru::cf::C;
 
 namespace {
 struct schema_string : tut::schema_basic {
-  schema_string() {
-    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
-      context.begin(L"string", schema::rule::attributes());
-      context.end();
-    context.end();
-  }
+  schema_string() 
+  : tut::schema_basic(
+      rule("document", schema::rule_attr("doc"), Vector<schema::rule_t>() <<
+        rule("node", schema::rule_attr()))) {}
 };
 }
 
@@ -71,8 +68,8 @@ void object::test<3>(int) {
     run_test(L"foo bar");
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token foo");
+    ensure_equals("correct error", gott::string(mm.what()),  
+                  "1:1 : mismatch in document(doc) after token foo");
   }
 }
 
@@ -82,8 +79,8 @@ void object::test<4>(int) {
     run_test(L"foo\nbar");
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "2:1 : mismatch at token bar");
+    ensure_equals("correct error", gott::string(mm.what()), 
+                  "2:1 : mismatch in document(doc) at token bar");
   }
 }
 

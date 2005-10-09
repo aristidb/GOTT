@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,38 +21,42 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_UNORDERED_HPP
 #define GOTT_UTIL_TDL_SCHEMA_UNORDERED_HPP
 
-#include "../parse.hpp"
-#include "../rule_factory.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
 #include "../parse_position.hpp"
 #include "../slot.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
-class match_unordered : public rule {
-  typedef std::pair<rule::factory const *, slotcfg> element;
+class match_unordered : public item {
+  struct element : Moveable<element> {
+    rule_t const *first;
+    slotcfg second;
+
+    element() {} // dumb default constructor
+    element(rule_t const *f, slotcfg const &s) : first(f), second(s) {}
+  };
 public:
-  typedef factory_template::slotcfg_manychildren<
-            match_unordered,
-            slotcfg::one,
-            slotcfg::all>
-          factory;
-  match_unordered(std::vector<element> const &, rule::attributes const &, 
-                  match &);
+  match_unordered(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_unordered();
 
+  static bool accept_empty(Vector<element> const &);
+
 private:
-  typedef std::list<element> list_t;
+  typedef Vector<element> list_t;
   list_t children;
   list_t::iterator pos;
   positioning::id last;
+  bool all_happy;
 
+  expect expectation() const;
   bool play(ev::child_succeed const &);
   bool play(ev::child_fail const &);
+  string name() const;
 };
 
-}}}}
+}}}
 
 #endif

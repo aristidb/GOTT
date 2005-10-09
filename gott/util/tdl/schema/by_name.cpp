@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,35 +20,41 @@
 
 #include "by_name.hpp"
 #include "../exceptions.hpp"
+#include <gott/util/string/string.hpp>
 
-using std::wstring;
-namespace tdl = gott::util::tdl;
+namespace tdl = gott::tdl;
 namespace schema = tdl::schema;
-using schema::name_manager_t;
+using schema::by_name_t;
 
-name_manager_t &schema::name_manager() {
-  static name_manager_t m;
+by_name_t &schema::by_name() {
+  static by_name_t m;
   return m;
 }
 
-class name_manager_t::IMPL {
+class by_name_t::IMPL {
 public:
-  hashd::hash_map<wstring, unsigned> items;
+  typedef VectorMap<string, item_constructor> mapping; 
+  mapping items;
+
+  item_constructor get(string const &name) {
+    int i = items.Find(name);
+    if (i < 0)
+      throw unregistered_type(name);
+    return items[i];
+  }
 };
 
-name_manager_t::name_manager_t() : p(new IMPL) {
+by_name_t::by_name_t() : p(new IMPL) {
 }
 
-name_manager_t::~name_manager_t() {
+by_name_t::~by_name_t() {
 }
 
-void name_manager_t::add(wstring const &name, unsigned id) {
-  p->items.insert(std::make_pair(name, id));
+void by_name_t::add(string const &name, item_constructor type) {
+  p->items.Add(name, type);
 }
 
-unsigned name_manager_t::get(wstring const &name) const {
-  hashd::hash_map<wstring, unsigned>::const_iterator it = p->items.find(name);
-  if (it == p->items.end())
-    throw unregistered_type(name);
-  return it->second;
+schema::rule_t by_name_t::get(string const &n, rule_attr const &a, 
+                              Vector<rule_t> pick_ &c) const {
+  return rule_t(p->get(n), a, c);
 }

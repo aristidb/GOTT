@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,34 +19,28 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::wstring;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+
 using stru::cf::S;
 using stru::cf::C;
 
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
+typedef stru::repatch_integer I;
+using schema::rule_t;
 
 namespace {
 struct schema_follow_integer_integer : tut::schema_basic {
-  schema_follow_integer_integer() {
-    context.begin(L"document", 
-                  RA(wstring(L"doc")));
-      context.begin(L"follow",
-                    RA(wstring(L"foll")));
-        context.begin(L"integer",
-                    RA(wstring(L"int1")));
-        context.end();
-        context.begin(L"integer",
-                    RA(wstring(L"int2")));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_follow_integer_integer() 
+  : tut::schema_basic(
+      rule("document", RA("doc"), Vector<rule_t>() <<
+        rule("follow", RA("foll"), Vector<rule_t>() <<
+          rule("node", RA("int1", true, new I())) <<
+          rule("node", RA("int2", true, new I()))))) {}
 };
 }
 
@@ -76,8 +70,8 @@ void object::test<2>(int) {
     run_test(L"d7");
     fail("just string");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token d7");
+    ensure_equals("correct error", std::string(mm.what()),
+      "1:1 : mismatch in document(doc)>follow(foll)>node(int1) at token d7");
   }
 }
 
@@ -87,8 +81,8 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch after token ");
+    ensure_equals("correct error", std::string(mm.what()), 
+     "0:1 : mismatch in document(doc)>follow(foll)>node(int1) after token ");
   }
 }
 
@@ -98,8 +92,8 @@ void object::test<4>(int) {
     run_test(L"-77 foo");
     fail("followed string");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch at token foo");
+    ensure_equals("correct error", std::string(mm.what()), 
+     "1:5 : mismatch in document(doc)>follow(foll)>node(int2) at token foo");
   }
 }
 
@@ -109,8 +103,8 @@ void object::test<5>(int) {
     run_test(L"4");
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 4");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:1 : mismatch in document(doc)>follow(foll) after token 4");
   }
 }
 
@@ -120,8 +114,8 @@ void object::test<6>(int) {
     run_test(L"4 99,y");
     fail("follows");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:6 : mismatch at token y");
+    ensure_equals("correct error", std::string(mm.what()), 
+        "1:6 : mismatch in document(doc)>follow(foll) at token y");
   }
 }
 

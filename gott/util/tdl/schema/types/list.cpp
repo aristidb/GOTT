@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,24 +19,26 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "list.hpp"
+#include "../rule_attr.hpp"
+#include <gott/util/debug/assert.hpp>
 
-namespace schema = gott::util::tdl::schema;
-namespace ev = gott::util::tdl::schema::ev;
-using schema::rule;
+namespace schema = gott::tdl::schema;
+namespace ev = gott::tdl::schema::ev;
+using schema::item;
 using schema::slotcfg;
 using schema::match_list;
 
-match_list::match_list(rule::factory const &r, slotcfg const &c,
-                                 rule::attributes const &a, match &m)
-: rule(need, a, m), sub(r), cfg(c) {
+match_list::match_list(rule_attr const &a, Vector<rule_t> const &r, match &m)
+: item(a, m), sub(r[0]), cfg(r[0].attributes().outer()) {
+  GOTT_ASSERT_2(r.GetCount(), 1, std::equal_to<int>(), "1 child");
   last = m.pos().current();
-  expectation = cfg.expectation();
-  if (expectation == rule::need || expectation == rule::maybe)
+  if (accept_more(expectation()))
     matcher().add(sub);
 }
 
 match_list::~match_list() {
-  matcher().pos().forget(last);
+  if (expectation() != nothing)
+    matcher().pos().forget(last);
 }
 
 bool match_list::play(ev::child_fail const &) {
@@ -53,10 +55,9 @@ bool match_list::play(ev::child_succeed const &) {
 
 bool match_list::full() {
   cfg.add();
-  expectation = cfg.expectation();
 
-  if (expects() != nothing) {
-    matcher().pos().forget(last);
+  matcher().pos().forget(last);
+  if (expectation() != nothing) {
     last = matcher().pos().current();
     matcher().add(sub);
   }
@@ -66,8 +67,16 @@ bool match_list::full() {
 
 bool match_list::empty() {
   matcher().pos().seek(last);
-  if (expectation != need)
-    expectation = nothing;
+  if (expectation() != need)
+    cfg.cancel();
 
   return true;
+}
+
+item::expect match_list::expectation() const {
+  return cfg.expectation();
+}
+
+gott::string match_list::name() const {
+  return L"list";
 }

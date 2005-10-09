@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,17 +21,20 @@
 #ifndef GOTT_TDL_SCHEMA_EVENT_HPP
 #define GOTT_TDL_SCHEMA_EVENT_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <iosfwd>
+#include <gott/util/string/string.hpp>
+#include <gott/util/visibility.hpp>
+#include <boost/variant.hpp>
+#include <ntl.h>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
-class rule;
+class item;
 
 /**
- * Schema events. Interesting for rule-writers.
+ * Schema events. Interesting for rule_t-writers.
  */
 namespace ev {
 
@@ -41,11 +44,11 @@ namespace ev {
 class event {
 public:
   /**
-   * Notify a rule of this event.
-   * Calls rule::play with a reference to *this.
-   * \param r The rule to notify.
+   * Notify a item of this event.
+   * Calls item::play with a reference to *this.
+   * \param r The item to notify.
    */
-  virtual bool play(rule &r) const = 0;
+  virtual bool play(item &r) const = 0;
 
   /**
    * @internal
@@ -53,7 +56,9 @@ public:
    * Meant for debugging purposes.
    * \param s The stream to write to.
    */
-  virtual void print(std::wostream &s) const = 0;
+  virtual void print(std::ostream &s) const = 0;
+
+  virtual event *clone() const = 0;
 
   virtual ~event() = 0;
 };
@@ -61,7 +66,7 @@ public:
 /**
  * Print an event to a stream.
  */
-inline std::wostream &operator<<(std::wostream &s, event const &e) {
+inline std::ostream &operator<<(std::ostream &s, event const &e) {
   e.print(s);
   return s;
 }
@@ -73,46 +78,53 @@ class token : public event {
 /// The event class for the simple::parser::begin_parse token.
 class begin_parse : public token {
 public:
-  bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  bool play(item &r) const;
+  void print(std::ostream &s) const;
+  event *clone() const { return new begin_parse; }
 };
 
 /// The event class for the simple::parser::down token.
 class down : public token {
 public:
-  bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  bool play(item &r) const;
+  void print(std::ostream &s) const;
+  event *clone() const { return new down; }
 };
 
 /// The event class for the simple::parser::node token.
 class node : public token {
-  std::wstring data;
+  string data;
 public:
-  node(std::wstring const &);
+  node(string const &);
     // construct a node with the given data
 
-  bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  bool play(item &r) const;
+  void print(std::ostream &s) const;
+  event *clone() const { return new node(*this); }
 
-  std::wstring const &get_data() const EXPORT;
+  string const &get_data() const GOTT_EXPORT;
     // get the data of this node-event
 };
 
 /// The event class for the simple::parser::up token.
 class up : public token {
 public:
-  bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  bool play(item &r) const;
+  void print(std::ostream &s) const;
+  event *clone() const { return new up; }
 };
 
 /// The event class for the simple::parser::end_parse token.
 class end_parse : public token {
 public:
-  bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  bool play(item &r) const;
+  void print(std::ostream &s) const;
+  event *clone() const { return new end_parse; }
 };
 
 typedef boost::variant<begin_parse, down, node, up, end_parse> token_t;
+
+NTL_MOVEABLE(token_t);
 
 token const &get(token_t const &);
 
@@ -123,17 +135,19 @@ class notification : public event {
 /// The event class for a succeeded child.
 class child_succeed : public notification {
 public:
-  bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  bool play(item &r) const;
+  void print(std::ostream &s) const;
+  event *clone() const { return new child_succeed; }
 };
 
 /// The event class for a failed child.
 class child_fail : public notification {
 public:
-  bool play(rule &r) const;
-  void print(std::wostream &s) const;
+  bool play(item &r) const;
+  void print(std::ostream &s) const;
+  event *clone() const { return new child_fail; }
 };
 
-}}}}}
+}}}}
 
 #endif

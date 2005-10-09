@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,28 +19,28 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
-#include <gott/util/tdl/schema/types/enumeration.hpp>
+#include <gott/util/tdl/structure/types/enumeration.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::vector;
-using std::wstring;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+
 using stru::cf::S;
 using stru::cf::C;
+using schema::rule_attr;
+using schema::rule_t;
+using stru::repatch_enumeration;
 
 namespace {
 struct schema_enumeration : tut::schema_basic {
-  schema_enumeration() {
-    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
-      vector<wstring> v(3);
-      v[0] = L"first"; v[1] = L"second"; v[2] = L"third";
-      context.begin(L"enumeration", schema::match_enumeration::attributes(v));
-      context.end();
-    context.end();
-  }
+  schema_enumeration() 
+  : tut::schema_basic(
+    rule("document", rule_attr(), Vector<rule_t>() <<
+      rule("node", rule_attr(Vector<gott::string>(), true, Xany(),
+             new repatch_enumeration(Vector<gott::string>() <<
+               "first" << "second" << "third")))))
+  {}
 };
 }
 
@@ -57,21 +57,21 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"first");
-  C(S(Xany(0)), L"doc").write_to(xp);
+  C(S(Xany(0))).write_to(xp);
   ensure_equals("first", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
   run_test(L"second");
-  C(S(Xany(1)), L"doc").write_to(xp);
+  C(S(Xany(1))).write_to(xp);
   ensure_equals("second", tree, xp);
 }
 
 template<> template<>
 void object::test<3>(int) {
   run_test(L"third");
-  C(S(Xany(2)), L"doc").write_to(xp);
+  C(S(Xany(2))).write_to(xp);
   ensure_equals("third", tree, xp);
 }
 
@@ -82,7 +82,7 @@ void object::test<4>(int) {
     fail("out-of");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token d7");
+        std::string(mm.what()), "1:1 : mismatch in document>node at token d7");
   }
 }
 
@@ -93,7 +93,7 @@ void object::test<5>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch after token ");  
+        std::string(mm.what()), "0:1 : mismatch in document>node after token ");  
   }
 }
 
@@ -104,7 +104,7 @@ void object::test<6>(int) {
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token second");  
+        std::string(mm.what()), "1:1 : mismatch in document after token second");  
   }
 }
 
@@ -115,7 +115,7 @@ void object::test<7>(int) {
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token foo");
+        std::string(mm.what()), "1:1 : mismatch in document>node at token foo");
   }
 }
 

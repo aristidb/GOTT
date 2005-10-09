@@ -1,0 +1,2 @@
+Import('shrd')
+shrd.SharedLibrary('ntl', 'src/Cont.cpp')

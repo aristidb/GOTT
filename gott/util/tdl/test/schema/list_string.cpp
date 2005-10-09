@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,30 +21,27 @@
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::wstring;
-using stru::cf::S;
-using stru::cf::C;
-using stru::cf::M;
-using schema::slotcfg;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+using gott::string;
 
-typedef schema::rule::attributes RA;
+using namespace stru::cf;
+using schema::slotcfg;
+using schema::rule_t;
+
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_list_string : tut::schema_basic {
-  schema_list_string() {
-    context.begin(L"document");
-      context.begin(L"list");
-        context.begin(L"string", 
-                      RA(wstring(L"el")), slotcfg(slotcfg::list));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_list_string() 
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("list", RA(), Vector<rule_t>() <<
+          rule("node", 
+            RA(Vector<string>() << "el", true, Xany(), 0, 
+               slotcfg(), slotcfg(slotcfg::list)))))) {}
 };
 }
 
@@ -61,9 +58,9 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z");
-  stru::cf::nd_list c;
+  nd_list c;
   for (wchar_t ch = 'a'; ch <= 'z'; ++ch)
-    c.push_back(S(Xany(wstring(1,ch)), L"el"));
+    c.push_back(S(Xany(std::wstring(1,ch)), "el"));
   C(M(c)).write_to(xp);
   ensure_equals("alphabet", tree, xp);
 }
@@ -87,8 +84,8 @@ void object::test<4>(int) {
     run_test(L"a b");
     fail("following");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch after token a");
+    ensure_equals("correct error", gott::string(mm.what()), 
+        "1:1 : mismatch in document>list>node(el) after token a");
   }
 }
 

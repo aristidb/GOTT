@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,39 +21,36 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_NAMED_HPP
 #define GOTT_UTIL_TDL_SCHEMA_NAMED_HPP
 
-#include "../parse.hpp"
-#include "../rule_factory.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
 #include "../rule_attr.hpp"
-#include "../slot.hpp"
+#include "../happy_once.hpp"
+#include "follow_ordered.hpp"
+#include "node.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
-class match_named : public rule {
+class match_named : public happy_once {
 public:
-  static EXPORT
-  rule::attributes attributes(std::wstring const &s, bool cc = true);
+  static GOTT_EXPORT
+  rule_attr attributes(string const &s, bool cc = true);
   
-  typedef factory_template::slotcfg_onechild<
-    match_named, slotcfg::one, slotcfg::single> factory;
-  match_named(rule::factory const &, slotcfg const &, rule::attributes const &,
-    match &);
+  match_named(rule_attr const &, Vector<rule_t> const &, match &);
+
+  ~match_named();
+
+  static bool accept_empty(bool) { return false; }
 
 private:
-  bool play(ev::node const &);
-  bool play(ev::down const &);
-  bool play(ev::up const &);
+  virtual string name() const;
+  string tag;
+  //match_follow_ordered::factory outer;
+  //match_node::factory inner_name;
   bool play(ev::child_succeed const &);
-  bool play(ev::child_fail const &);
-  
-  rule::factory const &sub;
-  bool optional;
-
-  enum { read_none, read_node, read_down, read_sub, read_up } state;
 };
   
-}}}}
+}}}
 
 #endif

@@ -2,7 +2,7 @@
 // Content: Simple SAX-like TDL parser
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,14 +18,35 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "parser.hpp"
+#include "meta.hpp"
+#include <gott/util/string/string.hpp>
+#include <gott/util/string/stl.hpp>
 
 using std::wistream;
-using std::wstring;
-using gott::util::tdl::simple::meta_parser;
+using gott::tdl::simple::meta_parser;
 
-void gott::util::tdl::simple::parse_meta(std::wistream &in, meta_parser &p, 
-                                         line_logger *) {
+static bool pass(gott::string const &, gott::string const &) {
+  return false;
+}
+
+NTL_MOVEABLE(meta_parser::callback);
+
+class meta_parser::IMPL {
+public:
+  IMPL() : def(pass) {}
+
+  callback def;
+  typedef VectorMap<string, callback> cb_t;
+  cb_t cb;
+  void exec(string const &);
+};
+
+meta_parser::meta_parser() : p(new IMPL) {
+}
+
+meta_parser::~meta_parser() {}
+
+void meta_parser::parse(std::wistream &in, line_logger *) {
   while (in) {
     if (in.peek() != L'#') {
       if (in.peek() != L'\n')
@@ -39,49 +60,35 @@ void gott::util::tdl::simple::parse_meta(std::wistream &in, meta_parser &p,
         break;
       }
       in.get();
-      wstring s;
+      std::wstring s;
       getline(in, s);
-      p.exec(s);
+      p->exec(s);
     }
   }
 }
 
-namespace {
-  struct pass {
-    bool operator() (wstring const &, wstring const &) const {
-      return false;
-    }
-  };
-}
-
-meta_parser::meta_parser() : def(pass()) {
-}
-
-void meta_parser::exec(wstring const &line) {
-  wstring::const_iterator start = line.begin(), pos;
-  for (pos = line.begin(); pos != line.end(); ++pos)
+void meta_parser::IMPL::exec(string const &line_) {
+  string::utf32_range line = line_.as_utf32();
+  utf8_iterator pos = line.begin;
+  for (; pos != line.end; ++pos)
     if (*pos == L' ')
       break;
   
-  wstring cmd(start, pos);
-  wstring param;
-  while (*pos == L' ' && ++pos != line.end())
+  string cmd(range(line.begin, pos));
+  while (*pos == L' ' && ++pos != line.end)
     ;
-  param.assign(pos, line.end());
+  string param(range(pos, line.end));
 
-  cb_t::iterator it = cb.find(cmd);
+  int i = cb.Find(cmd);
 
-  if (it == cb.end())
+  if (i < 0 || !cb[i](cmd, param))
     def(cmd, param);
-  else
-    if (!it->second(cmd, param))
-      def(cmd, param);
 }
 
 void meta_parser::set_default(callback const &f) {
-  def = f;
+  p->def = f;
 }
 
-void meta_parser::set_specific(wstring const &cmd, callback const &f) {
-  cb.insert(make_pair(cmd, f));
+void meta_parser::set_specific(string const &cmd, callback const &f) {
+  p->cb.Add(cmd, f);
 }

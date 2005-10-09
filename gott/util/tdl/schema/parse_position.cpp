@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,18 +21,19 @@
 #include "parse_position.hpp"
 #include "event.hpp"
 #include <gott/util/tdl/structure/structure.hpp>
+#include <ntl.h>
+#include <gott/util/debug/assert.hpp>
 
-using std::vector;
 using std::size_t;
-namespace schema = gott::util::tdl::schema;
-namespace structure = gott::util::tdl::structure;
+namespace schema = gott::tdl::schema;
+namespace structure = gott::tdl::structure;
 
 using structure::revocable_structure;
 using schema::positioning;
 
 class positioning::IMPL {
 public:
-  typedef vector<ev::token_t> buffer_t;
+  typedef Vector<ev::token_t> buffer_t;
 
   revocable_structure &struc;
 
@@ -41,7 +42,14 @@ public:
   bool replay, in_replay;
   bool in_pass;
 
-  IMPL(revocable_structure &s) 
+  long current() {
+    if (in_pass)
+      return consumed;
+    else
+      return unconsumed;
+  }
+
+  IMPL(revocable_structure &s)
     : struc(s), unconsumed(0), consumed(-1), replay(false), in_pass(false) {}
 };
 
@@ -51,7 +59,7 @@ positioning::~positioning() {}
 template<class T>
 void positioning::add(T const &t) {
   p->unconsumed = p->buffer.size();
-  p->buffer.push_back(t);
+  p->buffer.Add(t);
   p->in_pass = false;
 }
 
@@ -74,10 +82,11 @@ bool positioning::proceeded(id const &x) const {
 }
 
 positioning::id positioning::current() {
-  if (p->in_pass)
-    return std::make_pair(p->consumed, p->struc.point());
-  else
-    return std::make_pair(p->unconsumed, p->struc.point());
+  return id(p->current(), p->struc.point());
+}
+
+positioning::id positioning::current_readonly() {
+  return id(p->current(), -1);
 }
 
 void positioning::seek(id const &x) {
@@ -104,10 +113,11 @@ void positioning::replay(acceptor &acc) {
     for (p->unconsumed = p->consumed + 1;
          p->unconsumed < long(p->buffer.size());
          ++p->unconsumed) {
-      acc(get(p->buffer[p->unconsumed]));
+      acc(get(p->buffer[int(p->unconsumed)])); // NTL-Vector::operator[](int)
       if (p->replay)
         break;
-      GOTT_ASSERT_2(p->consumed, p->unconsumed, gott::debug::equals(), 
+
+      GOTT_ASSERT_2(p->consumed, p->unconsumed, std::equal_to<long>(),
                     "Gotta consume token");
     }
     p->in_replay = false;

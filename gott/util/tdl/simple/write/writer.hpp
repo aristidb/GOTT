@@ -2,7 +2,7 @@
 // Content: Simple TDL writer
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,35 +21,32 @@
 #ifndef GOTT_UTIL_TDL_SIMPLE_WRITER_H
 #define GOTT_UTIL_TDL_SIMPLE_WRITER_H
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/visibility.hpp>
+#include <iosfwd>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace simple {
 
 class writer {
-  std::wostream &stream;
-  unsigned level;
-  unsigned indentation_width;
-  bool newline;
-  bool last_block;
-  bool level_change;
-
-  void indent();
-  void print_as_block(std::wstring const &s);
 public:
-  EXPORT writer(std::wostream &, unsigned = 4);
-  EXPORT void down();
-  EXPORT void up();
-  EXPORT void node(std::wstring const &content, 
+  GOTT_EXPORT writer(std::wostream &, unsigned = 4);
+  GOTT_EXPORT void down();
+  GOTT_EXPORT void up();
+  GOTT_EXPORT void node(std::wstring const &content, 
                    bool quote = false, 
                    bool block = false);
-  EXPORT void comment(std::wstring const &content, bool on_new_line);
-  EXPORT void end_document();
+  GOTT_EXPORT void comment(std::wstring const &content, bool on_new_line);
+  GOTT_EXPORT void end_document();
 
-  EXPORT class non_conformant_block {};
+  GOTT_EXPORT class non_conformant_block {};
+
+private:
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
 };
 
-}}}}
+}}}
+
 #endif

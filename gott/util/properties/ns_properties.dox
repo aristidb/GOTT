@@ -1,4 +1,4 @@
 /**
-\namespace gott::util::properties
+\namespace gott::properties
 A full-fledged properties library.
 */

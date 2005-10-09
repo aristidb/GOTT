@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,25 +19,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "unordered.hpp"
+#include <gott/util/range_algo.hpp>
 
-using std::vector;
-
-namespace schema = gott::util::tdl::schema;
-namespace ev = gott::util::tdl::schema::ev;
-using schema::rule;
+namespace schema = gott::tdl::schema;
+namespace ev = gott::tdl::schema::ev;
+using schema::item;
 using schema::match_unordered;
 
-match_unordered::match_unordered(vector<element> const &r, 
-                                 rule::attributes const &a, match &m) 
-: rule(need, a, m), last(m.pos().current()) {
-  copy(range(r), std::back_inserter(children));
+match_unordered::match_unordered(rule_attr const &a, Vector<rule_t> const &r,
+                                 match &m) 
+: item(a, m), last(m.pos().current()), all_happy(true) {
+  (void)r;//FIXME copy(range(r), std::back_inserter(children));
 
   pos = children.begin();
 
   if (pos != children.end())
     matcher().add(*pos->first);
-  else
-    expectation = nothing;
 }
 
 match_unordered::~match_unordered() {
@@ -46,12 +43,10 @@ match_unordered::~match_unordered() {
 
 bool match_unordered::play(ev::child_succeed const &) {
   pos->second.add();
-  if (pos->second.expectation() == rule::nothing) 
-    children.erase(pos);
+  if (pos->second.expectation() == item::nothing) 
+    children.Remove(pos - children.begin());
 
-  if (children.empty())
-    expectation = nothing;
-  else {
+  if (!children.IsEmpty()) {
     pos = children.begin();
     matcher().pos().forget(last);
     last = matcher().pos().current();
@@ -66,10 +61,30 @@ bool match_unordered::play(ev::child_fail const &) {
   bool happy = pos->second.expectation() != need;
   if (++pos == children.end())
     if (happy) {
-      expectation = nothing;
+      children.clear();
       return true;
-    } else
+    } else {
+      all_happy = false;
       return false;
+    }
   matcher().add(*pos->first);
   return true;
+}
+
+item::expect match_unordered::expectation() const {
+  if (children.IsEmpty() && all_happy)
+    return nothing;
+  return need;
+}
+
+bool match_unordered::accept_empty(Vector<element> const &children) {
+  bool accept = true;
+  for (Vector<element>::const_iterator it = children.begin(); 
+       it != children.end(); ++it)
+    ;//FIXME accept &= it->second.prefix_optional() || it->first->accept_empty();
+  return accept;
+}
+
+gott::string match_unordered::name() const {
+  return L"unordered";
 }

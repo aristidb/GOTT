@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,76 +20,41 @@
 
 #include "named.hpp"
 #include "../event.hpp"
+#include <gott/util/string/string.hpp>
+#include <gott/util/tdl/structure/types/enumeration.hpp>
 
-using std::list;
-using std::wstring;
-using gott::util::xany::Xany;
-using gott::util::xany::Xany_cast;
+using gott::xany::Xany;
+using gott::xany::Xany_cast;
 
-namespace schema = gott::util::tdl::schema;
-namespace ev = gott::util::tdl::schema::ev;
-using schema::rule;
+namespace schema = gott::tdl::schema;
+namespace ev = gott::tdl::schema::ev;
+using schema::item;
+using schema::rule_attr;
 using schema::match_named;
 
-rule::attributes match_named::attributes(wstring const &s, bool cc) {
-  return rule::attributes(std::list<wstring>(1, s), cc, s);
+rule_attr match_named::attributes(string const &s, bool cc) {
+  return rule_attr(Vector<string>() << s, cc, Xany(s));
 }
 
-match_named::match_named(rule::factory const &s, slotcfg const &c,
-                         rule::attributes const &a, match &m) 
-: rule(need, a, m), sub(s), optional(c.get_mode() == slotcfg::optional),
-state(read_none) {
-  if (a.user().type() != typeid(wstring))
-    throw std::bad_exception();
+match_named::match_named(rule_attr const &a, Vector<rule_t> const &s, match &m) 
+: happy_once(a, m), 
+  tag(Xany_cast<string>(a.user()))//,
+  //FIXME outer(rule_attr(rule_attr::simple, false)),
+  /*inner_name(rule_attr(rule_attr::simple, false, 
+        new structure::repatch_enumeration(Vector<string>() << tag)))*/ {
+          (void)s;
+  //outer.add(inner_name);
+  //outer.add(s);
+  //matcher().add(outer);
 }
 
-bool match_named::play(ev::node const &n) {
-  if (state != read_none)
-    return false;
-
-  if (n.get_data() == Xany_cast<wstring>(get_attributes().user())) {
-    state = read_node;
-    if (optional) {
-      expectation = maybe;
-      // WE ARE OPTIONAL, MIGHT HAVE TO RECOVER THE INCOMING up EVENT
-    }
-    return true;
-  }
-  
-  return false;
-}
-
-bool match_named::play(ev::down const &) {
-  if (state == read_node) {
-    state = read_down;
-    matcher().add(sub);
-    return true;
-  }
-  return false;
-}
+match_named::~match_named() {}
 
 bool match_named::play(ev::child_succeed const &) {
-  state = read_sub;
-  if (optional) {
-    // WE NEED NO LONGER GO BACK
-  }
+  be_happy();
   return true;
 }
 
-bool match_named::play(ev::child_fail const &) {
-  if (optional) {
-    // GO BACK
-    return true;
-  }
-  return false;
+gott::string match_named::name() const {
+  return "named";
 }
-
-bool match_named::play(ev::up const &) {
-  if (state == read_sub) {
-    state = read_up;
-    expectation = nothing;
-    return true;
-  }
-  return false;
-}
-

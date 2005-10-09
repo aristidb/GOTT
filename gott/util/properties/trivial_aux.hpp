@@ -2,7 +2,7 @@
 // Content: Properties library
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,11 +22,13 @@
 #define GOTT_UTIL_PROPERTY_TRIVIAL_AUX_HPP
 
 namespace gott {
-namespace util {
 namespace properties {
 
 struct no_lock {
   typedef no_lock read_lock, write_lock, read_write_lock;
+
+  static void begin(no_lock &) {}
+  static void end(no_lock &) {}
 };
 
 template<class ValueType, class Storage>
@@ -64,6 +66,6 @@ struct no_notification {
   void notify(void *) const {}
 };
 
-}}}
+}}
 
 #endif

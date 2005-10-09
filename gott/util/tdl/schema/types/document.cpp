@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,15 +19,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "document.hpp"
+#include <gott/util/debug/assert.hpp>
 
-namespace schema = gott::util::tdl::schema;
-namespace ev = gott::util::tdl::schema::ev;
-using schema::rule;
+namespace schema = gott::tdl::schema;
+namespace ev = gott::tdl::schema::ev;
+using schema::item;
 using schema::match_document;
 
-match_document::match_document(rule::factory const &sr, 
-                               rule::attributes const &a, match &m)
-: rule(need, a, m), sub(sr), state(first) {}
+match_document::match_document(rule_attr const &a, Vector<rule_t> const &sr, 
+                               match &m)
+: happy_once(a, m), sub(sr[0]), state(first) {
+  GOTT_ASSERT_2(sr.GetCount(), 1, std::equal_to<int>(), "one parameter");
+}
 
 bool match_document::play(ev::begin_parse const &) {
   state = begun_parse;
@@ -53,7 +56,7 @@ bool match_document::play(ev::up const &) {
 
 bool match_document::play(ev::end_parse const &) {
   if (state == closed) {
-    expectation = nothing;
+    be_happy();
     return true;
   }
 
@@ -62,4 +65,8 @@ bool match_document::play(ev::end_parse const &) {
 
 bool match_document::play(ev::child_succeed const &) {
   return true;
+}
+
+gott::string match_document::name() const {
+  return "document";
 }

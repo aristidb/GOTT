@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,15 +21,13 @@
 #include "../by_name.hpp"
 #include "any.hpp"
 #include "document.hpp"
-#include "enumeration.hpp"
-#include "follow.hpp"
-#include "integer.hpp"
+#include "follow_ordered.hpp"
 #include "list.hpp"
-#include "literal.hpp"
 #include "named.hpp"
 #include "ordered.hpp"
-#include "string.hpp"
+#include "node.hpp"
 #include "unordered.hpp"
+#include <gott/util/string/string.hpp>
 
 namespace {
 struct builtin_types {
@@ -37,18 +35,17 @@ struct builtin_types {
 } auto_reg;
 }
 
-namespace s = gott::util::tdl::schema;
+using namespace gott::tdl::schema;
+
+#define REG(t) by_name().add<match_##t>(#t)
 
 builtin_types::builtin_types() {
-  s::name_manager().add(L"any",         s::match_any::factory::index());
-  s::name_manager().add(L"document",    s::match_document::factory::index());
-  s::name_manager().add(L"enumeration", s::match_enumeration::factory::index());
-  s::name_manager().add(L"follow",      s::match_follow::factory::index());
-  s::name_manager().add(L"integer",     s::match_integer::factory::index());
-  s::name_manager().add(L"list",        s::match_list::factory::index());
-  s::name_manager().add(L"literal",     s::match_literal::factory::index());
-  s::name_manager().add(L"named",       s::match_named::factory::index());
-  s::name_manager().add(L"ordered",     s::match_ordered::factory::index());
-  s::name_manager().add(L"string",      s::match_string::factory::index());
-  s::name_manager().add(L"unordered",   s::match_unordered::factory::index());
+  REG(any);
+  REG(document);
+  by_name().add<match_follow_ordered>("follow");
+  REG(list);
+  REG(named);
+  REG(ordered);
+  REG(node);
+  REG(unordered);
 }

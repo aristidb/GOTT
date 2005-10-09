@@ -2,7 +2,7 @@
 // Content: TDL common base
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,23 +19,26 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "exceptions.hpp"
+#include <gott/util/range_algo.hpp>
+#include <gott/util/string/string.hpp>
 
-using gott::util::tdl::tdl_exception;
+using gott::tdl::tdl_exception;
 
-tdl_exception::tdl_exception(std::wstring const &msg) : message_wide(msg) {
-  std::ostringstream ss;
-  ss << message_wide;
-  message_narrow = ss.str();
-}
+class tdl_exception::IMPL {
+public:
+  IMPL(string const &s) : msg(new char[s.size() + 1]) {
+    copy(s.as_utf8().cast<char const *>(), msg);
+    msg[s.size()] = '\0';
+  }
+  ~IMPL() throw() { delete msg; }
+  char *msg;
+};
 
-tdl_exception::tdl_exception(std::string const &msg) : message_narrow(msg) {
-  std::wostringstream ss;
-  ss << message_narrow;
-  message_wide = ss.str();
-}
+tdl_exception::tdl_exception(string const &msg)
+: p(new IMPL(msg)) {}
 
 tdl_exception::~tdl_exception() throw() {}
 
 char const *tdl_exception::what() const throw() {
-  return message_narrow.c_str();
+  return p->msg;
 }

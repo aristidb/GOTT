@@ -1,7 +1,12 @@
 #include "property.hpp"
+#include <gott/util/string/string.hpp>
+#include <gott/util/string/buffer.hpp>
+#include <iostream>
 
-using namespace std;
-using namespace gott::util::properties;
+using namespace gott;
+using namespace gott::properties;
+using std::cout;
+using std::endl;
 
 template<int i>
 int add(int x) { return x + i; }
@@ -9,7 +14,7 @@ int add(int x) { return x + i; }
 struct test_observe {
   template<class T>
   void notify(T *p) {
-    cout << "Changed: " << print_ptr(p);
+    cout << "Changed: " << long(p);
     cout << " -> " << p->get() << endl;
   }
 };
@@ -20,26 +25,28 @@ public:
   vobserve() {}
   template<class T>
   void notify(T *p) {
-    cout << "Changed(ref): " << print_ptr(p);
+    cout << "Changed(ref): " << long(p);
     cout << " -> " << p->get() << endl;
   }
 };
 
 int main() {
-  property<int> p;
+  concrete_property<int> p;
   p.set(4);
   p.apply_change(add<2>);
   *p.read_write() -= 2;
   
-  property<property<int> > x(p);
+  concrete_property<concrete_property<int> > x(p);
   cout << x.read()->get() << endl;
   
-  property<string, test_observe> w("Hallo");
-  w.read_write()->append(" Welt!");
+  concrete_property<string_buffer, test_observe> w(string("Hallo"));
+  utf32_t const *add = (utf32_t const*)" Welt!";
+  std::copy(add, add + 6, w.read_write()->append(6).begin);
   cout << w.get() << endl;
 
   vobserve V;
-  property<int, vobserve &> q(44, V);
+  concrete_property<int, vobserve &> q(44, V);
+  property<int> &ref = q;
   srand(time(NULL));
-  q.apply_write(rand);
+  ref.apply_write(rand);
 }

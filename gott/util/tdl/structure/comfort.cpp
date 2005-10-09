@@ -2,7 +2,7 @@
 // Content: TDL Data Structures
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,15 +20,16 @@
 
 #include "comfort.hpp"
 #include "structure.hpp"
+#include <boost/bind.hpp>
+#include <gott/util/range_algo.hpp>
 
-using gott::util::xany::Xany;
-namespace cf = gott::util::tdl::structure::cf;
+using gott::xany::Xany;
+namespace cf = gott::tdl::structure::cf;
 using cf::node_inserter_t;
-using gott::util::tdl::structure::writable_structure;
+using gott::tdl::structure::writable_structure;
 using boost::bind;
 using boost::ref;
 using std::list;
-using std::wstring;
 
 node_inserter_t::node_inserter_t(Xany const &d, nd_list const &c, 
                                  tag_list const &t)
@@ -39,39 +40,42 @@ node_inserter_t::~node_inserter_t() {}
 void node_inserter_t::write_to(writable_structure &o) const {
   o.begin();
     o.data(data);
-    o.set_tags(tags);
+    for (tag_list::const_iterator it=tags.begin(); it != tags.end(); ++it)
+      o.add_tag(*it);
     for_each(range(children), bind(&node_inserter_t::write_to, _1, ref(o)));
   o.end();
 }
 
-node_inserter_t cf::S(xany::Xany data, tag_list tags) {
+node_inserter_t cf::S(xany::Xany const &data, tag_list const &tags) {
   return node_inserter_t(data, nd_list(), tags);
 }
 
-node_inserter_t cf::S(xany::Xany data, wstring tag) {
-  return node_inserter_t(data, nd_list(), tag_list(1, tag));
+node_inserter_t cf::S(xany::Xany const &data, string const &tag) {
+  return node_inserter_t(data, nd_list(), tag_list() << tag);
 }
 
-node_inserter_t cf::M(nd_list children, tag_list tags) {
+node_inserter_t cf::M(nd_list const &children, tag_list const &tags) {
   return node_inserter_t(Xany(), children, tags);
 }
 
-node_inserter_t cf::M(nd_list children, wstring tag) {
-  return node_inserter_t(Xany(), children, tag_list(1, tag));
+node_inserter_t cf::M(nd_list const &children, string const &tag) {
+  return node_inserter_t(Xany(), children, tag_list() << tag);
 }
 
-node_inserter_t cf::MD(xany::Xany data, nd_list children, tag_list tags) {
+node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children, 
+                       tag_list const &tags) {
   return node_inserter_t(data, children, tags);
 }
 
-node_inserter_t cf::MD(xany::Xany data, nd_list children, wstring tag) {
-  return node_inserter_t(data, children, tag_list(1, tag));
+node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children, 
+                       string const &tag) {
+  return node_inserter_t(data, children, tag_list() << tag);
 }
 
-node_inserter_t cf::C(node_inserter_t child, tag_list tags) {
-  return node_inserter_t(Xany(), nd_list(1, child), tags);
+node_inserter_t cf::C(node_inserter_t const &child, tag_list const &tags) {
+  return node_inserter_t(Xany(), nd_list() << child, tags);
 }
 
-node_inserter_t cf::C(node_inserter_t child, wstring tag) {
-  return node_inserter_t(Xany(), nd_list(1, child), tag_list(1, tag));
+node_inserter_t cf::C(node_inserter_t const &child, string const &tag) {
+  return node_inserter_t(Xany(), nd_list() << child, tag_list() << tag);
 }

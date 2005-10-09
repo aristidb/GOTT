@@ -2,7 +2,7 @@
 // Content: TDL Data Structures
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,16 +21,21 @@
 #include "structure.hpp"
 #include "tree.hpp"
 #include "print.hpp"
+#include <gott/util/range_algo.hpp>
+#include <boost/bind.hpp>
+#include <sstream>
+#include <gott/util/autoconv.hpp>
+#include <gott/util/string/string.hpp>
 
 using std::list;
-using std::wstring;
-using std::vector;
+
 using std::pair;
 using boost::intrusive_ptr;
 using boost::scoped_ptr;
-using gott::util::xany::Xany;
+using gott::xany::Xany;
+using gott::string;
 
-namespace stru = gott::util::tdl::structure;
+namespace stru = gott::tdl::structure;
 using stru::writable_structure;
 using stru::revocable_structure;
 using stru::copyable_structure;
@@ -41,20 +46,36 @@ writable_structure::~writable_structure() {}
 revocable_structure::~revocable_structure() {}
 copyable_structure::~copyable_structure() {}
 
+class tree::IMPL {
+public:
+  IMPL() : current_tag(0) {}
+
+  typedef unsigned long tag;
+  
+  static boost::intrusive_ptr<node> erase(boost::intrusive_ptr<node>);
+  boost::intrusive_ptr<node> root, pos;
+  tag current_tag;
+  VectorMap<tag, boost::intrusive_ptr<node> > tagpos;
+
+  bool del_since(boost::intrusive_ptr<node> &, tag);
+};
+
+NTL_MOVEABLE(intrusive_ptr<tree::node>);
+
 struct tree::node {
   size_t use_count;
   Xany data;
-  list<wstring> tags;
+  Vector<string> tags;
   intrusive_ptr<node> child0, lastchild, dad, sibling, last;
   size_t size;
-  tree::tag ttag;
+  IMPL::tag ttag;
   
   class index;
   scoped_ptr<index> indx;
 
   class index {
-    typedef vector<intrusive_ptr<node> > v_pn;
-    typedef hashd::hash_multimap<wstring, intrusive_ptr<node> > hmm_spn;
+    typedef Vector<intrusive_ptr<node> > v_pn;
+    typedef VectorMap<string, intrusive_ptr<node> > hmm_spn;
     
     v_pn by_no;
     hmm_spn by_name;
@@ -62,16 +83,17 @@ struct tree::node {
     bool built;
 
   public:
-    typedef hmm_spn::const_iterator tag_position;
-    typedef pair<tag_position, tag_position> tag_range_type;
+    typedef hmm_spn const *tag_container_ptr;
+    typedef int tag_position;
+    typedef pair<tag_container_ptr, tag_position> tag_range_type;
     
     index(intrusive_ptr<node> const &n) : parent(n), built(false) {}
 
     void build_all() {
       if (!built) {
-        by_no.reserve(parent->size);
+        by_no.Reserve(parent->size);
         for (intrusive_ptr<node> i = parent->child0; i; i = i->sibling) {
-          by_no.push_back(i);
+          by_no.Add(i);
           add_entry(i);
         }
         built = true;
@@ -79,20 +101,20 @@ struct tree::node {
     }
 
     void add_entry(intrusive_ptr<node> const &x) {
-      for (list<wstring>::iterator i =x->tags.begin(); i != x->tags.end(); ++i)
-        by_name.insert(hmm_spn::value_type(*i, x));
+      for (Vector<string>::iterator i= x->tags.begin(); i != x->tags.end();++i)
+        by_name.Add(*i, x);
     }
 
     intrusive_ptr<node> get_at(size_t i) {
       return by_no[i];
     }
 
-    tag_range_type with_name(wstring const &n) {
-      return by_name.equal_range(n);
+    tag_range_type with_name(string const &n) {
+      return tag_range_type(&by_name, by_name.Find(n));
     }
   };
   
-  node(tree::tag t) : use_count(0), size(0), ttag(t) {}
+  node(IMPL::tag t) : use_count(0), size(0), ttag(t) {}
 
   bool equals(node const &) const;
 };
@@ -106,7 +128,7 @@ void stru::intrusive_ptr_release(tree::node *p) {
     delete p;
 }
 
-intrusive_ptr<tree::node> tree::erase(intrusive_ptr<node> x) {
+intrusive_ptr<tree::node> tree::IMPL::erase(intrusive_ptr<node> x) {
   --x->dad->size;
 
   if (x->sibling) 
@@ -124,65 +146,61 @@ intrusive_ptr<tree::node> tree::erase(intrusive_ptr<node> x) {
   return x->sibling;
 }
 
-tree::tree() : current_tag(0) {}
+tree::tree() : p(new IMPL) {}
 tree::~tree() {}
 
 void tree::begin() {
-  if (!pos) {
-    root = intrusive_ptr<node>(new node(current_tag));
-    pos = root;
+  if (!p->pos) {
+    p->root = intrusive_ptr<node>(new node(p->current_tag));
+    p->pos = p->root;
     return;
   }
   
-  intrusive_ptr<node> nn(new node(current_tag));
-  nn->dad = pos;
+  intrusive_ptr<node> nn(new node(p->current_tag));
+  nn->dad = p->pos;
 
-  if (!pos->child0) {
-    pos->child0 = nn;
-    pos->lastchild = nn;
+  if (!p->pos->child0) {
+    p->pos->child0 = nn;
+    p->pos->lastchild = nn;
   } else {
-    pos->lastchild->sibling = nn;
-    nn->last = pos->lastchild;
-    pos->lastchild = nn;
+    p->pos->lastchild->sibling = nn;
+    nn->last = p->pos->lastchild;
+    p->pos->lastchild = nn;
   }
   
-  ++pos->size;
+  ++p->pos->size;
   
-  pos = nn;
+  p->pos = nn;
 }
 
 void tree::end() {
-  if (pos != root)
-    pos = pos->dad;
+  if (p->pos != p->root)
+    p->pos = p->pos->dad;
 }
 
 void tree::data(Xany const &x) {
-  pos->data = x;
+  p->pos->data = x;
 }
 
-void tree::add_tag(wstring const &s) {
-  pos->tags.push_back(s);
-}
-
-void tree::set_tags(list<wstring> const &l) {
-  pos->tags = l;
+void tree::add_tag(string const &s) {
+  p->pos->tags.push_back(s);
 }
 
 revocable_structure::pth tree::point() {
-  tagpos[++current_tag] = pos;
-  return current_tag;
+  p->tagpos.Add(++p->current_tag, p->pos);
+  return p->current_tag;
 }
 
 void tree::revert(revocable_structure::pth const &mp) {
-  del_since(root, mp);
-  pos = tagpos[mp];
+  p->del_since(p->root, mp);
+  p->pos = p->tagpos.Get(mp);
 }
 
-void tree::get_rid_of(revocable_structure::pth const &p) {
-  tagpos.erase(tagpos.find(p));
+void tree::get_rid_of(revocable_structure::pth const &x) {
+  p->tagpos.RemoveKey(x);
 }
 
-bool tree::del_since(intrusive_ptr<node> &n, tag t) {
+bool tree::IMPL::del_since(intrusive_ptr<node> &n, tag t) {
   for (intrusive_ptr<node> i = n->child0; i;)
     if (del_since(i, t)) 
       i = erase(i);
@@ -212,9 +230,9 @@ tree::iterator tree::iterator::up() const { return n->dad; }
 tree::iterator tree::iterator::next() const { return n->sibling; }
 
 Xany const &tree::iterator::get_data() const { return n->data; }
-list<wstring> const &tree::iterator::get_tags() const { return n->tags; }
+Vector<string> const &tree::iterator::get_tags() const { return n->tags; }
 
-tree::iterator tree::get_root() const { return root; }
+tree::iterator tree::get_root() const { return p->root; }
 
 bool tree::iterator::contents_equal(iterator const &o) const {
   return n->equals(*o.n);
@@ -223,14 +241,12 @@ bool tree::iterator::contents_equal(iterator const &o) const {
 class tree::tagged_iterator::IMPL {
 public:
   tree::node::index::tag_range_type range;
-  tree::node::index::tag_position pos;
-  bool valid;
 
   IMPL(tree::node::index::tag_range_type const &r) 
-    : range(r), pos(r.first), valid(true) {}
+    : range(r) {}
 };
 
-tree::tagged_iterator tree::iterator::with_tag(wstring const &s) const {
+tree::tagged_iterator tree::iterator::with_tag(string const &s) const {
   if (!n->indx)
     n->indx.reset(new tree::node::index(n));
   n->indx->build_all();
@@ -244,16 +260,15 @@ tree::tagged_iterator::tagged_iterator(tagged_iterator const &o)
 tree::tagged_iterator::~tagged_iterator() {}
 
 void tree::tagged_iterator::operator++() {
-  if (++pIMPL->pos == pIMPL->range.second)
-    pIMPL->valid = false;
+  pIMPL->range.second = pIMPL->range.first->FindNext(pIMPL->range.second);
 }
 
 tree::tagged_iterator::operator bool() const {
-  return pIMPL->valid;
+  return pIMPL->range.second > 0;
 }
 
 tree::iterator tree::tagged_iterator::get() const {
-  return pIMPL->pos->second;
+  return (*pIMPL->range.first)[pIMPL->range.second];
 }
 
 void tree::copy_to(writable_structure &target) const {
@@ -271,17 +286,17 @@ void tree::copy_to(writable_structure &target) const {
       target.end();
     }
   } visitor = {target};
-  visitor(root);
+  visitor(p->root);
 }
 
 bool tree::operator==(tree const &o) const {
-  return root->equals(*o.root);
+  return p->root->equals(*o.p->root);
 }
 
 bool tree::node::equals(node const &o) const {
   if (data != o.data) 
     return false;
-  if (tags.size() != o.tags.size())
+  if (tags.GetCount() != o.tags.GetCount())
     return false;
   if (!equal(range(tags), range(o.tags)))
     return false;
@@ -296,16 +311,20 @@ bool tree::node::equals(node const &o) const {
   return !(p || q);
 }
 
-std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
-  direct_print p(s);
+template<class Ch>
+std::basic_ostream<Ch> &
+stru::operator<<(std::basic_ostream<Ch> &s, tree::iterator const &i) {
+  direct_print<Ch> p(s);
   struct printer {
     writable_structure &p;
     void operator() (tree::iterator const &x) {
       p.begin();
         p.data(x.get_data());
-        p.set_tags(x.get_tags());
+        for (Vector<string>::const_iterator it = x.get_tags().begin();
+             it != x.get_tags().end(); ++it)
+          p.add_tag(*it);
         for (tree::iterator i = x.first_child(); i; i = i.next())
-          this->operator()(i);
+          operator()(i);
       p.end();
     }
   } x = {p};
@@ -313,13 +332,17 @@ std::wostream &stru::operator<<(std::wostream &s, tree::iterator const &i) {
   return s;
 }
 
+template std::ostream &
+  stru::operator<< <char>(std::ostream &, tree::iterator const &);
+template std::wostream &
+  stru::operator<< <wchar_t>(std::wostream&,tree::iterator const &);
+
 #ifdef DEBUG
 #include <iostream>
 
 using std::wostream;
 
 void tree::dump(wostream &stream) {
-  intrusive_ptr<node> it = root;
   struct visitor {
     wostream &out;
     unsigned level;
@@ -339,7 +362,7 @@ void tree::dump(wostream &stream) {
 
       out << L'(' << p->ttag << L')';
       out << L" : ";
-      for (list<wstring>::iterator it = p->tags.begin(); 
+      for (Vector<string>::iterator it = p->tags.begin(); 
            it != p->tags.end(); ++it)
         out << *it << L' ';
       out << L"{\n";
@@ -352,7 +375,7 @@ void tree::dump(wostream &stream) {
     }
     visitor(wostream &oo, intrusive_ptr<node> p) : out(oo), level(0), pp(p) {}
   };
-  visitor v(stream, pos);
-  v(root);
+  visitor v(stream, p->pos);
+  v(p->root);
 }
 #endif

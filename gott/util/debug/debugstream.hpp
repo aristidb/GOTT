@@ -3,7 +3,7 @@
    Content: A stream for debug output
    Changes:
 
-   This File is part of the Gott Project (http://gott.sf.net)
+   This file is part of the Gott Project (http://gott.sf.net)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -24,10 +24,9 @@
 #define GOTT_UTIL_DEBUG_DEBUGSTREAM_HPP
 
 #include <iostream>
-#include <gott/util/misc/utf32string.hpp>
+#include <gott/util/string/types.hpp>
 
 namespace gott {
-namespace util {
 namespace debug {
   /** Debug Output Stream
    * \remarks
@@ -36,6 +35,6 @@ namespace debug {
    *      Per default the stream is directed to stdcerr
    */
   extern ::std::basic_ostream<utf32_t> debugstream;
-}}}
+}}
 
 #endif

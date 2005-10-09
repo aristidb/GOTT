@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,6 @@
 #define GOTT_TDL_SCHEMA_EV_FWD_HPP
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 namespace ev {
@@ -40,6 +39,6 @@ class node;
 class child_succeed;
 class child_fail;
 
-}}}}}
+}}}}
 
 #endif

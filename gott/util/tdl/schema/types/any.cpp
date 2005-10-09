@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,29 +20,29 @@
 
 #include "any.hpp"
 
-using std::vector;
-namespace schema = gott::util::tdl::schema;
+namespace schema = gott::tdl::schema;
 namespace ev = schema::ev;
 using schema::match_any;
+using schema::item;
 
-match_any::match_any(vector<rule::factory const *> const &vv,
-                     rule::attributes const &a, match &m) 
-: rule(need, a, m), v(vv), pos(v.begin()) {
+match_any::match_any(rule_attr const &a, Vector<rule_t> const &vv, match &m) 
+: happy_once(a, m), v(vv), pos(v.begin()) {
   if (pos != v.end()) {
     begin = matcher().pos().current();
-    matcher().add(**pos);
+    matcher().add(*pos);
   }
 }
 
 match_any::~match_any() {
-  matcher().pos().forget(begin);
+  if (expectation() != nothing)
+    matcher().pos().forget(begin);
 }
 
 bool match_any::play(ev::child_fail const &) {
   matcher().pos().seek(begin);
   
   if (++pos != v.end()) {
-    matcher().add(**pos);
+    matcher().add(*pos);
     return true;
   }
 
@@ -50,6 +50,19 @@ bool match_any::play(ev::child_fail const &) {
 }
 
 bool match_any::play(ev::child_succeed const &) {
-  expectation = nothing;
+  matcher().pos().forget(begin);
+  be_happy();
   return true;
+}
+
+bool match_any::accept_empty(Vector<rule_t const *> const &choices) {
+  for (Vector<rule_t const *>::const_iterator it = choices.begin(); 
+       it != choices.end(); ++it)
+    ;/*FIXME if ((*it)->accept_empty())
+      return true;*/
+  return false;
+}
+
+gott::string match_any::name() const {
+  return "any";
 }

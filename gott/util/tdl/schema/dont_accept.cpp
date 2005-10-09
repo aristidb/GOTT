@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "../exceptions.hpp"
+#include <gott/util/string/string.hpp>
 
-using gott::util::tdl::schema::dont_accept;
+using gott::tdl::schema::dont_accept;
+using gott::string;
 
-dont_accept::dont_accept(std::wstring const &desc) 
-  : tdl_exception(L"Don't accept" + ((desc == L"" ? L"" : L": ") + desc)) {}
+static string pizza(string const &x) {
+  string const components[] = { "Don't accept", (x == "") ? "" : ": ", x };
+  return string(gott::range(components), string::concatenate);
+}
+
+dont_accept::dont_accept(string const &desc) 
+  : tdl_exception(pizza(desc)) {}
 
 dont_accept::~dont_accept() throw() {}

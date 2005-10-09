@@ -2,7 +2,7 @@
 // Content: TDL Data Structures
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,12 @@
 #ifndef GOTT_UTIL_TDL_STRUC_STRUC_H
 #define GOTT_UTIL_TDL_STRUC_STRUC_H
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/visibility.hpp>
+#include <gott/util/xany/xany.hpp>
 
 namespace gott {
-namespace util {
+class string;
+
 namespace tdl {
 namespace structure {
 
@@ -55,15 +57,9 @@ public:
    * Add a tag to the node.
    * \param t The tag to add.
    */
-  virtual void add_tag(std::wstring const &t) = 0;
+  virtual void add_tag(string const &t) = 0;
 
-  /**
-   * Set a node's tags. Must not be called after add_tag.
-   * \param t All the tags to add.
-   */
-  virtual void set_tags(std::list<std::wstring> const &t) = 0;
-
-  EXPORT virtual ~writable_structure() = 0;
+  GOTT_EXPORT virtual ~writable_structure() = 0;
 };
 
 /**
@@ -92,7 +88,7 @@ public:
    */
   virtual void get_rid_of(pth const &pt) = 0;
 
-  EXPORT virtual ~revocable_structure() = 0;
+  GOTT_EXPORT virtual ~revocable_structure() = 0;
 };
 
 /**
@@ -106,7 +102,7 @@ public:
    */
   virtual void copy_to(writable_structure &ws) const = 0;
 
-  EXPORT virtual ~copyable_structure() = 0;
+  GOTT_EXPORT virtual ~copyable_structure() = 0;
 };
 
 /**
@@ -114,8 +110,9 @@ public:
  * \param stream The stream to read from.
  * \param structure The structure to fill.
  */
-EXPORT void direct_struc(std::wistream &stream, writable_structure &structure);
+GOTT_EXPORT 
+void direct_struc(std::wistream &stream, writable_structure &structure);
 
-}}}}
+}}}
 
 #endif

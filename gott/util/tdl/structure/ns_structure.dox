@@ -1,4 +1,4 @@
 /**
-\namespace gott::util::tdl::structure
+\namespace gott::tdl::structure
 Library for TDL & TDL Schema compatible data structures.
 */

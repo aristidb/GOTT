@@ -2,7 +2,7 @@
 // Content: TDL query engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,4 +19,4 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "../structure/tree.hpp"
-template class selection<gott::util::tdl::structure::tree::iterator>;
+template class selection<gott::tdl::structure::tree::iterator>;

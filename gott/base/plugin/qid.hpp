@@ -21,30 +21,22 @@
 #ifndef GOTT_BASE_PLUGIN_QID_HPP
 #define GOTT_BASE_PLUGIN_QID_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/string/atom.hpp>
 
 namespace gott {
-namespace base {
 namespace plugin {
 
-class QID {
+class QID : public atom, Moveable<QID> {
 public:
-  QID(char const *);
-  QID(wchar_t const *);
-  QID(std::string const &);
-  QID(std::wstring const &);
-
-  QID parent() const;
-
-  QID child(char const *) const;
-  QID child(wchar_t const *) const;
-  QID child(std::string const &) const;
-  QID child(std::wstring const &) const;
+  QID(atom const &) GOTT_EXPORT;
+  ~QID() GOTT_EXPORT;
 };
 
-bool operator==(QID const &, QID const &);
-bool operator!=(QID const &, QID const &);
+}}
 
-}}}
+template<>
+inline unsigned GetHashValue(gott::plugin::QID const &q) {
+  return GetHashValue((gott::atom &) q);
+}
 
 #endif

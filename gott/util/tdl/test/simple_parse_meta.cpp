@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,32 +18,36 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <gott/util/tdl/simple/parse/parser.hpp>
+#include <gott/util/tdl/simple/parse/meta.hpp>
 #include <gott/util/tut/tut.h>
+#include <sstream>
+#include <gott/util/string/string.hpp>
+#include <gott/util/string/stl.hpp>
 
-using std::wstring;
-using std::vector;
 using std::pair;
 using std::ostream;
 using std::wistringstream;
-using gott::util::tdl::simple::meta_parser;
-using gott::util::tdl::simple::parse_meta;
+using gott::tdl::simple::meta_parser;
+using gott::string;
+
+typedef pair<string, string> twostring;
+NTL_MOVEABLE(twostring);
 
 namespace tut {
 struct meta_basic {
   meta_parser parser;
-  wstring data, rest;
-  vector<pair<wstring, wstring> > xp, ev;
-  bool operator() (wstring const &cmd, wstring const &param) {
-    ev.push_back(pair<wstring,wstring>(cmd, param));
+  string data, rest;
+  Vector<pair<string, string> > xp, ev;
+  bool operator() (string const &cmd, string const &param) {
+    ev.push_back(pair<string,string>(cmd, param));
     return true;
   }
-  void expect(wstring const &cmd, wstring const &param = L"") {
-    xp.push_back(pair<wstring,wstring>(cmd, param));
+  void expect(string const &cmd, string const &param = L"") {
+    xp.push_back(pair<string,string>(cmd, param));
   }
   void run_test() {
     wistringstream x(data);
-    parse_meta(x, parser);
+    parser.parse(x);
     rest = x.str().c_str() + x.tellg();
   }
   meta_basic() { parser.set_default(boost::ref(*this)); }
@@ -53,13 +57,8 @@ typedef test_group<meta_basic> tf;
 typedef tf::object object;
 }
 
-ostream &operator<<(ostream &o, vector<pair<wstring,wstring> > const &v) {
-  for (vector<pair<wstring,wstring> >::const_iterator it = v.begin();
-       it != v.end(); ++it) {
-    o << it->first << "::";
-    o << it->second << '\n';
-  }
-  return o;
+ostream &operator<<(ostream &o, pair<string,string> const &x) {
+  return o << x.first << "::" << x.second << '\n';
 }
 
 namespace {
@@ -73,7 +72,7 @@ void object::test<1>(int) {
   data = L"#?foobar qulux-dei zql";
   run_test();
   expect(L"foobar", L"qulux-dei zql");
-  ensure_equals("simple meta declaration", ev, xp);
+  ensure_equals("simple meta declaration", range(ev), range(xp));
 }
 
 template<> template<>
@@ -81,9 +80,9 @@ void object::test<2>(int) {
   data = L"\n\n\n\n#?real     kluft\n\n\n\n\n   \n       \n\n#?delta_x yz";
   run_test();
   expect(L"real", L"kluft");
-  ensure_equals("multi-line declaration", ev, xp);
+  ensure_equals("multi-line declaration", range(ev), range(xp));
   ensure_equals("multi-line declaration rest", rest, 
-                L"   \n       \n\n#?delta_x yz");
+                string(L"   \n       \n\n#?delta_x yz"));
 }
 
 template<> template<>
@@ -92,8 +91,8 @@ void object::test<3>(int) {
   run_test();
   expect(L"a");
   expect(L"", L"b");
-  ensure_equals("multi-line #2", ev, xp);
-  ensure_equals("multi-line #2 rest", rest, L"#\n#?c");
+  ensure_equals("multi-line #2", range(ev), range(xp));
+  ensure_equals("multi-line #2 rest", rest, string(L"#\n#?c"));
 }
 
 template<> template<>

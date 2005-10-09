@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,31 +20,35 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
+#include <gott/util/tdl/structure/types/integer.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::wstring;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+using gott::string;
+
 using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
-
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
+using schema::rule_t;
+using schema::rule;
 
 namespace {
 struct schema_12plus_int : tut::schema_basic {
-  schema_12plus_int() {
-    context.begin(L"document");
-      context.begin(L"list");
-        context.begin(L"integer", 
-                      RA(wstring(L"el")), slotcfg(slotcfg::minimum, 12));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_12plus_int() 
+  : tut::schema_basic(
+      rule("document", RA(),
+        Vector<rule_t>() <<
+         rule("list", RA(),
+           Vector<rule_t>() <<
+           rule("node",
+             RA(Vector<string>() << "el", true, Xany(), 
+                new stru::repatch_integer(), 
+                slotcfg(), slotcfg(slotcfg::minimum, 12))))))
+  {}
 };
 }
 
@@ -75,7 +79,7 @@ void object::test<1>(int n) {
       err << "0:1";
     else
       err << "1:" << ((n-1)*2-1);
-    err << " : mismatch after token ";
+    err << " : mismatch in document>list>node(el) after token ";
     if (n > 1)
       err << (n - 1);
     ensure_equals("correct error", m.what(), err.str());
@@ -89,7 +93,7 @@ void object::test<12>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch after token 1");
+                  "1:1 : mismatch in document>list>node(el) after token 1");
   }
 }
 
@@ -100,7 +104,7 @@ void object::test<13>(int) {
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch at token zzzz");
+                  "1:1 : mismatch in document>list>node(el) at token zzzz");
   }
 }
 

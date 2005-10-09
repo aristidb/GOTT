@@ -1,1 +1,4 @@
-SConscript(dirs = ['tdl', 'xany', 'misc', 'properties', 'debug'])
+Import('env')
+env.Program('thunk_test', 'thunk.cpp')
+
+SConscript(dirs = ['tdl', 'xany', 'properties', 'debug', 'string'])

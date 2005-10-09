@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,24 +19,23 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::wstring;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+
 using stru::cf::S;
 using stru::cf::C;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_integer : tut::schema_basic {
-  schema_integer() {
-    context.begin(L"document", schema::rule::attributes(wstring(L"doc")));
-      context.begin(L"integer", schema::rule::attributes());
-      context.end();
-    context.end();
-  }
+  schema_integer() 
+  : tut::schema_basic(
+      rule("document", RA(), Vector<schema::rule_t>() <<
+        rule("node", RA("i", true, new stru::repatch_integer())))) {}
 };
 }
 
@@ -53,7 +52,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test(L"4");
-  C(S(Xany(4)), L"doc").write_to(xp);
+  C(S(Xany(4), L"i")).write_to(xp);
   ensure_equals("single integer entity", tree, xp);
 }
 
@@ -64,7 +63,7 @@ void object::test<2>(int) {
     fail("non-integral");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token d7");
+      std::string(mm.what()), "1:1 : mismatch in document>node(i) at token d7");
   }
 }
 
@@ -75,7 +74,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch after token ");
+     std::string(mm.what()), "0:1 : mismatch in document>node(i) after token ");
   }
 }
 
@@ -86,7 +85,7 @@ void object::test<4>(int) {
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 4");
+        std::string(mm.what()), "1:1 : mismatch in document after token 4");
   }
 }
 
@@ -97,14 +96,14 @@ void object::test<5>(int) {
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "2:1 : mismatch at token bar");
+        std::string(mm.what()), "2:1 : mismatch in document at token bar");
   }
 }
 
 template<> template<>
 void object::test<6>(int) {
   run_test(L"-777777");
-  C(S(Xany(-777777)), L"doc").write_to(xp);
+  C(S(Xany(-777777), L"i")).write_to(xp);
   ensure_equals("negative", tree, xp);
 }
 
@@ -115,7 +114,7 @@ void object::test<7>(int) {
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch at token foo");
+     std::string(mm.what()), "1:1 : mismatch in document>node(i) at token foo");
   }
 }
 

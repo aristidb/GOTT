@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,26 +20,37 @@
 
 #include "ordered.hpp"
 
-using std::vector;
-
-namespace schema = gott::util::tdl::schema;
-namespace ev = gott::util::tdl::schema::ev;
-using schema::rule;
+namespace schema = gott::tdl::schema;
+namespace ev = gott::tdl::schema::ev;
+using schema::item;
 using schema::match_ordered;
 
-match_ordered::match_ordered(vector<rule::factory const *> const &r, 
-                             rule::attributes const &a, match &m)
-: rule(need, a, m), subrules(r), pos(subrules.begin()) {
+match_ordered::match_ordered(rule_attr const &a, Vector<rule_t> const&r,match&m)
+: happy_once(a, m), subrules(r), pos(subrules.begin()) {
   if (pos != subrules.end())
-    matcher().add(**pos);
+    matcher().add(*pos);
   else
-    expectation = nothing;  
+    be_happy();
 }
+
+match_ordered::~match_ordered() {}
 
 bool match_ordered::play(ev::child_succeed const &) {
   if (++pos != subrules.end()) 
-    matcher().add(**pos);
+    matcher().add(*pos);
   else 
-    expectation = nothing;
+    be_happy();
   return true;
+}
+
+bool match_ordered::accept_empty(Vector<rule_t> const &children) {
+  bool accept = true;
+  for (Vector<rule_t>::const_iterator it = children.begin(); 
+       it != children.end(); ++it)
+    ;//FIXME accept &= (*it)->accept_empty();
+  return accept;
+}
+
+gott::string match_ordered::name() const {
+  return "ordered";
 }

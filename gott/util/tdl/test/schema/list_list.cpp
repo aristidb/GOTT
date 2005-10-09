@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,32 +19,33 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
 
-namespace u = gott::util;
-using namespace u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-namespace schema = u::tdl::schema;
-using u::xany::Xany;
-using std::wstring;
+
+using namespace gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+using gott::string;
 using stru::cf::S;
 using stru::cf::C;
 
 namespace {
 struct schema_multi_footype : tut::schema_basic {
-  schema_multi_footype() {
-    context.begin(L"document", rule::attributes(wstring(L"d")));
-      context.begin(L"ordered", rule::attributes(wstring(L"o")));
-        context.begin(L"list", rule::attributes(wstring(L"s")));
-          context.begin(L"list", rule::attributes(wstring(L"t")));
-            context.begin(L"integer", rule::attributes(wstring(L"ii")));
-            ;context.end();
-          ;context.end();
-        ;context.end();
-        context.begin(L"string", rule::attributes(wstring(L"xx")));
-      ;context.end();
-    ;context.end();
-  }
+  schema_multi_footype() 
+  : tut::schema_basic(
+    rule("document", rule_attr(), Vector<rule_t>() <<
+      rule("ordered", rule_attr(), Vector<rule_t>() <<
+        rule("list", rule_attr("s"), Vector<rule_t>() <<
+          rule("list", 
+            rule_attr(Vector<string>() << "t", true, Xany(), 0,
+              slotcfg(), slotcfg(slotcfg::list)),
+            Vector<rule_t>() <<
+            rule("node",
+              rule_attr(Vector<string>() << "ii", true, Xany(), 
+                new stru::repatch_integer(),
+                slotcfg(), slotcfg(slotcfg::list))))) <<
+        rule("node", rule_attr("xx"))))) {}
 };
 }
 
@@ -54,7 +55,7 @@ typedef tf::object object;
 }
 
 namespace {
-  tut::tf multi_footype_test("schema::list_list");
+  tut::tf multi_footype_test("list_list");
 }
 
 namespace tut {
@@ -64,7 +65,7 @@ void object::test<1>(int) {
   stru::cf::nd_list c;
   c.push_back(S(Xany(), L"s"));
   c.push_back(S(Xany(L"a_string"), L"xx"));
-  C(M(c,L"o"),L"d").write_to(xp);
+  C(M(c)).write_to(xp);
   ensure_equals("string only", tree, xp);
 }
 
@@ -77,7 +78,7 @@ void object::test<2>(int) {
   stru::cf::nd_list c;
   c.push_back(C(M(i, L"t"), L"s"));
   c.push_back(S(Xany(L"a"), L"xx"));
-  C(M(c,L"o"),L"d").write_to(xp);
+  C(M(c)).write_to(xp);
   ensure_equals("ints+string", tree, xp);
 }
 
@@ -87,7 +88,7 @@ void object::test<3>(int) {
   stru::cf::nd_list c;
   c.push_back(C(C(S(Xany(7000),L"ii"),L"t"),L"s"));
   c.push_back(S(Xany(L"(4)"), L"xx"));
-  C(M(c,L"o"),L"d").write_to(xp);
+  C(M(c)).write_to(xp);
   ensure_equals("int+string", tree, xp);
 }
 
@@ -96,9 +97,10 @@ void object::test<4>(int) {
   try {
     run_test(L"");
     fail("empty");
-  } catch (schema::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()),
-                  "0:1 : mismatch after token ");
+  } catch (mismatch const &m) {
+    ensure_equals("correct error", gott::string(m.what()),
+       "0:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
+       " after token ");
   }
 }
 
@@ -107,9 +109,10 @@ void object::test<5>(int) {
   try {
     run_test(L"44");
     fail("should be greedy");
-  } catch (schema::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()),
-                  "1:1 : mismatch after token 44");
+  } catch (mismatch const &m) {
+    ensure_equals("correct error", gott::string(m.what()),
+        "1:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
+        " after token 44");
   }
 }
 

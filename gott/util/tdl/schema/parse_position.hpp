@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,12 +21,12 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_PARSE_POSITION_HPP
 #define GOTT_UTIL_TDL_SCHEMA_PARSE_POSITION_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
 #include "ev_fwd.hpp"
 #include <gott/util/tdl/structure/structure.hpp>
+#include <utility>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
-namespace util {
 namespace tdl {
 
 namespace schema {
@@ -41,12 +41,13 @@ public:
 
   typedef std::pair<long, structure::revocable_structure::pth> id;
 
-  id current() EXPORT;
-  void seek(id const &) EXPORT;
-  void seek_and_forget(id const &) EXPORT;
-  void forget(id const &) EXPORT;
+  id current() GOTT_EXPORT;
+  id current_readonly() GOTT_EXPORT;
+  void seek(id const &) GOTT_EXPORT;
+  void seek_and_forget(id const &) GOTT_EXPORT;
+  void forget(id const &) GOTT_EXPORT;
 
-  struct EXPORT acceptor {
+  struct GOTT_EXPORT acceptor {
     virtual void operator()(ev::token const &) = 0;
   };
 
@@ -59,7 +60,7 @@ public:
   void consume();
   void pass(); 
 
-  bool proceeded(id const &) const EXPORT; // from the unconsumed token
+  bool proceeded(id const &) const GOTT_EXPORT; // from the unconsumed token
 
 #ifdef DEBUG
   void debug_dump() const;
@@ -70,6 +71,8 @@ private:
   boost::scoped_ptr<IMPL> p;
 };
 
-}}}}
+}}}
+
+NTL_MOVEABLE(gott::tdl::schema::positioning::id);
 
 #endif

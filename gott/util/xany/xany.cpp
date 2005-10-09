@@ -19,11 +19,11 @@
 #include "xany.hpp"
 
 using namespace std;
-using namespace gott::util::xany;
+using namespace gott::xany;
 
 operations_base::~operations_base() {}
 
-bool gott::util::xany::operator==(Xany const &lhs, Xany const &rhs) {
+bool gott::xany::operator==(Xany const &lhs, Xany const &rhs) {
   if (lhs.empty() || rhs.empty())
     return lhs.empty() && rhs.empty();
   if (lhs.type() != rhs.type())
@@ -32,7 +32,7 @@ bool gott::util::xany::operator==(Xany const &lhs, Xany const &rhs) {
           .equals(lhs, rhs);
 }
 
-bool gott::util::xany::operator!=(Xany const &lhs, Xany const &rhs) {
+bool gott::xany::operator!=(Xany const &lhs, Xany const &rhs) {
   return !(lhs == rhs);
 }
 

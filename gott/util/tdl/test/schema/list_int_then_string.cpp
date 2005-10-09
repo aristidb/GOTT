@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,33 +19,34 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <gott/util/tdl/structure/types/integer.hpp>
+#include <gott/util/string/string.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::wstring;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+
 using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 
-typedef schema::rule::attributes RA;
+typedef schema::rule_attr RA;
+using schema::rule_t;
+using schema::slotcfg;
 
 namespace {
 struct schema_list_int_then_string : tut::schema_basic {
-  schema_list_int_then_string() {
-    context.begin(L"document", RA(wstring(L"doc")));
-      context.begin(L"ordered", RA(wstring(L"ord")));
-        context.begin(L"list", RA(wstring(L"list")));
-          context.begin(L"integer", RA(wstring(L"int")));
-          context.end();
-        context.end();
-        context.begin(L"string", RA(wstring(L"string")));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_list_int_then_string() 
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("ordered", RA("ord"), Vector<rule_t>() <<
+          rule("list", RA("list"), Vector<rule_t>() <<
+            rule("node", 
+              RA(Vector<gott::string>() << "int", true, Xany(),
+                new stru::repatch_integer(),
+                slotcfg(), slotcfg(slotcfg::list)))) <<
+          rule("node", RA("string"))))) {}
 };
 }
 
@@ -65,7 +66,7 @@ void object::test<1>(int) {
   stru::cf::nd_list c;
   c.push_back(C(S(Xany(4), L"int"), L"list"));
   c.push_back(S(Xany(L"x"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  C(M(c, L"ord")).write_to(xp);
   ensure_equals("single integer, then string", tree, xp);
 }
 
@@ -75,7 +76,7 @@ void object::test<2>(int) {
   stru::cf::nd_list c;
   c.push_back(S(Xany(), L"list"));
   c.push_back(S(Xany(L"d7"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  C(M(c, L"ord")).write_to(xp);
   ensure_equals("just string", tree, xp);
 }
 
@@ -85,8 +86,9 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch after token ");
+    ensure_equals("correct error", gott::string(mm.what()), 
+        "0:1 : mismatch in document>ordered(ord)>list(list)>node(int)"
+        " after token ");
   }
 }
 
@@ -96,8 +98,8 @@ void object::test<4>(int) {
     run_test(L"foo bar");
     fail("following");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token foo");
+    ensure_equals("correct error", gott::string(mm.what()), 
+        "1:1 : mismatch in document after token foo");
   }
 }
 
@@ -107,8 +109,9 @@ void object::test<5>(int) {
     run_test(L"4");
     fail("just integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 4");
+    ensure_equals("correct error", gott::string(mm.what()), 
+        "1:1 : mismatch in document>ordered(ord)>list(list)>node(int)"
+        " after token 4");
   }
 }
 
@@ -119,7 +122,7 @@ void object::test<6>(int) {
     fail("too many strings");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch at token y");
+        gott::string(mm.what()), "1:5 : mismatch in document at token y");
   }
 }
 
@@ -132,7 +135,7 @@ void object::test<7>(int) {
   stru::cf::nd_list c;
   c.push_back(M(ll, L"list"));
   c.push_back(S(Xany(L"(zzz doink)"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  C(M(c, L"ord")).write_to(xp);
   ensure_equals("many thingies", tree, xp);
 }
 

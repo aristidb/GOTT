@@ -2,7 +2,7 @@
 // Content: TDL Data Structures
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,50 +19,72 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "print.hpp"
+#include <ostream>
+#include <gott/util/string/string.hpp>
 
-using std::wostream;
-using std::wstring;
-using std::list;
-using gott::util::xany::Xany;
-using gott::util::tdl::structure::direct_print;
+using std::basic_ostream;
+using gott::xany::Xany;
+using gott::tdl::structure::direct_print;
 
-direct_print::direct_print(wostream &o, unsigned s) 
-: out(o), level(-s), step(s), line_ended(true), tag_printed(false) {}
+template<class C>
+class direct_print<C>::IMPL {
+public:
+  IMPL(basic_ostream<C> &o, unsigned s)
+  : out(o), level(-s), step(s), line_ended(true), tag_printed(false) {}
+  
+  basic_ostream<C> &out;
+  unsigned level;
+  unsigned const step;
+  bool line_ended, tag_printed;    
+};
 
-direct_print::~direct_print() {}
+template<class C>
+direct_print<C>::direct_print(basic_ostream<C> &o, unsigned s) 
+: p(new IMPL(o, s)) {}
 
-void direct_print::begin() {
-  level += step;
-  if (!line_ended)
-    out << L'\n';
-  line_ended = true;
+template<class C> direct_print<C>::~direct_print() {}
+
+template<class C> void direct_print<C>::begin() {
+  p->level += p->step;
+  if (!p->line_ended)
+    p->out << '\n';
+  p->line_ended = true;
 }
 
-void direct_print::end() {
-  level -= step;
+template<class C> void direct_print<C>::end() {
+  p->level -= p->step;
 }
 
-void direct_print::data(Xany const &x) {
-  for (unsigned i = 0; i < level; ++i)
-    out << L' ';
+template<class C> void direct_print<C>::data(Xany const &x) {
+  for (unsigned i = 0; i < p->level; ++i)
+    p->out << ' ';
   if (x.empty())
-    out << L'-';
+    p->out << '-';
   else
-    out << x;
-  tag_printed = false;
-  line_ended = false;
+    p->out << x;
+  p->tag_printed = false;
+  p->line_ended = false;
 }
 
-void direct_print::add_tag(wstring const &s) {
-  if (tag_printed)
-    out << L", ";
+template<class C> void direct_print<C>::add_tag(string const &s) {
+  if (p->tag_printed)
+    p->out << ", ";
   else
-    out << L" : ";
-  out << s;
-  tag_printed = true;
+    p->out << " : ";
+  p->out << s;
+  p->tag_printed = true;
 }
 
-void direct_print::set_tags(list<wstring> const &l) {
-  for (list<wstring>::const_iterator it = l.begin(); it != l.end(); ++it)
-    add_tag(*it);
+std::ostream &gott::tdl::structure::operator<<(std::ostream &o, 
+                                               copyable_structure const &s) {
+  direct_print<char> p(o);
+  s.copy_to(p);
+  return o;
+}
+
+std::wostream &gott::tdl::structure::operator<<(std::wostream &o, 
+                                                copyable_structure const &s) {
+  direct_print<wchar_t> p(o);
+  s.copy_to(p);
+  return o;
 }

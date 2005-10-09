@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,11 +23,11 @@
 #include <gott/util/tdl/structure/comfort.hpp>
 #include <gott/util/tdl/structure/print.hpp>
 #include <gott/util/tut/tut.h>
+#include <sstream>
 
-namespace util = gott::util;
-namespace stru = util::tdl::structure;
+namespace stru = gott::tdl::structure;
 namespace cf = stru::cf;
-using util::xany::Xany;
+using gott::xany::Xany;
 
 namespace tut {
 struct structure_basic {
@@ -114,8 +114,11 @@ void object::test<5>(int) {
     w.end();
   w.end();
 
-  ensure_equals("stringified tree", stru::to_string<wchar_t>(p1),
-      L"-\n    8899.2\n        77 : --!");
+  std::ostringstream strm;
+  stru::direct_print<char> o(strm);
+  p1.copy_to(o);
+  ensure_equals("stringified tree", strm.str(),
+      "-\n    8899.2\n        77 : --!");
 }
 
 template<> template<>

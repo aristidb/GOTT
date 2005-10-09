@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,19 +24,19 @@
 #include <gott/util/tdl/structure/print.hpp>
 #include <gott/util/tdl/structure/comfort.hpp>
 #include <gott/util/tut/tut.h>
+#include <gott/util/range.hpp>
 
 using std::wcout;
 using std::flush;
 using std::endl;
-using std::wstring;
 
-namespace tdl = gott::util::tdl;
+namespace tdl = gott::tdl;
 using tdl::structure::tree;
 using tdl::structure::writable_structure;
 using tdl::query::selection;
-using gott::util::xany::Xany;
-using gott::util::range;
-using gott::util::const_range;
+using gott::xany::Xany;
+using gott::range;
+using gott::const_range;
 namespace cf = tdl::structure::cf;
 
 namespace tut {

@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,74 +19,75 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "event.hpp"
-#include "parse.hpp"
+#include "match.hpp"
+#include "item.hpp"
 
-namespace ev = gott::util::tdl::schema::ev;
-using gott::util::tdl::schema::rule;
-using std::wostream;
+namespace ev = gott::tdl::schema::ev;
+using gott::tdl::schema::item;
+using std::ostream;
 using boost::static_visitor;
 
 ev::event::~event() {}
 
-bool ev::begin_parse::play(rule &r) const {
+bool ev::begin_parse::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::node::play(rule &r) const {
+bool ev::node::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::down::play(rule &r) const {
+bool ev::down::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::up::play(rule &r) const { 
+bool ev::up::play(item &r) const { 
   return r.play(*this);
 }
 
-bool ev::end_parse::play(rule &r) const {
+bool ev::end_parse::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::child_succeed::play(rule &r) const {
+bool ev::child_succeed::play(item &r) const {
   return r.play(*this);
 }
 
-bool ev::child_fail::play(rule &r) const {
+bool ev::child_fail::play(item &r) const {
   return r.play(*this);
 }
 
-void ev::begin_parse::print(wostream &s) const {
-  s << L"token:begin_parse";
+void ev::begin_parse::print(ostream &s) const {
+  s << "token:begin_parse";
 }
 
-void ev::node::print(wostream &s) const {
-  s << L"token:node{" << data << L"}";
+void ev::node::print(ostream &s) const {
+  s << "token:node{" << data << "}";
 }
 
-void ev::down::print(wostream &s) const {
-  s << L"token:down";
+void ev::down::print(ostream &s) const {
+  s << "token:down";
 }
 
-void ev::up::print(wostream &s) const {
-  s << L"token:up";
+void ev::up::print(ostream &s) const {
+  s << "token:up";
 }
 
-void ev::end_parse::print(wostream &s) const {
-  s << L"token:end_parse";
+void ev::end_parse::print(ostream &s) const {
+  s << "token:end_parse";
 }
 
-void ev::child_succeed::print(wostream &s) const {
-  s << L"notify:child_succeed";
+void ev::child_succeed::print(ostream &s) const {
+  s << "notify:child_succeed";
 }
 
-void ev::child_fail::print(wostream &s) const {
-  s << L"notify:child_fail";
+void ev::child_fail::print(ostream &s) const {
+  s << "notify:child_fail";
 }
 
-ev::node::node(std::wstring const &s) : data(s) {}
+ev::node::node(string const &s) : data(s) {}
 
-std::wstring const &ev::node::get_data() const { return data; }
+gott::string const &ev::node::get_data() const { return data; }
 
 namespace {
   struct token_visitor : public static_visitor<ev::token const &> {

@@ -1,35 +1,49 @@
+cppdef = Split(ARGUMENTS.get('def', ''))
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
-cflags = Split(ARGUMENTS.get('cflags', '-Wall -W'))
+cflags = Split(ARGUMENTS.get('cflags', ''))
 release = int(ARGUMENTS.get('release', 0))
 if release:
 	debug = 0
-	opt = ['-O3']
+	optimize = 'full'
+	debug = -1
 else:
 	debug = 1
-	opt = ['-O0']
+	optimize = 'none'
+
 debug = int(ARGUMENTS.get('debug', debug))
-opt = ARGUMENTS.get('opt', opt)
-cflags += [opt]
-if debug:
-	cflags += ['-g','-ggdb3']
-	cppdef = ['DEBUG']
-else:
-	cppdef = ['NDEBUG']
-caux = ARGUMENTS.get('aux', '')
-cflags += [caux]
+
+if debug == 1:
+	cppdef += ['DEBUG']
+elif debug == -1:
+	cppdef += ['NDEBUG']
+
+optimize = ARGUMENTS.get('optimize', optimize)
+
+caux = ARGUMENTS.get('aux')
+cflags += Split(caux)
+
 cflagsoverride = ARGUMENTS.get('cfoverride', 0)
 if cflagsoverride:
 	cflags = cflagsoverride
 
 env = Environment(
-		  CXX = cxx, 
-		  CCFLAGS = cflags, 
-		  CPPPATH=['#/..'], 
-		  CPPDEFINES=cppdef)
+  CXX = cxx, 
+  CCFLAGS = cflags, 
+  CPPPATH=['#/..', '#/contrib/ntl'], 
+  LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/string #/base/plugin'),
+  CPPDEFINES=cppdef)
 
 Export('env')
+Export('optimize')
+Export('debug')
+
 conf = SConscript('configure/SConscript')
 env = conf.Finish()
 
-SConscript(dirs = ['util', 
-		   'tools/autobuild'])
+shrd = env.Copy()
+shrd.Append(CPPDEFINES = 'BUILDING_DLL')
+
+Export('shrd')
+
+SConscript(dirs = ['util', 'base',
+		   'tools/autobuild', 'contrib/ntl'])

@@ -2,7 +2,7 @@
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,27 +21,29 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_ORDERED_HPP
 #define GOTT_UTIL_TDL_SCHEMA_ORDERED_HPP
 
-#include "../parse.hpp"
-#include "../rule_factory.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
+#include "../happy_once.hpp"
 
 namespace gott {
-namespace util {
 namespace tdl {
 namespace schema {
 
-class match_ordered : public rule {
+class match_ordered : public happy_once {
 public:
-  typedef factory_template::manychildren<match_ordered> factory;
-  match_ordered(std::vector<rule::factory const *> const &r, 
-                rule::attributes const &, match &);
+  match_ordered(rule_attr const &, Vector<rule_t> const &, match &);
+  ~match_ordered();
+
+  static bool accept_empty(Vector<rule_t> const &r);
 
 private:
-  std::vector<rule::factory const *> subrules;
-  std::vector<rule::factory const *>::iterator pos;
+  Vector<rule_t> subrules;
+  Vector<rule_t>::iterator pos;
 
   bool play(ev::child_succeed const &);
+  string name() const;
 };
 
-}}}}
+}}}
 
 #endif

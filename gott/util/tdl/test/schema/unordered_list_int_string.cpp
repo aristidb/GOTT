@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,31 +20,29 @@
 
 #include "common.hpp"
 #include <gott/util/tdl/schema/slot.hpp>
+#include <gott/util/tdl/structure/types/integer.hpp>
 
-namespace u = gott::util;
-namespace schema = u::tdl::schema;
-namespace stru = u::tdl::structure;
-namespace simple = u::tdl::simple;
-using u::xany::Xany;
-using std::wstring;
+namespace schema = gott::tdl::schema;
+namespace stru = gott::tdl::structure;
+namespace simple = gott::tdl::simple;
+using gott::xany::Xany;
+using gott::string;
+
 using stru::cf::S;
 using stru::cf::C;
-
-typedef schema::rule::attributes RA;
+using schema::rule_t;
+using schema::slotcfg;
+typedef schema::rule_attr RA;
 
 namespace {
 struct schema_unordered_list_integer_string : tut::schema_basic {
-  schema_unordered_list_integer_string() {
-    context.begin(L"document", RA(wstring(L"doc")));
-      context.begin(L"unordered", RA(wstring(L"ord")));
-        context.begin(L"integer", RA(wstring(L"int")), 
-                      schema::slotcfg(schema::slotcfg::list));
-        context.end();
-        context.begin(L"string", RA(wstring(L"string")));
-        context.end();
-      context.end();
-    context.end();
-  }
+  schema_unordered_list_integer_string()
+  : tut::schema_basic(
+      rule("document", RA(), Vector<rule_t>() <<
+        rule("node",
+          RA(Vector<string>()<<"node",true,Xany(),new stru::repatch_integer(),
+             slotcfg(), slotcfg(slotcfg::list))) <<
+        rule("node", RA()))) {}
 };
 }
 
@@ -62,16 +60,16 @@ template<> template<>
 void object::test<1>(int) {
   run_test(L"4\nx");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(4), L"int"));
-  c.push_back(S(Xany(L"x"), L"string"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  c.push_back(S(Xany(4)));
+  c.push_back(S(Xany(L"x")));
+  C(M(c)).write_to(xp);
   ensure_equals("int then string", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
   run_test(L"d7");
-  C(C(S(Xany(L"d7"), L"string"), L"ord"), L"doc").write_to(xp);
+  C(C(S(Xany(L"d7")))).write_to(xp);
   ensure_equals("single string", tree, xp);
 }
 
@@ -81,8 +79,8 @@ void object::test<3>(int) {
     run_test(L"");
     fail("empty");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "0:1 : mismatch after token ");
+    ensure_equals("correct error", gott::string(mm.what()), 
+        "0:1 : mismatch in document>unordered>node after token ");
   }
 }
 
@@ -92,8 +90,8 @@ void object::test<4>(int) {
     run_test(L"list bar");
     fail("string following string");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token list");
+    ensure_equals("correct error", gott::string(mm.what()), 
+        "1:1 : mismatch in document>unordered>node after token list");
   }
 }
 
@@ -103,8 +101,8 @@ void object::test<5>(int) {
     run_test(L"list,list");
     fail("two strings");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:6 : mismatch at token list");
+    ensure_equals("correct error", gott::string(mm.what()), 
+        "1:6 : mismatch in document>unordered>node at token list");
   }
 }
 
@@ -114,8 +112,8 @@ void object::test<6>(int) {
     run_test(L"4,x,y");
     fail("int then two strings");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:5 : mismatch at token y");
+    ensure_equals("correct error", gott::string(mm.what()), 
+        "1:5 : mismatch in document>unordered>node at token y");
   }
 }
 
@@ -125,8 +123,8 @@ void object::test<7>(int) {
     run_test(L"732 bar");
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        std::string(mm.what()), "1:1 : mismatch after token 732");
+    ensure_equals("correct error", gott::string(mm.what()), 
+        "1:1 : mismatch in document>unordered>node after token 732");
   }
 }
 
@@ -134,9 +132,9 @@ template<> template<>
 void object::test<8>(int) {
   run_test(L"foo,77");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"foo"), L"string"));
-  c.push_back(S(Xany(77), L"int"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  c.push_back(S(Xany(L"foo")));
+  c.push_back(S(Xany(77)));
+  C(M(c)).write_to(xp);
   ensure_equals("reordered #1", tree, xp);
 }
 
@@ -144,10 +142,10 @@ template<> template<>
 void object::test<9>(int) {
   run_test(L"1,foo,77");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(1), L"int"));
-  c.push_back(S(Xany(L"foo"), L"string"));
-  c.push_back(S(Xany(77), L"int"));
-  C(M(c, L"ord"), L"doc").write_to(xp);
+  c.push_back(S(Xany(1)));
+  c.push_back(S(Xany(L"foo")));
+  c.push_back(S(Xany(77)));
+  C(M(c)).write_to(xp);
   ensure_equals("reordered #2", tree, xp);
 }
 

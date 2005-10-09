@@ -2,7 +2,7 @@
 // Content: TDL common base
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,46 +21,63 @@
 #ifndef GOTT_UTIL_TDL_EXCEPTIONS_HPP
 #define GOTT_UTIL_TDL_EXCEPTIONS_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/visibility.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <ntl.h>
 
 namespace gott {
-namespace util {
+class string;
+
 namespace tdl {
 
-class EXPORT tdl_exception : public std::exception {
-  std::string message_narrow;
-  std::wstring message_wide;
+class GOTT_EXPORT tdl_exception : public std::exception {
 public:
-  tdl_exception(std::string const &msg) LOCAL;
-  tdl_exception(std::wstring const &msg) LOCAL;
+  tdl_exception(string const &msg) GOTT_LOCAL;
+  tdl_exception(tdl_exception const &) GOTT_LOCAL;
   ~tdl_exception() throw();
   char const *what() const throw();
+
+private:
+  class IMPL;
+  boost::scoped_ptr<IMPL> p;
+
+  tdl_exception() GOTT_LOCAL;
 };
 
 namespace schema {
 
-namespace detail { struct line_pos; }
+namespace detail { struct stream_position; }
 
 /**
  * Schema mismatch exception.
- * Thrown when a rule failed to match and could not be backtracked.
+ * Thrown when a item failed to match and could not be backtracked.
  */
-struct EXPORT mismatch : public tdl_exception {
-  mismatch(detail::line_pos const &p) LOCAL;
+struct GOTT_EXPORT mismatch : public tdl_exception {
+  GOTT_LOCAL
+  mismatch(detail::stream_position const &p, Vector<string> const &);
   ~mismatch() throw();
 };
 
-struct EXPORT unregistered_type : public tdl_exception {
-  unregistered_type(std::wstring const &type) LOCAL;
+struct GOTT_EXPORT unregistered_type : public tdl_exception {
+  unregistered_type(string const &type) GOTT_LOCAL;
   ~unregistered_type() throw();
 };
 
-struct EXPORT dont_accept : public tdl_exception {
-  dont_accept(std::wstring const &desc) LOCAL;
+struct GOTT_EXPORT dont_accept : public tdl_exception {
+  dont_accept(string const &desc);
   ~dont_accept() throw();
 };
 
 }
-}}}
+
+namespace structure {
+
+struct GOTT_EXPORT failed_repatch : public tdl_exception {
+  failed_repatch(string const &desc);
+  ~failed_repatch() throw();
+};
+
+}
+}}
 
 #endif

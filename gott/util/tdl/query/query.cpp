@@ -2,7 +2,7 @@
 // Content: TDL query engine
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,42 +19,41 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "query.hpp"
+#include <algorithm>
 
-using std::wstring;
 using std::size_t;
-using gott::util::tdl::query::selection;
+using gott::tdl::query::selection;
+using gott::string;
 
 template<class I>
 void selection<I>::add(I const &x) {
-  impl.reserve(impl.size() + x.size());
   for (I i = x.first_child(); i; i = i.next())
-    impl.push_back(i);
+    impl.Add(i);
 }
 
 template<class I>
 void selection<I>::add_windex(I const &x, size_t i) {
   if (x.size() > i)
-    impl.push_back(x[i]);
+    impl.Add(x[i]);
 }
 
 template<class I>
 void selection<I>::add_wrange(I const &x, size_t a, size_t b) {
   size_t end = std::min(b, x.size());
   
-  impl.reserve(impl.size() + (end - a));
   for (; a < end; ++a)
-    impl.push_back(x[a]);
+    impl.Add(x[a]);
 }
 
 template<class I>
-void selection<I>::add_wtag(I const &x, wstring const &s) {
+void selection<I>::add_wtag(I const &x, string const &s) {
   for (typename I::tagged i = x.with_tag(s); i; ++i)
-    impl.push_back(i.get());
+    impl.Add(i.get());
 }
 
 template<class I> 
 selection<I> const &selection<I>::operator+=(selection const &b) {
-  impl.insert(impl.end(), b.impl.begin(), b.impl.end());
+  impl.Append(b.impl);
   return *this;
 }
 
@@ -83,7 +82,7 @@ selection<I> selection<I>::find_all() const {
 }
 
 template<class I>
-selection<I> selection<I>::find_tag(wstring const &s) const {
+selection<I> selection<I>::find_tag(string const &s) const {
   selection tmp;
   for (const_iterator it = impl.begin(); it != impl.end(); ++it)
     tmp.add_wtag(*it, s);

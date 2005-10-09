@@ -2,7 +2,7 @@
 // Content: TDL Data Structures
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,12 +21,16 @@
 #ifndef GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 #define GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <ntl.h>
+#include <gott/util/xany/xany.hpp>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
-namespace util {
+class string;
+
 namespace tdl {
 namespace structure {
+
 class writable_structure;
 
 /**
@@ -34,23 +38,23 @@ class writable_structure;
  */
 namespace cf {
 
-typedef std::list<std::wstring> tag_list;
+typedef Vector<string> tag_list;
 class node_inserter_t;
-typedef std::list<node_inserter_t> nd_list;
+typedef Array<node_inserter_t> nd_list;
 
 /**
  * General concatenateable structure generator.
  */
-class node_inserter_t {
+class node_inserter_t : Moveable<node_inserter_t> {
 public:
   /**
    * Actually writes the structure in spe.
    * \param ws The structure to write to.
    */
-  EXPORT void write_to(writable_structure &ws) const;
+  GOTT_EXPORT void write_to(writable_structure &ws) const;
 
   node_inserter_t(xany::Xany const &d, nd_list const &c, tag_list const &t);
-  EXPORT ~node_inserter_t();
+  GOTT_EXPORT ~node_inserter_t();
 
 private:
   xany::Xany data;
@@ -63,28 +67,32 @@ private:
  * \param data The node's data.
  * \param tags The nodes's tags.
  */
-EXPORT node_inserter_t S(xany::Xany data, tag_list tags = tag_list());
+GOTT_EXPORT 
+node_inserter_t S(xany::Xany const &data, tag_list const &tags = tag_list());
 
 /**
  * Create a leaf node (generator).
  * \param data The node's data.
  * \param tag The nodes's sole tag.
  */
-EXPORT node_inserter_t S(xany::Xany data, std::wstring tag);
+GOTT_EXPORT 
+node_inserter_t S(xany::Xany const &data, string const &tag);
 
 /**
  * Create a node (generator) without data but with children.
  * \param children The node's children in spe.
  * \param tags The node's tags.
  */
-EXPORT node_inserter_t M(nd_list children, tag_list tags = tag_list());
+GOTT_EXPORT 
+node_inserter_t M(nd_list const &children, tag_list const &tags = tag_list());
 
 /**
  * Create a node (generator) without data but with children.
  * \param children The node's children in spe.
  * \param tag The node's sole tag.
  */
-EXPORT node_inserter_t M(nd_list children, std::wstring tag);
+GOTT_EXPORT 
+node_inserter_t M(nd_list const &children, string const &tag);
 
 /**
  * Create a node (generator) with data and children.
@@ -92,8 +100,9 @@ EXPORT node_inserter_t M(nd_list children, std::wstring tag);
  * \param children The node's children in spe.
  * \param tags The node's tags.
  */
-EXPORT node_inserter_t MD(xany::Xany data, nd_list children,
-                   tag_list tags = tag_list());
+GOTT_EXPORT 
+node_inserter_t MD(xany::Xany const &data, nd_list const &children,
+                   tag_list const &tags = tag_list());
 
 /**
  * Create a node (generator) with data and children.
@@ -101,22 +110,27 @@ EXPORT node_inserter_t MD(xany::Xany data, nd_list children,
  * \param children The node's children in spe.
  * \param tag The node's sole tag.
  */
-EXPORT node_inserter_t MD(xany::Xany data, nd_list children, std::wstring tag);
+GOTT_EXPORT 
+node_inserter_t MD(xany::Xany const &data, nd_list const &children, 
+                   string const &tag);
 
 /**
  * Create a node (generator) without data and with a single child.
  * \param child The node's child in spe.
  * \param tags The node's tags.
  */
-EXPORT node_inserter_t C(node_inserter_t child, tag_list tags = tag_list());
+GOTT_EXPORT 
+node_inserter_t C(node_inserter_t const &child, 
+                  tag_list const &tags = tag_list());
 
 /**
  * Create a node (generator) without data and with a single child.
  * \param child The node's child in spe.
  * \param tag The node's sole tag.
  */
-EXPORT node_inserter_t C(node_inserter_t child, std::wstring tag);
+GOTT_EXPORT 
+node_inserter_t C(node_inserter_t const &child, string const &tag);
 
-}}}}}
+}}}}
 
 #endif

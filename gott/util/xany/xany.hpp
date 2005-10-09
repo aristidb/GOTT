@@ -19,6 +19,7 @@
 #ifndef GOTT_TDL_UTIL_XANY_HPP
 #define GOTT_TDL_UTIL_XANY_HPP
 
+#include <gott/util/string/string.hpp>
 #include <typeinfo>
 #include <algorithm>
 #include <boost/type_traits.hpp>
@@ -27,10 +28,9 @@
 #include <iosfwd>
 #include <gott/util/xany/promote.hpp>
 
-#include <gott/util/misc/visibility.hpp>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
-namespace util {
 namespace xany {
 
 /**
@@ -47,10 +47,12 @@ namespace xany {
  * @endcode
  */
 struct operations_base {
-  EXPORT virtual ~operations_base() = 0;
+  GOTT_EXPORT virtual ~operations_base() = 0;
 };
 
 template<class T> struct operations;
+
+template<> struct operations<void> : operations_base {};
 
 /**
  * Typeless objects.
@@ -68,7 +70,7 @@ public:
    * Constructs a typeless object from data.
    * \param v The data to save.
    */
-  template<class T> explicit Xany(T const &v)
+  template<class T> explicit Xany(T v)
     : place(new holder<typename promote<T>::type>(promote<T>::get(v))) {}
 
   ~Xany() { 
@@ -76,8 +78,7 @@ public:
   }
 
   /// Copy constructor.
-  Xany(Xany const &o)
-    : place(o.place ? o.place->clone() : 0) {}
+  Xany(Xany const &o) : place(o.place ? o.place->clone() : 0) {}
 
   /**
    * Swaps the object's contents with another object.
@@ -113,6 +114,10 @@ public:
    * \return A basetype reference to the operations.
    */
   operations_base const &get_operations() const { 
+    if (!place) {
+      static operations<void> nothing;
+      return nothing;
+    }
     return place->get_operations();
   }
 
@@ -124,10 +129,20 @@ public:
   }
 
   /**
-   * Returns the object's data' type.
+   * Returns the object's data type.
    */
   std::type_info const &type() const {
     return place ? place->type() : typeid(void);
+  }
+
+  /**
+   * Checks for type compatibilty.
+   */
+  template<class T>
+  bool compatible() const {
+    if (!place)
+      return false;
+    return typeid(typename promote<T>::type) == place->type();
   }
 
 private:
@@ -186,7 +201,7 @@ T Xany_cast(Xany const &p) {
  * Any equality-comparable Xany-compatible type has this interface in its
  * operations.
  */
-struct EXPORT equality_comparable : virtual operations_base {
+struct GOTT_EXPORT equality_comparable : virtual operations_base {
   virtual bool equals(Xany const &, Xany const &) const = 0;
   virtual ~equality_comparable() = 0;
 };
@@ -205,17 +220,17 @@ template<class T> struct operations : equality_comparer<T> {};
 /**
  * Checks whether two typeless objects are equal.
  */
-EXPORT bool operator==(Xany const &lhs, Xany const &rhs);
+GOTT_EXPORT bool operator==(Xany const &lhs, Xany const &rhs);
 
 /**
  * Checks whether two typeless objects differ.
  */
-EXPORT bool operator!=(Xany const &lhs, Xany const &rhs);
+GOTT_EXPORT bool operator!=(Xany const &lhs, Xany const &rhs);
 
 /**
  * Any printable Xany-compatible type has this interface in its operations.
  */
-struct EXPORT printable : virtual operations_base {
+struct GOTT_EXPORT printable : virtual operations_base {
   virtual void print(std::ostream &, Xany const &) const = 0;
   virtual void print(std::wostream &, Xany const &) const = 0;
   virtual ~printable() = 0;
@@ -245,14 +260,13 @@ operator<<(std::basic_ostream<Ch, ChT> &s, Xany const &v) {
   return s;
 }
 
-#define GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(T) \
+#define GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(T) \
   template<> struct operations<T> : equality_comparer<T>, printer<T> {}
 
-GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(long);
-GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(double);
-GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(std::string);
-GOTT_UTIL_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(std::wstring);
+GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(long);
+GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(double);
+GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(string);
 
-}}}
+}}
 
 #endif

@@ -2,7 +2,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,22 +18,23 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <gott/util/tdl/schema/parse.hpp>
+#include <gott/util/tdl/schema/match.hpp>
 #include <gott/util/tdl/schema/parse_position.hpp>
+#include <gott/util/tdl/schema/rule.hpp>
+#include <gott/util/tdl/schema/rule_attr.hpp>
 #include <gott/util/tdl/structure/structure.hpp>
 #include <gott/util/tdl/simple/parse/parser.hpp>
-#include <gott/util/tdl/schema/context.hpp>
 #include <gott/util/tut/tut.h>
+#include <gott/util/string/string.hpp>
 
-namespace tdl = gott::util::tdl;
+namespace tdl = gott::tdl;
 
 namespace {
 struct ignore_struct : tdl::structure::revocable_structure {
-  void data(gott::util::xany::Xany const &) {}
+  void data(gott::xany::Xany const &) {}
   void begin() {}
   void end() {}
-  void add_tag(std::wstring const &) {}
-  void set_tags(std::list<std::wstring> const &) {}
+  void add_tag(gott::string const &) {}
 
   pth point() { return pth(); }
   void revert(pth const &) {}
@@ -47,13 +48,8 @@ struct test_base {
   tdl::simple::parser &parse;
 
   test_base() 
-    : match(no_stru),
-      pos(match.pos()),
-      parse(match) {
-    tdl::schema::context c;
-    c.begin(L"document");
-    c.end();
-    match.add(c.get());
+  : match(no_stru), pos(match.pos()), parse(match) {
+    match.add(tdl::schema::rule("document", tdl::schema::rule_attr()));
   }
 };
 
@@ -67,7 +63,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   parse.begin_parse();
-  ensure_equals("first token index", pos.current().first, 0U);
+  ensure_equals("first token index", pos.current().first, 0);
 }
 
 template<> template<>

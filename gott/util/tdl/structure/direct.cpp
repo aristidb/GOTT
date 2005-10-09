@@ -2,7 +2,7 @@
 // Content: TDL Data Structures
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,11 +20,12 @@
 
 #include "structure.hpp"
 #include "../simple/parse/parser.hpp"
+#include <gott/util/string/string.hpp>
 
-using std::wstring;
-using gott::util::xany::Xany;
-using gott::util::tdl::simple::parser;
-using gott::util::tdl::structure::writable_structure;
+
+using gott::xany::Xany;
+using gott::tdl::simple::parser;
+using gott::tdl::structure::writable_structure;
 
 namespace {
   class my_parser : public parser {
@@ -33,7 +34,7 @@ namespace {
 
     void begin_parse() {}
     void end_parse() {}
-    void comment(wstring const &, bool) {}
+    void comment(gott::string const &, bool) {}
 
     void down() {
       if (!data)
@@ -50,7 +51,7 @@ namespace {
       s.end();
     }
 
-    void node(wstring const &x) {
+    void node(gott::string const &x) {
       if (data)
         s.end();
   
@@ -61,14 +62,12 @@ namespace {
     }
 
   public:
-    my_parser(writable_structure &ss) : s(ss), data(false) {}
+    my_parser(writable_structure &ss) : parser(0), s(ss), data(false) {}
     virtual ~my_parser() {}
   };
 }
 
-void gott::util::tdl::structure::direct_struc(std::wistream &in, 
+void gott::tdl::structure::direct_struc(std::wistream &in, 
                                               writable_structure &out) {
-  my_parser pp(out);
-  parser &p = pp;
-  parse(in, p);
+  my_parser(out).parse(in);
 }

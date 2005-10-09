@@ -3,7 +3,7 @@
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,19 +21,25 @@
 
 #include <gott/util/tdl/simple/parse/parser.hpp>
 #include <gott/util/tut/tut.h>
+#include <ostream>
+#include <gott/util/string/string.hpp>
+
+using gott::string;
 
 namespace tut {
-struct spb : gott::util::tdl::simple::parser {
+struct spb : gott::tdl::simple::parser {
+  spb() : parser(0) {}
+
   enum event_id { b, e, d, u, n, c };
-  typedef std::pair<event_id, std::wstring> event;
-  std::vector<event> xp, ev;
+  typedef std::pair<event_id, string> event;
+  Vector<event> xp, ev;
 
   void begin_parse() { ev.push_back(event(b, L"")); }
   void end_parse() { ev.push_back(event(e, L"")); }
   void down() { ev.push_back(event(d, L"")); }
   void up() { ev.push_back(event(u, L"")); }
-  void node(std::wstring const &w) { ev.push_back(event(n, w)); }
-  void comment(std::wstring const &w, bool nl) { 
+  void node(string const &w) { ev.push_back(event(n, w)); }
+  void comment(string const &w, bool nl) { 
     ev.push_back(event(c, (nl ? L"\n" : L"") + w)); 
   }
 
@@ -41,8 +47,8 @@ struct spb : gott::util::tdl::simple::parser {
   void E() { xp.push_back(event(e, L"")); }
   void D() { xp.push_back(event(d, L"")); }
   void U() { xp.push_back(event(u, L"")); }
-  void N(std::wstring const &w) { xp.push_back(event(n, w)); }
-  void C(std::wstring const &w, bool nl) { 
+  void N(string const &w) { xp.push_back(event(n, w)); }
+  void C(string const &w, bool nl) { 
     xp.push_back(event(c, (nl ? L"\n" : L"") + w)); 
   }
 };
@@ -51,20 +57,14 @@ typedef test_group<spb> tf;
 typedef tf::object object;
 }
 
+NTL_MOVEABLE(tut::spb::event);
+
 namespace {
 tut::tf spp("simple::parse");
 }
 
-using gott::util::tdl::simple::parse;
-
-std::ostream &operator<<(std::ostream &o, 
-                         std::vector<tut::spb::event> const &e) {
-  o << '\n';
-  for (std::vector<tut::spb::event>::const_iterator it = e.begin(); 
-       it != e.end(); ++it) 
-    o << "bedunc"[it->first] << it->second << ' ';
-  o << '\n';
-  return o;
+std::ostream &operator<<(std::ostream &o, tut::spb::event const &e) {
+  return o << "bedunc"[e.first] << e.second << ' ';
 }
 
 namespace tut {
@@ -73,69 +73,69 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   std::wistringstream data(L"");
-  parse(data, *this);
+  parse(data);
   B(); D(); U(); E();
-  ensure_equals("empty", ev, xp);
+  ensure_equals("empty", range(ev), range(xp));
 }
 
 // Very simple document
 template<> template<>
 void object::test<2>(int) {
   std::wistringstream data(L"hallodu");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"hallodu"); U(); E();
-  ensure_equals("single-word", ev, xp);
+  ensure_equals("single-word", range(ev), range(xp));
 }
 
 // One-line document with more than one element
 template<> template<>
 void object::test<3>(int) {
   std::wistringstream data(L"  hallodu, foobar zulu");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"hallodu"); N(L"foobar"); D(); N(L"zulu"); U(); U(); E();
-  ensure_equals("multiple-word", ev, xp);
+  ensure_equals("multiple-word", range(ev), range(xp));
 }
 
 // Empty multi-line document with funny spaces
 template<> template<>
 void object::test<4>(int) {
   std::wistringstream data(L"\n\n          \n     \n\n\n");
-  parse(data, *this);
+  parse(data);
   B(); D(); U(); E();
-  ensure_equals("quasi-empty", ev, xp);
+  ensure_equals("quasi-empty", range(ev), range(xp));
 }
 
 // Two simple documents
 template<> template<>
 void object::test<5>(int) {
   std::wistringstream data(L"\n\n\nfoobar      \n***\n  zumwinkel");
-  parse(data, *this);
-  parse(data, *this);
+  parse(data);
+  parse(data);
 
   B(); D(); N(L"foobar"); U(); E();
   B(); D(); N(L"zumwinkel"); U(); E();
 
-  ensure_equals("dual stream #1", ev, xp);
+  ensure_equals("dual stream #1", range(ev), range(xp));
 }
 
 // Indentation
 template<> template<>
 void object::test<6>(int) {
   std::wistringstream data(L"\n\n  \n       fobar\n");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"fobar"); U(); E();
 
-  ensure_equals("indented #1", ev, xp);
+  ensure_equals("indented #1", range(ev), range(xp));
 }
 
 // Indentation #2 (reduced)
 template<> template<>
 void object::test<7>(int) {
   std::wistringstream data(L"\n  x");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"x"); U(); E();
 
-  ensure_equals("indented #2", ev, xp);
+  ensure_equals("indented #2", range(ev), range(xp));
 }
 
 
@@ -143,20 +143,20 @@ void object::test<7>(int) {
 template<> template<>
 void object::test<8>(int) {
   std::wistringstream data(L"\n\n#__ mycomment,\n");
-  parse(data, *this);
+  parse(data);
   B(); D(); C(L"__ mycomment,", true); U(); E();
 
-  ensure_equals("own-line comment", ev, xp);
+  ensure_equals("own-line comment", range(ev), range(xp));
 }
 
 // Newlined char
 template<> template<>
 void object::test<9>(int) {
   std::wistringstream data(L"\na");
-  parse(data, *this);
+  parse(data);
   B(); D(); N(L"a"); U(); E();
 
-  ensure_equals("newlined char", ev, xp);
+  ensure_equals("newlined char", range(ev), range(xp));
 }
 
 // Wiki test #1
@@ -175,7 +175,7 @@ a\n\
     7\n\
   -2\n"
   );
-  parse(data, *this);
+  parse(data);
   
   B();
     D();
@@ -193,7 +193,7 @@ a\n\
     U();
   E();
 
-  ensure_equals("wiki test #1", ev, xp);
+  ensure_equals("wiki test #1", range(ev), range(xp));
 }
 
 // Wiki test #2
@@ -214,7 +214,7 @@ type multi\n\
        named sum integer (> 0)\n\
        $ list integer"
   );
-  parse(data, *this);
+  parse(data);
   B(); D();
     N(L"module"); D(); N(L"foo"); U();
     N(L"schema"); D(); N(L"footype"); U();
@@ -234,7 +234,7 @@ type multi\n\
     U();
   U(); E();
 
-  ensure_equals("wiki test #2", ev, xp);
+  ensure_equals("wiki test #2", range(ev), range(xp));
 }
 
 // Wiki test #3
@@ -256,8 +256,8 @@ TITLE:    Roses\n\
 ARTIST:   \"Kathy Mattea\"\n\
 RATING:   7\n\
 RIPPED:   T");
-  parse(data, *this);
-  std::wstring dataset[3][4] = {
+  parse(data);
+  string dataset[3][4] = {
     {L"Home",  L"Dixie Chicks", L"9", L"T"},
     {L"Fly",   L"Dixie Chicks", L"8", L"T"},
     {L"Roses", L"Kathy Mattea", L"7", L"T"}
@@ -272,7 +272,7 @@ RIPPED:   T");
     }
   U(); E();
 
-  ensure_equals("wiki test #3", ev, xp);
+  ensure_equals("wiki test #3", range(ev), range(xp));
 }
 
 // Old CVS #1
@@ -296,7 +296,7 @@ a `\n\
    du\n\
  pferd\n"
   );
-  parse(data, *this);
+  parse(data);
   B(); D();
     N(L"a"); N(L"b"); D(); 
       N(L"c"); N(L"d"); C(L"comment", false); N(L"J");
@@ -307,7 +307,7 @@ a `\n\
     N(L"a"); D(); N(L"ahllo\n du\n"); N(L"pferd"); U();
   U(); E();
 
-  ensure_equals("Old CVS test #1", ev, xp);
+  ensure_equals("Old CVS test #1", range(ev), range(xp));
 }
 
 // Simple block test
@@ -319,7 +319,7 @@ a `\n\
   du\n\
  pferd\n"
   );
-  parse(data, *this);
+  parse(data);
   B(); D();
     N(L"a"); 
     D(); 
@@ -327,7 +327,7 @@ a `\n\
     U();
   U(); E();
 
-  ensure_equals("simple block", ev, xp);
+  ensure_equals("simple block", range(ev), range(xp));
 }
 
 template<> template<>

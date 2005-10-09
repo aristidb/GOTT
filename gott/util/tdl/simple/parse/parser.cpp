@@ -2,7 +2,7 @@
 // Content: Simple SAX-like TDL parser
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "parser.hpp"
+#include "line_logger.hpp"
+#include <boost/algorithm/string.hpp>
+#include <gott/util/string/string.hpp>
+#include <gott/util/string/buffer.hpp>
 
 using std::wistream;
-using std::wstring;
-using gott::util::tdl::simple::parser;
-using gott::util::tdl::simple::line_logger;
+using gott::string;
+using gott::range;
+using gott::tdl::simple::parser;
+using gott::tdl::simple::line_logger;
 
 parser::~parser() {}
 
@@ -61,7 +66,7 @@ struct internal_line_logger {
   
   void start_token() { rp = p; }
   
-  void end_token(std::wstring const &n) {
+  void end_token(string const &n) {
     if (ref)
       ref->token(rp, p, n);
   }
@@ -73,26 +78,24 @@ class exec_parse {
   unsigned indent;
   bool up, started_document;
   unsigned buff_indent;
-  wstring current_line;
+  string current_line;
 
   internal_line_logger ln;
 
   void normal(unsigned = 0);
-  void normal_line(wstring const &);
+  void normal_line(string const &);
   bool empty_line();
   void block();
   
   void get_indent();
   void restore_indent(unsigned);
-  void skip_whitespace(wstring::const_iterator &, 
-                       wstring::const_iterator const &);
-  static bool border(wchar_t);
-  wstring read_quoted(wstring::const_iterator &, 
-                      wstring::const_iterator const &); 
-  wstring read_paren(wstring::const_iterator &, 
-                     wstring::const_iterator const &);
-  wstring read_string(wstring::const_iterator &, 
-                      wstring::const_iterator const &);
+  void skip_whitespace(string::utf8_range &);
+  static bool border(char);
+  string read_quoted(string::utf8_range &);
+  string read_paren(string::utf8_range &);
+  string read_string(string::utf8_range &);
+
+  bool read_line();
 
 public:
   exec_parse(wistream &s, parser &p, line_logger *l) 
@@ -106,9 +109,8 @@ class cancellor {};
 
 line_logger::~line_logger() {}
 
-void gott::util::tdl::simple::parse(std::wistream &s, 
-                                    parser &p, line_logger *l) {
-  exec_parse x(s, p, l);
+void parser::parse(std::wistream &s) {
+  exec_parse x(s, *this, ll);
   x.run_parse();
 }
 
@@ -124,12 +126,20 @@ void exec_parse::run_parse() {
   parse.end_parse();
 }
 
+bool exec_parse::read_line() {
+  std::wstring line;
+  if (!getline(stream, line))
+    return false;
+  current_line = line;
+  return true;
+}
+
 void exec_parse::normal(unsigned last) {
   if (!up) parse.down();
 
   try {
     do {
-      if (getline(stream, current_line))
+      if (read_line())
         if (indent == 1 && current_line == L"***") // no space before, no behind
           throw cancellor();
         else
@@ -156,18 +166,19 @@ void exec_parse::normal(unsigned last) {
   parse.up();
 }
 
-void exec_parse::normal_line(wstring const &s) {
+void exec_parse::normal_line(string const &s) {
   unsigned count = 0;
 
   bool to_down = false, empty = true;
 
-  wstring::const_iterator pos = s.begin();
+  string::utf8_range unread = s.as_utf8();
   
-  while (pos != s.end()) {
-    skip_whitespace(pos, s.end());
+  while (!unread.empty()) {
+    skip_whitespace(unread);
   
-    if (*pos == L'#') {
-      wstring y(++pos, s.end());
+    if (*unread.begin == '#') {
+      ++unread.begin;
+      string y(unread);
       ln.new_char();
       ln.start_token();
       ln.end_token(y);
@@ -182,21 +193,21 @@ void exec_parse::normal_line(wstring const &s) {
       parse.down();
     }
   
-    if (*pos == L'`') {
+    if (*unread.begin == '`') {
       block();
       break;
     }
     
-    parse.node(read_string(pos, s.end()));
+    parse.node(read_string(unread));
     started_document = true;
 
-    skip_whitespace(pos, s.end());
+    skip_whitespace(unread);
     
     ln.start_token();
-    if (pos != s.end() && *pos == L',') {
+    if (!unread.empty() && *unread.begin == ',') {
       ln.new_char();
       ln.end_token(L",");
-      ++pos;
+      ++unread.begin;
       to_down = false;
     } else
       to_down = true;
@@ -211,9 +222,8 @@ void exec_parse::normal_line(wstring const &s) {
 bool exec_parse::empty_line() {
   if (stream.peek() == L'#') {
     stream.get();
-    wstring s;
-    getline(stream, s);
-    parse.comment(s, true);
+    read_line();
+    parse.comment(current_line, true);
     return true;
   }
   
@@ -228,20 +238,18 @@ bool exec_parse::empty_line() {
 void exec_parse::block() {
   unsigned old_indent = indent;
 
-  wstring str;
+  gott::string_buffer str;
   
   get_indent();
 
   do {
-    wstring tmp;
-    if (!getline(stream, tmp))
+    if (!read_line())
       break;
     
     ln.start_line();
     
-    str.reserve(str.size() + tmp.size() + 1);
-    str += tmp;
-    str += '\n';
+    str += current_line;
+    str += "\n";
 
     unsigned ind = 0;
     wchar_t c;
@@ -258,61 +266,61 @@ void exec_parse::block() {
   restore_indent(old_indent);
 }
 
-void exec_parse::skip_whitespace(wstring::const_iterator &it, 
-                                     wstring::const_iterator const &end) {
-  while (it != end && *it == L' ') {
+void exec_parse::skip_whitespace(string::utf8_range &unread) {
+  while (!unread.empty() && *unread.begin == ' ') {
     ln.new_char();
-    ++it;
+    ++unread.begin;
   }
 }
 
-bool exec_parse::border(wchar_t c) {
-  return (c == L' ' || c == L',' || c == L'"' || c == L'#' || c == L'(');
+bool exec_parse::border(char c) {
+  return (c == ' ' || c == ',' || c == '"' || c == '#' || c == '(');
 }
 
-wstring exec_parse::read_quoted(wstring::const_iterator &it, 
-                                    wstring::const_iterator const &end) {
-  wstring::const_iterator start = it;
+string exec_parse::read_quoted(string::utf8_range &unread) {
+  string::utf8_range whole = unread;
   bool double_dquote = true;
   do {
-    while (it != end && *it != L'"')
-      ++it;
-    if (++it == end)
+    while (!unread.empty() && *unread.begin != '"')
+      ++unread.begin;
+    if (++unread.begin >= unread.end)
       break;
-    double_dquote = *it++ == L'"';
+    double_dquote = *unread.begin++ == L'"';
   } while (double_dquote);
-  it -= 1 + !double_dquote; // double_dquote still set if break was executed
+  unread.begin -= 1 + !double_dquote; // double_dquote still set if break was executed
 
-  ln.add_char(it - start + 1);
+  ln.add_char(unread.begin - whole.begin + 1);
 
-  ln.end_token(wstring(start - 1, ++it));
+  ln.end_token(range(whole.begin - 1, ++unread.begin));
   
-  wstring s(start, it - 1);
-  boost::algorithm::replace_all(s, L"\"\"", L"\"");
+  gott::string_buffer s = string(range(whole.begin, unread.begin - 1));
+  static const string two_quote("\"\""), one_quote("\"");
+  boost::algorithm::replace_all(s, two_quote.as_utf32(), one_quote.as_utf32());
  
   return s;
 }
 
-wstring exec_parse::read_paren(wstring::const_iterator &it, 
-                                   wstring::const_iterator const &end) {
-  wstring::const_iterator start = it++;
+string exec_parse::read_paren(string::utf8_range &unread) {
+  string::utf8_range whole = unread;
   struct balancer {
     unsigned long bal;
     balancer() : bal(1) {}
     operator bool() { return bal == 0; }
-    void operator() (wchar_t c) {
-      if (c == L'(')
+    void operator() (char c) {
+      if (c == '(')
         ++bal;
-      if (c == L')')
+      if (c == ')')
         --bal;
     }
   } balance;
 
-  for (; it != end && !balance; ++it) 
-    balance(*it);
+  ++unread.begin; // skip (
 
-  wstring result(start, it);
-  if (it == end && !balance) { // multi-line
+  for (; !unread.empty() && !balance; ++unread.begin) 
+    balance(*unread.begin);
+
+  gott::string_buffer result = string(range(whole.begin, unread.begin));
+  if (unread.empty() && !balance) { // multi-line
     result += L'\n';
     wchar_t c;
     while (!balance && stream.get(c)) {
@@ -326,22 +334,22 @@ wstring exec_parse::read_paren(wstring::const_iterator &it,
   return result;
 }
 
-wstring exec_parse::read_string(wstring::const_iterator &it, 
-                                    wstring::const_iterator const &end) {
+string exec_parse::read_string(string::utf8_range &unread) {
   ln.start_token();
   
-  if (*it == L'"')
-    return read_quoted(++it, end);
-  else if (*it == L'(')
-    return read_paren(it, end);
+  if (*unread.begin == '"') {
+    ++unread.begin;
+    return read_quoted(unread);
+  } else if (*unread.begin == '(')
+    return read_paren(unread);
 
-  wstring::const_iterator start = it;
-  while (it != end && !border(*it))
-    ++it;
+  string::utf8_range::value_type start = unread.begin;
+  while (!unread.empty() && !border(*unread.begin))
+    ++unread.begin;
   
-  ln.add_char(it - start);
+  ln.add_char(unread.begin - start);
 
-  wstring out(start, it);
+  string out(range(start, unread.begin));
   ln.end_token(out);
   return out;
 }

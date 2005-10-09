@@ -2,7 +2,7 @@
 // Content: Properties library
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,14 +21,153 @@
 #ifndef GOTT_UTIL_PROPERTY_PROPERTY_HPP
 #define GOTT_UTIL_PROPERTY_PROPERTY_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
 #include <gott/util/properties/embedded_storage.hpp>
 #include <gott/util/properties/trivial_aux.hpp>
 #include <gott/util/properties/policy.hpp>
 
 namespace gott {
-namespace util {
 namespace properties {
+
+template<class T>
+class property {
+public:
+  typedef T value_type;
+  typedef T *pointer;
+  typedef T &reference;
+  typedef T const *const_pointer;
+  typedef T const &const_reference;
+
+  struct read_reference {
+    const_pointer operator->() const {
+      return ptr;
+    }
+
+    const_reference operator*() const {
+      return *ptr;
+    }
+    
+    read_reference(property const &p)
+    : container(p), ptr(p.begin_read()), ref_count(new unsigned long(1)) {}
+
+    read_reference(read_reference const &o)
+      : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
+      { ++*ref_count; }
+
+    ~read_reference() {
+      if (--*ref_count == 0)
+        container.end_read(ptr);
+    }
+
+    property const &container;
+    const_pointer ptr;
+    unsigned long *ref_count;
+  };
+
+  struct write_reference {
+    pointer operator->() {
+      return ptr;
+    }
+
+    reference operator*() {
+      return *ptr;
+    }
+    
+    write_reference(property &p)
+    : container(p), ptr(p.begin_write()), ref_count(new unsigned long(1)) {}
+
+    write_reference(write_reference const &o)
+      : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
+      { ++*ref_count; }
+
+    ~write_reference() {
+      if (--*ref_count == 0)
+        container.end_write(ptr);
+    }
+    
+    property &container;
+    pointer ptr;
+    unsigned long *ref_count;
+  };
+
+  struct read_write_reference {
+    pointer operator->() {
+      return ptr;
+    }
+
+    reference operator*() {
+      return *ptr;
+    }
+    
+    read_write_reference(property &p)
+    : container(p), ptr(p.begin_read_write()), ref_count(new unsigned long(1)){}
+
+    read_write_reference(read_write_reference const &o)
+      : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
+      { ++*ref_count; }
+
+    ~read_write_reference() {
+      if (--*ref_count == 0)
+        container.end_read_write(ptr);
+    }
+    
+    property &container;
+    pointer ptr;
+    unsigned long *ref_count;
+  };
+
+  read_reference read() const { 
+    return *this; 
+  }
+
+  read_write_reference read_write() {
+    return *this; 
+  }
+
+  write_reference write() {
+    return *this;
+  }
+
+  void set(value_type const &v) {
+    *write() = v;
+  }
+
+  const_reference get() const {
+    return *read();
+  }
+
+  const_reference operator()() const { return get(); }
+
+  const_reference operator() (value_type const &v) {
+    return *read_write() = v;
+  }
+
+  template<class F> 
+  void apply_change(F func) {
+    read_write_reference x(read_write());
+    *x = func(*x);
+  }
+
+  template<class F>
+  void apply_read(F func) const {
+    func(*read());
+  }
+
+  template<class F>
+  void apply_write(F func) {
+    *write() = func();
+  }
+  
+  virtual ~property() {}
+
+protected:
+  virtual T const *begin_read() const = 0;
+  virtual T *begin_write() = 0;
+  virtual T *begin_read_write() = 0;
+  
+  virtual void end_read(T const *) const = 0;
+  virtual void end_write(T *) = 0;
+  virtual void end_read_write(T *) = 0;
+};
 
 template<
   class Type,
@@ -37,9 +176,18 @@ template<
   class Access = direct_access<Type, Storage>,
   class Lock = no_lock
 >
-class property {
+class concrete_property :
+  public property<Type>,
+  public base<Notification>,
+  public base<Storage>,
+  public base<Access>,
+  public base<Lock>
+{
 public:
   typedef Type value_type;
+  typedef Type *pointer;
+  typedef Type const *const_pointer;
+
   typedef typename policy<Storage>::class_type storage_policy;
   typedef typename policy<Lock>::class_type lock_policy;
   typedef typename policy<Access>::class_type access_policy;
@@ -59,138 +207,66 @@ private:
   typedef typename lock_policy::read_write_lock read_write_lock;
 
 public:
-  property(storage_p s = storage_policy(),
+  concrete_property(storage_p s = storage_policy(),
            notification_p n = notification_policy(),
            access_p a = access_policy(),
            lock_p l = lock_policy())
   : storage(s), access(a), notifier(n), lock(l) {
   }
 
-  property(storage_p s,
+  concrete_property(storage_p s,
            access_p a,
            notification_p n = notification_policy(),
            lock_p l = lock_policy())
   : storage(s), access(a), notifier(n), lock(l) {
   }
 
-  property(value_type const &v,
+  concrete_property(value_type const &v,
            notification_p n = notification_policy(),
            access_p a = access_policy(),
            lock_p l = lock_policy())
   : storage(v), access(a), notifier(n), lock(l) {
   }
 
-  void set(value_type const &v) {
-    write_lock w(lock);
-    if (access.set(storage, v))
-      notifier.notify(this);
-  }
-
-  typename storage_policy::const_reference get() const {
-    read_lock r(lock);
-    return access.get(storage);
-  }
-
-  typename storage_policy::const_reference operator()() const { return get(); }
-
-  typename storage_policy::const_reference operator() (value_type const &v) {
-    read_write_lock rw(lock);
-    if (access.set(storage, v))
-      notifier.notify(this);
-    return access.get(storage);
-  }
-
-  template<class T> 
-  void apply_change(T func) {
-    read_write_lock rw(lock);
-    value_type old = access.get(storage);
-    if (access.set(storage, func(old)))
-      notifier.notify(this);
-  }
-
-  template<class T>
-  void apply_read(T func) const {
-    read_lock r(lock);
-    func(access.get(storage));
-  }
-
-  template<class T>
-  void apply_write(T func) {
-    write_lock w(lock);
-    if (access.set(storage, func()))
-      notifier.notify(this);
-  }
-
-  struct read_reference {
-    typename storage_policy::const_pointer operator->() const {
-      return ptr;
-    }
-
-    typename storage_policy::const_reference operator*() const {
-      return *ptr;
-    }
-    
-    read_reference(property const &p)
-      : container(p), ptr(p.access.build(p.storage)), lock(p.lock) {}
-
-    ~read_reference() {
-      container.access.done_with(ptr);
-    }
-
-    property const &container;
-    typename storage_policy::const_pointer ptr;
-    read_lock lock;
-  };
-
-  template<class XWLock>
-  struct x_write_reference {
-    typename storage_policy::pointer operator->() {
-      return ptr;
-    }
-
-    typename storage_policy::reference operator*() {
-      return *ptr;
-    }
-    
-    x_write_reference(property &p)
-      : container(p), ptr(p.access.build(p.storage)), lock(p.lock) {}
-
-    ~x_write_reference() {
-      if (container.access.done_with(ptr))
-        container.notifier.notify(&container);
-    }
-
-    property &container;
-    typename storage_policy::pointer ptr;
-    XWLock lock;
-  };
-
-
-  template<class> friend class reference_implementation;
-
-  read_reference read() const { 
-    return *this; 
-  }
-
-  x_write_reference<read_write_lock> read_write() {
-    return *this; 
-  }
-
-  x_write_reference<write_lock> write() {
-    return *this;
-  }
-
-  notification_policy const &notification() const {
-    return notifier;
-  }
-
 private:
+  const_pointer begin_read() const {
+    read_lock::begin(lock);
+    return storage.get_pointer();
+  }
+
+  pointer begin_write() {
+    write_lock::begin(lock);
+    return storage.get_pointer();
+  }
+
+  pointer begin_read_write() {
+    read_write_lock::begin(lock);
+    return storage.get_pointer();
+  }
+
+  void end_read(const_pointer p) const {
+    storage.finish_pointer(p);
+    read_lock::end(lock);
+  }
+
+  void end_write(pointer p) {
+    storage.finish_pointer(p);
+    write_lock::end(lock);
+    notifier.notify(this);
+  }
+  
+  void end_read_write(pointer p) {
+    storage.finish_pointer(p);
+    read_write_lock::end(lock);
+    notifier.notify(this);
+  }
+  
   storage_s storage;
   access_s access;
   notification_s notifier;
-  lock_s lock;
+  mutable lock_s lock;
 };
 
-}}}
+}}
 
 #endif

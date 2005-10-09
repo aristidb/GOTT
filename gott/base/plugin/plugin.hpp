@@ -21,10 +21,9 @@
 #ifndef GOTT_BASE_PLUGIN_PLUGIN_HPP
 #define GOTT_BASE_PLUGIN_PLUGIN_HPP
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/visibility.hpp>
 
 namespace gott {
-namespace base {
 namespace plugin {
 
 class system_configuration;
@@ -32,15 +31,15 @@ class plugin_configuration;
 class hook;
 class QID;
 
-class EXPORT plugin_base {
+class GOTT_EXPORT plugin_base {
 public:
   virtual ~plugin_base() = 0;
-  virtual void add(QID const &point, hook const &extension);
+  virtual void add(QID const &point, hook const &extension) = 0;
 };
 
 typedef plugin_base *(*plugin_builder)(system_configuration &, 
                                        plugin_configuration const &);
 
-}}}
+}}
 
 #endif

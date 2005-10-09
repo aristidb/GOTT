@@ -2,7 +2,7 @@
 // Content: Simple SAX-like TDL parser
 // Authors: Aristid Breitkreuz
 //
-// This File is part of the Gott Project (http://gott.sf.net)
+// This file is part of the Gott Project (http://gott.sf.net)
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,17 +21,29 @@
 #ifndef GOTT_UTIL_TDL_SIMPLE_PARSER_H
 #define GOTT_UTIL_TDL_SIMPLE_PARSER_H
 
-#include <gott/util/misc/commonheaders.hpp>
+#include <gott/util/visibility.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
-namespace util {
+class string;
+
 namespace tdl {
 namespace simple {
+
+class line_logger;
 
 /**
  * The callback interface to parse.
  */
-struct EXPORT parser {
+class GOTT_EXPORT parser {
+public:
+  /**
+   * Parse a TDL document. Does not treat the meta-data section specifically.
+   * \param s The stream to read a document from.
+   */
+  void parse(std::wistream &s);
+
+public:
   // callbacks
   virtual void begin_parse() = 0;
     ///< Called as soon as the parse has begun.
@@ -39,10 +51,10 @@ struct EXPORT parser {
   virtual void down() = 0;
     ///< Called when we open a new sub-layer.
  
-  virtual void node(std::wstring const &content) = 0;
+  virtual void node(string const &content) = 0;
     ///< Called when a node has been read.
 
-  virtual void comment(std::wstring const &content, bool on_new_line) = 0;
+  virtual void comment(string const &content, bool on_new_line) = 0;
     ///< Called when a comment has been read.
 
   virtual void up() = 0;
@@ -52,111 +64,14 @@ struct EXPORT parser {
     ///< Final call.
 
   virtual ~parser() = 0;
-};
 
-/**
- * The callback interface notified by parse() of line and cursor changes.
- */
-struct line_logger {
-  virtual void start_line() = 0;
-    ///< A new line was started.
-
-  /**
-   * A new token has appeared.
-   * \param start The starting line position of the token.
-   * \param end The first line position after the token.
-   * \param nd The token itself.
-   */
-  virtual void token(unsigned start, unsigned end, std::wstring const &nd) = 0;
-
-  /**
-   * Called whenever a different line position is reached.
-   * \param line_pos The line position.
-   */
-  virtual void line_position(unsigned line_pos) = 0;
-
-  EXPORT virtual ~line_logger() = 0;
-};
-
-/**
- * TDL Meta-data callback.
- * This is an interface where you can specify meta-data call-backs and that you
- * can pass to parse_meta.
- * Meta-data is the section of the file containing '#?...' (and empty) lines
- * only. A non-empty line ends this section.
- * If a specified handler fails, the default handler is called.
- * The default handler should always succeed (currently failure is ignored).
- */
-class meta_parser {
-public:
-  /**
-   * The function type for a command handler.
-   * \param cmd The command name.
-   * \param param The rest of the command.
-   * \return The success of the handler.
-   */
-  typedef 
-    boost::function<bool (std::wstring const &cmd, std::wstring const &param)> 
-    callback;
-
-  EXPORT meta_parser();
-
-  /**
-   * Example handler. Stores the parameters of the latest invocation.
-   */
-  class store_one_param {
-  public:
-    /// The "function content".
-    bool operator() (std::wstring const &, std::wstring const &p) { 
-      x = p; 
-      return true;
-    }
-
-    /// The stored parameters.
-    std::wstring const &data() const { return x; }
-
-  private:
-    std::wstring x;
-  };
+protected:
+  GOTT_LOCAL parser(line_logger *l) : ll(l) {}
+  GOTT_LOCAL void set_line_logger(line_logger *l) { ll = l; }
   
-  /**
-   * Set the default command handler.
-   * \param f The handler to add.
-   */
-  void set_default(callback const &f) EXPORT;
-  
-  /**
-   * Set a specific command handler.
-   * \param s The command to invocate this handler on.
-   * \param f The handler to add.
-   */
-  void set_specific(std::wstring const &s, callback const &f) EXPORT;
-
-public:
-  /// @internal
-  void exec(std::wstring const &line);
-
 private:
-  callback def;
-  typedef hashd::hash_map<std::wstring, callback> cb_t;
-  cb_t cb;
+  line_logger *ll;
 };
 
-/**
- * Parse a TDL document. Does not treat the meta-data section specifically.
- * \param s The stream to read a document from.
- * \param p The parser callback to notify of tokens.
- * \param l (optional) The line-logger callback.
- */
-EXPORT void parse(std::wistream &s, parser &p, line_logger *l = 0);
-
-/**
- * Parses the meta-data section of a TDL document to a special parser.
- * \param s The stream to read from.
- * \param p The meta-data callback to notify.
- * \param l (optional) The line-logger callback.
- */
-EXPORT void parse_meta(std::wistream &s, meta_parser &p, line_logger *l = 0);
-
-}}}}
+}}}
 #endif
