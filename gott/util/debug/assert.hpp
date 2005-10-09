@@ -24,11 +24,17 @@
 namespace gott {
 namespace debug {
 
+#include <boost/current_function.hpp>
+#ifndef BOOST_CURRENT_FUNCTION
+#define BOOST_CURRENT_FUNCTION "<unkown-func>"
+#endif
+
 template<class T, class U>
-void fail(int line, char const *file, char const *lhs, char const *rhs,
-          char const *message, T const &lhs_v, U const &rhs_v) {
-  std::cerr << "Assertion failed in " << file << ':' << line << '\n';
-  std::cerr << "Message: " << message << '\n';
+void fail(int line, char const *file, char const *function, char const *lhs,
+	  char const *rhs, char const *message, T const &lhs_v,
+	  U const &rhs_v) {
+  std::cerr << "Assertion failed in " << function << '@' << file << ':'
+	    << line << "\nMessage: " << message << '\n';
   if (lhs)
     std::cerr << lhs << ": " << lhs_v << '\n';
   if (rhs)
@@ -37,20 +43,20 @@ void fail(int line, char const *file, char const *lhs, char const *rhs,
 
 template<class T, class F>
 void assert_1(T const &value, F function, 
-              int line, char const *file, 
+              int line, char const *file, char const *func_name,
               char const *var_name,
               char const *message) {
   if (!function(value))
-    fail(line, file, var_name, 0, message, value, 0);
+    fail(line, file, func_name, var_name, 0, message, value, 0);
 }
 
 template<class T, class U, class F>
 void assert_2(T const &lhs, U const &rhs, F function,
-              int line, char const *file,
+              int line, char const *file, char const *func_name,
               char const *lhs_name, char const *rhs_name,
               char const *message) {
   if (!function(lhs, rhs))
-    fail(line, file, lhs_name, rhs_name, message, lhs, rhs);
+    fail(line, file, func_name, lhs_name, rhs_name, message, lhs, rhs);
 }
 
 struct equals {
@@ -61,9 +67,9 @@ struct equals {
 };
 
 #define GOTT_ASSERT_1(x, f, m) \
-  gott::debug::assert_1((x),(f),__LINE__,__FILE__,#x,m)
+  gott::debug::assert_1((x),(f),__LINE__,__FILE__,BOOST_CURRENT_FUNCTION,#x,m)
 #define GOTT_ASSERT_2(x, y, f, m) \
-  gott::debug::assert_2((x),(y),(f),__LINE__,__FILE__,#x,#y,m)
+  gott::debug::assert_2((x),(y),(f),__LINE__,__FILE__,BOOST_CURRENT_FUNCTION,#x,#y,m)
 
 }}
 
