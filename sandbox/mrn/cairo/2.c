@@ -8,6 +8,26 @@
 
 enum { WIDTH=300,
        HEIGHT=200 };
+       /*
+       Mit großer Macht kommt große Verantwortung!
+       
+struct Path {
+   std::list<std::pair<point2,bool> > // so vielleicht?
+   Warum? 
+   Dachte es gibt mehr als lineto und moveto curve usw..
+   mit mehr als zwei params...  
+   oH stimmt
+    Es müssen ja auch die einzelnen Pfadsegmenttypen gespeichert werden...
+   cairot_t 
+   achdem 
+   wollen wir das mit nem scenegraph wrappen?
+   Vielleicht vorerst nicht
+   typedef boost::function<void(cairo_surface_t)> path_object; 
+   path_object f = path(<ref?>),move_to(16,16),line_t(WIDTH-16,16),line_to(vector_point2_obj) .... <--?
+   Wir könnten so kleine funktoren bauen die das alles forwarden.. 
+   dann hätten wir in der boost::function nur eine virtuelle Funktion und könnten das 
+   Objekt transportieren.. lazy_cairo++
+};*/
 
 void draw(Display *display, Drawable window, int screen) {
   XClearWindow(display, window);
@@ -47,10 +67,10 @@ void draw(Display *display, Drawable window, int screen) {
   cairo_close_path(cr);
   cairo_stroke(cr);
 
-  cairo_set_source_rgba(cr, 0.0, 1.0, 0.0, 0.4); // == grün
+  cairo_set_source_rgba(cr, 0.0, 1.0, 0.0, 0.4);
   cairo_move_to(cr, 100, 100);
   cairo_set_font_size (cr, 20);
-  cairo_show_text(cr, "Hallo!");
+  cairo_show_text(cr, "Hallo, Welt du schönste aller!");
 
   if(cairo_status(cr)) {
     fprintf(stderr, "Cairo: %s\n",
@@ -90,6 +110,8 @@ int main() {
       if(event.xexpose.count > 0)
         break;
 
+      // flickert. (und zwar wegen erase, unter windows wusst ich mal, wie man
+      // das loswird)
       draw(display, window, screen);
       break;
     }
@@ -97,6 +119,3 @@ int main() {
 
   XCloseDisplay(display);
 }
-
-
-
