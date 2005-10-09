@@ -33,10 +33,10 @@ by_name_t &schema::by_name() {
 
 class by_name_t::IMPL {
 public:
-  typedef VectorMap<string, item_constructor> mapping; 
+  typedef VectorMap<string, abstract_rule> mapping; 
   mapping items;
 
-  item_constructor get(string const &name) {
+  abstract_rule const &get(string const &name) {
     int i = items.Find(name);
     if (i < 0)
       throw unregistered_type(name);
@@ -50,7 +50,7 @@ by_name_t::by_name_t() : p(new IMPL) {
 by_name_t::~by_name_t() {
 }
 
-void by_name_t::add(string const &name, item_constructor type) {
+void by_name_t::add(string const &name, abstract_rule const &type) {
   p->items.Add(name, type);
 }
 

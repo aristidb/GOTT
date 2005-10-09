@@ -69,6 +69,7 @@ public:
 
   void parental_requirement(ev::event const &, unsigned);
   void real_parental_requirement();
+
   struct deferred_miss {
     deferred_miss(ev::event const &e, unsigned c) 
     : event(e.clone()), count(c) {}
@@ -77,12 +78,14 @@ public:
     : event(o.event), count(o.count) {
       const_cast<deferred_miss &>(o).event = 0;
     }
+
     ~deferred_miss() { delete event; }
 
     ev::event *event;
     unsigned count;
   };
-  boost::optional<deferred_miss> miss;
+
+  ::boost::optional<deferred_miss> miss;
 
   structure::revocable_structure &base_struc;
 
@@ -207,7 +210,7 @@ void match::IMPL::add(rule_t const &f) {
   parse.Add().structure = struc;
 
   item *the_item = f.get(ref);
-  GOTT_ASSERT_1(the_item, nonnull(), "Acquired rule_t");
+  GOTT_ASSERT_2(the_item,(item*)0,std::not_equal_to<item*>(),"Acquired rule_t");
   GOTT_ASSERT_2(the_item->attributes(), f.attributes(), 
       std::equal_to<rule_attr>(), "Rule attributes");
 

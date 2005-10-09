@@ -45,12 +45,17 @@ construct_item(rule_attr const &att, Vector<rule_t> const&children, match &m) {
 typedef 
 item *(*item_constructor)(rule_attr const &, Vector<rule_t> const &, match &);
 
+struct abstract_rule : Moveable<abstract_rule> {
+  explicit abstract_rule(item_constructor c) : constructor(c) {}
+  item_constructor constructor;
+};
+
 /**
  * Rule-factory to produce item objects.
  */
 class GOTT_EXPORT rule_t : Moveable<rule_t> {
 public:
-  rule_t(item_constructor, rule_attr const &, Vector<rule_t> pick_ &);
+  rule_t(abstract_rule const &, rule_attr const &, Vector<rule_t> pick_ &);
   rule_t(rule_t const &);
   rule_t(rule_t const *);
   ~rule_t();
@@ -67,7 +72,7 @@ private:
 
 template<class T>
 rule_t rule(rule_attr const &a, Vector<rule_t> const &c = Vector<rule_t>()) {
-  return rule_t(construct_item<T>, a, c);
+  return rule_t(abstract_rule(construct_item<T>), a, c);
 }
 
 rule_t rule(string const &name, rule_attr const &a, Vector<rule_t> const &c =

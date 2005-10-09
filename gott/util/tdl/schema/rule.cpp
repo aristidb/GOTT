@@ -33,28 +33,29 @@ using sh::item;
 class rule_t::IMPL {
 public:
   struct immediate {
-    item_constructor con;
+    abstract_rule abstract;
     rule_attr attr;
     Vector<rule_t> children;
 
-    immediate(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
-    : con(t), attr(a), children(c) {}
+    immediate(abstract_rule const &ar, rule_attr const &a, Vector<rule_t> pick_ &c)
+    : abstract(ar), attr(a), children(c) {}
 
     immediate(immediate const &o)
-    : con(o.con), attr(o.attr), children(o.children, 1) {}
+    : abstract(o.abstract), attr(o.attr), children(o.children, 1) {}
   };
 
   boost::variant<immediate, rule_t const *> data;
 
-  IMPL(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
-  : data(immediate(t, a, c)) {}
+  IMPL(abstract_rule const &ar, rule_attr const &a, Vector<rule_t> pick_ &c)
+  : data(immediate(ar, a, c)) {}
 
   IMPL(rule_t const *p)
   : data(p) {}
 };
 
-rule_t::rule_t(item_constructor t, rule_attr const &a, Vector<rule_t> pick_ &c)
-: p(new IMPL(t, a, c)) {}
+rule_t::rule_t(abstract_rule const &ar, rule_attr const &a,
+    Vector<rule_t> pick_ &c)
+: p(new IMPL(ar, a, c)) {}
 
 rule_t::rule_t(rule_t const &o) : p(o.p) {}
 
@@ -70,7 +71,7 @@ item *rule_t::get(match &m) const {
   switch (p->data.which()) {
   case 0: // immediate
     { IMPL::immediate const &imm = boost::get<IMPL::immediate>(p->data);
-      return imm.con(imm.attr, imm.children, m); }
+      return imm.abstract.constructor(imm.attr, imm.children, m); }
   case 1: // indirect
     return boost::get<rule_t *>(p->data)->get(m);
   }

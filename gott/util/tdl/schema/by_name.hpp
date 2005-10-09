@@ -45,12 +45,12 @@ public:
    * \param name The name to find the type with.
    * \param type The type.
    */
-  GOTT_EXPORT void add(string const &name, item_constructor tpye);
+  GOTT_EXPORT void add(string const &name, abstract_rule const &tpye);
 
   template<class T>
   void add(string const &name) {
-    item_constructor type = &construct_item<T>;
-    add(name, type);
+    item_constructor type_con = &construct_item<T>;
+    add(name, abstract_rule(type_con));
   }
 
   /**
