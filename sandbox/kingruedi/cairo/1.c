@@ -16,20 +16,23 @@ void draw(Display *display, Drawable window, int screen) {
     (display, window, DefaultVisual(display, screen), WIDTH, HEIGHT);
   cairo_t *cr=cairo_create(surface);
 
-  cairo_set_source_rgb(cr, 1, 1, 1);
-  cairo_paint(cr);
-  //cairo_save(cr);
-  cairo_set_source_rgba(cr, 0.2, 0.2, 0.0, 0.6);
-  cairo_set_line_width(cr, 1.5);
+  cairo_save(cr);
+  cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.6);
+  cairo_move_to(cr, 100, 100);
+  cairo_set_font_size(cr, 20);
+  cairo_show_text(cr, "Hallo!");
+  cairo_restore(cr);
+
+  cairo_set_source_rgba(cr, 0.2, 0.2, 0.0, 0.3);
+  cairo_set_line_width(cr, 1.8);
 
   cairo_new_path(cr);
   cairo_move_to(cr, 10, 10);
   cairo_rel_line_to(cr, 100, 0);
   cairo_rel_line_to(cr, 0, 100);
+  cairo_curve_to(cr, 80, 80, 120, 10, 280, 180);
   cairo_close_path(cr);
-
   cairo_stroke(cr);
-  //cairo_restore(cr);
 
   if(cairo_status(cr)) {
     fprintf(stderr, "Cairo: %s\n",
@@ -42,6 +45,7 @@ void draw(Display *display, Drawable window, int screen) {
 }
 
 int main() {
+  printf("Hello World\n");
   Display *display=XOpenDisplay(NULL);
   int screen=DefaultScreen(display);
   XSetWindowAttributes attribute;

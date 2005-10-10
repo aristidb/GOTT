@@ -25,7 +25,7 @@
 #include "types.hpp"
 #include <gott/util/visibility.hpp>
 
-namespace std {
+namespace std { //This Code is illegal according to c++98/03
   template<class> class allocator;
   template<class> class char_traits;
   template<class, class, class> class basic_string;
