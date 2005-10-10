@@ -5,7 +5,6 @@
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
-#include <GL/glx.h>
 #include <X11/extensions/xf86vmode.h>
 #include <set>
 #include <string>
@@ -20,11 +19,8 @@ class window : public gott::gui::widget_events, public gott::gui::window_flags
     friend class gott::gui::x11::application;
   private:
     rect window_rect;
-    //gl_context context;
     application *app;
     ::Window		handle;	
-    ::GLXContext  context;
-    ::GLXWindow		drawable;
     std::size_t flags;
     enum Protocols { DeleteWindow, Focus, Ping, ContextHelp };
     ::Atom protocols[4];
@@ -33,7 +29,6 @@ class window : public gott::gui::widget_events, public gott::gui::window_flags
 
     // Implementation specific functions:
 
-    GLXFBConfig get_fbconfig( pixelformat const& p ) const;
     XVisualInfo* get_visualinfo( pixelformat const& p ) const;
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
@@ -41,7 +36,6 @@ class window : public gott::gui::widget_events, public gott::gui::window_flags
 
     ~window();
    
-    gl_interface get_gl();
     void swap_buffer();
     
     void open( application& app, rect const&r, std::string const& title, pixelformat const& p, std::size_t flags );

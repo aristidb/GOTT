@@ -61,24 +61,7 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
 	// run the user-handler
 
 	GLXFBConfig fb_config;
-	XVisualInfo* visual_info = 0;
-	if( ! app->use_fallback() )
-	{
-		// select the appropriate fbconfig
-		fb_config = get_fbconfig( p );
-		
-		// did we find a suitable fb_config?
-		if ( fb_config == None )
-      throw std::runtime_error("no suitable fb config");
-		
-		visual_info = glXGetVisualFromFBConfig( app->get_display(),	fb_config );
-	}
-	else
-	{
-    std::cout << "Using fallback " << std::endl;
-		visual_info = get_visualinfo( p );
-    std::cout << "visual info is" << visual_info << std::endl;
-	}
+	XVisualInfo* visual_info = get_visualinfo( p );
 		
 	// did we find a matching visual info too?
 	if ( visual_info == 0 )
@@ -115,7 +98,7 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
         , r.width 
         , r.height 
         , 0 // border?
-        , visual_info->depth, InputOutput, visual_info->visual, 
+        , DefaultDepth( app->get_display(), app->get_screen() ), InputOutput, DefaultVisual( app->get_display(),app->get_screen() ), 
         attributes_mask, &attributes );
   }
 
@@ -157,31 +140,7 @@ protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
 	
 	// flag this window as open
 	flags |= window_flags::Open;
-	
-	// fallback if we are below GLX version 1.3 (damn ATI drivers)
-  if( app->use_fallback() == 0 ) // GLX >= 1.3
-  {
-    // create the GL context
-    context = glXCreateNewContext( app->get_display(), fb_config, GLX_RGBA_TYPE, 0, true);
-
-    if( context == None )
-      throw std::runtime_error("glXCreateNewContext did not yield a context");
-
-    drawable = glXCreateWindow( app->get_display(), fb_config, handle, 0 );
-
-    if( drawable == None )
-      throw std::runtime_error("no drawable" );
-  }
-  else // GLX <= 1.2
-  {
-    std::cout << "Using glX Fallback mode for glX-1.2" << std::endl;
-
-    context = glXCreateContext( app->get_display(), visual_info, 0, true );
-
-    if ( context == None )
-      throw std::runtime_error("glXCreateContext did not yield a context");
-  }
-	
+  
   // Get the current attributes .. lets hope the window manager already reset the window sizes:
   XWindowAttributes attr;
   XGetWindowAttributes( app->get_display(), handle, & attr );
@@ -261,166 +220,8 @@ void window::hide()
 }
 
 XVisualInfo* window::get_visualinfo( pixelformat const& format ) const
-{
-  std::vector<boost::int32_t> values;
-  values.push_back( GLX_RGBA );
-    		
-	if( format.color.first )
-	{
-    switch( format.color.second )
-    {
-      case 32:
-      case 24:
-        values.push_back(GLX_RED_SIZE);
-        values.push_back( 8 );
-        values.push_back(GLX_GREEN_SIZE);
-        values.push_back( 8 );
-        values.push_back(GLX_BLUE_SIZE);
-        values.push_back( 8 );
-        break;
-
-      case 16:
-        values.push_back(GLX_RED_SIZE);
-        values.push_back( 5 );
-        values.push_back(GLX_GREEN_SIZE);
-        values.push_back( 6 );
-        values.push_back(GLX_BLUE_SIZE);
-        values.push_back( 5 );
-        break;
-      case 1:
-        values.push_back(GLX_RED_SIZE);
-        values.push_back( 1 );
-        values.push_back(GLX_GREEN_SIZE);
-        values.push_back( 1 );
-        values.push_back(GLX_BLUE_SIZE);
-        values.push_back( 1 );
-      default:
-        break;
-    }
-  }
-  else{
-    values.push_back(GLX_RED_SIZE);
-    values.push_back( 1 );
-    values.push_back(GLX_GREEN_SIZE);
-    values.push_back( 1 );
-    values.push_back(GLX_BLUE_SIZE);
-    values.push_back( 1 );
-  }
-
-if( format.flags & pixelformat::DoubleBuffer )
-		values.push_back( GLX_DOUBLEBUFFER );
-
-  
-  if( format.depth.first )
-	{
-    values.push_back(GLX_DEPTH_SIZE);
-    values.push_back(format.depth.second);
-  }
-  else
-  {
-    values.push_back(GLX_DEPTH_SIZE);
-    values.push_back(1);
-  }
-	
-  values.push_back( None );
- 	
-	return glXChooseVisual( app->get_display(), app->get_screen(), &(values[0]) );
-}
-
-GLXFBConfig	window::get_fbconfig( pixelformat const& format ) const
-{
-  std::vector<boost::int32_t> values;
-	GLXFBConfig*			Array = 0;
-	GLXFBConfig				Result = 0;
-	int						bits = 0;
-	int						elements = 0;
-
-	if( format.flags & pixelformat::DrawToWindow )
-		bits |= GLX_WINDOW_BIT_SGIX;
-
-	if(format.flags & pixelformat::DrawToPBuffer)
-		bits |= GLX_PBUFFER_BIT_SGIX;
-
-  values.push_back( GLX_DRAWABLE_TYPE_SGIX);
-  values.push_back( bits);
-
-	if( format.flags & pixelformat::DoubleBuffer )
-  {
-    values.push_back( GLX_DOUBLEBUFFER );
-    values.push_back( 1 );
-  }
-
-	if( format.color.first )
-	{
-    switch( format.color.second )
-    {
-      case 32:
-      case 24:
-        values.push_back(GLX_RED_SIZE);
-        values.push_back( 8 );
-        values.push_back(GLX_GREEN_SIZE);
-        values.push_back( 8 );
-        values.push_back(GLX_BLUE_SIZE);
-        values.push_back( 8 );
-        break;
-
-      case 16:
-        values.push_back(GLX_RED_SIZE);
-        values.push_back( 5 );
-        values.push_back(GLX_GREEN_SIZE);
-        values.push_back( 6 );
-        values.push_back(GLX_BLUE_SIZE);
-        values.push_back( 5 );
-        break;
-      default:
-        break;
-    }
-  }
-
-	if( format.depth.first )
-	{
-    values.push_back(GLX_DEPTH_SIZE);
-    values.push_back(format.depth.second);
-	}
-
-	if( format.stencil.first )
-	{
-    values.push_back(GLX_STENCIL_SIZE);
-    values.push_back(format.stencil.second);
-	}
-
-	if( format.samples.first ) 
-	{
-		if( app->is_extension_supported( "GL_ARB_multisample" ) )
-		{
-			values.push_back( GLX_SAMPLE_BUFFERS_ARB );
-      values.push_back(  1 );
-	
-			if( format.samples.second )
-      {
-        values.push_back( GLX_SAMPLES_ARB );
-        values.push_back( format.samples.second );
-      }
-		}
-		else
-		{
-		}
-	}
-
-  values.push_back( None );
-
-
-	Array = glXChooseFBConfig( app->get_display(), app->get_screen(), &values[0], &elements );
-
-	if ( elements )
-	{
-		Result = Array[ 0 ];
-		XFree( Array );
-		
-		return Result;
-	}
-
-	return None;
+{ 
+  return 0;
 }
 
 void window::set_title( std::string const& t )
@@ -450,16 +251,6 @@ void window::close()
     return;
   if( drawable && handle )
     exec_on_close();
-  if( context )
-  {
-    glXDestroyContext( app->get_display(), context );
-    context = 0;
-  }
-  if( drawable )
-  {
-    glXDestroyWindow( app->get_display(), drawable );
-    drawable = 0;
-  }
   if( handle )
   {
     XDestroyWindow( app->get_display(), handle );
@@ -501,28 +292,10 @@ void window::on_key(gott::gui::key_event const&)
 
 void window::swap_buffer() 
 {
-  if( is_open() )
-    if( !app->use_fallback() )
-      glXSwapBuffers( app->get_display(), drawable);
-    else 
-      glXSwapBuffers( app->get_display(), handle );
 }
 
 void window::set_render_context()
 {
-  if( !is_open() )
-    return;
-  if( !app->use_fallback() )
-  {
-    if( glXMakeContextCurrent( app->get_display(), drawable, drawable, context ) ) 
-      return;
-  }
-  else 
-  {
-    if( glXMakeCurrent( app->get_display(), handle, context ) ) 
-      return;
-  }
-  throw std::runtime_error("Error while setting context");
 }
 
 ::Window window::get_handle() const

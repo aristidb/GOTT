@@ -6,8 +6,6 @@
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
-#include <GL/glx.h>
-#include <GL/glu.h>
 #include <X11/extensions/xf86vmode.h>
 
 #include "application.hpp"
@@ -22,7 +20,6 @@ namespace gott{ namespace gui{ namespace x11{
 application::application( char const* connection )
   : display( XOpenDisplay(connection) ), focus_window(0)
 {
-  std::cout << "TEST" << std::endl;
   if( display == 0 )
     throw std::runtime_error("Could not open default x11 connection");
 
@@ -33,52 +30,7 @@ application::application( char const* connection )
     throw std::runtime_error("Could not create atoms");
 
 
-  int major, minor;
-  if( false == glXQueryVersion( display, &major, &minor ) )
-    throw std::runtime_error("Could not query glXVersion");
-	
-	old_glx = ( major <= 1 ) && ( minor < 3 );
-
   init_cursor();
-
-  try
-  {
-    std::cout << "TEST" << std::endl;
-    pixelformat format;
-    rect region(0,0,1,1);
-    window win( *this, region, "glx-test-window", format, std::size_t(window_flags::Defaults) );
-    std::cout << "TEST " <<  win.is_open() << std::endl;
-    
-    XSync( display, 0 );
-    std::size_t num_events;
-    int break_counter = 10;
-    while( (num_events = XPending( display )) != 0 && --break_counter )
-      XSync( display, 0 );
-
-    for( std::size_t i = 0; i < num_events; ++i )
-      handle_pending_messages();
-    std::cout << "set_render_context:" << std::endl;
-    win.set_render_context();
-    std::cout << "init_extensions:" << std::endl;
-    init_extensions();
-
-    copy(extensions.begin(), extensions.end(), ostream_iterator<std::string>(cout) ); 
-
-    std::cout << "closeing:" << std::endl;
-    win.close();
-    std::cout << "Synching again ... window has been closed!"  << std::endl;
-    XSync( display, 0 );
-    num_events = XPending( display );
-    std::cout << "Handling " <<  num_events << " Events." << std::endl;
-    for( std::size_t i = 0; i < num_events; ++i )
-      handle_pending_messages();
-
-  }
-  catch( std::runtime_error & e)
-  {
-    std::cout << e.what() << std::endl;
-  }
-
 }
 
 application::status application::handle_pending_messages()
@@ -150,29 +102,6 @@ int application::get_screen() const
   return screen;
 }
 
-void application::init_extensions() 
-{
-  if( glXQueryExtensionsString( display, screen ) != 0 )
-  {
-    istringstream in(glXQueryExtensionsString(display,screen) );
-    copy( istream_iterator<string>(in), istream_iterator<string>(), 
-        insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
-  }
-  else 
-    throw runtime_error("glx bad");
-
-  {
-
-    if( glGetString( GL_EXTENSIONS ) == 0 )
-    {
-      throw runtime_error( reinterpret_cast<const char* >(gluErrorString ( glGetError())));
-    }
-    istringstream in( reinterpret_cast<const char*>(glGetString( GL_EXTENSIONS ) ) );
-    copy( istream_iterator<string>(in), istream_iterator<string>(), 
-        insert_iterator<set<string> >( extensions, extensions.begin() ) ); 
-  }
-}
-
 void application::register_window( window * ref )
 {
   if( ! focus_window && windows.empty() )
@@ -194,19 +123,9 @@ Display* application::get_display()
   return display;
 }
 
-bool application::use_fallback()const
-{
-  return old_glx;
-}
-
 Atom application::get_atom( char const * atom_name )
 {
   return XInternAtom( display, atom_name, 0 );
-}
-
-bool application::is_extension_supported( std::string const& str ) const
-{
-  return extensions.find(str) != extensions.end();
 }
 
 void application::init_cursor()

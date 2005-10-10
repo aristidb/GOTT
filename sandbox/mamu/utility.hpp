@@ -5,9 +5,6 @@
 
 namespace gott{ namespace gui{ 
 
-struct gl_interface
-{
-};
 
 struct vert 
 {
@@ -66,7 +63,7 @@ struct pixelformat
   };
   Flags flags;
   typedef std::pair<bool, short> buffer_bit_type; // rename!
-  buffer_bit_type color, depth, stencil, samples;
+  buffer_bit_type color, depth, samples;
 
   pixelformat();
 };

@@ -33,18 +33,6 @@ pixel_glyph::pixel_glyph( FT_Face & face, std::size_t glyph_index, device_proper
 
   FT_Bitmap & bitmap = face->glyph->bitmap;
 
-  size_t width = bitmap.width;
-  size_t height = bitmap.rows;
-  unsigned char *buffer = new unsigned char[ ((height - face->glyph->bitmap_top) + height )* width * 2];
-  std::memset( buffer, 0 , width*height*2 );
-  for( std::size_t i = 0; i < height; ++i ) {
-    for(  std::size_t j = 0; j < width; ++j ) {
-      if(  bitmap.buffer[i*width+ j] ) {
-        buffer[((height-1-(i + (height - face->glyph->bitmap_top)))*width + j)*2 ] = 255;
-        buffer[((height-1-(i + (height - face->glyph->bitmap_top)))*width + j)*2 + 1 ] = bitmap.buffer[i*width+ j];
-      }
-    }
-  }
   list = glGenLists( 1 );
   glPixelStorei( GL_UNPACK_SWAP_BYTES, false );
   glPixelStorei( GL_UNPACK_LSB_FIRST, false );
@@ -53,9 +41,47 @@ pixel_glyph::pixel_glyph( FT_Face & face, std::size_t glyph_index, device_proper
   glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0 );
   glPixelStorei( GL_UNPACK_SKIP_ROWS , 0 );
   glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
-  glNewList(list, GL_COMPILE);
-  glDrawPixels(  width, height,  GL_LUMINANCE_ALPHA , GL_UNSIGNED_BYTE, buffer );
-  glEndList();
+
+  if( d.dot_layout == device_property::CRTDiffuse ) {
+    size_t width = bitmap.width;
+    size_t height = bitmap.rows;
+    unsigned char *buffer = new unsigned char[ ((height - face->glyph->bitmap_top) + height )* width * 2];
+    std::memset( buffer, 0 , width*height*2 );
+    for( std::size_t i = 0; i < height; ++i ) {
+      for(  std::size_t j = 0; j < width; ++j ) {
+        if(  bitmap.buffer[i*width+ j] ) {
+          buffer[((height-1-(i + (height - face->glyph->bitmap_top)))*width + j)*2 ] = 255;
+          buffer[((height-1-(i + (height - face->glyph->bitmap_top)))*width + j)*2 + 1 ] = bitmap.buffer[i*width+ j];
+        }
+      }
+    }
+    glNewList(list, GL_COMPILE);
+    glDrawPixels(  width, height,  GL_LUMINANCE_ALPHA , GL_UNSIGNED_BYTE, buffer );
+    glEndList();
+    delete[] buffer;
+  }else {
+    size_t width = bitmap.width / 3;
+    size_t height = bitmap.rows;
+    //std::cout << "height : " << height << " " << width*3 << " oder " << width/3 << std::endl;
+    unsigned char *buffer = new unsigned char[ height*width * 4];
+    std::memset( buffer, 0 , width*height*4 );
+    for( std::size_t i = 0; i < height; ++i ) {
+      for(  std::size_t j = 0; j < width; ++j ) {
+        if( bitmap.buffer[(i*width+j)*3] + bitmap.buffer[(i*width+j)*3 + 1] + bitmap.buffer[(i*width+j)*3 + 2] != 0 ) {
+        buffer[((height-1-i)*width + j)*4] = bitmap.buffer[(i*width+j)*3];
+        buffer[((height-1-i)*width + j)*4 + 1 ] = bitmap.buffer[(i*width+j)*3 + 1];
+        buffer[((height-1-i)*width + j)*4 + 2 ] = bitmap.buffer[(i*width+j)*3 + 2];
+        buffer[((height-1-i)*width + j)*4 + 3 ] = 255; 
+//          std::max(bitmap.buffer[(i*width+j)*3],std::max(bitmap.buffer[(i*width+j)*3 + 1], bitmap.buffer[(i*width+j)*3 + 2] ) );
+        }
+      }
+    }
+
+    glNewList(list, GL_COMPILE);
+    glDrawPixels(  width, height,  GL_RGBA, GL_UNSIGNED_BYTE, buffer );
+    delete[] buffer;
+    glEndList();
+  }
 }
 
 pixel_glyph::~pixel_glyph(){ glDeleteLists( list, 1 ); }
