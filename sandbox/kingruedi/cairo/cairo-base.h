@@ -5,10 +5,11 @@
 #include <cairo-xlib.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/keysym.h>
 #include <stdlib.h>
 
 typedef void (*draw_func_t)(cairo_t*, cairo_surface_t*);
-typedef void (*key_func_t)(unsigned int keycode);
+typedef void (*key_func_t)(KeySym keycode);
 
 typedef struct {
   Display *display;
@@ -71,7 +72,8 @@ void base_loop(cairo_base *ptr) {
       break;
     case KeyPress:
       if(ptr->key)
-	ptr->key(event.xkey.keycode);
+	ptr->key(XLookupKeysym(&event.xkey, 0));
+      ptr->draw(ptr->cr, ptr->surface);
       break;
     }
   }

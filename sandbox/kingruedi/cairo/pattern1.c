@@ -1,6 +1,7 @@
 #include <cairo.h>
 #include "cairo-base.h"
 #include <stdio.h>
+#include <X11/keysym.h>
 
 enum {
   WIDTH=320,
@@ -19,7 +20,7 @@ void draw_it(cairo_t *cr,
   cairo_text_extents(cr, "Pattern", &extents);
   cairo_restore(cr);
 
-  printf("%f %f\n", extents.width, extents.height);
+  //printf("%f %f\n", extents.width, extents.height);
 
   // new surface should be the pattern
   cairo_surface_t *pattern_surface=cairo_surface_create_similar

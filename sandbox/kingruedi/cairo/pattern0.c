@@ -49,8 +49,25 @@ void draw_it(cairo_t *cr,
   cairo_pattern_destroy(pattern);
 }
 
+void key(KeySym keycode) {
+  switch(keycode) {
+  case XK_e:
+    if(++extend>CAIRO_EXTEND_REFLECT)
+      extend=CAIRO_EXTEND_NONE;
+    printf("Extend: %d\n", extend);
+    break;
+  case XK_f:
+    if(++filter>CAIRO_FILTER_GAUSSIAN)
+      filter=CAIRO_FILTER_FAST;
+    printf("Filter: %d\n", filter);
+    break;
+  case NoSymbol:
+    puts("grml\n");
+  }
+}
+
 int main() {
-  cairo_base *ptr=base_init(WIDTH, HEIGHT, draw_it, NULL);
+  cairo_base *ptr=base_init(WIDTH, HEIGHT, draw_it, key);
   base_loop(ptr);
   base_free(ptr);
 }
