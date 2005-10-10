@@ -1,7 +1,6 @@
 #include <stdexcept>
 #include <iostream>
 #include <cairo.h>
-#include <cairo-xlib.h>
 #include "utility.hpp"
 #include "input.hpp"
 #include "x11/application.hpp"
@@ -51,6 +50,40 @@ class window : public x11::window
     {
       set_render_context();
       x11::window::on_redraw();
+      cairo_t * cr = this->get_context();
+      rect g = get_rect();
+
+      cairo_pattern_t *pattern=cairo_pattern_create_linear(0.0, 0.0,
+          g.width,g.height);
+
+      cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
+      cairo_pattern_set_filter(pattern, CAIRO_FILTER_GOOD);
+      cairo_pattern_add_color_stop_rgba(pattern, 0,
+          1.0, 0.0, 0.0, 0.7);
+      cairo_pattern_add_color_stop_rgba(pattern, 0.2,
+          0.8, 0.2, 0, 0.5);
+      cairo_pattern_add_color_stop_rgba(pattern, 0.4,
+          0.6, 0.2, 0.2, 0.5);
+      cairo_pattern_add_color_stop_rgba(pattern, 0.6,
+          0.4, 0.4, 0.2, 0.5);
+      cairo_pattern_add_color_stop_rgba(pattern, 0.8,
+          0.2, 0.4, 0.4, 0.3);
+      cairo_pattern_add_color_stop_rgba(pattern, 1.0,
+          0.0, 0.6, 0.4, 0.2);
+      cairo_set_source(cr, pattern);
+      cairo_rectangle(cr, 0.0, 0.0, g.width,g.height);
+
+      cairo_fill(cr);
+
+      cairo_save(cr);
+      cairo_set_source_rgba(cr, 0.0, 0.2, 0.1, 0.6);
+      cairo_move_to(cr, 100, 100);
+      cairo_set_font_size(cr, 20);
+      cairo_show_text(cr, "Hallo Muster!");
+      cairo_restore(cr);
+
+      cairo_pattern_destroy(pattern);
+
  
       swap_buffer();
     }

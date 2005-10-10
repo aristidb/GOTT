@@ -28,6 +28,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <cairo-xlib.h>
 #include <set>
 #include <string>
 #include "../widget_events.hpp"
@@ -49,6 +50,8 @@ class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::wi
     ::Atom protocols[4];
     ::Atom wm_name, wm_icon_name, wm_type;
     window * parent;
+    cairo_surface_t *surface;
+    cairo_t *context;
 
     // Implementation specific functions:
 
@@ -89,6 +92,9 @@ class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::wi
     virtual void on_configure( gott::gui::rect const&);
     virtual void on_mouse(gott::gui::mouse_event const&);
     virtual void on_key(gott::gui::key_event const&);
+
+    cairo_surface_t* get_surface();
+    cairo_t *get_context();
 
 };
 

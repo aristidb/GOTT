@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cairo-xlib.h>
 #include <boost/cstdint.hpp>
 #include "window.hpp"
 #include "application.hpp"
@@ -24,13 +25,13 @@ window::~window()
 }
 
 window::window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
-  : app( &app ), handle(0), flags(Clear), parent(0)
+  : app( &app ), handle(0), flags(Clear), parent(0), surface(0), context(0)
 {
   open(r,title,p,flags);
 }
 
 window::window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
-  : app( get_default_app() ), flags(Clear), parent(0)
+  : app( get_default_app() ), flags(Clear), parent(0), surface(0), context(0)
 {
   open(r,title,p,flags);
 }
@@ -148,6 +149,10 @@ protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
 
   flags |= window_flags::Open;
 
+  surface =  cairo_xlib_surface_create(app->get_display(), handle, visual_info.visual, window_rect.width, window_rect.height);
+  context = cairo_create(surface);
+
+
 
   app->register_window( this );
   
@@ -251,8 +256,14 @@ void window::close()
   if( handle )
   {
     exec_on_close();
+    if( surface )
+      cairo_surface_destroy( surface );
+    if( context )
+      cairo_destroy( context );
     XDestroyWindow( app->get_display(), handle );
     handle = 0;
+    surface = 0;
+    context = 0;
   }
   flags &= ~window_flags::Open;
   app->remove_window( this );
@@ -278,6 +289,7 @@ void window::on_close()
 void window::on_configure( gott::gui::rect const& r)
 {
   window_rect = r;
+  cairo_xlib_surface_set_size(surface, window_rect.width, window_rect.height);
 }
 
 void window::on_mouse(gott::gui::mouse_event const&)
@@ -305,6 +317,10 @@ gott::gui::rect const& window::get_rect() const
 {
   return window_rect;
 }
+
+cairo_surface_t* window::get_surface() { return surface; };
+cairo_t* window::get_context() { return context;}
+
 
 
 bool window::has_decoration() const

@@ -54,7 +54,7 @@ source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp']
 env.StaticLibrary('gottbase', source_files)
 
 x11_example_files= ['test_x11.cpp']
-libs=['gottx11', 'gottbase' ,'X11', 'boost_signals',  'z']
+libs=['gottx11', 'gottbase' ,'X11', 'boost_signals',  'z', 'cairo']
 env.ParseConfig('pkg-config --cflags --libs cairo')
 env.Program('test_x11', x11_example_files, LIBS=libs, LIBPATH=['.', 'x11/','/usr/X11R6/lib'])
 
