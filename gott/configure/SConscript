@@ -44,7 +44,7 @@ def CheckOptimization(context):
 def CheckDebug(context):
 	context.Message('Checking if compiler supports gcc-style debug flags... ')
 	lastCCFLAGS = context.env['CCFLAGS'][:]
-	context.env.Append(CCFLAGS = ['-g'])
+	context.env.Append(CCFLAGS = ['-ggdb3','-O0'])
 	result = context.TryCompile("void func() {}\n", '.cpp')
 	if not result:
 		context.env.Replace(CCFLAGS = lastCCFLAGS)
@@ -54,7 +54,7 @@ def CheckDebug(context):
 print 'Configuration...'
 Import('env')
 tests =	{
-	'CompilerVisibility': CheckCompilerVisibility,
+##	'CompilerVisibility': CheckCompilerVisibility,
 	'Warnings': CheckWarnings,
 	'Optimization': CheckOptimization,
 	'Debug': CheckDebug
@@ -63,7 +63,7 @@ conf = Configure(env, custom_tests = tests)
 if optimize != 'none':
 	conf.Optimization()
 conf.Warnings()
-conf.CompilerVisibility()
+##conf.CompilerVisibility()
 Import('debug')
 if debug == 1:
 	conf.Debug()

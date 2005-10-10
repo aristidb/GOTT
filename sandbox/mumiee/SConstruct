@@ -1,0 +1,60 @@
+cppdef = Split(ARGUMENTS.get('def', ''))
+cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
+cflags = Split(ARGUMENTS.get('cflags', ''))
+release = int(ARGUMENTS.get('release', 1))
+if release:
+	debug = 0
+	optimize = 'full'
+	debug = -1
+else:
+	debug = 1
+	optimize = 'none'
+
+debug = int(ARGUMENTS.get('debug', debug))
+
+if debug == 1:
+	cppdef += ['DEBUG']
+elif debug == -1:
+	cppdef += ['NDEBUG']
+
+optimize = ARGUMENTS.get('optimize', optimize)
+
+caux = ARGUMENTS.get('aux')
+cflags += Split(caux)
+
+cflagsoverride = ARGUMENTS.get('cfoverride', 0)
+if cflagsoverride:
+	cflags = cflagsoverride
+
+cflags += ['-I../../']
+env = Environment(
+  CXX = cxx, 
+  CCFLAGS = cflags, 
+  CPPPATH=['#/..'], 
+  LIBPATH=['x11/'],
+  CPPDEFINES=cppdef)
+
+Export('env')
+Export('optimize')
+Export('debug')
+
+conf = SConscript('../../gott/configure/SConscript')
+env = conf.Finish()
+
+shrd = env.Copy()
+shrd.Append(CPPDEFINES = 'BUILDING_DLL')
+
+Export('shrd')
+
+SConscript(dirs = ['x11'])
+
+source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp']
+
+# env.SharedLibrary('gottbase', source_files)
+env.StaticLibrary('gottbase', source_files)
+
+x11_example_files= ['test_x11.cpp']
+libs=['gottx11', 'gottbase' ,'X11', 'boost_signals',  'z']
+env.ParseConfig('pkg-config --cflags --libs cairo')
+env.Program('test_x11', x11_example_files, LIBS=libs, LIBPATH=['.', 'x11/','/usr/X11R6/lib'])
+
