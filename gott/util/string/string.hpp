@@ -43,7 +43,7 @@
 #include <ostream>
 #include <gott/util/thunk.hpp>
 #else
-namespace std {
+namespace std { //This code is illegal according to C++98/03!
   template<class> class allocator;
   template<class> class char_traits;
   template<class, class> class vector;
