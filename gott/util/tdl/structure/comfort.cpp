@@ -29,7 +29,6 @@ using cf::node_inserter_t;
 using gott::tdl::structure::writable_structure;
 using boost::bind;
 using boost::ref;
-using std::list;
 
 node_inserter_t::node_inserter_t(Xany const &d, nd_list const &c, 
                                  tag_list const &t)

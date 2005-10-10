@@ -27,8 +27,6 @@
 #include <gott/util/autoconv.hpp>
 #include <gott/util/string/string.hpp>
 
-using std::list;
-
 using std::pair;
 using boost::intrusive_ptr;
 using boost::scoped_ptr;

@@ -24,14 +24,7 @@
 
 #include "types.hpp"
 #include <gott/util/visibility.hpp>
-
-namespace std { //This Code is illegal according to c++98/03
-  template<class> class allocator;
-  template<class> class char_traits;
-  template<class, class, class> class basic_string;
-  typedef basic_string<char, char_traits<char>, allocator<char> > string;
-  typedef basic_string<wchar_t,char_traits<wchar_t>,allocator<wchar_t> >wstring;
-}
+#include <string>
 
 namespace gott {
 

@@ -35,23 +35,10 @@
 
 #ifndef NO_STDLIB
 #include <iosfwd>
+#include <string>
 
 #ifdef _MSC_VER
-#include <string>
-#include <vector>
-#include <list>
-#include <ostream>
 #include <gott/util/thunk.hpp>
-#else
-namespace std { //This code is illegal according to C++98/03!
-  template<class> class allocator;
-  template<class> class char_traits;
-  template<class, class> class vector;
-  template<class, class> class list;
-  template<class, class, class> class basic_string;
-  typedef basic_string<char, char_traits<char>, allocator<char> > string;
-  typedef basic_string<wchar_t,char_traits<wchar_t>,allocator<wchar_t> >wstring;
-}
 #endif
 #endif
 
@@ -158,18 +145,6 @@ public:
   string(string_buffer const &b) {
     set_up(to_utf8_alloc(range(b).cast<char const *>(), utf32), true);
   }
-
-#ifndef NO_STDLIB
-  /**
-   * Concatenate.
-   */
-  string(std::vector<string, std::allocator<string> > const &) GOTT_EXPORT;
-
-  /**
-   * Concatenate.
-   */
-  string(std::list<string, std::allocator<string> > const &) GOTT_EXPORT;
-#endif
 
   enum concat_tag { concatenate };
 
