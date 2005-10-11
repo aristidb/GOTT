@@ -5,7 +5,7 @@
 #include "input.hpp"
 #include "x11/application.hpp"
 #include "x11/window.hpp"
-#include "device.hpp"
+//#include "device.hpp"
 #include <boost/bind.hpp>
 
 using namespace std;
