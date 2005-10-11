@@ -1,61 +1,64 @@
 #include "input.hpp"
-#include "globals_x11.hpp"
-#include <X11/Xdefs.h>
-#include <X11/keysym.h>
 
-namespace gott{namespace gui{
+namespace gott{ namespace gui{ namespace x11{
 
-impl::key_table::key_table()
+key_table const& key_table::get_instance() 
+{
+  static key_table instance;
+  return instance;
+}
+
+key_table::key_table()
 {
   std::memset( t, 0, 2*256 );
 
-  t[ 1 ][ 'a' ] = t[ 1 ][ 'A' ] = KeyA;
-  t[ 1 ][ 'b' ] = t[ 1 ][ 'B' ] = KeyB;
-  t[ 1 ][ 'c' ] = t[ 1 ][ 'C' ] = KeyC;
-  t[ 1 ][ 'd' ] = t[ 1 ][ 'D' ] = KeyD;
-  t[ 1 ][ 'e' ] = t[ 1 ][ 'E' ] = KeyE;
-  t[ 1 ][ 'f' ] = t[ 1 ][ 'F' ] = KeyF;
-  t[ 1 ][ 'g' ] = t[ 1 ][ 'G' ] = KeyG;
-  t[ 1 ][ 'h' ] = t[ 1 ][ 'H' ] = KeyH;
-  t[ 1 ][ 'i' ] = t[ 1 ][ 'I' ] = KeyI;
-  t[ 1 ][ 'j' ] = t[ 1 ][ 'J' ] = KeyJ;
-  t[ 1 ][ 'k' ] = t[ 1 ][ 'K' ] = KeyK;
-  t[ 1 ][ 'l' ] = t[ 1 ][ 'L' ] = KeyL;
-  t[ 1 ][ 'm' ] = t[ 1 ][ 'M' ] = KeyM;
-  t[ 1 ][ 'n' ] = t[ 1 ][ 'N' ] = KeyN;
-  t[ 1 ][ 'o' ] = t[ 1 ][ 'O' ] = KeyO;
-  t[ 1 ][ 'p' ] = t[ 1 ][ 'P' ] = KeyP;
-  t[ 1 ][ 'q' ] = t[ 1 ][ 'Q' ] = KeyQ;
-  t[ 1 ][ 'r' ] = t[ 1 ][ 'R' ] = KeyR;
-  t[ 1 ][ 's' ] = t[ 1 ][ 'S' ] = KeyS;
-  t[ 1 ][ 't' ] = t[ 1 ][ 'T' ] = KeyT;
-  t[ 1 ][ 'u' ] = t[ 1 ][ 'U' ] = KeyU;
-  t[ 1 ][ 'v' ] = t[ 1 ][ 'V' ] = KeyV;
-  t[ 1 ][ 'w' ] = t[ 1 ][ 'W' ] = KeyW;
-  t[ 1 ][ 'x' ] = t[ 1 ][ 'X' ] = KeyX;
-  t[ 1 ][ 'y' ] = t[ 1 ][ 'Y' ] = KeyY;
-  t[ 1 ][ 'z' ] = t[ 1 ][ 'Z' ] = KeyZ;
+  t[ 1 ][ int('a') ] = t[ 1 ][ int('A') ] = KeyA;
+  t[ 1 ][ int('b') ] = t[ 1 ][ int('B') ] = KeyB;
+  t[ 1 ][ int('c') ] = t[ 1 ][ int('C') ] = KeyC;
+  t[ 1 ][ int('d') ] = t[ 1 ][ int('D') ] = KeyD;
+  t[ 1 ][ int('e') ] = t[ 1 ][ int('E') ] = KeyE;
+  t[ 1 ][ int('f') ] = t[ 1 ][ int('F') ] = KeyF;
+  t[ 1 ][ int('g') ] = t[ 1 ][ int('G') ] = KeyG;
+  t[ 1 ][ int('h') ] = t[ 1 ][ int('H') ] = KeyH;
+  t[ 1 ][ int('i') ] = t[ 1 ][ int('I') ] = KeyI;
+  t[ 1 ][ int('j') ] = t[ 1 ][ int('J') ] = KeyJ;
+  t[ 1 ][ int('k') ] = t[ 1 ][ int('K') ] = KeyK;
+  t[ 1 ][ int('l') ] = t[ 1 ][ int('L') ] = KeyL;
+  t[ 1 ][ int('m') ] = t[ 1 ][ int('M') ] = KeyM;
+  t[ 1 ][ int('n') ] = t[ 1 ][ int('N') ] = KeyN;
+  t[ 1 ][ int('o') ] = t[ 1 ][ int('O') ] = KeyO;
+  t[ 1 ][ int('p') ] = t[ 1 ][ int('P') ] = KeyP;
+  t[ 1 ][ int('q') ] = t[ 1 ][ int('Q') ] = KeyQ;
+  t[ 1 ][ int('r') ] = t[ 1 ][ int('R') ] = KeyR;
+  t[ 1 ][ int('s') ] = t[ 1 ][ int('S') ] = KeyS;
+  t[ 1 ][ int('t') ] = t[ 1 ][ int('T') ] = KeyT;
+  t[ 1 ][ int('u') ] = t[ 1 ][ int('U') ] = KeyU;
+  t[ 1 ][ int('v') ] = t[ 1 ][ int('V') ] = KeyV;
+  t[ 1 ][ int('w') ] = t[ 1 ][ int('W') ] = KeyW;
+  t[ 1 ][ int('x') ] = t[ 1 ][ int('X') ] = KeyX;
+  t[ 1 ][ int('y') ] = t[ 1 ][ int('Y') ] = KeyY;
+  t[ 1 ][ int('z') ] = t[ 1 ][ int('Z') ] = KeyZ;
 
-  t[ 1 ][ ' ' ] = KeySpace;
-  t[ 1 ][ ';' ] = KeySemicolon;
-  t[ 1 ][ ':' ] = KeyColon;
-  t[ 1 ][ ',' ] = KeyComma;
-  t[ 1 ][ '.' ] = KeyPeriod;
-  t[ 1 ][ '/' ] = KeySlash;
-  t[ 1 ][ '-' ] = KeyMinus;
-  t[ 1 ][ '=' ] = KeyEquals;
-  t[ 1 ][ '[' ] = KeyLBracket;
-  t[ 1 ][ ']' ] = KeyRBracket;
-  t[ 1 ][ '1' ] = Key1;
-  t[ 1 ][ '2' ] = Key2;
-  t[ 1 ][ '3' ] = Key3;
-  t[ 1 ][ '4' ] = Key4;
-  t[ 1 ][ '5' ] = Key5;
-  t[ 1 ][ '6' ] = Key6;
-  t[ 1 ][ '7' ] = Key7;
-  t[ 1 ][ '8' ] = Key8;
-  t[ 1 ][ '9' ] = Key9;
-  t[ 1 ][ '0' ] = Key0;
+  t[ 1 ][ int(' ') ] = KeySpace;
+  t[ 1 ][ int(';') ] = KeySemicolon;
+  t[ 1 ][ int(':') ] = KeyColon;
+  t[ 1 ][ int(',') ] = KeyComma;
+  t[ 1 ][ int('.') ] = KeyPeriod;
+  t[ 1 ][ int('/') ] = KeySlash;
+  t[ 1 ][ int('-') ] = KeyMinus;
+  t[ 1 ][ int('=') ] = KeyEquals;
+  t[ 1 ][ int('[') ] = KeyLBracket;
+  t[ 1 ][ int(']') ] = KeyRBracket;
+  t[ 1 ][ int('1') ] = Key1;
+  t[ 1 ][ int('2') ] = Key2;
+  t[ 1 ][ int('3') ] = Key3;
+  t[ 1 ][ int('4') ] = Key4;
+  t[ 1 ][ int('5') ] = Key5;
+  t[ 1 ][ int('6') ] = Key6;
+  t[ 1 ][ int('7') ] = Key7;
+  t[ 1 ][ int('8') ] = Key8;
+  t[ 1 ][ int('9') ] = Key9;
+  t[ 1 ][ int('0') ] = Key0;
 
   t[ 0 ][XK_BackSpace&0xFF] = KeyBack;
   t[ 0 ][XK_Tab&0xFF] = KeyTab;
@@ -126,7 +129,7 @@ impl::key_table::key_table()
   t[ 0 ][XK_Mode_switch&0xFF] = KeyAlt_gr;
 }
 
-key_code impl::key_table::translate_key( KeySym const& sym ) const
+key_code key_table::translate_key( KeySym const& sym ) const
 {
 	if ( !sym )
 		return NoKey;
@@ -157,10 +160,5 @@ key_code impl::key_table::translate_key( KeySym const& sym ) const
 	return NoKey;
 }
 
+}}}
 
-key_state::key_state()
-  : keyboard( 512, 0)
-{
-}
-
-}}

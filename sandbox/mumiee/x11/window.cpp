@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cairo-xlib.h>
 #include <boost/cstdint.hpp>
 #include "window.hpp"
 #include "application.hpp"
@@ -24,13 +25,13 @@ window::~window()
 }
 
 window::window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
-  : app( &app ), handle(0), context(0), drawable(0), flags(Clear), parent(0)
+  : app( &app ), handle(0), flags(Clear), parent(0), surface(0), context(0)
 {
   open(r,title,p,flags);
 }
 
 window::window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
-  : app( get_default_app() ), handle(0), drawable(0), flags(Clear), parent(0)
+  : app( get_default_app() ), flags(Clear), parent(0), surface(0), context(0)
 {
   open(r,title,p,flags);
 }
@@ -60,19 +61,14 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
 
 	// run the user-handler
 
-	GLXFBConfig fb_config;
-	XVisualInfo* visual_info = get_visualinfo( p );
+	XVisualInfo visual_info = get_visualinfo( p );
 		
-	// did we find a matching visual info too?
-	if ( visual_info == 0 )
-		throw std::runtime_error( "unable to find requested visual." );
-
   {
     XSetWindowAttributes	attributes;
     unsigned int attributes_mask = 0;
     // init the colormap
     attributes.colormap = XCreateColormap( app->get_display(), root_window,
-        visual_info->visual, AllocNone );
+        visual_info.visual, AllocNone );
 
     attributes.border_pixel = 0;
 
@@ -98,7 +94,8 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
         , r.width 
         , r.height 
         , 0 // border?
-        , DefaultDepth( app->get_display(), app->get_screen() ), InputOutput, DefaultVisual( app->get_display(),app->get_screen() ), 
+        , visual_info.depth, InputOutput
+        , visual_info.visual, 
         attributes_mask, &attributes );
   }
 
@@ -151,6 +148,10 @@ protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
   window_rect.height = attr.y;
 
   flags |= window_flags::Open;
+
+  surface =  cairo_xlib_surface_create(app->get_display(), handle, visual_info.visual, window_rect.width, window_rect.height);
+  context = cairo_create(surface);
+
 
 
   app->register_window( this );
@@ -219,9 +220,12 @@ void window::hide()
   XUnmapWindow( app->get_display(), handle );
 }
 
-XVisualInfo* window::get_visualinfo( pixelformat const& format ) const
-{ 
-  return 0;
+XVisualInfo window::get_visualinfo( pixelformat const& ) const
+{
+  XVisualInfo vinfo;
+  if(  XMatchVisualInfo( app->get_display(), app->get_screen(), 24, TrueColor, &vinfo) == 0 )
+    throw std::runtime_error( "unable to find requested visual." );
+  return vinfo;
 }
 
 void window::set_title( std::string const& t )
@@ -249,12 +253,17 @@ void window::close()
 {
   if( ! is_open() )
     return;
-  if( drawable && handle )
-    exec_on_close();
   if( handle )
   {
+    exec_on_close();
+    if( surface )
+      cairo_surface_destroy( surface );
+    if( context )
+      cairo_destroy( context );
     XDestroyWindow( app->get_display(), handle );
     handle = 0;
+    surface = 0;
+    context = 0;
   }
   flags &= ~window_flags::Open;
   app->remove_window( this );
@@ -280,6 +289,7 @@ void window::on_close()
 void window::on_configure( gott::gui::rect const& r)
 {
   window_rect = r;
+  cairo_xlib_surface_set_size(surface, window_rect.width, window_rect.height);
 }
 
 void window::on_mouse(gott::gui::mouse_event const&)
@@ -307,6 +317,10 @@ gott::gui::rect const& window::get_rect() const
 {
   return window_rect;
 }
+
+cairo_surface_t* window::get_surface() { return surface; };
+cairo_t* window::get_context() { return context;}
+
 
 
 bool window::has_decoration() const

@@ -1,3 +1,25 @@
+// Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
+// Content: GOTT X11 Window class
+// Authors: Andreas Pokorny
+//
+// This file is part of the Gott Project (http://gott.sf.net)
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
 
 #ifndef GOTT_GUI_X11_WINDOW_HPP_INLCUDED
 #define GOTT_GUI_X11_WINDOW_HPP_INLCUDED
@@ -5,15 +27,17 @@
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
-#include <X11/extensions/xf86vmode.h>
+#include <X11/Xutil.h>
+#include <cairo-xlib.h>
 #include <set>
 #include <string>
 #include "../widget_events.hpp"
+#include <gott/util/visibility.hpp>
 
 namespace gott{ namespace gui{ namespace x11{
 
 class application;
-class window : public gott::gui::widget_events, public gott::gui::window_flags
+class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::window_flags
 {
   public:
     friend class gott::gui::x11::application;
@@ -26,10 +50,12 @@ class window : public gott::gui::widget_events, public gott::gui::window_flags
     ::Atom protocols[4];
     ::Atom wm_name, wm_icon_name, wm_type;
     window * parent;
+    cairo_surface_t *surface;
+    cairo_t *context;
 
     // Implementation specific functions:
 
-    XVisualInfo* get_visualinfo( pixelformat const& p ) const;
+    XVisualInfo get_visualinfo( pixelformat const& p ) const;
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
     window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
@@ -66,6 +92,9 @@ class window : public gott::gui::widget_events, public gott::gui::window_flags
     virtual void on_configure( gott::gui::rect const&);
     virtual void on_mouse(gott::gui::mouse_event const&);
     virtual void on_key(gott::gui::key_event const&);
+
+    cairo_surface_t* get_surface();
+    cairo_t *get_context();
 
 };
 

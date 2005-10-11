@@ -275,14 +275,14 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
         if( event.xclient.message_type == protocols_atom )
         {
           std::cout << "Protocols " << std::endl;
-          if( event.xclient.data.l[0] == win->protocols[window::Ping] )
+          if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::Ping] )
           {
             std::cout << "Ping " << std::endl;
             event.xclient.window = RootWindow(display, screen);
             XSendEvent(display, event.xclient.window, false
                 , SubstructureNotifyMask|SubstructureRedirectMask, &event );
           }
-          else if( event.xclient.data.l[0] == win->protocols[window::DeleteWindow] )
+          else if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::DeleteWindow] )
           {
 
             std::cout << "Close " << std::endl;

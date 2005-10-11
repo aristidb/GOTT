@@ -1,25 +1,86 @@
+// Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
+// Content: GOTT Input Frontend Code
+// Authors: Andreas Pokorny
+//
+// This file is part of the Gott Project (http://gott.sf.net)
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_GUI_INPUT_HPP
-#define GOTT_GUI_INPUT_HPP
+
+#ifndef GOTT_GUI_INPUT_HPP_INCLUDED
+#define GOTT_GUI_INPUT_HPP_INCLUDED
 
 #include <vector>
+#include <gott/util/visibility.hpp>
+
+#include "utility.hpp"
 
 namespace gott{namespace gui{
   
-struct mouse_event
+struct GOTT_EXPORT mouse_state
 {
-  /*enum event_type
-  { Move = 0, 
-    ButtonPress, 
-    ButtonRelease };*/
+  public:
+
+  private:
+    coord primary;
+    coord secondary;
+
+    char buttons[8];
+    
+    
+  public:
+
+    mouse_state();
+
+    inline bool get_button( std::size_t index ) const { return buttons[index]==1; }
+    inline int get_x_axis() const { return primary.x; }
+    inline int get_y_axis() const { return primary.y; }
+    inline int get_z_axis() const { return secondary.x; }
+    inline coord const& get_primary_position() const { return primary; }
+    inline coord const& get_secondary_position() const { return secondary; }
+
+    inline void set_button( std::size_t index, bool state ) { buttons[index]=state; }
+    inline void update_primary_position( coord const& movement ) { primary += movement; }
+    inline void update_secondary_position( coord const& movement ) { secondary += movement; }
+    inline void set_primary_position( coord const& p ) { primary = p; }
+    inline void set_secondary_position( coord const& p ) { secondary = p; }
+
+
 };
 
-struct mouse_state
+/**
+ * Representing a pointer device event. 
+ * handled through a union,
+ */
+struct GOTT_EXPORT mouse_event
 {
-  private:
-    std::size_t x,y;
-  public:
-    
+  enum event_type
+  { Move = 0, 
+    Press, 
+    Release 
+  };
+  event_type type;
+
+  mouse_event( coord const& p, coord const& s )
+  : type( Move ), primary(p), secondary(s) {}
+  mouse_event( event_type const& type, std::size_t index )
+    : type(type), button_index(index) {}
+  // add a time stamp here?
+  coord primary;
+  coord secondary;
+  std::size_t button_index;
 };
 
 enum key_code {
@@ -106,7 +167,7 @@ enum key_code {
   KeyNumpad3         = 0x51,
   KeyNumpad0         = 0x52,
   KeyDecimal         = 0x53,    // . on numeric keypad 
-  KeyOEM102         = 0x56,    // < > | on UK/Germany keyboards 
+  KeyOEM102          = 0x56,    // < > | on UK/Germany keyboards 
   KeyF11             = 0x57,
   KeyF12             = 0x58,
   KeyF13             = 0x64,    //                     (NEC PC98) 
@@ -166,11 +227,11 @@ enum key_code {
   KeyWebBack         = 0xEA,    // Web Back 
   KeyMyComputer      = 0xEB,    // My Computer 
   KeyMail            = 0xEC,    // Mail 
-  KeyMediaSelect     = 0xED,   // Media Select 
+  KeyMediaSelect     = 0xED,    // Media Select 
   NoKey
 };
 
-struct key_event
+struct GOTT_EXPORT key_event
 {
   enum event_type{ Press, Release }; // Hold?
   event_type type;
@@ -178,7 +239,7 @@ struct key_event
   key_event( key_code code, event_type t ); 
 };
 
-struct key_state
+struct GOTT_EXPORT key_state
 {
   private:
     std::vector<unsigned char> keyboard;
