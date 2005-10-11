@@ -1,6 +1,13 @@
+
 #include <iostream>
+#ifdef USE_GLITZ
+#include <cairo-glitz.h>
+#else
 #include <cairo-xlib.h>
+#endif
+#pragma GCC visibility push(default)
 #include <boost/cstdint.hpp>
+#pragma GCC visibility pop
 #include "window.hpp"
 #include "application.hpp"
 
@@ -99,17 +106,17 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
         attributes_mask, &attributes );
   }
 
-	if( handle == None )
+  if( handle == None )
     throw std::runtime_error("no window handle");
-///////////////
+  ///////////////
 
   set_window_type( fl );
 
- 
+
   protocols[0] = app->get_atom("WM_DELETE_WINDOW");
-protocols[1] = app->get_atom("WM_TAKE_FOCUS");
-protocols[2] = app->get_atom("_NET_WM_PING");
-protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
+  protocols[1] = app->get_atom("WM_TAKE_FOCUS");
+  protocols[2] = app->get_atom("_NET_WM_PING");
+  protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
   XSetWMProtocols( app->get_display(), handle, protocols, 4);
 
   // set _NET_WM_PID
@@ -149,8 +156,15 @@ protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
 
   flags |= window_flags::Open;
 
+
+#ifdef USE_GLITZ
+  // add glitz foobar here
+  surface = cairo_glitz_surface_create( --- -);
+  context = cairo_create(surface);
+#else
   surface =  cairo_xlib_surface_create(app->get_display(), handle, visual_info.visual, window_rect.width, window_rect.height);
   context = cairo_create(surface);
+#endif
 
 
 
@@ -289,7 +303,9 @@ void window::on_close()
 void window::on_configure( gott::gui::rect const& r)
 {
   window_rect = r;
+#ifndef USE_GLITZ
   cairo_xlib_surface_set_size(surface, window_rect.width, window_rect.height);
+#endif
 }
 
 void window::on_mouse(gott::gui::mouse_event const&)

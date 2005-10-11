@@ -5,8 +5,9 @@
 #include "input.hpp"
 #include "x11/application.hpp"
 #include "x11/window.hpp"
-//#include "device.hpp"
+#pragma GCC visibility push(default)
 #include <boost/bind.hpp>
+#pragma GCC visibility pop
 
 using namespace std;
 using namespace gott::gui;

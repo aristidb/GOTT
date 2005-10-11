@@ -22,7 +22,10 @@
 #define GOTT_GUI_WIDGETS_EVENTS_HPP_INCLUDED
 
 
+#pragma GCC visibility push(default)
 #include <boost/signals.hpp>
+#pragma GCC visibility pop
+#include <gott/util/visibility.hpp>
 #include "utility.hpp"
 #include "input.hpp"
 
