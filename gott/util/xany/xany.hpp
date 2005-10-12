@@ -59,6 +59,8 @@ template<> struct operations<void> : operations_base {};
  * Has two special features:
  *   - Type promotion (see xany::promote).
  *   - Runtime-typed operations (see xany::operations_base).
+ *
+ * TODO: visibility-safety for free for all (optional)
  */
 class Xany {
   template<class T> class holder;

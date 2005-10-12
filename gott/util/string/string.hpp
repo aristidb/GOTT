@@ -52,7 +52,7 @@ template<class> class range_t;
 /**
  * UTF-8 string literals storage class.
  */
-class string : Moveable<string> {
+class GOTT_EXPORT string : Moveable<string> {
 public:
   typedef range_t<utf8_t const *> utf8_range;
   typedef range_t<utf8_iterator> utf32_range;
@@ -60,55 +60,55 @@ public:
   /**
    * Construct empty string
    */
-  string() { 
+  GOTT_LOCAL string() { 
     set_up(offset(range("").cast<utf8_t const*>(), 0, -1), false);
   }
 
   /**
    * Construct from encoded string.
    */
-  string(range_t<char const *> in, encoding enc = utf8) {
+  GOTT_LOCAL string(range_t<char const *> in, encoding enc = utf8) {
     set_up(to_utf8_alloc(in, enc), true);
   }
 
   /**
    * Construct from encoded c-string.
    */
-  string(char const *in, encoding enc = utf8) {
+  GOTT_LOCAL string(char const *in, encoding enc = utf8) {
     set_up(to_utf8_alloc(zero_terminated(in), enc), true);
   }
 
   /**
    * Construct from encoded wide string.
    */
-  string(range_t<wchar_t const *> in, encoding enc = utf32) {
+  GOTT_LOCAL string(range_t<wchar_t const *> in, encoding enc = utf32) {
     set_up(to_utf8_alloc(in.cast<char const *>(), enc), true);
   }
 
   /**
    * Construct from encoded wide c-string.
    */
-  string(wchar_t const *in, encoding enc = utf32) {
+  GOTT_LOCAL string(wchar_t const *in, encoding enc = utf32) {
     set_up(to_utf8_alloc(zero_terminated(in).cast<char const *>(), enc), true);
   }
 
   /**
    * Construct string from thunk.
    */
-  string(thunk_t<utf8_t> &) GOTT_EXPORT;
+  string(thunk_t<utf8_t> &);
 
 #ifndef NO_STDLIB
   /**
    * Construct string from std::string.
    */
-  string(std::string const &s, encoding enc = utf8) {
+  GOTT_LOCAL string(std::string const &s, encoding enc = utf8) {
     set_up(to_utf8_alloc(range(&s[0], s.length()), enc), true);
   }
 
   /**
    * Construct string from std::wstring.
    */
-  string(std::wstring const &s, encoding enc = utf32) {
+  GOTT_LOCAL string(std::wstring const &s, encoding enc = utf32) {
     set_up(to_utf8_alloc(range(&s[0], s.length()).cast<char const *>(), enc), 
         true);
   }
@@ -117,7 +117,7 @@ public:
    * Construct std::string from string using unicode encoding.
    * Use to_string if you need a different encoding.
    */
-  operator std::string() const {
+  GOTT_LOCAL operator std::string() const {
     return to_string(*this);
   }
 
@@ -125,7 +125,7 @@ public:
    * Construct std::wstring from string using unicode encoding.
    * Use to_wstring if you need a different encoding.
    */
-  operator std::wstring() const {
+  GOTT_LOCAL operator std::wstring() const {
     return to_wstring(*this);
   }
 #endif
@@ -135,14 +135,14 @@ public:
   /**
    * Construct from UTF8-c-literal. Shares memory.
    */
-  string(range_t<utf8_t const *> in, literal_tag) {
+  GOTT_LOCAL string(range_t<utf8_t const *> in, literal_tag) {
     set_up(in, false);
   }
 
   /**
    * Construct from string_buffer.
    */
-  string(string_buffer const &b) {
+  GOTT_LOCAL string(string_buffer const &b) {
     set_up(to_utf8_alloc(range(b).cast<char const *>(), utf32), true);
   }
 
@@ -152,7 +152,7 @@ public:
    * Concatenate.
    */
   template<class I>
-  string(range_t<I> const &r, concat_tag) {
+  GOTT_LOCAL string(range_t<I> const &r, concat_tag) {
     std::size_t size = 0;
     for (I it = r.begin; it != r.end; ++it)
       size += it->size();
@@ -168,27 +168,27 @@ public:
   /**
    * Construct from character range.
    */
-  string(range_t<utf8_iterator> const &r) {
+  GOTT_LOCAL string(range_t<utf8_iterator> const &r) {
     foreign(r.call<utf8_t const *>(&utf8_iterator::ptr));
   }
   
   /**
    * Construct from character range.
    */
-  string(range_t<utf8_t const *> const &r) {
+  GOTT_LOCAL string(range_t<utf8_t const *> const &r) {
     foreign(r);
   }
 
   /// Copy-Constructor.
-  string(string const &) GOTT_EXPORT;
+  string(string const &);
 
   /// Destructor.
-  ~string() GOTT_EXPORT;
+  ~string();
 
   /**
    * Swap with another string.
    */
-  void swap(string &other) {
+  GOTT_LOCAL void swap(string &other) {
     class representation *tmp = p;
     p = other.p;
     other.p = tmp;
@@ -197,31 +197,31 @@ public:
   /**
    * Assign from another string.
    */
-  void operator=(string other) {
+  GOTT_LOCAL void operator=(string other) {
     other.swap(*this);
   }
 
   /**
    * Get the internally used UTF8 string.
    */
-  range_t<utf8_t const *> as_utf8() const GOTT_EXPORT;
+  range_t<utf8_t const *> as_utf8() const;
 
   /**
    * Access the string as UTF32.
    */
-  range_t<utf8_iterator> as_utf32() const {
+  GOTT_LOCAL range_t<utf8_iterator> as_utf32() const {
     return as_utf8().cast<utf8_iterator>();
   }
 
   /**
    * Get the number of characters (not bytes) in the string.
    */
-  std::size_t length() const GOTT_EXPORT;
+  std::size_t length() const;
 
   /**
    * Get the number of bytes the string needs as UTF8-encoded.
    */
-  std::size_t size() const {
+  GOTT_LOCAL std::size_t size() const {
     return as_utf8().size();
   }
 
@@ -229,8 +229,8 @@ private:
   class representation;
   representation *p;
 
-  void set_up(range_t<utf8_t const *> const &d, bool o) GOTT_EXPORT;
-  void foreign(range_t<utf8_t const *> const &x) GOTT_EXPORT;
+  void set_up(range_t<utf8_t const *> const &d, bool o);
+  void foreign(range_t<utf8_t const *> const &x);
 };
 
 #ifndef NO_STDLIB
