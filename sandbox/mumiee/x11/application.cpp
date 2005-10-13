@@ -12,6 +12,7 @@
 #include "window.hpp"
 #include "input.hpp"
 
+// #define LOG_EVENTS
 using namespace std;
 
 
@@ -145,16 +146,20 @@ void application::init_cursor()
 
 void application::process_event( gott::gui::x11::window* win, XEvent& event )
 {
+#ifdef LOG_EVENTS
   std::cout << "Event on: " << win->get_handle() << " ";
   if( focus_window )
     std::cout << "  Focus on: " << win->get_handle() << " ";
   else 
     std::cout << "  No Focus ";
+#endif
   switch( event.type )
   {
     case ReparentNotify:
       {
+#ifdef LOG_EVENTS
         std::cout << "ReparentNotify" << std::endl;
+#endif
         if( win->has_decoration()  == 0 )
         {
           XSetWindowAttributes  attributes;
@@ -180,7 +185,9 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     case ButtonPress:
       {
+#ifdef LOG_EVENTS
         std::cout << "ButtonPress" << std::endl;
+#endif
         //XSetInputFocus( display, win->get_handle(), RevertToPointerRoot, CurrentTime );
 
         mouse_info.set_button( event.xbutton.button, true );
@@ -191,7 +198,9 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     case ButtonRelease:
       {
+#ifdef LOG_EVENTS
         std::cout << "ButtonRelease" << std::endl;
+#endif
         mouse_info.set_button( event.xbutton.button, false );
         mouse_event ev( mouse_event::Release, event.xbutton.button );
         win->exec_on_mouse( ev );
@@ -200,7 +209,9 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     case MapNotify:
       {
+#ifdef LOG_EVENTS
         std::cout << "MapNotify" << std::endl;
+#endif
         //XSetInputFocus( display, win->get_handle(), RevertToPointerRoot, CurrentTime );
         win->exec_on_redraw();
         break;
@@ -208,14 +219,19 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     case DestroyNotify:
       {
+
+#ifdef LOG_EVENTS
         std::cout << "DestroyNotify" << std::endl;
+#endif
         // FIXME 
         break;
       };
 
     case KeyPress:
       {
+#ifdef LOG_EVENTS
         std::cout << "KeyPress" << std::endl;
+#endif
         XKeyEvent sym = event.xkey;
         key_code c = key_table::get_instance().translate_key( XLookupKeysym( &sym, 0) );
 
@@ -227,7 +243,9 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     case KeyRelease:
       {
+#ifdef LOG_EVENTS
         std::cout << "KeyRelease" << std::endl;
+#endif
         XKeyEvent sym = event.xkey;
         key_code c = key_table::get_instance().translate_key( XLookupKeysym( &sym, 0) );
 
@@ -238,7 +256,9 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
       }
     case ConfigureNotify:
       {
+#ifdef LOG_EVENTS
         std::cout << "ConfigureNotify" << std::endl;
+#endif
         XWindowAttributes root_attribs;
         ::Window root_window = RootWindow( display, screen );
 
@@ -260,24 +280,35 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
     case Expose:
       {
 
+#ifdef LOG_EVENTS
         std::cout << "Expose" << std::endl;
+#endif
         if( win== 0 )
           return;
 
         win->exec_on_redraw();
+
+#ifdef LOG_EVENTS
         std::cout << "Expose done " << std::endl;
+#endif
         break;
       }
 
     case ClientMessage:
       {
+#ifdef LOG_EVENTS
         std::cout << "ClientMessage" << std::endl;
+#endif
         if( event.xclient.message_type == protocols_atom )
         {
+#ifdef LOG_EVENTS
           std::cout << "Protocols " << std::endl;
+#endif
           if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::Ping] )
           {
+#ifdef LOG_EVENTS
             std::cout << "Ping " << std::endl;
+#endif
             event.xclient.window = RootWindow(display, screen);
             XSendEvent(display, event.xclient.window, false
                 , SubstructureNotifyMask|SubstructureRedirectMask, &event );
@@ -285,7 +316,9 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
           else if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::DeleteWindow] )
           {
 
+#ifdef LOG_EVENTS
             std::cout << "Close " << std::endl;
+#endif
             win->close();
           }
           std::cout << "unrecognized client-message type:" <<    XGetAtomName( display, event.xclient.data.l[0]) << '\n';
@@ -306,15 +339,19 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     case UnmapNotify:
       {
+#ifdef LOG_EVENTS
         std::cout << "UnmapNotify" << std::endl;
+#endif
         break;
       };
 
     case FocusIn:
       {
+#ifdef LOG_EVENTS
         std::cout << "FocusIn" << std::endl;
         if( (focus_window != 0) && (focus_window != win) )
           std::cout << "(gott-gui) Warning: another window is still focused.\n";
+#endif
 
         focus_window = win;
 
@@ -325,9 +362,11 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     case FocusOut:
       {
+#ifdef LOG_EVENTS
         std::cout << "FocusOut" << std::endl;
         if( focus_window && (focus_window != win) )
           std::cout << "(gott-gui) Warning: losing focus without having focus.\n";
+#endif
 
         focus_window = 0;
 
@@ -337,8 +376,11 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
       };
 
     default:
+#ifdef LOG_EVENTS
       // unrecognized event -> terminate
       std::cout << "(gott-gui) unrecognized event:" << event.type <<  '\n';
+#endif
+      break;
   };
 
 }
