@@ -1,3 +1,12 @@
+import string 
+
+def filter_flag(flags,flag):
+	nflags = []
+	for f in flags:
+		if f != flag:
+			nflags	+= [f]
+	return nflags
+
 cppdef = Split(ARGUMENTS.get('def', ''))
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
 cflags = Split(ARGUMENTS.get('cflags', ''))
@@ -70,11 +79,12 @@ our_libs=['gottx11', 'gottbase' ,'X11', 'boost_signals',  'z' ]
 if rlib =='antigrain':
 	env.ParseConfig('pkg-config --cflags  libagg')
 	env.ParseConfig('pkg-config --libs libagg')
+	cflags = filter_flag(env['CCFLAGS'],'-Werror')
+	env.Replace(CCFLAGS = cflags)
 if rlib =='cairo':
 	env.ParseConfig('pkg-config --cflags cairo')
 	env.ParseConfig('pkg-config --libs cairo')
 
- 
 env.Append(LIBS=our_libs)
 env.Append(LIBPATH=['.', 'x11/','/usr/X11R6/lib'])
 env.Program('test_x11', x11_example_files )
