@@ -1,6 +1,6 @@
 #include <stdexcept>
 #include <iostream>
-#include <cairo.h>
+//#include <cairo.h>
 #include "utility.hpp"
 #include "input.hpp"
 #include "x11/application.hpp"
@@ -51,6 +51,10 @@ class window : public x11::window
     {
       set_render_context();
       x11::window::on_redraw();
+#ifdef USE_ANTIGRAIN
+//      agg::rendering_buffer & buf =  get_render_buffer();
+#else
+      
       cairo_t * cr = this->get_context();
       rect g = get_rect();
 
@@ -84,8 +88,7 @@ class window : public x11::window
       cairo_restore(cr);
 
       cairo_pattern_destroy(pattern);
-
- 
+#endif 
       swap_buffer();
     }
 

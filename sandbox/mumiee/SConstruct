@@ -19,6 +19,16 @@ elif debug == -1:
 
 optimize = ARGUMENTS.get('optimize', optimize)
 
+rlib = ARGUMENTS.get('rlib', 'antigrain')
+
+if rlib == 'antigrain':
+	cppdef += ['USE_ANTIGRAIN']
+elif rlib == 'cairo':
+	cppdef += ['USE_CAIRO']
+  
+
+
+
 caux = ARGUMENTS.get('aux')
 cflags += Split(caux)
 
@@ -37,6 +47,7 @@ env = Environment(
 Export('env')
 Export('optimize')
 Export('debug')
+Export('rlib')
 
 conf = SConscript('../../gott/configure/SConscript')
 env = conf.Finish()
@@ -50,11 +61,21 @@ SConscript(dirs = ['x11'])
 
 source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp']
 
-env.SharedLibrary('gottbase', source_files)
+#env.SharedLibrary('gottbase', source_files)
 env.StaticLibrary('gottbase', source_files)
 
 x11_example_files= ['test_x11.cpp']
-libs=['gottx11', 'gottbase' ,'X11', 'boost_signals',  'z', 'cairo']
-env.ParseConfig('pkg-config --cflags --libs cairo')
-env.Program('test_x11', x11_example_files, LIBS=libs, LIBPATH=['.', 'x11/','/usr/X11R6/lib'])
+our_libs=['gottx11', 'gottbase' ,'X11', 'boost_signals',  'z' ]
+
+if rlib =='antigrain':
+	env.ParseConfig('pkg-config --cflags  libagg')
+	env.ParseConfig('pkg-config --libs libagg')
+if rlib =='cairo':
+	env.ParseConfig('pkg-config --cflags cairo')
+	env.ParseConfig('pkg-config --libs cairo')
+
+ 
+env.Append(LIBS=our_libs)
+env.Append(LIBPATH=['.', 'x11/','/usr/X11R6/lib'])
+env.Program('test_x11', x11_example_files )
 

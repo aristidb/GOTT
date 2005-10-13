@@ -2,16 +2,13 @@ import os
 import glob
 
 Import('env')
+Import('rlib')
 
-source_files = []
-for root, dirs, _ in os.walk('.'):
-	if '.svn' in dirs:
-		dirs.remove('.svn')
-	if 'test' in dirs:
-		dirs.remove('test')
-	source_files += glob.glob(root + '/*.cpp')
+source_files = ['input.cpp','window.cpp','application.cpp', rlib + '.cpp']
 
-env.SharedLibrary('gottx11', source_files)
+
+
+#env.SharedLibrary('gottx11', source_files)
 env.StaticLibrary('gottx11', source_files)
 
 
