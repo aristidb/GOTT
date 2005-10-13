@@ -76,6 +76,16 @@ class window : public x11::window
           array[i] = middle.gradient(end, (i - half_size) / double(half_size));
       }
   }
+  template<typename Array>
+  void fill_color_array( Array& array, std::vector<std::pair<float,agg::rgba8> > const& colours ) {
+    for( std::size_t i = 0; i < colours.size()-1; ++i ) {
+      unsigned bpos = unsigned(float(array.size()) * colours[i].first);
+      unsigned epos = unsigned(float(array.size()) * colours[i+1].first);
+      for( std::size_t j = bpos; j != epos; ++j ){
+        array[j] = colours[i].second.gradient(colours[i+1].second, (j-bpos)/double(epos-bpos) );
+      }
+    }
+  }
 #endif
     void on_redraw() 
     {
@@ -151,11 +161,12 @@ class window : public x11::window
     // and where it ends. The actual meaning of "d1" and "d2" depands
     // on the gradient function.
     //----------------
+    rect g = get_rect();
     span_gradient_type span_gradient(span_allocator, 
                                      span_interpolator, 
                                      gradient_func, 
                                      color_array, 
-                                     0, 100);
+                                     0, g.width);
 
     // The gradient renderer
     //----------------
@@ -172,12 +183,22 @@ class window : public x11::window
     //----------------
     rbase.clear(agg::rgba8(255, 255, 255));
 
-    fill_color_array(color_array, 
+    std::vector<std::pair<float, agg::rgba8> > colours;
+    colours.push_back( std::make_pair( 0.0f, agg::rgba8(255, 0, 0, 178)));
+    colours.push_back( std::make_pair( 0.2f, agg::rgba8(204, 51, 0, 127)));
+    colours.push_back( std::make_pair( 0.4f, agg::rgba8(153, 51, 51, 127)));
+    colours.push_back( std::make_pair( 0.6f, agg::rgba8(102, 102, 51, 127)));
+    colours.push_back( std::make_pair( 0.8f, agg::rgba8(51, 102, 102, 76)));
+    colours.push_back( std::make_pair( 1.0f, agg::rgba8(0, 153, 102, 51)));
+
+    fill_color_array( color_array, colours );
+
+/*    fill_color_array(color_array, 
                      agg::rgba8(0,50,50), 
                      agg::rgba8(240, 255, 100), 
-                     agg::rgba8(80, 0, 0));
+                     agg::rgba8(80, 0, 0));*/
 
-    agg::ellipse ell(50, 50, 50, 50, 100);
+    agg::ellipse ell(g.width / 2, g.height/2, g.width/2, g.height/2, 100);
     ras.add_path(ell);
 
     agg::render_scanlines(ras, sl, ren_gradient);
