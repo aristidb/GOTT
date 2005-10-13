@@ -28,16 +28,26 @@
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <cairo-xlib.h>
 #include <set>
 #include <string>
 #include "../widget_events.hpp"
 #include <gott/util/visibility.hpp>
 
+#ifdef USE_ANTIGRAIN
+#include "antigrain.hpp"
+#else
+#include "cairo.hpp"
+#endif
+
 namespace gott{ namespace gui{ namespace x11{
 
 class application;
-class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::window_flags
+class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::window_flags,
+#ifdef USE_ANTIGRAIN
+                           public antigrain 
+#else
+                             public cairo
+#endif
 {
   public:
     friend class gott::gui::x11::application;
@@ -50,12 +60,9 @@ class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::wi
     ::Atom protocols[4];
     ::Atom wm_name, wm_icon_name, wm_type;
     window * parent;
-    cairo_surface_t *surface;
-    cairo_t *context;
-
+    
     // Implementation specific functions:
 
-    XVisualInfo get_visualinfo( pixelformat const& p ) const;
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
     window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags );
@@ -93,8 +100,6 @@ class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::wi
     virtual void on_mouse(gott::gui::mouse_event const&);
     virtual void on_key(gott::gui::key_event const&);
 
-    cairo_surface_t* get_surface();
-    cairo_t *get_context();
 
 };
 

@@ -1,10 +1,6 @@
 
 #include <iostream>
-#ifdef USE_GLITZ
-#include <cairo-glitz.h>
-#else
-#include <cairo-xlib.h>
-#endif
+
 #pragma GCC visibility push(default)
 #include <boost/cstdint.hpp>
 #pragma GCC visibility pop
@@ -32,13 +28,13 @@ window::~window()
 }
 
 window::window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
-  : app( &app ), handle(0), flags(Clear), parent(0), surface(0), context(0)
+  : app( &app ), handle(0), flags(Clear), parent(0)
 {
   open(r,title,p,flags);
 }
 
 window::window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
-  : app( get_default_app() ), flags(Clear), parent(0), surface(0), context(0)
+  : app( get_default_app() ), flags(Clear), parent(0)
 {
   open(r,title,p,flags);
 }
@@ -57,7 +53,7 @@ void window::open( application& a, rect const&r, std::string const& title, pixel
   open(r,title,p,flags);
 }
 
-void window::open(rect const&r, std::string const& t, pixelformat const& p, std::size_t fl )
+void window::open(rect const&r, std::string const& t, pixelformat const& , std::size_t fl )
 {
   if( is_open() )
     close();
@@ -67,15 +63,14 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
  	// init the pixelformat and get the associated visual info
 
 	// run the user-handler
-
-	XVisualInfo visual_info = get_visualinfo( p );
+  this->prepare_visual( app->get_screen(), app->get_display() );
 		
   {
     XSetWindowAttributes	attributes;
     unsigned int attributes_mask = 0;
     // init the colormap
     attributes.colormap = XCreateColormap( app->get_display(), root_window,
-        visual_info.visual, AllocNone );
+        this->get_visual(), AllocNone );
 
     attributes.border_pixel = 0;
 
@@ -101,8 +96,8 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
         , r.width 
         , r.height 
         , 0 // border?
-        , visual_info.depth, InputOutput
-        , visual_info.visual, 
+        , this->get_depth(), InputOutput
+        , this->get_visual(), 
         attributes_mask, &attributes );
   }
 
@@ -156,17 +151,7 @@ void window::open(rect const&r, std::string const& t, pixelformat const& p, std:
 
   flags |= window_flags::Open;
 
-
-#ifdef USE_GLITZ
-  // add glitz foobar here
-  surface = cairo_glitz_surface_create( --- -);
-  context = cairo_create(surface);
-#else
-  surface =  cairo_xlib_surface_create(app->get_display(), handle, visual_info.visual, window_rect.width, window_rect.height);
-  context = cairo_create(surface);
-#endif
-
-
+  this->setup_renderer(app->get_display(), app->get_screen(), handle, window_rect );
 
   app->register_window( this );
   
@@ -234,13 +219,7 @@ void window::hide()
   XUnmapWindow( app->get_display(), handle );
 }
 
-XVisualInfo window::get_visualinfo( pixelformat const& ) const
-{
-  XVisualInfo vinfo;
-  if(  XMatchVisualInfo( app->get_display(), app->get_screen(), 24, TrueColor, &vinfo) == 0 )
-    throw std::runtime_error( "unable to find requested visual." );
-  return vinfo;
-}
+
 
 void window::set_title( std::string const& t )
 {
@@ -270,14 +249,10 @@ void window::close()
   if( handle )
   {
     exec_on_close();
-    if( surface )
-      cairo_surface_destroy( surface );
-    if( context )
-      cairo_destroy( context );
+
+    this->close_renderer(app->get_display(), app->get_screen(), handle ); 
     XDestroyWindow( app->get_display(), handle );
     handle = 0;
-    surface = 0;
-    context = 0;
   }
   flags &= ~window_flags::Open;
   app->remove_window( this );
@@ -303,9 +278,7 @@ void window::on_close()
 void window::on_configure( gott::gui::rect const& r)
 {
   window_rect = r;
-#ifndef USE_GLITZ
-  cairo_xlib_surface_set_size(surface, window_rect.width, window_rect.height);
-#endif
+  this->resize_renderer( app->get_display(), app->get_screen(), handle, window_rect);
 }
 
 void window::on_mouse(gott::gui::mouse_event const&)
@@ -318,6 +291,7 @@ void window::on_key(gott::gui::key_event const&)
 
 void window::swap_buffer() 
 {
+  this->update_window();
 }
 
 void window::set_render_context()
@@ -333,9 +307,6 @@ gott::gui::rect const& window::get_rect() const
 {
   return window_rect;
 }
-
-cairo_surface_t* window::get_surface() { return surface; };
-cairo_t* window::get_context() { return context;}
 
 
 
