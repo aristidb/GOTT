@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <iostream>
+#include <boost/timer.hpp>
 #ifdef USE_ANTIGRAIN
 #include "agg_pixfmt_rgba.h"
 #include "agg_renderer_base.h"
@@ -28,6 +29,7 @@ using gott::gui::x11::application;
 class window : public x11::window
 {
   private:
+    boost::timer t;
 
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p )
@@ -89,6 +91,8 @@ class window : public x11::window
 #endif
     void on_redraw() 
     {
+      std::cout << "Time passed since last frame: " << t.elapsed() << std::endl; 
+      t = boost::timer();
       set_render_context();
       x11::window::on_redraw();
 #ifdef USE_ANTIGRAIN
@@ -181,7 +185,7 @@ class window : public x11::window
 
     // Finally we can draw a circle.
     //----------------
-    rbase.clear(agg::rgba8(255, 255, 255));
+   // rbase.clear(agg::rgba8(255, 255, 255));
 
     std::vector<std::pair<float, agg::rgba8> > colours;
     colours.push_back( std::make_pair( 0.0f, agg::rgba8(255, 0, 0, 178)));

@@ -126,7 +126,7 @@ void antigrain::setup_renderer( Display* , int , Drawable win , rect const& r ){
   gc = XCreateGC(display, window, 0, 0); 
   window_buffer = new unsigned char[r.width * r.height * (bpp / 8)];
 
-  memset(window_buffer, 255, r.width * r.height * (bpp / 8));
+  memset(window_buffer, 0, r.width * r.height * (bpp / 8));
 
   rbuffer.attach(window_buffer, r.width, r.height,
       flip_y ? -r.width * (bpp / 8) : r.width * (bpp / 8));

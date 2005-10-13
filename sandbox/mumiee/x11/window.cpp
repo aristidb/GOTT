@@ -210,13 +210,13 @@ void window::set_window_type( std::size_t fl )
 void window::show()
 {
   if( is_open() )
-  XMapWindow( app->get_display(), handle );
+    XMapWindow( app->get_display(), handle );
 }
 
 void window::hide()
 {
   if( is_open() )
-  XUnmapWindow( app->get_display(), handle );
+    XUnmapWindow( app->get_display(), handle );
 }
 
 
