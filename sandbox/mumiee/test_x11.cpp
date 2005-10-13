@@ -2,14 +2,14 @@
 #include <iostream>
 #include <boost/timer.hpp>
 #ifdef USE_ANTIGRAIN
-#include "agg_pixfmt_rgba.h"
-#include "agg_renderer_base.h"
-#include "agg_renderer_scanline.h"
-#include "agg_scanline_u.h"
-#include "agg_rasterizer_scanline_aa.h"
-#include "agg_ellipse.h"
-#include "agg_span_gradient.h"
-#include "agg_span_interpolator_linear.h"
+#include <agg_pixfmt_rgba.h>
+#include <agg_renderer_base.h>
+#include <agg_renderer_scanline.h>
+#include <agg_scanline_u.h>
+#include <agg_rasterizer_scanline_aa.h>
+#include <agg_ellipse.h>
+#include <agg_span_gradient.h>
+#include <agg_span_interpolator_linear.h>
 #else
 //#include <cairo.h>
 #endif

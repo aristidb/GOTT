@@ -61,6 +61,19 @@ Export('rlib')
 conf = SConscript('../../gott/configure/SConscript')
 env = conf.Finish()
 
+# Should this be inf configure/?
+if rlib =='antigrain':
+	print "Using antigrain..."
+	env.ParseConfig('pkg-config --cflags  libagg')
+	env.ParseConfig('pkg-config --libs libagg')
+	cflags = filter_flag(env['CCFLAGS'],'-Werror')
+	env.Replace(CCFLAGS = cflags)
+else:
+	print "Using cairo..."	
+	env.ParseConfig('pkg-config --cflags cairo')
+	env.ParseConfig('pkg-config --libs cairo')
+
+
 shrd = env.Copy()
 shrd.Append(CPPDEFINES = 'BUILDING_DLL')
 
@@ -75,15 +88,6 @@ env.StaticLibrary('gottbase', source_files)
 
 x11_example_files= ['test_x11.cpp']
 our_libs=['gottx11', 'gottbase' ,'X11', 'boost_signals',  'z' ]
-
-if rlib =='antigrain':
-	env.ParseConfig('pkg-config --cflags  libagg')
-	env.ParseConfig('pkg-config --libs libagg')
-	cflags = filter_flag(env['CCFLAGS'],'-Werror')
-	env.Replace(CCFLAGS = cflags)
-if rlib =='cairo':
-	env.ParseConfig('pkg-config --cflags cairo')
-	env.ParseConfig('pkg-config --libs cairo')
 
 env.Append(LIBS=our_libs)
 env.Append(LIBPATH=['.', 'x11/','/usr/X11R6/lib'])
