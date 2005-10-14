@@ -39,10 +39,11 @@ struct schema_unordered_list_integer_string : tut::schema_basic {
   schema_unordered_list_integer_string()
   : tut::schema_basic(
       rule("document", RA(), Vector<rule_t>() <<
-        rule("node",
-          RA(Vector<string>()<<"node",true,Xany(),new stru::repatch_integer(),
-             slotcfg(), slotcfg(slotcfg::list))) <<
-        rule("node", RA()))) {}
+        rule("unordered", RA(), Vector<rule_t>() <<
+          rule("node",
+            RA(Vector<string>()<<"node",true,Xany(),new stru::repatch_integer(),
+               slotcfg(), slotcfg(slotcfg::list))) <<
+          rule("node", RA())))) {}
 };
 }
 

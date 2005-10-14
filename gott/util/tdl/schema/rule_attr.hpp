@@ -57,8 +57,8 @@ public:
                      slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
   : c(cc), t(l), u(x), r(rr), i(I), o(O) {}
 
-  rule_attr(rule_attr const &o)
-  : c(o.c), t(o.t, 1), u(o.u), r(o.r) {}
+  rule_attr(rule_attr const &o_)
+  : c(o_.c), t(o_.t, 1), u(o_.u), r(o_.r), i(o_.i), o(o_.o) {}
 
   bool coat() const { return c; }
   void set_coat(bool x) { c = x; }
