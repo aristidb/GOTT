@@ -39,7 +39,7 @@ struct schema_ordered_string_integer : tut::schema_basic {
       rule("document", RA(), Vector<rule_t>() <<
         rule("ordered", RA(), Vector<rule_t>() <<
          rule("node", RA()) <<
-         rule("node", RA(RA::simple, true, new stru::repatch_integer()))))) {}
+         rule("node", RA("i", true, new stru::repatch_integer()))))) {}
 };
 }
 

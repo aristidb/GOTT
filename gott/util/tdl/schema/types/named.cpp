@@ -46,6 +46,7 @@ match_named::match_named(rule_attr const &a, Vector<rule_t> const &s, match &m)
           new structure::repatch_enumeration(Vector<string>() << tag))) <<
         s[0])) {
   GOTT_ASSERT_2(s.GetCount(), 1, std::equal_to<int>(), "one parameter");
+  matcher().add(rewritten);
 }
 
 match_named::~match_named() {}
