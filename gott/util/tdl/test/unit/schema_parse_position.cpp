@@ -49,7 +49,9 @@ struct test_base {
 
   test_base() 
   : match(no_stru), pos(match.pos()), parse(match) {
-    match.add(tdl::schema::rule("document", tdl::schema::rule_attr()));
+    match.add(tdl::schema::rule("document", tdl::schema::rule_attr(),
+     Vector<tdl::schema::rule_t>() << 
+     tdl::schema::rule("node", tdl::schema::rule_attr())));
   }
 };
 
