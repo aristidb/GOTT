@@ -20,7 +20,6 @@
 
 #include "follow_ordered.hpp"
 #include "../event.hpp"
-#include "../rule_attr.hpp"
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
@@ -32,7 +31,7 @@ match_follow_ordered::match_follow_ordered(rule_attr const &a,
 : item(a, m), opened(0), saw_up(false), last(m.pos().current()), 
     unhappy(false) {
   for (Vector<rule_t>::const_iterator it = c.begin(); it != c.end(); ++it)
-    ;//FIXME children.Add(*it);
+    children.Add(*it);
   pos = children.begin();
   init_accept_empty();
   if (expectation() == nothing)
@@ -46,7 +45,7 @@ void match_follow_ordered::init_accept_empty() {
   for (int i = children.GetCount() - 1; i >= 0; --i) {
     active_element &e = children[i];
     e.rest_accept_empty = rest_accept_empty;
-    //FIXME e.accept_empty = e.generator->accept_empty();
+    e.accept_empty = e.generator.accept_empty();
     rest_accept_empty &= (e.slot.prefix_optional() || e.accept_empty);
   }
 }

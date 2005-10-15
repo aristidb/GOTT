@@ -25,6 +25,7 @@
 #include "../rule.hpp"
 #include "../slot.hpp"
 #include "../parse_position.hpp"
+#include "../rule_attr.hpp"
 
 namespace gott {
 namespace tdl {
@@ -44,7 +45,7 @@ private:
     bool accept_empty, rest_accept_empty;
     
     active_element(rule_t const &e) 
-    : generator(e) {}
+    : generator(e), slot(e.attributes().outer()) {}
   };
 
   void init_accept_empty();
