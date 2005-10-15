@@ -1,5 +1,3 @@
-// FIXME
-#if 0
 // Copyright (C) 2004-2005 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
@@ -29,49 +27,41 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
-
+using gott::string;
 using namespace stru::cf;
 using schema::slotcfg;
-
+using schema::rule_t;
 typedef schema::rule_attr RA;
 
 namespace {
 struct schema_multi_footype : tut::schema_basic {
-  schema::context c[2];
-  schema_multi_footype() {
-    schema::context_template document, footype, multi;
+  rule_t multi, footype;
 
-    document.begin(L"document", RA(L"--doc--"));
-      document.param(0);
-    document.end();
+  schema_multi_footype() 
+  : tut::schema_basic(rule("document", RA("--doc--"), 
+        Vector<rule_t>() << rule_t(&footype))) {
+    footype = rule("named", schema::match_named::attributes("a"),
+        Vector<rule_t>() << rule_t(&multi));
 
-    footype.begin(L"named", schema::match_named::attributes(L"a"));
-      footype.param(1);
-    footype.end();
-
-    multi.begin(L"unordered", RA(L"--unordered--"));
-      multi.begin(L"named", schema::match_named::attributes(L"plugin"));
-        multi.begin(L"node", RA(L"plugin-data"), 
-                    slotcfg(slotcfg::list));
-        multi.end();
-      multi.end();
-      multi.begin(L"named", schema::match_named::attributes(L"sum"));
-        multi.begin(L"node", 
-                    RA(L"sum-data", true, new stru::repatch_integer())); // > 0
-        multi.end();
-      multi.end();
-      multi.begin(L"node", RA(L"--other--", true, new stru::repatch_integer()), 
-                  slotcfg(slotcfg::some));
-      multi.end();
-    multi.end();
-
-    Vector<schema::context*> v;
-    for (size_t i = 0; i < 2; ++i)
-      v.Add() = &c[i];
-
-    multi.instantiate(v, c[1]);
-    footype.instantiate(v, c[0]);
-    document.instantiate(v, context);
+    multi =
+      rule("unordered", RA("--unordered--"), Vector<rule_t>() <<
+        rule("named", schema::match_named::attributes("plugin"), 
+          Vector<rule_t>() << 
+          rule("list", RA(RA::simple, false), Vector<rule_t>() <<
+            rule("node", 
+              RA(Vector<string>() << "plugin-data", true, Xany(), 0,
+                slotcfg(), slotcfg(slotcfg::list))))) <<
+        rule("named", schema::match_named::attributes("sum"),
+          Vector<rule_t>() <<
+          rule("list", RA(RA::simple, false), Vector<rule_t>() <<
+            rule("node", 
+              RA(Vector<string>() << "sum-data", true, Xany(),
+                 new stru::repatch_integer(),
+                 slotcfg(), slotcfg(slotcfg::some))))) <<
+        rule("node", 
+          RA(Vector<string>() << "--other--", true, Xany(), 
+             new stru::repatch_integer(),
+             slotcfg(), slotcfg(slotcfg::some))));
   }
 };
 }
@@ -191,4 +181,3 @@ void object::test<6>(int) {
 
 // further tests
 }
-#endif
