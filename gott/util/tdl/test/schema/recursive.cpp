@@ -1,5 +1,3 @@
-// FIXME
-#if 0
 // Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
@@ -21,7 +19,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
-#include <gott/util/tdl/schema/context_template.hpp>
 #include <gott/util/tdl/schema/slot.hpp>
 #include <gott/util/tdl/structure/types/enumeration.hpp>
 #include <gott/util/tdl/structure/types/integer.hpp>
@@ -30,36 +27,28 @@ namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
+using gott::string;
 
 using namespace stru::cf;
 using schema::slotcfg;
+using schema::rule_t;
 using schema::rule_attr;
 
 namespace {
 struct recursive : tut::schema_basic {
-  schema::context rec;
+  rule_t rec;
   
   recursive() {
-    schema::context_template document, type;
-
-    document.begin(L"document");
-      document.param(0);
-    document.end();
-
-    type.begin(L"ordered", rule_attr(rule_attr::simple, false));
-      type.begin(L"node", rule_attr(rule_attr::simple, true, 
-            new stru::repatch_integer()));
-      type.end();
-      type.begin(L"ordered", rule_attr(rule_attr::simple, false), 
-                 slotcfg(slotcfg::optional));
-        type.param(0);
-      type.end();
-    type.end();
-
-    Vector<schema::context*> cc;
-    cc.Add(&rec);
-    type.instantiate(cc, rec);
-    document.instantiate(cc, context);
+    grammar = rule("document", rule_attr(), Vector<rule_t>() << rule_t(&rec));
+    rec = 
+      rule("ordered", rule_attr(rule_attr::simple, false), Vector<rule_t>() <<
+        rule("node", rule_attr(rule_attr::simple, true, 
+            new stru::repatch_integer())) <<
+        rule("list", rule_attr(rule_attr::simple, false), Vector<rule_t>() <<
+          rule("ordered", 
+                rule_attr(Vector<string>(), false, Xany(), 0,
+                  slotcfg(), slotcfg(slotcfg::optional)),
+                Vector<rule_t>() << rule_t(&rec))));
   }
 };
 }
@@ -94,4 +83,3 @@ void object::test<8>(int) {
 
 // further tests
 }
-#endif

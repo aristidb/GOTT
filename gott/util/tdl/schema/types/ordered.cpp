@@ -26,7 +26,7 @@ using schema::item;
 using schema::match_ordered;
 
 match_ordered::match_ordered(rule_attr const &a, Vector<rule_t> const&r,match&m)
-: happy_once(a, m), subrules(r), pos(subrules.begin()) {
+: happy_once(a, m), subrules(r, 1), pos(subrules.begin()) {
   if (pos != subrules.end())
     matcher().add(*pos);
   else

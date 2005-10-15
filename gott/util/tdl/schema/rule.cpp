@@ -53,6 +53,8 @@ public:
   : data(p) {}
 };
 
+rule_t::rule_t() {}
+
 rule_t::rule_t(abstract_rule const &ar, rule_attr const &a,
     Vector<rule_t> pick_ &c)
 : p(new IMPL(ar, a, c)) {}
@@ -70,10 +72,12 @@ void rule_t::operator=(rule_t const &o) {
 item *rule_t::get(match &m) const {
   switch (p->data.which()) {
   case 0: // immediate
-    { IMPL::immediate const &imm = boost::get<IMPL::immediate>(p->data);
-      return imm.abstract.constructor(imm.attr, imm.children, m); }
+    { 
+      IMPL::immediate const &im = boost::get<IMPL::immediate>(p->data);
+      return im.abstract.constructor(im.attr, im.children ,m); 
+    }
   case 1: // indirect
-    return boost::get<rule_t *>(p->data)->get(m);
+    return boost::get<rule_t const *>(p->data)->get(m);
   }
   throw 0;
 }
@@ -83,7 +87,7 @@ rule_attr const &rule_t::attributes() const {
   case 0: // immediate
     return boost::get<IMPL::immediate>(p->data).attr;
   case 1: // indirect
-    return boost::get<rule_t *>(p->data)->attributes();
+    return boost::get<rule_t const *>(p->data)->attributes();
   }
   throw 0;
 }
@@ -91,10 +95,12 @@ rule_attr const &rule_t::attributes() const {
 bool rule_t::accept_empty() const {
   switch (p->data.which()) {
   case 0: // immediate
-    { IMPL::immediate const &imm = boost::get<IMPL::immediate>(p->data);
-      return imm.abstract.accept_empty(imm.attr, imm.children); }
+    { 
+      IMPL::immediate const &imm = boost::get<IMPL::immediate>(p->data);
+      return imm.abstract.accept_empty(imm.attr, imm.children);
+    }
   case 1: // indirect
-    return boost::get<rule_t *>(p->data)->accept_empty();
+    return boost::get<rule_t const *>(p->data)->accept_empty();
   }
   throw 0;
 }

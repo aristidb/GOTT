@@ -60,9 +60,10 @@ struct abstract_rule : Moveable<abstract_rule> {
  */
 class GOTT_EXPORT rule_t : Moveable<rule_t> {
 public:
+  rule_t();
   rule_t(abstract_rule const &, rule_attr const &, Vector<rule_t> pick_ &);
   rule_t(rule_t const &);
-  rule_t(rule_t const *);
+  explicit rule_t(rule_t const *);
   ~rule_t();
 
   void operator=(rule_t const &);

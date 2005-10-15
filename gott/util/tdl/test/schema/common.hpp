@@ -34,6 +34,7 @@ struct schema_basic {
   gott::tdl::schema::match match;
   gott::tdl::schema::rule_t grammar;
   std::wstring rest;
+  schema_basic() : match(tree) {}
   schema_basic(gott::tdl::schema::rule_t const &r) : match(tree), grammar(r) {}
   void run_test(std::wstring const &input) {
     match.add(grammar);
