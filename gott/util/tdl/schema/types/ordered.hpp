@@ -34,7 +34,7 @@ public:
   match_ordered(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_ordered();
 
-  static bool accept_empty(Vector<rule_t> const &r);
+  static bool accept_empty(rule_attr const &, Vector<rule_t> const &);
 
 private:
   Vector<rule_t> subrules;

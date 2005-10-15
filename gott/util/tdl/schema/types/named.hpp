@@ -41,7 +41,8 @@ public:
 
   ~match_named();
 
-  static bool accept_empty(bool) { return false; }
+  static bool accept_empty(rule_attr const &, Vector<rule_t> const &) 
+  { return false; }
 
 private:
   virtual string name() const;

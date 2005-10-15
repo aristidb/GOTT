@@ -55,8 +55,8 @@ bool match_any::play(ev::child_succeed const &) {
   return true;
 }
 
-bool match_any::accept_empty(Vector<rule_t const *> const &choices) {
-  for (Vector<rule_t const *>::const_iterator it = choices.begin(); 
+bool match_any::accept_empty(rule_attr const &, Vector<rule_t> const &choices) {
+  for (Vector<rule_t>::const_iterator it = choices.begin(); 
        it != choices.end(); ++it)
     ;/*FIXME if ((*it)->accept_empty())
       return true;*/

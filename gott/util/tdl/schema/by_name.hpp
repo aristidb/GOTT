@@ -50,7 +50,8 @@ public:
   template<class T>
   void add(string const &name) {
     item_constructor type_con = &construct_item<T>;
-    add(name, abstract_rule(type_con));
+    item_check accept_empty = &T::accept_empty;
+    add(name, abstract_rule(type_con, accept_empty));
   }
 
   /**

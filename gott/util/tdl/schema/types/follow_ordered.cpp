@@ -20,6 +20,7 @@
 
 #include "follow_ordered.hpp"
 #include "../event.hpp"
+#include "../rule_attr.hpp"
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
@@ -37,7 +38,7 @@ match_follow_ordered::match_follow_ordered(rule_attr const &a,
   if (expectation() == nothing)
     return;
   last = matcher().pos().current();
-  matcher().add(*pos->generator);
+  matcher().add(pos->generator);
 }
 
 void match_follow_ordered::init_accept_empty() {
@@ -61,7 +62,7 @@ bool match_follow_ordered::play(ev::child_succeed const &) {
       return true;
     matcher().pos().forget(last);
     last = matcher().pos().current();
-    matcher().add(*pos->generator);
+    matcher().add(pos->generator);
   }
   return true;
 }
@@ -79,7 +80,7 @@ bool match_follow_ordered::play(ev::child_fail const &) {
   matcher().pos().seek(last);
   if (--opened < 0) {
     opened = 0;
-    matcher().add(*pos->generator);
+    matcher().add(pos->generator);
   }
   return true;
 }
@@ -88,7 +89,7 @@ bool match_follow_ordered::play(ev::down const &) {
   if (saw_up || !search_insertible())
     return false;
   ++opened;
-  matcher().add(*pos->generator);
+  matcher().add(pos->generator);
   return true;
 }
 
@@ -118,11 +119,12 @@ item::expect match_follow_ordered::expectation() const {
   return need;
 }
 
-bool match_follow_ordered::accept_empty(Vector<element> const &children) {
+bool match_follow_ordered::accept_empty(rule_attr const &,
+                                        Vector<rule_t> const &children) {
   bool accept = true;
-  for (Vector<element>::const_iterator it = children.begin(); 
+  for (Vector<rule_t>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
-    ;//FIXME accept &= it->second.prefix_optional() || it->first->accept_empty();
+    accept &= it->attributes().outer().prefix_optional() || it->accept_empty();
   return accept;
 }
 

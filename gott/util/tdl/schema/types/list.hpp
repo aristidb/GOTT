@@ -35,7 +35,7 @@ public:
   match_list(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_list();
 
-  static bool accept_empty(bool x) { return x; }
+  static bool accept_empty(rule_attr const &, Vector<rule_t> const &s);
 
 private:
   rule_t const &sub;

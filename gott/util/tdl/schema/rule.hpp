@@ -45,9 +45,14 @@ construct_item(rule_attr const &att, Vector<rule_t> const&children, match &m) {
 typedef 
 item *(*item_constructor)(rule_attr const &, Vector<rule_t> const &, match &);
 
+typedef
+bool (*item_check)(rule_attr const &, Vector<rule_t> const &);
+
 struct abstract_rule : Moveable<abstract_rule> {
-  explicit abstract_rule(item_constructor c) : constructor(c) {}
+  explicit abstract_rule(item_constructor c, item_check ae) 
+  : constructor(c), accept_empty(ae) {}
   item_constructor constructor;
+  item_check accept_empty;
 };
 
 /**
@@ -64,6 +69,7 @@ public:
 
   item *get(match &) const;
   rule_attr const &attributes() const;
+  bool accept_empty() const;
 
 private:
   class IMPL;
@@ -72,7 +78,7 @@ private:
 
 template<class T>
 rule_t rule(rule_attr const &a, Vector<rule_t> const &c = Vector<rule_t>()) {
-  return rule_t(abstract_rule(construct_item<T>), a, c);
+  return rule_t(abstract_rule(&construct_item<T>, &T::accept_any), a, c);
 }
 
 rule_t rule(string const &name, rule_attr const &a, Vector<rule_t> const &c =

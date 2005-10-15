@@ -43,11 +43,12 @@ bool match_ordered::play(ev::child_succeed const &) {
   return true;
 }
 
-bool match_ordered::accept_empty(Vector<rule_t> const &children) {
+bool match_ordered::accept_empty(rule_attr const &, 
+                                 Vector<rule_t> const &children) {
   bool accept = true;
   for (Vector<rule_t>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
-    ;//FIXME accept &= (*it)->accept_empty();
+    accept &= it->accept_empty();
   return accept;
 }
 

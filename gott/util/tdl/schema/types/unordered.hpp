@@ -32,17 +32,16 @@ namespace schema {
 
 class match_unordered : public item {
   struct element : Moveable<element> {
-    rule_t const *first;
-    slotcfg second;
+    rule_t generator;
+    slotcfg slot;
 
-    element() {} // dumb default constructor
-    element(rule_t const *f, slotcfg const &s) : first(f), second(s) {}
+    element(rule_t const *g, slotcfg const &s) : generator(g), slot(s) {}
   };
 public:
   match_unordered(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_unordered();
 
-  static bool accept_empty(Vector<element> const &);
+  static bool accept_empty(rule_attr const &, Vector<rule_t> const &);
 
 private:
   typedef Vector<element> list_t;

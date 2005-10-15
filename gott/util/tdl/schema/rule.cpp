@@ -75,11 +75,7 @@ item *rule_t::get(match &m) const {
   case 1: // indirect
     return boost::get<rule_t *>(p->data)->get(m);
   }
-  throw (void*)0; // never happen
-}
-
-rule_t sh::rule(string const &id, rule_attr const &a, Vector<rule_t> pick_ &c) {
-  return by_name().get(id, a, c);
+  throw 0;
 }
 
 rule_attr const &rule_t::attributes() const {
@@ -88,6 +84,21 @@ rule_attr const &rule_t::attributes() const {
     return boost::get<IMPL::immediate>(p->data).attr;
   case 1: // indirect
     return boost::get<rule_t *>(p->data)->attributes();
-  };
-  throw (void*)0; // never happen
+  }
+  throw 0;
+}
+
+bool rule_t::accept_empty() const {
+  switch (p->data.which()) {
+  case 0: // immediate
+    { IMPL::immediate const &imm = boost::get<IMPL::immediate>(p->data);
+      return imm.abstract.accept_empty(imm.attr, imm.children); }
+  case 1: // indirect
+    return boost::get<rule_t *>(p->data)->accept_empty();
+  }
+  throw 0;
+}
+
+rule_t sh::rule(string const &id, rule_attr const &a, Vector<rule_t> pick_ &c) {
+  return by_name().get(id, a, c);
 }

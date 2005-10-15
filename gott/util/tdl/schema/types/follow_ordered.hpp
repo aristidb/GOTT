@@ -31,21 +31,20 @@ namespace tdl {
 namespace schema {
 
 class match_follow_ordered : public item {
-  typedef std::pair<rule_t const *, slotcfg> element;
 public:
   match_follow_ordered(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_follow_ordered();
 
-  static bool accept_empty(Vector<element> const &);
+  static bool accept_empty(rule_attr const &, Vector<rule_t> const &);
   
 private:
   struct active_element : Moveable<active_element> {
-    rule_t const *generator;
+    rule_t generator;
     slotcfg slot;
     bool accept_empty, rest_accept_empty;
     
-    active_element(element const &e) 
-      : generator(e.first), slot(e.second) {}
+    active_element(rule_t const &e) 
+    : generator(e) {}
   };
 
   void init_accept_empty();

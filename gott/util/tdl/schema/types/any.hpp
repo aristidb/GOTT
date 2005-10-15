@@ -37,7 +37,7 @@ public:
   match_any(rule_attr const &, Vector<rule_t> const &, match &);
   ~match_any();
 
-  static bool accept_empty(Vector<rule_t const *> const &);
+  static bool accept_empty(rule_attr const &, Vector<rule_t> const &);
 
 private:
   Vector<rule_t> v;

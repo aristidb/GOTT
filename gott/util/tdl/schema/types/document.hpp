@@ -35,7 +35,8 @@ class match_document : public happy_once {
 public:
   match_document(rule_attr const &, Vector<rule_t> const &, match &);
 
-  static bool accept_empty(...) { return false; }
+  static bool accept_empty(rule_attr const &, Vector<rule_t> const &)
+  { return false; }
   
 private:
   rule_t const &sub;

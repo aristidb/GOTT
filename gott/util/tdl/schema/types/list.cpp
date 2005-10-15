@@ -80,3 +80,7 @@ item::expect match_list::expectation() const {
 gott::string match_list::name() const {
   return L"list";
 }
+
+bool match_list::accept_empty(rule_attr const &, Vector<rule_t> const &c) {
+  return c[0].attributes().outer().prefix_optional();
+}
