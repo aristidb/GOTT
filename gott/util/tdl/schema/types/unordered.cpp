@@ -30,7 +30,7 @@ using schema::match_unordered;
 match_unordered::match_unordered(rule_attr const &a, Vector<rule_t> const &r,
                                  match &m) 
 : item(a, m), last(m.pos().current()), all_happy(true) {
-  (void)r;//FIXME copy(range(r), std::back_inserter(children));
+  copy(range(r), std::back_inserter(children));
 
   pos = children.begin();
 

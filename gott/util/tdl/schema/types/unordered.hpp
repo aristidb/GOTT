@@ -25,6 +25,7 @@
 #include "../rule.hpp"
 #include "../parse_position.hpp"
 #include "../slot.hpp"
+#include "../rule_attr.hpp"
 
 namespace gott {
 namespace tdl {
@@ -35,7 +36,7 @@ class match_unordered : public item {
     rule_t generator;
     slotcfg slot;
 
-    element(rule_t const *g, slotcfg const &s) : generator(g), slot(s) {}
+    element(rule_t const &g) : generator(g), slot(g.attributes().outer()) {}
   };
 public:
   match_unordered(rule_attr const &, Vector<rule_t> const &, match &);
