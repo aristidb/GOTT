@@ -1,7 +1,0 @@
-currently there is no makefile or other system to help you building ASL. I'm sorry
-
-improtant:
-ASL headers refer to each other using
-#include <asl/foo.hpp>
-
-so include this directory in your compiler include path.
