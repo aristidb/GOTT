@@ -62,12 +62,16 @@ conf = SConscript('../../gott/configure/SConscript')
 env = conf.Finish()
 
 # Should this be inf configure/?
+our_libs=[]
 if rlib =='antigrain':
 	print "Using antigrain..."
 	env.ParseConfig('pkg-config --cflags  libagg')
 	env.ParseConfig('pkg-config --libs libagg')
+	env.ParseConfig('pkg-config --libs freetype2')
+	env.ParseConfig('pkg-config --cflags freetype2')
 	cflags = filter_flag(env['CCFLAGS'],'-Werror')
 	env.Replace(CCFLAGS = cflags)
+	our_libs+=['aggfontfreetype']
 else:
 	print "Using cairo..."	
 	env.ParseConfig('pkg-config --cflags cairo')
@@ -87,7 +91,7 @@ source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp']
 env.StaticLibrary('gottbase', source_files)
 
 x11_example_files= ['test_x11.cpp']
-our_libs=['gottx11', 'gottbase' ,'X11', 'boost_signals',  'z' ]
+our_libs += ['gottx11', 'gottbase' ,'X11', 'boost_signals',  'z' ]
 
 env.Append(LIBS=our_libs)
 env.Append(LIBPATH=['.', 'x11/','/usr/X11R6/lib'])

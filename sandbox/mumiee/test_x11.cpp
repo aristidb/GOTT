@@ -7,9 +7,13 @@
 #include <agg_renderer_scanline.h>
 #include <agg_scanline_u.h>
 #include <agg_rasterizer_scanline_aa.h>
+#include "agg_renderer_primitives.h"
+#include "agg_conv_curve.h"
+#include "agg_conv_contour.h"
 #include <agg_ellipse.h>
 #include <agg_span_gradient.h>
 #include <agg_span_interpolator_linear.h>
+#include <agg_font_freetype.h>
 #else
 //#include <cairo.h>
 #endif
@@ -25,21 +29,101 @@ using namespace std;
 using namespace gott::gui;
 using gott::gui::x11::application;
 
+#ifdef USE_ANTIGRAIN
+static char text[] = 
+"Anti-Grain Geometry is designed as a set of loosely coupled "
+"algorithms and class templates united with a common idea, "
+"so that all the components can be easily combined. Also, "
+"the template based design allows you to replace any part of "
+"the library without the necessity to modify a single byte in "
+"the existing code. ";
+
+std::string find_font_file( std::string const& ) {
+  return "/usr/share/fonts/corefonts/verdana.ttf";
+}
+#endif
+
 
 class window : public x11::window
 {
   private:
     boost::timer t;
+#ifdef USE_ANTIGRAIN
+    typedef agg::pixfmt_rgba32 pixfmt_type;
+    typedef agg::renderer_base<pixfmt_type> renderer_base_type;
+    typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
+
+    // Gradient shape function (linear, radial, custom, etc)
+    //-----------------
+    typedef agg::gradient_x gradient_func_type;   
+
+    // Span interpolator. This object is used in all span generators 
+    // that operate with transformations during iterating of the spans,
+    // for example, image transformers use the interpolator too.
+    //-----------------
+    typedef agg::span_interpolator_linear<> interpolator_type;
+
+
+    // Span allocator is an object that allocates memory for 
+    // the array of colors that will be used to render the 
+    // color spans. One object can be shared between different 
+    // span generators.
+    //-----------------
+    typedef agg::span_allocator<agg::rgba8> span_allocator_type;
+
+
+    // Finally, the gradient span generator working with the agg::rgba8 
+    // color type. 
+    // The 4-th argument is the color function that should have 
+    // the [] operator returning the color in range of [0...255].
+    // In our case it will be a simple look-up table of 256 colors.
+    //-----------------
+    typedef agg::span_gradient<agg::rgba8, 
+                               interpolator_type, 
+                               gradient_func_type, 
+                               color_array_type,
+                               span_allocator_type> span_gradient_type;
+    // The gradient scanline renderer type
+    //-----------------
+    typedef agg::renderer_scanline_aa<renderer_base_type, span_gradient_type> renderer_gradient_type;
+    typedef agg::renderer_scanline_aa_solid<renderer_base_type> renderer_solid;
+    typedef agg::renderer_scanline_bin_solid<renderer_base_type> renderer_bin;
+    typedef agg::font_engine_freetype_int32 font_engine_type;
+    typedef agg::font_cache_manager<font_engine_type> font_manager_type;
+    font_engine_type font_engine;
+    font_manager_type font_manager;
+#endif
+
 
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p )
-      : x11::window( app, r, title, p, window_flags::Defaults ) {
+      : x11::window( app, r, title, p, window_flags::Defaults )
+#ifdef USE_ANTIGRAIN
+      , font_manager(font_engine)
+#endif
+      {
+#ifdef USE_ANTIGRAIN
+        if( ! font_engine.load_font( find_font_file("verdana").c_str(), 0,agg::glyph_ren_agg_gray8 ) ) 
+        {
+          throw runtime_error("could not find verdana font");
+        }
+#endif
         set_on_key(boost::bind(&window::on_key, this, _1));
         set_on_redraw(boost::bind(&window::on_redraw, this));
         set_on_configure(boost::bind(&window::on_configure, this, _1));
       }
     window( rect const& r, std::string const& title, pixelformat const& p )
-      : x11::window( r, title, p, window_flags::Defaults ){
+      : x11::window( r, title, p, window_flags::Defaults )
+#ifdef USE_ANTIGRAIN
+      , font_manager(font_engine)
+#endif
+      {
+#ifdef USE_ANTIGRAIN
+        if( ! font_engine.load_font( find_font_file("verdana").c_str(), 0, agg::glyph_ren_agg_gray8) ) 
+        {
+          throw runtime_error("could not find verdana font");
+        }
+#endif
         set_on_key(boost::bind(&window::on_key, this, _1));
         set_on_redraw(boost::bind(&window::on_redraw, this));
         set_on_configure(boost::bind(&window::on_configure, this, _1));
@@ -99,55 +183,11 @@ class window : public x11::window
     agg::rendering_buffer & rbuf =  get_render_buffer();
   // Pixel format and basic renderers.
     //-----------------
-    typedef agg::pixfmt_rgba32 pixfmt_type;
-    typedef agg::renderer_base<pixfmt_type> renderer_base_type;
-
-    typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
-
-
-    // Gradient shape function (linear, radial, custom, etc)
-    //-----------------
-    typedef agg::gradient_x gradient_func_type;   
-
-
-    // Span interpolator. This object is used in all span generators 
-    // that operate with transformations during iterating of the spans,
-    // for example, image transformers use the interpolator too.
-    //-----------------
-    typedef agg::span_interpolator_linear<> interpolator_type;
-
-
-    // Span allocator is an object that allocates memory for 
-    // the array of colors that will be used to render the 
-    // color spans. One object can be shared between different 
-    // span generators.
-    //-----------------
-    typedef agg::span_allocator<agg::rgba8> span_allocator_type;
-
-
-    // Finally, the gradient span generator working with the agg::rgba8 
-    // color type. 
-    // The 4-th argument is the color function that should have 
-    // the [] operator returning the color in range of [0...255].
-    // In our case it will be a simple look-up table of 256 colors.
-    //-----------------
-    typedef agg::span_gradient<agg::rgba8, 
-                               interpolator_type, 
-                               gradient_func_type, 
-                               color_array_type,
-                               span_allocator_type> span_gradient_type;
-
-
-    // The gradient scanline renderer type
-    //-----------------
-    typedef agg::renderer_scanline_aa<renderer_base_type, 
-                                      span_gradient_type> renderer_gradient_type;
-
-
-    // Common declarations (pixel format and basic renderer).
+        // Common declarations (pixel format and basic renderer).
     //----------------
     pixfmt_type pixf(rbuf);
     renderer_base_type rbase(pixf);
+    rbase.clear(agg::rgba(1,1,1));
 
 
     // The gradient objects declarations
@@ -206,6 +246,49 @@ class window : public x11::window
     ras.add_path(ell);
 
     agg::render_scanlines(ras, sl, ren_gradient);
+
+    const char* p = text;
+    const size_t font_size = 12;
+    font_engine.height( font_size );
+    font_engine.hinting( true );
+    font_engine.width( font_size );
+    font_engine.flip_y( true );
+    renderer_solid solid_ren( rbase );
+    double x = 10.0, y = 10 + font_size, y0 = y;
+    while(*p) {
+      const agg::glyph_cache* glyph = font_manager.glyph(*p);
+      if(glyph)
+      {
+        font_manager.add_kerning(&x, &y);
+
+        if(x >= g.width - font_size )
+        {
+          x = 10.0;
+          y0 += font_size ;
+        //  if(y0 <= 120) break;
+          y = y0;
+        }
+
+        font_manager.init_embedded_adaptors(glyph, x, y);
+
+        switch(glyph->data_type)
+        {
+      
+          case agg::glyph_data_gray8:
+                   solid_ren.color(agg::rgba8(0, 0, 0,255));
+                   agg::render_scanlines(font_manager.gray8_adaptor(), 
+                       font_manager.gray8_scanline(), 
+                       solid_ren);
+                   break;
+          default: break;
+        }
+
+        // increment pen position
+        x += glyph->advance_x;
+        y += glyph->advance_y;
+      }
+      ++p;
+    }
 #else
       
       cairo_t * cr = this->get_context();
