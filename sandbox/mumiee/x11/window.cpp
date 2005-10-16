@@ -1,9 +1,7 @@
 
 #include <iostream>
 
-#pragma GCC visibility push(default)
 #include <boost/cstdint.hpp>
-#pragma GCC visibility pop
 #include "window.hpp"
 #include "application.hpp"
 

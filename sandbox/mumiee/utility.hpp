@@ -23,9 +23,9 @@
 
 #ifndef GOTT_GUI_UTILITY_HPP_INCLUDED
 #define GOTT_GUI_UTILITY_HPP_INCLUDED
-#pragma GCC visibility push(default) 
+// #pragma GCC visibility push(default) 
 #include <boost/signals.hpp>
-#pragma GCC visibility pop
+// #pragma GCC visibility pop
 #include <utility>
 #include <gott/util/visibility.hpp>
 
