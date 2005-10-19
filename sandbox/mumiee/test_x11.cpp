@@ -13,6 +13,7 @@
 #include <agg_ellipse.h>
 #include <agg_span_gradient.h>
 #include <agg_span_interpolator_linear.h>
+#include <agg_span_allocator.h>
 #include <agg_font_freetype.h>
 #else
 //#include <cairo.h>
