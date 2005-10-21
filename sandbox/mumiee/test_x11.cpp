@@ -6,6 +6,7 @@
 #include <agg_renderer_base.h>
 #include <agg_renderer_scanline.h>
 #include <agg_scanline_u.h>
+#include <agg_span_allocator.h>
 #include <agg_rasterizer_scanline_aa.h>
 #include "agg_renderer_primitives.h"
 #include "agg_conv_curve.h"
@@ -82,11 +83,10 @@ class window : public x11::window
     typedef agg::span_gradient<agg::rgba8, 
                                interpolator_type, 
                                gradient_func_type, 
-                               color_array_type,
-                               span_allocator_type> span_gradient_type;
+                               color_array_type> span_gradient_type;
     // The gradient scanline renderer type
     //-----------------
-    typedef agg::renderer_scanline_aa<renderer_base_type, span_gradient_type> renderer_gradient_type;
+    typedef agg::renderer_scanline_aa<renderer_base_type, span_allocator_type, span_gradient_type > renderer_gradient_type;
     typedef agg::renderer_scanline_aa_solid<renderer_base_type> renderer_solid;
     typedef agg::renderer_scanline_bin_solid<renderer_base_type> renderer_bin;
     typedef agg::font_engine_freetype_int32 font_engine_type;
@@ -207,15 +207,14 @@ class window : public x11::window
     // on the gradient function.
     //----------------
     rect g = get_rect();
-    span_gradient_type span_gradient(span_allocator, 
-                                     span_interpolator, 
+    span_gradient_type span_gradient(span_interpolator, 
                                      gradient_func, 
                                      color_array, 
                                      0, g.width);
 
     // The gradient renderer
     //----------------
-    renderer_gradient_type ren_gradient(rbase, span_gradient);
+    renderer_gradient_type ren_gradient(rbase, span_allocator, span_gradient);
 
 
     // The rasterizing/scanline stuff

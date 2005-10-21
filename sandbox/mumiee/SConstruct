@@ -1,4 +1,4 @@
-import string 
+import string, sys 
 
 def filter_flag(flags,flag):
 	nflags = []
@@ -83,7 +83,7 @@ else:
 	env.ParseConfig('pkg-config --cflags cairo')
 	env.ParseConfig('pkg-config --libs cairo')
 
-
+print sys.platform
 x11_env = env.Copy();
 x11_env.Append(LIBS=['X11'])
 x11_env.Append(LIBPATH=['/usr/X11R6/lib'])
