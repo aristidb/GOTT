@@ -44,8 +44,6 @@ class rounded_rect : public vector_obj {
     void draw( agg::rendering_buffer &buf );
 
     handle_list get_handles();
-
-
 };
 
 }}}

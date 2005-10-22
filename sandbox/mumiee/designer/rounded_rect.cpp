@@ -18,8 +18,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <agg_pixfmt_rgba.h>
+#include <agg_renderer_base.h>
+#include <agg_renderer_scanline.h>
+#include <agg_rasterizer_scanline_aa.h>
+#include <agg_rounded_rect.h>
+#include <agg_color_rgba.h>
+#include <agg_scanline_p.h>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#include <algorithm>
+#include <iterator>
 #include "utility.hpp"
 #include "rounded_rect.hpp"
 #include "simple_handle.hpp"
@@ -28,10 +37,35 @@
 namespace gott{namespace gui{namespace designer{
 
 void rounded_rect::draw( agg::rendering_buffer &buf ) {
+
+  typedef agg::pixfmt_rgba32 pixfmt_type;
+  typedef agg::renderer_base<pixfmt_type> renderer_base_type;
+  typedef agg::renderer_scanline_aa_solid<renderer_base_type> renderer_solid_type;
+
+  pixfmt_type pixf(buf);
+  renderer_base_type rb(pixf);
+  renderer_solid_type ren(rb);
+
+  agg::rasterizer_scanline_aa<> ras;
+  agg::scanline_p8 sl;
+
+  // Render two "control" circles
+
+  // Creating a rounded rectangle
+  agg::rounded_rect rrect(position.left, position.top, position.left + position.width, position.top + position.height, radius );
+  rrect.normalize_radius();
+
+  // Drawing as an outline
+  ras.add_path(rrect);
+  ren.color(agg::rgba(1,0,0));
+  agg::render_scanlines(ras, sl, ren);
+
+  ras.gamma(agg::gamma_none());
 }
 
 rounded_rect::handle_list rounded_rect::get_handles() {
   handle_list ret;
+  std::copy( handles.begin(), handles.end(), std::back_insert_iterator<handle_list>(ret) );
   return ret;
 }
 
@@ -65,6 +99,15 @@ rounded_rect::rounded_rect( rect const& p ) : position(p), radius(0) {
         );
     handles.push_back( sh_h( s ) );
   }
+
+  {
+    simple_handle * s = new simple_handle( coord(p.left + p.width,p.top),
+         ( var(position.width) = bind(&coord::x, _1)  - var(position.left) )
+         ,( var(position.top) = bind(&coord::y, _1) )
+        );
+    handles.push_back( sh_h( s ) );
+  }
+
 }
 
 }}}
