@@ -146,7 +146,8 @@ class window : public x11::window
               drag_on( current_point ); 
               break;
             case mouse_event::Release:  
-              drag_end( current_point ); 
+              drag_end( current_point );
+              dragging = false;
               break;
             default: break;
           }
