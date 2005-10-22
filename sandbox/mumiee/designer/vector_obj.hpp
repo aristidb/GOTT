@@ -31,22 +31,22 @@ namespace gott { namespace gui { namespace designer {
     typedef unsigned int depth_t;
     virtual ~vector_obj() =0;
 
-    vector_obj() : depth(0), fill(0x0) { }
-    vector_obj(coord const &pos, depth_t depth_, filler const *f)
+    GOTT_LOCAL vector_obj() : depth(0), fill(0x0) { }
+    GOTT_LOCAL vector_obj(coord const &pos, depth_t depth_, filler const *f)
       : position(pos), depth(depth_), fill(f)
     { }
 
-    void set_position(coord const& pos) { position=pos; }
-    coord const &get_position() const { return position; }
+    GOTT_LOCAL void set_position(coord const& pos) { position=pos; }
+    GOTT_LOCAL coord const &get_position() const { return position; }
 
     /** Depth of the object in the rendering pipeline
      * 0 is the lowest depth
      */
-    void set_depth(depth_t depth_) { depth=depth_; }
-    depth_t get_depth() const { return depth; }
+    GOTT_LOCAL void set_depth(depth_t depth_) { depth=depth_; }
+    GOTT_LOCAL depth_t get_depth() const { return depth; }
 
-    void set_filler(filler const *f) { fill=f; }
-    filler const *get_filler() const { return fill; }
+    GOTT_LOCAL void set_filler(filler const *f) { fill=f; }
+    GOTT_LOCAL filler const *get_filler() const { return fill; }
 
     virtual void draw( agg::rendering_buffer & ) = 0;
   private:
