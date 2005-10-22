@@ -104,7 +104,7 @@ env.Append(LIBS=our_libs)
 x11_example_files= ['test_x11.cpp']
 env.Program('test_x11', x11_example_files, LIBPATH=['./', 'x11'] )
 
-designer_files= ['designer.cpp']
+designer_files= ['designer.cpp', 'simple_handle.cpp', 'handle.cpp']
 env.Program('designer', designer_files, LIBPATH=['./', 'x11'] )
 
 

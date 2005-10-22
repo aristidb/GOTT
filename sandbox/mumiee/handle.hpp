@@ -21,7 +21,8 @@
 
 #ifndef GOTT_GUI_DESIGNER_HANDLE_HPP_INCLUDED
 #define GOTT_GUI_DESIGNER_HANDLE_HPP_INCLUDED
-#include "utitlity.hpp"
+#include <agg_rendering_buffer.h>
+#include "utility.hpp"
 
 namespace gott{namespace gui{namespace designer{
 struct handle{

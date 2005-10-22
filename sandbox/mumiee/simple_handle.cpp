@@ -18,6 +18,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <agg_pixfmt_rgba.h>
 #include <agg_renderer_base.h>
 #include <agg_renderer_primitives.h>
 #include <agg_color_rgba.h>
@@ -29,23 +30,28 @@ simple_handle::simple_handle() {
 }
 
 void simple_handle::draw( agg::rendering_buffer & buffer ) {
-  typedef agg::pixfmt_rgba32 pixfmt_type;
-  typedef agg::renderer_base<pixfmt_type> renderer_base_type;
-  pixfmt_type pixf(buffer);
-  renderer_base_type rbase(pixf);
+  if( enabled() ) {
+    typedef agg::pixfmt_rgba32 pixfmt_type;
+    typedef agg::renderer_base<pixfmt_type> renderer_base_type;
+    pixfmt_type pixf(buffer);
+    renderer_base_type rbase(pixf);
 
 
-  agg::renderer_primitives<renderer_base_type>  prim_renderer(rbase);
+    agg::renderer_primitives<renderer_base_type>  prim_renderer(rbase);
 
-  prim_renderer.fill_color(agg::rgba(0,0,0,0.5));
-  prim_renderer.rectangle( r.left, r.top, r.left+ r.width, r.top+r.height );
+    rect const& r = get_region();
+    prim_renderer.fill_color(agg::rgba(0,0,0,0.5));
+    prim_renderer.rectangle( r.left, r.top, r.left+ r.width, r.top+r.height );
+  }
 }
 
 bool simple_handle::begin_drag( coord position, size_t button_index ) {
-  if( button_index == 1 )
+  if( enabled() && button_index == 1 ) {
+    // set new posistion 
+    // handle movement
     return true;
-  // set new posistion 
-  // handle movement
+  }
+  return false;
 }
 void simple_handle::continue_drag( coord new_position) {
   // set new posistion 

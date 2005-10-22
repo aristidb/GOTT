@@ -19,6 +19,8 @@
 #include "input.hpp"
 #include "x11/application.hpp"
 #include "x11/window.hpp"
+#include "handle.hpp"
+#include "simple_handle.hpp"
 // #pragma GCC visibility push(default)
 #include <boost/bind.hpp>
 // #pragma GCC visibility pop
