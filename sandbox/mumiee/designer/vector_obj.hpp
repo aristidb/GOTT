@@ -25,6 +25,7 @@
 namespace gott { namespace gui { namespace designer {
   class filler;
 
+  /// Base Class for Objects capable of rendering agg vectors
   struct GOTT_EXPORT vector_obj {
     virtual ~vector_obj() =0;
 
@@ -36,12 +37,17 @@ namespace gott { namespace gui { namespace designer {
     void set_position(coord const& pos) { position=pos; }
     coord const &get_position() const { return position; }
 
+    /** Depth of the object in the rendering pipeline
+     * 0 is the lowest depth
+     */
     typedef unsigned int depth_t;
     void set_depth(depth_t depth_) { depth=depth_; }
     depth_t get_depth() const { return depth; }
 
     void set_filler(filler const *f) { fill=f; }
     filler const *get_filler() const { return fill; }
+
+    virtual void draw( agg::rendering_buffer & ) = 0;
   private:
     coord position;
     depth_t depth;
