@@ -61,6 +61,13 @@ Export('rlib')
 conf = SConscript('../../gott/configure/SConscript')
 env = conf.Finish()
 
+cflags = filter_flag(env['CCFLAGS'],'-fvisibility=hidden')
+env.Replace(CCFLAGS = cflags)
+
+cflags = filter_flag(env['CPPDEFINES'],'HAVE_VISIBILITY')
+env.Replace(CPPDEFINES = cflags)
+
+
 # Should this be inf configure/?
 our_libs=[]
 
