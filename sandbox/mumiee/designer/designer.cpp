@@ -119,19 +119,19 @@ class window : public x11::window
         set_on_configure(boost::bind(&window::on_configure, this, _1));
       }
 
-    void drag_begin( coord pos, std::size_t button ) { //button  mask?
-      std::cout << "Beginning to drag:" << pos.x << "  " << pos.y << std::endl;
+    void drag_begin( coord const& start_pos, coord const& current_pos, size_t button ) {  //button  mask?
+      std::cout << "Beginning to drag:" << start_pos.x << "  " << start_pos.y << std::endl;
     }
 
-    void drag_on( coord pos ) {
+    void drag_on( coord const& pos ) {
       std::cout << "continuing to drag:" << pos.x << "  " << pos.y << std::endl;
     }
 
-    void drag_end( coord end ) {
+    void drag_end( coord const& end ) {
       std::cout << "ending to drag:" << end.x << "  " << end.y << std::endl;
     }
 
-    void on_click( coord pos, size_t button ) {
+    void on_click( coord const& pos, size_t button ) {
       std::cout << "just clicked :" << pos.x << "  " << pos.y  << " B: " << button << std::endl;
     }
 
@@ -159,7 +159,7 @@ class window : public x11::window
                 int sum = sqr( click_point.x - current_point.x ) + sqr( click_point.y -current_point.y );
                 if(  sum > 25 )  {
                   dragging = true;
-                  drag_begin( current_point, ev.button_index );
+                  drag_begin( click_point, current_point, ev.button_index );
                 }
 
                 break;

@@ -29,6 +29,15 @@ namespace gott{namespace gui{namespace designer{
 simple_handle::simple_handle( coord const& pos ) : handle(pos) {
 }
 
+simple_handle::simple_handle( coord const& pos, pos_update_signal::slot_type const& update_handler ) : handle(pos) {
+  pos_update.connect( update_handler );
+}
+
+simple_handle::simple_handle( coord const& pos, pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag ) : handle(pos) {
+  pos_update.connect( update_handler );
+  final_pos.connect( end_drag );
+}
+
 boost::signals::connection 
 simple_handle::add_position_handler( pos_update_signal::slot_type const& slot ) 
 {
