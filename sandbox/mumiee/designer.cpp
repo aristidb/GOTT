@@ -207,33 +207,33 @@ class window : public x11::window
         }
       }
     }
-  template<class Array>
-  void fill_color_array(Array& array, 
-                        agg::rgba8 begin, 
-                        agg::rgba8 middle, 
-                        agg::rgba8 end)
-  {
+    template<class Array>
+    void fill_color_array(Array& array, 
+                          agg::rgba8 begin, 
+                          agg::rgba8 middle, 
+                          agg::rgba8 end)
+    {
       unsigned i;
       unsigned half_size = array.size() / 2;
       for(i = 0; i < half_size; ++i)
       {
-          array[i] = begin.gradient(middle, i / double(half_size));
+        array[i] = begin.gradient(middle, i / double(half_size));
       }
       for(; i < array.size(); ++i)
       {
-          array[i] = middle.gradient(end, (i - half_size) / double(half_size));
-      }
-  }
-  template<typename Array>
-  void fill_color_array( Array& array, std::vector<std::pair<float,agg::rgba8> > const& colours ) {
-    for( std::size_t i = 0; i < colours.size()-1; ++i ) {
-      unsigned bpos = unsigned(float(array.size()) * colours[i].first);
-      unsigned epos = unsigned(float(array.size()) * colours[i+1].first);
-      for( std::size_t j = bpos; j != epos; ++j ){
-        array[j] = colours[i].second.gradient(colours[i+1].second, (j-bpos)/double(epos-bpos) );
+        array[i] = middle.gradient(end, (i - half_size) / double(half_size));
       }
     }
-  }
+    template<typename Array>
+    void fill_color_array( Array& array, std::vector<std::pair<float,agg::rgba8> > const& colours ) {
+      for( std::size_t i = 0; i < colours.size()-1; ++i ) {
+        unsigned bpos = unsigned(float(array.size()) * colours[i].first);
+        unsigned epos = unsigned(float(array.size()) * colours[i+1].first);
+        for( std::size_t j = bpos; j != epos; ++j ){
+          array[j] = colours[i].second.gradient(colours[i+1].second, (j-bpos)/double(epos-bpos) );
+        }
+      }
+    }
     void on_redraw() 
     {
       std::cout << "Time passed since last frame: " << t.elapsed() << std::endl; 

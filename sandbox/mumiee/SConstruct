@@ -83,7 +83,6 @@ else:
 	env.ParseConfig('pkg-config --cflags cairo')
 	env.ParseConfig('pkg-config --libs cairo')
 
-print sys.platform
 x11_env = env.Copy();
 x11_env.Append(LIBS=['X11'])
 x11_env.Append(LIBPATH=['/usr/X11R6/lib'])
@@ -105,5 +104,7 @@ env.Append(LIBS=our_libs)
 x11_example_files= ['test_x11.cpp']
 env.Program('test_x11', x11_example_files, LIBPATH=['./', 'x11'] )
 
+designer_files= ['designer.cpp']
+env.Program('designer', designer_files, LIBPATH=['./', 'x11'] )
 
 
