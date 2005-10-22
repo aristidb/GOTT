@@ -29,6 +29,19 @@ namespace gott{namespace gui{namespace designer{
 simple_handle::simple_handle() {
 }
 
+boost::signals::connection 
+simple_handle::add_poisition_handler( pos_update_signal::slot_type const& slot ) 
+{
+  return pos_update.connect( slot );
+}
+
+boost::signals::connection 
+simple_handle::add_final_position_handler( pos_update_signal::slot_type const& slot ) 
+{
+  return final_pos.connect( slot );
+}
+
+
 void simple_handle::draw( agg::rendering_buffer & buffer ) {
   if( enabled() ) {
     typedef agg::pixfmt_rgba32 pixfmt_type;
@@ -47,20 +60,22 @@ void simple_handle::draw( agg::rendering_buffer & buffer ) {
 
 bool simple_handle::begin_drag( coord position, size_t button_index ) {
   if( enabled() && button_index == 1 ) {
-    // set new posistion 
+    set_position( position );
+    pos_update( position );
+    
     // handle movement
     return true;
   }
   return false;
 }
 void simple_handle::continue_drag( coord new_position) {
-  // set new posistion 
-  // handle movement
+    set_position( new_position );
+    pos_update( new_position );
 }
 bool simple_handle::end_drag( coord new_position) {
-  // set new posistion 
-  // handle movement
-  // handle end drag
+  set_position( new_position );
+  pos_update( new_position );
+  final_pos( new_position );
   return true;
 }
 

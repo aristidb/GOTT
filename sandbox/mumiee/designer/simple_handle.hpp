@@ -33,7 +33,15 @@ namespace gott{namespace gui{namespace designer{
 struct simple_handle : public handle {
 
   public:
+    typedef boost::signal<void (coord)> pos_update_signal;
+  private:
+
+    pos_update_signal pos_update, final_pos;
+  public:
     simple_handle();
+
+    boost::signals::connection add_poisition_handler( pos_update_signal::slot_type const& slot );
+    boost::signals::connection add_final_position_handler( pos_update_signal::slot_type const& slot );
 
     /**
      * \brief handle draws itself in here: 
@@ -47,7 +55,7 @@ struct simple_handle : public handle {
      */
     virtual bool begin_drag( coord position, size_t button_index );
     /**
-     * people should reimplement that to implement constraints
+    * people should reimplement that to implement constraints
      */
     virtual void continue_drag( coord new_position);
     /**
