@@ -101,7 +101,7 @@ base_env.StaticLibrary('gottbase', base_source_files)
 
 our_libs += ['boost_signals']
 
-our_libs += ['gottbase', 'gottx11', '-lboost_signals', '-lX11']
+our_libs += ['gottx11', 'gottbase', 'boost_signals', 'X11']
 env.Append(LIBS=our_libs)
 x11_example_files= ['test_x11.cpp']
 env.Program('test_x11', x11_example_files, LIBPATH=['./', 'x11'] )

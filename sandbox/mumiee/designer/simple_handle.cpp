@@ -68,7 +68,7 @@ bool simple_handle::begin_drag( coord position, size_t button_index ) {
   }
   return false;
 }
-void simple_handle::continue_drag( coord new_position) {
+void simple_handle::drag( coord new_position) {
     set_position( new_position );
     pos_update( new_position );
 }

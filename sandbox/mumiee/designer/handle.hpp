@@ -51,7 +51,7 @@ class handle : public vector_obj{
     /**
      * people should reimplement that to implement constraints
      */
-    virtual void continue_drag( coord new_position) = 0;
+    virtual void drag( coord new_position) = 0;
     /**
      * people should reimplement that to implement constraints
      * @returns true when the drag end was succesful

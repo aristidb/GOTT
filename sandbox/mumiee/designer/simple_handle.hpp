@@ -57,7 +57,7 @@ struct simple_handle : public handle {
     /**
     * people should reimplement that to implement constraints
      */
-    virtual void continue_drag( coord new_position);
+    virtual void drag( coord new_position);
     /**
      * people should reimplement that to implement constraints
      * @returns true when the drag end was succesful
