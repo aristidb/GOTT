@@ -30,7 +30,7 @@ simple_handle::simple_handle( coord const& pos ) : handle(pos) {
 }
 
 boost::signals::connection 
-simple_handle::add_poisition_handler( pos_update_signal::slot_type const& slot ) 
+simple_handle::add_position_handler( pos_update_signal::slot_type const& slot ) 
 {
   return pos_update.connect( slot );
 }
