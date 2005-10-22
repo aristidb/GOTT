@@ -57,10 +57,11 @@ void simple_handle::continue_drag( coord new_position) {
   // set new posistion 
   // handle movement
 }
-void simple_handle::end_drag( coord new_position) {
+bool simple_handle::end_drag( coord new_position) {
   // set new posistion 
   // handle movement
   // handle end drag
+  return true;
 }
 
 }}}

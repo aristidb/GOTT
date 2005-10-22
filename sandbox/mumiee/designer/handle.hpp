@@ -46,19 +46,18 @@ struct handle{
 
     /**
      * people should reimplement that to use a certain button
-     * @returns true when the drag start should be succesful
+     * @returns true when the drag start was succesful
      */
     virtual bool begin_drag( coord position, size_t button_index )= 0;
     /**
      * people should reimplement that to implement constraints
-     * @returns true when the drag start should be succesful
      */
     virtual void continue_drag( coord new_position) = 0;
     /**
      * people should reimplement that to implement constraints
-     * @returns true when the drag start should be succesful
+     * @returns true when the drag end was succesful
      */
-    virtual void end_drag( coord new_position) = 0;
+    virtual bool end_drag( coord new_position) = 0;
 
 };
 

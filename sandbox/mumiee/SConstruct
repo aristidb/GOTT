@@ -99,6 +99,8 @@ base_source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp']
 #base_shrd_env.SharedLibrary('gottbase', base_source_files)
 base_env.StaticLibrary('gottbase', base_source_files)
 
+our_libs += ['boost_signals']
+
 our_libs += ['gottbase', 'gottx11']
 env.Append(LIBS=our_libs)
 x11_example_files= ['test_x11.cpp']
