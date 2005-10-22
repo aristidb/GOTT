@@ -38,7 +38,7 @@ struct simple_handle : public handle {
 
     pos_update_signal pos_update, final_pos;
   public:
-    simple_handle();
+    simple_handle( coord const& pos );
 
     boost::signals::connection add_poisition_handler( pos_update_signal::slot_type const& slot );
     boost::signals::connection add_final_position_handler( pos_update_signal::slot_type const& slot );

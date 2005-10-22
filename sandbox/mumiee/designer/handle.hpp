@@ -23,20 +23,19 @@
 #define GOTT_GUI_DESIGNER_HANDLE_HPP_INCLUDED
 #include <agg_rendering_buffer.h>
 #include "utility.hpp"
+#include "vector_obj.hpp"
 
 namespace gott{namespace gui{namespace designer{
-struct handle{
+class handle : public vector_obj{
   private:
-    coord position;
     rect region;
     bool status;
   public:
-    handle();
+    handle( coord const& pos );
     rect const& get_region() const;
     bool enabled() const;
     void enable();
     void disable();
-    void set_position( coord const& new_position );
 
     /**
      * \brief handle draws itself in here: 

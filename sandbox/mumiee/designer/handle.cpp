@@ -21,7 +21,7 @@
 #include "handle.hpp"
 
 namespace gott{namespace gui{namespace designer{
-handle::handle() {
+handle::handle( coord const& pos ) : vector_obj(pos, std::numeric_limits<depth_t>::max(), 0 )   {
 }
 rect const& handle::get_region() const{
   return region;
@@ -34,11 +34,6 @@ void handle::enable(){
 }
 void handle::disable() {
   status = false;
-}
-void handle::set_position( coord const& new_position ){
-  position = new_position;
-  region.left = new_position.x - region.width/2;
-  region.top = new_position.y - region.height/2;
 }
 
 }}}

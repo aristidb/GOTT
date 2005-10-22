@@ -201,7 +201,7 @@ class window : public x11::window
       {
         switch(ev.code)
         {
-          case KeyLeft:  break;
+          case KeyR:  break;
           case KeyRight: break;
           case KeyUp:  break;
           case KeyDown:  break;

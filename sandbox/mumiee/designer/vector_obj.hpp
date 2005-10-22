@@ -20,6 +20,7 @@
 
 #ifndef GOTT_GUI_DESIGNER_VECTOR_OBJ_HPP_INCLUDED
 #define GOTT_GUI_DESIGNER_VECTOR_OBJ_HPP_INCLUDED
+#include <agg_rendering_buffer.h>
 #include "utility.hpp"
 
 namespace gott { namespace gui { namespace designer {
@@ -27,6 +28,7 @@ namespace gott { namespace gui { namespace designer {
 
   /// Base Class for Objects capable of rendering agg vectors
   struct GOTT_EXPORT vector_obj {
+    typedef unsigned int depth_t;
     virtual ~vector_obj() =0;
 
     vector_obj() : depth(0), fill(0x0) { }
@@ -40,7 +42,6 @@ namespace gott { namespace gui { namespace designer {
     /** Depth of the object in the rendering pipeline
      * 0 is the lowest depth
      */
-    typedef unsigned int depth_t;
     void set_depth(depth_t depth_) { depth=depth_; }
     depth_t get_depth() const { return depth; }
 

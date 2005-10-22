@@ -5,7 +5,7 @@ Import('env')
 
 
 env.Append(CCFLAGS=['-I./'])
-designer_files= ['designer.cpp', 'simple_handle.cpp', 'handle.cpp']
+designer_files= ['designer.cpp', 'simple_handle.cpp', 'handle.cpp', 'vector_obj.cpp']
 env.Program('designer', designer_files, LIBPATH=['../', '../x11'] )
 
 

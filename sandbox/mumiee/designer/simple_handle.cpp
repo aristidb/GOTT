@@ -26,7 +26,7 @@
 
 namespace gott{namespace gui{namespace designer{
 
-simple_handle::simple_handle() {
+simple_handle::simple_handle( coord const& pos ) : handle(pos) {
 }
 
 boost::signals::connection 
