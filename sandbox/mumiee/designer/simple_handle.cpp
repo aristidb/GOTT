@@ -41,7 +41,7 @@ void simple_handle::draw( agg::rendering_buffer & buffer ) {
 
     rect const& r = get_region();
     prim_renderer.fill_color(agg::rgba(0,0,0,0.5));
-    prim_renderer.rectangle( r.left, r.top, r.left+ r.width, r.top+r.height );
+    prim_renderer.rectangle( r.left, r.top, r.left + r.width, r.top + r.height );
   }
 }
 
