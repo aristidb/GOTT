@@ -190,14 +190,12 @@ template<
   class Type,
   class Notification = no_notification,
   class Storage = embedded_storage<Type>,
-  class Access = direct_access<Type, Storage>,
   class Lock = no_lock
 >
 class concrete_property :
   public property<Type>,
   public base<Notification>,
   public base<Storage>,
-  public base<Access>,
   public base<Lock>
 {
 public:
@@ -207,7 +205,6 @@ public:
 
   typedef typename policy<Storage>::class_type storage_policy;
   typedef typename policy<Lock>::class_type lock_policy;
-  typedef typename policy<Access>::class_type access_policy;
   typedef typename policy<Notification>::class_type notification_policy;
 
 private:
@@ -215,8 +212,6 @@ private:
   typedef typename policy<Notification>::storage notification_s;
   typedef typename policy<Storage>::parameter storage_p;
   typedef typename policy<Storage>::storage storage_s;
-  typedef typename policy<Access>::parameter access_p;
-  typedef typename policy<Access>::storage access_s;
   typedef typename policy<Lock>::parameter lock_p;
   typedef typename policy<Lock>::storage lock_s;
   typedef typename lock_policy::read_lock read_lock;
@@ -229,23 +224,14 @@ private:
 public:
   concrete_property(storage_p s = storage_policy(),
            notification_p n = notification_policy(),
-           access_p a = access_policy(),
            lock_p l = lock_policy())
-  : storage(s), access(a), notifier(n), lock(l) {
-  }
-
-  concrete_property(storage_p s,
-           access_p a,
-           notification_p n = notification_policy(),
-           lock_p l = lock_policy())
-  : storage(s), access(a), notifier(n), lock(l) {
+  : storage(s), notifier(n), lock(l) {
   }
 
   concrete_property(value_type const &v,
            notification_p n = notification_policy(),
-           access_p a = access_policy(),
            lock_p l = lock_policy())
-  : storage(v), access(a), notifier(n), lock(l) {
+  : storage(v), notifier(n), lock(l) {
   }
 
 private:
@@ -282,7 +268,6 @@ private:
   }
   
   storage_s storage;
-  access_s access;
   notification_s notifier;
   mutable lock_s lock;
 };
@@ -326,15 +311,15 @@ private:
   }
 
   void end_read(annotated_const_pointer p) const {
-    translator.const_unbox(p);
+    translator.template const_unbox<typename property<OldType>::read_reference>(p);
   }
 
   void end_write(annotated_pointer p) {
-    translator.unbox(p);
+    translator.template unbox<typename property<OldType>::write_reference>(p);
   }
   
   void end_read_write(annotated_pointer p) {
-    translator.unbox(p);
+    translator.template unbox<typename property<OldType>::read_write_reference>(p);
   }
   
   property<OldType> &bound;

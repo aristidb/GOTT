@@ -22,7 +22,6 @@
 #define GOTT_UTIL_PROPERTIES_TRANSLATE_HPP
 
 #include <utility>
-#include <gott/util/xany/xany.hpp>
 
 namespace gott {
 namespace properties {
@@ -37,28 +36,26 @@ private:
 public:
   template<class T>
   ap box(T x) {
-    return ap(new New(*x), new xany::Xany(x));
+    return ap(new New(*x), new T(x));
   }
 
   template<class T>
   cap const_box(T x) const {
-    return cap(new New(*x), new xany::Xany(x));
+    return cap(new New(*x), new T(x));
   }
 
+  template<class T>
   void unbox(ap x) {
-    using namespace xany;
-    Xany *p = static_cast<Xany *>(x.second);
-    if (p->compatible<typename property<Old>::write_reference>())
-      *Xany_cast_ref<typename property<Old>::write_reference>(*p) = Old(*x.first);
-    else // if (p->compatible<typename property<Old>::read_write_reference>())
-      *Xany_cast_ref<typename property<Old>::read_write_reference>(*p) = Old(*x.first);
+    T *p = static_cast<T *>(x.second);
+    **p = Old(*x.first);
     delete x.first;
     delete p;
   }
   
+  template<class T>
   void const_unbox(cap x) const {
     delete x.first;
-    delete static_cast<xany::Xany *>(x.second);
+    delete static_cast<T *>(x.second);
   }
 };
 

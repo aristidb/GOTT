@@ -1,2 +1,2 @@
 Import('env')
-env.Program('test.cpp', LIBS=['ntl', 'string', 'xany'])
+env.Program('test.cpp', LIBS=['ntl', 'string'])
