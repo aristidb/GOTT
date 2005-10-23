@@ -177,7 +177,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
     case MotionNotify:
       {
 //        std::cout << "MotionNotify" << std::endl;
-        mouse_info.update_primary_position( coord( event.xmotion.x, event.xmotion.y ) );
+        mouse_info.set_primary_position( coord( event.xmotion.x, event.xmotion.y ) );
         mouse_event ev( coord(event.xmotion.x, event.xmotion.y), coord(0,0) );
         win->exec_on_mouse( ev );
         break;
