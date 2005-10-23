@@ -269,7 +269,7 @@ private:
   
   storage_s storage;
   notification_s notifier;
-  mutable lock_s lock;
+  mutable lock_s lock; //FIXME
 };
 
 template<
