@@ -34,7 +34,7 @@ using gott::gui::x11::application;
 template<typename T>
 inline T sqr(T const a ) {return a*a;}
 std::string find_font_file( std::string const& ) {
-  return "/usr/share/fonts/corefonts/verdana.ttf";
+  return "/usr/share/fonts/truetype/msttcorefonts/verdana.ttf";
 }
 
 
@@ -273,7 +273,7 @@ class window : public x11::window
     }
     void on_redraw() 
     {
-      std::cout << "Time passed since last frame: " << t.elapsed() << std::endl; 
+      //      std::cout << "Time passed since last frame: " << t.elapsed() << std::endl; 
       t = boost::timer();
       set_render_context();
       x11::window::on_redraw();

@@ -37,6 +37,10 @@
 
 namespace gott{namespace gui{namespace designer{
 
+rounded_rect::hit_t rounded_rect::hit(coord const &c) const {
+  return OUTSIDE; //TODO
+}
+
 void rounded_rect::draw( agg::rendering_buffer &buf ) {
 
   typedef agg::pixfmt_rgba32 pixfmt_type;

@@ -51,7 +51,14 @@ namespace gott { namespace gui { namespace designer {
     GOTT_LOCAL void set_filler(filler const *f) { fill=f; }
     GOTT_LOCAL filler const *get_filler() const { return fill; }
 
-    virtual void draw( agg::rendering_buffer & ) = 0;
+    virtual void draw(agg::rendering_buffer &) = 0;
+
+    enum hit_t {
+      OUTSIDE,
+      BORDER,
+      INSIDE
+    }
+    virtual hit_t hit(coord const &c) const =0;
   private:
     depth_t depth;
     filler const *fill;

@@ -42,6 +42,7 @@ class rounded_rect : public vector_obj {
     coord get_position() const;
 
     void draw( agg::rendering_buffer &buf );
+  hit_t hit(coord const &c) const;
 
     handle_list get_handles();
 };
