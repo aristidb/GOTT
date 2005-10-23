@@ -165,6 +165,7 @@ class window : public x11::window
             case mouse_event::Release:  
               drag_end( current_point );
               dragging = false;
+              mouse_clicked = false;
               break;
             default: break;
           }
