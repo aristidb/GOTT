@@ -56,8 +56,8 @@ int main()
 	  rect.width=rect.height=18;
 	  XDrawRectangle(display, window, gc, rect.x, rect.y,
 			 rect.width, rect.height);
-	  XserverRegion damage_r=XFixesCreateRegion(display, &rect, 1);
-	  XDamageSubtract(display, damage, None, damage_r);
+	  //	  XserverRegion damage_r=XFixesCreateRegion(display, &rect, 1);
+	  //	  XDamageSubtract(display, damage, None, damage_r);
 	}
       }
       break;
