@@ -184,9 +184,9 @@ class concrete_property :
   public base<Lock>
 {
 public:
-  typedef Type value_type;
-  typedef Type *pointer;
-  typedef Type const *const_pointer;
+  typedef typename property<Type>::value_type value_type;
+  typedef typename property<Type>::const_pointer const_pointer;
+  typedef typename property<Type>::pointer pointer;
 
   typedef typename policy<Storage>::class_type storage_policy;
   typedef typename policy<Lock>::class_type lock_policy;
@@ -265,6 +265,52 @@ private:
   access_s access;
   notification_s notifier;
   mutable lock_s lock;
+};
+
+template<class OtherProperty, class NewType, class Translation>
+class binding_property : public property<NewType> {
+public:
+  typedef typename property<NewType>::value_type value_type;
+  typedef typename property<NewType>::const_pointer const_pointer;
+  typedef typename property<NewType>::pointer pointer;
+  
+  typedef typename policy<Translation>::class_type translation_policy;
+
+private:
+  typedef typename policy<Translation>::parameter translation_p;
+  typedef typename policy<Translation>::storage translation_s;
+
+public:
+  binding_property(OtherProperty &b, translation_p t) 
+  : bound(b), translator(t) {}
+
+private:
+  const_pointer begin_read() const {
+    return translator.box_pointer(bound.begin_read());
+  }
+
+  pointer begin_write() {
+    return translator.box_pointer(bound.begin_write());
+  }
+
+  pointer begin_read_write() {
+    return translator.box_pointer(bound.begin_read_write());
+  }
+
+  void end_read(const_pointer p) const {
+    bound.end_read(translator.unbox_pointer(p));
+  }
+
+  void end_write(pointer p) {
+    bound.end_write(translator.unbox_pointer(p));
+  }
+  
+  void end_read_write(pointer p) {
+    bound.end_read_write(translator.unbox_pointer(p));
+  }
+  
+  translation_s translator;
+  OtherProperty &bound;
 };
 
 }}
