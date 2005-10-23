@@ -21,9 +21,11 @@
 #ifndef GOTT_UTIL_PROPERTY_PROPERTY_HPP
 #define GOTT_UTIL_PROPERTY_PROPERTY_HPP
 
-#include <gott/util/properties/embedded_storage.hpp>
-#include <gott/util/properties/trivial_aux.hpp>
-#include <gott/util/properties/policy.hpp>
+#include "embedded_storage.hpp"
+#include "trivial_aux.hpp"
+#include "policy.hpp"
+#include "translate.hpp"
+#include <utility>
 
 namespace gott {
 namespace properties {
@@ -37,13 +39,16 @@ public:
   typedef T const *const_pointer;
   typedef T const &const_reference;
 
+  typedef std::pair<pointer, void *> annotated_pointer;
+  typedef std::pair<const_pointer, void *> annotated_const_pointer;
+
   struct read_reference {
     const_pointer operator->() const {
-      return ptr;
+      return ptr.first;
     }
 
     const_reference operator*() const {
-      return *ptr;
+      return *ptr.first;
     }
     
     read_reference(property const &p)
@@ -58,18 +63,22 @@ public:
         container.end_read(ptr);
     }
 
+    bool operator==(read_reference const &o) const {
+      return ref_count == o.ref_count;
+    }
+
     property const &container;
-    const_pointer ptr;
+    annotated_const_pointer ptr;
     unsigned long *ref_count;
   };
 
   struct write_reference {
     pointer operator->() {
-      return ptr;
+      return ptr.first;
     }
 
     reference operator*() {
-      return *ptr;
+      return *ptr.first;
     }
     
     write_reference(property &p)
@@ -83,19 +92,23 @@ public:
       if (--*ref_count == 0)
         container.end_write(ptr);
     }
+
+    bool operator==(write_reference const &o) const {
+      return ref_count == o.ref_count;
+    }
     
     property &container;
-    pointer ptr;
+    annotated_pointer ptr;
     unsigned long *ref_count;
   };
 
   struct read_write_reference {
     pointer operator->() {
-      return ptr;
+      return ptr.first;
     }
 
     reference operator*() {
-      return *ptr;
+      return *ptr.first;
     }
     
     read_write_reference(property &p)
@@ -109,9 +122,13 @@ public:
       if (--*ref_count == 0)
         container.end_read_write(ptr);
     }
+
+    bool operator==(read_write_reference const &o) const {
+      return ref_count == o.ref_count;
+    }
     
     property &container;
-    pointer ptr;
+    annotated_pointer ptr;
     unsigned long *ref_count;
   };
 
@@ -160,13 +177,13 @@ public:
   virtual ~property() {}
 
 protected:
-  virtual T const *begin_read() const = 0;
-  virtual T *begin_write() = 0;
-  virtual T *begin_read_write() = 0;
+  virtual annotated_const_pointer begin_read() const = 0;
+  virtual annotated_pointer begin_write() = 0;
+  virtual annotated_pointer begin_read_write() = 0;
   
-  virtual void end_read(T const *) const = 0;
-  virtual void end_write(T *) = 0;
-  virtual void end_read_write(T *) = 0;
+  virtual void end_read(annotated_const_pointer) const = 0;
+  virtual void end_write(annotated_pointer) = 0;
+  virtual void end_read_write(annotated_pointer) = 0;
 };
 
 template<
@@ -206,6 +223,9 @@ private:
   typedef typename lock_policy::write_lock write_lock;
   typedef typename lock_policy::read_write_lock read_write_lock;
 
+  typedef typename property<Type>::annotated_pointer annotated_pointer;
+  typedef typename property<Type>::annotated_const_pointer annotated_const_pointer;
+
 public:
   concrete_property(storage_p s = storage_policy(),
            notification_p n = notification_policy(),
@@ -229,34 +249,34 @@ public:
   }
 
 private:
-  const_pointer begin_read() const {
+  annotated_const_pointer begin_read() const {
     read_lock::begin(lock);
-    return storage.get_pointer();
+    return annotated_const_pointer(storage.get_pointer(), 0);
   }
 
-  pointer begin_write() {
+  annotated_pointer begin_write() {
     write_lock::begin(lock);
-    return storage.get_pointer();
+    return annotated_pointer(storage.get_pointer(), 0);
   }
 
-  pointer begin_read_write() {
+  annotated_pointer begin_read_write() {
     read_write_lock::begin(lock);
-    return storage.get_pointer();
+    return annotated_pointer(storage.get_pointer(), 0);
   }
 
-  void end_read(const_pointer p) const {
-    storage.finish_pointer(p);
+  void end_read(annotated_const_pointer p) const {
+    storage.finish_pointer(p.first);
     read_lock::end(lock);
   }
 
-  void end_write(pointer p) {
-    storage.finish_pointer(p);
+  void end_write(annotated_pointer p) {
+    storage.finish_pointer(p.first);
     write_lock::end(lock);
     notifier.notify(this);
   }
   
-  void end_read_write(pointer p) {
-    storage.finish_pointer(p);
+  void end_read_write(annotated_pointer p) {
+    storage.finish_pointer(p.first);
     read_write_lock::end(lock);
     notifier.notify(this);
   }
@@ -267,8 +287,13 @@ private:
   mutable lock_s lock;
 };
 
-template<class OtherProperty, class NewType, class Translation>
-class binding_property : public property<NewType> {
+template<
+  class OldType, 
+  class NewType = OldType, 
+  class Translation = 
+    direct_translation<NewType, OldType>
+> 
+class translation_property : public property<NewType> {
 public:
   typedef typename property<NewType>::value_type value_type;
   typedef typename property<NewType>::const_pointer const_pointer;
@@ -280,37 +305,40 @@ private:
   typedef typename policy<Translation>::parameter translation_p;
   typedef typename policy<Translation>::storage translation_s;
 
+  typedef typename property<NewType>::annotated_pointer annotated_pointer;
+  typedef typename property<NewType>::annotated_const_pointer annotated_const_pointer;
+
 public:
-  binding_property(OtherProperty &b, translation_p t) 
+  translation_property(property<OldType> &b, translation_p t = translation_policy()) 
   : bound(b), translator(t) {}
 
 private:
-  const_pointer begin_read() const {
-    return translator.box_pointer(bound.begin_read());
+  annotated_const_pointer begin_read() const {
+    return translator.const_box(bound.read());
   }
 
-  pointer begin_write() {
-    return translator.box_pointer(bound.begin_write());
+  annotated_pointer begin_write() {
+    return translator.box(bound.write());
   }
 
-  pointer begin_read_write() {
-    return translator.box_pointer(bound.begin_read_write());
+  annotated_pointer begin_read_write() {
+    return translator.box(bound.read_write());
   }
 
-  void end_read(const_pointer p) const {
-    bound.end_read(translator.unbox_pointer(p));
+  void end_read(annotated_const_pointer p) const {
+    translator.const_unbox(p);
   }
 
-  void end_write(pointer p) {
-    bound.end_write(translator.unbox_pointer(p));
+  void end_write(annotated_pointer p) {
+    translator.unbox(p);
   }
   
-  void end_read_write(pointer p) {
-    bound.end_read_write(translator.unbox_pointer(p));
+  void end_read_write(annotated_pointer p) {
+    translator.unbox(p);
   }
   
+  property<OldType> &bound;
   translation_s translator;
-  OtherProperty &bound;
 };
 
 }}

@@ -33,6 +33,8 @@ public:
 int main() {
   concrete_property<int> p;
   p.set(4);
+  translation_property<int, double> xx(p);
+  *xx.read_write() += 1.7;
   p.apply_change(add<2>);
   *p.read_write() -= 2;
   
@@ -40,7 +42,7 @@ int main() {
   cout << x.read()->get() << endl;
   
   concrete_property<string_buffer, test_observe> w(string("Hallo"));
-  utf32_t const *add = (utf32_t const*)" Welt!";
+  utf32_t const *add = (utf32_t const*)L" Welt!";
   std::copy(add, add + 6, w.read_write()->append(6).begin);
   cout << w.get() << endl;
 

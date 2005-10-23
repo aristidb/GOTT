@@ -217,7 +217,8 @@ template<class T> struct equality_comparer : equality_comparable {
 /**
  * The default operations implementation.
  */
-template<class T> struct operations : equality_comparer<T> {};
+template<class T> 
+struct operations : equality_comparer<T> {};
 
 /**
  * Checks whether two typeless objects are equal.
