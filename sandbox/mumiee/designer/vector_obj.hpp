@@ -20,6 +20,9 @@
 
 #ifndef GOTT_GUI_DESIGNER_VECTOR_OBJ_HPP_INCLUDED
 #define GOTT_GUI_DESIGNER_VECTOR_OBJ_HPP_INCLUDED
+
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include <agg_rendering_buffer.h>
 #include "utility.hpp"
 
@@ -32,12 +35,12 @@ namespace gott { namespace gui { namespace designer {
     virtual ~vector_obj() =0;
 
     GOTT_LOCAL vector_obj() : depth(0), fill(0x0) { }
-    GOTT_LOCAL vector_obj(coord const &pos, depth_t depth_, filler const *f)
-      : position(pos), depth(depth_), fill(f)
+    GOTT_LOCAL vector_obj( depth_t depth_, filler const *f)
+      : depth(depth_), fill(f)
     { }
 
-    GOTT_LOCAL void set_position(coord const& pos) { position=pos; }
-    GOTT_LOCAL coord const &get_position() const { return position; }
+    virtual void set_position(coord const& pos) = 0;
+    virtual coord get_position() const = 0;
 
     /** Depth of the object in the rendering pipeline
      * 0 is the lowest depth
@@ -50,10 +53,12 @@ namespace gott { namespace gui { namespace designer {
 
     virtual void draw( agg::rendering_buffer & ) = 0;
   private:
-    coord position;
     depth_t depth;
     filler const *fill;
   };
+
+  typedef boost::shared_ptr<vector_obj> shared_vec_obj;
+  typedef boost::weak_ptr<vector_obj> weak_vec_obj;
 }}}
 
 #endif

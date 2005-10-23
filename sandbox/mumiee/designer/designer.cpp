@@ -21,6 +21,8 @@
 #include "x11/window.hpp"
 #include "handle.hpp"
 #include "simple_handle.hpp"
+#include "vector_obj.hpp"
+#include "rounded_rect.hpp"
 // #pragma GCC visibility push(default)
 #include <boost/bind.hpp>
 // #pragma GCC visibility pop
@@ -86,6 +88,9 @@ class window : public x11::window
 
     bool mouse_clicked, dragging;
     gott::gui::coord click_point;
+    std::list<boost::shared_ptr<designer::vector_obj> > objects;
+    std::list<boost::weak_ptr<designer::vector_obj> > drawables;
+    std::list<boost::weak_ptr<designer::handle> > handles;
 
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p )
@@ -102,6 +107,18 @@ class window : public x11::window
         set_on_mouse(boost::bind(&window::on_mouse, this, _1));
         set_on_redraw(boost::bind(&window::on_redraw, this));
         set_on_configure(boost::bind(&window::on_configure, this, _1));
+
+        designer::rounded_rect *rr  = new  designer::rounded_rect(rect( 40,20, 100, 200 ) );
+
+        objects.push_back( boost::shared_ptr<designer::vector_obj>( rr ) );
+        drawables.push_back( objects.back() );
+
+        designer::rounded_rect::handle_list l (rr->get_handles() );
+
+        for(  designer::rounded_rect::handle_list::const_iterator it = l.begin(), e=l.end(); it != e; ++it ) {
+          handles.push_back( *it );
+          drawables.push_back( *it );
+        }
       }
     window( rect const& r, std::string const& title, pixelformat const& p )
       : x11::window( r, title, p, window_flags::Defaults )
@@ -308,6 +325,17 @@ class window : public x11::window
       ras.add_path(ell);
 
       agg::render_scanlines(ras, sl, ren_gradient);
+
+      size_t hir= 0;
+
+      for( std::list< boost::weak_ptr<designer::vector_obj> >::iterator it = drawables.begin(); it != drawables.end(); ++it )
+      {
+        if(boost::shared_ptr<designer::vector_obj> obj = it->lock())
+        {
+          std::cout << ++hir << std::endl;
+          obj->draw( rbuf );
+        }
+      }
 
       swap_buffer();
     }

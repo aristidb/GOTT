@@ -22,8 +22,6 @@
 #define GOTT_GUI_DESIGNER_ROUNDED_RECT_HPP_INCLUDED
 #include "handle.hpp"
 #include "vector_obj.hpp"
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
 
 namespace gott{namespace gui{namespace designer{
 
@@ -32,7 +30,7 @@ class rounded_rect : public vector_obj {
     typedef std::list<boost::shared_ptr<handle> > internal_handle_list;
    
     internal_handle_list handles;
-    rect position;
+    rect extents;
     int radius;
   public:
     typedef std::list<boost::weak_ptr<handle> > handle_list;
@@ -40,6 +38,8 @@ class rounded_rect : public vector_obj {
     rounded_rect( rect const& position );
     ~rounded_rect();
 
+    void set_position(coord const& pos);
+    coord get_position() const;
 
     void draw( agg::rendering_buffer &buf );
 

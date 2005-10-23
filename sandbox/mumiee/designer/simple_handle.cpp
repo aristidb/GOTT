@@ -26,14 +26,23 @@
 
 namespace gott{namespace gui{namespace designer{
 
-simple_handle::simple_handle( coord const& pos ) : handle(pos) {
+simple_handle::simple_handle() {
 }
 
-simple_handle::simple_handle( coord const& pos, pos_update_signal::slot_type const& update_handler ) : handle(pos) {
+simple_handle::simple_handle( pos_update_signal::slot_type const& update_handler )  {
   pos_update.connect( update_handler );
 }
+void simple_handle::set_position_handler( boost::function<coord ()> getter, boost::function<void (coord const&)> setter ) {
+  get_coord = getter;
+  set_coord = setter;
+  coord c = get_coord();
+  rect r = get_region();
+  r.left = c.x - r.width/2;
+  r.top = c.y - r.height/2;
+  set_region( r );
+}
 
-simple_handle::simple_handle( coord const& pos, pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag ) : handle(pos) {
+simple_handle::simple_handle( pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag )  {
   pos_update.connect( update_handler );
   final_pos.connect( end_drag );
 }
@@ -63,6 +72,7 @@ void simple_handle::draw( agg::rendering_buffer & buffer ) {
 
     rect const& r = get_region();
     prim_renderer.fill_color(agg::rgba(0,0,0,0.5));
+    prim_renderer.line_color(agg::rgba(0,0,0,0.5));
     prim_renderer.rectangle( r.left, r.top, r.left + r.width, r.top + r.height );
   }
 }
@@ -78,8 +88,8 @@ bool simple_handle::begin_drag( coord position, size_t button_index ) {
   return false;
 }
 void simple_handle::drag( coord new_position) {
-    set_position( new_position );
-    pos_update( new_position );
+  set_position( new_position );
+  pos_update( new_position );
 }
 bool simple_handle::end_drag( coord new_position) {
   set_position( new_position );
@@ -88,5 +98,11 @@ bool simple_handle::end_drag( coord new_position) {
   return true;
 }
 
+void simple_handle::set_position( coord const& pos ) {
+  set_coord(pos);
+}
+coord simple_handle::get_position() const{
+  return get_coord();
+}
 }}}
 

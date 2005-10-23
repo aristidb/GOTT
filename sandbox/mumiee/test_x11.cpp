@@ -188,7 +188,7 @@ class window : public x11::window
     //----------------
     pixfmt_type pixf(rbuf);
     renderer_base_type rbase(pixf);
-    rbase.clear(agg::rgba(1,1,1));
+    rbase.clear(agg::rgba(1,1,1,0));
 
 
     // The gradient objects declarations

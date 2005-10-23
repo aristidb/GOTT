@@ -27,6 +27,7 @@
 #include <agg_scanline_p.h>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#include <boost/lambda/construct.hpp>
 #include <algorithm>
 #include <iterator>
 #include "utility.hpp"
@@ -52,7 +53,7 @@ void rounded_rect::draw( agg::rendering_buffer &buf ) {
   // Render two "control" circles
 
   // Creating a rounded rectangle
-  agg::rounded_rect rrect(position.left, position.top, position.left + position.width, position.top + position.height, radius );
+  agg::rounded_rect rrect(extents.left, extents.top, extents.left + extents.width, extents.top + extents.height, radius );
   rrect.normalize_radius();
 
   // Drawing as an outline
@@ -73,42 +74,72 @@ rounded_rect::~rounded_rect()
 {
 }
 
-rounded_rect::rounded_rect( rect const& p ) : position(p), radius(0) {
+void rounded_rect::set_position(coord const& pos){
+  extents.left = pos.x;
+  extents.top = pos.y;
+}
+
+coord rounded_rect::get_position() const{
+  return coord(extents.left,extents.top);
+}
+
+rounded_rect::rounded_rect( rect const& p ) : extents(p), radius(0) {
   using namespace boost::lambda;
   typedef boost::shared_ptr<handle> sh_h;
   {
-    simple_handle * s = new simple_handle( coord(p.left,p.top),
-         ( var(position.left) = bind(&coord::x, _1) )
-         ,( var(position.top) = bind(&coord::y, _1) )
+    simple_handle * s = new simple_handle( 
+        (( var(extents.left) = bind(&coord::x, _1) )
+         ,( var(extents.top) = bind(&coord::y, _1) ) )
+        );
+    s->set_position_handler( 
+        bind(constructor<coord>(), var(extents.left), var(extents.top) ) 
+        ,  (( var(extents.left) = bind(&coord::x, _1) )
+          ,( var(extents.top) = bind(&coord::y, _1) ) )
         );
     handles.push_back( sh_h( s ) );
   }
 
   {
-    simple_handle * s = new simple_handle( coord(p.left,p.top + p.height),
-         ( var(position.left) = bind(&coord::x, _1) )
-         ,( var(position.height) = bind(&coord::y, _1) - var(position.top) )
+    simple_handle * s = new simple_handle(
+         (( var(extents.left) = bind(&coord::x, _1) )
+         ,( var(extents.height) = bind(&coord::y, _1) - var(extents.top) ))
+        );
+    s->set_position_handler( 
+        bind(constructor<coord>(), var(extents.left), var(extents.top) + var(extents.height) ) 
+        , (( var(extents.left) = bind(&coord::x, _1) )
+         ,( var(extents.height) = bind(&coord::y, _1) - var(extents.top) ))
         );
     handles.push_back( sh_h( s ) );
   }
 
   {
-    simple_handle * s = new simple_handle( coord(p.left + p.width,p.top + p.height),
-         ( var(position.width) = bind(&coord::x, _1)  - var(position.left) )
-         ,( var(position.height) = bind(&coord::y, _1) - var(position.top) )
+    simple_handle * s = new simple_handle( 
+         (( var(extents.width) = bind(&coord::x, _1)  - var(extents.left) )
+         ,( var(extents.height) = bind(&coord::y, _1) - var(extents.top) ))
+        );
+    s->set_position_handler( 
+        bind(constructor<coord>(), var(extents.left) + var(extents.width), var(extents.top) + var(extents.height)) 
+        , (( var(extents.width) = bind(&coord::x, _1)  - var(extents.left) )
+         ,( var(extents.height) = bind(&coord::y, _1) - var(extents.top) ))
         );
     handles.push_back( sh_h( s ) );
   }
 
   {
-    simple_handle * s = new simple_handle( coord(p.left + p.width,p.top),
-         ( var(position.width) = bind(&coord::x, _1)  - var(position.left) )
-         ,( var(position.top) = bind(&coord::y, _1) )
+    simple_handle * s = new simple_handle( 
+        (( var(extents.width) = bind(&coord::x, _1)  - var(extents.left) )
+         ,( var(extents.top) = bind(&coord::y, _1) ))
+        );
+    s->set_position_handler( 
+        bind(constructor<coord>(), var(extents.left) + var(extents.width), var(extents.top) ) 
+        ,  (( var(extents.width) = bind(&coord::x, _1)  - var(extents.left) )
+          ,( var(extents.top) = bind(&coord::y, _1) ))
         );
     handles.push_back( sh_h( s ) );
   }
 
 }
+
 
 }}}
 

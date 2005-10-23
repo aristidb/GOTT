@@ -21,11 +21,15 @@
 #include "handle.hpp"
 
 namespace gott{namespace gui{namespace designer{
-handle::handle( coord const& pos ) : vector_obj(pos, std::numeric_limits<depth_t>::max(), 0 )   {
+handle::handle( ) : vector_obj( std::numeric_limits<depth_t>::max(), 0 ), region(0,0,10,10), status(true)  {
 }
 rect const& handle::get_region() const{
   return region;
 }
+void handle::set_region( rect const& r ){
+  region = r;
+}
+
 bool handle::enabled() const{
   return status;
 }

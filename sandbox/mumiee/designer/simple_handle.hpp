@@ -21,6 +21,7 @@
 #ifndef GOTT_GUI_DESIGNER_SIMPLE_HANDLE_HPP_INCLUDED
 #define GOTT_GUI_DESIGNER_SIMPLE_HANDLE_HPP_INCLUDED
 #include <boost/signals.hpp>
+#include <boost/function.hpp>
 #include "handle.hpp"
 
 namespace gott{namespace gui{namespace designer{
@@ -37,13 +38,17 @@ struct simple_handle : public handle {
   private:
 
     pos_update_signal pos_update, final_pos;
+    boost::function<coord ()> get_coord;
+    boost::function<void (coord const&)> set_coord;
   public:
-    simple_handle( coord const& pos );
-    simple_handle( coord const& pos, pos_update_signal::slot_type const& update_handler );
-    simple_handle( coord const& pos, pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag );
+    simple_handle();
+    simple_handle( pos_update_signal::slot_type const& update_handler );
+    simple_handle( pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag );
 
     boost::signals::connection add_position_handler( pos_update_signal::slot_type const& slot );
     boost::signals::connection add_final_position_handler( pos_update_signal::slot_type const& slot );
+
+    void set_position_handler( boost::function<coord ()> getter, boost::function<void (coord const&)> setter );
 
     /**
      * \brief handle draws itself in here: 
@@ -66,7 +71,8 @@ struct simple_handle : public handle {
      */
     virtual bool end_drag( coord new_position);
 
-
+    void set_position( coord const& pos );
+    coord get_position() const;
 };
 }}}
 
