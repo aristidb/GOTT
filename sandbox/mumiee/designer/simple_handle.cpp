@@ -32,14 +32,20 @@ simple_handle::simple_handle() {
 simple_handle::simple_handle( pos_update_signal::slot_type const& update_handler )  {
   pos_update.connect( update_handler );
 }
+void simple_handle::update_region() {
+  if( get_coord ) {
+    coord c = get_coord();
+    rect r = get_region();
+    r.left = c.x - r.width/2;
+    r.top = c.y - r.height/2;
+    set_region( r );
+  }
+}
 void simple_handle::set_position_handler( boost::function<coord ()> getter, boost::function<void (coord const&)> setter ) {
   get_coord = getter;
   set_coord = setter;
-  coord c = get_coord();
-  rect r = get_region();
-  r.left = c.x - r.width/2;
-  r.top = c.y - r.height/2;
-  set_region( r );
+
+  update_region();
 }
 
 simple_handle::simple_handle( pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag )  {
@@ -81,6 +87,7 @@ bool simple_handle::begin_drag( coord position, size_t button_index ) {
   if( enabled() && button_index == 1) {
     set_position( position );
     pos_update( position );
+    update_region();
     
     // handle movement
     return true;
@@ -90,11 +97,13 @@ bool simple_handle::begin_drag( coord position, size_t button_index ) {
 void simple_handle::drag( coord new_position) {
   set_position( new_position );
   pos_update( new_position );
+  update_region();
 }
 bool simple_handle::end_drag( coord new_position) {
   set_position( new_position );
   pos_update( new_position );
   final_pos( new_position );
+  update_region();
   return true;
 }
 

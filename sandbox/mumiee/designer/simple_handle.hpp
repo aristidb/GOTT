@@ -37,6 +37,8 @@ struct simple_handle : public handle {
     typedef boost::signal<void (coord)> pos_update_signal;
   private:
 
+    void update_region();
+
     pos_update_signal pos_update, final_pos;
     boost::function<coord ()> get_coord;
     boost::function<void (coord const&)> set_coord;
