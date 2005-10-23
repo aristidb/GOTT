@@ -92,6 +92,7 @@ class window : public x11::window
     std::list<boost::weak_ptr<designer::vector_obj> > drawables;
     std::list<boost::weak_ptr<designer::handle> > handles;
     boost::shared_ptr<designer::handle> current_handle;
+    std::size_t last_click_button;
 
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p )
@@ -140,16 +141,13 @@ class window : public x11::window
     void drag_begin( coord const& start_pos, coord const& current_pos, size_t button ) {  //button  mask?
       // TODO normalize position, use center as reference 
       // and use difference to adjust all following movement
-      std::cout << "STARTPOS : " << start_pos.x << " " << start_pos.y << std::endl;
       for( std::list<boost::weak_ptr<designer::handle> >::const_iterator it = handles.begin(), e = handles.end(); it != e; ++it ) {
         if(boost::shared_ptr<designer::handle> obj = it->lock())
         {
           gott::gui::rect r = obj->get_region();
-          std::cout << "RECT:" << r.left << " " << r.top << " " << r.width << " " << r.height << std::endl;
           if( r.is_inside( start_pos ) && obj->begin_drag(start_pos, button) ) {
             obj->drag( current_pos );
             current_handle = obj;
-
           }
         }
       }
@@ -195,7 +193,7 @@ class window : public x11::window
                 int sum = sqr( click_point.x - current_point.x ) + sqr( click_point.y -current_point.y );
                 if(  sum > 25 )  {
                   dragging = true;
-                  drag_begin( click_point, current_point, ev.button_index );
+                  drag_begin( click_point, current_point, last_click_button );
                 }
 
                 break;
@@ -221,8 +219,8 @@ class window : public x11::window
           case mouse_event::Release: 
             break;
           case mouse_event::Press: 
-            std::cout << " Just pressed at: "  << current_point.x <<  " " << current_point.y << std::endl;
             click_point = current_point;
+            last_click_button = ev.button_index;
             mouse_clicked = true;
             break;
           default: break;

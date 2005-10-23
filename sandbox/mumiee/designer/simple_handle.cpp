@@ -78,7 +78,7 @@ void simple_handle::draw( agg::rendering_buffer & buffer ) {
 }
 
 bool simple_handle::begin_drag( coord position, size_t button_index ) {
-  if( enabled() && button_index == 1 ) {
+  if( enabled() && button_index == 1) {
     set_position( position );
     pos_update( position );
     
