@@ -191,7 +191,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
         //XSetInputFocus( display, win->get_handle(), RevertToPointerRoot, CurrentTime );
 
         mouse_info.set_button( event.xbutton.button, true );
-        mouse_event ev( mouse_event::Press, event.xbutton.button );
+        mouse_event ev( mouse_event::Press, event.xbutton.button, mouse_info.get_primary_position(), mouse_info.get_secondary_position());
         win->exec_on_mouse( ev );
         break;
       };
@@ -202,7 +202,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
         std::cout << "ButtonRelease" << std::endl;
 #endif
         mouse_info.set_button( event.xbutton.button, false );
-        mouse_event ev( mouse_event::Release, event.xbutton.button );
+        mouse_event ev( mouse_event::Release, event.xbutton.button, mouse_info.get_primary_position(), mouse_info.get_secondary_position() );
         win->exec_on_mouse( ev );
         break;
       };

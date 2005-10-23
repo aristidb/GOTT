@@ -91,6 +91,7 @@ class window : public x11::window
     std::list<boost::shared_ptr<designer::vector_obj> > objects;
     std::list<boost::weak_ptr<designer::vector_obj> > drawables;
     std::list<boost::weak_ptr<designer::handle> > handles;
+    boost::shared_ptr<designer::handle> current_handle;
 
   public:
     window( application& app, rect const& r, std::string const& title, pixelformat const& p )
@@ -137,19 +138,36 @@ class window : public x11::window
       }
 
     void drag_begin( coord const& start_pos, coord const& current_pos, size_t button ) {  //button  mask?
-      std::cout << "Beginning to drag:" << start_pos.x << "  " << start_pos.y << std::endl;
+      // TODO normalize position, use center as reference 
+      // and use difference to adjust all following movement
+      std::cout << "STARTPOS : " << start_pos.x << " " << start_pos.y << std::endl;
+      for( std::list<boost::weak_ptr<designer::handle> >::const_iterator it = handles.begin(), e = handles.end(); it != e; ++it ) {
+        if(boost::shared_ptr<designer::handle> obj = it->lock())
+        {
+          gott::gui::rect r = obj->get_region();
+          std::cout << "RECT:" << r.left << " " << r.top << " " << r.width << " " << r.height << std::endl;
+          if( r.is_inside( start_pos ) && obj->begin_drag(start_pos, button) ) {
+            obj->drag( current_pos );
+            current_handle = obj;
+
+          }
+        }
+      }
     }
 
     void drag_on( coord const& pos ) {
-      std::cout << "continuing to drag:" << pos.x << "  " << pos.y << std::endl;
+      if( current_handle ) 
+        current_handle->drag( pos );
     }
 
     void drag_end( coord const& end ) {
-      std::cout << "ending to drag:" << end.x << "  " << end.y << std::endl;
+      if( current_handle )  {
+        current_handle->drag( end );
+        current_handle->end_drag( end );
+      }
     }
 
     void on_click( coord const& pos, size_t button ) {
-      std::cout << "just clicked :" << pos.x << "  " << pos.y  << " B: " << button << std::endl;
     }
 
     void on_mouse( gott::gui::mouse_event const& ev )
@@ -203,7 +221,7 @@ class window : public x11::window
           case mouse_event::Release: 
             break;
           case mouse_event::Press: 
-            std::cout << " Just pressed " << std::endl;
+            std::cout << " Just pressed at: "  << current_point.x <<  " " << current_point.y << std::endl;
             click_point = current_point;
             mouse_clicked = true;
             break;
@@ -327,16 +345,9 @@ class window : public x11::window
 
       agg::render_scanlines(ras, sl, ren_gradient);
 
-      size_t hir= 0;
-
       for( std::list< boost::weak_ptr<designer::vector_obj> >::iterator it = drawables.begin(); it != drawables.end(); ++it )
-      {
         if(boost::shared_ptr<designer::vector_obj> obj = it->lock())
-        {
-          std::cout << ++hir << std::endl;
           obj->draw( rbuf );
-        }
-      }
 
       swap_buffer();
     }

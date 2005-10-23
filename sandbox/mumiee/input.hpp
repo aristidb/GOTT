@@ -75,8 +75,8 @@ struct GOTT_EXPORT mouse_event
 
   mouse_event( coord const& p, coord const& s )
   : type( Move ), primary(p), secondary(s) {}
-  mouse_event( event_type const& type, std::size_t index )
-    : type(type), button_index(index) {}
+  mouse_event( event_type const& type, std::size_t index, coord const& p, coord const& s)
+    : type(type), primary(p), secondary(s), button_index(index) {}
   // add a time stamp here?
   coord primary;
   coord secondary;
