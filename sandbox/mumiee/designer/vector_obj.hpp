@@ -57,7 +57,7 @@ namespace gott { namespace gui { namespace designer {
       OUTSIDE,
       BORDER,
       INSIDE
-    }
+    };
     virtual hit_t hit(coord const &c) const =0;
   private:
     depth_t depth;
