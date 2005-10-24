@@ -40,9 +40,8 @@ static char text[] =
 "the library without the necessity to modify a single byte in "
 "the existing code. ";
 
-std::string find_font_file( std::string const& ) {
-  return "/usr/share/fonts/corefonts/verdana.ttf";
-}
+
+
 #endif
 
 
@@ -104,7 +103,7 @@ class window : public x11::window
 #endif
       {
 #ifdef USE_ANTIGRAIN
-        if( ! font_engine.load_font( find_font_file("verdana").c_str(), 0,agg::glyph_ren_agg_gray8 ) ) 
+        if( ! font_engine.load_font( find_font_file("/usr/share/fonts/","verdana.ttf").c_str(), 0,agg::glyph_ren_agg_gray8 ) ) 
         {
           throw runtime_error("could not find verdana font");
         }
@@ -120,7 +119,7 @@ class window : public x11::window
 #endif
       {
 #ifdef USE_ANTIGRAIN
-        if( ! font_engine.load_font( find_font_file("verdana").c_str(), 0, agg::glyph_ren_agg_gray8) ) 
+        if( ! font_engine.load_font( find_font_file("/usr/share/fonts","verdana.ttf").c_str(), 0, agg::glyph_ren_agg_gray8) ) 
         {
           throw runtime_error("could not find verdana font");
         }

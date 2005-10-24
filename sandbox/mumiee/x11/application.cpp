@@ -284,14 +284,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
             , event.xconfigure.height );
 
         win->exec_on_configure( new_rect );
-        win->exec_on_redraw();
 
-#ifdef HAVE_XSYNC
-        if( use_xsync() && win->avail_request ) {
-          XSyncSetCounter( display, win->counter, win->last_request );
-          win->avail_request = false;
-        }
-#endif
         break;
 
       }
@@ -306,6 +299,13 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
           return;
 
         win->exec_on_redraw();
+#ifdef HAVE_XSYNC
+        if( use_xsync() && win->avail_request ) {
+          XSyncSetCounter( display, win->counter, win->last_request );
+          win->avail_request = false;
+        }
+#endif
+
 
 #ifdef LOG_EVENTS
         std::cout << "Expose done " << std::endl;

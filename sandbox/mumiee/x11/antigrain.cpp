@@ -160,13 +160,15 @@ void antigrain::setup_renderer( Display* , int , Drawable win , rect const& r ){
 }
 
 void antigrain::resize_renderer( Display* , int , Drawable , rect const& r ){
-  delete [] window_buffer;
-  window_img->data = 0;
-  XDestroyImage(window_img);
-  window_buffer = new unsigned char[r.width * r.height * ( bpp / 8 )];
-  rbuffer.attach( window_buffer, r.width, r.height, flip_y?-r.width*(bpp/8) : r.width*(bpp/8) );
-  window_img = XCreateImage( display, vis, depth, ZPixmap, 0, reinterpret_cast<char*>(window_buffer), r.width, r.height, sys_bpp, r.width * (sys_bpp / 8));
-  window_img->byte_order = byte_order;
+  if( r.width !=rbuffer.width()  ||  r.height != rbuffer.height() ){
+    delete [] window_buffer;
+    window_img->data = 0;
+    XDestroyImage(window_img);
+    window_buffer = new unsigned char[r.width * r.height * ( bpp / 8 )];
+    rbuffer.attach( window_buffer, r.width, r.height, flip_y?-r.width*(bpp/8) : r.width*(bpp/8) );
+    window_img = XCreateImage( display, vis, depth, ZPixmap, 0, reinterpret_cast<char*>(window_buffer), r.width, r.height, sys_bpp, r.width * (sys_bpp / 8));
+    window_img->byte_order = byte_order;
+  }
 }
 
 

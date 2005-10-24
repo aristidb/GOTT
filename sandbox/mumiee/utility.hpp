@@ -31,6 +31,7 @@
 
 namespace gott{ namespace gui{ 
 
+std::string find_font_file( std::string const& path_name, std::string const& name );
   // throw away!
 
 struct GOTT_EXPORT vert 

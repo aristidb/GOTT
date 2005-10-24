@@ -33,11 +33,6 @@ using gott::gui::x11::application;
 
 template<typename T>
 inline T sqr(T const a ) {return a*a;}
-std::string find_font_file( std::string const& ) {
-  return "/usr/share/fonts/truetype/msttcorefonts/verdana.ttf";
-}
-
-
 
 class window : public x11::window
 {
@@ -101,7 +96,7 @@ class window : public x11::window
       , mouse_clicked(false)
       , dragging(false)
       {
-        if( ! font_engine.load_font( find_font_file("verdana").c_str(), 0,agg::glyph_ren_agg_gray8 ) ) 
+        if( ! font_engine.load_font( find_font_file("/usr/share/fonts/","verdana.ttf").c_str(), 0,agg::glyph_ren_agg_gray8 ) ) 
         {
           throw runtime_error("could not find verdana font");
         }
@@ -128,7 +123,7 @@ class window : public x11::window
       , mouse_clicked(false)
       , dragging(false)
       {
-        if( ! font_engine.load_font( find_font_file("verdana").c_str(), 0, agg::glyph_ren_agg_gray8) ) 
+        if( ! font_engine.load_font( find_font_file("/usr/share/fonts/","verdana.ttf").c_str(), 0,agg::glyph_ren_agg_gray8 ) ) 
         {
           throw runtime_error("could not find verdana font");
         }
