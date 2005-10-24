@@ -140,6 +140,26 @@ void window::open(rect const&r, std::string const& t, pixelformat const& , std::
   protocols[2] = app->get_atom("_NET_WM_PING");
   protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
 #ifdef HAVE_XSYNC
+
+#ifdef LOG_EVENTS
+  // WM Supports XSync?
+ {
+   Atom *wm_protocols;
+   int n;
+   if(!XGetWMProtocols(app->get_display(), handle, &wm_protocols, &n))
+     std::cout << "XGetWMProtocols failed\n";
+   else {
+     std::cout << "WM_PROTOCOLS { " << n << '\n';
+     for(int i=0; i<n; ++i) {
+       std::cout << XGetAtomName(app->get_display(), wm_protocols[i]) << '\n';
+     }
+     std::cout << "}\n";
+     XFree(wm_protocols);
+   }
+ }
+  //
+#endif
+
   if(app->use_xsync() ) {
     last_request.hi = last_request.lo = 0;
     if( counter = XSyncCreateCounter( app->get_display(), last_request ) )  {

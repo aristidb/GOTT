@@ -22,7 +22,7 @@ else:
 debug = int(ARGUMENTS.get('debug', debug))
 
 if debug == 1:
-	cppdef += ['DEBUG']
+	cppdef += ['DEBUG', 'LOG_EVENTS']
 elif debug == -1:
 	cppdef += ['NDEBUG']
 
