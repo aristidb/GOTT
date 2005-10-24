@@ -1,9 +1,28 @@
+#include <iostream>
 #include <stdexcept>
 #include <agg2/agg_basics.h>
 #include <agg2/util/agg_color_conv_rgb8.h>
 #include "antigrain.hpp"
 
 namespace gott{namespace gui{namespace x11{ 
+
+namespace detail {
+template<class CopyRow> 
+void sub_color_conv( gott::gui::rect const& region,
+    agg::rendering_buffer* dst, 
+    const agg::rendering_buffer* src,
+    CopyRow copy_row_functor)
+{
+  if(region.width)
+  {
+    unsigned y;
+    for(y = 0; y < region.height; y++)
+    {
+      copy_row_functor(dst->row(y), src->row(y + region.top) +region.left, region.width);
+    }
+  }
+}
+}
 
 antigrain::antigrain()
   : display(0), vis(0), window(0), depth(32), byte_order(LSBFirst), sys_bpp(32), bpp(32), format(pix_format_rgba32), sys_format(pix_format_undefined)
@@ -134,7 +153,7 @@ void antigrain::setup_renderer( Display* , int , Drawable win , rect const& r ){
   window_img = XCreateImage(display,  vis, //CopyFromParent, 
         depth,       ZPixmap, 
         0,
-        (char*)window_buffer, 
+        reinterpret_cast<char*>(window_buffer), 
         r.width,       r.height,        sys_bpp,
         r.width * (sys_bpp / 8));
   window_img->byte_order = byte_order;
@@ -166,6 +185,276 @@ void antigrain::close_renderer(Display* , int ,  Drawable ){
 }
 
 
+void antigrain::update_rect( gott::gui::rect const& r ){
+  if(window_img == 0) return;
+  window_img->data = (char*)window_buffer;
+
+  if( format == sys_format)
+  {
+    std::cout << "COPY" << std::endl;
+    XPutImage( display, 
+        window, 
+        gc, 
+        window_img, 
+        r.left, r.top, r.left, r.top,
+        r.width, 
+        r.height);
+  }
+  else
+  {
+    int row_len = rbuffer.width() * sys_bpp / 8;
+    unsigned char* buf_tmp = 
+      new unsigned char[row_len * rbuffer.height()];
+
+    agg::rendering_buffer rbuf_tmp;
+    rbuf_tmp.attach(buf_tmp, 
+        rbuffer.width(), 
+        rbuffer.height(), 
+        flip_y ? -row_len : row_len);
+
+    using namespace agg;
+
+    switch(sys_format)            
+    {
+      default: break;
+      case pix_format_rgb555:
+               switch(format)
+               {
+                 default: break;
+                 case pix_format_rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb555()); break;
+                 case pix_format_rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb555()); break;
+                 case pix_format_rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb555());  break;
+                 case pix_format_bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb555());  break;
+                 case pix_format_rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb555()); break;
+                 case pix_format_argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb555()); break;
+                 case pix_format_bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb555()); break;
+                 case pix_format_abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb555()); break;
+               }
+               break;
+
+      case pix_format_rgb565:
+               switch(format)
+               {
+                 default: break;
+                 case pix_format_rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb565()); break;
+                 case pix_format_rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb565()); break;
+                 case pix_format_rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb565());  break;
+                 case pix_format_bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb565());  break;
+                 case pix_format_rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb565()); break;
+                 case pix_format_argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb565()); break;
+                 case pix_format_bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb565()); break;
+                 case pix_format_abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb565()); break;
+               }
+               break;
+
+      case pix_format_rgba32:
+               switch(format)
+               {
+                 default: break;
+                 case pix_format_rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgba32()); break;
+                 case pix_format_rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgba32()); break;
+                 case pix_format_rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgba32());  break;
+                 case pix_format_bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgba32());  break;
+                 case pix_format_rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgba32()); break;
+                 case pix_format_argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_rgba32()); break;
+                 case pix_format_bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgba32()); break;
+                 case pix_format_abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgba32()); break;
+               }
+               break;
+
+      case pix_format_abgr32:
+               switch(format)
+               {
+                 default: break;
+                 case pix_format_rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_abgr32()); break;
+                 case pix_format_rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_abgr32()); break;
+                 case pix_format_rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_abgr32());  break;
+                 case pix_format_bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_abgr32());  break;
+                 case pix_format_abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_abgr32()); break;
+                 case pix_format_rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_abgr32()); break;
+                 case pix_format_argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_abgr32()); break;
+                 case pix_format_bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_abgr32()); break;
+               }
+               break;
+
+      case pix_format_argb32:
+               switch(format)
+               {
+                 default: break;
+                 case pix_format_rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_argb32()); break;
+                 case pix_format_rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_argb32()); break;
+                 case pix_format_rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_argb32());  break;
+                 case pix_format_bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_argb32());  break;
+                 case pix_format_rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_argb32()); break;
+                 case pix_format_argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_argb32()); break;
+                 case pix_format_abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_argb32()); break;
+                 case pix_format_bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_argb32()); break;
+               }
+               break;
+
+      case pix_format_bgra32:
+               switch(format)
+               {
+                 default: break;
+                 case pix_format_rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_bgra32()); break;
+                 case pix_format_rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_bgra32()); break;
+                 case pix_format_rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_bgra32());  break;
+                 case pix_format_bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_bgra32());  break;
+                 case pix_format_rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_bgra32()); break;
+                 case pix_format_argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_bgra32()); break;
+                 case pix_format_abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_bgra32()); break;
+                 case pix_format_bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_bgra32()); break;
+               }
+               break;
+    }
+
+    window_img->data = (char*)buf_tmp;
+    XPutImage(display, 
+        window, 
+        gc, 
+        window_img, 
+        r.left, r.top, r.left, r.top,
+        r.width, 
+        r.height);
+
+    delete [] buf_tmp;
+  }
+  /*{
+    std::cout << "CONVERT from " << format << " to " << sys_format << std::endl;
+    int row_len = r.width * sys_bpp / 8;
+    unsigned char* buf_tmp = 
+      new unsigned char[row_len * r.height];
+
+    agg::rendering_buffer rbuf_tmp;
+    rbuf_tmp.attach(buf_tmp, 
+        r.width, 
+        r.height, 
+        flip_y ? -row_len : row_len);
+
+    using namespace agg;
+
+    switch(sys_format)            
+    {
+      default: 
+        break;
+      case pix_format_rgb555:
+        switch(format)
+        {
+          default: break;
+          case pix_format_rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb555()); break;
+          case pix_format_rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb555()); break;
+          case pix_format_rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb555());  break;
+          case pix_format_bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb555());  break;
+          case pix_format_rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb555()); break;
+          case pix_format_argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb555()); break;
+          case pix_format_bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb555()); break;
+          case pix_format_abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb555()); break;
+        }
+        break;
+
+      case pix_format_rgb565:
+        switch(format)
+        {
+          default: break;
+          case pix_format_rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb565()); break;
+          case pix_format_rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb565()); break;
+          case pix_format_rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb565());  break;
+          case pix_format_bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb565());  break;
+          case pix_format_rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb565()); break;
+          case pix_format_argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb565()); break;
+          case pix_format_bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb565()); break;
+          case pix_format_abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb565()); break;
+        }
+        break;
+
+      case pix_format_rgba32:
+        switch(format)
+        {
+          default: break;
+          case pix_format_rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgba32()); break;
+          case pix_format_rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgba32()); break;
+          case pix_format_rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgba32());  break;
+          case pix_format_bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgba32());  break;
+          case pix_format_rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgba32()); break;
+          case pix_format_argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_rgba32()); break;
+          case pix_format_bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgba32()); break;
+          case pix_format_abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgba32()); break;
+        }
+        break;
+
+      case pix_format_abgr32:
+        switch(format)
+        {
+          default: break;
+          case pix_format_rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_abgr32()); break;
+          case pix_format_rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_abgr32()); break;
+          case pix_format_rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_abgr32());  break;
+          case pix_format_bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_abgr32());  break;
+          case pix_format_abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_abgr32()); break;
+          case pix_format_rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_abgr32()); break;
+          case pix_format_argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_abgr32()); break;
+          case pix_format_bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_abgr32()); break;
+        }
+        break;
+
+      case pix_format_argb32:
+        switch(format)
+        {
+          default: break;
+          case pix_format_rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_argb32()); break;
+          case pix_format_rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_argb32()); break;
+          case pix_format_rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_argb32());  break;
+          case pix_format_bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_argb32());  break;
+          case pix_format_rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_argb32()); break;
+          case pix_format_argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_argb32()); break;
+          case pix_format_abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_argb32()); break;
+          case pix_format_bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_argb32()); break;
+        }
+        break;
+
+      case pix_format_bgra32:
+        switch(format)
+        {
+          default: break;
+          case pix_format_rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_bgra32()); break;
+          case pix_format_rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_bgra32()); break;
+          case pix_format_rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_bgra32());  break;
+          case pix_format_bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_bgra32());  break;
+          case pix_format_rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_bgra32()); break;
+          case pix_format_argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_bgra32()); break;
+          case pix_format_abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_bgra32()); break;
+          case pix_format_bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_bgra32()); break;
+        }
+        break;
+    }
+    window_img->data = (char*)buf_tmp;
+    XPutImage(display, 
+        window, 
+        gc, 
+        window_img, 
+        r.left, r.top, r.left, r.top,
+        r.width, 
+        r.height);
+ */ /*   XImage * temp_image = XCreateImage(display, vis, depth, ZPixmap, 
+        0, reinterpret_cast<char*>(buf_tmp),
+        r.width, r.height, sys_bpp,
+        r.width * (sys_bpp / 8));
+
+    if( temp_image ){
+      temp_image->byte_order = byte_order;
+      XPutImage(display, window, gc, 
+          temp_image, 0, 0, r.left, r.top,
+          r.width, r.height);
+
+      temp_image->data = 0;
+
+      XDestroyImage( temp_image );
+    }*/
+/*
+    delete [] buf_tmp;
+  }*/
+
+}
 void antigrain::update_window() {
   if(window_img == 0) return;
   window_img->data = (char*)window_buffer;

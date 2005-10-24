@@ -4,6 +4,12 @@
 #include <boost/cstdint.hpp>
 #include "window.hpp"
 #include "application.hpp"
+#ifdef HAVE_XDAMAGE
+#include <X11/extensions/Xdamage.h>
+#endif
+#ifdef HAVE_XSYNC
+#include <X11/extensions/sync.h>
+#endif
 
 namespace gott{ namespace gui{ namespace x11{
 
@@ -26,13 +32,13 @@ window::~window()
 }
 
 window::window( application& app, rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
-  : app( &app ), handle(0), flags(Clear), parent(0)
+  : app( &app ), handle(0), flags(Clear), use_xdamage(false), avail_request(false), parent(0)
 {
   open(r,title,p,flags);
 }
 
 window::window( rect const& r, std::string const& title, pixelformat const& p, std::size_t flags )
-  : app( get_default_app() ), flags(Clear), parent(0)
+  : app( get_default_app() ), flags(Clear), use_xdamage(false), avail_request(false), parent(0)
 {
   open(r,title,p,flags);
 }
@@ -60,12 +66,21 @@ void window::open(rect const&r, std::string const& t, pixelformat const& , std::
 
  	// init the pixelformat and get the associated visual info
 
+  use_xdamage = false;
+#ifdef HAVE_XDAMAGE
+  if(XDamageQueryExtension(app->get_display(), &xdamage_event_base, &xdamage_error_base)) {
+    use_xdamage = true;
+  }
+#endif
+
+
+
 	// run the user-handler
   this->prepare_visual( app->get_screen(), app->get_display() );
 		
   {
     XSetWindowAttributes	attributes;
-    unsigned int attributes_mask = 0;
+    unsigned int attributes_mask =  CWBorderPixel | CWColormap | CWEventMask ;
     // init the colormap
     attributes.colormap = XCreateColormap( app->get_display(), root_window,
         this->get_visual(), AllocNone );
@@ -74,6 +89,11 @@ void window::open(rect const&r, std::string const& t, pixelformat const& , std::
 
     attributes.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
       StructureNotifyMask | PointerMotionMask | FocusChangeMask;
+#ifdef HAVE_XDAMAGE
+    if( use_xdamage )
+        attributes.event_mask |= XDamageNotify;
+#endif
+
 
     if( ! fl & Decoration )     {
       attributes_mask |= CWOverrideRedirect;
@@ -85,7 +105,6 @@ void window::open(rect const&r, std::string const& t, pixelformat const& , std::
       attributes_mask |= CWSaveUnder;
     }
 
-    attributes_mask = CWBorderPixel | CWColormap | CWEventMask ;
 
     // create the physical window
     handle = XCreateWindow( app->get_display(), root_window
@@ -103,14 +122,35 @@ void window::open(rect const&r, std::string const& t, pixelformat const& , std::
     throw std::runtime_error("no window handle");
   ///////////////
 
+#ifdef HAVE_XDAMAGE
+  if( use_xdamage ) {
+    XSelectInput(app->get_display(), handle, KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
+      StructureNotifyMask | PointerMotionMask | PointerMotionMask | FocusChangeMask | ExposureMask | KeyPressMask | XDamageNotify);
+    damage=XDamageCreate(app->get_display(), handle, XDamageReportRawRectangles);
+    if( damage ) 
+      std:: cout << "Creation successful" << std::endl;
+  }
+#endif
   set_window_type( fl );
 
 
+  size_t num_p = 4;
   protocols[0] = app->get_atom("WM_DELETE_WINDOW");
   protocols[1] = app->get_atom("WM_TAKE_FOCUS");
   protocols[2] = app->get_atom("_NET_WM_PING");
   protocols[3] = app->get_atom("_NET_WM_CONTEXT_HELP");
-  XSetWMProtocols( app->get_display(), handle, protocols, 4);
+#ifdef HAVE_XSYNC
+  if(app->use_xsync() ) {
+    last_request.hi = last_request.lo = 0;
+    if( counter = XSyncCreateCounter( app->get_display(), last_request ) )  {
+      protocols[4] = app->get_atom("_NET_WM_SYNC_REQUEST");
+      ++num_p;
+      XChangeProperty( app->get_display(), handle, app->get_atom("_NET_WM_SYNC_REQUEST_COUNTER"), XA_CARDINAL, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&counter), 1 );
+    }
+  }
+#endif
+
+  XSetWMProtocols( app->get_display(), handle, protocols, num_p);
 
   // set _NET_WM_PID
   long curr_pid = getpid();
@@ -119,6 +159,7 @@ void window::open(rect const&r, std::string const& t, pixelformat const& , std::
       , XA_CARDINAL, 32, PropModeReplace,
       reinterpret_cast<unsigned char *>(&curr_pid), 1
       );
+
 
  /* if( parent == 0 )
     XChangeProperty( app->get_display(), handle

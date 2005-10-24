@@ -39,6 +39,13 @@
 #include "cairo.hpp"
 #endif
 
+#ifdef HAVE_XDAMAGE
+#include <X11/extensions/Xdamage.h>
+#endif
+#ifdef HAVE_XSYNC
+#include <X11/extensions/sync.h>
+#endif
+
 namespace gott{ namespace gui{ namespace x11{
 
 class application;
@@ -56,10 +63,19 @@ class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::wi
     application *app;
     ::Window		handle;	
     std::size_t flags;
-    enum Protocols { DeleteWindow, Focus, Ping, ContextHelp };
-    ::Atom protocols[4];
+    int xdamage_event_base, xdamage_error_base;
+    bool use_xdamage, use_xsync, avail_request;
+    enum Protocols { DeleteWindow, Focus, Ping, ContextHelp, SyncRequest };
+    ::Atom protocols[5];
     ::Atom wm_name, wm_icon_name, wm_type;
     window * parent;
+#ifdef HAVE_XSYNC
+    XSyncValue last_request;
+    XSyncCounter counter;
+#endif
+#ifdef HAVE_XDAMAGE
+    Damage damage;
+#endif
     
     // Implementation specific functions:
 
@@ -69,7 +85,7 @@ class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::wi
 
     ~window();
    
-    void swap_buffer();
+    void swap_buffer(); ///< old
     
     void open( application& app, rect const&r, std::string const& title, pixelformat const& p, std::size_t flags );
     void open( rect const&r, std::string const& title, pixelformat const& p, std::size_t flags );

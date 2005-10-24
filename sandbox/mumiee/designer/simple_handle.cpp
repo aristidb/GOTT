@@ -113,5 +113,14 @@ void simple_handle::set_position( coord const& pos ) {
 coord simple_handle::get_position() const{
   return get_coord();
 }
+
+
+vector_obj::hit_t simple_handle::hit(coord const &c) const {
+  rect reg = get_region();
+  if( c.x == reg.left || c.x == long(reg.left+reg.width) || c.y == reg.top || c.y == long(reg.top + reg.height))
+    return vector_obj::BORDER; 
+  return reg.is_inside( c ) ? vector_obj::INSIDE : vector_obj::OUTSIDE;
+}
+
 }}}
 

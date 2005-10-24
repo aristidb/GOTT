@@ -38,7 +38,10 @@
 namespace gott{namespace gui{namespace designer{
 
 rounded_rect::hit_t rounded_rect::hit(coord const &c) const {
-  return OUTSIDE; //TODO
+  if( c.x == extents.left || c.x == long(extents.left+extents.width) || c.y == extents.top || c.y == long(extents.top + extents.height))
+    return vector_obj::BORDER; 
+  return extents.is_inside( c ) ? vector_obj::INSIDE : vector_obj::OUTSIDE;
+  // TODO Still broken
 }
 
 void rounded_rect::draw( agg::rendering_buffer &buf ) {
@@ -92,10 +95,10 @@ rounded_rect::rounded_rect( rect const& p ) : extents(p), radius(0) {
   typedef boost::shared_ptr<handle> sh_h;
   {
     simple_handle * s = new simple_handle( 
-        (( var(extents.left) = bind(&coord::x, _1) )
-         ,( var(extents.top) = bind(&coord::y, _1) ) )
+        (( var(extents.left) = bind(&coord::x, _1) )      // << Dragevents
+         ,( var(extents.top) = bind(&coord::y, _1) ) )    // <<  --- " --
         );
-    s->set_position_handler( 
+    s->set_position_handler(   // \.- das hier liefert und setzt die position eines handles 
         bind(constructor<coord>(), var(extents.left), var(extents.top) ) 
         ,  (( var(extents.left) = bind(&coord::x, _1) )
           ,( var(extents.top) = bind(&coord::y, _1) ) )
@@ -146,4 +149,5 @@ rounded_rect::rounded_rect( rect const& p ) : extents(p), radius(0) {
 
 
 }}}
+
 

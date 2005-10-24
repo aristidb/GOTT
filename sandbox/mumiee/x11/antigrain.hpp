@@ -85,6 +85,7 @@ struct antigrain
     antigrain();
     ~antigrain();
     void update_window();
+    void update_rect( gott::gui::rect const& r );
     agg::rendering_buffer& get_render_buffer() { return rbuffer; }
 
 //    void put_image(const rendering_buffer* src ... position  ...);

@@ -24,9 +24,9 @@ namespace gott{namespace gui{namespace carbon{
 
 
 
-pascal OSStatus window_close (EventHandlerCallRef nextHandler, EventRef theEvent, void* userData);
+pascal OSStatus window_close( EventHandlerCallRef next_handler, EventRef ev, void* userData);
 
-pascal OSStatus window_close (EventHandlerCallRef nextHandler, EventRef theEvent, void* userData)
+pascal OSStatus window_close( EventHandlerCallRef next_handler, EventRef ev, void* userData)
 {
   window *win = reinterpret_cast<window*>(data);
 	
@@ -35,10 +35,10 @@ pascal OSStatus window_close (EventHandlerCallRef nextHandler, EventRef theEvent
     win->close();
   }
 
-	return CallNextEventHandler (nextHandler, theEvent);
+	return CallNextEventHandler( next_handler, ev);
 }
 
-pascal OSStatus window_draw(EventHandlerCallRef next_handler, EventRef event, void* data)
+pascal OSStatus window_draw( EventHandlerCallRef next_handler, EventRef event, void* data)
 {
   window *win = reinterpret_cast<window*>(data);
 

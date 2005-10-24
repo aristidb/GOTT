@@ -51,6 +51,7 @@ struct simple_handle : public handle {
     boost::signals::connection add_final_position_handler( pos_update_signal::slot_type const& slot );
 
     void set_position_handler( boost::function<coord ()> getter, boost::function<void (coord const&)> setter );
+    vector_obj::hit_t hit(coord const &c) const;
 
     /**
      * \brief handle draws itself in here: 

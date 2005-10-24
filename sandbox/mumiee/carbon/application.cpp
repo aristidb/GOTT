@@ -24,13 +24,13 @@
 
 namespace gott{namespace gui{namespace carbon{
     
-pascal OSStatus application_quit(EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data);
-pascal OSStatus application_mouse_down(EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data);
-pascal OSStatus application_mouse_up(EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data);
-pascal OSStatus application_mouse_dragged(EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data);
-pascal OSStatus application_key_down(EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data);
-pascal OSStatus application_key_up(EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data);
-pascal void application_idle(EventLoopTimerRef theTimer, void* user_data);
+pascal OSStatus application_quit(EventHandlerCallRef next_handler, EventRef ev, void* user_data);
+pascal OSStatus application_mouse_down(EventHandlerCallRef next_handler, EventRef ev, void* user_data);
+pascal OSStatus application_mouse_up(EventHandlerCallRef next_handler, EventRef ev, void* user_data);
+pascal OSStatus application_mouse_dragged(EventHandlerCallRef next_handler, EventRef ev, void* user_data);
+pascal OSStatus application_key_down(EventHandlerCallRef next_handler, EventRef ev, void* user_data);
+pascal OSStatus application_key_up(EventHandlerCallRef next_handler, EventRef ev, void* user_data);
+pascal void application_idle(EventLoopTimerRef timer, void* user_data);
 
 application::application(){
 
@@ -76,11 +76,11 @@ application::application(){
   // You may decide to change the wait value which is currently 50 milliseconds.
 /*  EventLoopRef		mainLoop;
   EventLoopTimerUPP	timerUPP;
-  EventLoopTimerRef	theTimer;
+  EventLoopTimerRef	timer;
 
   mainLoop = GetMainEventLoop();
   timerUPP = NewEventLoopTimerUPP( application_idle );
-  InstallEventLoopTimer( mainLoop, 0, 50 * kEventDurationMillisecond, timerUPP, this, &theTimer);*/
+  InstallEventLoopTimer( mainLoop, 0, 50 * kEventDurationMillisecond, timerUPP, this, &timer);*/
 
 
 }
@@ -91,22 +91,22 @@ application::run()
   RunApplicationEventLoop();
 }
 
-pascal OSStatus application_quit (EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data)
+pascal OSStatus application_quit (EventHandlerCallRef next_handler, EventRef ev, void* user_data)
 {
 	user_data;
 	
-	return CallNextEventHandler (nextHandler, theEvent);
+	return CallNextEventHandler (next_handler, ev);
 }
 
 
-pascal OSStatus application_mouse_down (EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data)
+pascal OSStatus application_mouse_down (EventHandlerCallRef next_handler, EventRef ev, void* user_data)
 {
   Point wheresMyMouse;
   UInt32 modifier;
 
-  GetEventParameter (theEvent, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &wheresMyMouse);
+  GetEventParameter (ev, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &wheresMyMouse);
   GlobalToLocal (&wheresMyMouse);
-  GetEventParameter (theEvent, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
+  GetEventParameter (ev, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
 
   platform_support * app = reinterpret_cast<platform_support*>(user_data);
 
@@ -149,18 +149,18 @@ pascal OSStatus application_mouse_down (EventHandlerCallRef nextHandler, EventRe
     }
   }
 
-  return CallNextEventHandler (nextHandler, theEvent);
+  return CallNextEventHandler (next_handler, ev);
 }
 
 
-pascal OSStatus application_mouse_up (EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data)
+pascal OSStatus application_mouse_up (EventHandlerCallRef next_handler, EventRef ev, void* user_data)
 {
   Point wheresMyMouse;
   UInt32 modifier;
 
-  GetEventParameter (theEvent, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &wheresMyMouse);
+  GetEventParameter (ev, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &wheresMyMouse);
   GlobalToLocal (&wheresMyMouse);
-  GetEventParameter (theEvent, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
+  GetEventParameter (ev, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
 
   platform_support * app = reinterpret_cast<platform_support*>(user_data);
 
@@ -185,18 +185,18 @@ pascal OSStatus application_mouse_up (EventHandlerCallRef nextHandler, EventRef 
       app->m_specific->m_cur_y, 
       app->m_specific->m_input_flags);
 
-  return CallNextEventHandler (nextHandler, theEvent);
+  return CallNextEventHandler (next_handler, ev);
 }
 
 
-pascal OSStatus application_mouse_dragged (EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data)
+pascal OSStatus application_mouse_dragged (EventHandlerCallRef next_handler, EventRef ev, void* user_data)
 {
   Point wheresMyMouse;
   UInt32 modifier;
 
-  GetEventParameter (theEvent, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &wheresMyMouse);
+  GetEventParameter (ev, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &wheresMyMouse);
   GlobalToLocal (&wheresMyMouse);
-  GetEventParameter (theEvent, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
+  GetEventParameter (ev, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
 
   platform_support * app = reinterpret_cast<platform_support*>(user_data);
 
@@ -227,17 +227,17 @@ pascal OSStatus application_mouse_dragged (EventHandlerCallRef nextHandler, Even
         app->m_specific->m_input_flags);
   }
 
-  return CallNextEventHandler (nextHandler, theEvent);
+  return CallNextEventHandler (next_handler, ev);
 }
 
 
-pascal OSStatus application_key_down (EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data)
+pascal OSStatus application_key_down (EventHandlerCallRef next_handler, EventRef ev, void* user_data)
 {
   char key_code;
   UInt32 modifier;
 
-  GetEventParameter (theEvent, kEventParamKeyMacCharCodes, typeChar, NULL, sizeof(char), NULL, &key_code);
-  GetEventParameter (theEvent, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
+  GetEventParameter (ev, kEventParamKeyMacCharCodes, typeChar, NULL, sizeof(char), NULL, &key_code);
+  GetEventParameter (ev, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
 
   platform_support * app = reinterpret_cast<platform_support*>(user_data);
 
@@ -304,17 +304,17 @@ pascal OSStatus application_key_down (EventHandlerCallRef nextHandler, EventRef 
     }
   }
 
-  return CallNextEventHandler (nextHandler, theEvent);
+  return CallNextEventHandler (next_handler, ev);
 }
 
 
-pascal OSStatus application_key_up (EventHandlerCallRef nextHandler, EventRef theEvent, void* user_data)
+pascal OSStatus application_key_up (EventHandlerCallRef next_handler, EventRef ev, void* user_data)
 {
   char key_code;
   UInt32 modifier;
 
-  GetEventParameter (theEvent, kEventParamKeyMacCharCodes, typeChar, NULL, sizeof(char), NULL, &key_code);
-  GetEventParameter (theEvent, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
+  GetEventParameter (ev, kEventParamKeyMacCharCodes, typeChar, NULL, sizeof(char), NULL, &key_code);
+  GetEventParameter (ev, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifier);
 
   platform_support * app = reinterpret_cast<platform_support*>(user_data);
 
@@ -330,11 +330,11 @@ pascal OSStatus application_key_up (EventHandlerCallRef nextHandler, EventRef th
       break;
   }
 
-  return CallNextEventHandler (nextHandler, theEvent);
+  return CallNextEventHandler( next_handler, ev);
 }
 
 
-pascal void application_idle( EventLoopTimerRef theTimer, void* user_data )
+pascal void application_idle( EventLoopTimerRef timer, void* user_data )
 {
 }
 

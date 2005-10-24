@@ -26,6 +26,8 @@ if debug == 1:
 elif debug == -1:
 	cppdef += ['NDEBUG']
 
+### cppdef += ['HAVE_XDAMAGE']
+cppdef += ['HAVE_XSYNC']
 optimize = ARGUMENTS.get('optimize', optimize)
 
 rlib = ARGUMENTS.get('rlib', 'antigrain')
@@ -91,7 +93,7 @@ else:
 	env.ParseConfig('pkg-config --libs cairo')
 
 x11_env = env.Copy();
-x11_env.Append(LIBS=['X11'])
+x11_env.Append(LIBS=['X11','Xdamage'])
 x11_env.Append(LIBPATH=['/usr/X11R6/lib'])
 x11_shrd_env = x11_env.Copy()
 x11_shrd_env.Append(CPPDEFINES = 'BUILDING_DLL')
@@ -108,7 +110,7 @@ base_env.StaticLibrary('gottbase', base_source_files)
 
 our_libs += ['boost_signals']
 
-our_libs += ['gottx11', 'gottbase', 'boost_signals', 'X11']
+our_libs += ['gottx11', 'gottbase', 'boost_signals', 'X11','Xdamage', 'Xext']
 env.Append(LIBS=our_libs)
 x11_example_files= ['test_x11.cpp']
 env.Program('test_x11', x11_example_files, LIBPATH=['./', 'x11'] )

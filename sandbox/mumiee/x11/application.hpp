@@ -47,6 +47,8 @@ class GOTT_EXPORT application
     idle_signal process_idle;
     mouse_state mouse_info;
     key_state key_info;
+    bool xsync;
+    int xsync_event_base, xsync_error_base;
     // actions?
     void init_cursor();
     void process_event( gott::gui::x11::window* win, XEvent& event );
@@ -71,6 +73,7 @@ class GOTT_EXPORT application
     Display* get_display();
     int get_screen() const;
     Atom get_atom( char const * atom_name );
+    bool use_xsync() const;
     
 };
 

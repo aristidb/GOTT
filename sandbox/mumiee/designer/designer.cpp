@@ -34,7 +34,7 @@ using gott::gui::x11::application;
 template<typename T>
 inline T sqr(T const a ) {return a*a;}
 std::string find_font_file( std::string const& ) {
-  return "/usr/share/fonts/truetype/msttcorefonts/verdana.ttf";
+  return "/usr/share/fonts/corefonts/verdana.ttf";
 }
 
 

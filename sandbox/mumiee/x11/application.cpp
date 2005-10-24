@@ -8,6 +8,10 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/xf86vmode.h>
 
+#ifdef HAVE_XSYNC
+#include <X11/extensions/sync.h>
+#endif
+
 #include "application.hpp"
 #include "window.hpp"
 #include "input.hpp"
@@ -19,7 +23,7 @@ using namespace std;
 namespace gott{ namespace gui{ namespace x11{
 
 application::application( char const* connection )
-  : display( XOpenDisplay(connection) ), focus_window(0)
+  : display( XOpenDisplay(connection) ), focus_window(0), xsync(false)
 {
   if( display == 0 )
     throw std::runtime_error("Could not open default x11 connection");
@@ -30,8 +34,15 @@ application::application( char const* connection )
   if( protocols_atom == None )
     throw std::runtime_error("Could not create atoms");
 
-
-  init_cursor();
+#ifdef HAVE_XSYNC
+  if(XSyncQueryExtension( display, &xsync_event_base, &xsync_error_base  ) ) {
+    int vermin,vermaj;
+    if( XSyncInitialize( display, &vermin, &vermaj ) )  {
+      xsync = true;
+    }
+  }
+#endif
+//  init_cursor();
 }
 
 application::status application::handle_pending_messages()
@@ -176,7 +187,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     case MotionNotify:
       {
-//        std::cout << "MotionNotify" << std::endl;
+        //        std::cout << "MotionNotify" << std::endl;
         mouse_info.set_primary_position( coord( event.xmotion.x, event.xmotion.y ) );
         mouse_event ev( coord(event.xmotion.x, event.xmotion.y), coord(0,0) );
         win->exec_on_mouse( ev );
@@ -256,9 +267,9 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
       }
     case ConfigureNotify:
       {
-#ifdef LOG_EVENTS
+//#ifdef LOG_EVENTS
         std::cout << "ConfigureNotify" << std::endl;
-#endif
+//#endif
         XWindowAttributes root_attribs;
         ::Window root_window = RootWindow( display, screen );
 
@@ -273,6 +284,14 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
             , event.xconfigure.height );
 
         win->exec_on_configure( new_rect );
+        win->exec_on_redraw();
+
+#ifdef HAVE_XSYNC
+        if( use_xsync() && win->avail_request ) {
+          XSyncSetCounter( display, win->counter, win->last_request );
+          win->avail_request = false;
+        }
+#endif
         break;
 
       }
@@ -280,10 +299,10 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
     case Expose:
       {
 
-#ifdef LOG_EVENTS
+//#ifdef LOG_EVENTS
         std::cout << "Expose" << std::endl;
-#endif
-        if( win== 0 )
+//#endif
+        if( win== 0 || event.xexpose.count > 0 )
           return;
 
         win->exec_on_redraw();
@@ -304,7 +323,13 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 #ifdef LOG_EVENTS
           std::cout << "Protocols " << std::endl;
 #endif
-          if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::Ping] )
+          if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::SyncRequest] ) {
+            win->last_request.lo = event.xclient.data.l[2];
+            win->last_request.hi = event.xclient.data.l[3];
+            win->avail_request = true;
+            std::cout << "last request : " << win->last_request.lo << " " << win->last_request.hi << std::endl;
+          }
+          else if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::Ping] )
           {
 #ifdef LOG_EVENTS
             std::cout << "Ping " << std::endl;
@@ -326,9 +351,9 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
         }
         /*else if( event.xclient.message_type == delete_atom )
-        {
+          {
           std::cout << "DELETE ATOM" << std::endl;
-        }*/
+          }*/
         else
         {
           std::cout << "unrecognized client-message type:" <<    XGetAtomName( display, event.xclient.message_type ) << '\n';
@@ -376,13 +401,21 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
       };
 
     default:
-#ifdef LOG_EVENTS
+#ifdef HAVE_XDAMAGE
+      if( win && win->use_xdamage && event.type == win->xdamage_event_base + XDamageNotify ) {
+        XDamageNotifyEvent *notify= reinterpret_cast<XDamageNotifyEvent *>(&event);
+        rect r(notify->area.x, notify->area.y, notify->area.width, notify->area.height);
+        // call render method with rect, or fusioned rect, if invalid rects are available?
+        win->update_rect( r );
+        return;
+      }
+#endif
+//#ifdef LOG_EVENTS
       // unrecognized event -> terminate
       std::cout << "(gott-gui) unrecognized event:" << event.type <<  '\n';
-#endif
+//#endif
       break;
   };
-
 }
 
 key_state const& application::get_key_state() const
@@ -393,6 +426,10 @@ key_state const& application::get_key_state() const
 mouse_state const& application::get_mouse_state() const
 {
   return mouse_info;
+}
+
+bool application::use_xsync() const {
+  return xsync;
 }
 
 }}}
