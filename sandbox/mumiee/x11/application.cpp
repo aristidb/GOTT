@@ -275,13 +275,15 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
         if(!win)
           return;
+        XEvent other = event;
+        while (! XCheckTypedWindowEvent( display, win->handle, ConfigureNotify, &other) );
 
         XGetWindowAttributes( display, root_window, &root_attribs );
 
-        rect new_rect( event.xconfigure.x
-            , root_attribs.height - event.xconfigure.height - event.xconfigure.y
-            , event.xconfigure.width 
-            , event.xconfigure.height );
+        rect new_rect( other.xconfigure.x
+            , root_attribs.height - other.xconfigure.height - other.xconfigure.y
+            , other.xconfigure.width 
+            , other.xconfigure.height );
 
         win->exec_on_configure( new_rect );
 

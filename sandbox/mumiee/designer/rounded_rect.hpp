@@ -35,7 +35,7 @@ class rounded_rect : public vector_obj {
   public:
     typedef std::list<boost::weak_ptr<handle> > handle_list;
 
-    rounded_rect( rect const& position );
+    rounded_rect( rect const& position, vector_obj::damage_type const& d );
     ~rounded_rect();
 
     void set_position(coord const& pos);

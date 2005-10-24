@@ -1,6 +1,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <boost/timer.hpp>
+#include <boost/bind.hpp>
+#include <boost/bind/placeholders.hpp>
 #include <agg_pixfmt_rgba.h>
 #include <agg_renderer_base.h>
 #include <agg_renderer_scanline.h>
@@ -105,7 +107,7 @@ class window : public x11::window
         set_on_redraw(boost::bind(&window::on_redraw, this));
         set_on_configure(boost::bind(&window::on_configure, this, _1));
 
-        designer::rounded_rect *rr  = new  designer::rounded_rect(rect( 40,20, 100, 200 ) );
+        designer::rounded_rect *rr  = new  designer::rounded_rect(rect( 40,20, 100, 200 ), boost::bind( &gott::gui::x11::window::damage_region, static_cast<window*>(this), _1) );
 
         objects.push_back( boost::shared_ptr<designer::vector_obj>( rr ) );
         drawables.push_back( objects.back() );
@@ -357,7 +359,7 @@ int main()
   try {
     application app;
     pixelformat format;
-    window a_window( app, rect(0,0,200,100),"Mein Titel", format ); 
+    window a_window( app, rect(0,0,200,100),"Widget Designer", format ); 
 
     app.run();
   } catch( std:: runtime_error &e ){

@@ -106,6 +106,8 @@ class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::wi
     void set_region( rect const& region );
     void set_render_context();
 
+    void damage_region(rect const& region );
+
 
     // event handlers:
     virtual void on_redraw();

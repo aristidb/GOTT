@@ -21,7 +21,8 @@
 #include "handle.hpp"
 
 namespace gott{namespace gui{namespace designer{
-handle::handle( ) : vector_obj( std::numeric_limits<depth_t>::max(), 0 ), region(0,0,10,10), status(true)  {
+handle::handle( vector_obj::damage_type const& d ) : vector_obj( std::numeric_limits<depth_t>::max(), 0, d ), region(0,0,10,10), status(true)  {
+
 }
 rect const& handle::get_region() const{
   return region;

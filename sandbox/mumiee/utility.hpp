@@ -57,7 +57,9 @@ struct GOTT_EXPORT rect
   rect( long l, long t , std::size_t width, std::size_t height);
   rect();
   bool is_inside( coord const& c ) const;
+  void add_region( rect const& r );
 };
+
 
 struct GOTT_EXPORT window_flags
 {

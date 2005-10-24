@@ -34,7 +34,7 @@ class handle : public vector_obj{
     rect region;
     bool status;
   public:
-    handle( );
+    handle( vector_obj::damage_type const& d );
     rect const& get_region() const;
     void set_region( rect const& reg );
     bool enabled() const;

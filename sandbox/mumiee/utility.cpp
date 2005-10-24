@@ -49,6 +49,13 @@ rect::rect()
   : left(0), top(0), width(1), height(1)
 {}
 
+void rect::add_region( rect const& other ) {
+  width = std::max( left + width, other.left + other.width);
+  left = std::min( left, other.left );
+  height = std::max( top + height, other.top + other.height);
+  top = std::min( top, other.top);
+}
+
 bool rect::is_inside( coord const& c  ) const {
   return c.x >= left && c.x <= left + long(width)  &&  c.y >= top && c.y <= top + long(height);
 }

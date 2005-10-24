@@ -90,13 +90,14 @@ coord rounded_rect::get_position() const{
   return coord(extents.left,extents.top);
 }
 
-rounded_rect::rounded_rect( rect const& p ) : extents(p), radius(0) {
+rounded_rect::rounded_rect( rect const& p, vector_obj::damage_type const& d ) : vector_obj(d), extents(p), radius(0) {
   using namespace boost::lambda;
   typedef boost::shared_ptr<handle> sh_h;
   {
     simple_handle * s = new simple_handle( 
         (( var(extents.left) = bind(&coord::x, _1) )      // << Dragevents
          ,( var(extents.top) = bind(&coord::y, _1) ) )    // <<  --- " --
+        , d
         );
     s->set_position_handler(   // \.- das hier liefert und setzt die position eines handles 
         bind(constructor<coord>(), var(extents.left), var(extents.top) ) 
@@ -110,6 +111,7 @@ rounded_rect::rounded_rect( rect const& p ) : extents(p), radius(0) {
     simple_handle * s = new simple_handle(
          (( var(extents.left) = bind(&coord::x, _1) )
          ,( var(extents.height) = bind(&coord::y, _1) - var(extents.top) ))
+        , d
         );
     s->set_position_handler( 
         bind(constructor<coord>(), var(extents.left), var(extents.top) + var(extents.height) ) 
@@ -123,6 +125,7 @@ rounded_rect::rounded_rect( rect const& p ) : extents(p), radius(0) {
     simple_handle * s = new simple_handle( 
          (( var(extents.width) = bind(&coord::x, _1)  - var(extents.left) )
          ,( var(extents.height) = bind(&coord::y, _1) - var(extents.top) ))
+        , d
         );
     s->set_position_handler( 
         bind(constructor<coord>(), var(extents.left) + var(extents.width), var(extents.top) + var(extents.height)) 
@@ -136,6 +139,7 @@ rounded_rect::rounded_rect( rect const& p ) : extents(p), radius(0) {
     simple_handle * s = new simple_handle( 
         (( var(extents.width) = bind(&coord::x, _1)  - var(extents.left) )
          ,( var(extents.top) = bind(&coord::y, _1) ))
+        , d
         );
     s->set_position_handler( 
         bind(constructor<coord>(), var(extents.left) + var(extents.width), var(extents.top) ) 

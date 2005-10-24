@@ -26,19 +26,27 @@
 
 namespace gott{namespace gui{namespace designer{
 
-simple_handle::simple_handle() {
+simple_handle::simple_handle( vector_obj::damage_type const& d ) : handle(d) {
+
 }
 
-simple_handle::simple_handle( pos_update_signal::slot_type const& update_handler )  {
+simple_handle::simple_handle( pos_update_signal::slot_type const& update_handler, vector_obj::damage_type const& d) 
+  : handle(d)  
+{
   pos_update.connect( update_handler );
 }
 void simple_handle::update_region() {
   if( get_coord ) {
     coord c = get_coord();
     rect r = get_region();
+    rect damaged = r;
     r.left = c.x - r.width/2;
     r.top = c.y - r.height/2;
     set_region( r );
+
+    damaged.add_region(r);
+    damage(damaged);
+    
   }
 }
 void simple_handle::set_position_handler( boost::function<coord ()> getter, boost::function<void (coord const&)> setter ) {
@@ -48,7 +56,7 @@ void simple_handle::set_position_handler( boost::function<coord ()> getter, boos
   update_region();
 }
 
-simple_handle::simple_handle( pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag )  {
+simple_handle::simple_handle( pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag, vector_obj::damage_type const& d ) :handle(d)  {
   pos_update.connect( update_handler );
   final_pos.connect( end_drag );
 }

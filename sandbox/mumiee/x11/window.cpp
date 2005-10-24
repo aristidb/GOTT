@@ -367,6 +367,22 @@ gott::gui::rect const& window::get_rect() const
   return window_rect;
 }
 
+void window::damage_region( rect const& region ) {
+  XEvent event;
+  event.type = Expose;
+  event.xexpose.type=Expose;
+  event.xexpose.serial=0; // hmm^hmm
+  event.xexpose.send_event=true;
+  event.xexpose.display=app->get_display();
+  event.xexpose.window=handle;
+  event.xexpose.x=region.left;
+  event.xexpose.y=region.top;
+  event.xexpose.width=region.width;
+  event.xexpose.height=region.height;
+  event.xexpose.count=0; // hmmm 
+  XSendEvent(app->get_display(), handle, true, 0L, &event );
+}
+
 
 
 bool window::has_decoration() const

@@ -23,6 +23,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include <boost/function.hpp>
 #include <agg_rendering_buffer.h>
 #include "utility.hpp"
 
@@ -31,13 +32,16 @@ namespace gott { namespace gui { namespace designer {
 
   /// Base Class for Objects capable of rendering agg vectors
   struct GOTT_EXPORT vector_obj {
+    typedef boost::function<void(gott::gui::rect const&)> damage_type;
     typedef unsigned int depth_t;
     virtual ~vector_obj() =0;
 
-    GOTT_LOCAL vector_obj() : depth(0), fill(0x0) { }
-    GOTT_LOCAL vector_obj( depth_t depth_, filler const *f)
-      : depth(depth_), fill(f)
+    GOTT_LOCAL vector_obj( damage_type const& d ) : depth(0), fill(0x0), damage_region(d) { }
+    GOTT_LOCAL vector_obj( depth_t depth_, filler const *f, damage_type const& d)
+      : depth(depth_), fill(f), damage_region(d)
     { }
+
+    GOTT_LOCAL void damage( gott::gui::rect const& r) { if(damage_region) damage_region(r); }
 
     virtual void set_position(coord const& pos) = 0;
     virtual coord get_position() const = 0;
@@ -62,6 +66,7 @@ namespace gott { namespace gui { namespace designer {
   private:
     depth_t depth;
     filler const *fill;
+    damage_type damage_region;
   };
 
   typedef boost::shared_ptr<vector_obj> shared_vec_obj;

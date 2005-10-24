@@ -43,9 +43,9 @@ struct simple_handle : public handle {
     boost::function<coord ()> get_coord;
     boost::function<void (coord const&)> set_coord;
   public:
-    simple_handle();
-    simple_handle( pos_update_signal::slot_type const& update_handler );
-    simple_handle( pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag );
+    simple_handle( vector_obj::damage_type const& d );
+    simple_handle( pos_update_signal::slot_type const& update_handler, vector_obj::damage_type const& d);
+    simple_handle( pos_update_signal::slot_type const& update_handler, pos_update_signal::slot_type const& end_drag, vector_obj::damage_type const& d);
 
     boost::signals::connection add_position_handler( pos_update_signal::slot_type const& slot );
     boost::signals::connection add_final_position_handler( pos_update_signal::slot_type const& slot );
