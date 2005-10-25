@@ -29,10 +29,6 @@ class embedded_storage {
   T obj;
 public:
   embedded_storage(T const &x = T()) : obj(x) {}
-  typedef T *pointer;
-  typedef T const *const_pointer;
-  typedef T &reference;
-  typedef T const &const_reference;
 
   T *get_pointer() { return &obj; }
   T const *get_pointer() const { return &obj; }

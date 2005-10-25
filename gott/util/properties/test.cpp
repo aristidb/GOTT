@@ -1,11 +1,16 @@
 #include "property.hpp"
 #include <gott/util/string/string.hpp>
 #include <gott/util/string/buffer.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/function.hpp>
 #include <iostream>
 
 using namespace gott;
 using namespace gott::properties;
+using namespace boost::lambda;
+using boost::function;
 using std::cout;
+using std::cin;
 using std::endl;
 
 template<int i>
@@ -30,6 +35,13 @@ public:
   }
 };
 
+int read_fun() {
+  int val;
+  if (cin >> val)
+    return val;
+  throw 0;
+}
+
 int main() {
   concrete_property<int> p;
   p.set(4);
@@ -51,4 +63,27 @@ int main() {
   property<int> &ref = q;
   srand(time(NULL));
   ref.apply_write(rand);
+
+  // Lambda is easy...
+  typedef
+  external_storage<
+    int,
+    function<int ()>,
+    function<void (int)> 
+  > 
+  stream_storage;
+
+  typedef
+  concrete_property<
+    int, 
+    no_notification, 
+    stream_storage
+  > 
+  stream_property;
+
+  function<int ()> read = read_fun;
+  function<void (int)> write = cout << _1 << '\n';
+  
+  stream_property streamed(stream_storage(read, write));
+  *streamed.read_write() *= 2;
 }
