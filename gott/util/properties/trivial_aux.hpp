@@ -21,45 +21,17 @@
 #ifndef GOTT_UTIL_PROPERTY_TRIVIAL_AUX_HPP
 #define GOTT_UTIL_PROPERTY_TRIVIAL_AUX_HPP
 
+#include <cstddef>
+#include <iostream>
+
 namespace gott {
 namespace properties {
 
 struct no_lock {
   typedef no_lock read_lock, write_lock, read_write_lock;
 
-  static void begin(no_lock &) {}
-  static void end(no_lock &) {}
-};
-
-template<class ValueType, class Storage>
-struct direct_access {
-  bool set(Storage &s, ValueType const &v) const { 
-    *s.get_pointer() = v;
-    return true;
-  }
-
-  ValueType const &get(Storage const &s) const {
-    return *s.get_pointer();
-  }
-
-  typedef typename Storage::pointer pointer;
-  typedef typename Storage::const_pointer const_pointer;
-
-  pointer build(Storage &s) const {
-    return s.get_pointer();
-  }
-
-  const_pointer build(Storage const &s) const {
-    return s.get_pointer();
-  }
-
-  bool done_with(pointer) const {
-    return true;
-  }
-
-  bool done_with(const_pointer) const {
-    return true;
-  }
+  void *operator new(std::size_t) throw() { return 0; }
+  void operator delete(void *) {}
 };
 
 struct no_notification {

@@ -18,10 +18,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_PROPERTY_PROPERTY_HPP
-#define GOTT_UTIL_PROPERTY_PROPERTY_HPP
+#ifndef GOTT_UTIL_PROPERTIES_PROPERTY_HPP
+#define GOTT_UTIL_PROPERTIES_PROPERTY_HPP
 
 #include "embedded_storage.hpp"
+#include "external_storage.hpp"
 #include "trivial_aux.hpp"
 #include "policy.hpp"
 #include "translate.hpp"
@@ -236,40 +237,37 @@ public:
 
 private:
   annotated_const_pointer begin_read() const {
-    read_lock::begin(lock);
-    return annotated_const_pointer(storage.get_pointer(), 0);
+    return annotated_const_pointer(storage.get_pointer(), new read_lock(lock));
   }
 
   annotated_pointer begin_write() {
-    write_lock::begin(lock);
-    return annotated_pointer(storage.get_pointer(), 0);
+    return annotated_pointer(storage.get_pointer(), new write_lock(lock));
   }
 
   annotated_pointer begin_read_write() {
-    read_write_lock::begin(lock);
-    return annotated_pointer(storage.get_pointer(), 0);
+    return annotated_pointer(storage.get_pointer(), new read_write_lock(lock));
   }
 
   void end_read(annotated_const_pointer p) const {
     storage.finish_pointer(p.first);
-    read_lock::end(lock);
+    delete static_cast<read_lock *>(p.second);
   }
 
   void end_write(annotated_pointer p) {
     storage.finish_pointer(p.first);
-    write_lock::end(lock);
+    delete static_cast<write_lock *>(p.second);
     notifier.notify(this);
   }
   
   void end_read_write(annotated_pointer p) {
     storage.finish_pointer(p.first);
-    read_write_lock::end(lock);
+    delete static_cast<write_lock *>(p.second);
     notifier.notify(this);
   }
   
   storage_s storage;
   notification_s notifier;
-  mutable lock_s lock; //FIXME
+  lock_s lock;
 };
 
 template<
