@@ -64,6 +64,11 @@ public:
         container.end_read(ptr);
     }
 
+    void operator=(read_reference const &o) {
+      ~read_reference();
+      new (this) read_reference(o);
+    }
+
     bool operator==(read_reference const &o) const {
       return ref_count == o.ref_count;
     }
@@ -94,6 +99,11 @@ public:
         container.end_write(ptr);
     }
 
+    void operator=(write_reference const &o) {
+      ~write_reference();
+      new (this) write_reference(o);
+    }
+
     bool operator==(write_reference const &o) const {
       return ref_count == o.ref_count;
     }
@@ -118,6 +128,11 @@ public:
     read_write_reference(read_write_reference const &o)
       : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
       { ++*ref_count; }
+
+    void operator=(read_write_reference const &o) {
+      ~read_write_reference();
+      new (this) read_write_reference(o);
+    }
 
     ~read_write_reference() {
       if (--*ref_count == 0)

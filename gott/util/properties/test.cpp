@@ -66,24 +66,21 @@ int main() {
 
   // Lambda is easy...
   typedef
-  external_storage<
-    int,
-    function<int ()>,
-    function<void (int)> 
-  > 
-  stream_storage;
-
-  typedef
   concrete_property<
     int, 
     no_notification, 
-    stream_storage
+    external_storage<int>
   > 
   stream_property;
 
   function<int ()> read = read_fun;
   function<void (int)> write = cout << _1 << '\n';
   
-  stream_property streamed(stream_storage(read, write));
-  *streamed.read_write() *= 2;
+  stream_property streamed(external_storage<int>(read, write));
+  for (;;) {
+    stream_property::read_write_reference r = streamed.read_write();
+    *r *= 2;
+    if (*r == 10)
+      break;
+  }
 }
