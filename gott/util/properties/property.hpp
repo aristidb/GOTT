@@ -256,7 +256,7 @@ private:
   }
 
   annotated_pointer begin_write() {
-    return annotated_pointer(storage.get_pointer(), new write_lock(lock));
+    return annotated_pointer(storage.get_pointer_noread(), new write_lock(lock));
   }
 
   annotated_pointer begin_read_write() {

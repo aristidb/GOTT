@@ -35,6 +35,7 @@ public:
   : in(in_f), out(out_f) {}
 
   T *get_pointer() { return new T(in()); }
+  T *get_pointer_noread() { return new T; }
   T const *get_pointer() const { return new T(in()); }
   void finish_pointer(T *p) { out(*p); delete p; }
   void finish_pointer(T const *p) const { delete p; }

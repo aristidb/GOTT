@@ -49,6 +49,12 @@ int main() {
   *xx.read_write() += 1.7;
   p.apply_change(add<2>);
   *p.read_write() -= 2;
+
+  { // DIRRTY
+    property<int>::read_write_reference r = p.read_write();
+    p.set(10);
+    *r -= 10;
+  }
   
   concrete_property<concrete_property<int> > x(p);
   cout << x.read()->get() << endl;
@@ -83,4 +89,5 @@ int main() {
     if (*r == 10)
       break;
   }
+  streamed.set(7);
 }
