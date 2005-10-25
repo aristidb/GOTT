@@ -70,10 +70,6 @@ public:
       new (this) read_reference(o);
     }
 
-    bool operator==(read_reference const &o) const {
-      return ref_count == o.ref_count;
-    }
-
     property const &container;
     annotated_const_pointer ptr;
     unsigned long *ref_count;
@@ -105,10 +101,6 @@ public:
       new (this) write_reference(o);
     }
 
-    bool operator==(write_reference const &o) const {
-      return ref_count == o.ref_count;
-    }
-    
     property &container;
     annotated_pointer ptr;
     unsigned long *ref_count;
@@ -140,10 +132,6 @@ public:
         container.end_read_write(ptr);
     }
 
-    bool operator==(read_write_reference const &o) const {
-      return ref_count == o.ref_count;
-    }
-    
     property &container;
     annotated_pointer ptr;
     unsigned long *ref_count;
