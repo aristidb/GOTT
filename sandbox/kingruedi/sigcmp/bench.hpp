@@ -6,9 +6,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string>
+#include <boost/cstdint.hpp>
 
 //This will be extend
-
 //Just a simple hack
 
 namespace bench {
@@ -57,6 +57,13 @@ namespace bench {
 	buf[i]=0;
 
     return misc::stoT<std::size_t>(buf);
+  }
+
+  inline ::boost::uint64_t rdtsc() {
+    ::boost::uint32_t eax, edx;
+    __asm__ __volatile__ ("rdtsc; mov %%eax, %0; mov %%edx, %1" : "=r" (eax)
+			  , "=r"(edx) : : "%eax", "%edx");
+    return (::boost::uint64_t(edx) << 32) | ::boost::uint64_t(eax);
   }
 }
 

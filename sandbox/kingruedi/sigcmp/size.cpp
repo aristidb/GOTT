@@ -1,4 +1,4 @@
-#ifdef HAS_SIGC
+#ifdef USE_SIGC
 #  include <sigc++/sigc++.h>
 #else
 #  include <boost/signals.hpp>
@@ -10,7 +10,7 @@
 #include "bench.hpp"
 
 struct foo
-#ifdef HAS_SIGC
+#ifdef USE_SIGC
   : public sigc::trackable
 #endif
 {
@@ -23,7 +23,7 @@ enum { TESTS=10000 };
 
 int main() {
   foo obj;
-#ifdef HAS_SIGC
+#ifdef USE_SIGC
   boost::ptr_vector<sigc::signal<void> > vec;
   for(size_t i=0; i<TESTS; ++i) {
     sigc::signal<void> *sig_ptr=new sigc::signal<void>;
