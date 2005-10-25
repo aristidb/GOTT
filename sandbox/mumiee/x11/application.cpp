@@ -188,6 +188,11 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
     case MotionNotify:
       {
         //        std::cout << "MotionNotify" << std::endl;
+        if(! win ) return;
+
+
+        while (! XCheckTypedWindowEvent( display, win->handle, MotionNotify, &event) );
+
         mouse_info.set_primary_position( coord( event.xmotion.x, event.xmotion.y ) );
         mouse_event ev( coord(event.xmotion.x, event.xmotion.y), coord(0,0) );
         win->exec_on_mouse( ev );
@@ -297,8 +302,13 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 //#ifdef LOG_EVENTS
         std::cout << "Expose" << std::endl;
 //#endif
-        if( win== 0 || event.xexpose.count > 0 )
+        if( win== 0 )
           return;
+
+        size_t skipped = 0;
+        while (! XCheckTypedWindowEvent( display, win->handle, Expose, &event) ) ++skipped;
+        std::cout << "Skipped " << skipped << " Expose events." << std::endl; 
+
 
         win->exec_on_redraw();
 #ifdef HAVE_XSYNC
