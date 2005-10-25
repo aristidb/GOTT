@@ -312,6 +312,10 @@ public:
   translation_property(property<OldType> &b, translation_p t = translation_policy()) 
   : bound(b), translator(t) {}
 
+  sigc::signal0<void> &on_change() {
+    return bound.on_change();
+  }
+
 private:
   annotated_const_pointer begin_read() const {
     return translator.const_box(bound.read());
