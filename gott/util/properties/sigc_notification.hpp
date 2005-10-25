@@ -18,27 +18,29 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_PROPERTY_TRIVIAL_AUX_HPP
-#define GOTT_UTIL_PROPERTY_TRIVIAL_AUX_HPP
+#ifndef GOTT_UTIL_PROPERTIES_SIGC_NOTIFICATION_HPP
+#define GOTT_UTIL_PROPERTIES_SIGC_NOTIFICATION_HPP
 
-#include <cstddef>
-#include <iostream>
 #include <sigc++/signal.h>
+#include "policy.hpp"
 
 namespace gott {
 namespace properties {
 
-struct no_lock {
-  typedef no_lock read_lock, write_lock, read_write_lock;
+struct sigc_notification;
 
-  void *operator new(std::size_t) throw() { return 0; }
-  void operator delete(void *) {}
+template<>
+struct base<sigc_notification> {
+  sigc::signal0<void> on_change_signal;
 };
 
-struct no_notification {
-  void notify(void *) const {}
-  sigc::signal0<void> *get_on_change(void *) {
-    return 0;
+struct sigc_notification {
+  void notify(base<sigc_notification> *c) const {
+    c->on_change_signal.emit();
+  }
+
+  sigc::signal0<void> *get_on_change(base<sigc_notification> *c) const {
+    return &c->on_change_signal;
   }
 };
 

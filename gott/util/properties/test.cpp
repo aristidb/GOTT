@@ -4,6 +4,7 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/function.hpp>
 #include <iostream>
+#include <sigc++/bind.h>
 
 using namespace gott;
 using namespace gott::properties;
@@ -16,13 +17,10 @@ using std::endl;
 template<int i>
 int add(int x) { return x + i; }
 
-struct test_observe {
-  template<class T>
-  void notify(T *p) {
-    cout << "Changed: " << long(p);
-    cout << " -> " << p->get() << endl;
-  }
-};
+void test_observe(property<string_buffer> *p) {
+  cout << "Changed: " << long(p);
+  cout << " -> " << p->get() << endl;
+}
 
 class vobserve {
   vobserve(vobserve const &);
@@ -33,6 +31,7 @@ public:
     cout << "Changed(ref): " << long(p);
     cout << " -> " << p->get() << endl;
   }
+  sigc::signal0<void> *get_on_change(void*) { return 0; }
 };
 
 int read_fun() {
@@ -59,7 +58,8 @@ int main() {
   concrete_property<concrete_property<int> > x(p);
   cout << x.read()->get() << endl;
   
-  concrete_property<string_buffer, test_observe> w(string("Hallo"));
+  concrete_property<string_buffer, sigc_notification> w(string("Hallo"));
+  w.on_change().connect(sigc::bind(&test_observe, &w));
   utf32_t const *add = (utf32_t const*)L" Welt!";
   std::copy(add, add + 6, w.read_write()->append(6).begin);
   cout << w.get() << endl;

@@ -26,6 +26,7 @@
 #include "trivial_aux.hpp"
 #include "policy.hpp"
 #include "translate.hpp"
+#include "sigc_notification.hpp"
 #include <utility>
 
 namespace gott {
@@ -189,6 +190,12 @@ public:
   void apply_write(F func) {
     *write() = func();
   }
+
+  class no_notification_error {};
+
+  virtual sigc::signal0<void> &on_change() {
+    throw no_notification_error();
+  }
   
   virtual ~property() {}
 
@@ -210,9 +217,9 @@ template<
 >
 class concrete_property :
   public property<Type>,
-  public base<Notification>,
-  public base<Storage>,
-  public base<Lock>
+  public base<typename policy<Notification>::class_type>,
+  public base<typename policy<Storage>::class_type>,
+  public base<typename policy<Lock>::class_type>
 {
 public:
   typedef typename property<Type>::value_type value_type;
@@ -248,6 +255,13 @@ public:
            notification_p n = notification_policy(),
            lock_p l = lock_policy())
   : storage(v), notifier(n), lock(l) {
+  }
+
+  sigc::signal0<void> &on_change() {
+    sigc::signal0<void> *p = notifier.get_on_change(this);
+    if (!p)
+      throw typename property<Type>::no_notification_error();
+    return *p;
   }
 
 private:
