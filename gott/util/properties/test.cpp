@@ -5,6 +5,7 @@
 #include <boost/function.hpp>
 #include <iostream>
 #include <sigc++/bind.h>
+#include <sigc++/connection.h>
 
 using namespace gott;
 using namespace gott::properties;
@@ -58,8 +59,11 @@ int main() {
   concrete_property<concrete_property<int> > x(p);
   cout << x.read()->get() << endl;
   
-  concrete_property<string_buffer, sigc_notification> w(string("Hallo"));
-  w.on_change().connect(sigc::bind(&test_observe, &w));
+  concrete_property<string_buffer, sigc_notification> w;
+  sigc::connection c = w.on_change().connect(sigc::bind(&test_observe, &w));
+  c.block();
+  w.set(string("Hallo"));
+  c.unblock();
   utf32_t const *add = (utf32_t const*)L" Welt!";
   std::copy(add, add + 6, w.read_write()->append(6).begin);
   cout << w.get() << endl;

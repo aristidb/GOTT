@@ -89,14 +89,16 @@ string_buffer::iterator string_buffer::erase(range_t<iterator> const &r) {
 
 gott::range_t<string_buffer::iterator>
 string_buffer::insert(iterator p, std::size_t len) {
-  if (std::size_t(data->storage_end - data->end) < len) {
-    std::size_t pp = p - data->begin;
-    data->ensure(len);
-    p = data->begin + pp;
-  } else
-    data->end += len;
-  for (iterator it = data->end - 1; it >= p + len; --it)
-    *it = *(it - len);
+  if (len != 0) {
+    if (std::size_t(data->storage_end - data->end) < len) {
+      std::size_t pp = p - data->begin;
+      data->ensure(len);
+      p = data->begin + pp;
+    } else
+      data->end += len;
+    for (iterator it = data->end - 1; it >= p + len; --it)
+      *it = *(it - len);
+  }
   return range(p, len);
 }
 
