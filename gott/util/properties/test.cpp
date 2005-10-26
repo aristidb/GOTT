@@ -1,3 +1,4 @@
+#include "verify.hpp"
 #include "property.hpp"
 #include "liaison.hpp"
 #include <gott/util/string/string.hpp>
@@ -114,5 +115,11 @@ int main() {
     s2.set("2/world!\n");
   }
   s2.set("muhkuh");
-  cout << s1.get();
+  cout << s1.get() << s2.get() << endl;
+
+  concrete_property<int, sigc_notification> sv;
+  verify<int, check_range<int>, enforce_value<int> > 
+    ver(sv, check_range<int>(0, 10));
+  sv.set(14);
+  cout << sv.get() << endl;
 }
