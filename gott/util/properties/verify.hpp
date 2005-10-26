@@ -52,6 +52,17 @@ private:
   }
 };
 
+template<class T, class Check, class OnFailure, class PropertyType>
+class owning_verify {
+public:
+  owning_verify(PropertyType const &p, Check c = Check(), OnFailure f = OnFailure())
+  : prop(p), internal_verify(prop, c, f) {}
+
+private:
+  PropertyType prop;
+  verify<T, Check, OnFailure> internal_verify;
+};
+
 template<class T>
 class check_range {
 public:
