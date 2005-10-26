@@ -43,6 +43,21 @@ public:
     right_to_left.disconnect();
   }
 
+  void block(bool should_block = true) {
+    left_to_right.block(should_block);
+    right_to_left.block(should_block);
+  }
+
+  void unblock() {
+    block(false);
+  }
+
+private:
+  property<T> &left;
+  property<T> &right;
+  sigc::connection left_to_right;
+  sigc::connection right_to_left;
+
   void left_changed() {
     right_to_left.block();
     right.set(left.get());
@@ -54,12 +69,32 @@ public:
     left.set(right.get());
     right_to_left.unblock();
   }
+};
+
+template<class T, class PropertyType>
+class owning_liaison {
+public:
+  owning_liaison(PropertyType const &lhs, PropertyType const &rhs)
+  : left(lhs), right(rhs), internal_liaison(left, right) {}
+
+  void block(bool should_block = true) {
+    internal_liaison.block(should_block);
+  }
+
+  void unblock() {
+    internal_liaison.unblock();
+  }
+
+  PropertyType &get_left() { return left; }
+  PropertyType const &get_left() const { return left; }
+
+  PropertyType &get_right() { return right; }
+  PropertyType const &get_right() const { return right; }
 
 private:
-  property<T> &left;
-  property<T> &right;
-  sigc::connection left_to_right;
-  sigc::connection right_to_left;
+  PropertyType left;
+  PropertyType right;
+  liaison<T> internal_liaison;
 };
 
 }}
