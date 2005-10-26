@@ -29,13 +29,20 @@ namespace gott {
 namespace properties {
 
 template<class T>
+struct no_conversion {
+  T const &left_to_right(T const &left) { return left; }
+  T const &right_to_left(T const &right) { return right; }
+};
+
+template<class T, class Conversion = no_conversion<T> >
 class liaison {
 public:
-  liaison(property<T> &lhs, property<T> &rhs)
+  liaison(property<T> &lhs, property<T> &rhs, Conversion c = Conversion())
   : left(lhs),
     right(rhs), 
     left_to_right(left.on_change().connect(sigc::bind(&liaison::left_changed, this))),
-    right_to_left(right.on_change().connect(sigc::bind(&liaison::right_changed, this)))
+    right_to_left(right.on_change().connect(sigc::bind(&liaison::right_changed, this))),
+    conversion(c)
   {}
 
   ~liaison() {
@@ -57,25 +64,26 @@ private:
   property<T> &right;
   sigc::connection left_to_right;
   sigc::connection right_to_left;
+  Conversion conversion;
 
   void left_changed() {
     right_to_left.block();
-    right.set(left.get());
+    right.set(conversion.left_to_right(left.get()));
     right_to_left.unblock();
   }
 
   void right_changed() {
     left_to_right.block();
-    left.set(right.get());
+    left.set(conversion.right_to_left(right.get()));
     right_to_left.unblock();
   }
 };
 
-template<class T, class PropertyType>
+template<class T, class Conversion, class PropertyType>
 class owning_liaison {
 public:
-  owning_liaison(PropertyType const &lhs, PropertyType const &rhs)
-  : left(lhs), right(rhs), internal_liaison(left, right) {}
+  owning_liaison(PropertyType const &lhs, PropertyType const &rhs, Conversion c)
+  : left(lhs), right(rhs), internal_liaison(left, right, c) {}
 
   void block(bool should_block = true) {
     internal_liaison.block(should_block);
@@ -94,7 +102,7 @@ public:
 private:
   PropertyType left;
   PropertyType right;
-  liaison<T> internal_liaison;
+  liaison<T, Conversion> internal_liaison;
 };
 
 }}

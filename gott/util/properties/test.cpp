@@ -43,6 +43,16 @@ int read_fun() {
   throw 0;
 }
 
+struct my_conversion {
+  string left_to_right(string const &left) {
+    return "2/" + left;
+  }
+
+  string right_to_left(string const &right) {
+    return offset(right.as_utf32(), 2);
+  }
+};
+
 int main() {
   concrete_property<int> p;
   p.set(4);
@@ -98,9 +108,9 @@ int main() {
 
   concrete_property<string, sigc_notification> s1, s2;
   {
-  liaison<string> l(s1, s2);
-  s1.set("Hallo\n");
-  cout << s2.get();
+    liaison<string, my_conversion> l(s1, s2);
+    s1.set("Hallo\n");
+    cout << s2.get();
   }
   s2.set("muhkuh");
   cout << s1.get();
