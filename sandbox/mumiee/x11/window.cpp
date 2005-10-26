@@ -320,6 +320,7 @@ void window::close()
 
 void window::on_redraw()
 {
+  needs_redraw = false;
 }
 
 void window::on_focus_enter()
@@ -368,7 +369,7 @@ gott::gui::rect const& window::get_rect() const
 }
 
 void window::damage_region( rect const& region ) {
-  XEvent event;
+/*  XEvent event;
   event.type = Expose;
   event.xexpose.type=Expose;
   event.xexpose.serial=0; // hmm^hmm
@@ -380,7 +381,8 @@ void window::damage_region( rect const& region ) {
   event.xexpose.width=region.width;
   event.xexpose.height=region.height;
   event.xexpose.count=0; // hmmm 
-  XSendEvent(app->get_display(), handle, true, 0L, &event );
+  XSendEvent(app->get_display(), handle, true, 0L, &event );*/
+  needs_redraw = true;
 }
 
 

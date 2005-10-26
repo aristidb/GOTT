@@ -27,7 +27,7 @@ elif debug == -1:
 	cppdef += ['NDEBUG']
 
 ### cppdef += ['HAVE_XDAMAGE']
-cppdef += ['HAVE_XSYNC']
+## cppdef += ['HAVE_XSYNC']
 optimize = ARGUMENTS.get('optimize', optimize)
 
 rlib = ARGUMENTS.get('rlib', 'antigrain')

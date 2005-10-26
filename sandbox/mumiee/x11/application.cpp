@@ -78,6 +78,12 @@ application::status application::handle_pending_messages()
       process_event( win, event ); 
     else 
       std::cout << "Unable to decode window " << event.xany.window << " RootWindow: " << RootWindow( display, screen ) << std::endl;
+
+    if( win->needs_redraw ){
+      win->exec_on_redraw();
+      XSync( display, 0 );//, 1 );
+      XFlush( display );
+    }
   }
 
   
@@ -191,7 +197,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
         if(! win ) return;
 
 
-        while (! XCheckTypedWindowEvent( display, win->handle, MotionNotify, &event) );
+        //while (! XCheckTypedWindowEvent( display, win->handle, MotionNotify, &event) );
 
         mouse_info.set_primary_position( coord( event.xmotion.x, event.xmotion.y ) );
         mouse_event ev( coord(event.xmotion.x, event.xmotion.y), coord(0,0) );
@@ -280,17 +286,22 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
         if(!win)
           return;
-        XEvent other = event;
-        while (! XCheckTypedWindowEvent( display, win->handle, ConfigureNotify, &other) );
 
         XGetWindowAttributes( display, root_window, &root_attribs );
 
-        rect new_rect( other.xconfigure.x
-            , root_attribs.height - other.xconfigure.height - other.xconfigure.y
-            , other.xconfigure.width 
-            , other.xconfigure.height );
+        rect old(win->get_rect());
+        rect new_rect( event.xconfigure.x
+            , root_attribs.height - event.xconfigure.height - event.xconfigure.y
+            , event.xconfigure.width 
+            , event.xconfigure.height );
 
         win->exec_on_configure( new_rect );
+
+        if( old.width != new_rect.width || old.height != new_rect.height ) {
+          win->exec_on_redraw();
+          XSync( display, 1 );
+          XFlush( display );
+        }
 
         break;
 
@@ -302,15 +313,11 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 //#ifdef LOG_EVENTS
         std::cout << "Expose" << std::endl;
 //#endif
-        if( win== 0 )
-          return;
 
-        size_t skipped = 0;
-        while (! XCheckTypedWindowEvent( display, win->handle, Expose, &event) ) ++skipped;
-        std::cout << "Skipped " << skipped << " Expose events." << std::endl; 
+        win->update_window();
+        XSync( display, 0 );
+        XFlush( display );
 
-
-        win->exec_on_redraw();
 #ifdef HAVE_XSYNC
         if( use_xsync() && win->avail_request ) {
           XSyncSetCounter( display, win->counter, win->last_request );
@@ -335,13 +342,16 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 #ifdef LOG_EVENTS
           std::cout << "Protocols " << std::endl;
 #endif
+#ifdef HAVE_XSYNC
           if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::SyncRequest] ) {
             win->last_request.lo = event.xclient.data.l[2];
             win->last_request.hi = event.xclient.data.l[3];
             win->avail_request = true;
             std::cout << "last request : " << win->last_request.lo << " " << win->last_request.hi << std::endl;
           }
-          else if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::Ping] )
+          else 
+#endif
+          if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::Ping] )
           {
 #ifdef LOG_EVENTS
             std::cout << "Ping " << std::endl;
@@ -414,7 +424,7 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
 
     default:
 #ifdef HAVE_XDAMAGE
-      if( win && win->use_xdamage && event.type == win->xdamage_event_base + XDamageNotify ) {
+      if( win->use_xdamage && event.type == win->xdamage_event_base + XDamageNotify ) {
         XDamageNotifyEvent *notify= reinterpret_cast<XDamageNotifyEvent *>(&event);
         rect r(notify->area.x, notify->area.y, notify->area.width, notify->area.height);
         // call render method with rect, or fusioned rect, if invalid rects are available?

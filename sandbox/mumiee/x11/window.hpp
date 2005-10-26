@@ -64,7 +64,7 @@ class GOTT_EXPORT window : public gott::gui::widget_events, public gott::gui::wi
     ::Window		handle;	
     std::size_t flags;
     int xdamage_event_base, xdamage_error_base;
-    bool use_xdamage, use_xsync, avail_request;
+    bool use_xdamage, use_xsync, avail_request, needs_redraw;
     enum Protocols { DeleteWindow, Focus, Ping, ContextHelp, SyncRequest };
     ::Atom protocols[5];
     ::Atom wm_name, wm_icon_name, wm_type;

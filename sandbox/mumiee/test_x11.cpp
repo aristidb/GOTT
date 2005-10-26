@@ -175,7 +175,7 @@ class window : public x11::window
 #endif
     void on_redraw() 
     {
-      std::cout << "Time passed since last frame: " << t.elapsed() << std::endl; 
+//      std::cout << "Time passed since last frame: " << t.elapsed() << std::endl; 
       t = boost::timer();
       set_render_context();
       x11::window::on_redraw();
