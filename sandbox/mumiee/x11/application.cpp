@@ -314,7 +314,8 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
         std::cout << "Expose" << std::endl;
 //#endif
 
-        win->update_window();
+        rect region( event.xexpose.x, event.xexpose.y, event.xexpose.width,  event.xexpose.height );
+        win->update_rect( region );
         XSync( display, 0 );
         XFlush( display );
 
