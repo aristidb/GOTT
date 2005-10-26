@@ -29,18 +29,15 @@ namespace properties {
 
 struct sigc_notification;
 
-template<>
-struct base<sigc_notification> {
-  sigc::signal0<void> on_change_signal;
-};
-
 struct sigc_notification {
-  void notify(base<sigc_notification> *c) const {
-    c->on_change_signal.emit();
+  sigc::signal0<void> on_change_signal;
+
+  void notify(void *) const {
+    on_change_signal.emit();
   }
 
-  sigc::signal0<void> *get_on_change(base<sigc_notification> *c) const {
-    return &c->on_change_signal;
+  sigc::signal0<void> *get_on_change(void *) {
+    return &on_change_signal;
   }
 };
 

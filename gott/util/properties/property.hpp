@@ -203,12 +203,7 @@ template<
   class Storage = embedded_storage<Type>,
   class Lock = no_lock
 >
-class concrete_property :
-  public property<Type>,
-  public base<typename policy<Notification>::class_type>,
-  public base<typename policy<Storage>::class_type>,
-  public base<typename policy<Lock>::class_type>
-{
+class concrete_property : public property<Type> {
 public:
   typedef typename property<Type>::value_type value_type;
   typedef typename property<Type>::const_pointer const_pointer;
