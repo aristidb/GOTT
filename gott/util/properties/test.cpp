@@ -109,8 +109,9 @@ int main() {
   concrete_property<string, sigc_notification> s1, s2;
   {
     liaison<string, my_conversion> l(s1, s2);
-    s1.set("Hallo\n");
+    s1.set("Hello, ");
     cout << s2.get();
+    s2.set("2/world!\n");
   }
   s2.set("muhkuh");
   cout << s1.get();
