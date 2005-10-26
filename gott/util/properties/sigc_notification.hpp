@@ -27,8 +27,6 @@
 namespace gott {
 namespace properties {
 
-struct sigc_notification;
-
 struct sigc_notification {
   sigc::signal0<void> on_change_signal;
 
