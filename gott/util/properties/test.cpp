@@ -1,4 +1,5 @@
 #include "property.hpp"
+#include "liaison.hpp"
 #include <gott/util/string/string.hpp>
 #include <gott/util/string/buffer.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -94,4 +95,13 @@ int main() {
       break;
   }
   streamed.set(7);
+
+  concrete_property<string, sigc_notification> s1, s2;
+  {
+  liaison<string> l(s1, s2);
+  s1.set("Hallo\n");
+  cout << s2.get();
+  }
+  s2.set("muhkuh");
+  cout << s1.get();
 }
