@@ -374,8 +374,8 @@ private:
 };
 
 /**
- * Translation policy for re-typing / converting-in-spirit a property. Does not
- * own the translated property, rather it keeps it by reference.
+ * Translation property for re-typing / converting-in-spirit a property. Does 
+ * not own the translated property, rather it keeps it by reference.
  * \param OldType The value type of the translated property.
  * \param NewType This property's value type.
  * \param Translation Policy for translating between real property and this.
