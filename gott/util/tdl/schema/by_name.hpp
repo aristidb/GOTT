@@ -45,7 +45,7 @@ public:
    * \param name The name to find the type with.
    * \param type The type.
    */
-  GOTT_EXPORT void add(string const &name, abstract_rule const &tpye);
+  GOTT_EXPORT void add(string const &name, abstract_rule const &type);
 
   template<class T>
   void add(string const &name) {
@@ -57,7 +57,9 @@ public:
   /**
    * Get a type from the database.
    * \param name The type's name.
-   * \return The type.
+   * \param att The attributes to supply to the type.
+   * \param children The children to supply to the type.
+   * \return A rule_t for the wanted type.
    */
   GOTT_EXPORT 
   rule_t get(string const &name, rule_attr const &att, 

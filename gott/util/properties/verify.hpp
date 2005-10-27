@@ -28,10 +28,10 @@
 namespace gott {
 namespace properties {
 
-template<class T, class Check, class OnFailure>
+template<class Type, class Check, class OnFailure>
 class verify {
 public:
-  verify(property<T> &p, Check c = Check(), OnFailure f = OnFailure())
+  verify(property<Type> &p, Check c = Check(), OnFailure f = OnFailure())
   : prop(p), check(c), on_failure(f), 
     change(prop.on_change().connect(sigc::bind(&verify::action, this))) {}
 
@@ -40,7 +40,7 @@ public:
   }
 
 private:
-  property<T> &prop;
+  property<Type> &prop;
   Check check;
   OnFailure on_failure;
   sigc::connection change;
@@ -63,15 +63,15 @@ private:
   verify<T, Check, OnFailure> internal_verify;
 };
 
-template<class T>
+template<class Type>
 class check_range {
 public:
-  typedef T context;
+  typedef Type context;
 
-  check_range(T const &s, T const &b) : small(s), big(b) {}
+  check_range(Type const &s, Type const &b) : small(s), big(b) {}
 
-  bool operator()(property<T> &prop, context &con) {
-    typename property<T>::read_reference r = prop.read();
+  bool operator()(property<Type> &prop, context &con) {
+    typename property<Type>::read_reference r = prop.read();
     if (*r < small) {
       con = small;
       return false;
@@ -84,13 +84,13 @@ public:
   }
 
 private:
-  T small;
-  T big;
+  Type small;
+  Type big;
 };
 
-template<class T>
+template<class Type>
 struct enforce_value {
-  void operator()(property<T> &prop, T const &value) {
+  void operator()(property<Type> &prop, Type const &value) {
     prop.set(value);
   }
 };

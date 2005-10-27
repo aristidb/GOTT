@@ -23,14 +23,24 @@
 
 #include <boost/function.hpp>
 
-// (optional) TODO: use thread-local-storage
+/**
+ * External storage policy. Gets and sets its function via a function/functor.
+ * \param T The values' type.
+ * \param Input The input functor type.
+ * \param Output The output functor type.
+ */
 template<
   class T, 
   class Input = boost::function<T ()>, 
   class Output = boost::function<void (T)>
 >
-class external_storage {
+class external_storage { // (optional) TODO: use thread-local-storage
 public:
+  /**
+   * Constructor.
+   * \param in_f The function/functor for getting the value.
+   * \param out_f The function/functor for setting the value.
+   */
   external_storage(Input in_f = Input(), Output out_f = Output())
   : in(in_f), out(out_f) {}
 

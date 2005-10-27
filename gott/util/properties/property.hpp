@@ -32,18 +32,27 @@
 namespace gott {
 namespace properties {
 
-template<class T>
+/**
+ * Abstract property base class. Properties somehow store a value which you can
+ * set, read and change. They might emit a signal whenever their value is 
+ * changed.
+ * \param Type The value's type.
+ */
+template<class Type>
 class property {
 public:
-  typedef T value_type;
-  typedef T *pointer;
-  typedef T &reference;
-  typedef T const *const_pointer;
-  typedef T const &const_reference;
+  typedef Type value_type;
+  typedef Type *pointer;
+  typedef Type &reference;
+  typedef Type const *const_pointer;
+  typedef Type const &const_reference;
 
   typedef std::pair<pointer, void *> annotated_pointer;
   typedef std::pair<const_pointer, void *> annotated_const_pointer;
 
+  /**
+   * A read-only reference to a property's value. Reference-counted.
+   */
   struct read_reference {
     const_pointer operator->() const {
       return ptr.first;
@@ -75,6 +84,9 @@ public:
     unsigned long *ref_count;
   };
 
+  /**
+   * A write-only reference to a property's value. Reference-counted.
+   */
   struct write_reference {
     pointer operator->() {
       return ptr.first;
@@ -106,6 +118,9 @@ public:
     unsigned long *ref_count;
   };
 
+  /**
+   * A reference to a property's value. Reference-counted.
+   */
   struct read_write_reference {
     pointer operator->() {
       return ptr.first;
@@ -137,54 +152,106 @@ public:
     unsigned long *ref_count;
   };
 
+  /**
+   * Access the value for reading.
+   * \return A read_reference to the value.
+   */
   read_reference read() const { 
     return *this; 
   }
 
+  /**
+   * Access the value for changing.
+   * \return A read_write_reference to the value.
+   */
   read_write_reference read_write() {
     return *this; 
   }
 
+  /**
+   * Access the value for writing. Reading the value results in undefined
+   * behaviour.
+   * \return A write_reference to the value.
+   */
   write_reference write() {
     return *this;
   }
 
-  void set(value_type const &v) {
+  /**
+   * Set the value to another value.
+   * \param v The new value.
+   */
+  void set(const_reference v) {
     *write() = v;
   }
 
+  /**
+   * Get the value.
+   * \return The value.
+   */
   const_reference get() const {
     return *read();
   }
 
+  /**
+   * Get the value.
+   * \see get()
+   */
   const_reference operator()() const { return get(); }
 
+  /**
+   * Set the value to another value.
+   * \see set()
+   */
   const_reference operator() (value_type const &v) {
     return *read_write() = v;
   }
 
+  /**
+   * Change the value by applying a function or functor on it and resetting it
+   * to the result.
+   * \param func The function/functor to apply.
+   */
   template<class F> 
   void apply_change(F func) {
     read_write_reference x(read_write());
     *x = func(*x);
   }
 
+  /**
+   * Read the value to a function or functor.
+   * \param func The function/functor to call.
+   */
   template<class F>
   void apply_read(F func) const {
     func(*read());
   }
 
+  /**
+   * Set the value to the result of a function or functor.
+   * \param func The function/functor to call.
+   */
   template<class F>
   void apply_write(F func) {
     *write() = func();
   }
 
+  /**
+   * Thrown when on_change() is called but there is no notification signal
+   * available.
+   */
   class no_notification_error {};
 
+  /**
+   * Return a signal emitted whenever the value of the property changes.
+   * \throw property::no_notification_error
+   * \return A reference to the signal.
+   */
   virtual sigc::signal0<void> &on_change() {
     throw no_notification_error();
   }
   
+  /// Destructor.
   virtual ~property() {}
 
 protected:
@@ -197,6 +264,18 @@ protected:
   virtual void end_read_write(annotated_pointer) = 0;
 };
 
+/**
+ * Generic property type. Allows for nearly arbitrary properties via policies.
+ * Policies can be specified as reference types so they are stored by referenc
+ * in the property.
+ * Default: No notifications, embedded storage (if concrete_property is on the
+ *   stack, the value will be there, too), no locking.
+ * 
+ * \param Type The type of the property's value.
+ * \param Notification Notification policy for the property.
+ * \param Storage Storage policy for the property.
+ * \param Lock Locking policy for the property.
+ */
 template<
   class Type,
   class Notification = no_notification,
@@ -228,12 +307,24 @@ private:
   typedef typename property<Type>::annotated_const_pointer annotated_const_pointer;
 
 public:
+  /**
+   * Constructor.
+   * \param s [optional] The storage policy.
+   * \param n [optional] The notification policy.
+   * \param l [optional] The locking policy.
+   */
   concrete_property(storage_p s = storage_policy(),
            notification_p n = notification_policy(),
            lock_p l = lock_policy())
   : storage(s), notifier(n), lock(l) {
   }
 
+  /**
+   * Constructor.
+   * \param v The initial value.
+   * \param n [optional] The notification policy.
+   * \param l [optional] The locking policy.
+   */
   concrete_property(value_type const &v,
            notification_p n = notification_policy(),
            lock_p l = lock_policy())
@@ -282,9 +373,16 @@ private:
   lock_s lock;
 };
 
+/**
+ * Translation policy for re-typing / converting-in-spirit a property. Does not
+ * own the translated property, rather it keeps it by reference.
+ * \param OldType The value type of the translated property.
+ * \param NewType This property's value type.
+ * \param Translation Policy for translating between real property and this.
+ */
 template<
   class OldType, 
-  class NewType = OldType, 
+  class NewType, 
   class Translation = 
     direct_translation<NewType, OldType>
 > 
@@ -304,6 +402,11 @@ private:
   typedef typename property<NewType>::annotated_const_pointer annotated_const_pointer;
 
 public:
+  /**
+   * Constructor.
+   * \param b The bound property.
+   * \param t [optional] The translation policy.
+   */
   translation_property(property<OldType> &b, translation_p t = translation_policy()) 
   : bound(b), translator(t) {}
 

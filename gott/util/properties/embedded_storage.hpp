@@ -24,6 +24,10 @@
 namespace gott {
 namespace properties {
 
+/**
+ * Default storage policy. Simply keeps the value in itself.
+ * \param T The value's type.
+ */
 template<class T>
 class embedded_storage {
   T obj;

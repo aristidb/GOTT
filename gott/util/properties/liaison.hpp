@@ -34,10 +34,10 @@ struct no_conversion {
   T const &right_to_left(T const &right) { return right; }
 };
 
-template<class T, class Conversion = no_conversion<T> >
+template<class Type, class Conversion = no_conversion<Type> >
 class liaison {
 public:
-  liaison(property<T> &lhs, property<T> &rhs, Conversion c = Conversion())
+  liaison(property<Type> &lhs, property<Type> &rhs, Conversion c = Conversion())
   : left(lhs),
     right(rhs), 
     left_to_right(left.on_change().connect(sigc::bind(&liaison::left_changed, this))),
@@ -60,8 +60,8 @@ public:
   }
 
 private:
-  property<T> &left;
-  property<T> &right;
+  property<Type> &left;
+  property<Type> &right;
   sigc::connection left_to_right;
   sigc::connection right_to_left;
   Conversion conversion;

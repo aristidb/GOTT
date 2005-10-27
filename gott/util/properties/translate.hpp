@@ -26,8 +26,6 @@
 namespace gott {
 namespace properties {
 
-template<class T> class property;
-
 template<class New, class Old>
 struct direct_translation {
 private:

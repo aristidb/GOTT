@@ -80,7 +80,7 @@ public:
    * Increment the position by a full character step. Postfix variant.
    * \param IGNORE Supplied by compiler.
    */
-  utf8_iterator operator++(int) {
+  utf8_iterator operator++(int IGNORE) { (void) IGNORE;
     utf8_iterator tmp(*this);
     ++*this;
     return tmp;
@@ -100,7 +100,7 @@ public:
    * Decrement the position by a full character step. Postfix variant.
    * \param IGNORE Supplied by compiler.
    */
-  utf8_iterator operator--(int) {
+  utf8_iterator operator--(int IGNORE) { (void) IGNORE;
     utf8_iterator tmp(*this);
     --*this;
     return tmp;
