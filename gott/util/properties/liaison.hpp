@@ -40,8 +40,10 @@ public:
   liaison(property<Type> &lhs, property<Type> &rhs, Conversion c = Conversion())
   : left(lhs),
     right(rhs), 
-    left_to_right(left.on_change().connect(sigc::bind(&liaison::left_changed, this))),
-    right_to_left(right.on_change().connect(sigc::bind(&liaison::right_changed, this))),
+    left_to_right(left.on_change().connect(
+          sigc::bind(&liaison::left_changed, this))),
+    right_to_left(right.on_change().connect(
+          sigc::bind(&liaison::right_changed, this))),
     conversion(c)
   {}
 

@@ -304,7 +304,8 @@ private:
   typedef typename lock_policy::read_write_lock read_write_lock;
 
   typedef typename property<Type>::annotated_pointer annotated_pointer;
-  typedef typename property<Type>::annotated_const_pointer annotated_const_pointer;
+  typedef typename property<Type>::annotated_const_pointer 
+    annotated_const_pointer;
 
 public:
   /**
@@ -344,7 +345,7 @@ private:
   }
 
   annotated_pointer begin_write() {
-    return annotated_pointer(storage.get_pointer_noread(), new write_lock(lock));
+    return annotated_pointer(storage.get_pointer_noread(),new write_lock(lock));
   }
 
   annotated_pointer begin_read_write() {
@@ -399,7 +400,8 @@ private:
   typedef typename policy<Translation>::storage translation_s;
 
   typedef typename property<NewType>::annotated_pointer annotated_pointer;
-  typedef typename property<NewType>::annotated_const_pointer annotated_const_pointer;
+  typedef typename property<NewType>::annotated_const_pointer 
+    annotated_const_pointer;
 
 public:
   /**
@@ -407,7 +409,8 @@ public:
    * \param b The bound property.
    * \param t [optional] The translation policy.
    */
-  translation_property(property<OldType> &b, translation_p t = translation_policy()) 
+  translation_property(property<OldType> &b, 
+      translation_p t = translation_policy()) 
   : bound(b), translator(t) {}
 
   sigc::signal0<void> &on_change() {
@@ -428,7 +431,8 @@ private:
   }
 
   void end_read(annotated_const_pointer p) const {
-    translator.template const_unbox<typename property<OldType>::read_reference>(p);
+    translator.template const_unbox<typename property<OldType>::read_reference>
+      (p);
   }
 
   void end_write(annotated_pointer p) {
@@ -436,7 +440,8 @@ private:
   }
   
   void end_read_write(annotated_pointer p) {
-    translator.template unbox<typename property<OldType>::read_write_reference>(p);
+    translator.template unbox<typename property<OldType>::read_write_reference>
+      (p);
   }
   
   property<OldType> &bound;
