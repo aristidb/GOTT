@@ -28,12 +28,26 @@
 namespace gott {
 namespace properties {
 
-template<class Type, class Check, class OnFailure>
+struct ignore_correct;
+  
+template<
+  class Type,
+  class Check, 
+  class OnFailure, 
+  class OnCorrect = ignore_correct
+>
 class verify {
 public:
-  verify(property<Type> &p, Check c = Check(), OnFailure f = OnFailure())
-  : prop(p), check(c), on_failure(f), 
+  verify(property<Type> &p, 
+      Check c = Check(), 
+      OnFailure f = OnFailure(),
+      OnCorrect k = OnCorrect())
+  : prop(p), check(c), failure(f), correct(k),
     change(prop.on_change().connect(sigc::bind(&verify::action, this))) {}
+
+  OnCorrect &on_correct() { return correct; }
+
+  OnFailure &on_failure() { return failure; }
 
   ~verify() {
     change.disconnect();
@@ -42,13 +56,16 @@ public:
 private:
   property<Type> &prop;
   Check check;
-  OnFailure on_failure;
+  OnFailure failure;
+  OnCorrect correct;
   sigc::connection change;
 
   void action() {
     typename Check::context con;
     if (!check(prop, con))
-      on_failure(prop, con);
+      failure(prop, con);
+    else
+      correct(prop);
   }
 };
 
@@ -95,6 +112,11 @@ struct enforce_value {
   void operator()(property<Type> &prop, Type const &value) {
     prop.set(value);
   }
+};
+
+struct ignore_correct {
+  template<class T>
+  void operator()(T const &) {}
 };
 
 }}

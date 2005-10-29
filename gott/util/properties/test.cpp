@@ -1,12 +1,14 @@
 #include "verify.hpp"
 #include "property.hpp"
 #include "liaison.hpp"
+#include "triggered_copy.hpp"
 #include <gott/util/string/string.hpp>
 #include <gott/util/string/buffer.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/function.hpp>
 #include <iostream>
 #include <sigc++/bind.h>
+#include <sigc++/hide.h>
 #include <sigc++/connection.h>
 
 using namespace gott;
@@ -62,7 +64,7 @@ int main() {
   p.apply_change(add<2>);
   *p.read_write() -= 2;
 
-  { // DIRRTY
+  { // DIRRTY - undefined behaviour
     property<int>::read_write_reference r = p.read_write();
     p.set(10);
     *r -= 10;
@@ -107,6 +109,7 @@ int main() {
   }
   streamed.set(7);
 
+  // Liaisons and verifications
   concrete_property<string, sigc_notification> s1, s2;
   {
     liaison<string, my_conversion> l(s1, s2);
@@ -118,8 +121,19 @@ int main() {
   cout << s1.get() << s2.get() << endl;
 
   concrete_property<int, sigc_notification> sv;
+  {
   verify<int, check_range<int>, enforce_value<int> > 
     ver(sv, check_range<int>(0, 10));
   sv.set(14);
-  cout << sv.get() << endl;
+  }
+  cout << sv.get() << ' ';
+
+  verify<int, check_range<int>, enforce_value<int>, 
+      sigc::signal1<void, property<int> const &> > 
+    ver(sv, check_range<int>(-5, 5));
+  concrete_property<int> second;
+  // Now this makes second be a copy of sv but always valid!
+  ver.on_correct().connect(sigc::hide(triggered_copy<int>(sv, second)));
+  sv.set(-22);
+  cout << second.get() << endl;
 }
