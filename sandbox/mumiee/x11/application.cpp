@@ -81,7 +81,7 @@ application::status application::handle_pending_messages()
 
     if( win->needs_redraw ){
       win->exec_on_redraw();
-      XSync( display, 0 );//, 1 );
+      XSync( display, 1 );
       XFlush( display );
     }
   }
@@ -428,8 +428,12 @@ void application::process_event( gott::gui::x11::window* win, XEvent& event )
       if( win->use_xdamage && event.type == win->xdamage_event_base + XDamageNotify ) {
         XDamageNotifyEvent *notify= reinterpret_cast<XDamageNotifyEvent *>(&event);
         rect r(notify->area.x, notify->area.y, notify->area.width, notify->area.height);
+        std::cout << "Damaged : " << r.left << "," << r.top << " -> " << r.left + r.width << "," << r.top + r.height << std::endl;
         // call render method with rect, or fusioned rect, if invalid rects are available?
-        win->update_rect( r );
+        //win->update_rect( r );
+        //XSync( display, 0 );
+        //XFlush( display );
+
         return;
       }
 #endif
