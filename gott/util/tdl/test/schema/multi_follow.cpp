@@ -29,7 +29,7 @@ using gott::string;
 using namespace stru::cf;
 using schema::rule_t;
 using schema::slotcfg;
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 typedef stru::repatch_enumeration E;
 typedef Vector<gott::string> VN;
 #define L(i) \

@@ -28,7 +28,7 @@ using gott::xany::Xany;
 
 using stru::cf::S;
 using stru::cf::C;
-using schema::rule_attr;
+using schema::rule_attr_t;
 using schema::rule_t;
 using stru::repatch_enumeration;
 
@@ -36,8 +36,8 @@ namespace {
 struct schema_enumeration : tut::schema_basic {
   schema_enumeration() 
   : tut::schema_basic(
-    rule("document", rule_attr(), Vector<rule_t>() <<
-      rule("node", rule_attr(Vector<gott::string>(), true, Xany(),
+    rule("document", rule_attr_t(), Vector<rule_t>() <<
+      rule("node", rule_attr_t(Vector<gott::string>(), true, Xany(),
              new repatch_enumeration(Vector<gott::string>() <<
                "first" << "second" << "third")))))
   {}

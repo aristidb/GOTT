@@ -31,9 +31,9 @@ namespace schema {
 
 class match_node : public happy_once {
 public:
-  match_node(rule_attr const &, Vector<rule_t> const &, match &);
+  match_node(rule_attr_t const &, Vector<rule_t> const &, match &);
 
-  static bool accept_empty(rule_attr const &, Vector<rule_t> const &) 
+  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &) 
   { return false; }
   
 private:

@@ -32,7 +32,7 @@ using stru::cf::M;
 using schema::slotcfg;
 using schema::rule_t;
 
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_epsilon : tut::schema_basic {

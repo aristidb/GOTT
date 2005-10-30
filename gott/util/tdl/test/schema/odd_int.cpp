@@ -35,7 +35,7 @@ using stru::cf::M;
 using schema::slotcfg;
 using schema::item;
 using schema::rule_t;
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 
 item::expect odd(std::size_t c) {
   return c % 2 ? item::maybe : item::need;

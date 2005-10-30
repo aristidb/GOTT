@@ -28,7 +28,7 @@ using gott::xany::Xany;
 
 using namespace stru::cf;
 
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 using schema::rule_t;
 
 namespace {

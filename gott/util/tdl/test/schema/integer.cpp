@@ -28,14 +28,18 @@ using gott::xany::Xany;
 
 using stru::cf::S;
 using stru::cf::C;
-typedef schema::rule_attr RA;
+using schema::rule_attr;
+using schema::repatcher; // tag
+using schema::tag; // another tag
+typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_integer : tut::schema_basic {
   schema_integer() 
   : tut::schema_basic(
-      rule("document", RA(), Vector<schema::rule_t>() <<
-        rule("node", RA("i", true, new stru::repatch_integer())))) {}
+      rule("document", rule_attr(), Vector<schema::rule_t>() <<
+        rule("node", rule_attr(tag = "i", repatcher = new stru::repatch_integer()))))
+  {}
 };
 }
 

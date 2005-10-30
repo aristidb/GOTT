@@ -32,7 +32,7 @@ using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 using schema::slotcfg;
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 using schema::rule_t;
 using schema::rule;
 

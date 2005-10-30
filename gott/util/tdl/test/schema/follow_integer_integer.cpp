@@ -29,7 +29,7 @@ using gott::xany::Xany;
 using stru::cf::S;
 using stru::cf::C;
 
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 typedef stru::repatch_integer I;
 using schema::rule_t;
 

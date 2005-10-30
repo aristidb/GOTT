@@ -27,11 +27,11 @@ namespace gott {
 namespace tdl {
 namespace schema {
 
-class rule_attr;
+class rule_attr_t;
 
 class GOTT_EXPORT happy_once : public item {
 public:
-  happy_once(rule_attr const &a, match &m);
+  happy_once(rule_attr_t const &a, match &m);
   ~happy_once();
   expect expectation() const;
 

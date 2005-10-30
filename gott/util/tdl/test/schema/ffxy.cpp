@@ -30,7 +30,7 @@ using schema::slotcfg;
 
 using namespace stru::cf;
 using schema::rule_t;
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 typedef stru::repatch_integer I;
 
 namespace {

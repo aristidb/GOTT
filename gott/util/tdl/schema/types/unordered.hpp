@@ -39,10 +39,10 @@ class match_unordered : public item {
     element(rule_t const &g) : generator(g), slot(g.attributes().outer()) {}
   };
 public:
-  match_unordered(rule_attr const &, Vector<rule_t> const &, match &);
+  match_unordered(rule_attr_t const &, Vector<rule_t> const &, match &);
   ~match_unordered();
 
-  static bool accept_empty(rule_attr const &, Vector<rule_t> const &);
+  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &);
 
 private:
   typedef Vector<element> list_t;

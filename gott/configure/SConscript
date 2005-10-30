@@ -17,7 +17,7 @@ def CheckWarnings(context):
 	context.Message('Checking if compiler supports gcc-style warnings... ')
 	lastCCFLAGS = context.env['CCFLAGS'][:]
 
-	context.env.Append(CCFLAGS = Split('-Wall -W -Werror'))
+	context.env.Append(CCFLAGS = Split('-Wall -W')) # stripped -Werror because of boost 1.33.0 parameters library
 
 	result = context.TryCompile("int global;\n", '.cpp')
 	if not result:

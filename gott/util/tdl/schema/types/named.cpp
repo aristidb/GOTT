@@ -30,19 +30,19 @@ using gott::xany::Xany_cast;
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
 using schema::item;
-using schema::rule_attr;
+using schema::rule_attr_t;
 using schema::match_named;
 
-rule_attr match_named::attributes(string const &s, bool cc) {
-  return rule_attr(Vector<string>() << s, cc, Xany(s));
+rule_attr_t match_named::attributes(string const &s, bool cc) {
+  return rule_attr_t(Vector<string>() << s, cc, Xany(s));
 }
 
-match_named::match_named(rule_attr const &a, Vector<rule_t> const &s, match &m) 
+match_named::match_named(rule_attr_t const &a, Vector<rule_t> const &s, match &m) 
 : happy_once(a, m), 
   tag(Xany_cast<string>(a.user())),
   rewritten(
-      rule("follow", rule_attr(rule_attr::simple, false), Vector<rule_t>() <<
-        rule("node", rule_attr(rule_attr::simple, false, 
+      rule("follow", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() <<
+        rule("node", rule_attr_t(rule_attr_t::simple, false, 
           new structure::repatch_enumeration(Vector<string>() << tag))) <<
         s[0])) {
   GOTT_ASSERT_2(s.GetCount(), 1, std::equal_to<int>(), "one parameter");

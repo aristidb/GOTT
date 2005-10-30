@@ -25,6 +25,10 @@
 #include "../structure/repatch.hpp"
 #include "slot.hpp"
 #include <boost/shared_ptr.hpp>
+#if !defined(BOOST_PARAMETER_MAX_ARITY) || BOOST_PARAMETER_MAX_ARITY < 6
+#define BOOST_PARAMETER_MAX_ARITY 6
+#endif
+#include <boost/parameter.hpp>
 #include <gott/util/string/string.hpp>
 #include <iosfwd>
 #include <ntl.h>
@@ -36,51 +40,45 @@ namespace structure { class repatcher; }
 namespace schema {
 
 // Class rule_attr
-// Defines the user-supplyable rule_attr for a rule_t
-class rule_attr {
+// Defines the user-supplyable rule_attr_t for a rule_t
+class rule_attr_t {
 public:
   enum simple_tag { simple };
-  explicit rule_attr(simple_tag = simple, bool cc = true, 
+  rule_attr_t(simple_tag = simple, bool cc = true, 
       structure::repatcher const *rr = 0) 
   : c(cc), r(rr) {}
 
-  explicit rule_attr(Vector<string> const &l, bool cc = true, 
+  explicit rule_attr_t(Vector<string> const &l, bool cc = true, 
       structure::repatcher const *rr = 0)
   : c(cc), t(l), r(rr) {}
 
-  explicit rule_attr(string const &s, bool cc = true, 
+  explicit rule_attr_t(string const &s, bool cc = true, 
       structure::repatcher const *rr = 0)
   : c(cc), t(Vector<string>() << s), r(rr) {}
 
-  explicit rule_attr(Vector<string> const &l, bool cc, 
+  explicit rule_attr_t(Vector<string> const &l, bool cc, 
                      xany::Xany const &x, structure::repatcher const *rr = 0,
                      slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
   : c(cc), t(l), u(x), r(rr), i(I), o(O) {}
 
-  rule_attr(rule_attr const &o_)
+  rule_attr_t(rule_attr_t const &o_)
   : c(o_.c), t(o_.t, 1), u(o_.u), r(o_.r), i(o_.i), o(o_.o) {}
 
   bool coat() const { return c; }
-  void set_coat(bool x) { c = x; }
 
   Vector<string> const &tags() const { return t; }
-  void add_tag(string const &x) { t.push_back(x); }
 
   xany::Xany const &user() const { return u; }
 
   structure::repatcher const *repatcher() const { return r.get(); }
 
-  bool operator==(rule_attr const &o) const {
+  bool operator==(rule_attr_t const &o) const {
     return c == o.c && range(t) == range(o.t) && u == o.u && r == o.r;
   }
 
-  slotcfg const &inner() const {
-    return i;
-  }
+  slotcfg const &inner() const { return i; }
 
-  slotcfg const &outer() const {
-    return o;
-  }
+  slotcfg const &outer() const { return o; }
 
 private:
   bool c;
@@ -91,7 +89,48 @@ private:
   slotcfg o;
 };
 
-GOTT_EXPORT std::ostream &operator<<(std::ostream &s, rule_attr const &a);
+namespace {
+
+BOOST_PARAMETER_KEYWORD(tg, tag)
+BOOST_PARAMETER_KEYWORD(tg, tags)
+BOOST_PARAMETER_KEYWORD(tg, coat)
+BOOST_PARAMETER_KEYWORD(tg, user)
+BOOST_PARAMETER_KEYWORD(tg, repatcher)
+BOOST_PARAMETER_KEYWORD(tg, inner)
+BOOST_PARAMETER_KEYWORD(tg, outer)
+
+typedef boost::parameter::parameters<
+  tg::tags, tg::coat, tg::user, tg::repatcher, tg::inner, tg::outer
+> rule_attr_params;
+
+Vector<string> entag(string const &s) { return Vector<string>() << s; }
+Vector<string> entag(Vector<string> const &v) { return v; }
+
+}
+
+BOOST_PARAMETER_FUN(rule_attr_t, rule_attr, 0, 6, rule_attr_params);
+
+template<class Args>
+rule_attr_t rule_attr_with_named_params(Args const &args) {
+  struct combine_strip {
+    Vector<string> operator() (string const &s) const { 
+      if (s != "")
+        return Vector<string>() << s; 
+      else
+        return Vector<string>();
+    }
+  };
+  return rule_attr_t(
+      args[tags | combine_strip()(args[tag | ""])],
+      args[coat | true],
+      args[user | xany::Xany()],
+      args[repatcher | static_cast<structure::repatcher *>(0)],
+      args[inner | slotcfg()],
+      args[outer | slotcfg()]
+  );
+}
+
+GOTT_EXPORT std::ostream &operator<<(std::ostream &s, rule_attr_t const &a);
 
 }}}
 

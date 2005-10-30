@@ -34,10 +34,10 @@ namespace schema {
 // Matches the first applicable of an arbitrary number of rule_ts.
 class match_any : public happy_once {
 public:
-  match_any(rule_attr const &, Vector<rule_t> const &, match &);
+  match_any(rule_attr_t const &, Vector<rule_t> const &, match &);
   ~match_any();
 
-  static bool accept_empty(rule_attr const &, Vector<rule_t> const &);
+  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &);
 
 private:
   Vector<rule_t> v;

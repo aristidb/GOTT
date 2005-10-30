@@ -31,10 +31,10 @@ namespace schema {
 
 class match_ordered : public happy_once {
 public:
-  match_ordered(rule_attr const &, Vector<rule_t> const &, match &);
+  match_ordered(rule_attr_t const &, Vector<rule_t> const &, match &);
   ~match_ordered();
 
-  static bool accept_empty(rule_attr const &, Vector<rule_t> const &);
+  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &);
 
 private:
   Vector<rule_t> subrules;

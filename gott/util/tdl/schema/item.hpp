@@ -34,7 +34,7 @@ namespace structure { class repatcher; }
 namespace schema {
 
 class match;
-class rule_attr;
+class rule_attr_t;
 
 /**
  * The base class of the implementation of a rule_t-matcher object.
@@ -140,13 +140,13 @@ public:
   /**
    * Get the attributes associated with this rule_t.
    */
-  rule_attr const &attributes() const GOTT_EXPORT;
+  rule_attr_t const &attributes() const GOTT_EXPORT;
 
 protected:
   match &matcher();
     // return a reference to the match-object that embedded us
 
-  item(rule_attr const &a, match &m);
+  item(rule_attr_t const &a, match &m);
     // an implementation must supply attributes
 
 private:

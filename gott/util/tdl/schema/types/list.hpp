@@ -32,10 +32,10 @@ namespace schema {
 
 class match_list : public item {
 public:
-  match_list(rule_attr const &, Vector<rule_t> const &, match &);
+  match_list(rule_attr_t const &, Vector<rule_t> const &, match &);
   ~match_list();
 
-  static bool accept_empty(rule_attr const &, Vector<rule_t> const &s);
+  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &s);
 
 private:
   rule_t const &sub;

@@ -27,17 +27,17 @@
 
 namespace sh = gott::tdl::schema;
 using sh::rule_t;
-using sh::rule_attr;
+using sh::rule_attr_t;
 using sh::item;
 
 class rule_t::IMPL {
 public:
   struct immediate {
     abstract_rule abstract;
-    rule_attr attr;
+    rule_attr_t attr;
     Vector<rule_t> children;
 
-    immediate(abstract_rule const &ar, rule_attr const &a, Vector<rule_t> pick_ &c)
+    immediate(abstract_rule const &ar, rule_attr_t const &a, Vector<rule_t> pick_ &c)
     : abstract(ar), attr(a), children(c) {}
 
     immediate(immediate const &o)
@@ -46,7 +46,7 @@ public:
 
   boost::variant<immediate, rule_t const *> data;
 
-  IMPL(abstract_rule const &ar, rule_attr const &a, Vector<rule_t> pick_ &c)
+  IMPL(abstract_rule const &ar, rule_attr_t const &a, Vector<rule_t> pick_ &c)
   : data(immediate(ar, a, c)) {}
 
   IMPL(rule_t const *p)
@@ -55,7 +55,7 @@ public:
 
 rule_t::rule_t() {}
 
-rule_t::rule_t(abstract_rule const &ar, rule_attr const &a,
+rule_t::rule_t(abstract_rule const &ar, rule_attr_t const &a,
     Vector<rule_t> pick_ &c)
 : p(new IMPL(ar, a, c)) {}
 
@@ -82,7 +82,7 @@ item *rule_t::get(match &m) const {
   throw 0;
 }
 
-rule_attr const &rule_t::attributes() const {
+rule_attr_t const &rule_t::attributes() const {
   switch (p->data.which()) {
   case 0: // immediate
     return boost::get<IMPL::immediate>(p->data).attr;
@@ -105,6 +105,6 @@ bool rule_t::accept_empty() const {
   throw 0;
 }
 
-rule_t sh::rule(string const &id, rule_attr const &a, Vector<rule_t> pick_ &c) {
+rule_t sh::rule(string const &id, rule_attr_t const &a, Vector<rule_t> pick_ &c) {
   return by_name().get(id, a, c);
 }

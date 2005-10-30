@@ -62,7 +62,7 @@ public:
    * \return A rule_t for the wanted type.
    */
   GOTT_EXPORT 
-  rule_t get(string const &name, rule_attr const &att, 
+  rule_t get(string const &name, rule_attr_t const &att, 
              Vector<rule_t> pick_ &children) const;
 
   class IMPL;

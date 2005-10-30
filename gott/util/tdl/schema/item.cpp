@@ -29,16 +29,16 @@
 namespace schema = gott::tdl::schema;
 using schema::match;
 using schema::item;
-using schema::rule_attr;
+using schema::rule_attr_t;
 namespace ev = schema::ev;
 using gott::tdl::structure::writable_structure;
 
 class item::IMPL {
 public:
   match *cont;
-  rule_attr attrib;
+  rule_attr_t attrib;
 
-  IMPL(match &m, rule_attr const &a) 
+  IMPL(match &m, rule_attr_t const &a) 
   : cont(&m), attrib(a) {
     start_structure();
     add_tags();
@@ -62,7 +62,7 @@ private:
   }
 };
 
-item::item(rule_attr const &a, match &m) 
+item::item(rule_attr_t const &a, match &m) 
 : pIMPL(new IMPL(m, a)) {
 }
 
@@ -72,7 +72,7 @@ void item::finish() {
 
 item::~item() {}
 
-rule_attr const &item::attributes() const { return pIMPL->attrib; }
+rule_attr_t const &item::attributes() const { return pIMPL->attrib; }
 match &item::matcher() { return *pIMPL->cont; }
 
 bool item::play(ev::begin_parse const &) { return play_other(); }
@@ -88,7 +88,7 @@ bool item::play_other() { return false; }
 
 bool item::miss_events(ev::event const &, unsigned) { return false; }
 
-std::ostream &schema::operator<<(std::ostream &s, rule_attr const &a) {
+std::ostream &schema::operator<<(std::ostream &s, rule_attr_t const &a) {
   s << '(' << (a.coat() ? "coat" : "flat");
   s << ",tags:" << range(a.tags());
   if (dynamic_cast<xany::printable const *>(&a.user().get_operations()))

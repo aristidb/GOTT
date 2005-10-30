@@ -34,7 +34,7 @@ using stru::cf::M;
 using schema::slotcfg;
 using schema::rule_t;
 
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_one_int : tut::schema_basic {

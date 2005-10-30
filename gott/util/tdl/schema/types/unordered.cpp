@@ -27,7 +27,7 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_unordered;
 
-match_unordered::match_unordered(rule_attr const &a, Vector<rule_t> const &r,
+match_unordered::match_unordered(rule_attr_t const &a, Vector<rule_t> const &r,
                                  match &m) 
 : item(a, m), last(m.pos().current()), all_happy(true) {
   copy(range(r), std::back_inserter(children));
@@ -78,7 +78,7 @@ item::expect match_unordered::expectation() const {
   return need;
 }
 
-bool match_unordered::accept_empty(rule_attr const &, 
+bool match_unordered::accept_empty(rule_attr_t const &, 
                                    Vector<rule_t> const &children) {
   bool accept = true;
   for (Vector<rule_t>::const_iterator it = children.begin(); 

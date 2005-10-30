@@ -32,7 +32,7 @@ using stru::cf::S;
 using stru::cf::C;
 using schema::rule_t;
 using schema::slotcfg;
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_unordered_list_integer_string : tut::schema_basic {

@@ -33,9 +33,9 @@ namespace schema {
 // Matches a whole tdl document that contains the given sub-type
 class match_document : public happy_once {
 public:
-  match_document(rule_attr const &, Vector<rule_t> const &, match &);
+  match_document(rule_attr_t const &, Vector<rule_t> const &, match &);
 
-  static bool accept_empty(rule_attr const &, Vector<rule_t> const &)
+  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &)
   { return false; }
   
 private:

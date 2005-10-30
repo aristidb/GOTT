@@ -32,7 +32,7 @@ using stru::cf::S;
 using stru::cf::C;
 using schema::rule_t;
 
-typedef schema::rule_attr RA;
+typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {

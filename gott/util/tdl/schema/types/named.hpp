@@ -35,13 +35,13 @@ namespace schema {
 class match_named : public happy_once {
 public:
   static GOTT_EXPORT
-  rule_attr attributes(string const &s, bool cc = true);
+  rule_attr_t attributes(string const &s, bool cc = true);
   
-  match_named(rule_attr const &, Vector<rule_t> const &, match &);
+  match_named(rule_attr_t const &, Vector<rule_t> const &, match &);
 
   ~match_named();
 
-  static bool accept_empty(rule_attr const &, Vector<rule_t> const &) 
+  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &) 
   { return false; }
 
 private:

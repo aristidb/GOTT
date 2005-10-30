@@ -212,7 +212,7 @@ void match::IMPL::add(rule_t const &f) {
   item *the_item = f.get(ref);
   GOTT_ASSERT_2(the_item,(item*)0,std::not_equal_to<item*>(),"Acquired rule_t");
   GOTT_ASSERT_2(the_item->attributes(), f.attributes(), 
-      std::equal_to<rule_attr>(), "Rule attributes");
+      std::equal_to<rule_attr_t>(), "Rule attributes");
 
   parse[current].the_item = the_item;
 }

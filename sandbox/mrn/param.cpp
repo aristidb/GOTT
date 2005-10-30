@@ -12,11 +12,13 @@ void open_window_impl(char const *title, int x = 0, int y = 0,
     ") with size (" << dx << ',' << dy << ")\n";
 }
 
+namespace {
 BOOST_PARAMETER_KEYWORD(tag, title)
 BOOST_PARAMETER_KEYWORD(tag, x_pos)
 BOOST_PARAMETER_KEYWORD(tag, y_pos)
 BOOST_PARAMETER_KEYWORD(tag, x_size)
 BOOST_PARAMETER_KEYWORD(tag, y_size)
+}
 
 typedef parameter::parameters<
     tag::title,

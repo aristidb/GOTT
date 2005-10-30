@@ -32,21 +32,21 @@ using gott::string;
 using namespace stru::cf;
 using schema::slotcfg;
 using schema::rule_t;
-using schema::rule_attr;
+using schema::rule_attr_t;
 
 namespace {
 struct recursive : tut::schema_basic {
   rule_t rec;
   
   recursive() {
-    grammar = rule("document", rule_attr(), Vector<rule_t>() << rule_t(&rec));
+    grammar = rule("document", rule_attr_t(), Vector<rule_t>() << rule_t(&rec));
     rec = 
-      rule("ordered", rule_attr(rule_attr::simple, false), Vector<rule_t>() <<
-        rule("node", rule_attr(rule_attr::simple, true, 
+      rule("ordered", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() <<
+        rule("node", rule_attr_t(rule_attr_t::simple, true, 
             new stru::repatch_integer())) <<
-        rule("list", rule_attr(rule_attr::simple, false), Vector<rule_t>() <<
+        rule("list", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() <<
           rule("ordered", 
-                rule_attr(Vector<string>(), false, Xany(), 0,
+                rule_attr_t(Vector<string>(), false, Xany(), 0,
                   slotcfg(), slotcfg(slotcfg::optional)),
                 Vector<rule_t>() << rule_t(&rec))));
   }

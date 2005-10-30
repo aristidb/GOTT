@@ -28,7 +28,7 @@ using schema::item;
 using schema::slotcfg;
 using schema::match_list;
 
-match_list::match_list(rule_attr const &a, Vector<rule_t> const &r, match &m)
+match_list::match_list(rule_attr_t const &a, Vector<rule_t> const &r, match &m)
 : item(a, m), sub(r[0]), cfg(r[0].attributes().outer()) {
   GOTT_ASSERT_2(r.GetCount(), 1, std::equal_to<int>(), "1 child");
   last = m.pos().current();
@@ -81,6 +81,6 @@ gott::string match_list::name() const {
   return L"list";
 }
 
-bool match_list::accept_empty(rule_attr const &, Vector<rule_t> const &c) {
+bool match_list::accept_empty(rule_attr_t const &, Vector<rule_t> const &c) {
   return c[0].attributes().outer().prefix_optional();
 }

@@ -31,22 +31,22 @@ class string;
 namespace tdl {
 namespace schema {
 
-class rule_attr;
+class rule_attr_t;
 class item;
 class rule_t;
 class match;
 
 template<class T>
 item *
-construct_item(rule_attr const &att, Vector<rule_t> const&children, match &m) {
+construct_item(rule_attr_t const &att, Vector<rule_t> const&children, match &m) {
   return new T(att, children, m);
 }
 
 typedef 
-item *(*item_constructor)(rule_attr const &, Vector<rule_t> const &, match &);
+item *(*item_constructor)(rule_attr_t const &, Vector<rule_t> const &, match &);
 
 typedef
-bool (*item_check)(rule_attr const &, Vector<rule_t> const &);
+bool (*item_check)(rule_attr_t const &, Vector<rule_t> const &);
 
 struct abstract_rule : Moveable<abstract_rule> {
   explicit abstract_rule(item_constructor c, item_check ae) 
@@ -61,7 +61,7 @@ struct abstract_rule : Moveable<abstract_rule> {
 class GOTT_EXPORT rule_t : Moveable<rule_t> {
 public:
   rule_t();
-  rule_t(abstract_rule const &, rule_attr const &, Vector<rule_t> pick_ &);
+  rule_t(abstract_rule const &, rule_attr_t const &, Vector<rule_t> pick_ &);
   rule_t(rule_t const &);
   explicit rule_t(rule_t const *);
   ~rule_t();
@@ -69,7 +69,7 @@ public:
   void operator=(rule_t const &);
 
   item *get(match &) const;
-  rule_attr const &attributes() const;
+  rule_attr_t const &attributes() const;
   bool accept_empty() const;
 
 private:
@@ -78,11 +78,11 @@ private:
 };
 
 template<class T>
-rule_t rule(rule_attr const &a, Vector<rule_t> const &c = Vector<rule_t>()) {
+rule_t rule(rule_attr_t const &a, Vector<rule_t> const &c = Vector<rule_t>()) {
   return rule_t(abstract_rule(&construct_item<T>, &T::accept_any), a, c);
 }
 
-rule_t rule(string const &name, rule_attr const &a, Vector<rule_t> const &c =
+rule_t rule(string const &name, rule_attr_t const &a, Vector<rule_t> const &c =
     Vector<rule_t>()) GOTT_EXPORT;
 
 }}}

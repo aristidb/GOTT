@@ -23,7 +23,7 @@
 using gott::tdl::schema::happy_once;
 using gott::tdl::schema::item;
 
-happy_once::happy_once(rule_attr const &a, match &m) 
+happy_once::happy_once(rule_attr_t const &a, match &m) 
   : item(a, m), happy(false) {}
 happy_once::~happy_once() {}
 

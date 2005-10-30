@@ -34,18 +34,18 @@ namespace {
 struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() 
   : tut::schema_basic(
-    rule("document", rule_attr(), Vector<rule_t>() <<
-      rule("ordered", rule_attr(), Vector<rule_t>() <<
-        rule("list", rule_attr("s"), Vector<rule_t>() <<
+    rule("document", rule_attr_t(), Vector<rule_t>() <<
+      rule("ordered", rule_attr_t(), Vector<rule_t>() <<
+        rule("list", rule_attr_t("s"), Vector<rule_t>() <<
           rule("list", 
-            rule_attr(Vector<string>() << "t", true, Xany(), 0,
+            rule_attr_t(Vector<string>() << "t", true, Xany(), 0,
               slotcfg(), slotcfg(slotcfg::list)),
             Vector<rule_t>() <<
             rule("node",
-              rule_attr(Vector<string>() << "ii", true, Xany(), 
+              rule_attr_t(Vector<string>() << "ii", true, Xany(), 
                 new stru::repatch_integer(),
                 slotcfg(), slotcfg(slotcfg::list))))) <<
-        rule("node", rule_attr("xx"))))) {}
+        rule("node", rule_attr_t("xx"))))) {}
 };
 }
 

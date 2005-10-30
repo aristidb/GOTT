@@ -29,15 +29,15 @@ using gott::xany::Xany;
 using gott::string;
 using stru::cf::S;
 using stru::cf::C;
-using schema::rule_attr;
+using schema::rule_attr_t;
 
 namespace {
 struct schema_literal : tut::schema_basic {
   schema_literal() 
   : tut::schema_basic(
-      rule("document", rule_attr(), Vector<schema::rule_t>() <<
+      rule("document", rule_attr_t(), Vector<schema::rule_t>() <<
         rule("node", 
-          rule_attr(L"foobar", true, 
+          rule_attr_t(L"foobar", true, 
             new stru::repatch_enumeration(Vector<string>() | "foobar"))))) {}
 };
 }

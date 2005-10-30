@@ -54,7 +54,7 @@ void by_name_t::add(string const &name, abstract_rule const &type) {
   p->items.Add(name, type);
 }
 
-schema::rule_t by_name_t::get(string const &n, rule_attr const &a, 
+schema::rule_t by_name_t::get(string const &n, rule_attr_t const &a, 
                               Vector<rule_t> pick_ &c) const {
   return rule_t(p->get(n), a, c);
 }

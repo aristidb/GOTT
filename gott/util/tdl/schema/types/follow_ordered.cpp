@@ -26,7 +26,7 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_follow_ordered;
 
-match_follow_ordered::match_follow_ordered(rule_attr const &a, 
+match_follow_ordered::match_follow_ordered(rule_attr_t const &a, 
                                            Vector<rule_t> const &c, match &m)
 : item(a, m), opened(0), saw_up(false), last(m.pos().current()), 
     unhappy(false) {
@@ -118,7 +118,7 @@ item::expect match_follow_ordered::expectation() const {
   return need;
 }
 
-bool match_follow_ordered::accept_empty(rule_attr const &,
+bool match_follow_ordered::accept_empty(rule_attr_t const &,
                                         Vector<rule_t> const &children) {
   bool accept = true;
   for (Vector<rule_t>::const_iterator it = children.begin(); 
