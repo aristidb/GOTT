@@ -103,9 +103,6 @@ typedef boost::parameter::parameters<
   tg::tags, tg::coat, tg::user, tg::repatcher, tg::inner, tg::outer
 > rule_attr_params;
 
-Vector<string> entag(string const &s) { return Vector<string>() << s; }
-Vector<string> entag(Vector<string> const &v) { return v; }
-
 }
 
 BOOST_PARAMETER_FUN(rule_attr_t, rule_attr, 0, 6, rule_attr_params);
