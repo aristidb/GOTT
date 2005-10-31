@@ -21,7 +21,6 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_RULE_ATTR_HPP
 #define GOTT_UTIL_TDL_SCHEMA_RULE_ATTR_HPP
 
-#include "rule.hpp"
 #include "../structure/repatch.hpp"
 #include "slot.hpp"
 #include <boost/shared_ptr.hpp>

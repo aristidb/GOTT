@@ -21,6 +21,7 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_RULE_HPP
 #define GOTT_UTIL_TDL_SCHEMA_RULE_HPP
 
+#include "rule_attr.hpp"
 #include <boost/shared_ptr.hpp>
 #include <gott/util/visibility.hpp>
 #include <ntl.h>
@@ -82,8 +83,23 @@ rule_t rule(rule_attr_t const &a, Vector<rule_t> const &c = Vector<rule_t>()) {
   return rule_t(abstract_rule(&construct_item<T>, &T::accept_any), a, c);
 }
 
-rule_t rule(string const &name, rule_attr_t const &a, Vector<rule_t> const &c =
-    Vector<rule_t>()) GOTT_EXPORT;
+rule_t rule(string const &name, rule_attr_t const &a = rule_attr_t(), 
+    Vector<rule_t> const &c = Vector<rule_t>()) GOTT_EXPORT;
+
+inline
+rule_t rule(string const &name, rule_attr_t const &a, rule_t const &c) {
+  return rule(name, a, Vector<rule_t>() << c);
+}
+
+inline
+rule_t rule(string const &name, Vector<rule_t> const &c) {
+  return rule(name, rule_attr_t(), c);
+}
+
+inline
+rule_t rule(string const &name, rule_t const &c) {
+  return rule(name, rule_attr_t(), Vector<rule_t>() << c);
+}
 
 }}}
 
