@@ -53,7 +53,7 @@ public:
     /// Accept maximally \arg x children
     maximum = 32,
     /// Accept exactly \arg x children
-    exact = 64
+    exactly = 64
   };
 
   /// Ranged modes (two \c std::size_t parameters).
@@ -78,7 +78,7 @@ public:
     /// All modes that accept maximally one child.
     single = one | optional, 
     /// All modes that accept more than one child.
-    multiple = list | some | minimum | maximum | exact | range | function,
+    multiple = list | some | minimum | maximum | exactly | range | function,
     /// All modes.
     all = single | multiple
   };
@@ -142,6 +142,22 @@ private:
   class IMPL;
   boost::scoped_ptr<IMPL> p;
 };
+
+namespace {
+inline slotcfg one() { return slotcfg(); }
+inline slotcfg optional() { return slotcfg(slotcfg::optional); }
+inline slotcfg some() { return slotcfg(slotcfg::some); }
+inline slotcfg list() { return slotcfg(slotcfg::list); }
+
+inline slotcfg at_least(std::size_t n) { return slotcfg(slotcfg::minimum, n); }
+inline slotcfg no_more_than(std::size_t n) { return slotcfg(slotcfg::maximum, n); }
+inline slotcfg exactly(std::size_t n) { return slotcfg(slotcfg::exactly, n); }
+
+inline slotcfg between(std::size_t min, std::size_t max) {
+  return slotcfg(slotcfg::range, min, max);
+}
+
+}
 
 }}}
 

@@ -41,7 +41,7 @@ struct schema_3int : tut::schema_basic {
       rule("document", rule("list", rule("node", schema::rule_attr(
                schema::tag = "el",
                schema::repatcher = new stru::repatch_integer(), 
-               schema::outer = slotcfg(slotcfg::exact, 3)))))) {}
+               schema::outer = slotcfg(slotcfg::exactly, 3)))))) {}
 };
 }
 

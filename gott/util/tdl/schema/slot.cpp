@@ -116,7 +116,7 @@ item::expect slotcfg::expectation() const {
     else
       return item::need;
 
-  case exact:
+  case exactly:
     if (p->count < get<size_t>(p->type))
       return item::need;
     else if (p->count == get<size_t>(p->type))

@@ -42,7 +42,7 @@ struct schema_epsilon : tut::schema_basic {
         rule("list", RA(), Vector<rule_t>() <<
           rule("node", 
             RA(Vector<gott::string>(), true, Xany(), 0,
-               slotcfg(), slotcfg(slotcfg::exact, 0))))))
+               slotcfg(), slotcfg(slotcfg::exactly, 0))))))
   {}
 };
 }

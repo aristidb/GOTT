@@ -42,7 +42,7 @@ struct schema_12plus_int : tut::schema_basic {
       rule("document", rule("list", rule("node", rule_attr(
                schema::tag = "el",
                schema::repatcher = new stru::repatch_integer(),
-               schema::outer = slotcfg(slotcfg::minimum, 12))))))
+               schema::outer = schema::at_least(12))))))
   {}
 };
 }
