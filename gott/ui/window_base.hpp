@@ -35,7 +35,7 @@
 namespace gott{namespace ui{
 class uicontext_base;
 
-struct GOTT_EXPORT window_flags
+struct window_flags
 {
   enum {
     Clear = 0

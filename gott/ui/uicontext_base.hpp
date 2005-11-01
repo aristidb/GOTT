@@ -44,7 +44,10 @@ class GOTT_EXPORT uicontext_base {
      * quit the current application if no other control loop is running. 
      */
     virtual void quit() = 0;
-    /* remove - see wiki about event loop 
+
+#if 0
+    Removed - see wiki about event loop 
+
     virtual gott::ui::uicontext_base::status
        handle_pending_messages() = 0;
     virtual void handle_idle() = 0;
@@ -53,11 +56,12 @@ class GOTT_EXPORT uicontext_base {
     virtual sigc::connection
     append_process_idle_handler(
       idle_signal::slot_type const& slot
-      ) = 0; */
+      ) = 0;
+#endif
 
     virtual gott::ui::key_state const& get_key_state() const = 0;
     virtual gott::ui::mouse_state const& get_mouse_state() const = 0;
-    virtual ~uicontext();
+    virtual ~uicontext_base() = 0; // TODO:implement!
 };
 }}
 

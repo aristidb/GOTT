@@ -34,7 +34,7 @@ namespace gott{namespace ui{
  * into two coordinate structures. 
  * The number of buttons is limited to eight buttons.
  */
-struct GOTT_EXPORT mouse_state
+struct mouse_state
 {
   public:
 
@@ -47,7 +47,7 @@ struct GOTT_EXPORT mouse_state
     
   public:
 
-    mouse_state();
+    GOTT_EXPORT mouse_state();
 
     inline bool get_button( std::size_t index ) const { return buttons[index]==1; }
     inline int get_x_axis() const { return primary.x; }
@@ -65,7 +65,7 @@ struct GOTT_EXPORT mouse_state
 
 /**
  */
-struct GOTT_EXPORT MoUsE_event
+struct mouse_event
 {
   enum event_type
   { Move = 0, 
@@ -74,9 +74,9 @@ struct GOTT_EXPORT MoUsE_event
   };
   event_type type;
 
-  MoUsE_event( coord const& p, coord const& s )
+  mouse_event( coord const& p, coord const& s )
   : type( Move ), primary(p), secondary(s) {}
-  MoUsE_event( event_type const& type, std::size_t index, coord const& p, coord const& s)
+  mouse_event( event_type const& type, std::size_t index, coord const& p, coord const& s)
     : type(type), primary(p), secondary(s), button_index(index) {}
   // add a time stamp here?
   coord primary;
@@ -236,23 +236,23 @@ enum key_code {
  * \brief Keyboard Event structure
  * TODO: Hold, or key repeat events
  */
-struct GOTT_EXPORT key_event
+struct key_event
 {
   enum event_type{ Press, Release }; // Hold?
   event_type type;
   key_code code; 
-  key_event( key_code code, event_type t ); 
+  key_event( key_code code, event_type t ); // TODO! GOTT_EXPORT?
 };
 
 /**
  * \brief Preliminary keyboard struture to represent the current key status.
  */
-struct GOTT_EXPORT key_state
+struct key_state
 {
   private:
     std::vector<unsigned char> keyboard;
   public:
-    key_state();
+    key_state(); // TODO! GOTT_EXPORT?
     inline bool get_state( key_code code ) const {return keyboard[code]&1; }
     inline bool operator()( key_code code ) const {return keyboard[code]&1; }
     inline void set( key_code code ) {keyboard[code]=1; }
