@@ -59,7 +59,7 @@ sigc::signal0<void> & window_base::on_focus_leave()
   return focus_leave_;
 }
 
-sigc::singal1<void,MoUsE_event const&> & window_base::on_mouse()
+sigc::signal1<void,mouse_event const&> & window_base::on_mouse()
 {
   return mouse_;
 }

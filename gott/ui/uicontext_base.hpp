@@ -22,20 +22,48 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include <sigc++/signal.hpp>
+#include <sigc++/signal.h>
+#include <gott/util/visibility.hpp>
+#include <gott/ui/input.hpp>
+#include <gott/ui/window_base.hpp>
 
 namespace gott{ namespace ui{
 
 /**
- * \brief 
+ * \brief Base class for all user interface contexts. 
+ * These classes will gather and dispatch system events to the 
+ * responsible windows and organize the communication with the 
+ * system. Every window must have an uicontext, thus they will 
+ * register themselves with a matching uicontext.
 */
 class GOTT_EXPORT uicontext_base {
+  private:
+    gott::ui::key_state keys_;
+    gott::ui::mouse_state mouse_;
+  protected:
+    gott::ui::key_state & get_key_state();
+    gott::ui::mouse_state & get_mouse_state();
+
   public:
 
     /**
+     * \name window registration
+     */
+    //\{
+    /**
+     * \brief registers a window in the event dispatching system of the context.
+     * Should be called by every window_base implementation right after 
+     * successful construction.
      */
     virtual void register_window( window_base * ref ) = 0;
+    /**
+     * \brief removes a window from the event dispatching system of the context.
+     * Should be called by every window_base implementation right before 
+     * destruction. After that all incoming events to this window shall be 
+     * droped.
+     */
     virtual void remove_window( window_base *ref ) = 0;
+    //\}
 
 
     /**
@@ -59,9 +87,9 @@ class GOTT_EXPORT uicontext_base {
       ) = 0;
 #endif
 
-    virtual gott::ui::key_state const& get_key_state() const = 0;
-    virtual gott::ui::mouse_state const& get_mouse_state() const = 0;
-    virtual ~uicontext_base() = 0; // TODO:implement!
+    gott::ui::key_state const& get_key_state() const;
+    gott::ui::mouse_state const& get_mouse_state() const;
+    virtual ~uicontext_base() = 0;
 };
 }}
 

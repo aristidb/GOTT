@@ -72,8 +72,8 @@ class GOTT_EXPORT window_base {
     sigc::signal0<void> focus_enter_
        , focus_leave_
        , close_;
-    sigc::singal1<void,MoUsE_event const& > mouse_;
-    sigc::signal1<void,key_event const& > key_;
+    sigc::signal1<void,mouse_event const& > mouse_;
+    sigc::signal1<void,gott::ui::key_event const& > key_;
 
   public:
 
@@ -105,7 +105,7 @@ class GOTT_EXPORT window_base {
     /// This event is emitted right before the window gets closed
     sigc::signal0<void>& on_close();
     sigc::signal0<void>& on_focus_leave();
-    sigc::singal1<void,MoUsE_event const & > & on_mouse();
+    sigc::signal1<void,mouse_event const & > & on_mouse();
     sigc::signal1<void,key_event const&>& on_key();
     //\}
 

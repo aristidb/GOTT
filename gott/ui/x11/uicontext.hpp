@@ -1,7 +1,8 @@
-#ifndef GOTT_UTIL_GEOMETRY_HPP_INCLUDED
-#define GOTT_UTIL_GEOMETRY_HPP_INCLUDED
+#ifndef GOTT_UI_X11_UICONTEXT_HPP_INCLUDED
+#define GOTT_UI_X11_UICONTEXT_HPP_INCLUDED
+
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
-// Content: GOTT simple geometry utility classes 
+// Content: GOTT User interface context base class
 // Authors: Andreas Pokorny
 //
 // This file is part of the Gott Project (http://gott.sf.net)
@@ -21,33 +22,29 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include <gott/util/visibility.hpp>
-#include <cctype>
 
-// move into subdir if this file grows to much 
-namespace gott{
+namespace gott{namespace ui{namespace x11{
 
-struct GOTT_EXPORT coord
-{
-  coord() : x(0), y(0) {}
-  coord( int x_, int y_ ) : x(x_), y(y_){}
-  int x, y;
-  inline coord& operator +=(  coord const& r )  { x+=r.x;y+=r.y;return *this; }
+class uicontext : public uicontext_base {
+  private:
+    std::vector<gott::ui::x11::window*> windows_;
+    Display * display_;
+    int screen;
+  public:
+    void register_window( window_base * ref );
+    void remove_window( window_base *ref );
+
+
+    /**
+     * \brief terminate the context.
+     * A call to this method ends this user interface session, and might also 
+     * quit the current application if no other control loop is running. 
+     */
+    void quit();
+
+    ~uicontext();
 };
-
-inline coord operator +( coord const& l, coord const& r )  { coord t(l); t += r; return t; }
-
-struct GOTT_EXPORT rect 
-{
-  long left, top; 
-  size_t width, height;
-  rect( long l, long t , size_t width, size_t height);
-  rect();
-  bool is_inside( coord const& c ) const;
-  void add_region( rect const& r );
-};
-
-}
+}}}
 
 #endif
 
