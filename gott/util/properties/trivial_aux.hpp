@@ -37,9 +37,7 @@ struct no_lock {
 
 struct no_notification {
   void notify(void *) const {}
-  sigc::signal0<void> *get_on_change(void *) {
-    return 0;
-  }
+  enum { has_signal = false };
 };
 
 }}

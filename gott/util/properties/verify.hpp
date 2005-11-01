@@ -38,7 +38,7 @@ template<
 >
 class verify {
 public:
-  verify(property<Type> &p, 
+  verify(notifying_property<Type> &p, 
       Check c = Check(), 
       OnFailure f = OnFailure(),
       OnCorrect k = OnCorrect())
@@ -54,7 +54,7 @@ public:
   }
 
 private:
-  property<Type> &prop;
+  notifying_property<Type> &prop;
   Check check;
   OnFailure failure;
   OnCorrect correct;

@@ -34,9 +34,11 @@ struct sigc_notification {
     on_change_signal.emit();
   }
 
-  sigc::signal0<void> *get_on_change(void *) {
-    return &on_change_signal;
+  sigc::signal0<void> &get_on_change(void *) {
+    return on_change_signal;
   }
+
+  enum { has_signal = true };
 };
 
 }}

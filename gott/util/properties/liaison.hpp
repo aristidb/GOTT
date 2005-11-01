@@ -37,7 +37,8 @@ struct no_conversion {
 template<class Type, class Conversion = no_conversion<Type> >
 class liaison {
 public:
-  liaison(property<Type> &lhs, property<Type> &rhs, Conversion c = Conversion())
+  liaison(notifying_property<Type> &lhs, notifying_property<Type> &rhs, 
+      Conversion c = Conversion())
   : left(lhs),
     right(rhs), 
     left_to_right(left.on_change().connect(
@@ -62,8 +63,8 @@ public:
   }
 
 private:
-  property<Type> &left;
-  property<Type> &right;
+  notifying_property<Type> &left;
+  notifying_property<Type> &right;
   sigc::connection left_to_right;
   sigc::connection right_to_left;
   Conversion conversion;

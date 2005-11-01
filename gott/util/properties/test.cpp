@@ -36,7 +36,7 @@ public:
     cout << "Changed(ref): " << long(p);
     cout << " -> " << p->get() << endl;
   }
-  sigc::signal0<void> *get_on_change(void*) { return 0; }
+  enum { has_signal = false };
 };
 
 int read_fun() {

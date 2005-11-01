@@ -236,21 +236,6 @@ public:
     *write() = func();
   }
 
-  /**
-   * Thrown when on_change() is called but there is no notification signal
-   * available.
-   */
-  class no_notification_error {};
-
-  /**
-   * Return a signal emitted whenever the value of the property changes.
-   * \throw property::no_notification_error
-   * \return A reference to the signal.
-   */
-  virtual sigc::signal0<void> &on_change() {
-    throw no_notification_error();
-  }
-  
   /// Destructor.
   virtual ~property() {}
 
@@ -262,6 +247,26 @@ protected:
   virtual void end_read(annotated_const_pointer) const = 0;
   virtual void end_write(annotated_pointer) = 0;
   virtual void end_read_write(annotated_pointer) = 0;
+};
+
+template<class T>
+class notifying_property : public property<T> {
+public:
+  /**
+   * Return a signal emitted whenever the value of the property changes.
+   * \return A reference to the signal.
+   */
+  virtual sigc::signal0<void> &on_change() = 0;
+};
+
+template<class T, bool has_signal>
+struct property_chooser { // true
+  typedef notifying_property<T> type;
+};
+
+template<class T>
+struct property_chooser<T, false> {
+  typedef property<T> type;
 };
 
 /**
@@ -282,7 +287,9 @@ template<
   class Storage = embedded_storage<Type>,
   class Lock = no_lock
 >
-class concrete_property : public property<Type> {
+class concrete_property 
+: public
+    property_chooser<Type, policy<Notification>::class_type::has_signal>::type {
 public:
   typedef typename property<Type>::value_type value_type;
   typedef typename property<Type>::const_pointer const_pointer;
@@ -333,10 +340,7 @@ public:
   }
 
   sigc::signal0<void> &on_change() {
-    sigc::signal0<void> *p = notifier.get_on_change(this);
-    if (!p)
-      throw typename property<Type>::no_notification_error();
-    return *p;
+    return notifier.get_on_change(this);
   }
 
 private:
