@@ -388,8 +388,7 @@ private:
 template<
   class OldType, 
   class NewType, 
-  class Translation = 
-    direct_translation<NewType, OldType>
+  class Translation = direct_translation<NewType, OldType>
 > 
 class translation_property : public property<NewType> {
 public:
@@ -416,10 +415,6 @@ public:
   translation_property(property<OldType> &b, 
       translation_p t = translation_policy()) 
   : bound(b), translator(t) {}
-
-  sigc::signal0<void> &on_change() {
-    return bound.on_change();
-  }
 
 private:
   annotated_const_pointer begin_read() const {
@@ -450,6 +445,52 @@ private:
   
   property<OldType> &bound;
   translation_s translator;
+};
+
+template<
+  class OldType,
+  class NewType,
+  class Translation = direct_translation<NewType, OldType>
+> 
+class notifying_translation_property : public notifying_property<NewType> {
+public:
+  typedef typename property<NewType>::value_type value_type;
+  typedef typename property<NewType>::const_pointer const_pointer;
+  typedef typename property<NewType>::pointer pointer;
+  
+  typedef typename policy<Translation>::class_type translation_policy;
+
+private:
+  typedef typename policy<Translation>::parameter translation_p;
+  typedef typename policy<Translation>::storage translation_s;
+
+  typedef typename property<NewType>::annotated_pointer annotated_pointer;
+  typedef typename property<NewType>::annotated_const_pointer 
+    annotated_const_pointer;
+
+public:
+  /**
+   * Constructor.
+   * \param b The bound property.
+   * \param t [optional] The translation policy.
+   */
+  notifying_translation_property(notifying_property<OldType> &b, 
+      translation_p t = translation_policy()) 
+  : delegate(b, t), on_change_signal(b.on_change()) {}
+
+  sigc::signal0<void> on_change() { return on_change_signal; }
+
+private:
+  annotated_const_pointer begin_read() { return delegate.begin_read(); }
+  annotated_pointer begin_write() { return delegate.begin_write(); }
+  annotated_pointer begin_read_write() { return delegate.begin_read_write(); }
+
+  void end_read(annotated_const_pointer p) { delegate.end_read(p); }
+  void end_write(annotated_pointer p) { delegate.end_write(p); }
+  void end_read_write(annotated_pointer p) { delegate.end_read_write(p); }
+
+  translation_property<OldType, NewType, Translation> delegate;
+  sigc::signal0<void> on_change_signal;
 };
 
 }}
