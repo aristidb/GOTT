@@ -22,6 +22,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include <X11/X.h>
+#include <X11/Xatom.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #include <gott/ui/window_base.hpp>
 
@@ -31,7 +35,6 @@ class uicontext;
 
 class GOTT_EXPORT window : public gott::ui::window_base {
   private:
-    uicontext *context; ///<weak_ptr?
     gott::properties::concrete_property<rect,sigc_notification> region_;
     gott::properties::concrete_property<gott::string,sigc_notification> title_;
     gott::properties::concrete_property<bool,sigc_notification> visibility_;

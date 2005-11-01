@@ -1,5 +1,7 @@
+#ifndef GOTT_UTIL_GEOMETRY_HPP_INCLUDED
+#define GOTT_UTIL_GEOMETRY_HPP_INCLUDED
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
-// Content: GOTT window base class
+// Content: GOTT simple geometry utility classes 
 // Authors: Andreas Pokorny
 //
 // This file is part of the Gott Project (http://gott.sf.net)
@@ -18,58 +20,33 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <gott/ui/window_base.hpp>
-namespace gott{namespace ui{
 
-window_base::~window_base()
-{}
+#include <gott/util/visibility.hpp>
 
-sigc::signal2<void, agg::rendering_buffer&, rect const&> & window_base::on_draw()
+// move into subdir if this file grows to much 
+namespace gott{
+
+struct GOTT_EXPORT coord
 {
-  return draw_;
+  coord() : x(0), y(0) {}
+  coord( int x_, int y_ ) : x(x_), y(y_){}
+  int x, y;
+  inline coord& operator +=(  coord const& r )  { x+=r.x;y+=r.y;return *this; }
+};
+
+inline coord operator +( coord const& l, coord const& r )  { coord t(l); t += r; return t; }
+
+struct GOTT_EXPORT rect 
+{
+  long left, top; 
+  size_t width, height;
+  rect( long l, long t , size_t width, size_t height);
+  rect();
+  bool is_inside( coord const& c ) const;
+  void add_region( rect const& r );
+};
+
 }
 
-sigc::signal1<void, rect const&> & window_base::on_configure()
-{
-  return configure_;
-}
-
-sigc::signal1<void, rect const&> & window_base::on_resize()
-{
-  return resize_;
-}
-
-sigc::signal1<void, rect const&> & window_base::on_move()
-{
-  return move_;
-}
-
-sigc::signal0<void> & window_base::on_focus_enter()
-{
-  return focus_enter_;
-}
-
-sigc::signal0<void> & window_base::on_close()
-{
-  return close_;
-}
-
-sigc::signal0<void> & window_base::on_focus_leave()
-{
-  return focus_leave_;
-}
-
-sigc::singal1<void,MoUsE_event const&> & window_base::on_mouse()
-{
-  return mouse_;
-}
-
-sigc::signal1<void,key_event const&> & window_base::on_key()
-{
-  return key_;
-}
-
-
-
-}}
+#endif
 

@@ -1,5 +1,5 @@
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
-// Content: GOTT window base class
+// Content: GOTT input structures
 // Authors: Andreas Pokorny
 //
 // This file is part of the Gott Project (http://gott.sf.net)
@@ -18,57 +18,24 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <gott/ui/window_base.hpp>
+
+#include <gott/ui/input.hpp>
+#include <cstring>
+
 namespace gott{namespace ui{
 
-window_base::~window_base()
+key_event::key_event( key_code c, event_type t)  
+    : type(t), code(c)
 {}
 
-sigc::signal2<void, agg::rendering_buffer&, rect const&> & window_base::on_draw()
-{
-  return draw_;
-}
+key_state::key_state()
+  : keyboard( std::size_t(gott::ui::NoKey), static_cast<unsigned char>(0) )
+{}
 
-sigc::signal1<void, rect const&> & window_base::on_configure()
+mouse_state::mouse_state()
 {
-  return configure_;
+  std::memset( buttons, 0, sizeof(buttons) );
 }
-
-sigc::signal1<void, rect const&> & window_base::on_resize()
-{
-  return resize_;
-}
-
-sigc::signal1<void, rect const&> & window_base::on_move()
-{
-  return move_;
-}
-
-sigc::signal0<void> & window_base::on_focus_enter()
-{
-  return focus_enter_;
-}
-
-sigc::signal0<void> & window_base::on_close()
-{
-  return close_;
-}
-
-sigc::signal0<void> & window_base::on_focus_leave()
-{
-  return focus_leave_;
-}
-
-sigc::singal1<void,MoUsE_event const&> & window_base::on_mouse()
-{
-  return mouse_;
-}
-
-sigc::signal1<void,key_event const&> & window_base::on_key()
-{
-  return key_;
-}
-
 
 
 }}

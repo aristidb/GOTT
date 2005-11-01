@@ -1,5 +1,5 @@
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
-// Content: GOTT window base class
+// Content: GOTT simple geometry utility classes 
 // Authors: Andreas Pokorny
 //
 // This file is part of the Gott Project (http://gott.sf.net)
@@ -18,58 +18,29 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <gott/ui/window_base.hpp>
-namespace gott{namespace ui{
+#include <utility>
+#include <algorithm>
+#include <gott/util/geometry.hpp>
 
-window_base::~window_base()
+namespace gott{
+rect::rect( long l, long t, std::size_t w, std::size_t h)
+  : left(l), top(t), width(w), height(h)
+{
+}
+rect::rect()
+  : left(0), top(0), width(1), height(1)
 {}
 
-sigc::signal2<void, agg::rendering_buffer&, rect const&> & window_base::on_draw()
-{
-  return draw_;
+void rect::add_region( rect const& other ) {
+  width = std::max( left + width, other.left + other.width);
+  left = std::min( left, other.left );
+  height = std::max( top + height, other.top + other.height);
+  top = std::min( top, other.top);
 }
 
-sigc::signal1<void, rect const&> & window_base::on_configure()
-{
-  return configure_;
+bool rect::is_inside( coord const& c  ) const {
+  return c.x >= left && c.x <= left + long(width)  &&  c.y >= top && c.y <= top + long(height);
 }
 
-sigc::signal1<void, rect const&> & window_base::on_resize()
-{
-  return resize_;
 }
-
-sigc::signal1<void, rect const&> & window_base::on_move()
-{
-  return move_;
-}
-
-sigc::signal0<void> & window_base::on_focus_enter()
-{
-  return focus_enter_;
-}
-
-sigc::signal0<void> & window_base::on_close()
-{
-  return close_;
-}
-
-sigc::signal0<void> & window_base::on_focus_leave()
-{
-  return focus_leave_;
-}
-
-sigc::singal1<void,MoUsE_event const&> & window_base::on_mouse()
-{
-  return mouse_;
-}
-
-sigc::signal1<void,key_event const&> & window_base::on_key()
-{
-  return key_;
-}
-
-
-
-}}
 

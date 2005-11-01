@@ -21,11 +21,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <bitset>
+#include <gott/util/visibility.hpp>
+#include <sigc++/signal.h>
+#include <gott/util/properties/property.hpp>
+#include <gott/util/string/string.hpp>
+#include <gott/util/geometry.hpp>
+#include <gott/ui/input.hpp>
 
-
-#include <sigc++/signal.hpp>
-#include <gott/util/properties.hpp>
-#include <gott/util/string.hpp>
+// rendering system!
+#include <agg_rendering_buffer.h>
 
 namespace gott{namespace ui{
 class uicontext_base;
@@ -53,21 +58,57 @@ struct GOTT_EXPORT window_flags
   };
 };
 
+
+/**
+ * window_base describes the base for all window classes, event 
+ */
 class GOTT_EXPORT window_base {
   private:
-    sigc::signal2<void, agg::rendering_buffer&, rect const&> on_draw;
-    sigc::signal1<void, rect const&> on_configure
-      , on_resize
-      , on_move;
-    sigc::signal0<void> on_focus_enter
-       , on_focus_leave
-       , on_close;
-    sigc::singal1<void,mouse_event const&> on_mouse;
-    sigc::signal1<void,key_event const&> on_key;
+    uicontext_base *context; 
+    sigc::signal2<void, agg::rendering_buffer&, rect const&> draw_;
+    sigc::signal1<void, rect const&> configure_
+      , resize_
+      , move_;
+    sigc::signal0<void> focus_enter_
+       , focus_leave_
+       , close_;
+    sigc::singal1<void,MoUsE_event const& > mouse_;
+    sigc::signal1<void,key_event const& > key_;
 
   public:
 
-    // add signal connectors here
+    window_base( uicontext_base * context );
+
+    /**
+     * \name Window signals
+     */
+    //\{
+    /**
+     * \brief draw signal 
+     * The rendering system is currently directly coupled to antigrain.
+     * A correct slot only makes changes in the rectangular region defined by the 
+     * second parameter.
+     */
+    sigc::signal2<void, agg::rendering_buffer&, rect const&>& on_draw();
+    /// Both resize and move events will be handled by this signal
+    sigc::signal1<void, rect const&>& on_configure();
+    /**
+     * Only those events that do change the size of the window will 
+     * emit this signal.
+     */
+    sigc::signal1<void, rect const&>& on_resize();
+    /**
+     * Only move events will emit this signal.
+     */
+    sigc::signal1<void, rect const&>& on_move();
+    sigc::signal0<void>& on_focus_enter();
+    /// This event is emitted right before the window gets closed
+    sigc::signal0<void>& on_close();
+    sigc::signal0<void>& on_focus_leave();
+    sigc::singal1<void,MoUsE_event const & > & on_mouse();
+    sigc::signal1<void,key_event const&>& on_key();
+    //\}
+
 
     typedef gott::properties::property<rect> rect_property_type;
     typedef gott::properties::property<gott::string> string_property_type;
@@ -117,7 +158,7 @@ class GOTT_EXPORT window_base {
 
 #if 0
     /**
-     * \name op
+     * \name 
      * open().set(true) <- ?? sounds broken 
      */
     // virtual toggle_property_type& open() = 0; 
@@ -136,7 +177,7 @@ class GOTT_EXPORT window_base {
      * \param[in]
      * \param[in] flags is a combination of window flags
      */
-    virtual void open( uicontext& app, rect const& position, string const& title, std::size_t flags ) = 0;
+    virtual void open( uicontext_base& app, rect const& position, string const& title, std::size_t flags ) = 0;
 
 
     /**
@@ -156,7 +197,7 @@ class GOTT_EXPORT window_base {
     /**
      * \brief get the uicontext this window belongs to. 
      */
-    virtual uicontext* get_uicontext() = 0;
+    virtual uicontext_base* get_uicontext() = 0;
 
     virtual ~window_base();
 };
