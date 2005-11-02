@@ -22,6 +22,14 @@
 
 namespace gott{namespace ui{namespace x11{
 
+window::window( uicontext& app, rect const& position, string const& title, std::size_t flags ) 
+  : handle(0), invalid_area(0,0,0,0), context(&app)
+{
+
+  ::Window root_window = RootWindow( context->get_display(), context->get_screen() );
+  context->register_window( this );
+}
+
 gott::ui::window_base::rect_property_type& window::region()
 {
   return region_;
@@ -65,10 +73,6 @@ gott::ui::window_base::flags_property_type const& window::flags() const
   return flags_;
 }
  
-
-void window::open( uicontext& app, rect const& position, string const& title, std::size_t flags ){
-}
-
 
 
 void window::set_size_hints(){

@@ -1,0 +1,89 @@
+#ifndef GOTT_UI_SELECT_LOOP_HPP_INCLUDED
+#define GOTT_UI_SELECT_LOOP_HPP_INCLUDED
+
+// Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
+// Content: GOTT select loop
+// Authors: Andreas Pokorny
+//
+// This file is part of the Gott Project (http://gott.sf.net)
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#include <map> 
+#include <sys/select.h> 
+#include <boost/function.hpp>
+#include <gott/util/visibility.hpp>
+
+
+// TODO: wrong namespace, and wrong place for this file?
+namespace gott{namespace events{
+
+/**
+ * \brief select_loop encapsulates a main loop that uses pselect to dispatch events
+ * select_loop is not copyable.
+ */
+class GOTT_EXPORT select_loop {
+  private:
+    struct GOTT_LOCAL handler {  // is local allowed here?
+      boost::function<void()> on_read, on_write, on_exception;
+    };
+    fd_set read_fds, write_fds, except_fds;
+    typedef std::map<int, handler > callback_map;
+    callback_map callbacks;
+
+    select_loop( select_loop const& cp );
+    select_loop& operator=( select_loop const& cp );
+
+  public:
+    select_loop();
+    ~select_loop();
+    /**
+     * \name callback registration and removal methods
+     * There are three possible incomming events for each 
+     * file descriptor. ...
+     */
+    //\{
+    /**
+     * \brief adds a file descriptor to watch and register a callback for incomming data events.
+     * If the file descriptor already exists only the ready-for-reading callback is replaced.
+     * \param[in] fd file descriptor of the socket to watch
+     * \param[in] on_read callback called whenever data is waiting at the socket.
+     */
+    void add_read_fd( int fd, boost::function<void()> on_read );
+    /**
+     * \brief adds a file descriptor to watch and registers a write callback.
+     * If the file descriptor already exists only the write callback is replaced.
+     * \param[in] fd file descriptor of the socket to watch
+     * \param[in] on_write called whenever the socket is ready for writing
+     */
+    void add_write_fd( int fd, boost::function<void()> on_write );
+    /**
+     * \brief adds a file descriptor to watch and registers a write callback.
+     * If the file descriptor already exists only the excetion callback is replaced.
+     * \param[in] fd file descriptor of the socket to watch
+     * \param[in] on_exception  will be called if exceptions happen on that socket
+     */
+    void add_exception_fd( int fd, boost::function<void()> on_exception );
+    void add_fd( int fd, boost::function<void()> on_read, boost::function<void()> on_write, boost::function<void()> on_exception );
+    void remove_fd( int fd );
+    //\}
+
+    void run();
+};
+
+}}
+
+#endif
+

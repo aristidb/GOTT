@@ -172,16 +172,6 @@ class GOTT_EXPORT window_base {
     virtual flags_property_type const& flags() const = 0; 
 
     /**
-     * \brief opens a new window using the uicontext
-     * \param[in] app the context
-     * \param[in] title unicode string of the window title 
-     * \param[in] position position and size of the window
-     * \param[in] flags is a combination of window flags
-     */
-    virtual void open( uicontext_base& app, rect const& position, string const& title, std::size_t flags ) = 0;
-
-
-    /**
      * \brief sets all kinds of hints
      * The window system might not respec these hints. It should be possible
      * to set the resize steps, a minimum size, and maybe a fixed apsect ratio?

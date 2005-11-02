@@ -40,6 +40,9 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     gott::properties::concrete_property<bool,sigc_notification> visibility_;
     gott::properties::concrete_property<std::bitset<10>,sigc_notification> flags_;
     Window handle;
+
+    gott::x11::detail::agg_buffer impl;
+
     agg::rendering_buffer buffer;
     rect invalid_area;
 
@@ -48,9 +51,13 @@ class GOTT_EXPORT window : public gott::ui::window_base {
   public:
 
     /**
-     * Should we provide a default constructor?
+     * \brief creates and opens a window 
+     * \param[in] app user interface system context of this window
+     * \param[in] position the position and size of the window
+     * \param[in] title a unicode string containing the title of the window
+     * \param[in] flags a combination of ui::window_flags
      */
-    window();
+    window( uicontext& app, rect const& position, string const& title, std::size_t flags );
 
     /**
      * Should we provide a default constructor?
@@ -72,8 +79,6 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     
     flags_property_type& flags(); 
     flags_property_type const& flags() const; 
-
-    void open( uicontext& app, rect const& position, string const& title, std::size_t flags );
 
 
     void set_size_hints();
