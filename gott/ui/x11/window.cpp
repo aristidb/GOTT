@@ -66,22 +66,46 @@ gott::ui::window_base::flags_property_type const& window::flags() const
 }
  
 
-void window::open( uicontext& app, rect const& position, string const& title, std::size_t flags )
-{
+void window::open( uicontext& app, rect const& position, string const& title, std::size_t flags ){
 }
 
 
 
-void window::set_size_hints()
-{
+void window::set_size_hints(){
 }
 
-void window::update_region( rect const& region )
-{
+void window::update_region( rect const& region ){
+  blit_buffer( buffer, region );
 }
 
-uicontext* window::get_uicontext()
-{
+uicontext* window::get_uicontext(){
+  return context;
+}
+
+bool window::needs_update() const{
+  return invalid_area.width == 0 || invalid_area.height == 0;
+}
+rect window::get_invalidation_area() const{
+  return invalid_area;
+}
+void window::invalidate_area( rect const& region ){
+  invalid_area.add_region(region);
+}
+
+
+void window::blit_buffer( agg::rendering_buffer const& buffer, recont const& target_region ){
+}
+
+agg::rendering_buffer const& window::screen_buffer() const{
+  return buffer;
+}
+
+agg::rendering_buffer & window::screen_buffer(){
+  return buffer;
+}
+
+Window window::get_handle() const{
+  return handle;
 }
 
 

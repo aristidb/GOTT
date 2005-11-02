@@ -110,10 +110,10 @@ class GOTT_EXPORT window_base {
     //\}
 
 
-    typedef gott::properties::property<rect> rect_property_type;
-    typedef gott::properties::property<gott::string> string_property_type;
-    typedef gott::properties::property<bool> toggle_property_type;
-    typedef gott::properties::property<std::bitset<10> > flags_property_type;
+    typedef gott::properties::notifying_property<rect> rect_property_type;
+    typedef gott::properties::notifying_property<gott::string> string_property_type;
+    typedef gott::properties::notifying_property<bool> toggle_property_type;
+    typedef gott::properties::notifying_property<std::bitset<10> > flags_property_type;
     
     /**
      * \name Window region interface 
@@ -173,8 +173,9 @@ class GOTT_EXPORT window_base {
 
     /**
      * \brief opens a new window using the uicontext
-     * \param[in]
-     * \param[in]
+     * \param[in] app the context
+     * \param[in] title unicode string of the window title 
+     * \param[in] position position and size of the window
      * \param[in] flags is a combination of window flags
      */
     virtual void open( uicontext_base& app, rect const& position, string const& title, std::size_t flags ) = 0;
@@ -198,6 +199,59 @@ class GOTT_EXPORT window_base {
      * \brief get the uicontext this window belongs to. 
      */
     virtual uicontext_base* get_uicontext() = 0;
+
+
+    /**
+     * \name handling render updates
+     * To ensure that new data gets visible as soon as possible, 
+     * the user has to invalidate regions of the screen. The event loop
+     * will then initiate a buffered redraw and screen update sequence, 
+     * as soon as there are no more events to be processed. 
+     * TODO: The current invalidation system is based on accumulated rectangular regions, 
+     *  this concept could be improvd towards polygonal regions. 
+     * \{
+     */
+    /**
+     * This method signalizes if there are pending updates for this
+     * window. The uicontext should check that method, and emit the redraw
+     * event. 
+     */
+    virtual bool needs_update() const = 0;
+    /**
+     * \brief returns the invalid area. 
+     * To reduce and optimize redraws, the system should use the rect provided
+     * by this method, to emit a proper draw signal.
+     */
+    virtual rect get_invalid_area() const = 0;
+    /**
+     * \brief invalidates a rectangular area on screen
+     * Use this method to tell the system that a redraw should take place as soon 
+     * as possible. This method will not signal a draw event!
+     */
+    virtual void invalidate_area( rect const& region ) = 0;
+    //\}
+
+    /**
+     * \name Antigrain related render methods. 
+     * These methods will be removed in the future. The final rendering system should not have any 
+     * visable external dependencies. 
+     * \{
+     */
+    /**
+     * \brief copies a buffer onto the window. 
+     */
+    virtual void blit_buffer( agg::rendering_buffer const& buffer, recont const& target_region ) = 0;
+    /**
+     * \brief returns the screen buffer
+     */
+    virtual agg::rendering_buffer const& screen_buffer() const = 0;
+    /**
+     * \brief returns a mutable version of the screen buffer. 
+     * Users should not have to use this method.
+     */
+    virtual agg::rendering_buffer & screen_buffer() = 0;
+    //\}
+
 
     virtual ~window_base();
 };

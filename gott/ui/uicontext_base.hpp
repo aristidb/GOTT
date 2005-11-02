@@ -37,12 +37,9 @@ namespace gott{ namespace ui{
  * register themselves with a matching uicontext.
 */
 class GOTT_EXPORT uicontext_base {
-  private:
+  protected:
     gott::ui::key_state keys_;
     gott::ui::mouse_state mouse_;
-  protected:
-    gott::ui::key_state & get_key_state();
-    gott::ui::mouse_state & get_mouse_state();
 
   public:
 

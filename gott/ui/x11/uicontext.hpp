@@ -22,17 +22,52 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include <X11/X.h>
+#include <X11/Xatom.h>
+#include <gott/ui/uicontext_base.hpp>
+#include <gott/ui/window_base.hpp>
+#include <gott/ui/x11/window.hpp>
 
 namespace gott{namespace ui{namespace x11{
 
-class uicontext : public uicontext_base {
+/**
+ * \brief Xlib implementation of uicontext for X11.
+ */
+class GOTT_EXPORT uicontext : public uicontext_base {
   private:
     std::vector<gott::ui::x11::window*> windows_;
+    // TODO: pimpl ?
     Display * display_;
-    int screen;
+    //move screen number to window class?
+    int screen_; 
+    XAtom protocols_atom_;
+    void process_event( window* win, XEvent& e );
   public:
+
+    /**
+     * \brief Opens a xlib connection. 
+     * If you omit the connection parameter, the default Display will be used to 
+     * connect to the server.
+     */
+    uicontext( const char * connection = 0 );
+
+    /**
+     * \returns xlibs file descriptor to use in the select_loop main loop class
+     */
+    int get_descriptor() const;
+
+    /**
+     * \name select_loop handlers
+     */
+    //\{ 
+    void process_read();
+    void process_exception();
+    //\}
+
     void register_window( window_base * ref );
     void remove_window( window_base *ref );
+
+    gott::ui::x11::window* find_window( Window handle );
 
 
     /**
@@ -41,6 +76,11 @@ class uicontext : public uicontext_base {
      * quit the current application if no other control loop is running. 
      */
     void quit();
+
+    /**
+     * \brief returns the x11 display pointer.
+     */
+    Display* get_display();
 
     ~uicontext();
 };

@@ -39,6 +39,11 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     gott::properties::concrete_property<gott::string,sigc_notification> title_;
     gott::properties::concrete_property<bool,sigc_notification> visibility_;
     gott::properties::concrete_property<std::bitset<10>,sigc_notification> flags_;
+    Window handle;
+    agg::rendering_buffer buffer;
+    rect invalid_area;
+
+    uicontext * context;
 
   public:
 
@@ -77,8 +82,30 @@ class GOTT_EXPORT window : public gott::ui::window_base {
 
     uicontext* get_uicontext();
 
-    ~window();
 
+    bool needs_update() const;
+    rect get_invalidation_area() const;
+    void invalidate_area( rect const& region );
+
+
+
+    // agg stuff
+    void blit_buffer( agg::rendering_buffer const& buffer, recont const& target_region );
+    agg::rendering_buffer const& screen_buffer() const;
+    agg::rendering_buffer & screen_buffer();
+
+
+    /**
+     * \name special x11 functions
+     * \{
+     */
+    /**
+     * \returns the Window/XID of the window
+     */
+    Window get_handle() const;
+    //\}
+
+    ~window();
 };
 
 
