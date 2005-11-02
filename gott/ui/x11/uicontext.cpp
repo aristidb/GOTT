@@ -32,9 +32,9 @@ void uicontext::quit(){
 }
 
 
-gott::ui::key_state const& uicontext::get_key_state() const = 0;
-gott::ui::mouse_state const& uicontext::get_mouse_state() const = 0;
-~uicontext_base() = 0;
+uicontext::~uicontext() {
+}
+
 }}}
 
 #endif

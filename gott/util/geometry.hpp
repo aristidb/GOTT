@@ -27,7 +27,7 @@
 // move into subdir if this file grows to much 
 namespace gott{
 
-struct GOTT_EXPORT coord
+struct GOTT_LOCAL coord
 {
   coord() : x(0), y(0) {}
   coord( int x_, int y_ ) : x(x_), y(y_){}
@@ -35,9 +35,9 @@ struct GOTT_EXPORT coord
   inline coord& operator +=(  coord const& r )  { x+=r.x;y+=r.y;return *this; }
 };
 
-inline coord operator +( coord const& l, coord const& r )  { coord t(l); t += r; return t; }
+GOTT_LOCAL inline coord operator +( coord const& l, coord const& r )  { coord t(l); t += r; return t; }
 
-struct GOTT_EXPORT rect 
+struct GOTT_LOCAL rect 
 {
   long left, top; 
   size_t width, height;

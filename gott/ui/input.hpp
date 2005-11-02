@@ -34,7 +34,7 @@ namespace gott{namespace ui{
  * into two coordinate structures. 
  * The number of buttons is limited to eight buttons.
  */
-struct mouse_state
+struct GOTT_LOCAL mouse_state
 {
   public:
 
@@ -65,7 +65,7 @@ struct mouse_state
 
 /**
  */
-struct mouse_event
+struct GOTT_LOCAL mouse_event
 {
   enum event_type
   { Move = 0, 
@@ -236,7 +236,7 @@ enum key_code {
  * \brief Keyboard Event structure
  * TODO: Hold, or key repeat events
  */
-struct key_event
+struct GOTT_LOCAL key_event
 {
   enum event_type{ Press, Release }; // Hold?
   event_type type;
@@ -247,7 +247,7 @@ struct key_event
 /**
  * \brief Preliminary keyboard struture to represent the current key status.
  */
-struct key_state
+struct GOTT_LOCAL key_state
 {
   private:
     std::vector<unsigned char> keyboard;
