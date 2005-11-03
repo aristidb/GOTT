@@ -25,6 +25,7 @@
 #include "slot.hpp"
 #include <boost/shared_ptr.hpp>
 #if !defined(BOOST_PARAMETER_MAX_ARITY) || BOOST_PARAMETER_MAX_ARITY < 6
+#undef BOOST_PARAMETER_MAX_ARITY
 #define BOOST_PARAMETER_MAX_ARITY 6
 #endif
 #include <boost/parameter.hpp>
