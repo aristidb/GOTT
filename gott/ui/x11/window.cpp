@@ -17,14 +17,17 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
+#include <sys/types.h>
+#include <unistd.h>
+#include <boost/bind.hpp> 
+#include <boost/lambda/lambda.hpp> 
 #include <gott/ui/x11/window.hpp> 
 #include <gott/ui/x11/agg_detail.hpp> 
-#include <boost/bind.hpp> 
 
 namespace gott{namespace ui{namespace x11{
 
 using boost::bind;
+using boost::lambda::var;
 using boost::_1;
 window::window( uicontext& app, rect const& position, string const& title, std::size_t flags ) 
   : region_( gott::propertis::external_storage<rect>( 
@@ -35,8 +38,20 @@ window::window( uicontext& app, rect const& position, string const& title, std::
         bind(&window::get_title, this)
         , bind(&window::set_title, this, _1 ) )
       )
+  , visibility_( gott::propertis::external_storage<bool>(
+        var(mapped_state)
+        , bind(&window::map_window, this, _1 ) )
+      )
+  , flags_( gptt::propertis::external_storage<flags_type>(
+        var(window_flags)
+        , bind(&window::set_window_type, this, _1) )
+      ) 
   , handle(0)
-  , impl(0), invalid_area(0,0,0,0), context(&app)
+  , impl(0)
+  , invalid_area(0,0,0,0)
+  , mapped_state(false)
+  , window_flags(0)
+  , context(&app)
 {
 
   ::Window root_window = RootWindow( context->get_display(), context->get_screen() );
@@ -98,7 +113,11 @@ window::window( uicontext& app, rect const& position, string const& title, std::
     throw std::runtime_error("no window handle");
   ///////////////
 
-  set_window_type( fl );
+  // not exception safe!
+  impl = new detail::agg_buffer( context->get_display(), context->get_screen(), handle, vis_info.first, vis_info.second );
+  impl->resize_buffer( position );
+
+  flags_.set( flags );
 
 
   size_t num_p = 4;
@@ -130,7 +149,7 @@ window::window( uicontext& app, rect const& position, string const& title, std::
   //if( fl & Decoration )
   //  set_decoration();
 
-  set_title( t );
+  title_.set(t);
 	XSync( context->get_display(), 0 );
 
   // Wait for Map events? 
@@ -138,26 +157,12 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 	// flag this window as open
 	flags |= window_flags::Open;
   
-  // Get the current attributes .. lets hope the window manager already reset the window sizes:
-  XWindowAttributes attr;
-  XGetWindowAttributes( context->get_display(), handle, & attr );
-
-  window_rect.left = attr.x;
-  window_rect.top = attr.y;
-  window_rect.width = attr.width;
-  window_rect.height = attr.height;
-
-  flags |= window_flags::Open;
-
-  this->setup_renderer(context->get_display(), context->get_screen(), handle, window_rect );
+  region_.set(position)
 
   context->register_window( this );
-  
-  if( fl & Visible )
-    show();
-
-  exec_on_configure( window_rect );
-
+ 
+  if( flags & Visible )
+    visibility_.set(true);
 }
 
 /**
@@ -196,7 +201,7 @@ void window::handle_resize( rect const& region ){
       && region.top == attr.y 
       && region.width == attr.width
       && region.height == attr.height ) {
-    agg_buffer->resize_buffer( region )
+    impl->resize_buffer( region )
   }
   else 
     if( region.left == attr.x
@@ -232,6 +237,61 @@ void window::set_title( gott::string const& str ){
   XSetWMName( context->get_display(), handle, &property );
 
   XFree( property.value );
+}
+
+void window::map_window( bool new_state ) {
+  if( new_state != mapped_state ) {
+    if( new_state )
+      XMapWindow( context->get_display(), handle );
+    else 
+      XUnmapWindow( context->get_display(), handle );
+    mapped_state = new_state;
+  }
+}
+
+void window::set_window_type( gott::ui::window_base::flags_type const& fl ){
+#if 0 
+  fl &= (Menu|Normal|Toolbar|Utility|Splash|Dock|ToolTip|Decoration);
+  
+  WMHints hints; 
+  if( !( fl & Decoration ) )
+    hints.decorations = 0;
+
+  Atom wm_hints = context->get_atom("_MOTIF_WM_HINTS");
+  XChangeProperty(context->get_display(), handle, wm_hints, wm_hints, 32, PropModeReplace, 
+      reinterpret_cast<unsigned char*>(&hints), 5);
+
+  std::vector<Atom> net_wintypes;
+  if( fl & Normal )
+    net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_NORMAL") );
+  if( fl & Menu ) 
+    net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_MENU") );
+  if( fl & Toolbar ) 
+    net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_TOOLBAR") );
+  if( fl & Utility ) 
+    net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_UTILITY") );
+  if( fl & Dialog ) 
+    net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_DIALOG") );
+  if( fl & Splash ) 
+    net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_SPLASH") );
+  if( fl & Dock ) 
+    net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_DOCK") );
+
+
+  if( net_wintypes.size() )
+    change_property(
+        context->get_atom( "_NET_WM_WINDOW_TYPE" ), XA_ATOM, 32
+        , reinterpret_cast<unsigned char *>(&(net_wintypes[0])), net_wintypes.size());
+  else 
+    XDeleteProperty( context->get_display(), handle
+        , context->get_atom( "_NET_WM_WINDOW_TYPE"));
+
+  if( fl & ( Toolbar || ToolTip || Dialog  ) &&  parent )
+    XSetTransientForHint( context->get_display(), handle, parent->handle );
+
+  flags |= fl;
+#endif
+
 }
 
 gott::ui::window_base::rect_property_type& window::region()
@@ -322,6 +382,7 @@ void window::change_property( Atom property, Atom type, int format, unsigned cha
 
 window::~window()
 {
+  delete impl;
 }
 
 

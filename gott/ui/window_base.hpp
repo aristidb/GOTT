@@ -109,11 +109,12 @@ class GOTT_EXPORT window_base {
     sigc::signal1<void,key_event const&>& on_key();
     //\}
 
+    typedef std::bitset<10> flags_type;
 
     typedef gott::properties::notifying_property<rect> rect_property_type;
     typedef gott::properties::notifying_property<gott::string> string_property_type;
     typedef gott::properties::notifying_property<bool> toggle_property_type;
-    typedef gott::properties::notifying_property<std::bitset<10> > flags_property_type;
+    typedef gott::properties::notifying_property<flags_type> flags_property_type;
     
     /**
      * \name Window region interface 

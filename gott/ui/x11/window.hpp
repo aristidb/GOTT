@@ -37,13 +37,15 @@ class GOTT_EXPORT window : public gott::ui::window_base {
   private:
     gott::properties::concrete_property<rect,sigc_notification,external_storage<rect> > region_;
     gott::properties::concrete_property<gott::string,sigc_notification,external_storage<gott::string> > title_;
-    gott::properties::concrete_property<bool,sigc_notification> visibility_;
-    gott::properties::concrete_property<std::bitset<10>,sigc_notification> flags_;
+    gott::properties::concrete_property<bool,sigc_notification,external_storage<bool> > visibility_;
+    gott::properties::concrete_property<flags_type,sigc_notification,external_storage<flags_type> > flags_;
     Window handle;
 
     gott::x11::detail::agg_buffer* impl;
 
     rect invalid_area;
+    bool mapped_state;
+    flags_type window_flags;
 
     uicontext * context;
 
@@ -52,6 +54,9 @@ class GOTT_EXPORT window : public gott::ui::window_base {
 
     gott::string get_title() const;
     void set_title( gott::string const& str );
+
+    void map_window( bool new_state );
+    void set_window_type( flags_type const& fl );
 
   public:
 
