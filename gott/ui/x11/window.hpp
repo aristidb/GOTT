@@ -65,7 +65,7 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     window( uicontext& app, rect const& position, string const& title, std::size_t flags );
 
     /**
-     * Should we provide a default constructor?
+     * \brief opens a new window
      */
     window( gott::ui::x11::uicontext& app, rect const& position, string const& title, std::size_t flags);
 

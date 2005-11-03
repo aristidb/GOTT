@@ -144,8 +144,8 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 
   window_rect.left = attr.x;
   window_rect.top = attr.y;
-  window_rect.width = attr.y;
-  window_rect.height = attr.y;
+  window_rect.width = attr.width;
+  window_rect.height = attr.height;
 
   flags |= window_flags::Open;
 
@@ -166,7 +166,11 @@ window::window( uicontext& app, rect const& position, string const& title, std::
  * \returns the area covered by the window 
  */
 rect window::get_region() const{
+  XWindowAttributes attr;
+  XGetWindowAttributes( context->get_display(), handle, &attr );
+  return rect(attr.x, attr.y, attr.width,attr.height );
 }
+
 /**
  * \brief forwards resize events to the system
  * There are two different resize events, which makes the 
@@ -177,16 +181,57 @@ rect window::get_region() const{
  * back as a ConfigureNotify. The uicontext will tell the 
  * window that the size actually changed. So we have to differ
  * between these two resize ``events''.
- * This sounds problematic, but it is simple to solve. We can 
- * check this by ... tbc stay tuned
+ * This sounds ugly, but it is simple to solve. We can check 
+ * this by requesting the ``real'' current window size from xlib, 
+ * and compare it with the passed one. If they do not differ, 
+ * we just forward the resize to our agg_buffer which will 
+ * then update its buffer, otherwise we send the resize request 
+ * to xlib. 
  */
-void window::handle_resize( rect const& r ){
+void window::handle_resize( rect const& region ){
+  XWindowAttributes attr;
+  XGetWindowAttributes( context->get_display(), handle, &attr );
+          
+  if( region.left == attr.x
+      && region.top == attr.y 
+      && region.width == attr.width
+      && region.height == attr.height ) {
+    agg_buffer->resize_buffer( region )
+  }
+  else 
+    if( region.left == attr.x
+        && region.top == attr.y 
+        && ( region.width != attr.width
+          || region.height != attr.height ) )
+      XResizeWindow( context->get_display(), handle, region.width, region.height );
+    else if(( region.left == attr.x
+          || region.top == attr.y )
+        && region.width == attr.width
+        && region.height == attr.height )
+      XMoveWindow( context->get_display(), handle, region.left, region.top);
+    else
+      XMoveResizeWindow(context->get_display(), handle, region.left, region.top, region.width, region.height );
 }
 
 gott::string window::get_title() const{
 }
 
+/**
+ * Converts the string to a text property, and sets it as the 
+ * X11 window manager title property. 
+ */
 void window::set_title( gott::string const& str ){
+  // convert the string we got to a text property
+  XTextProperty property;
+  char *a = const_cast<char*>(str.as_utf8().begin());
+
+  if( XmbTextListToTextProperty( context->get_display(), &a, 1, XTextStyle , &property ) != Success )
+    return;
+
+  // set the physical window name
+  XSetWMName( context->get_display(), handle, &property );
+
+  XFree( property.value );
 }
 
 gott::ui::window_base::rect_property_type& window::region()
