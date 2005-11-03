@@ -35,18 +35,23 @@ class uicontext;
 
 class GOTT_EXPORT window : public gott::ui::window_base {
   private:
-    gott::properties::concrete_property<rect,sigc_notification> region_;
-    gott::properties::concrete_property<gott::string,sigc_notification> title_;
+    gott::properties::concrete_property<rect,sigc_notification,external_storage<rect> > region_;
+    gott::properties::concrete_property<gott::string,sigc_notification,external_storage<gott::string> > title_;
     gott::properties::concrete_property<bool,sigc_notification> visibility_;
     gott::properties::concrete_property<std::bitset<10>,sigc_notification> flags_;
     Window handle;
 
-    gott::x11::detail::agg_buffer impl;
+    gott::x11::detail::agg_buffer* impl;
 
-    agg::rendering_buffer buffer;
     rect invalid_area;
 
     uicontext * context;
+
+    rect get_region() const;
+    void handle_resize( rect const& r );
+
+    gott::string get_title() const;
+    void set_title( gott::string const& str );
 
   public:
 
@@ -108,6 +113,10 @@ class GOTT_EXPORT window : public gott::ui::window_base {
      * \returns the Window/XID of the window
      */
     Window get_handle() const;
+    /**
+     * \brief Sets a property 
+     */
+    void change_property( Atom property, Atom type, int format, unsigned char *data, int nlements );
     //\}
 
     ~window();

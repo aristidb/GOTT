@@ -78,9 +78,17 @@ class GOTT_EXPORT uicontext : public uicontext_base {
     void quit();
 
     /**
+     * \name special x11 functions
+     * \{
+     */
+    /**
      * \brief returns the x11 display pointer.
      */
     Display* get_display();
+    int get_screen() const;
+    Atom get_atom( const char* atom ) const;
+    //\}
+
 
     ~uicontext();
 };
