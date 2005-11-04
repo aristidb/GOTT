@@ -71,6 +71,7 @@ void uicontext::quit(){
 }
 
 int uicontext::get_descriptor() const{
+  return ConnectionNumber( display_ );
 }
 
 void uicontext::process_event( window* win, XEvent& e ) {

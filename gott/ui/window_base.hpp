@@ -41,7 +41,8 @@ class uicontext_base;
  * so there is no gurantee that these flags have any effects on 
  * the window.
  *
- * \todo these flags need revision, Open, and Visible might not be there
+ * \todo these flags need revision, Open is not required, and Visible is
+ * handled by a different property, 
  */
 struct GOTT_LOCAL window_flags
 {
@@ -193,6 +194,8 @@ class GOTT_EXPORT window_base {
      * \brief This property provides access to the visibility status of the window.
      * Changes to this property will be forwarded to the underlying window 
      * system. 
+     * \todo discuss different visible states, like fullscreen, maximized 
+     * minimized and normal visibility.
      */
     //\{
     ///

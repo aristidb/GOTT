@@ -35,6 +35,9 @@ namespace gott{namespace ui{namespace x11{
 namespace detail { struct agg_buffer; }
 
 
+/**
+ * \brief x11 window class. 
+ */
 class GOTT_EXPORT window : public gott::ui::window_base {
   private:
     friend class uicontext;
