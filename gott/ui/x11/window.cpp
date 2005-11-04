@@ -20,11 +20,20 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <boost/bind.hpp> 
+#include <boost/cstdint.hpp> 
 #include <boost/lambda/lambda.hpp> 
 #include <gott/ui/x11/window.hpp> 
 #include <gott/ui/x11/agg_detail.hpp> 
 
 namespace gott{namespace ui{namespace x11{
+namespace {
+  // TODO define motif flags here
+  struct GOTT_LOCAL WMHints
+  {
+    boost::int32_t flags, functions, decorations, input_mode, status;
+    WMHints() : flags(0), functions(1), decorations(1), input_mode(1), status(0) {}
+  };
+}
 
 using boost::bind;
 using boost::lambda::var;
@@ -35,7 +44,7 @@ window::window( uicontext& app, rect const& position, string const& title, std::
         , bind(&window::handle_resize, this, _1 ) )  
       )
   , title_( gott::propertis::external_storage<gott::string>(
-        bind(&window::get_title, this)
+        var(title_string)
         , bind(&window::set_title, this, _1 ) )
       )
   , visibility_( gott::propertis::external_storage<bool>(
@@ -43,14 +52,14 @@ window::window( uicontext& app, rect const& position, string const& title, std::
         , bind(&window::map_window, this, _1 ) )
       )
   , flags_( gptt::propertis::external_storage<flags_type>(
-        var(window_flags)
+        var(win_flags)
         , bind(&window::set_window_type, this, _1) )
       ) 
   , handle(0)
   , impl(0)
   , invalid_area(0,0,0,0)
   , mapped_state(false)
-  , window_flags(0)
+  , win_flags(0)
   , context(&app)
 {
 
@@ -128,7 +137,7 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 
   XSetWMProtocols( context->get_display(), handle, protocols, num_p);
 
-  // set _NET_WM_PID
+  // set _NET_WM_PID - to allow the wm to kill the application providing the window
   long curr_pid = getpid();
   change_property(
       context->get_atom("_NET_WM_PID")
@@ -146,9 +155,6 @@ window::window( uicontext& app, rect const& position, string const& title, std::
         , reinterpret_cast<unsigned char *>(&X11->wm_client_leader), 1);*/
 //////////////////
   
-  //if( fl & Decoration )
-  //  set_decoration();
-
   title_.set(t);
 	XSync( context->get_display(), 0 );
 
@@ -218,14 +224,12 @@ void window::handle_resize( rect const& region ){
       XMoveResizeWindow(context->get_display(), handle, region.left, region.top, region.width, region.height );
 }
 
-gott::string window::get_title() const{
-}
-
 /**
  * Converts the string to a text property, and sets it as the 
  * X11 window manager title property. 
  */
 void window::set_title( gott::string const& str ){
+  title_string = str;
   // convert the string we got to a text property
   XTextProperty property;
   char *a = const_cast<char*>(str.as_utf8().begin());
@@ -249,8 +253,13 @@ void window::map_window( bool new_state ) {
   }
 }
 
+
+/**
+ * \brief update the hints for the window manager. 
+ * This code is pretty much untested, there is no evidence
+ * whether these flags are really considered by the wm... 
+ */
 void window::set_window_type( gott::ui::window_base::flags_type const& fl ){
-#if 0 
   fl &= (Menu|Normal|Toolbar|Utility|Splash|Dock|ToolTip|Decoration);
   
   WMHints hints; 
@@ -258,8 +267,7 @@ void window::set_window_type( gott::ui::window_base::flags_type const& fl ){
     hints.decorations = 0;
 
   Atom wm_hints = context->get_atom("_MOTIF_WM_HINTS");
-  XChangeProperty(context->get_display(), handle, wm_hints, wm_hints, 32, PropModeReplace, 
-      reinterpret_cast<unsigned char*>(&hints), 5);
+  change_property(wm_hints, wm_hints, 32, reinterpret_cast<unsigned char*>(&hints), 5);
 
   std::vector<Atom> net_wintypes;
   if( fl & Normal )
@@ -286,11 +294,11 @@ void window::set_window_type( gott::ui::window_base::flags_type const& fl ){
     XDeleteProperty( context->get_display(), handle
         , context->get_atom( "_NET_WM_WINDOW_TYPE"));
 
+#if
   if( fl & ( Toolbar || ToolTip || Dialog  ) &&  parent )
     XSetTransientForHint( context->get_display(), handle, parent->handle );
-
-  flags |= fl;
 #endif
+  win_flags |= fl;
 
 }
 
@@ -343,7 +351,13 @@ void window::set_size_hints(){
 }
 
 void window::update_region( rect const& region ){
-  blit_buffer( buffer, region );
+  if( region.left == 0 
+      && region.top == 0  
+      && region.width == impl->buffer.width()
+      && region.height == impl->buffer.height() )
+    impl->update_window();
+  else
+    impl->update_rect( region );
 }
 
 uicontext* window::get_uicontext(){
@@ -361,15 +375,19 @@ void window::invalidate_area( rect const& region ){
 }
 
 
-void window::blit_buffer( agg::rendering_buffer const& buffer, recont const& target_region ){
+void window::blit_buffer( coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format ) {
+  impl->blit_buffer(destination,buffer,buf_format);
+}
+void window::blit_rect( rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format  ) {
+  impl->blit_rect(source, destination, buf_format, buf_format );
 }
 
 agg::rendering_buffer const& window::screen_buffer() const{
-  return buffer;
+  return impl->buffer;
 }
 
 agg::rendering_buffer & window::screen_buffer(){
-  return buffer;
+  return impl->buffer;
 }
 
 Window window::get_handle() const{

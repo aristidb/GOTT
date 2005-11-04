@@ -35,7 +35,15 @@
 namespace gott{namespace ui{
 class uicontext_base;
 
-struct window_flags
+/**
+ * \brief These flags are used to define the type and look of the window
+ * Some flags might not be representable in the underlying system, 
+ * so there is no gurantee that these flags have any effects on 
+ * the window.
+ *
+ * TODO: these flags need revision,
+ */
+struct GOTT_LOCAL window_flags
 {
   enum {
     Clear = 0
@@ -45,22 +53,60 @@ struct window_flags
       , KeyEvents = 1<<3
       , MouseEvents = 1<<4
       , Menu = 1<<5
-      , Toolbar = 1<<6
+      , Toolbar = 1<<6 ///< Window is / has? a Toolbar window 
       , Utility = 1<<7
       , Dialog = 1<<8
-      , Splash = 1<<9
+      , Splash = 1<<9 ///< Window displays a Splashscreen
       , Normal = 1<<10
-      , Dock = 1<<11
-      , ToolTip = 1<<12
+      , Dock = 1<<11  ///< The window is a small dock application
+      , ToolTip = 1<<12 ///< The Window displays a Tooltip
       , Open = 1<<13
       , Defaults = (MouseEvents | KeyEvents | Visible | Decoration )
 
   };
 };
 
+/**
+ * \brief holds the pixel format enum, \see pixel_format::type
+ */
+struct GOTT_LOCAL pixel_format {
+  enum type
+  {
+    undefined = 0,  ///< By default. No conversions are applied 
+    bw,             ///< 1 bit per color B/W
+    gray8,          ///< Simple 256 level grayscale
+    gray16,         ///< Simple 65535 level grayscale
+    rgb555,         ///< 15 bit rgb. Depends on the byte ordering!
+    rgb565,         ///< 16 bit rgb. Depends on the byte ordering!
+    rgbAAA,         ///< 30 bit rgb. Depends on the byte ordering!
+    rgbBBA,         ///< 32 bit rgb. Depends on the byte ordering!
+    bgrAAA,         ///< 30 bit bgr. Depends on the byte ordering!
+    bgrABB,         ///< 32 bit bgr. Depends on the byte ordering!
+    rgb24,          ///< R-G-B, one byte per color component
+    bgr24,          ///< B-G-R, native win32 BMP format.
+    rgba32,         ///< R-G-B-A, one byte per color component
+    argb32,         ///< A-R-G-B, native MAC format
+    abgr32,         ///< A-B-G-R, one byte per color component
+    bgra32,         ///< B-G-R-A, native win32 BMP format
+    rgb48,          ///< R-G-B, 16 bits per color component
+    bgr48,          ///< B-G-R, native win32 BMP format.
+    rgba64,         ///< R-G-B-A, 16 bits byte per color component
+    argb64,         ///< A-R-G-B, native MAC format
+    abgr64,         ///< A-B-G-R, one byte per color component
+    bgra64,         ///< B-G-R-A, native win32 BMP format
+
+    formats
+  };
+};
+
+
 
 /**
- * window_base describes the base for all window classes, event 
+ * \brief window_base describes the base for all window classes. 
+ * The inteface is currently coupled to Antigrain Graphics, 
+ * this should be changed in the near future. The agg::types 
+ * will remain here until then, to allow writing other non 
+ * renderer related code. 
  */
 class GOTT_EXPORT window_base {
   private:
@@ -109,7 +155,7 @@ class GOTT_EXPORT window_base {
     sigc::signal1<void,key_event const&>& on_key();
     //\}
 
-    typedef std::bitset<10> flags_type;
+    typedef std::bitset<14> flags_type;
 
     typedef gott::properties::notifying_property<rect> rect_property_type;
     typedef gott::properties::notifying_property<gott::string> string_property_type;
@@ -124,9 +170,10 @@ class GOTT_EXPORT window_base {
      * and resize events, and an update of the region property content.
      */
     //\{
-    /// \returns a refernce to the region property with write access
+    /**
+     * \returns a refernce to the region property with write access
+     */
     virtual rect_property_type& region() = 0;
-    /// \returns a reference region property with read only access
     virtual rect_property_type const& region() const = 0;
     //\}
 
@@ -140,7 +187,6 @@ class GOTT_EXPORT window_base {
     //\{
     /// \returns a refernce to a mutable title property
     virtual string_property_type & title() = 0; 
-    /// \returns a const refernce to a mutable title property
     virtual string_property_type const& title() const = 0; 
     //\}
 
@@ -167,10 +213,14 @@ class GOTT_EXPORT window_base {
 #endif
     
     /**
-     * Currently not implemented:
+     * \name Window type flags and other
+     * This property displays the window type, \see window_flags for 
+     * possible bitmasks
+     * \{
      */
     virtual flags_property_type& flags() = 0; 
     virtual flags_property_type const& flags() const = 0; 
+    // \}
 
     /**
      * \brief sets all kinds of hints
@@ -229,17 +279,19 @@ class GOTT_EXPORT window_base {
      * \{
      */
     /**
-     * \brief copies a buffer onto the window. 
+     * \brief copy the contents of the buffer onto screen 
      */
-    virtual void blit_buffer( agg::rendering_buffer const& buffer, recont const& target_region ) = 0;
+    virtual void blit_buffer( coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32 ) = 0;
+
+    /**
+     * \brief copy the contents described by source, from buffer to screen.
+     */
+    virtual void blit_rect( rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32 ) = 0;
+
     /**
      * \brief returns the screen buffer
      */
     virtual agg::rendering_buffer const& screen_buffer() const = 0;
-    /**
-     * \brief returns a mutable version of the screen buffer. 
-     * Users should not have to use this method.
-     */
     virtual agg::rendering_buffer & screen_buffer() = 0;
     //\}
 

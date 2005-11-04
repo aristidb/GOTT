@@ -45,14 +45,14 @@ class GOTT_EXPORT window : public gott::ui::window_base {
 
     rect invalid_area;
     bool mapped_state;
-    flags_type window_flags;
+    flags_type win_flags;
+    gott::string title_string;
 
     uicontext * context;
 
     rect get_region() const;
     void handle_resize( rect const& r );
 
-    gott::string get_title() const;
     void set_title( gott::string const& str );
 
     void map_window( bool new_state );
@@ -104,8 +104,9 @@ class GOTT_EXPORT window : public gott::ui::window_base {
 
 
 
-    // agg stuff
-    void blit_buffer( agg::rendering_buffer const& buffer, recont const& target_region );
+    void blit_buffer( coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format );
+    void blit_rect( rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format  );
+
     agg::rendering_buffer const& screen_buffer() const;
     agg::rendering_buffer & screen_buffer();
 
