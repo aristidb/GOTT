@@ -26,21 +26,21 @@
 #include <X11/Xatom.h>
 #include <gott/ui/uicontext_base.hpp>
 #include <gott/ui/window_base.hpp>
-#include <gott/ui/x11/window.hpp>
 
 namespace gott{namespace ui{namespace x11{
 
+class window;
 /**
  * \brief Xlib implementation of uicontext for X11.
  * \todo use pimpl and some further abstraction to remove X11 headers?
+ * \todo should screen number be part of the window class?
  */
 class GOTT_EXPORT uicontext : public uicontext_base {
   private:
     std::vector<gott::ui::x11::window*> windows_;
     Display * display_;
-    //move screen number to window class?
     int screen_; 
-    XAtom protocols_atom_;
+    Atom protocols_atom_;
     void process_event( window* win, XEvent& e );
   public:
 

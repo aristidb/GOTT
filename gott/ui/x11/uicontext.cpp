@@ -1,6 +1,3 @@
-#ifndef GOTT_UI_X11_UICONTEXT_HPP_INCLUDED
-#define GOTT_UI_X11_UICONTEXT_HPP_INCLUDED
-
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
 // Content: GOTT User interface context base class
 // Authors: Andreas Pokorny
@@ -27,6 +24,7 @@
 #include <gott/ui/x11/uicontext.hpp>
 #include <gott/ui/x11/input.hpp>
 #include <gott/util/geometry.hpp>
+#include <gott/ui/x11/window.hpp>
 
 namespace gott{namespace ui{namespace x11{
 
@@ -35,7 +33,7 @@ uicontext::uicontext( const char * connection )
  if(display_ == 0) 
    throw std::runtime_error("Could not open the x11 connection");
 
- screen = DefaultScreen( display_ );
+ screen_ = DefaultScreen( display_ );
 
  protocols_atom_ = XInternAtom( display_, "WM_PROTOCOLS", false );
  if( protocols_atom_ == None )
@@ -50,7 +48,7 @@ void uicontext::remove_window( window_base *ref ){
 }
 
 gott::ui::x11::window* uicontext::find_window( Window handle )  {
-  for( std::size_t i = 0, e != windows_.size(); i != e; ++i ) 
+  for( std::size_t i = 0, e = windows_.size(); i != e; ++i ) 
     if( windows_[i]->get_handle() == handle ) 
       return windows_[i];
   return 0;
@@ -59,13 +57,13 @@ gott::ui::x11::window* uicontext::find_window( Window handle )  {
 void uicontext::quit(){
 }
 
-int uicontext::get_descpritor() const{
+int uicontext::get_descriptor() const{
 }
 
 void uicontext::process_event( window* win, XEvent& e ) {
   switch( e.type ) {
     case ReparentNotify:
-      if( win->flags().get()[windows_flags::Decoration]  == 0 )
+      if( win->flags().get()[window_flags::Decoration]  == 0 )
       {
         XSetWindowAttributes  attributes;
 
@@ -220,6 +218,4 @@ uicontext::~uicontext() {
 }
 
 }}}
-
-#endif
 

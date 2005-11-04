@@ -18,7 +18,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <X.h>
+#include <X11/X.h>
 #include <utility>
 #include <gott/ui/x11/agg_detail.hpp>
 #include <agg2/agg_basics.h>
@@ -153,7 +153,7 @@ void agg_buffer::update_rect( rect const& r )  {
   {
     std::cout << "COPY" << std::endl;
     XPutImage( display, 
-        window, 
+        handle, 
         gc, 
         window_img, 
         r.left, r.top, r.left, r.top,
@@ -162,15 +162,15 @@ void agg_buffer::update_rect( rect const& r )  {
   }
   else
   {
-    int row_len = rbuffer.width() * sys_bpp / 8;
+    int row_len = buffer.width() * sys_bpp / 8;
     unsigned char* buf_tmp = 
-      new unsigned char[row_len * rbuffer.height()];
+      new unsigned char[row_len * buffer.height()];
 
     agg::rendering_buffer rbuf_tmp;
     rbuf_tmp.attach(buf_tmp, 
-        rbuffer.width(), 
-        rbuffer.height(), 
-        flip_y ? -row_len : row_len);
+        buffer.width(), 
+        buffer.height(), 
+        row_len);
 
     using namespace agg;
 
@@ -181,14 +181,14 @@ void agg_buffer::update_rect( rect const& r )  {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb555()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb555()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb555());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb555());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb555()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb555()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb555()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb555()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_rgb555()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_rgb555()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_rgb555());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_rgb555());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_rgb555()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_rgb555()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_rgb555()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_rgb555()); break;
                }
                break;
 
@@ -196,14 +196,14 @@ void agg_buffer::update_rect( rect const& r )  {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb565()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb565()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb565());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb565());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb565()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb565()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb565()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb565()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_rgb565()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_rgb565()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_rgb565());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_rgb565());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_rgb565()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_rgb565()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_rgb565()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_rgb565()); break;
                }
                break;
 
@@ -211,14 +211,14 @@ void agg_buffer::update_rect( rect const& r )  {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgba32()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgba32()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgba32());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgba32());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgba32()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_rgba32()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgba32()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgba32()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_rgba32()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_rgba32()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_rgba32());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_rgba32());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_rgba32()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_rgba32()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_rgba32()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_rgba32()); break;
                }
                break;
 
@@ -226,14 +226,14 @@ void agg_buffer::update_rect( rect const& r )  {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_abgr32()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_abgr32()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_abgr32());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_abgr32());  break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_abgr32()); break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_abgr32()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_abgr32()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_abgr32()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_abgr32()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_abgr32()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_abgr32());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_abgr32());  break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_abgr32()); break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_abgr32()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_abgr32()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_abgr32()); break;
                }
                break;
 
@@ -241,14 +241,14 @@ void agg_buffer::update_rect( rect const& r )  {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_argb32()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_argb32()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_argb32());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_argb32());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_argb32()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_argb32()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_argb32()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_argb32()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_argb32()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_argb32()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_argb32());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_argb32());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_argb32()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_argb32()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_argb32()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_argb32()); break;
                }
                break;
 
@@ -256,21 +256,21 @@ void agg_buffer::update_rect( rect const& r )  {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_bgra32()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_bgra32()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_bgra32());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_bgra32());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_bgra32()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_bgra32()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_bgra32()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_bgra32()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_bgra32()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_bgra32()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_bgra32());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_bgra32());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_bgra32()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_bgra32()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_bgra32()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_bgra32()); break;
                }
                break;
     }
 
     window_img->data = reinterpret_cast<char*>(buf_tmp);
     XPutImage(display, 
-        window, 
+        handle, 
         gc, 
         window_img, 
         r.left, r.top, r.left, r.top,
@@ -292,7 +292,7 @@ void agg_buffer::update_rect( rect const& r )  {
     rbuf_tmp.attach(buf_tmp, 
         r.width, 
         r.height, 
-        flip_y ? -row_len : row_len);
+         row_len);
 
     using namespace agg;
 
@@ -304,14 +304,14 @@ void agg_buffer::update_rect( rect const& r )  {
         switch(format)
         {
           default: break;
-          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb555()); break;
-          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb555()); break;
-          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb555());  break;
-          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb555());  break;
-          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb555()); break;
-          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb555()); break;
-          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb555()); break;
-          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb555()); break;
+          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb555_to_rgb555()); break;
+          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb565_to_rgb555()); break;
+          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb24_to_rgb555());  break;
+          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgr24_to_rgb555());  break;
+          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgba32_to_rgb555()); break;
+          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_argb32_to_rgb555()); break;
+          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgra32_to_rgb555()); break;
+          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_abgr32_to_rgb555()); break;
         }
         break;
 
@@ -319,14 +319,14 @@ void agg_buffer::update_rect( rect const& r )  {
         switch(format)
         {
           default: break;
-          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb565()); break;
-          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb565()); break;
-          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb565());  break;
-          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb565());  break;
-          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb565()); break;
-          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb565()); break;
-          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb565()); break;
-          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb565()); break;
+          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb555_to_rgb565()); break;
+          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb565_to_rgb565()); break;
+          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb24_to_rgb565());  break;
+          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgr24_to_rgb565());  break;
+          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgba32_to_rgb565()); break;
+          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_argb32_to_rgb565()); break;
+          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgra32_to_rgb565()); break;
+          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_abgr32_to_rgb565()); break;
         }
         break;
 
@@ -334,14 +334,14 @@ void agg_buffer::update_rect( rect const& r )  {
         switch(format)
         {
           default: break;
-          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgba32()); break;
-          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgba32()); break;
-          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgba32());  break;
-          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgba32());  break;
-          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgba32()); break;
-          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_rgba32()); break;
-          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgba32()); break;
-          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgba32()); break;
+          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb555_to_rgba32()); break;
+          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb565_to_rgba32()); break;
+          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb24_to_rgba32());  break;
+          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgr24_to_rgba32());  break;
+          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgba32_to_rgba32()); break;
+          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_argb32_to_rgba32()); break;
+          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgra32_to_rgba32()); break;
+          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_abgr32_to_rgba32()); break;
         }
         break;
 
@@ -349,14 +349,14 @@ void agg_buffer::update_rect( rect const& r )  {
         switch(format)
         {
           default: break;
-          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_abgr32()); break;
-          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_abgr32()); break;
-          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_abgr32());  break;
-          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_abgr32());  break;
-          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_abgr32()); break;
-          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_abgr32()); break;
-          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_abgr32()); break;
-          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_abgr32()); break;
+          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb555_to_abgr32()); break;
+          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb565_to_abgr32()); break;
+          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb24_to_abgr32());  break;
+          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgr24_to_abgr32());  break;
+          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_abgr32_to_abgr32()); break;
+          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgba32_to_abgr32()); break;
+          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_argb32_to_abgr32()); break;
+          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgra32_to_abgr32()); break;
         }
         break;
 
@@ -364,14 +364,14 @@ void agg_buffer::update_rect( rect const& r )  {
         switch(format)
         {
           default: break;
-          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_argb32()); break;
-          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_argb32()); break;
-          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_argb32());  break;
-          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_argb32());  break;
-          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_argb32()); break;
-          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_argb32()); break;
-          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_argb32()); break;
-          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_argb32()); break;
+          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb555_to_argb32()); break;
+          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb565_to_argb32()); break;
+          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb24_to_argb32());  break;
+          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgr24_to_argb32());  break;
+          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgba32_to_argb32()); break;
+          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_argb32_to_argb32()); break;
+          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_abgr32_to_argb32()); break;
+          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgra32_to_argb32()); break;
         }
         break;
 
@@ -379,20 +379,20 @@ void agg_buffer::update_rect( rect const& r )  {
         switch(format)
         {
           default: break;
-          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb555_to_bgra32()); break;
-          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb565_to_bgra32()); break;
-          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgb24_to_bgra32());  break;
-          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgr24_to_bgra32());  break;
-          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_rgba32_to_bgra32()); break;
-          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_argb32_to_bgra32()); break;
-          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_abgr32_to_bgra32()); break;
-          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &rbuffer, color_conv_bgra32_to_bgra32()); break;
+          case pixel_format::rgb555: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb555_to_bgra32()); break;
+          case pixel_format::rgb565: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb565_to_bgra32()); break;
+          case pixel_format::rgb24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgb24_to_bgra32());  break;
+          case pixel_format::bgr24:  detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgr24_to_bgra32());  break;
+          case pixel_format::rgba32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_rgba32_to_bgra32()); break;
+          case pixel_format::argb32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_argb32_to_bgra32()); break;
+          case pixel_format::abgr32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_abgr32_to_bgra32()); break;
+          case pixel_format::bgra32: detail::sub_color_conv( r, &rbuf_tmp, &buffer, color_conv_bgra32_to_bgra32()); break;
         }
         break;
     }
     window_img->data = reinterpret_cast<char*>(buf_tmp);
     XPutImage(display, 
-        window, 
+        handle, 
         gc, 
         window_img, 
         r.left, r.top, r.left, r.top,
@@ -405,7 +405,7 @@ void agg_buffer::update_rect( rect const& r )  {
 
     if( temp_image ){
       temp_image->byte_order = byte_order;
-      XPutImage(display, window, gc, 
+      XPutImage(display, handle, gc, 
           temp_image, 0, 0, r.left, r.top,
           r.width, r.height);
 
@@ -426,24 +426,24 @@ void agg_buffer::update_window() {
   if( format == sys_format)
   {
     XPutImage( display, 
-        window, 
+        handle, 
         gc, 
         window_img, 
         0, 0, 0, 0,
-        rbuffer.width(), 
-        rbuffer.height());
+        buffer.width(), 
+        buffer.height());
   }
   else
   {
-    int row_len = rbuffer.width() * sys_bpp / 8;
+    int row_len = buffer.width() * sys_bpp / 8;
     unsigned char* buf_tmp = 
-      new unsigned char[row_len * rbuffer.height()];
+      new unsigned char[row_len * buffer.height()];
 
     agg::rendering_buffer rbuf_tmp;
     rbuf_tmp.attach(buf_tmp, 
-        rbuffer.width(), 
-        rbuffer.height(), 
-        flip_y ? -row_len : row_len);
+        buffer.width(), 
+        buffer.height(), 
+         row_len);
 
     using namespace agg;
 
@@ -454,14 +454,14 @@ void agg_buffer::update_window() {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb555()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb555()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb555());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb555());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb555()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb555()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb555()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb555()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_rgb555()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_rgb555()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_rgb555());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_rgb555());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_rgb555()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_rgb555()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_rgb555()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_rgb555()); break;
                }
                break;
 
@@ -469,14 +469,14 @@ void agg_buffer::update_window() {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgb565()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgb565()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgb565());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgb565());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgb565()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_rgb565()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgb565()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgb565()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_rgb565()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_rgb565()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_rgb565());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_rgb565());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_rgb565()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_rgb565()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_rgb565()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_rgb565()); break;
                }
                break;
 
@@ -484,14 +484,14 @@ void agg_buffer::update_window() {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_rgba32()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_rgba32()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_rgba32());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_rgba32());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_rgba32()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_rgba32()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_rgba32()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_rgba32()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_rgba32()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_rgba32()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_rgba32());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_rgba32());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_rgba32()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_rgba32()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_rgba32()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_rgba32()); break;
                }
                break;
 
@@ -499,14 +499,14 @@ void agg_buffer::update_window() {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_abgr32()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_abgr32()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_abgr32());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_abgr32());  break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_abgr32()); break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_abgr32()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_abgr32()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_abgr32()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_abgr32()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_abgr32()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_abgr32());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_abgr32());  break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_abgr32()); break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_abgr32()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_abgr32()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_abgr32()); break;
                }
                break;
 
@@ -514,14 +514,14 @@ void agg_buffer::update_window() {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_argb32()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_argb32()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_argb32());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_argb32());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_argb32()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_argb32()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_argb32()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_argb32()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_argb32()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_argb32()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_argb32());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_argb32());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_argb32()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_argb32()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_argb32()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_argb32()); break;
                }
                break;
 
@@ -529,26 +529,26 @@ void agg_buffer::update_window() {
                switch(format)
                {
                  default: break;
-                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb555_to_bgra32()); break;
-                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb565_to_bgra32()); break;
-                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_rgb24_to_bgra32());  break;
-                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &rbuffer, color_conv_bgr24_to_bgra32());  break;
-                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &rbuffer, color_conv_rgba32_to_bgra32()); break;
-                 case pixel_format::argb32: color_conv(&rbuf_tmp, &rbuffer, color_conv_argb32_to_bgra32()); break;
-                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &rbuffer, color_conv_abgr32_to_bgra32()); break;
-                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &rbuffer, color_conv_bgra32_to_bgra32()); break;
+                 case pixel_format::rgb555: color_conv(&rbuf_tmp, &buffer, color_conv_rgb555_to_bgra32()); break;
+                 case pixel_format::rgb565: color_conv(&rbuf_tmp, &buffer, color_conv_rgb565_to_bgra32()); break;
+                 case pixel_format::rgb24:  color_conv(&rbuf_tmp, &buffer, color_conv_rgb24_to_bgra32());  break;
+                 case pixel_format::bgr24:  color_conv(&rbuf_tmp, &buffer, color_conv_bgr24_to_bgra32());  break;
+                 case pixel_format::rgba32: color_conv(&rbuf_tmp, &buffer, color_conv_rgba32_to_bgra32()); break;
+                 case pixel_format::argb32: color_conv(&rbuf_tmp, &buffer, color_conv_argb32_to_bgra32()); break;
+                 case pixel_format::abgr32: color_conv(&rbuf_tmp, &buffer, color_conv_abgr32_to_bgra32()); break;
+                 case pixel_format::bgra32: color_conv(&rbuf_tmp, &buffer, color_conv_bgra32_to_bgra32()); break;
                }
                break;
     }
 
     window_img->data = reinterpret_cast<char*>(buf_tmp);
     XPutImage(display, 
-        window, 
+        handle, 
         gc, 
         window_img, 
         0, 0, 0, 0,
-        rbuffer.width(), 
-        rbuffer.height());
+        buffer.width(), 
+        buffer.height());
 
     delete [] buf_tmp;
   }
@@ -556,10 +556,10 @@ void agg_buffer::update_window() {
 }
 
 
-void agg_buffer::blit_buffer( coord const& destination, agg_rendering_buffer const& buffer, pixel_format::type buf_format ){
+void agg_buffer::blit_buffer( coord const& , agg::rendering_buffer const& , pixel_format::type ){
   // display buffer on window 
 }
-void agg_buffer::blit_rect( rect const& source, coord const& destination, agg_rendering_buffer const& buffer, pixel_format::type buf_format ) {
+void agg_buffer::blit_rect( rect const& , coord const& , agg::rendering_buffer const& , pixel_format::type ) {
   // partially display buffer on window 
 }
 agg_buffer::~agg_buffer(){
@@ -578,7 +578,7 @@ agg_buffer::~agg_buffer(){
 }
 
 
-XVisualInfo* pick_visual( Display* display,  int screen ) 
+std::pair<Visual*,int> pick_visual( Display* display, int screen )
 {
   // Direct Color True Color ?? 
   XVisualInfo templ;
@@ -589,10 +589,10 @@ XVisualInfo* pick_visual( Display* display,  int screen )
   long mask = VisualRedMaskMask | VisualBlueMaskMask | VisualGreenMaskMask | VisualDepthMask;
 
   int num_ret;
-  XVisualInfo* ret = XGetVisualInfo( display, mask, &temp, &num_ret );
+  XVisualInfo* ret = XGetVisualInfo( display, mask, &templ, &num_ret );
   if( ret == 0 )  {
     templ.depth = 24;
-    XVisualInfo* ret = XGetVisualInfo( display, mask, &temp, &num_ret );
+    ret = XGetVisualInfo( display, mask, &templ, &num_ret );
   }
   if( ret == 0 )
     return std::make_pair( XDefaultVisual(display,screen), XDefaultDepth(display,screen) );

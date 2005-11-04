@@ -37,23 +37,22 @@ namespace {
 
 using boost::bind;
 using boost::lambda::var;
-using boost::_1;
 window::window( uicontext& app, rect const& position, string const& title, std::size_t flags ) 
-  : region_( gott::propertis::external_storage<rect>( 
+  : region_( gott::properties::external_storage<rect>( 
         bind(&window::get_region, this) 
         , bind(&window::handle_resize, this, _1 ) )  
       )
-  , title_( gott::propertis::external_storage<gott::string>(
+  , title_( gott::properties::external_storage<gott::string>(
         var(title_string)
         , bind(&window::set_title, this, _1 ) )
       )
-  , visibility_( gott::propertis::external_storage<bool>(
+  , visibility_( gott::properties::external_storage<bool>(
         var(mapped_state)
-        , bind(&window::map_window, this, _1 ) )
+        , bind(&window::map_window, this,_1 ) )
       )
-  , flags_( gptt::propertis::external_storage<flags_type>(
+  , flags_( gott::properties::external_storage<flags_type>(
         var(win_flags)
-        , bind(&window::set_window_type, this, _1) )
+        , bind(&window::set_window_type, this,_1) )
       ) 
   , handle(0)
   , impl(0)
@@ -77,26 +76,26 @@ window::window( uicontext& app, rect const& position, string const& title, std::
     attributes.border_pixel = 0;
 
     attributes.event_mask = ExposureMask | StructureNotifyMask; 
-    if( flags & MouseEvents ) 
+    if( flags & window_flags::MouseEvents ) 
       attributes.event_mask = 
         PointerMotionMask 
         | FocusChangeMask 
         | ButtonPressMask 
         | ButtonReleaseMask;
 
-    if( flags & KeyEvents ) 
+    if( flags & window_flags::KeyEvents ) 
       attributes.event_mask = 
         FocusChangeMask 
         | KeyPressMask 
         | KeyReleaseMask;
 
 
-    if( ! flags & Decoration )     {
+    if( ! flags & window_flags::Decoration )     {
       attributes_mask |= CWOverrideRedirect;
       attributes.override_redirect = true;
     }
 
-    if( flags & ToolTip || fl & Splash  ) {
+    if( flags & window_flags::ToolTip || flags & window_flags::Splash  ) {
       attributes.save_under = true ;
       attributes_mask |= CWSaveUnder;
     }
@@ -155,7 +154,7 @@ window::window( uicontext& app, rect const& position, string const& title, std::
         , reinterpret_cast<unsigned char *>(&X11->wm_client_leader), 1);*/
 //////////////////
   
-  title_.set(t);
+  title_.set(title);
 	XSync( context->get_display(), 0 );
 
   // Wait for Map events? 
@@ -163,11 +162,11 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 	// flag this window as open
 	flags |= window_flags::Open;
   
-  region_.set(position)
+  region_.set(position);
 
   context->register_window( this );
  
-  if( flags & Visible )
+  if( flags & window_flags::Visible )
     visibility_.set(true);
 }
 
@@ -205,20 +204,20 @@ void window::handle_resize( rect const& region ){
           
   if( region.left == attr.x
       && region.top == attr.y 
-      && region.width == attr.width
-      && region.height == attr.height ) {
-    impl->resize_buffer( region )
+      && long(region.width) == attr.width
+      && long(region.height) == attr.height ) {
+    impl->resize_buffer( region );
   }
   else 
     if( region.left == attr.x
         && region.top == attr.y 
-        && ( region.width != attr.width
-          || region.height != attr.height ) )
+        && ( long(region.width) != attr.width
+          || long(region.height) != attr.height ) )
       XResizeWindow( context->get_display(), handle, region.width, region.height );
     else if(( region.left == attr.x
           || region.top == attr.y )
-        && region.width == attr.width
-        && region.height == attr.height )
+        && long(region.width) == attr.width
+        && long(region.height) == attr.height )
       XMoveWindow( context->get_display(), handle, region.left, region.top);
     else
       XMoveResizeWindow(context->get_display(), handle, region.left, region.top, region.width, region.height );
@@ -232,7 +231,7 @@ void window::set_title( gott::string const& str ){
   title_string = str;
   // convert the string we got to a text property
   XTextProperty property;
-  char *a = const_cast<char*>(str.as_utf8().begin());
+  char *a = const_cast<char*>(reinterpret_cast<char const*>(str.as_utf8().begin ) );
 
   if( XmbTextListToTextProperty( context->get_display(), &a, 1, XTextStyle , &property ) != Success )
     return;
@@ -256,33 +255,34 @@ void window::map_window( bool new_state ) {
 
 /**
  * \brief update the hints for the window manager. 
- * This code is pretty much untested, there is no evidence
+ * \bug This code is pretty much untested, there is no evidence
  * whether these flags are really considered by the wm... 
  */
-void window::set_window_type( gott::ui::window_base::flags_type const& fl ){
-  fl &= (Menu|Normal|Toolbar|Utility|Splash|Dock|ToolTip|Decoration);
+void window::set_window_type( gott::ui::window_base::flags_type const& new_flags ){
+  flags_type fl( new_flags );
+  fl &= (window_flags::Menu|window_flags::Normal|window_flags::Toolbar|window_flags::Utility|window_flags::Splash|window_flags::Dock|window_flags::ToolTip|window_flags::Decoration);
   
   WMHints hints; 
-  if( !( fl & Decoration ) )
+  if( !( fl[window_flags::Decoration] ) )
     hints.decorations = 0;
 
   Atom wm_hints = context->get_atom("_MOTIF_WM_HINTS");
   change_property(wm_hints, wm_hints, 32, reinterpret_cast<unsigned char*>(&hints), 5);
 
   std::vector<Atom> net_wintypes;
-  if( fl & Normal )
+  if( fl [window_flags::Normal] )
     net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_NORMAL") );
-  if( fl & Menu ) 
+  if( fl[window_flags::Menu] ) 
     net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_MENU") );
-  if( fl & Toolbar ) 
+  if( fl[window_flags::Toolbar] ) 
     net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_TOOLBAR") );
-  if( fl & Utility ) 
+  if( fl[window_flags::Utility] ) 
     net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_UTILITY") );
-  if( fl & Dialog ) 
+  if( fl[window_flags::Dialog] ) 
     net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_DIALOG") );
-  if( fl & Splash ) 
+  if( fl[window_flags::Splash] ) 
     net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_SPLASH") );
-  if( fl & Dock ) 
+  if( fl[window_flags::Dock] ) 
     net_wintypes.push_back( context->get_atom("_NET_WM_WINDOW_TYPE_DOCK") );
 
 
@@ -293,9 +293,9 @@ void window::set_window_type( gott::ui::window_base::flags_type const& fl ){
   else 
     XDeleteProperty( context->get_display(), handle
         , context->get_atom( "_NET_WM_WINDOW_TYPE"));
-
-#if
-  if( fl & ( Toolbar || ToolTip || Dialog  ) &&  parent )
+ 
+#if 0
+  if( fl[window_flags::Toolbar] || fl[window_flags::ToolTip] || fl[window_flags::Dialog] &&  parent )
     XSetTransientForHint( context->get_display(), handle, parent->handle );
 #endif
   win_flags |= fl;
@@ -317,7 +317,7 @@ gott::ui::window_base::string_property_type & window::title()
   return title_;
 }
  
-gott::ui::window_base::string_property_type const& window::title()
+gott::ui::window_base::string_property_type const& window::title() const
 {
   return title_;
 }
@@ -379,7 +379,7 @@ void window::blit_buffer( coord const& destination, agg::rendering_buffer const&
   impl->blit_buffer(destination,buffer,buf_format);
 }
 void window::blit_rect( rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format  ) {
-  impl->blit_rect(source, destination, buf_format, buf_format );
+  impl->blit_rect(source, destination, buffer, buf_format );
 }
 
 agg::rendering_buffer const& window::screen_buffer() const{
@@ -394,7 +394,7 @@ Window window::get_handle() const{
   return handle;
 }
 
-void window::change_property( Atom property, Atom type, int format, unsigned char *data, int nlements ) {
+void window::change_property( Atom property, Atom type, int format, unsigned char *data, int nelements ) {
   XChangeProperty(context->get_display(), handle, property, type, format, PropModeReplace, data, nelements);
 }
 

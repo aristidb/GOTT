@@ -26,6 +26,8 @@
 #include <X11/Xutil.h>
 #include <agg_basics.h>
 #include <agg_rendering_buffer.h>
+#include <gott/ui/window_base.hpp>
+#include <gott/util/geometry.hpp>
 
 namespace gott{namespace ui{namespace x11{namespace detail{
 
@@ -38,7 +40,7 @@ namespace gott{namespace ui{namespace x11{namespace detail{
  * \param[in] copy_row_functor the converting functor, works on a row as a whole
  */
 template<class CopyRow> 
-void sub_color_conv( gott::gui::rect const& region,
+void sub_color_conv( rect const& region,
     agg::rendering_buffer* dst, 
     const agg::rendering_buffer* src,
     CopyRow copy_row_functor)

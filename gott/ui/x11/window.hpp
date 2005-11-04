@@ -28,20 +28,22 @@
 #include <X11/Xutil.h>
 
 #include <gott/ui/window_base.hpp>
+#include <gott/ui/x11/uicontext.hpp>
+#include <gott/util/properties/external_storage.hpp>
 
 namespace gott{namespace ui{namespace x11{
+namespace detail { struct agg_buffer; }
 
-class uicontext;
 
 class GOTT_EXPORT window : public gott::ui::window_base {
   private:
-    gott::properties::concrete_property<rect,sigc_notification,external_storage<rect> > region_;
-    gott::properties::concrete_property<gott::string,sigc_notification,external_storage<gott::string> > title_;
-    gott::properties::concrete_property<bool,sigc_notification,external_storage<bool> > visibility_;
-    gott::properties::concrete_property<flags_type,sigc_notification,external_storage<flags_type> > flags_;
+    gott::properties::concrete_property<rect,gott::properties::sigc_notification,gott::properties::external_storage<rect> > region_;
+    gott::properties::concrete_property<gott::string,gott::properties::sigc_notification,gott::properties::external_storage<gott::string> > title_;
+    gott::properties::concrete_property<bool,gott::properties::sigc_notification,gott::properties::external_storage<bool> > visibility_;
+    gott::properties::concrete_property<flags_type,gott::properties::sigc_notification,gott::properties::external_storage<flags_type> > flags_;
     Window handle;
 
-    gott::x11::detail::agg_buffer* impl;
+    gott::ui::x11::detail::agg_buffer* impl;
 
     rect invalid_area;
     bool mapped_state;
@@ -49,6 +51,8 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     gott::string title_string;
 
     uicontext * context;
+
+    Atom protocols[4];
 
     rect get_region() const;
     void handle_resize( rect const& r );
@@ -69,15 +73,10 @@ class GOTT_EXPORT window : public gott::ui::window_base {
      */
     window( uicontext& app, rect const& position, string const& title, std::size_t flags );
 
-    /**
-     * \brief opens a new window
-     */
-    window( gott::ui::x11::uicontext& app, rect const& position, string const& title, std::size_t flags);
-
     rect_property_type& region();
     rect_property_type const& region() const;
     string_property_type & title(); 
-    string_property_type const& title();
+    string_property_type const& title() const;
 
     toggle_property_type& visible(); 
     toggle_property_type const& visible() const; 

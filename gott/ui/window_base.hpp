@@ -123,8 +123,6 @@ class GOTT_EXPORT window_base {
 
   public:
 
-    window_base( uicontext_base * context );
-
     /**
      * \name Window signals
      */
