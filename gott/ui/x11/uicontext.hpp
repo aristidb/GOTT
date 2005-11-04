@@ -32,11 +32,11 @@ namespace gott{namespace ui{namespace x11{
 
 /**
  * \brief Xlib implementation of uicontext for X11.
+ * \todo use pimpl and some further abstraction to remove X11 headers?
  */
 class GOTT_EXPORT uicontext : public uicontext_base {
   private:
     std::vector<gott::ui::x11::window*> windows_;
-    // TODO: pimpl ?
     Display * display_;
     //move screen number to window class?
     int screen_; 

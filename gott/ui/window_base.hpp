@@ -41,7 +41,7 @@ class uicontext_base;
  * so there is no gurantee that these flags have any effects on 
  * the window.
  *
- * TODO: these flags need revision,
+ * \todo these flags need revision, Open, and Visible might not be there
  */
 struct GOTT_LOCAL window_flags
 {
@@ -248,7 +248,7 @@ class GOTT_EXPORT window_base {
      * the user has to invalidate regions of the screen. The event loop
      * will then initiate a buffered redraw and screen update sequence, 
      * as soon as there are no more events to be processed. 
-     * TODO: The current invalidation system is based on accumulated rectangular regions, 
+     * \todo The current invalidation system is based on accumulated rectangular regions, 
      *  this concept could be improvd towards polygonal regions. 
      * \{
      */

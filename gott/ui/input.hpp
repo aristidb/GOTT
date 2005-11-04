@@ -234,7 +234,7 @@ enum key_code {
 
 /**
  * \brief Keyboard Event structure
- * TODO: Hold, or key repeat events
+ * \todo Hold, or key repeat events
  */
 struct GOTT_LOCAL key_event
 {
