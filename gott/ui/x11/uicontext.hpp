@@ -41,6 +41,12 @@ class GOTT_EXPORT uicontext : public uicontext_base {
     Display * display_;
     int screen_; 
     Atom protocols_atom_;
+    /**
+     * \brief handles a window event.
+     * \todo Test all uses of XSync and XFlush
+     * \todo Focus handling not yet implemented
+     * \todo window closing not yet resolved
+     */
     void process_event( window* win, XEvent& e );
   public:
 

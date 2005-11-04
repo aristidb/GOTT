@@ -37,6 +37,7 @@ namespace detail { struct agg_buffer; }
 
 class GOTT_EXPORT window : public gott::ui::window_base {
   private:
+    friend class uicontext;
     gott::properties::concrete_property<rect,gott::properties::sigc_notification,gott::properties::external_storage<rect> > region_;
     gott::properties::concrete_property<gott::string,gott::properties::sigc_notification,gott::properties::external_storage<gott::string> > title_;
     gott::properties::concrete_property<bool,gott::properties::sigc_notification,gott::properties::external_storage<bool> > visibility_;
@@ -51,6 +52,7 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     gott::string title_string;
 
     uicontext * context;
+    enum Protocols { DeleteWindow, Focus, Ping, ContextHelp, SyncRequest };
 
     Atom protocols[4];
 

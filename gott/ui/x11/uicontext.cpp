@@ -42,9 +42,22 @@ uicontext::uicontext( const char * connection )
 }
 
 void uicontext::register_window( window_base * ref ){
+  window *xwin = dynamic_cast<window*>(ref);
+  if(xwin)
+    windows_.push_back( xwin );
+  else {
+    // do what?
+  }
 }
 
 void uicontext::remove_window( window_base *ref ){
+  window *xwin = dynamic_cast<window*>(ref);
+  if(xwin) {
+  }
+  else {
+    // do what
+  }
+
 }
 
 gott::ui::x11::window* uicontext::find_window( Window handle )  {
@@ -74,47 +87,53 @@ void uicontext::process_event( window* win, XEvent& e ) {
       }
       break;
     case MotionNotify:
-      mouse_info.set_primary_position( coord( event.xmotion.x, event.xmotion.y ) );
-      mouse_event ev( coord(event.xmotion.x, event.xmotion.y), coord(0,0) );
-      win->on_mouse().emit( ev );
-      break;
+      {
+        mouse_.set_primary_position( coord( e.xmotion.x, e.xmotion.y ) );
+        mouse_event ev( coord(e.xmotion.x, e.xmotion.y), coord(0,0) );
+        win->on_mouse().emit( ev );
+        break;
+      }
     case ButtonPress:
-      mouse_.set_button( event.xbutton.button, true );
-      mouse_event ev( mouse_event::Press, event.xbutton.button, mouse_info.get_primary_position(), mouse_info.get_secondary_position());
+      {
+      mouse_.set_button( e.xbutton.button, true );
+      mouse_event ev( mouse_event::Press, e.xbutton.button, mouse_.get_primary_position(), mouse_.get_secondary_position());
       win->on_mouse().emit( ev );
       break;
+      }
     case ButtonRelease:
-      mouse_.set_button( event.xbutton.button, false );
-      mouse_event ev( mouse_event::Release, event.xbutton.button, mouse_info.get_primary_position(), mouse_info.get_secondary_position() );
-      win->on_mouse().emit( ev );
-      break;
+      {
+        mouse_.set_button( e.xbutton.button, false );
+        mouse_event ev( mouse_event::Release, e.xbutton.button, mouse_.get_primary_position(), mouse_.get_secondary_position() );
+        win->on_mouse().emit( ev );
+        break;
+      }
     case MapNotify: 
       {
         rect reg( win->region().get() );
         reg.left = reg.top = 0;
-        win->blit_buffer( win->get_screen_buffer(), reg );
+        win->update_region( reg ); //< required?
         break;
       }
     case DestroyNotify:
       break;
     case KeyPress:
       {
-        XKeyEvent sym = event.xkey;
-        key_code c = key_table::get_instance().translate_key( XLookupKeysym( &sym, 0) );
+        XKeyEvent sym = e.xkey;
+        key_code c = detail::key_table::get_instance().translate_key( XLookupKeysym( &sym, 0) );
 
         keys_.set(c);
-        if ( win && win->flags & window_flags::KeyEvents )
+        if ( win && win->flags().get()[window_flags::KeyEvents] )
           win->on_key().emit( key_event( c, key_event::Press ) );
         break;
       }
 
     case KeyRelease:
       {
-        XKeyEvent sym = event.xkey;
-        key_code c = key_table::get_instance().translate_key( XLookupKeysym( &sym, 0) );
+        XKeyEvent sym = e.xkey;
+        key_code c = detail::key_table::get_instance().translate_key( XLookupKeysym( &sym, 0) );
 
         keys_.unset(c);
-        if ( win && win->flags & window_flags::KeyEvents )
+        if ( win && win->flags().get()[window_flags::KeyEvents] )
           win->on_key().emit( key_event( c, key_event::Press ) );
         break;
       }
@@ -123,13 +142,13 @@ void uicontext::process_event( window* win, XEvent& e ) {
         XWindowAttributes root_attribs;
         ::Window root_window = RootWindow( display_, screen_ );
 
-        XGetWindowAttributes( display, root_window, &root_attribs );
+        XGetWindowAttributes( display_, root_window, &root_attribs );
 
         rect old_rect(win->region().get());
-        rect new_rect( event.xconfigure.x
-            , root_attribs.height - event.xconfigure.height - event.xconfigure.y
-            , event.xconfigure.width 
-            , event.xconfigure.height );
+        rect new_rect( e.xconfigure.x
+            , root_attribs.height - e.xconfigure.height - e.xconfigure.y
+            , e.xconfigure.width 
+            , e.xconfigure.height );
 
         win->region().set( new_rect );
 
@@ -142,8 +161,8 @@ void uicontext::process_event( window* win, XEvent& e ) {
         if( resize ) {
           win->on_resize().emit(new_rect);
           rect invalid_region(0,0,new_rect.width, new_rect.height);
-          win->on_draw().emit( win->get_screen_buffer(), invalid_region );
-          win->blit_buffer( win->get_screen_buffer(), invalid_region );
+          win->on_draw().emit( win->screen_buffer(), invalid_region );
+          win->update_region( invalid_region );
 
           XSync( display_, 1 ); // TODO: test if that stuff is still required! XSync could cause trouble with select
           // maybe 0 is enough 
@@ -154,8 +173,9 @@ void uicontext::process_event( window* win, XEvent& e ) {
       }
     case Expose:
       {
-        rect region( event.xexpose.x, event.xexpose.y, event.xexpose.width,  event.xexpose.height );
-        win->blit_buffer( win->get_screen_buffer(), region );
+        // This is already in window coordinates
+        rect region( e.xexpose.x, e.xexpose.y, e.xexpose.width,  e.xexpose.height );
+        win->update_region( region );
         XSync( display_, 0 ); // TODO: test if that stuff is still required! XSync could cause trouble with select
         XFlush( display_ );
         break;
@@ -163,21 +183,23 @@ void uicontext::process_event( window* win, XEvent& e ) {
 
     case ClientMessage:
       {
-        if( event.xclient.message_type == protocols_atom )
+        if( e.xclient.message_type == protocols_atom_ )
         {
-          if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::Ping] )
+          if( ::Atom(e.xclient.data.l[0]) == win->protocols[window::Ping] )
           {
-            event.xclient.window = RootWindow(display, screen);
-            XSendEvent(display, event.xclient.window, false
-                , SubstructureNotifyMask|SubstructureRedirectMask, &event );
+            e.xclient.window = RootWindow(display_, screen_);
+            XSendEvent(display_, e.xclient.window, false
+                , SubstructureNotifyMask|SubstructureRedirectMask, &e);
           }
-          else if( ::Atom(event.xclient.data.l[0]) == win->protocols[window::DeleteWindow] )
-            win->close();
+          else if( ::Atom(e.xclient.data.l[0]) == win->protocols[window::DeleteWindow] ) {
+            // How should we close a window?!?!
+            // win->close()
+          }
           else 
-            std::cout << "unrecognized client-message type:" <<    XGetAtomName( display, event.xclient.data.l[0]) << '\n';
+            std::cout << "unrecognized client-message type:" <<    XGetAtomName( display_, e.xclient.data.l[0]) << '\n';
         }
         else
-          std::cout << "unrecognized client-message type:" <<    XGetAtomName( display, event.xclient.message_type ) << '\n';
+          std::cout << "unrecognized client-message type:" <<    XGetAtomName( display_, e.xclient.message_type ) << '\n';
         break;
       }
     case UnmapNotify:
@@ -187,7 +209,7 @@ void uicontext::process_event( window* win, XEvent& e ) {
       //focus_window = win;
       break;
     case FocusOut:
-      focus_window = 0;
+      // focus_window = 0;
       break;
     default:
       break;
@@ -205,9 +227,9 @@ void uicontext::process_read(){
 
   // if any window needs redraw, than do that here:
   // TODO: Accumulate rects? -> discuss
-  for( std::size_t i = 0, e != windows_.size(); i != e; ++i ) 
+  for( std::size_t i = 0, e = windows_.size(); i != e; ++i ) 
     if( windows_[i]->needs_update() )
-      windows_[i]->on_draw().emit( windows_[i]->get_screen_buffer(), windows_[i]->get_invalid_area() );
+      windows_[i]->on_draw().emit( windows_[i]->screen_buffer(), windows_[i]->get_invalid_area() );
 
 }
 
