@@ -2,8 +2,5 @@ import glob
 
 Import('shrd')
 
-shrd.ParseConfig('pkg-config --libs libagg')
-shrd.ParseConfig('pkg-config --cflags libagg')
-
 shrd.SharedLibrary('x11', glob.glob('*.cpp') )
 
