@@ -2,9 +2,6 @@ import glob
 
 Import('shrd')
 
-shrd.ParseConfig('pkg-config --libs libagg')
-shrd.ParseConfig('pkg-config --cflags libagg')
-
 shrd.SharedLibrary('base_ui', glob.glob('*.cpp') + [ '../util/geometry.cpp' ] )
 
 SConscript(dirs = ['directfb', 'x11', 'win32'] )
