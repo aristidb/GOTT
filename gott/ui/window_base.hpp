@@ -36,33 +36,32 @@ namespace gott{namespace ui{
 class uicontext_base;
 
 /**
- * \brief These flags are used to define the type and look of the window
+ * \brief window_flags contains a set of bitmask to specify properites of windows.
  * Some flags might not be representable in the underlying system, 
- * so there is no gurantee that these flags have any effects on 
- * the window.
+ * so there is no gurantee these flags have any effects on the window.
  *
- * \todo these flags need revision, Open is not required, and Visible is
+ * \todo gott::ui::window_flags needs revision, gott::ui::window_flags::Open is not required, and gott::ui::window_flags::Visible is
  * handled by a different property, 
  */
 struct GOTT_LOCAL window_flags
 {
   enum {
-    Clear = 0
-      , Decoration 
-      , Fullscreen
-      , Visible = 4
-      , KeyEvents = 1<<3
-      , MouseEvents = 1<<4
-      , Menu = 1<<5
-      , Toolbar = 1<<6 ///< Window is / has? a Toolbar window 
-      , Utility = 1<<7
-      , Dialog = 1<<8
-      , Splash = 1<<9 ///< Window displays a Splashscreen
-      , Normal = 1<<10
-      , Dock = 1<<11  ///< The window is a small dock application
-      , ToolTip = 1<<12 ///< The Window displays a Tooltip
-      , Open = 1<<13
-      , Defaults = (MouseEvents | KeyEvents | Visible | Decoration )
+    Clear = 0 ///< no flags specified 
+      , Decoration  ///< Window decoration is enabled
+      , Fullscreen ///< Window takes the whole screen
+      , Visible = 4 ///< Window is visible
+      , KeyEvents = 1<<3 ///< Window receives key events
+      , MouseEvents = 1<<4 ///< Window receives mouse events
+      , Menu = 1<<5 ///< Menu window 
+      , Toolbar = 1<<6 ///< Window is / has? a tool bar window 
+      , Utility = 1<<7 ///< Utility window
+      , Dialog = 1<<8 ///< Dialog window
+      , Splash = 1<<9 ///< Window displays a splash screen
+      , Normal = 1<<10 ///< Normal window 
+      , Dock = 1<<11  ///< Window is a small dock application
+      , ToolTip = 1<<12 ///< Window displays a tool tip
+      , Open = 1<<13 ///< Window is open
+      , Defaults = (MouseEvents | KeyEvents | Visible | Decoration ) ///< Default window settings, receiving events and decoration
 
   };
 };
@@ -215,8 +214,8 @@ class GOTT_EXPORT window_base {
     
     /**
      * \name Window type flags and other
-     * This property displays the window type, \see window_flags for 
-     * possible bitmasks
+     * This property displays the window type.
+     * \sa gott::ui::window_flags for  possible bitmasks
      * \{
      */
     virtual flags_property_type& flags() = 0; 
