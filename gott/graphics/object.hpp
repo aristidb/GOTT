@@ -45,7 +45,13 @@ public:
   virtual invalidation draw(
       drawing_context &out, 
       transformations const &transf,
-      invalidation const &invalid) = 0;
+      invalidation const &invalid) const = 0;
+
+  /**
+   * Provide the clobbered region when a child changed.
+   * \param child The child that changed.
+   */
+  virtual invalidation child_changed(object const *child) const = 0;
 
   /// Destructor.
   virtual ~object() = 0;
