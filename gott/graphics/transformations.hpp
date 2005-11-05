@@ -21,13 +21,61 @@
 #ifndef GOTT_GRAPHICS_TRANSFORMATIONS_HPP
 #define GOTT_GRAPHICS_TRANSFORMATIONS_HPP
 
+#include <gott/util/visibility.hpp>
+
 namespace gott {
 namespace graphics {
 
 /**
  * Transformations that can be applied to any graphics::object.
+ * \todo Please check if this is scientifically fine.
  */
-class transformations {};
+class transformations {
+  /**
+   * Rotate.
+   * \todo Select rotation unit (degree, radian).
+   */
+  GOTT_EXPORT void rotate(double rot);
+
+  /**
+   * Translate.
+   * \todo Use double for this?
+   */
+ GOTT_EXPORT void translate(double dx, double dy);
+
+  /**
+   * Scale.
+   * \todo Unit?
+   */
+  GOTT_EXPORT void scale(double rx, double ry);
+};
+
+/**
+ * Rotate.
+ * \see transformations::rotate
+ */
+inline transformations rotate(transformations t, double rot) {
+  t.rotate(rot);
+  return t;
+}
+
+/**
+ * Translate.
+ * \see transformations::translate
+ */
+inline transformations translate(transformations t, double dx, double dy) {
+  t.translate(dx, dy);
+  return t;
+}
+
+/**
+ * Scale.
+ * \see transformations::scale
+ */
+inline transformations scale(transformations t, double rx, double ry) {
+  t.scale(rx, ry);
+  return t;
+}
 
 }}
 

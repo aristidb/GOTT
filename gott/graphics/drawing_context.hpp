@@ -27,7 +27,9 @@ namespace graphics {
 /**
  * Interface for the underlying immediate renderer.
  */
-class drawing_context {};
+class drawing_context {
+
+};
 
 }}
 
