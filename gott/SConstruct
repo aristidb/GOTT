@@ -30,7 +30,7 @@ env = Environment(
   CXX = cxx, 
   CCFLAGS = cflags, 
   CPPPATH=['#/..', '#/contrib/ntl'], 
-  LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/string #/base/plugin #/base/events #/ui #/ui/x11' ),
+  LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/string #/base/plugin #/base/events #/ui #/ui/x11 #/graphics' ),
   CPPDEFINES=cppdef)
 
 Export('env')
@@ -51,5 +51,5 @@ shrd.Append(CPPDEFINES = 'BUILDING_DLL')
 
 Export('shrd')
 
-SConscript(dirs = ['util', 'base', 'ui',
+SConscript(dirs = ['util', 'base', 'ui', 'graphics',
 		   'tools/autobuild', 'contrib/ntl'])

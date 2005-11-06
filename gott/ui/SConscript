@@ -2,6 +2,6 @@ import glob
 
 Import('shrd')
 
-shrd.SharedLibrary('base_ui', glob.glob('*.cpp') + [ '../graphics/geometry.cpp' ] ) # use graphics library later
+shrd.SharedLibrary('base_ui', glob.glob('*.cpp'))
 
 SConscript(dirs = ['directfb', 'x11', 'win32'] )
