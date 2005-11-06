@@ -23,7 +23,7 @@
 #include <X11/Xlib.h>
 #include <gott/ui/x11/uicontext.hpp>
 #include <gott/ui/x11/input.hpp>
-#include <gott/util/geometry.hpp>
+#include <gott/graphics/geometry.hpp>
 #include <gott/ui/x11/window.hpp>
 
 namespace gott{namespace ui{namespace x11{

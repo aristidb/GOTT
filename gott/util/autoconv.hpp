@@ -21,20 +21,16 @@
 
 #include <ostream>
 
-namespace std {
-
-inline ostream &operator<<(ostream &o, wchar_t const *in) {
-  typedef codecvt<wchar_t, char, mbstate_t> CCV;
-  CCV const &c = use_facet<CCV>(o.getloc());
-  mbstate_t st = mbstate_t();
-  size_t l = wcslen(in);
-  string out(l / c.encoding(), '$');
+inline std::ostream &operator<<(std::ostream &o, wchar_t const *in) {
+  typedef std::codecvt<wchar_t, char, mbstate_t> CCV;
+  CCV const &c = std::use_facet<CCV>(o.getloc());
+  std::mbstate_t st = std::mbstate_t();
+  std::size_t l = std::wcslen(in);
+  std::string out(l / c.encoding(), '$');
   wchar_t const *in_n = 0;
   char *out_n = 0;
   c.out(st, in, in + l, in_n, &out[0], &out[0] + out.length(), out_n);
   return o << out;
-}
-
 }
 
 #endif

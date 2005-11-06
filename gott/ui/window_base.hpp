@@ -26,7 +26,7 @@
 #include <sigc++/signal.h>
 #include <gott/util/properties/property.hpp>
 #include <gott/util/string/string.hpp>
-#include <gott/util/geometry.hpp>
+#include <gott/graphics/geometry.hpp>
 #include <gott/ui/input.hpp>
 
 // rendering system!
