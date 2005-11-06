@@ -49,6 +49,7 @@ class GOTT_EXPORT select_loop {
   public:
     select_loop();
     ~select_loop();
+
     /**
      * \name callback registration and removal methods
      * There are three possible incomming events for each 

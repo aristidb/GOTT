@@ -241,7 +241,7 @@ struct GOTT_LOCAL key_event
   enum event_type{ Press, Release }; // Hold?
   event_type type;
   key_code code; 
-  key_event( key_code code, event_type t ); // TODO! GOTT_EXPORT?
+  GOTT_EXPORT key_event( key_code code, event_type t );
 };
 
 /**
@@ -252,7 +252,7 @@ struct GOTT_LOCAL key_state
   private:
     std::vector<unsigned char> keyboard;
   public:
-    key_state(); // TODO! GOTT_EXPORT?
+    GOTT_EXPORT key_state();
     inline bool get_state( key_code code ) const {return keyboard[code]&1; }
     inline bool operator()( key_code code ) const {return keyboard[code]&1; }
     inline void set( key_code code ) {keyboard[code]=1; }

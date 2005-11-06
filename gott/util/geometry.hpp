@@ -27,6 +27,9 @@
 // move into subdir if this file grows to much 
 namespace gott{
 
+/**
+ * \brief Small coordinate structure.
+ */
 struct GOTT_LOCAL coord
 {
   coord() : x(0), y(0) {}
@@ -37,16 +40,28 @@ struct GOTT_LOCAL coord
 
 GOTT_LOCAL inline coord operator +( coord const& l, coord const& r )  { coord t(l); t += r; return t; }
 
+/** 
+ * \brief Small rectangle structure
+ */
 struct GOTT_LOCAL rect 
 {
   long left, top; 
   size_t width, height;
-  rect( long l, long t , size_t width, size_t height);
-  rect();
-  bool is_inside( coord const& c ) const;
-  void add_region( rect const& r );
-};
+  rect( long l, long t, size_t w, size_t h) : left(l), top(t), width(w), height(h){}
+  rect() : left(0), top(0), width(1), height(1) {}
 
+  /**
+   * \returns true if coordinate is inside the rectangle.
+   */
+  inline bool is_inside( coord const& c ) const{
+    return c.x >= left && c.x <= left + long(width)  &&  c.y >= top && c.y <= top + long(height);
+  }
+
+  /**
+   * \brief Turns *this into a rectangle containing *this and other
+   */
+  GOTT_EXPORT void add_region( rect const& other );
+};
 }
 
 #endif

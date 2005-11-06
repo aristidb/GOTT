@@ -67,7 +67,7 @@ struct GOTT_LOCAL window_flags
 };
 
 /**
- * \brief holds the pixel format enum, \see pixel_format::type
+ * \brief holds the pixel format enum, called gott::ui::pixel_format::type
  */
 struct GOTT_LOCAL pixel_format {
   enum type

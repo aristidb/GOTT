@@ -41,6 +41,16 @@ uicontext::uicontext( const char * connection )
 
 }
 
+Display* uicontext::get_display() {
+  return display_;
+}
+int uicontext::get_screen() const {
+  return screen_;
+}
+Atom uicontext::get_atom( const char* atom ) const {
+  return XInternAtom( display_, atom, 0 );
+}
+
 void uicontext::register_window( window_base * ref ){
   window *xwin = dynamic_cast<window*>(ref);
   if(xwin)
@@ -53,9 +63,12 @@ void uicontext::register_window( window_base * ref ){
 void uicontext::remove_window( window_base *ref ){
   window *xwin = dynamic_cast<window*>(ref);
   if(xwin) {
+    std::vector<gott::ui::x11::window*>::iterator it = find( windows_.begin(), windows_.end(), xwin);
+    if( it != windows_.end()) 
+      windows_.erase( it );
   }
   else {
-    // do what
+    // do what?
   }
 
 }

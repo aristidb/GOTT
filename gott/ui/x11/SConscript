@@ -1,6 +1,8 @@
 import glob
 
 Import('shrd')
-
+shrd.Append(LIBS = 'X11')
 shrd.SharedLibrary('x11', glob.glob('*.cpp') )
+
+SConscript(dirs = ['test'] )
 

@@ -28,10 +28,12 @@ namespace gott{namespace ui{
 
 /**
  * \brief A generic API unaware window class
- * The generic window, unlike other GUI-Systems this window class allows migrateing 
+ * The generic window, unlike other GUI-Systems this window class allows migrating 
  * a window from one context to another .. elaborate...
  */
 class GOTT_EXPORT window : public window_base  {
+  private:
+    window_base * base;
   public:
 
 

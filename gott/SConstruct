@@ -30,7 +30,7 @@ env = Environment(
   CXX = cxx, 
   CCFLAGS = cflags, 
   CPPPATH=['#/..', '#/contrib/ntl'], 
-  LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/string #/base/plugin'),
+  LIBPATH=Split('#/contrib/ntl #/util/tdl #/util/xany #/util/string #/base/plugin #/base/events #/ui #/ui/x11' ),
   CPPDEFINES=cppdef)
 
 Export('env')
