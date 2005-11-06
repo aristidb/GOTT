@@ -1,0 +1,6 @@
+import glob
+
+Import('shrd')
+
+shrd.SharedLibrary('events', glob.glob('*.cpp') )
+
