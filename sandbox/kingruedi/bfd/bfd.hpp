@@ -48,7 +48,7 @@ namespace binary {
       throw "Not an object";
 
     void *tmp;
-    size_t size;
+    unsigned int size;
     long mini_count = bfd_read_minisymbols(file.handle(), is_dynamic, 
 					   &tmp, &size);
     helper::c_ptr<void> mini_syms(tmp);
