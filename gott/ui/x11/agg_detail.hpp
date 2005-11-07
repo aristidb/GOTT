@@ -27,7 +27,7 @@
 #include <agg_basics.h>
 #include <agg_rendering_buffer.h>
 #include <gott/ui/window_base.hpp>
-#include <gott/util/geometry.hpp>
+#include <gott/graphics/geometry.hpp>
 
 namespace gott{namespace ui{namespace x11{namespace detail{
 

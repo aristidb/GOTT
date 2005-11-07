@@ -1,8 +1,5 @@
-#ifndef GOTT_UI_WINDOWS_HPP_INCLUDED
-#define GOTT_UI_WINDOWS_HPP_INCLUDED
-
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
-// Content: GOTT generic delegating window class
+// Content: GOTT User interface context base class
 // Authors: Andreas Pokorny
 //
 // This file is part of the Gott Project (http://gott.sf.net)
@@ -22,29 +19,20 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include <gott/ui/window_base.hpp>
-
-namespace gott{namespace ui{
-
-/**
- * \brief A generic API unaware window class
- * The generic window, unlike other GUI-Systems this window class allows migrating 
- * a window from one context to another .. elaborate...
- */
-class GOTT_EXPORT window : public window_base  {
-  private:
-    window_base * base;
-  public:
+#include <gott/ui/uicontext_base.hpp>
 
 
-    void set_size_hints();
-    void update_region( rect const& region );
-    uicontext* get_uicontext();
+namespace gott{namespace ui{namespace x11{
 
-    ~window();
-};
+gott::ui::key_state const& uicontext_base::get_key_state() const{
+  return keys_;
+}
 
-}}
+gott::ui::mouse_state const& uicontext_base::get_mouse_state() const{
+  return mouse_;
+}
 
-#endif
+uicontext_base::~uicontext_base(){}
+
+}}}
 

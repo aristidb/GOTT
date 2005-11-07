@@ -155,7 +155,6 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 //////////////////
   
   title_.set(title);
-	XSync( context->get_display(), 0 );
 
   // Wait for Map events? 
 	
@@ -168,6 +167,7 @@ window::window( uicontext& app, rect const& position, string const& title, std::
  
   if( flags & window_flags::Visible )
     visibility_.set(true);
+  XFlush( context->get_display() );
 }
 
 /**
@@ -244,8 +244,10 @@ void window::set_title( gott::string const& str ){
 
 void window::map_window( bool new_state ) {
   if( new_state != mapped_state ) {
-    if( new_state )
-      XMapWindow( context->get_display(), handle );
+    if( new_state ) {
+      XMapWindow( context->get_display(), handle ); 
+      std::cout << "Lets move" << std::endl;
+    }
     else 
       XUnmapWindow( context->get_display(), handle );
     mapped_state = new_state;
@@ -367,7 +369,7 @@ uicontext* window::get_uicontext(){
 bool window::needs_update() const{
   return invalid_area.width == 0 || invalid_area.height == 0;
 }
-rect window::get_invalidation_area() const{
+rect window::get_invalid_area() const {
   return invalid_area;
 }
 void window::invalidate_area( rect const& region ){

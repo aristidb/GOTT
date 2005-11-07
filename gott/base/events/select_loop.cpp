@@ -67,13 +67,13 @@ void select_loop::run(){
   {
     size_t n = callbacks.rbegin()->first + 1;
     while( int num_fd = select( n, &read_fds, &write_fds, &except_fds, 0 ) != -1 ) {
-      for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end(); it!=e;++it)  {
+      for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end(); num_fd && it!=e;++it)  {
         if( FD_ISSET( it->first, &read_fds ) ) 
-          it->second.on_read();
+          --num_fd,it->second.on_read();
         if( FD_ISSET( it->first, &write_fds) ) 
-          it->second.on_write();
+          --num_fd,it->second.on_write();
         if( FD_ISSET( it->first, &except_fds) ) 
-          it->second.on_exception();
+          --num_fd,it->second.on_exception();
       }
       if( callbacks.empty() )
         return;

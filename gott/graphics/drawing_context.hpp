@@ -1,9 +1,6 @@
-#ifndef GOTT_UI_WINDOWS_HPP_INCLUDED
-#define GOTT_UI_WINDOWS_HPP_INCLUDED
-
-// Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
-// Content: GOTT generic delegating window class
-// Authors: Andreas Pokorny
+// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Content: Non-immediate graphics library
+// Authors: Aristid Breitkreuz
 //
 // This file is part of the Gott Project (http://gott.sf.net)
 //
@@ -21,30 +18,19 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef GOTT_GRAPHICS_DRAWING_CONTEXT_HPP
+#define GOTT_GRAPHICS_DRAWING_CONTEXT_HPP
 
-#include <gott/ui/window_base.hpp>
-
-namespace gott{namespace ui{
+namespace gott {
+namespace graphics {
 
 /**
- * \brief A generic API unaware window class
- * The generic window, unlike other GUI-Systems this window class allows migrating 
- * a window from one context to another .. elaborate...
+ * Interface for the underlying immediate renderer.
  */
-class GOTT_EXPORT window : public window_base  {
-  private:
-    window_base * base;
-  public:
+class drawing_context {
 
-
-    void set_size_hints();
-    void update_region( rect const& region );
-    uicontext* get_uicontext();
-
-    ~window();
 };
 
 }}
 
 #endif
-

@@ -32,8 +32,10 @@ namespace gott{namespace ui{namespace x11{
 class window;
 /**
  * \brief Xlib implementation of uicontext for X11.
- * \todo use pimpl and some further abstraction to remove X11 headers?
- * \todo should screen number be part of the window class?
+ * \todo Use pimpl and some further abstraction to remove X11 headers, from our public headers?
+ * \todo Should screen number be part of the window class?
+ * \todo How should we react on illegal gott::x11::uicontext::register_window and 
+ * gott::x11::uicontext::remove_window parameters?
  */
 class GOTT_EXPORT uicontext : public uicontext_base {
   private:

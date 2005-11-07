@@ -103,7 +103,7 @@ class GOTT_EXPORT window : public gott::ui::window_base {
 
 
     bool needs_update() const;
-    rect get_invalidation_area() const;
+    rect get_invalid_area() const;
     void invalidate_area( rect const& region );
 
 

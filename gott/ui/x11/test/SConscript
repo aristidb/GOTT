@@ -1,0 +1,6 @@
+import glob
+
+Import('env')
+
+env.Program('simple_x11', 'simple_x11.cpp', LIBS=['X11','string','base_ui','x11','events','ntl','graphics'])
+
