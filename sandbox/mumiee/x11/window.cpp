@@ -122,6 +122,31 @@ void window::open(rect const&r, std::string const& t, pixelformat const& , std::
     throw std::runtime_error("no window handle");
   ///////////////
 
+#ifdef BUFFER_WINDOW
+  // based on agg-2.4/src/platform/X11/agg_platform_support.cpp
+
+  int bpp=32; //TODO
+  int depth=this->get_depth();
+  if(depth == 15)
+    depth=16;
+  else if(depht == 24)
+    depth=32;
+
+  buffer=new unsigned char[r.width * r.height * (bpp/8)];
+  memset(buffer, 255, r.width * r.height * (bpp/8));
+  window_buffer_img = XCreateImage(app->get_display(),
+				   this->get_visual(),
+				   this->get_depth(),
+				   ZPixmap,
+				   0,
+				   reinterpret_cast<char*>(buffer),
+				   r.width,
+				   r.height,
+				   depth,
+				   width * (depth/8));
+			       
+#endif
+
 #ifdef HAVE_XDAMAGE
   if( use_xdamage ) {
     XSelectInput(app->get_display(), handle, KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
@@ -308,6 +333,10 @@ void window::close()
   if( handle )
   {
     exec_on_close();
+
+#ifdef BUFFER_WINDOW
+    XDestroyImage(window_buffer_img);
+#endif
 
     this->close_renderer(app->get_display(), app->get_screen(), handle ); 
     XDestroyWindow( app->get_display(), handle );
