@@ -48,6 +48,16 @@ public:
       invalidation const &invalid) const = 0;
 
   /**
+   * Return the regions that have to be repainted _before_ the object can be drawn.
+   * \param transf The transformations to apply.
+   * \param invalid The (already) clobbered region.
+   * \return Where to repaint the background.
+   */
+  virtual invalidation clobbered_background(
+      transformations const &transf,
+      invalidation const &invalid) const = 0;
+
+  /**
    * Provide the clobbered region when a child changed.
    * \param child The child that changed.
    */
