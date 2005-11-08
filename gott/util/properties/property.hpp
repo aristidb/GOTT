@@ -189,7 +189,7 @@ public:
    * Get the value.
    * \return The value.
    */
-  const_reference get() const {
+  value_type get() const {
     return *read();
   }
 
@@ -197,7 +197,7 @@ public:
    * Get the value.
    * \see get()
    */
-  const_reference operator()() const { return get(); }
+  value_type operator()() const { return get(); }
 
   /**
    * Set the value to another value.
