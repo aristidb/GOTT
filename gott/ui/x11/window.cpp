@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <sys/types.h>
 #include <unistd.h>
+#include <iostream>
 #include <boost/bind.hpp> 
 #include <boost/cstdint.hpp> 
 #include <boost/lambda/lambda.hpp> 
@@ -77,14 +78,14 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 
     attributes.event_mask = ExposureMask | StructureNotifyMask; 
     if( flags & window_flags::MouseEvents ) 
-      attributes.event_mask = 
+      attributes.event_mask |= 
         PointerMotionMask 
         | FocusChangeMask 
         | ButtonPressMask 
         | ButtonReleaseMask;
 
     if( flags & window_flags::KeyEvents ) 
-      attributes.event_mask = 
+      attributes.event_mask |= 
         FocusChangeMask 
         | KeyPressMask 
         | KeyReleaseMask;
@@ -246,7 +247,6 @@ void window::map_window( bool new_state ) {
   if( new_state != mapped_state ) {
     if( new_state ) {
       XMapWindow( context->get_display(), handle ); 
-      std::cout << "Lets move" << std::endl;
     }
     else 
       XUnmapWindow( context->get_display(), handle );
@@ -356,8 +356,9 @@ void window::update_region( rect const& region ){
   if( region.left == 0 
       && region.top == 0  
       && region.width == impl->buffer.width()
-      && region.height == impl->buffer.height() )
+      && region.height == impl->buffer.height() ) {
     impl->update_window();
+  }
   else
     impl->update_rect( region );
 }

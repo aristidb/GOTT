@@ -168,19 +168,23 @@ void uicontext::process_event( window* win, XEvent& e ) {
 
         bool move = old_rect.left != new_rect.left || old_rect.top != new_rect.top;
         bool resize = old_rect.width != new_rect.width || old_rect.height != new_rect.height;
-        win->on_configure().emit( new_rect );
 
-        if( move )
-          win->on_move().emit(new_rect);
-        if( resize ) {
-          win->on_resize().emit(new_rect);
-          rect invalid_region(0,0,new_rect.width, new_rect.height);
-          win->on_draw().emit( win->screen_buffer(), invalid_region );
-          win->update_region( invalid_region );
+        if( move || resize ) {
+          win->on_configure().emit( new_rect );
 
-          XSync( display_, 1 ); // TODO: test if that stuff is still required! XSync could cause trouble with select
-          // maybe 0 is enough 
-          XFlush( display_ );
+          if( move ) {
+            win->on_move().emit(new_rect);
+          }
+          if( resize ) {
+            win->on_resize().emit(new_rect);
+            rect invalid_region(0,0,new_rect.width, new_rect.height);
+            win->on_draw().emit( win->screen_buffer(), invalid_region );
+            win->update_region( invalid_region );
+
+            XSync( display_, 1 ); // TODO: test if that stuff is still required! XSync could cause trouble with select
+            // maybe 0 is enough 
+            XFlush( display_ );
+          }
         }
 
         break;
@@ -235,8 +239,9 @@ void uicontext::process_read(){
     XEvent event;
     XNextEvent(display_, &event );
     window * win  = find_window( event.xany.window );
-    if( win ) 
+    if( win )  {
       process_event( win, event );
+    }
   }
 
   // if any window needs redraw, than do that here:
