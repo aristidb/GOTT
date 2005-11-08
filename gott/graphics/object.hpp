@@ -48,12 +48,25 @@ public:
       invalidation const &invalid) const = 0;
 
   /**
-   * Return the regions that have to be repainted _before_ the object can be drawn.
+   * Return the regions that have to be repainted _before_ the object can be 
+   * drawn. Every transparent (but visible, this means alpha != 0) bit of the 
+   * object has to be included. Other bits may be included.
    * \param transf The transformations to apply.
-   * \param invalid The (already) clobbered region.
+   * \param invalid The interesting region.
    * \return Where to repaint the background.
    */
-  virtual invalidation clobbered_background(
+  virtual invalidation transparent_parts(
+      transformations const &transf,
+      invalidation const &invalid) const = 0;
+
+  /**
+   * Return the regions that do _not_ have to be painted behind the object.
+   * Omitting bits is not lethal. The result must not include non-opaque bits.
+   * \param transf The transformations to apply.
+   * \param invalid The interesting region.
+   * \return Where not to paint any background.
+   */
+  virtual invalidation opaque_parts(
       transformations const &transf,
       invalidation const &invalid) const = 0;
 
