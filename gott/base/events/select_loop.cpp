@@ -18,7 +18,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "select_loop.hpp"
+
 namespace gott{namespace events{
 select_loop::select_loop() {
   FD_ZERO(&read_fds);
@@ -26,6 +28,12 @@ select_loop::select_loop() {
   FD_ZERO(&except_fds);
 }
 
+
+void select_loop::add_timer( deadline_timer const& timer ) {
+  if( ! timer.timer.is_not_a_date_time() ) {
+    timed_events.push( timer );
+  }
+}
 void select_loop::add_read_fd( int fd, boost::function<void()> fun ) {
   FD_SET(fd, &read_fds);
   callbacks[fd].on_read = fun;
@@ -62,23 +70,52 @@ void select_loop::remove_fd( int fd ) {
   }
 }
 
-void select_loop::run(){
-  if( callbacks.size() )
-  {
-    size_t n = callbacks.rbegin()->first + 1;
-    while( int num_fd = select( n, &read_fds, &write_fds, &except_fds, 0 ) != -1 ) {
-      for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end(); num_fd && it!=e;++it)  {
-        if( FD_ISSET( it->first, &read_fds ) ) 
-          --num_fd,it->second.on_read();
-        if( FD_ISSET( it->first, &write_fds) ) 
-          --num_fd,it->second.on_write();
-        if( FD_ISSET( it->first, &except_fds) ) 
-          --num_fd,it->second.on_exception();
-      }
-      if( callbacks.empty() )
-        return;
-      n = callbacks.rbegin()->first + 1;
+timeval select_loop::handle_timed_events(){
+  using namespace boost::posix_time;
+  timeval ret;
+  ret.tv_sec = ret.tv_usec = 0;
+  if( ! timed_events.empty() ){
+    ptime now( microsec_clock::local_time() );
+    time_duration td = timed_events.top().timer - now;
+    for( ; td.is_negative() || td.total_seconds() == 0 ; td = timed_events.top().timer - now  ) {
+      deadline_timer::handler_type cp = timed_events.top().handler;
+      timed_events.pop();
+      add_timer( cp() );
     }
+    ret.tv_sec = td.total_seconds();
+    ret.tv_usec = td.fractional_seconds();
+    //long    tv_sec;   seconds 
+    //long    tv_usec;  microseconds 
+  }
+  return ret;
+}
+
+void select_loop::run(){
+  using namespace boost::posix_time;
+  size_t n = callbacks.rbegin()->first + 1;
+  timeval next_event = handle_timed_events(), *t=0; 
+
+  if( next_event.tv_sec ||next_event.tv_usec ) 
+    t = &next_event;
+
+  int num_fd;
+  while( ( !timed_events.empty() || !callbacks.empty() )  
+      && ( num_fd = select( n, &read_fds, &write_fds, &except_fds, t ) ) != -1 ) 
+  {
+    for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end(); num_fd && it!=e;++it)  {
+      if( FD_ISSET( it->first, &read_fds ) ) 
+        --num_fd,it->second.on_read();
+      if( FD_ISSET( it->first, &write_fds) ) 
+        --num_fd,it->second.on_write();
+      if( FD_ISSET( it->first, &except_fds) ) 
+        --num_fd,it->second.on_exception();
+    }
+    next_event = handle_timed_events();
+
+    if( next_event.tv_sec ||next_event.tv_usec ) 
+      t = &next_event;
+
+    n = callbacks.rbegin()->first + 1;
   }
 }
 

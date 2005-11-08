@@ -2,5 +2,7 @@ import glob
 
 Import('shrd')
 
-shrd.SharedLibrary('events', glob.glob('*.cpp') )
+local_shrd = shrd
+local_shrd.Append(LIBS='boost_date_time')
+local_shrd.SharedLibrary('events', glob.glob('*.cpp'))
 

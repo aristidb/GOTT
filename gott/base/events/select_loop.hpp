@@ -22,9 +22,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <map> 
+#include <algorithm>
+#include <queue>
 #include <sys/select.h> 
 #include <boost/function.hpp>
 #include <gott/util/visibility.hpp>
+#include <gott/base/events/deadline_timer.hpp>
 
 
 // TODO: wrong namespace, and wrong place for this file?
@@ -41,15 +44,22 @@ class GOTT_EXPORT select_loop {
     };
     fd_set read_fds, write_fds, except_fds;
     typedef std::map<int, handler > callback_map;
+    typedef std::priority_queue<deadline_timer,std::vector<deadline_timer>,std::greater<deadline_timer> > queue_type;
     callback_map callbacks;
+    queue_type timed_events;
 
     select_loop( select_loop const& cp );
     select_loop& operator=( select_loop const& cp );
 
+    timeval handle_timed_events();
   public:
     select_loop();
     ~select_loop();
 
+    /**
+     * \brief add a gott::events::deadline_timer to the looop
+     */
+    void add_timer( deadline_timer const& timer );
     /**
      * \name callback registration and removal methods
      * There are three possible incomming events for each 

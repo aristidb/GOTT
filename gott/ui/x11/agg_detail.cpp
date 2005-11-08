@@ -27,7 +27,7 @@
 namespace gott{namespace ui{namespace x11{namespace detail{
 
 agg_buffer::agg_buffer( Display* d, int s, Window h, Visual* v, int de )
-  : display(d),window_buffer(0), vis(v), handle(h), gc(0), window_img(0), depth(de), screen(s)  {
+  : display(d),window_buffer(0), vis(v), handle(h), gc(0), window_img(0), depth(de), bpp(32), screen(s)  {
 
   unsigned long r_mask = vis->red_mask;
   unsigned long g_mask = vis->green_mask;
