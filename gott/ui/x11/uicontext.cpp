@@ -160,7 +160,7 @@ void uicontext::process_event( window* win, XEvent& e ) {
 
         rect old_rect(win->region().get());
         rect new_rect( e.xconfigure.x
-            , root_attribs.height - e.xconfigure.height - e.xconfigure.y
+            , e.xconfigure.y
             , e.xconfigure.width 
             , e.xconfigure.height );
 

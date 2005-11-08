@@ -209,7 +209,7 @@ void window::handle_resize( rect const& region ){
       && long(region.height) == attr.height ) {
     impl->resize_buffer( region );
   }
-  else 
+  else  {
     if( region.left == attr.x
         && region.top == attr.y 
         && ( long(region.width) != attr.width
@@ -222,6 +222,7 @@ void window::handle_resize( rect const& region ){
       XMoveWindow( context->get_display(), handle, region.left, region.top);
     else
       XMoveResizeWindow(context->get_display(), handle, region.left, region.top, region.width, region.height );
+  }
 }
 
 /**
