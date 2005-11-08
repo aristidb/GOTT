@@ -1,5 +1,5 @@
-#ifndef GOTT_BASE_EVENTS_TIMER_HPP_INCLUDED
-#define GOTT_BASE_EVENTS_TIMER_HPP_INCLUDED
+#ifndef GOTT_BASE_EVENTS_DEADLINE_TIMER_HPP_INCLUDED
+#define GOTT_BASE_EVENTS_DEADLINE_TIMER_HPP_INCLUDED
 
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
 // Content: GOTT select loop
@@ -37,7 +37,7 @@ namespace gott{namespace events{
  * In this example do_something will be called every 10 seconds ( + time to execute do_something ).
  * \code
  *   using namespace gott::events;
- *   using namespace gott::date_time::posix_time;
+ *   using namespace boost::date_time::posix_time;
  *   deadline_timer do_something() {
  *      // do something 
  *      return deadline_timer( microsec_clock::local_time() + seconds(10), &do_something );
@@ -57,7 +57,7 @@ namespace gott{namespace events{
  *      // do something 
  *     static int exec = 0;
  *     if( ++exec == 20 )
- *       return deadline_timer();
+ *       return deadline_timer::no_timer;
  *     else
  *       return deadline_timer( microsec_clock::local_time() + seconds(10), &do_something );
  *   }
@@ -72,8 +72,10 @@ struct GOTT_LOCAL deadline_timer{
   /**
    * \brief constructs an invalid deadline_timer.
    */
-  deadline_timer() : timer(boost::date_time::not_a_date_time) {};
-  deadline_timer( time_type const& t, handler_type const&  h) : timer(t),handler(h){};
+  deadline_timer() : timer(boost::date_time::not_a_date_time) {}
+  deadline_timer( time_type const& t, handler_type const&  h) : timer(t),handler(h){}
+
+  static const deadline_timer no_timer;
 };
 inline GOTT_LOCAL bool operator<( deadline_timer const& left, deadline_timer const& right ) { return left.timer < right.timer; } 
 inline GOTT_LOCAL bool operator>( deadline_timer const& left, deadline_timer const& right ) { return left.timer > right.timer; } 
