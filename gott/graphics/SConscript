@@ -1,0 +1,3 @@
+import glob
+Import('shrd')
+shrd.SharedLibrary('graphics', glob.glob('*.cpp'))

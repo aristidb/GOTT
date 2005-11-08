@@ -28,7 +28,7 @@ namespace helloworld {
 
 int main(int, char **argv) {
   try {
-    symvalue bar=helloworld::get_b_a_r(argv[0]);
+    symvalue bar=helloworld::get_b_a_r(argv[1]);
 
     ffi_cif cif;
     if(ffi_prep_cif(&cif, FFI_DEFAULT_ABI, 0, &ffi_type_void, 0x0)
