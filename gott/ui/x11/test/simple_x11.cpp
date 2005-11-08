@@ -136,24 +136,22 @@ void draw(agg::rendering_buffer& buf, gott::rect const& r )
 }
 
 deadline_timer move_window( window *win ) {
-  gott::rect reg = win->region().get();
-  std::cout <<"move_window from (" << reg.left << "," << reg.top << ")(" << reg.width << "," << reg.height << ")";
-  reg.left += 80 - rand()%180;
-  reg.top += 80 - rand()%180;
-  reg.left = std::max( 0L, reg.left );
-  reg.top = std::max( 0L, reg.top);
-  std::cout <<"  to (" << reg.left << "," << reg.top << ")(" << reg.width << "," << reg.height<<  ")" << std::endl;
-  win->region().set(reg);
+  gott::properties::property<gott::rect>::read_write_reference reg = win->region().read_write();
+  std::cout <<"move_window from (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height << ")";
+  reg->left += 80 - rand()%90;
+  reg->top += 80 - rand()%90;
+  reg->left = std::max( 0L, reg->left );
+  reg->top = std::max( 0L, reg->top);
+  std::cout <<"  to (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height <<  ")" << std::endl;
   return deadline_timer( microsec_clock::local_time() + seconds(6), boost::bind( &move_window, win) );
 }
 
 deadline_timer resize_window( window *win ) {
-  gott::rect reg = win->region().get();
-  std::cout <<"resize_window (" << reg.left << "," << reg.top << ")(" << reg.width << "," << reg.height  << ")";
-  reg.width = 10 + rand()%180;
-  reg.height= 10 + rand()%180;
-  std::cout <<"  to (" << reg.left << "," << reg.top << ")(" << reg.width << "," << reg.height << ")" << std::endl;
-  win->region().set(reg);
+  gott::properties::property<gott::rect>::read_write_reference reg = win->region().read_write();
+  std::cout <<"resize_window (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height  << ")";
+  reg->width = 10 + rand()%180;
+  reg->height= 10 + rand()%180;
+  std::cout <<"  to (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height << ")" << std::endl;
   return deadline_timer( microsec_clock::local_time() + seconds(10), boost::bind( &resize_window, win) );
 }
 
