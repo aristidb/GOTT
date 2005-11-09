@@ -30,38 +30,57 @@ namespace gott{
 /**
  * \brief Small coordinate structure.
  */
-struct GOTT_LOCAL coord
+struct coord
 {
   coord() : x(0), y(0) {}
   coord( int x_, int y_ ) : x(x_), y(y_){}
   int x, y;
-  inline coord& operator +=(  coord const& r )  { x+=r.x;y+=r.y;return *this; }
+  inline coord& operator +=(coord const& r)  { x+=r.x;y+=r.y; return *this; }
 };
 
-GOTT_LOCAL inline coord operator +( coord const& l, coord const& r )  { coord t(l); t += r; return t; }
+inline coord operator +(coord const& l, coord const& r)  { 
+  coord t(l); 
+  t += r; 
+  return t; 
+}
 
 /** 
  * \brief Small rectangle structure
  */
-struct GOTT_LOCAL rect 
+struct rect 
 {
   long left, top; 
   size_t width, height;
-  rect( long l, long t, size_t w, size_t h) : left(l), top(t), width(w), height(h){}
-  rect() : left(0), top(0), width(1), height(1) {}
+  rect( long l, long t, size_t w, size_t h) 
+  : left(l), top(t), width(w), height(h) {}
+
+  rect() 
+  : left(0), top(0), width(1), height(1) {}
 
   /**
    * \returns true if coordinate is inside the rectangle.
    */
   inline bool is_inside( coord const& c ) const{
-    return c.x >= left && c.x <= left + long(width)  &&  c.y >= top && c.y <= top + long(height);
+    return c.x >= left && c.x <= left + long(width)  
+      &&  c.y >= top && c.y <= top + long(height);
   }
 
   /**
    * \brief Turns *this into a rectangle containing *this and other
    */
   GOTT_EXPORT void add_region( rect const& other );
+
+  /**
+   * \see add_region
+   */
+  inline rect &operator+=(rect const &other) {
+    add_region(other);
+    return *this;
+  }
 };
+
+inline rect operator+(rect r1, rect const &r2) { return r1 += r2; }
+
 }
 
 #endif

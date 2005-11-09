@@ -18,30 +18,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_GRAPHICS_DRAWING_CONTEXT_HPP
-#define GOTT_GRAPHICS_DRAWING_CONTEXT_HPP
+#include "drawing_context.hpp"
 
-#include <gott/util/visibility.hpp>
+namespace graphics = gott::graphics;
+using graphics::drawing_context;
 
-namespace gott {
-namespace graphics {
-
-class path;
-class pattern;
-class line_management;
-class fill_rule;
-
-/**
- * Interface for the underlying immediate renderer.
- */
-class GOTT_EXPORT drawing_context {
-public:
-  virtual void fill(path const &contours, pattern const &contents) = 0;
-  virtual void stroke(path const &contours, line_management const &line) = 0;
-
-  virtual ~drawing_context() = 0;
-};
-
-}}
-
-#endif
+drawing_context::~drawing_context() {}

@@ -28,24 +28,32 @@ namespace graphics {
 
 /**
  * Transformations that can be applied to any graphics::object.
- * \todo Please check if this is scientifically fine.
  */
 class transformations {
+public:
+  /// Constructor.
+  transformations() {}
+
+  /// Destructor.
+  ~transformations() {}
+  
   /**
    * Rotate.
-   * \todo Select rotation unit (degree, radian).
+   * \param rot Rotation (counter-clockwise) in radian.
    */
   GOTT_EXPORT void rotate(double rot);
 
   /**
    * Translate.
-   * \todo Use double for this?
+   * \param dx Shift to the right.
+   * \param dy Shift upwards.
    */
  GOTT_EXPORT void translate(double dx, double dy);
 
   /**
-   * Scale.
-   * \todo Unit?
+   * Scale. 1.0 means no resize.
+   * \param rx Ratio in x direction.
+   * \param ry Ratio in y direction.
    */
   GOTT_EXPORT void scale(double rx, double ry);
 };
@@ -54,7 +62,8 @@ class transformations {
  * Rotate.
  * \see transformations::rotate
  */
-inline transformations rotate(transformations t, double rot) {
+inline 
+transformations rotate(double rot, transformations t = transformations()) {
   t.rotate(rot);
   return t;
 }
@@ -63,7 +72,8 @@ inline transformations rotate(transformations t, double rot) {
  * Translate.
  * \see transformations::translate
  */
-inline transformations translate(transformations t, double dx, double dy) {
+inline transformations translate(double dx, double dy, 
+    transformations t = transformations()) {
   t.translate(dx, dy);
   return t;
 }
@@ -72,7 +82,8 @@ inline transformations translate(transformations t, double dx, double dy) {
  * Scale.
  * \see transformations::scale
  */
-inline transformations scale(transformations t, double rx, double ry) {
+inline transformations scale(double rx, double ry,
+    transformations t = transformations()) {
   t.scale(rx, ry);
   return t;
 }
