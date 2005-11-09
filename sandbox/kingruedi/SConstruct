@@ -1,0 +1,45 @@
+#
+# SCons for my sandbox
+
+# based on mumiee's SConstruct
+
+cppdef = Split(ARGUMENTS.get('def', ''))
+cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
+cflags = Split(ARGUMENTS.get('cflags', ''))
+cflags += ['-I../../']
+
+release = int(ARGUMENTS.get('release', 1))
+if release:
+	debug = 0
+	optimize = 'full'
+	debug = -1
+else:
+	debug = 1
+	optimize = 'none'
+
+debug = int(ARGUMENTS.get('debug', debug))
+
+if debug == 1:
+	cppdef += ['DEBUG', 'LOG_EVENTS']
+elif debug == -1:
+	cppdef += ['NDEBUG']
+
+env = Environment(
+  CXX = cxx, 
+  CCFLAGS = cflags, 
+  CPPPATH=['#/..'], 
+  CPPDEFINES=cppdef)
+
+Export('env')
+
+SConscript(dirs=['agg'])
+
+SConscript(dirs=['bfd'])
+
+SConscript(dirs=['cairo'])
+
+SConscript(dirs=['sigcmp'])
+
+SConscript(dirs=['tut'])
+
+SConscript(dirs=['x11'])

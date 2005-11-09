@@ -1,0 +1,13 @@
+#
+#
+
+Import('env')
+
+print "Warning: At the moment TARGET is set to 'i486-pc-linux-gnu'. This could produce trouble if you are running the examples on a different platform"
+
+libs = [ 'bfd', 'ffi' ]
+
+env.Program('helloworld.cpp', LIBS=libs)
+
+env.SharedLibrary('dyn-helloworld.cpp')
+#env.Program('dyn-caller.cpp')
