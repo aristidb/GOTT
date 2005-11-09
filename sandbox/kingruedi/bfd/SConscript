@@ -10,4 +10,4 @@ libs = [ 'bfd', 'ffi' ]
 env.Program('helloworld.cpp', LIBS=libs)
 
 env.SharedLibrary('dyn-helloworld.cpp')
-#env.Program('dyn-caller.cpp')
+env.Program('dyn-caller.cpp', LIBS=libs+['dl'])
