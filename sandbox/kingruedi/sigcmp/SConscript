@@ -2,3 +2,26 @@
 #
 
 print "SigCmp has to be calles manualy"
+
+Import('env')
+
+sigcpp_env = env.Copy()
+sigcpp_env.ParseConfig('pkg-config sigc++-2.0 --libs')
+sigcpp_env.ParseConfig('pkg-config sigc++-2.0 --cflags')
+
+sigcpp_env.Append(CPPDEFINES=['USE_SIGC'])
+
+sigcpp_env.Object('sigc++-size.o', 'size.cpp')
+sigcpp_env.Program('sigc++-size', 'sigc++-size.o')
+
+sigcpp_env.Object('sigc++-speed.o', 'speed.cpp')
+sigcpp_env.Program('sigc++-speed', 'sigc++-speed.o')
+
+boostsig_env = env.Copy()
+
+libs = [ 'boost_signals' ]
+
+boostsig_env.Object('boost-size.o', 'size.cpp')
+boostsig_env.Program('boost-size', 'boost-size.o', LIBS=libs)
+boostsig_env.Object('boost-speed.o', 'speed.cpp')
+boostsig_env.Program('boost-speed', 'boost-speed.o', LIBS=libs)
