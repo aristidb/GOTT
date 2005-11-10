@@ -56,6 +56,16 @@ public:
    * \param ry Ratio in y direction.
    */
   GOTT_EXPORT void scale(double rx, double ry);
+
+  /**
+   * Apply all transformations to the point (x,y).
+   * \param x [inout] The x-coordinate of the point.
+   * \param y [inout] The y-coordinate of the point.
+   */
+  GOTT_EXPORT void apply(double &x, double &y);
+
+private:
+  // ...
 };
 
 /**

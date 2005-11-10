@@ -24,21 +24,42 @@
 #include <gott/util/visibility.hpp>
 
 namespace gott {
+
+class string;
+
 namespace graphics {
 
 class path;
 class pattern;
 class line_management;
 class fill_rule;
+class font;
+class transformations;
 
 /**
  * Interface for the underlying immediate renderer.
  */
 class GOTT_EXPORT drawing_context {
 public:
-  virtual void fill(path const &contours, pattern const &contents) = 0;
-  virtual void stroke(path const &contours, line_management const &line) = 0;
+  /**
+   * Draw a filled path.
+   */
+  virtual void fill(path const &contours, pattern const &contents,
+      transformations const &transf) = 0;
 
+  /**
+   * Draw a stroked path.
+   */
+  virtual void stroke(path const &contours, line_management const &line,
+      transformations const &transf) = 0;
+
+  /**
+   * Draw text.
+   */
+  virtual void text(string const &text, font const &style, 
+      transformations const &transf) = 0;
+
+  /// Destructor.
   virtual ~drawing_context() = 0;
 };
 
