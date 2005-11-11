@@ -32,7 +32,6 @@ namespace graphics {
 class path;
 class pattern;
 class line_management;
-class fill_rule;
 class font;
 class transformations;
 
@@ -43,18 +42,27 @@ class GOTT_EXPORT drawing_context {
 public:
   /**
    * Draw a filled path.
+   * \param contours The path to fill.
+   * \param contents What to fill the path with.
+   * \param transf The transformations to apply to the path.
    */
   virtual void fill(path const &contours, pattern const &contents,
       transformations const &transf) = 0;
 
   /**
    * Draw a stroked path.
+   * \param contours The path to stroke.
+   * \param line Properties of the stroke.
+   * \param transf The transformations to apply to the path.
    */
   virtual void stroke(path const &contours, line_management const &line,
       transformations const &transf) = 0;
 
   /**
    * Draw text.
+   * \param text The text to draw.
+   * \param style How to draw the text.
+   * \param transf The transformations to apply to the text.
    */
   virtual void text(string const &text, font const &style, 
       transformations const &transf) = 0;
