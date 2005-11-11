@@ -24,6 +24,9 @@
 namespace gott {
 namespace graphics {
 
+/**
+ * Pattern interface.
+ */
 class pattern {};
 
 }}

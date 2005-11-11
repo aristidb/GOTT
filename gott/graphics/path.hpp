@@ -24,6 +24,9 @@
 namespace gott {
 namespace graphics {
 
+/**
+ * A graphical path.
+ */
 class path {};
 
 }}

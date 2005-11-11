@@ -24,6 +24,9 @@
 namespace gott {
 namespace graphics {
 
+/**
+ * How a line is drawn.
+ */
 class line_management {};
 
 }}

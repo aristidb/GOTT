@@ -24,6 +24,9 @@
 namespace gott {
 namespace graphics {
 
+/**
+ * Text styling.
+ */
 class font {};
 
 }}
