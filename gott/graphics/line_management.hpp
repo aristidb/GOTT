@@ -27,7 +27,28 @@ namespace graphics {
 /**
  * How a line is drawn.
  */
-class line_management {};
+class line_management {
+public:
+  double line_width;
+
+  enum join {
+    join_miter,
+    join_round,
+    join_bevel
+  };
+
+  /// Style of line-endings.
+  enum cap {
+    /// End exactly at the end point.
+    cap_butt,
+    /// Round ending with the center of the circle being the end point.
+    cap_round,
+    // Square ending with the center of the square being the end point.
+    cap_square
+  };
+
+  // missing: dash
+};
 
 }}
 
