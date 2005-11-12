@@ -34,6 +34,8 @@ class pattern;
 class line_management;
 class font;
 class transformations;
+class source;
+class clipping;
 
 /**
  * Interface for the underlying immediate renderer.
@@ -52,11 +54,12 @@ public:
   /**
    * Draw a stroked path.
    * \param contours The path to stroke.
+   * \param contents What to paint in the actually stroked regions.
    * \param line Properties of the stroke.
    * \param transf The transformations to apply to the path.
    */
-  virtual void stroke(path const &contours, line_management const &line,
-      transformations const &transf) = 0;
+  virtual void stroke(path const &contours, pattern const &contents,
+      line_management const &line, transformations const &transf) = 0;
 
   /**
    * Draw text.
@@ -65,6 +68,15 @@ public:
    * \param transf The transformations to apply to the text.
    */
   virtual void text(string const &text, font const &style, 
+      transformations const &transf) = 0;
+
+  /**
+   * Blit an image.
+   * \param img The source image.
+   * \param clip The blit's clip region.
+   * \param transf The transformations to apply to the image.
+   */
+  virtual void blit(source const &img, clipping const &clip, 
       transformations const &transf) = 0;
 
   /// Destructor.
