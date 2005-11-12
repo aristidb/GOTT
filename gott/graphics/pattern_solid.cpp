@@ -18,22 +18,4 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_GRAPHICS_PATTERN_HPP
-#define GOTT_GRAPHICS_PATTERN_HPP
-
-#include <gott/util/visibility.hpp>
-
-namespace gott {
-namespace graphics {
-
-/**
- * Pattern interface.
- */
-class GOTT_EXPORT pattern {
-  /// Destructor.
-  virtual ~pattern() = 0;
-};
-
-}}
-
-#endif
+#include "pattern_solid.hpp"
