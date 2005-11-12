@@ -64,6 +64,8 @@ public:
    */
   GOTT_EXPORT void apply(double &x, double &y);
 
+  GOTT_EXPORT static transformations identity;
+
 private:
   // ...
 };
