@@ -22,6 +22,7 @@
 #define GOTT_GRAPHICS_DRAWING_CONTEXT_HPP
 
 #include <gott/util/visibility.hpp>
+#include <gott/util/properties/property.hpp>
 
 namespace gott {
 
@@ -42,6 +43,29 @@ class clipping;
  */
 class GOTT_EXPORT drawing_context {
 public:
+  enum compositing_operator_t {
+    operator_clear,
+
+    operator_source,
+    operator_over,
+    operator_in,
+    operator_out,
+    operator_atop,
+
+    operator_dest,
+    operator_dest_over,
+    operator_dest_in,
+    operator_dest_out,
+    operator_dest_atop,
+
+    operator_xor,
+    operator_add,
+    operator_saturate
+  };
+
+  virtual properties::property<compositing_operator_t> &compositing_operator() 
+    = 0;
+  
   /**
    * Draw a filled path.
    * \param contours The path to fill.
