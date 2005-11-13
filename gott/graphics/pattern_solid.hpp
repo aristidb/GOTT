@@ -29,8 +29,15 @@ namespace graphics {
 
 class color;
 
+/**
+ * Solid, single-color pattern.
+ */
 class pattern_solid : public pattern {
 public:
+  /**
+   * Constructor.
+   * \param col The color of the pattern.
+   */
   GOTT_EXPORT pattern_solid(color const &col);
 };
 
