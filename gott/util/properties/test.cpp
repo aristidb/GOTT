@@ -1,7 +1,11 @@
 #include "verify.hpp"
 #include "property.hpp"
+#include "concrete_property.hpp"
+#include "sigc_notification.hpp"
+#include "external_storage.hpp"
 #include "liaison.hpp"
 #include "triggered_copy.hpp"
+#include "translation_property.hpp"
 #include <gott/util/string/string.hpp>
 #include <gott/util/string/buffer.hpp>
 #include <boost/lambda/lambda.hpp>

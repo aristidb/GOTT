@@ -20,6 +20,7 @@
 
 #include <X11/X.h>
 #include <utility>
+#include <iostream>
 #include <gott/ui/x11/agg_detail.hpp>
 #include <agg2/agg_basics.h>
 #include <agg2/util/agg_color_conv_rgb8.h>
