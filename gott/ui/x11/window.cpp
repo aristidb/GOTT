@@ -44,7 +44,7 @@ using boost::lambda::constructor;
 window::window( uicontext& app, rect const& position, string const& title, std::size_t flags ) 
   : region_( gott::properties::external_storage<rect>( 
         bind(&window::get_region, this) 
-        , bind(&window::handle_resize, this, _1 ) )  
+        , bind(&window::set_region, this, _1 ) )  
       )
   , title_( gott::properties::external_storage<gott::string>(
         var(title_string)
@@ -188,35 +188,31 @@ rect window::get_region() const{
 }
 
 /**
+ * \brief Called by gott::x11::uicontext to update the region 
+ */
+void window::handle_sys_resize( rect const& region ){
+  if( region != last_region ) {
+    impl->resize_buffer( region );
+    invalidate_area(rect ( 0,0, region.width, region.height ) );
+    last_region = region;
+  }
+}
+/**
  * \brief forwards resize events to the system
- * There are two different resize events, which makes the 
- * whole thing problematic. If the user wants to resize the 
+ * If the user wants to resize the 
  * window he picks the propery and sets the new size, then 
  * xlib will send the resize event to the server/window manager. 
  * This resize request has to be processed there and returns
- * back as a ConfigureNotify. The uicontext will tell the 
- * window that the size actually changed. So we have to differ
- * between these two resize ``events''.
- * This sounds ugly, but it is simple to solve. We can check 
- * this by requesting the ``real'' current window size from xlib, 
- * and compare it with the passed one. If they do not differ, 
- * we just forward the resize to our agg_buffer which will 
- * then update its buffer, otherwise we send the resize request 
- * to xlib. 
+ * back as a ConfigureNotify. 
+ * The uicontext will tell the  window that the size actually 
+ * changed. So we have to differ between these two resize ``events''.
  */
-void window::handle_resize( rect const& region ){
+void window::set_region( rect const& region ){
   XWindowAttributes attr;
   XGetWindowAttributes( context->get_display(), handle, &attr );
 
   rect current( attr.x, attr.y, attr.width, attr.height );
-  if( region == current ) {
-    impl->resize_buffer( region );
-    if( last_region != current ) {
-      invalidate_area(rect ( 0,0, current.width, current.height ) );
-      last_region = region;
-    }
-  }
-  else if( region.left == current.left
+   if( region.left == current.left
       && region.top == current.top
       && ( region.width != current.width
         || region.height != current.height ) ) {

@@ -70,6 +70,12 @@ struct rect
   GOTT_EXPORT void add_region( rect const& other );
 
   /**
+   * \brief Turns *this into a rectangle containing parts of *this that are not in other
+   */
+  GOTT_EXPORT void subtract_region( rect const& other );
+
+
+  /**
    * \see add_region
    */
   inline rect &operator+=(rect const &other) {

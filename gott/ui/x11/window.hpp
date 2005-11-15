@@ -62,7 +62,8 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     Atom protocols[4];
 
     rect get_region() const;
-    void handle_resize( rect const& r );
+    void set_region( rect const& r );
+    void handle_sys_resize( rect const& r );
 
     void set_title( gott::string const& str );
 

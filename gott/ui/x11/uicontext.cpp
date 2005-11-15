@@ -161,7 +161,7 @@ void uicontext::process_event( window* win, XEvent& e ) {
        
         bool move = old.left != current.left && old.top != current.top;
         bool resize = old.width != current.width && old.height != current.height;
-        win->region().set( current );
+        win->handle_sys_resize( current );
 
         if( move || resize )
           win->on_configure().emit( current );
@@ -169,6 +169,14 @@ void uicontext::process_event( window* win, XEvent& e ) {
           win->on_move().emit( current );
         if( resize )
           win->on_resize().emit( current );
+
+        if( win->needs_update() ) {
+          rect inv(0,0,0,0);
+          std::swap( inv, win->invalid_area );
+          win->on_draw().emit( win->screen_buffer(), inv );
+          ///win->update_region( inv );
+        }
+
 
         break;
       }
@@ -230,8 +238,15 @@ void uicontext::process_read(){
   // if any window needs redraw, than do that here:
   // TODO: Accumulate rects? -> discuss
   for( std::size_t i = 0, e = windows_.size(); i != e; ++i ) 
-    if( windows_[i]->needs_update() )
-      windows_[i]->on_draw().emit( windows_[i]->screen_buffer(), windows_[i]->get_invalid_area() );
+  {
+    window * win=windows_[i];
+    if( win->needs_update() ) {
+      rect inv(0,0,0,0);
+      std::swap( inv, win->invalid_area );
+      win->on_draw().emit( win->screen_buffer(), inv );
+      win->update_region( inv );
+    }
+  }
 
 }
 
