@@ -23,6 +23,8 @@
 #include <boost/bind.hpp> 
 #include <boost/cstdint.hpp> 
 #include <boost/lambda/lambda.hpp> 
+#include <boost/lambda/bind.hpp> 
+#include <boost/lambda/construct.hpp> 
 #include <gott/ui/x11/window.hpp> 
 #include <gott/ui/x11/agg_detail.hpp> 
 
@@ -38,6 +40,7 @@ namespace {
 
 using boost::bind;
 using boost::lambda::var;
+using boost::lambda::constructor;
 window::window( uicontext& app, rect const& position, string const& title, std::size_t flags ) 
   : region_( gott::properties::external_storage<rect>( 
         bind(&window::get_region, this) 

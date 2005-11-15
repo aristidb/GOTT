@@ -153,27 +153,22 @@ void uicontext::process_event( window* win, XEvent& e ) {
       }
     case ConfigureNotify:
       {
-        /*XWindowAttributes root_attribs;
-        ::Window root_window = RootWindow( display_, screen_ );
-        XGetWindowAttributes( display_, root_window, &root_attribs );*/
-
-        win->region().set(rect( 
-              e.xconfigure.x,
+        rect old( win->last_region )
+          , current( e.xconfigure.x
               , e.xconfigure.y
               , e.xconfigure.width 
-              , e.xconfigure.height 
-              ) );
+              , e.xconfigure.height );
+       
+        bool move = old.left != current.left && old.top != current.top;
+        bool resize = old.width != current.width && old.height != current.height;
+        win->region().set( current );
 
-
-        if( win->needs_update() ) {
-          win->on_resize().emit(new_rect);
-          rect invalid_region(win->get_invalid_area());
-          win->on_draw().emit( win->screen_buffer(), invalid_region );
-          win->update_region( invalid_region );
-          XSync( display_, 1 ); // TODO: test if that stuff is still required! XSync could cause trouble with select
-          XFlush( display_ );
-        }
-
+        if( move || resize )
+          win->on_configure().emit( current );
+        if( move )
+          win->on_move().emit( current );
+        if( resize )
+          win->on_resize().emit( current );
 
         break;
       }
