@@ -51,7 +51,7 @@ class GOTT_EXPORT window : public gott::ui::window_base {
 
     gott::ui::x11::detail::agg_buffer* impl;
 
-    rect invalid_area;
+    rect last_region, invalid_area;
     bool mapped_state;
     flags_type win_flags;
     gott::string title_string;

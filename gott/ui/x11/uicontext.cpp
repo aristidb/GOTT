@@ -153,39 +153,27 @@ void uicontext::process_event( window* win, XEvent& e ) {
       }
     case ConfigureNotify:
       {
-        XWindowAttributes root_attribs;
+        /*XWindowAttributes root_attribs;
         ::Window root_window = RootWindow( display_, screen_ );
+        XGetWindowAttributes( display_, root_window, &root_attribs );*/
 
-        XGetWindowAttributes( display_, root_window, &root_attribs );
+        win->region().set(rect( 
+              e.xconfigure.x,
+              , e.xconfigure.y
+              , e.xconfigure.width 
+              , e.xconfigure.height 
+              ) );
 
-        rect old_rect(win->region().get());
-        rect new_rect( e.xconfigure.x
-            , e.xconfigure.y
-            , e.xconfigure.width 
-            , e.xconfigure.height );
 
-        win->region().set( new_rect );
-
-        bool move = old_rect.left != new_rect.left || old_rect.top != new_rect.top;
-        bool resize = old_rect.width != new_rect.width || old_rect.height != new_rect.height;
-
-        if( move || resize ) {
-          win->on_configure().emit( new_rect );
-
-          if( move ) {
-            win->on_move().emit(new_rect);
-          }
-          if( resize ) {
-            win->on_resize().emit(new_rect);
-            rect invalid_region(0,0,new_rect.width, new_rect.height);
-            win->on_draw().emit( win->screen_buffer(), invalid_region );
-            win->update_region( invalid_region );
-
-            XSync( display_, 1 ); // TODO: test if that stuff is still required! XSync could cause trouble with select
-            // maybe 0 is enough 
-            XFlush( display_ );
-          }
+        if( win->needs_update() ) {
+          win->on_resize().emit(new_rect);
+          rect invalid_region(win->get_invalid_area());
+          win->on_draw().emit( win->screen_buffer(), invalid_region );
+          win->update_region( invalid_region );
+          XSync( display_, 1 ); // TODO: test if that stuff is still required! XSync could cause trouble with select
+          XFlush( display_ );
         }
+
 
         break;
       }

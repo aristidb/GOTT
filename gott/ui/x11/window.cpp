@@ -169,6 +169,8 @@ window::window( uicontext& app, rect const& position, string const& title, std::
   if( flags & window_flags::Visible )
     visibility_.set(true);
   XFlush( context->get_display() );
+
+  invalidate_area( rect(0,0,position.width, position.height ) );
 }
 
 /**
@@ -202,26 +204,33 @@ rect window::get_region() const{
 void window::handle_resize( rect const& region ){
   XWindowAttributes attr;
   XGetWindowAttributes( context->get_display(), handle, &attr );
-          
-  if( region.left == attr.x
-      && region.top == attr.y 
-      && long(region.width) == attr.width
-      && long(region.height) == attr.height ) {
+
+  rect current( attr.x, attr.y, attr.width, attr.height );
+  if( region == current ) {
     impl->resize_buffer( region );
+    if( last_region != current ) {
+      invalidate_area(rect ( 0,0, current.width, current.height ) );
+      last_region = region;
+    }
   }
-  else  {
-    if( region.left == attr.x
-        && region.top == attr.y 
-        && ( long(region.width) != attr.width
-          || long(region.height) != attr.height ) )
-      XResizeWindow( context->get_display(), handle, region.width, region.height );
-    else if(( region.left == attr.x
-          || region.top == attr.y )
-        && long(region.width) == attr.width
-        && long(region.height) == attr.height )
-      XMoveWindow( context->get_display(), handle, region.left, region.top);
-    else
-      XMoveResizeWindow(context->get_display(), handle, region.left, region.top, region.width, region.height );
+  else if( region.left == current.left
+      && region.top == current.top
+      && ( region.width != current.width
+        || region.height != current.height ) ) {
+    XResizeWindow( context->get_display(), handle, region.width, region.height );
+    std::cout << "Sending Resize" << std::endl;
+  }
+  else if(( region.left != current.left
+        || region.top != current.top)
+      && region.width == current.width
+      && region.height == current.height ) {
+    std::cout << "region : " << region.left << "," << region.top << " vs current : " << current.left << "," << current.top << std::endl;
+    XMoveWindow( context->get_display(), handle, region.left, region.top);
+    std::cout << "Sending Move" << std::endl;
+  }
+  else {
+    XMoveResizeWindow(context->get_display(), handle, region.left, region.top, region.width, region.height );
+    std::cout << "Sending Move" << std::endl;
   }
 }
 
@@ -360,8 +369,9 @@ void window::update_region( rect const& region ){
       && region.height == impl->buffer.height() ) {
     impl->update_window();
   }
-  else
+  else {
     impl->update_rect( region );
+  }
 }
 
 uicontext* window::get_uicontext(){
@@ -369,7 +379,7 @@ uicontext* window::get_uicontext(){
 }
 
 bool window::needs_update() const{
-  return invalid_area.width == 0 || invalid_area.height == 0;
+  return invalid_area.width != 0 || invalid_area.height != 0;
 }
 rect window::get_invalid_area() const {
   return invalid_area;
