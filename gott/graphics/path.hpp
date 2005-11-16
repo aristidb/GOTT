@@ -105,6 +105,12 @@ public:
   GOTT_EXPORT void text(string const &txt, font const &style);
 
   // GOTT_EXPORT void glyphs(...);
+  
+  /**
+   * Transform the whole path.
+   * \param transf The transformations to apply.
+   */
+  GOTT_EXPORT void transform(transformations const &transf);
 };
 
 }}
