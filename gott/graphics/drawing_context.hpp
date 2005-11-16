@@ -63,8 +63,7 @@ public:
     operator_saturate
   };
 
-  virtual properties::property<compositing_operator_t> &compositing_operator() 
-    = 0;
+  properties::property<compositing_operator_t> &compositing_operator;
   
   /**
    * Draw a filled path.
@@ -93,6 +92,8 @@ public:
    */
   virtual void text(string const &text, font const &style, 
       transformations const &transf) = 0;
+
+  // virtual void glyphs(..) = 0;
 
   /**
    * Blit an image.

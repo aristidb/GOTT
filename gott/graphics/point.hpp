@@ -18,7 +18,19 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "path.hpp"
+#ifndef GOTT_GRAPHICS_POINT_HPP
+#define GOTT_GRAPHICS_POINT_HPP
 
-namespace graphics = gott::graphics;
-using graphics::path;
+namespace gott {
+namespace graphics {
+
+struct point {
+public:
+  point(double xx, double yy) : x(xx), y(yy) {}
+  double x;
+  double y;
+};
+
+}}
+
+#endif
