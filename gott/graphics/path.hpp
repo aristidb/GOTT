@@ -28,6 +28,7 @@ namespace gott {
 
 class string;
 class font;
+class transformations;
 
 namespace graphics {
 
