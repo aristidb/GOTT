@@ -193,7 +193,8 @@ rect window::get_region() const{
 void window::handle_sys_resize( rect const& region ){
   if( region != last_region ) {
     impl->resize_buffer( region );
-    invalidate_area(rect ( 0,0, region.width, region.height ) );
+    if( region.width != last_region.width || region.height != last_region.height )
+      invalidate_area(rect ( 0,0, region.width, region.height ) );
     last_region = region;
   }
 }
@@ -362,6 +363,10 @@ void window::set_size_hints(){
 }
 
 void window::update_region( rect const& region ){
+  if( needs_update() ) {
+    invalid_area.subtract_region( region );
+    on_draw().emit( screen_buffer(), region );
+  }
   if( region.left == 0 
       && region.top == 0  
       && region.width == impl->buffer.width()

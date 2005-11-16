@@ -109,10 +109,10 @@ void uicontext::process_event( window* win, XEvent& e ) {
       }
     case ButtonPress:
       {
-      mouse_.set_button( e.xbutton.button, true );
-      mouse_event ev( mouse_event::Press, e.xbutton.button, mouse_.get_primary_position(), mouse_.get_secondary_position());
-      win->on_mouse().emit( ev );
-      break;
+        mouse_.set_button( e.xbutton.button, true );
+        mouse_event ev( mouse_event::Press, e.xbutton.button, mouse_.get_primary_position(), mouse_.get_secondary_position());
+        win->on_mouse().emit( ev );
+        break;
       }
     case ButtonRelease:
       {
@@ -174,10 +174,10 @@ void uicontext::process_event( window* win, XEvent& e ) {
           rect inv(0,0,0,0);
           std::swap( inv, win->invalid_area );
           win->on_draw().emit( win->screen_buffer(), inv );
-          ///win->update_region( inv );
+          win->update_region( inv );
+          XSync( display_, 1); // TODO: test if that stuff is still required! XSync could cause trouble with select
+          XFlush( display_ );
         }
-
-
         break;
       }
     case Expose:
@@ -185,7 +185,7 @@ void uicontext::process_event( window* win, XEvent& e ) {
         // This is already in window coordinates
         rect region( e.xexpose.x, e.xexpose.y, e.xexpose.width,  e.xexpose.height );
         win->update_region( region );
-        XSync( display_, 0 ); // TODO: test if that stuff is still required! XSync could cause trouble with select
+        XSync( display_, 0); // TODO: test if that stuff is still required! XSync could cause trouble with select
         XFlush( display_ );
         break;
       }
@@ -245,6 +245,8 @@ void uicontext::process_read(){
       std::swap( inv, win->invalid_area );
       win->on_draw().emit( win->screen_buffer(), inv );
       win->update_region( inv );
+      XSync( display_, 1 );
+      XFlush( display_ );
     }
   }
 
