@@ -114,6 +114,8 @@ void select_loop::run(){
 
     if( next_event.tv_sec ||next_event.tv_usec ) 
       t = &next_event;
+    else
+      t = 0;
 
     n = callbacks.rbegin()->first + 1;
   }
