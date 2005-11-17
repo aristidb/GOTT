@@ -6,7 +6,7 @@
 #include <gott/ui/window_base.hpp>
 #include <gott/ui/x11/window.hpp>
 #include <gott/ui/x11/uicontext.hpp>
-#include <gott/util/string/string.hpp>
+#include <gott/string/string.hpp>
 #include <gott/base/events/select_loop.hpp>
 #include <agg_pixfmt_rgba.h>
 #include <agg_renderer_base.h>

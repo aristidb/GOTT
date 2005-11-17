@@ -22,10 +22,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <bitset>
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 #include <sigc++/signal.h>
-#include <gott/util/properties/property.hpp>
-#include <gott/util/string/string.hpp>
+#include <gott/properties/property.hpp>
+#include <gott/string/string.hpp>
 #include <gott/graphics/geometry.hpp>
 #include <gott/ui/input.hpp>
 

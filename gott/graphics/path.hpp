@@ -21,7 +21,7 @@
 #ifndef GOTT_GRAPHICS_PATH_HPP
 #define GOTT_GRAPHICS_PATH_HPP
 
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 #include "point.hpp"
 
 namespace gott {

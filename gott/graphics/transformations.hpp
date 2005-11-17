@@ -21,7 +21,7 @@
 #ifndef GOTT_GRAPHICS_TRANSFORMATIONS_HPP
 #define GOTT_GRAPHICS_TRANSFORMATIONS_HPP
 
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 
 namespace gott {
 namespace graphics {

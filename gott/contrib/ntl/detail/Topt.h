@@ -15,7 +15,7 @@
 
 // Changes (C) 2005 Aristid Breitkreuz, LGPL 2.1
 
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 
 template <class T>
 inline void Swap(T& a, T& b) { T tmp = a; a = b; b = tmp; }

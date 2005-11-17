@@ -21,8 +21,8 @@
 #ifndef GOTT_GRAPHICS_DRAWING_CONTEXT_HPP
 #define GOTT_GRAPHICS_DRAWING_CONTEXT_HPP
 
-#include <gott/util/visibility.hpp>
-#include <gott/util/properties/property.hpp>
+#include <gott/visibility.hpp>
+#include <gott/properties/property.hpp>
 
 namespace gott {
 

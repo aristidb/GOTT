@@ -21,7 +21,7 @@
 #ifndef GOTT_BASE_PLUGIN_QID_HPP
 #define GOTT_BASE_PLUGIN_QID_HPP
 
-#include <gott/util/string/atom.hpp>
+#include <gott/string/atom.hpp>
 
 namespace gott {
 namespace plugin {

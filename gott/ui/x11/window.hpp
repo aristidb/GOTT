@@ -29,9 +29,9 @@
 
 #include <gott/ui/window_base.hpp>
 #include <gott/ui/x11/uicontext.hpp>
-#include <gott/util/properties/concrete_property.hpp>
-#include <gott/util/properties/external_storage.hpp>
-#include <gott/util/properties/sigc_notification.hpp>
+#include <gott/properties/concrete_property.hpp>
+#include <gott/properties/external_storage.hpp>
+#include <gott/properties/sigc_notification.hpp>
 
 namespace gott{namespace ui{namespace x11{
 namespace detail { struct agg_buffer; }

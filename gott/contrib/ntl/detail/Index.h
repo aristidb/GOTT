@@ -17,7 +17,7 @@
 
 enum { UNSIGNED_HIBIT = 0x80000000 };
 
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 
 class GOTT_EXPORT HashBase : Moveable<HashBase> {
 	struct Link : Moveable<Link> {

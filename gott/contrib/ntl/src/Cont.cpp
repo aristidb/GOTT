@@ -17,7 +17,7 @@
 
 #include <ntl.h>
 
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 
 #ifdef _MSC_VER
 #pragma inline_depth(255)

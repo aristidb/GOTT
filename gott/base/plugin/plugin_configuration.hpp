@@ -21,7 +21,7 @@
 #ifndef GOTT_BASE_PLUGIN_PLUGIN_CONFIGURATION_HPP
 #define GOTT_BASE_PLUGIN_PLUGIN_CONFIGURATION_HPP
 
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {

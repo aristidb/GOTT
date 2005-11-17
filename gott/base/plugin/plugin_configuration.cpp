@@ -21,7 +21,7 @@
 #include "plugin_configuration.hpp"
 #include "qid.hpp"
 #include <boost/variant.hpp>
-#include <gott/util/xany/xany.hpp>
+#include <gott/xany/xany.hpp>
 
 using gott::plugin::plugin_configuration;
 using gott::plugin::hook;

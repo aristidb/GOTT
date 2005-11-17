@@ -26,7 +26,7 @@
 #include <queue>
 #include <sys/select.h> 
 #include <boost/function.hpp>
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 #include <gott/base/events/deadline_timer.hpp>
 
 

@@ -22,7 +22,7 @@
 #define GOTT_GRAPHICS_PATTERN_SOLID
 
 #include "pattern.hpp"
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 
 namespace gott {
 namespace graphics {

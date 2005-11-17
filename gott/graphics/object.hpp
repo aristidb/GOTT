@@ -21,7 +21,7 @@
 #ifndef GOTT_GRAPHICS_OBJECT_HPP
 #define GOTT_GRAPHICS_OBJECT_HPP
 
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 
 namespace gott {
 namespace graphics {

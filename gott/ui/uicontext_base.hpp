@@ -23,7 +23,7 @@
 
 
 #include <sigc++/signal.h>
-#include <gott/util/visibility.hpp>
+#include <gott/visibility.hpp>
 #include <gott/ui/input.hpp>
 #include <gott/ui/window_base.hpp>
 
