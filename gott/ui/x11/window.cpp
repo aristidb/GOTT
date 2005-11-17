@@ -219,7 +219,7 @@ void window::set_region( rect const& region ){
         || region.height != current.height ) ) {
     XResizeWindow( context->get_display(), handle, region.width, region.height );
     std::cout << "Sending Resize" << std::endl;
-  }
+  } 
   else if(( region.left != current.left
         || region.top != current.top)
       && region.width == current.width
@@ -232,6 +232,7 @@ void window::set_region( rect const& region ){
     XMoveResizeWindow(context->get_display(), handle, region.left, region.top, region.width, region.height );
     std::cout << "Sending Move" << std::endl;
   }
+  XSync( context->get_display(), 0 );
 }
 
 /**

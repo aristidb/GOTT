@@ -103,8 +103,10 @@ void select_loop::run(){
       && ( num_fd = select( n, &read_fds, &write_fds, &except_fds, t ) ) != -1 ) 
   {
     for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end(); num_fd && it!=e;++it)  {
-      if( FD_ISSET( it->first, &read_fds ) ) 
-        --num_fd,it->second.on_read();
+      if( FD_ISSET( it->first, &read_fds ) ) {
+        --num_fd;
+        it->second.on_read();
+      }
       if( FD_ISSET( it->first, &write_fds) ) 
         --num_fd,it->second.on_write();
       if( FD_ISSET( it->first, &except_fds) ) 
@@ -112,10 +114,12 @@ void select_loop::run(){
     }
     next_event = handle_timed_events();
 
-    if( next_event.tv_sec ||next_event.tv_usec ) 
+    if( next_event.tv_sec ||next_event.tv_usec )  {
       t = &next_event;
-    else
+    }
+    else {
       t = 0;
+    }
 
     n = callbacks.rbegin()->first + 1;
   }
