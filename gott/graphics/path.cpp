@@ -23,6 +23,7 @@
 #include "transformations.hpp"
 #include <gott/string/string.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <ntl.h>
 
 using gott::string;
 namespace graphics = gott::graphics;
@@ -34,6 +35,10 @@ struct path::node {
   virtual node *append(node *other);
   virtual node *clone() = 0;
 };
+
+typedef boost::scoped_ptr<path::node> node_p;
+NTL_MOVEABLE(node_p);
+
 path::~path() { delete head; }
 path::path(path const &o) : head(o.head->clone()) {}
 
@@ -44,16 +49,29 @@ struct concrete_node : path::node {
   path::node *clone() { return new T(static_cast<T &>(*this)); }
 };
 
-struct append : concrete_node<append> {
-  append(path::node *l, path::node *r) : left(l), right(r) {}
-  append(append const &o) 
-  : concrete_node<append>(), left(o.left->clone()), right(o.right->clone()) {}
-  boost::scoped_ptr<path::node> left, right;  
+struct appended : concrete_node<appended> {
+  typedef Vector<node_p > children_list;
+  appended(children_list const &c) : children(c) {}
+  appended(appended const &o) : concrete_node<appended>() {
+    children.AddN(o.children.GetCount());
+    for (int i = 0; i < o.children.GetCount(); ++i) // FIXME/ALERT: int
+      children[i].reset(o.children[i]->clone());
+  }
+  path::node *append(path::node *other) {
+    children.Add().reset(other);
+    return this;
+  }
+  children_list children;
 };
+
 }
 
 path::node *path::node::append(node *other) {
-  return new ::append(this, other);
+  ::appended::children_list c;
+  c.AddN(2);
+  c[0].reset(this);
+  c[1].reset(other);
+  return new ::appended(c);
 }
 
 path &path::operator+=(path const &o) {
@@ -142,7 +160,7 @@ struct transform : concrete_node<transform> {
   transform(transform const &o)
   : concrete_node<transform>(), transf(o.transf), child(o.child->clone()) {}
   transformations transf;
-  boost::scoped_ptr<path::node> child;
+  node_p child;
 };
 }
 
