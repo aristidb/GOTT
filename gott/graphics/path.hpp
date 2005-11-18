@@ -27,10 +27,11 @@
 namespace gott {
 
 class string;
-class font;
-class transformations;
 
 namespace graphics {
+
+class font;
+class transformations;
 
 /**
  * A graphical path.
@@ -62,7 +63,7 @@ public:
    * \param angle2 The stopping angle of the arc. If angle2 < angle1, angle2 
    *               will be increased by 2 * PI until angle2 >= angle1.
    */
-  GOTT_EXPORT void arc_p(point const &center, double radius, 
+  GOTT_EXPORT path &arc_p(point const &center, double radius, 
       double angle1, double angle2);
 
   /**
@@ -74,7 +75,7 @@ public:
    * \param angle2 The stopping angle of the arc. If angle2 > angle1, angle2 
    *               will be decreased by 2 * PI until angle2 <= angle1.
    */
-  GOTT_EXPORT void arc_negative_p(point const &center, double radius, 
+  GOTT_EXPORT path &arc_negative_p(point const &center, double radius, 
       double angle1, double angle2);
 
   /**
@@ -84,34 +85,40 @@ public:
    * \param c2 The scond control point.
    * \param e The end point.
    */
-  GOTT_EXPORT void curve_to_p(point const &c1, point const &c2, point const &e);
+  GOTT_EXPORT path &curve_to_p(point const &c1, point const &c2, point const &e);
 
   /**
    * Adds a line from the old current point to the new.
    * \param p The new current point.
    */
-  GOTT_EXPORT void line_to(point const &p);
+  GOTT_EXPORT path &line_to(point const &p);
 
   /**
    * Change the current point. This will create a new subpath if necessary.
    * \param p The new current point.
    */
-  GOTT_EXPORT void move_to(point const &p);
+  GOTT_EXPORT path &move_to(point const &p);
 
   /**
    * Add the outlines of a text to the path.
    * \param txt The text to get the outline from.
    * \param style The text's font.
    */
-  GOTT_EXPORT void text(string const &txt, font const &style);
+  GOTT_EXPORT path &text(string const &txt, font const &style);
 
-  // GOTT_EXPORT void glyphs(...);
+  // GOTT_EXPORT path &glyphs(...);
   
   /**
    * Transform the whole path.
    * \param transf The transformations to apply.
    */
-  GOTT_EXPORT void transform(transformations const &transf);
+  GOTT_EXPORT path &transform(transformations const &transf);
+
+public: // implementation
+  struct node;
+
+private:
+  node *head;
 };
 
 }}
