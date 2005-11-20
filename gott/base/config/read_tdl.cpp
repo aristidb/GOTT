@@ -45,10 +45,7 @@ match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra,
 : schema::happy_once(ra, m) {
   for (Vector<schema::rule_t>::const_iterator it = o_children.begin(); 
       it != o_children.end(); ++it)
-    if (it->attributes().user().compatible<string>())
-      children.Add(xany::Xany_cast<string>(it->attributes().user()), *it);
-    else
-      children.Add(it->attributes().tags()[0], *it);
+    children.Add(it->attributes().tags()[0], *it);
 }
 
 bool match_config_tdl::play(ev::down const &) {

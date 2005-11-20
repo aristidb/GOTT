@@ -75,7 +75,15 @@ template<class T> struct range_t {
     return Begin;
   }
 
+  value_type &begin() {
+    return Begin;
+  }
+
   value_type end() const {
+    return End;
+  }
+
+  value_type &end() {
     return End;
   }
 
@@ -94,7 +102,7 @@ template<class T> struct range_t {
    * Check if the range is empty.
    */
   bool empty() const {
-    return Begin == End;
+    return begin() == end();
   }
 };
 
