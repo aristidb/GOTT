@@ -1,3 +1,5 @@
+import os
+
 cppdef = Split(ARGUMENTS.get('def', ''))
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
 cflags = Split(ARGUMENTS.get('cflags', ''))
@@ -27,6 +29,7 @@ if cflagsoverride:
 	cflags = cflagsoverride
 
 env = Environment(
+  ENV = os.environ, # FIXME: security hole?
   CXX = cxx, 
   CCFLAGS = cflags, 
   CPPPATH=['#/..', '#/contrib/ntl'], 
