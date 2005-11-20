@@ -36,6 +36,6 @@ atom::atom(atom const &o) : string(o) {}
 atom::~atom() {}
 
 bool gott::operator==(atom const &a, atom const &b) {
-  return a.as_utf8().begin == b.as_utf8().begin; // same memory
+  return a.as_utf8().begin() == b.as_utf8().begin(); // same memory
 }
 

@@ -17,8 +17,8 @@ void print(string const &n) {
 #ifndef NO_STDLIB
   cerr << n;
 #else
-  for (string::utf8_range r = n.as_utf8(); !r.empty(); ++r.begin)
-    std::cerr << *r.begin;
+  for (string::utf8_range r = n.as_utf8(); !r.empty(); ++r.begin())
+    std::cerr << *r.begin();
 #endif
 }
 
@@ -43,7 +43,7 @@ int main() {
   b.erase(range(b.begin() + 2, 4));
   range_t<wchar_t const *> r = zero_terminated(L"test ");
 #ifdef NO_STDLIB
-  std::copy(r.begin, r.end, b.insert(b.begin(), r.size()).begin);
+  std::copy(r.begin(), r.end(), b.insert(b.begin(), r.size()).begin());
 #else
   copy(r, b.insert(b.begin(), r.size()));
 #endif

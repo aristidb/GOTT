@@ -243,7 +243,7 @@ void window::set_title( gott::string const& str ){
   title_string = str;
   // convert the string we got to a text property
   XTextProperty property;
-  char *a = const_cast<char*>(reinterpret_cast<char const*>(str.as_utf8().begin ) );
+  char *a = const_cast<char*>(reinterpret_cast<char const*>(str.as_utf8().begin() ) );
 
   if( XmbTextListToTextProperty( context->get_display(), &a, 1, XTextStyle , &property ) != Success )
     return;

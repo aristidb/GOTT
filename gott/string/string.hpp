@@ -154,14 +154,14 @@ public:
   template<class I>
   GOTT_LOCAL string(range_t<I> const &r, concat_tag) {
     std::size_t size = 0;
-    for (I it = r.begin; it != r.end; ++it)
+    for (I it = r.Begin; it != r.End; ++it)
       size += it->size();
     utf8_t *current = new utf8_t[size];
     set_up(range(current, size), true);
-    for (I it = r.begin; it != r.end; ++it) {
+    for (I it = r.Begin; it != r.End; ++it) {
       utf8_range r = it->as_utf8();
       while (!r.empty())
-        *current++ = *r.begin++;
+        *current++ = *r.Begin++;
     }
   }
 
@@ -323,7 +323,7 @@ inline bool operator>=(string const &a, string const &b) {
 template<>
 inline unsigned GetHashValue(gott::string const &s) {
   gott::range_t<gott::utf8_t const *> r = s.as_utf8();
-  return memhash(r.begin, r.size());
+  return memhash(r.Begin, r.size());
 }
 #endif
 

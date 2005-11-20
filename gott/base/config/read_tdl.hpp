@@ -24,6 +24,8 @@
 #include <gott/tdl/schema/item.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/rule_attr.hpp>
+#include <gott/tdl/schema/happy_once.hpp>
+#include <ntl.h>
 
 namespace gott {
 namespace config {
@@ -35,9 +37,9 @@ namespace config {
  * format:
  * sub-qid {%follow% {%ordered% sub-qid}} data
  */
-class match_config : tdl::schema::item {
+class match_config_tdl : public tdl::schema::happy_once {
 public:
-  match_config(tdl::schema::rule_attr_t const &, 
+  match_config_tdl(tdl::schema::rule_attr_t const &, 
       Vector<tdl::schema::rule_t> const &, 
       tdl::schema::match &);
 
@@ -51,7 +53,12 @@ private:
   bool play(tdl::schema::ev::up const &);
   bool play(tdl::schema::ev::node const &);
   bool play(tdl::schema::ev::child_succeed const &);
+
   string name() const;
+
+  VectorMap<string, tdl::schema::rule_t> children;
+  string current_id;
+  int level;
 };
 
 }}

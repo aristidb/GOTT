@@ -70,7 +70,7 @@ public:
   string_buffer(range_t<utf32_t const *> const &x) : data(0) {
     string_buffer empty;
     this->swap(empty);
-    insert(end(), x.begin, x.end);
+    insert(end(), x.begin(), x.end());
   }
 
   /// Destructor.
@@ -164,7 +164,7 @@ public:
 #else
     std::size_t len = b - a;
 #endif
-    iterator out = insert(pos, len).begin;
+    iterator out = insert(pos, len).Begin;
     while (a != b)
       *out++ = *a++;
   }
@@ -189,7 +189,7 @@ public:
   void operator+=(string_buffer const &sb) GOTT_EXPORT;
 
   void operator+=(utf32_t ch) GOTT_LOCAL {
-    *append(1).begin = ch;
+    *append(1).Begin = ch;
   }
 
 private:

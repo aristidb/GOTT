@@ -87,16 +87,16 @@ std::size_t gott::utf8_len(range_t<char const *> const &in, encoding enc) {
     return in.size();
   case utf32: {
     range_t<utf32_t const *> uss = in.cast<utf32_t const *>();
-    utf32_t const *us = uss.begin;
+    utf32_t const *us = uss.begin();
     std::size_t result = 0;
-    for (; us < uss.end; ++us)
+    for (; us < uss.end(); ++us)
       result += utf8_len(*us);
     return result;
   }
   default: {
-    char const *current = in.begin, *next;
+    char const *current = in.begin(), *next;
     std::size_t result = 0;
-    while (current < in.end) {
+    while (current < in.end()) {
       wchar_t ch = to_utf32_char(current, next, enc);
       result += utf8_len(ch);
       current = next;
@@ -157,14 +157,14 @@ gott::to_utf8_alloc(range_t<char const *> const &in, encoding enc) {
 
   if (enc == utf8) {
     utf8_t *out = result;
-    for (char const *it = in.begin; it != in.end; ++it)
+    for (char const *it = in.begin(); it != in.end(); ++it)
       *out++ = *it;
     return range(result, result + len);
   }
 
   utf8_t *out = result;
-  char const *current = in.begin, *next;
-  while (current < in.end) {
+  char const *current = in.begin(), *next;
+  while (current < in.end()) {
     write_utf32_to_utf8(to_utf32_char(current, next, enc), out);
     current = next;
   }
@@ -175,7 +175,7 @@ gott::range_t<char *>
 gott::to_enc_alloc(range_t<utf8_t const *> const &in_, encoding enc) {
   if (enc == utf8) {
     utf8_t *result = new utf8_t[in_.size()], *out = result;
-    for (utf8_t const *it = in_.begin; it != in_.end; ++it)
+    for (utf8_t const *it = in_.begin(); it != in_.end(); ++it)
       *out++ = *it;
     return range(result, in_.size()).cast<char *>();
   }
@@ -183,12 +183,12 @@ gott::to_enc_alloc(range_t<utf8_t const *> const &in_, encoding enc) {
   range_t<utf8_iterator> in = in_.cast<utf8_iterator>();
 
   std::size_t len = 0;
-  for (utf8_iterator it = in.begin; it < in.end; ++it)
+  for (utf8_iterator it = in.begin(); it < in.end(); ++it)
     len += enc_len(*it, enc);
 
   char *result = new char[len];
   char *out = result;
-  for (utf8_iterator it = in.begin; it < in.end; ++it)
+  for (utf8_iterator it = in.begin(); it < in.end(); ++it)
     write_utf32_to_enc(*it, out, enc);
   return range(result, out);
 }

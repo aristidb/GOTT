@@ -40,7 +40,7 @@ using gott::range_t;
 class string::representation {
 public:
   representation(range_t<utf8_t const *> d, bool o = true)
-  : ref_count(1), size(d.size()), length(0), owned(o), data(d.begin) {}
+  : ref_count(1), size(d.size()), length(0), owned(o), data(d.begin()) {}
 
   enum foreign_tag { foreign_copy };
 
@@ -48,7 +48,7 @@ public:
   : ref_count(1), size(x.size()), length(0), owned(true),
       data(new utf8_t[x.size()]) {
     utf8_t *out = const_cast<utf8_t *>(data);
-    for (utf8_t const *it = x.begin; it != x.end; ++it)
+    for (utf8_t const *it = x.begin(); it != x.end(); ++it)
       *out++ = *it;
   }
 
@@ -101,38 +101,38 @@ std::size_t string::length() const {
 
 #ifndef NO_STDLIB
 std::ostream &gott::operator<<(std::ostream &stream, string const &s) {
-  for (utf8_t const *it = s.as_utf8().begin; it < s.as_utf8().end; ++it)
+  for (utf8_t const *it = s.as_utf8().begin(); it < s.as_utf8().end(); ++it)
     stream << char(*it);
   return stream;
 }
 
 std::wostream &gott::operator<<(std::wostream &stream, string const &s) {
-  for (utf8_iterator it = s.as_utf32().begin; it < s.as_utf32().end; ++it)
+  for (utf8_iterator it = s.as_utf32().begin(); it < s.as_utf32().end(); ++it)
     stream << wchar_t(*it);
   return stream;
 }
 #endif
 
 bool gott::operator==(string const &a, string const &b) {
-  if (a.as_utf8().begin == b.as_utf8().begin)
+  if (a.as_utf8().begin() == b.as_utf8().begin())
     return true;
   return a.as_utf8() == b.as_utf8();
 }
 
 int gott::compare(string const &a, string const &b) {
-  if (a.as_utf8().begin == b.as_utf8().begin)
+  if (a.as_utf8().begin() == b.as_utf8().begin())
     return 0;
 
-  utf8_t const *p1 = a.as_utf8().begin;
-  utf8_t const *p2 = b.as_utf8().begin;
-  for (; p1 != a.as_utf8().end && p2 != b.as_utf8().end; ++p1, ++p2)
+  utf8_t const *p1 = a.as_utf8().begin();
+  utf8_t const *p2 = b.as_utf8().begin();
+  for (; p1 != a.as_utf8().end() && p2 != b.as_utf8().end(); ++p1, ++p2)
     if (*p1 != *p2)
       break;
-  if (p1 == a.as_utf8().end) {
-    if (p2 == b.as_utf8().end)
+  if (p1 == a.as_utf8().end()) {
+    if (p2 == b.as_utf8().end())
       return 0;
     return 1;
-  } else if (p2 == b.as_utf8().end)
+  } else if (p2 == b.as_utf8().end())
     return -1;
   
   return *p2 - *p1;

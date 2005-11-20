@@ -78,13 +78,13 @@ std::size_t string_buffer::size() const {
 }
 
 string_buffer::iterator string_buffer::erase(range_t<iterator> const &r) {
-  iterator a = r.begin;
-  iterator b = r.end;
+  iterator a = r.begin();
+  iterator b = r.end();
 
   while (b != data->end)
     *a++ = *b++;
   data->end = a;
-  return r.begin;
+  return r.begin();
 }
 
 gott::range_t<string_buffer::iterator>
@@ -103,12 +103,12 @@ string_buffer::insert(iterator p, std::size_t len) {
 }
 
 void string_buffer::operator+=(string const &s) {
-  utf8_iterator in = s.as_utf32().begin;
-  for (iterator pos = append(s.length()).begin; pos != end(); ++pos)
+  utf8_iterator in = s.as_utf32().begin();
+  for (iterator pos = append(s.length()).begin(); pos != end(); ++pos)
     *pos = *in++;
 }
 
 void string_buffer::operator+=(string_buffer const &sb) {
   range_t<const_iterator> r = range(sb);
-  insert(end(), r.begin, r.end);
+  insert(end(), r.begin(), r.end());
 }

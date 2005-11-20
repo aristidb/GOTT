@@ -176,8 +176,8 @@ void exec_parse::normal_line(string const &s) {
   while (!unread.empty()) {
     skip_whitespace(unread);
   
-    if (*unread.begin == '#') {
-      ++unread.begin;
+    if (*unread.begin() == '#') {
+      ++unread.Begin;
       string y(unread);
       ln.new_char();
       ln.start_token();
@@ -193,7 +193,7 @@ void exec_parse::normal_line(string const &s) {
       parse.down();
     }
   
-    if (*unread.begin == '`') {
+    if (*unread.begin() == '`') {
       block();
       break;
     }
@@ -204,10 +204,10 @@ void exec_parse::normal_line(string const &s) {
     skip_whitespace(unread);
     
     ln.start_token();
-    if (!unread.empty() && *unread.begin == ',') {
+    if (!unread.empty() && *unread.begin() == ',') {
       ln.new_char();
       ln.end_token(L",");
-      ++unread.begin;
+      ++unread.Begin;
       to_down = false;
     } else
       to_down = true;
@@ -267,9 +267,9 @@ void exec_parse::block() {
 }
 
 void exec_parse::skip_whitespace(string::utf8_range &unread) {
-  while (!unread.empty() && *unread.begin == ' ') {
+  while (!unread.empty() && *unread.begin() == ' ') {
     ln.new_char();
-    ++unread.begin;
+    ++unread.Begin;
   }
 }
 
@@ -281,19 +281,19 @@ string exec_parse::read_quoted(string::utf8_range &unread) {
   string::utf8_range whole = unread;
   bool double_dquote = true;
   do {
-    while (!unread.empty() && *unread.begin != '"')
-      ++unread.begin;
-    if (++unread.begin >= unread.end)
+    while (!unread.empty() && *unread.begin() != '"')
+      ++unread.Begin;
+    if (++unread.Begin >= unread.end())
       break;
-    double_dquote = *unread.begin++ == L'"';
+    double_dquote = *unread.Begin++ == L'"';
   } while (double_dquote);
-  unread.begin -= 1 + !double_dquote; // double_dquote still set if break was executed
+  unread.Begin -= 1 + !double_dquote; // double_dquote still set if break was executed
 
-  ln.add_char(unread.begin - whole.begin + 1);
+  ln.add_char(unread.begin() - whole.begin() + 1);
 
-  ln.end_token(range(whole.begin - 1, ++unread.begin));
+  ln.end_token(range(whole.begin() - 1, ++unread.Begin));
   
-  gott::string_buffer s = string(range(whole.begin, unread.begin - 1));
+  gott::string_buffer s = string(range(whole.begin(), unread.begin() - 1));
   static const string two_quote("\"\""), one_quote("\"");
   boost::algorithm::replace_all(s, two_quote.as_utf32(), one_quote.as_utf32());
  
@@ -314,12 +314,12 @@ string exec_parse::read_paren(string::utf8_range &unread) {
     }
   } balance;
 
-  ++unread.begin; // skip (
+  ++unread.Begin; // skip (
 
-  for (; !unread.empty() && !balance; ++unread.begin) 
-    balance(*unread.begin);
+  for (; !unread.empty() && !balance; ++unread.Begin) 
+    balance(*unread.begin());
 
-  gott::string_buffer result = string(range(whole.begin, unread.begin));
+  gott::string_buffer result = string(range(whole.begin(), unread.begin()));
   if (unread.empty() && !balance) { // multi-line
     result += L'\n';
     wchar_t c;
@@ -337,19 +337,19 @@ string exec_parse::read_paren(string::utf8_range &unread) {
 string exec_parse::read_string(string::utf8_range &unread) {
   ln.start_token();
   
-  if (*unread.begin == '"') {
-    ++unread.begin;
+  if (*unread.begin() == '"') {
+    ++unread.Begin;
     return read_quoted(unread);
-  } else if (*unread.begin == '(')
+  } else if (*unread.begin() == '(')
     return read_paren(unread);
 
-  string::utf8_range::value_type start = unread.begin;
-  while (!unread.empty() && !border(*unread.begin))
-    ++unread.begin;
+  string::utf8_range::value_type start = unread.begin();
+  while (!unread.empty() && !border(*unread.begin()))
+    ++unread.Begin;
   
-  ln.add_char(unread.begin - start);
+  ln.add_char(unread.begin() - start);
 
-  string out(range(start, unread.begin));
+  string out(range(start, unread.begin()));
   ln.end_token(out);
   return out;
 }

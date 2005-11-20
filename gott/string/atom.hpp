@@ -57,7 +57,7 @@ inline bool operator!=(atom const &a, atom const &b) {
 
 template<>
 inline unsigned GetHashValue(gott::atom const &a) {
-  return GetHashValue(a.as_utf8().begin);
+  return GetHashValue(a.as_utf8().Begin);
 }
 
 #endif

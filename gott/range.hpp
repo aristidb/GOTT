@@ -40,35 +40,43 @@ template<class T> struct range_t {
   /**
    * Iterator to start of the range.
    */
-  value_type begin;
+  value_type Begin;
 
   /**
    * Iterator to after the end of the range.
    */
-  value_type end;
+  value_type End;
 
   /**
    * Construct range from two iterators.
    */
-  range_t(value_type const &a, value_type const &b) : begin(a), end(b) {}
+  range_t(value_type const &a, value_type const &b) : Begin(a), End(b) {}
 
   /**
    * Construct range from range of implicitly convertible type.
    */
   template<class U>
-  range_t(range_t<U> const &o) : begin(o.begin), end(o.end) {}
+  range_t(range_t<U> const &o) : Begin(o.Begin), End(o.End) {}
 
   /**
    * Cast range to range of another type.
    */
   template<class U>
   range_t<U> cast() const {
-    return range_t<U>(U(begin), U(end));
+    return range_t<U>(U(Begin), U(End));
   }
 
   template<class Result, class U> 
   range_t<Result> call(U method) const {
-    return range_t<Result>((begin.*method)(), (end.*method)());
+    return range_t<Result>((Begin.*method)(), (End.*method)());
+  }
+
+  value_type begin() const {
+    return Begin;
+  }
+
+  value_type end() const {
+    return End;
   }
 
   /**
@@ -76,9 +84,9 @@ template<class T> struct range_t {
    */
   std::size_t size() const {
 #ifndef NO_STDLIB
-    return std::distance(begin, end);
+    return std::distance(Begin, End);
 #else
-    return end - begin;
+    return End - Begin;
 #endif
   }
 
@@ -86,7 +94,7 @@ template<class T> struct range_t {
    * Check if the range is empty.
    */
   bool empty() const {
-    return begin == end;
+    return Begin == End;
   }
 };
 
@@ -96,12 +104,12 @@ template<class T> struct range_t {
  */
 template<class T, class U>
 bool operator==(range_t<T> a, range_t<U> b) {
-  if (a.begin == b.begin)
-    return a.end == b.end;
+  if (a.begin() == b.begin())
+    return a.end() == b.end();
   if (a.size() != b.size())
     return false;
-  for (; a.begin != a.end; ++a.begin, ++b.begin)
-    if (*a.begin != *b.begin)
+  for (; a.Begin != a.End; ++a.Begin, ++b.Begin)
+    if (*a.Begin != *b.Begin)
       return false;
   return true;
 }
@@ -118,29 +126,13 @@ bool operator!=(range_t<T> const &a, range_t<U> const &b) {
 template<class Ch, class ChT, class T>
 std::basic_ostream<Ch, ChT> &
 operator<<(std::basic_ostream<Ch, ChT> &s, range_t<T> const &r) {
-  T i = r.begin;
+  T i = r.Begin;
   s << *i++;
-  for (; i != r.end; ++i)
+  for (; i != r.End; ++i)
     s << ' ' << *i;
   return s;
 }
 #endif
-
-/**
- * Return the begin of a range.
- * @see range_t::begin
- */
-template<class I> I begin(range_t<I> const &x) {
-  return x.begin;
-}
-
-/**
- * Return the end of a range.
- * @see range_t::end
- */
-template<class I> I end(range_t<I> const &x) {
-  return x.end;
-}
 
 /**
  * Build range from two iterators.
@@ -224,7 +216,7 @@ range_t<typename T::const_iterator> const_range(T const &c) {
  */
 template<class T, class S>
 range_t<T> offset(range_t<T> const &o, S a, S b = S()) {
-  return range(advanced(o.begin, a), advanced(o.end, b));
+  return range(advanced(o.begin(), a), advanced(o.end(), b));
 }
 
 /**
@@ -256,11 +248,6 @@ range_t<I> zero_terminated(I start) {
   return value_terminated(start, 0);
 }
 
-}
-
-namespace boost {
-  using gott::begin;
-  using gott::end;
 }
 
 #endif

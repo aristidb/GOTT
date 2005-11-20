@@ -222,7 +222,7 @@ void match::IMPL::handle_token(T const &e) {
   shadow_names.clear();
   range_t<Stack::iterator> in = range(parse);
   while (!in.empty())
-    shadow_names.Add(get_name(*in.begin++->the_item));
+    shadow_names.Add(get_name(*in.Begin++->the_item));
 
   if (miss) {    
     real_parental_requirement();
@@ -348,8 +348,8 @@ string match::IMPL::get_name(item const &rl) {
   if (rl.attributes().tags().GetCount() > 0) {
     out.Add(s_open);
     range_t<string const *> r = range(rl.attributes().tags());
-    out.Add(*r.begin);
-    for (string const *it = r.begin + 1; it != r.end; ++it) {
+    out.Add(*r.begin());
+    for (string const *it = r.begin() + 1; it != r.end(); ++it) {
       out.Add(sep);
       out.Add(*it);
     }

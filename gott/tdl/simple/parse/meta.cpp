@@ -69,15 +69,15 @@ void meta_parser::parse(std::wistream &in, line_logger *) {
 
 void meta_parser::IMPL::exec(string const &line_) {
   string::utf32_range line = line_.as_utf32();
-  utf8_iterator pos = line.begin;
-  for (; pos != line.end; ++pos)
+  utf8_iterator pos = line.begin();
+  for (; pos != line.end(); ++pos)
     if (*pos == L' ')
       break;
   
-  string cmd(range(line.begin, pos));
-  while (*pos == L' ' && ++pos != line.end)
+  string cmd(range(line.begin(), pos));
+  while (*pos == L' ' && ++pos != line.end())
     ;
-  string param(range(pos, line.end));
+  string param(range(pos, line.end()));
 
   int i = cb.Find(cmd);
 

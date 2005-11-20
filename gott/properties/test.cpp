@@ -83,7 +83,7 @@ int main() {
   w.set(string("Hallo"));
   c.unblock();
   utf32_t const *add = (utf32_t const*)L" Welt!";
-  std::copy(add, add + 6, w.read_write()->append(6).begin);
+  std::copy(add, add + 6, w.read_write()->append(6).begin());
   cout << w.get() << endl;
 
   vobserve V;

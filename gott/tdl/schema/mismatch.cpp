@@ -41,11 +41,11 @@ static string build_string(schema::detail::stream_position const &p,
   out.Add(*thunk<gott::utf8_t, integer_to_string>(p.pos + 1));
   out.Add(" : mismatch in ");
   gott::range_t<string const *> tg = range(t);
-  if (tg.begin != tg.end)
-    out.Add(*tg.begin++);
-  for (; tg.begin != tg.end; ++tg.begin) {
+  if (tg.begin() != tg.end())
+    out.Add(*tg.Begin++);
+  for (; tg.begin() != tg.end(); ++tg.Begin) {
     out.Add(">");
-    out.Add(*tg.begin);
+    out.Add(*tg.begin());
   }
   if (p.line_new > p.line || p.current > p.native_end)
     out.Add(" after token ");

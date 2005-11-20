@@ -57,21 +57,21 @@ repatch_integer::deferred_write(writable_structure &s) const {
       if (rng.empty())
         return false;
 
-      if (*rng.begin == L'-') {
-        ++rng.begin;
+      if (*rng.begin() == L'-') {
+        ++rng.begin();
         sign = -1;
         if (rng.empty())
           return false;
       }
   
-      if (!std::iswdigit(*rng.begin))
+      if (!std::iswdigit(*rng.begin()))
         return false;
     
 //    if (*it == L'0' && it[1] == L'x')
 //      return is_hex(it + 2, s.end(), v, sign)
 
-      for (; !rng.empty() && std::iswdigit(*rng.begin); ++rng.begin)
-        val = val * 10 + (*rng.begin - L'0');
+      for (; !rng.empty() && std::iswdigit(*rng.begin()); ++rng.begin())
+        val = val * 10 + (*rng.begin() - L'0');
 
       val *= sign;
       return true;

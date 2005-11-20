@@ -32,13 +32,13 @@ namespace gott {
 #define GOTT_A_R1(A, R) \
   template<class I1> \
   R A(range_t<I1> const &r) { \
-    return std::A(r.begin, r.end); \
+    return std::A(r.begin(), r.end()); \
   }
 
 #define GOTT_A_R1_P1(A, R) \
   template<class I1, class I2> \
   R A(range_t<I1> const &r, I2 x) { \
-    return std::A(r.begin, r.end, x); \
+    return std::A(r.begin(), r.end(), x); \
   }
 
 #define GOTT_A_R1_P01(A, R) \
@@ -48,13 +48,13 @@ namespace gott {
 #define GOTT_A_R2(A, R) \
   template<class I1, class I2> \
   R A(range_t<I1> const &r1, range_t<I2> const &r2) { \
-    return std::A(r1.begin, r1.end, r2.begin, r2.end); \
+    return std::A(r1.begin(), r1.end(), r2.begin(), r2.end()); \
   }
 
 #define GOTT_A_R2_P1(A, R) \
   template<class I1, class I2, class I3> \
   R A(range_t<I1> const &r1, range_t<I2> const &r2, I3 x) { \
-    return std::A(r1.begin, r1.end, r2.begin, r2.end, x); \
+    return std::A(r1.begin(), r1.end(), r2.begin(), r2.end(), x); \
   }
 
 #define GOTT_A_R2_P01(A, R) \
@@ -64,14 +64,14 @@ namespace gott {
 #define GOTT_A_R2I(A, R) \
   template<class I1, class I2> \
   R A(range_t<I1> const &r1, range_t<I2> const &r2) { \
-    return std::A(r1.begin, r1.end, r2.begin); \
+    return std::A(r1.begin(), r1.end(), r2.begin()); \
   } \
   GOTT_A_R1_P1(A, R)
 
 #define GOTT_A_R2I_P1(A, R) \
   template<class I1, class I2, class I3> \
   R A(range_t<I1> const &r1, range_t<I2> const &r2, I3 x) { \
-    return std::A(r1.begin, r1.end, r2.begin, x); \
+    return std::A(r1.begin(), r1.end(), r2.begin(), x); \
   }
 
 #define GOTT_A_R2I_P01(A, R) \
