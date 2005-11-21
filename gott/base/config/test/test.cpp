@@ -42,4 +42,5 @@ int main() {
   m.parse(std::wcin);
   structure::direct_print<char> wrt(std::cout);
   out.copy_to(wrt);
+  std::cout << '\n';
 }

@@ -25,6 +25,8 @@
 #include <boost/algorithm/string.hpp>
 #include <gott/range.hpp>
 
+#include <iostream>
+
 using gott::string;
 namespace config = gott::config;
 namespace schema = gott::tdl::schema;
@@ -42,39 +44,71 @@ struct config_type {
 match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra, 
     Vector<schema::rule_t> const &o_children, 
     schema::match &m) 
-: schema::happy_once(ra, m) {
+: schema::item(ra, m), next_child(-1) {
   for (Vector<schema::rule_t>::const_iterator it = o_children.begin(); 
       it != o_children.end(); ++it)
     children.Add(it->attributes().tags()[0], *it);
 }
 
 bool match_config_tdl::play(ev::down const &) {
-  current_id = current_id + "::";
-  ++level;
+  if (next_child >= 0 && !dirty)
+    matcher().add(children[next_child]);
+  else
+    current_id = current_id + "::";
+
+  std::cout << "down => " << current_id << std::endl;
+
   return true;
 }
 
 bool match_config_tdl::play(ev::up const &) {
-  {
-    range_t<utf8_t const *> in = current_id.as_utf8();
-    utf8_t const *it = 
-      boost::algorithm::find_last(in, "::").end();
-    current_id = range(current_id.as_utf8().Begin, it);
+  std::cout << "up => ";
+  if (next_child < 0) {
+    std::cout << '$' << current_id << std::endl;
+    return false;
   }
-  --level;
+
+  dirty = false;
+
+  current_id = offset(current_id.as_utf8(), 0, -add_len.Top());
+  add_len.Pop();
+  
+  std::cout << current_id << std::endl;
+  
   return true;
 }
 
 bool match_config_tdl::play(ev::node const &n) {
-  current_id = current_id + n.get_data();
-  int no = children.Find(current_id);
-  if (no >= 0)
-    matcher().add(children[no]);
+  if (current_id == string()) {
+    current_id = n.get_data();
+    add_len.Add(current_id.size());
+  } else {
+    current_id = current_id + n.get_data();
+    add_len.Add(n.get_data().size() + 2);
+  }
+
+  std::cout << "node => " << current_id << std::endl;
+  
+  next_child = children.Find(current_id);
+
   return true;
 }
 
 bool match_config_tdl::play(ev::child_succeed const &) {
+  dirty = true;
+  std::cout << "child_succeed => " << current_id << std::endl;
   return true;
+}
+
+schema::item::expect match_config_tdl::expectation() const {
+  if (next_child < 0)
+    if (current_id == string())
+      return maybe;
+    else
+      return need;
+  if (current_id == string())
+    return nothing;
+  return maybe;
 }
 
 string match_config_tdl::name() const {
