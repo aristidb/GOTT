@@ -1,5 +1,5 @@
 // Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
-// Content: Non-immediate graphics library
+// Content: Program configuration library
 // Authors: Aristid Breitkreuz
 //
 // This file is part of the Gott Project (http://gott.sf.net)
