@@ -53,8 +53,10 @@ match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra,
 bool match_config_tdl::play(ev::down const &) {
   if (next_child >= 0 && !dirty)
     matcher().add(children[next_child]);
-  else
+  else {
+    add_len.Top() += 2;
     current_id = current_id + "::";
+  }
 
   std::cout << "down => " << current_id << std::endl;
 
@@ -79,13 +81,11 @@ bool match_config_tdl::play(ev::up const &) {
 }
 
 bool match_config_tdl::play(ev::node const &n) {
-  if (current_id == string()) {
+  add_len.Add(n.get_data().size());
+  if (current_id == string()) 
     current_id = n.get_data();
-    add_len.Add(current_id.size());
-  } else {
+  else
     current_id = current_id + n.get_data();
-    add_len.Add(n.get_data().size() + 2);
-  }
 
   std::cout << "node => " << current_id << std::endl;
   
