@@ -73,6 +73,7 @@ bool match_config_tdl::play(ev::up const &) {
   }
 
   dirty = false;
+  peer = false;
 
   current_id = offset(current_id.as_utf8(), 0, -add_len.Top());
   add_len.Pop();
