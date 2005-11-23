@@ -57,31 +57,31 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z");
+  run_test("a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z");
   nd_list c;
-  for (wchar_t ch = 'a'; ch <= 'z'; ++ch)
-    c.push_back(S(Xany(std::wstring(1,ch)), "el"));
+  for (char ch = 'a'; ch <= 'z'; ++ch)
+    c.push_back(S(Xany(std::string(1,ch)), "el"));
   C(M(c)).write_to(xp);
   ensure_equals("alphabet", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
-  run_test(L"");
+  run_test("");
   C(S(Xany())).write_to(xp);
   ensure_equals("empty", tree, xp);
 }
 
 template<> template<>
 void object::test<3>(int) {
-  run_test(L"\"nene ich geh dann mal\"");
-  C(C(S(Xany(L"nene ich geh dann mal")))).write_to(xp);
+  run_test("\"nene ich geh dann mal\"");
+  C(C(S(Xany("nene ich geh dann mal")))).write_to(xp);
 }
 
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"a b");
+    run_test("a b");
     fail("following");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 

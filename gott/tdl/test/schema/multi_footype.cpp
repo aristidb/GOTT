@@ -79,7 +79,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
@@ -89,7 +89,7 @@ void object::test<1>(int) {
 
 template<> template<>
 void object::test<2>(int) {
-  run_test(L"a\n plugin x\n sum 7\n 77");
+  run_test("a\n plugin x\n sum 7\n 77");
   nd_list c;
   c.push_back(MD(Xany(0), nd_list() << S(Xany("x"), "plugin-data"), "plugin"));
   c.push_back(MD(Xany(0), nd_list() << S(Xany(7), "sum-data"), "sum"));
@@ -102,7 +102,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   run_test(
-      L"a\n"
+      "a\n"
       " 4\n"
       " sum\n"
       "     -1220\n"
@@ -110,14 +110,14 @@ void object::test<3>(int) {
       "                     x,y,z\n"
   );
   nd_list c, p;
-  p.push_back(S(Xany(L"x"), L"plugin-data"));
-  p.push_back(S(Xany(L"y"), L"plugin-data"));
-  p.push_back(S(Xany(L"z"), L"plugin-data"));
+  p.push_back(S(Xany("x"), "plugin-data"));
+  p.push_back(S(Xany("y"), "plugin-data"));
+  p.push_back(S(Xany("z"), "plugin-data"));
 
-  c.push_back(S(Xany(4), L"--other--"));
-  c.push_back(MD(Xany(0), nd_list() << S(Xany(-1220), L"sum-data"), L"sum"));
-  c.push_back(MD(Xany(0), p, L"plugin"));
-  C(MD(Xany(0), nd_list() << M(c, L"--unordered--"), L"a"), L"--doc--")
+  c.push_back(S(Xany(4), "--other--"));
+  c.push_back(MD(Xany(0), nd_list() << S(Xany(-1220), "sum-data"), "sum"));
+  c.push_back(MD(Xany(0), p, "plugin"));
+  C(MD(Xany(0), nd_list() << M(c, "--unordered--"), "a"), "--doc--")
     .write_to(xp);
   ensure_equals("reordered #1", tree, xp);
 }
@@ -125,7 +125,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   run_test(
-      L"a\n"
+      "a\n"
       " 4,7,-9\n"
       " sum\n"
       "     -1220\n"
@@ -133,15 +133,15 @@ void object::test<4>(int) {
       "                     x,y,z\n"
   );
   nd_list c, p;
-  p.push_back(S(Xany(L"x"), L"plugin-data"));
-  p.push_back(S(Xany(L"y"), L"plugin-data"));
-  p.push_back(S(Xany(L"z"), L"plugin-data"));
-  c.push_back(S(Xany(4), L"--other--"));
-  c.push_back(S(Xany(7), L"--other--"));
-  c.push_back(S(Xany(-9), L"--other--"));
-  c.push_back(MD(Xany(0), nd_list() << S(Xany(-1220), L"sum-data"), L"sum"));
+  p.push_back(S(Xany("x"), "plugin-data"));
+  p.push_back(S(Xany("y"), "plugin-data"));
+  p.push_back(S(Xany("z"), "plugin-data"));
+  c.push_back(S(Xany(4), "--other--"));
+  c.push_back(S(Xany(7), "--other--"));
+  c.push_back(S(Xany(-9), "--other--"));
+  c.push_back(MD(Xany(0), nd_list() << S(Xany(-1220), "sum-data"), "sum"));
   c.push_back(MD(Xany(0), p, L"plugin"));
-  C(MD(Xany(0), nd_list() << M(c, L"--unordered--"), L"a"), L"--doc--")
+  C(MD(Xany(0), nd_list() << M(c, "--unordered--"), "a"), "--doc--")
     .write_to(xp);
   ensure_equals("reordered #1", tree, xp);
 }
@@ -149,7 +149,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   run_test(
-      L"a\n"
+      "a\n"
       " 4,7,-9\n"
       " sum\n"
       "     -1220\n"
@@ -159,17 +159,17 @@ void object::test<5>(int) {
       " -1234"
   );
   nd_list c, p;
-  p.push_back(S(Xany(L"x"), L"plugin-data"));
-  p.push_back(S(Xany(L"y"), L"plugin-data"));
-  p.push_back(S(Xany(L"z"), L"plugin-data"));
-  c.push_back(S(Xany(4), L"--other--"));
-  c.push_back(S(Xany(7), L"--other--"));
-  c.push_back(S(Xany(-9), L"--other--"));
-  c.push_back(MD(Xany(0), nd_list() << S(Xany(-1220), L"sum-data"), L"sum"));
-  c.push_back(S(Xany(22), L"--other--"));
-  c.push_back(MD(Xany(0), p, L"plugin"));
-  c.push_back(S(Xany(-1234), L"--other--"));
-  C(MD(Xany(0), nd_list() << M(c, L"--unordered--"), L"a"), L"--doc--")
+  p.push_back(S(Xany("x"), "plugin-data"));
+  p.push_back(S(Xany("y"), "plugin-data"));
+  p.push_back(S(Xany("z"), "plugin-data"));
+  c.push_back(S(Xany(4), "--other--"));
+  c.push_back(S(Xany(7), "--other--"));
+  c.push_back(S(Xany(-9), "--other--"));
+  c.push_back(MD(Xany(0), nd_list() << S(Xany(-1220), "sum-data"), "sum"));
+  c.push_back(S(Xany(22), "--other--"));
+  c.push_back(MD(Xany(0), p, "plugin"));
+  c.push_back(S(Xany(-1234), "--other--"));
+  C(MD(Xany(0), nd_list() << M(c, "--unordered--"), "a"), "--doc--")
     .write_to(xp);
   ensure_equals("reordered #1", tree, xp);
 }

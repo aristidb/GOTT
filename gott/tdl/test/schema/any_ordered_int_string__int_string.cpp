@@ -64,7 +64,7 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"4\nx");
+  run_test("4\nx");
   stru::cf::nd_list c;
   c.push_back(S(Xany(4), L"int"));
   c.push_back(S(Xany(L"x"), L"string"));
@@ -74,7 +74,7 @@ void object::test<1>(int) {
 
 template<> template<>
 void object::test<2>(int) {
-  run_test(L"d7");
+  run_test("d7");
   C(C(S(Xany(L"d7"), L"string2"))).write_to(xp);
   ensure_equals("just string", tree, xp);
 }
@@ -82,7 +82,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", string(mm.what()),
@@ -93,7 +93,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"foo bar");
+    run_test("foo bar");
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -103,15 +103,15 @@ void object::test<4>(int) {
 
 template<> template<>
 void object::test<5>(int) {
-  run_test(L"4");
-  C(C(S(Xany(4), L"int2"))).write_to(xp);
+  run_test("4");
+  C(C(S(Xany(4), "int2"))).write_to(xp);
   ensure_equals("just integer", tree, xp);
 }
 
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"4,x,y");
+    run_test("4,x,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
         string(mm.what()), "1:5 : mismatch in document at token y");
@@ -121,7 +121,7 @@ void object::test<6>(int) {
 template<> template<>
 void object::test<7>(int) {
   try {
-    run_test(L"732 bar");
+    run_test("732 bar");
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", string(mm.what()),

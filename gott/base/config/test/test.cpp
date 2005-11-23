@@ -39,7 +39,7 @@ int main() {
   ));
   structure::tree out;
   schema::match m(conf, out);
-  m.parse(std::wcin);
+  m.parse(std::cin);
   structure::direct_print<char> wrt(std::cout);
   out.copy_to(wrt);
   std::cout << '\n';

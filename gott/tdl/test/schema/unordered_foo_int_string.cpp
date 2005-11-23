@@ -58,11 +58,11 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"foo\n4\nx");
+  run_test("foo\n4\nx");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(0), L"foo"));
+  c.push_back(S(Xany(0), "foo"));
   c.push_back(S(Xany(4)));
-  c.push_back(S(Xany(L"x")));
+  c.push_back(S(Xany("x")));
   C(M(c)).write_to(xp);
   ensure_equals("foo,int,string", tree, xp);
 }
@@ -70,7 +70,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   try {
-    run_test(L"d7");
+    run_test("d7");
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -81,7 +81,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -92,7 +92,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"foo bar");
+    run_test("foo bar");
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -103,7 +103,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"foo");
+    run_test("foo");
     fail("just foo");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -114,7 +114,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"4,x,y");
+    run_test("4,x,y");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "1:5 : mismatch in document>unordered>node(foo) at token y");
@@ -124,7 +124,7 @@ void object::test<6>(int) {
 template<> template<>
 void object::test<7>(int) {
   try {
-    run_test(L"732 bar");
+    run_test("732 bar");
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -134,22 +134,22 @@ void object::test<7>(int) {
 
 template<> template<>
 void object::test<8>(int) {
-  run_test(L"77,foo,foo");
+  run_test("77,foo,foo");
   stru::cf::nd_list c;
   c.push_back(S(Xany(77)));
-  c.push_back(S(Xany(0), L"foo"));
-  c.push_back(S(Xany(L"foo")));
+  c.push_back(S(Xany(0), "foo"));
+  c.push_back(S(Xany("foo")));
   C(M(c)).write_to(xp);
   ensure_equals("reordered #1", tree, xp);
 }
 
 template<> template<>
 void object::test<9>(int) {
-  run_test(L"hallo\n-4,foo");
+  run_test("hallo\n-4,foo");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"hallo")));
+  c.push_back(S(Xany("hallo")));
   c.push_back(S(Xany(-4)));
-  c.push_back(S(Xany(0), L"foo"));
+  c.push_back(S(Xany(0), "foo"));
   C(M(c)).write_to(xp);
   ensure_equals("reordered #2", tree, xp);
 }

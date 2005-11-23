@@ -56,7 +56,7 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"4\n 5");
+  run_test("4\n 5");
   stru::cf::nd_list c;
   c.push_back(S(Xany(4), L"int1"));
   c.push_back(S(Xany(5), L"int2"));
@@ -67,7 +67,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   try {
-    run_test(L"d7");
+    run_test("d7");
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()),
@@ -78,7 +78,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -89,7 +89,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"-77 foo");
+    run_test("-77 foo");
     fail("followed string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -100,7 +100,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"4");
+    run_test("4");
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -111,7 +111,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"4 99,y");
+    run_test("4 99,y");
     fail("follows");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 

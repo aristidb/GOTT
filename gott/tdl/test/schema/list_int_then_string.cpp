@@ -62,28 +62,28 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"4\nx");
+  run_test("4\nx");
   stru::cf::nd_list c;
-  c.push_back(C(S(Xany(4), L"int"), L"list"));
-  c.push_back(S(Xany(L"x"), L"string"));
-  C(M(c, L"ord")).write_to(xp);
+  c.push_back(C(S(Xany(4), "int"), "list"));
+  c.push_back(S(Xany(L"x"), "string"));
+  C(M(c, "ord")).write_to(xp);
   ensure_equals("single integer, then string", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
-  run_test(L"d7");
+  run_test("d7");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(), L"list"));
-  c.push_back(S(Xany(L"d7"), L"string"));
-  C(M(c, L"ord")).write_to(xp);
+  c.push_back(S(Xany(), "list"));
+  c.push_back(S(Xany(L"d7"), "string"));
+  C(M(c, "ord")).write_to(xp);
   ensure_equals("just string", tree, xp);
 }
 
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -95,7 +95,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"foo bar");
+    run_test("foo bar");
     fail("following");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -106,7 +106,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"4");
+    run_test("4");
     fail("just integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -118,7 +118,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"4,x,y");
+    run_test("4,x,y");
     fail("too many strings");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -128,14 +128,14 @@ void object::test<6>(int) {
 
 template<> template<>
 void object::test<7>(int) {
-  run_test(L"4\n\n5\n6,7\n(zzz doink)");
+  run_test("4\n\n5\n6,7\n(zzz doink)");
   stru::cf::nd_list ll;
   for (int i = 4; i <= 7; ++i)
-    ll.push_back(S(Xany(i), L"int"));
+    ll.push_back(S(Xany(i), "int"));
   stru::cf::nd_list c;
-  c.push_back(M(ll, L"list"));
-  c.push_back(S(Xany(L"(zzz doink)"), L"string"));
-  C(M(c, L"ord")).write_to(xp);
+  c.push_back(M(ll, "list"));
+  c.push_back(S(Xany("(zzz doink)"), "string"));
+  C(M(c, "ord")).write_to(xp);
   ensure_equals("many thingies", tree, xp);
 }
 

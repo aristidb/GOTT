@@ -55,7 +55,7 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"4");
+  run_test("4");
   C(S(Xany(4), L"i")).write_to(xp);
   ensure_equals("single integer entity", tree, xp);
 }
@@ -63,7 +63,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   try {
-    run_test(L"d7");
+    run_test("d7");
     fail("non-integral");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -74,7 +74,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -85,7 +85,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"4 bar");
+    run_test("4 bar");
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -96,7 +96,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"4\nbar");
+    run_test("4\nbar");
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -106,7 +106,7 @@ void object::test<5>(int) {
 
 template<> template<>
 void object::test<6>(int) {
-  run_test(L"-777777");
+  run_test("-777777");
   C(S(Xany(-777777), L"i")).write_to(xp);
   ensure_equals("negative", tree, xp);
 }
@@ -114,7 +114,7 @@ void object::test<6>(int) {
 template<> template<>
 void object::test<7>(int) {
   try {
-    run_test(L"foo bar");
+    run_test("foo bar");
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 

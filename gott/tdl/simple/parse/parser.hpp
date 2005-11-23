@@ -23,6 +23,7 @@
 
 #include <gott/visibility.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <iosfwd>
 
 namespace gott {
 class string;
@@ -41,7 +42,7 @@ public:
    * Parse a TDL document. Does not treat the meta-data section specifically.
    * \param s The stream to read a document from.
    */
-  void parse(std::wistream &s);
+  void parse(std::istream &s);
 
 public:
   // callbacks

@@ -65,9 +65,9 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int n) {
-  std::wostringstream data;
+  std::ostringstream data;
   for (int i = 0; i < n; ++i)
-    data << i << L'\n';
+    data << i << '\n';
   run_test(data.str());
   nd_list ndl;
   for (int i = 0; i < n; ++i)

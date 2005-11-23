@@ -55,7 +55,7 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"(hallo)\n-74545656");
+  run_test("(hallo)\n-74545656");
   stru::cf::nd_list c;
   c.push_back(S(Xany(L"(hallo)")));
   c.push_back(S(Xany(-74545656), L"i"));
@@ -66,7 +66,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   try {
-    run_test(L"d7");
+    run_test("d7");
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -77,7 +77,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -88,7 +88,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"foo bar");
+    run_test("foo bar");
     fail("following");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -99,7 +99,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"foo");
+    run_test("foo");
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -110,7 +110,8 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"x,4,y");
+    run_test("x,4,y");
+    fail("wrong order #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
         gott::string(mm.what()), "1:5 : mismatch in document at token y");
@@ -120,7 +121,8 @@ void object::test<6>(int) {
 template<> template<>
 void object::test<7>(int) {
   try {
-    run_test(L"4,x,y");
+    run_test("4,x,y");
+    fail("wrong order #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "1:3 : mismatch in document>ordered>node(i) at token x");

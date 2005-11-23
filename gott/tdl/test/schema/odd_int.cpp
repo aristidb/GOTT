@@ -69,9 +69,9 @@ namespace tut {
 template<> template<>
 void object::test<1>(int n) {
   try {
-    std::wostringstream w;
+    std::ostringstream w;
     for (int i = 0; i < n; ++i)
-      w << i%10 << L',' << 0 << L'\n';
+      w << i%10 << ',' << 0 << '\n';
     run_test(w.str());
     fail("even");
   } catch(schema::mismatch const &m) {
@@ -84,7 +84,7 @@ void object::test<1>(int n) {
 template<> template<>
 void object::test<12>(int) {
   try {
-    run_test(L"1 2 3");
+    run_test("1 2 3");
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
@@ -95,7 +95,7 @@ void object::test<12>(int) {
 template<> template<>
 void object::test<13>(int) {
   try {
-    run_test(L"zzzz");
+    run_test("zzzz");
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
@@ -106,18 +106,18 @@ void object::test<13>(int) {
 template<> template<>
 void object::test<14>(int t) {
   int n = t - 14;
-  std::wostringstream w;
+  std::ostringstream w;
   for (int i = 0; i < n; ++i) 
-    w << i << L',' << 1 << L'\n';
+    w << i << ',' << 1 << '\n';
   w << 0;
   run_test(w.str());
 
   stru::cf::nd_list c;
   for (int i = 0; i < n; ++i) {
-    c.push_back(S(Xany(i), L"el"));
-    c.push_back(S(Xany(1), L"el"));
+    c.push_back(S(Xany(i), "el"));
+    c.push_back(S(Xany(1), "el"));
   }
-  c.push_back(S(Xany(0), L"el"));
+  c.push_back(S(Xany(0), "el"));
   C(M(c)).write_to(xp);
 
   ensure_equals("odd", tree, xp);

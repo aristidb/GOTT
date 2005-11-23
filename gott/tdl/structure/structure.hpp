@@ -111,7 +111,7 @@ public:
  * \param structure The structure to fill.
  */
 GOTT_EXPORT 
-void direct_struc(std::wistream &stream, writable_structure &structure);
+void direct_struc(std::istream &stream, writable_structure &structure);
 
 }}}
 

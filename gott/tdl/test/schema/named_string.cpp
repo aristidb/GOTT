@@ -53,15 +53,15 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"ND\n zz");
-  C(MD(Xany(0), nd_list() << S(Xany(L"zz"), L"S"), L"ND"), L"doc").write_to(xp);
+  run_test("ND\n zz");
+  C(MD(Xany(0), nd_list() << S(Xany("zz"), "S"), "ND"), "doc").write_to(xp);
   ensure_equals("single follow_integer_integer entity", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
   try {
-    run_test(L"d7");
+    run_test("d7");
     fail("just string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -72,7 +72,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -83,7 +83,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"ND,foo");
+    run_test("ND,foo");
     fail("non-followed string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -94,7 +94,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"4");
+    run_test("4");
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -105,7 +105,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"4 99,y");
+    run_test("4 99,y");
     fail("nonsense");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -116,7 +116,7 @@ void object::test<6>(int) {
 template<> template<>
 void object::test<7>(int) {
   try {
-    run_test(L"ND");
+    run_test("ND");
     fail("just label");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 

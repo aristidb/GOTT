@@ -65,7 +65,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int c) {
   try {
-    std::wostringstream w;
+    std::ostringstream w;
     for (int i = 1; i < c; ++i) // 0-4
       w << (77 + i) << '\n';
     run_test(w.str());
@@ -80,13 +80,13 @@ void object::test<1>(int c) {
 
 template<> template<>
 void object::test<6>(int t) {
-  std::wostringstream w;
+  std::ostringstream w;
   for (int i = 1; i < t; ++i) // 5-8
     w << '\n' << -i;
   run_test(w.str());
   stru::cf::nd_list c;
   for (int i = 1; i < t; ++i)
-    c.push_back(S(Xany(-i), L"el"));
+    c.push_back(S(Xany(-i), "el"));
   C(M(c)).write_to(xp);
   ensure_equals("in range", tree, xp);
 }
@@ -94,7 +94,7 @@ void object::test<6>(int t) {
 template<> template<>
 void object::test<10>(int c) {
   try {
-    std::wostringstream w;
+    std::ostringstream w;
     for (int i = 1; i < c; ++i) // 9-...
       w << (77 + i) << '\n';
     run_test(w.str());
@@ -108,7 +108,7 @@ void object::test<10>(int c) {
 template<> template<>
 void object::test<16>(int) {
   try {
-    run_test(L"1 2 3");
+    run_test("1 2 3");
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()), 
@@ -119,7 +119,7 @@ void object::test<16>(int) {
 template<> template<>
 void object::test<17>(int) {
   try {
-    run_test(L"lala");
+    run_test("lala");
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()), 

@@ -59,17 +59,17 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"4\nx");
+  run_test("4\nx");
   stru::cf::nd_list c;
   c.push_back(S(Xany(4)));
-  c.push_back(S(Xany(L"x")));
+  c.push_back(S(Xany("x")));
   C(M(c)).write_to(xp);
   ensure_equals("int then string", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
-  run_test(L"d7");
+  run_test("d7");
   C(C(S(Xany(L"d7")))).write_to(xp);
   ensure_equals("single string", tree, xp);
 }
@@ -77,7 +77,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -88,7 +88,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"list bar");
+    run_test("list bar");
     fail("string following string");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -99,7 +99,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"list,list");
+    run_test("list,list");
     fail("two strings");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -110,7 +110,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"4,x,y");
+    run_test("4,x,y");
     fail("int then two strings");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -121,7 +121,7 @@ void object::test<6>(int) {
 template<> template<>
 void object::test<7>(int) {
   try {
-    run_test(L"732 bar");
+    run_test("732 bar");
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
@@ -131,9 +131,9 @@ void object::test<7>(int) {
 
 template<> template<>
 void object::test<8>(int) {
-  run_test(L"foo,77");
+  run_test("foo,77");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"foo")));
+  c.push_back(S(Xany("foo")));
   c.push_back(S(Xany(77)));
   C(M(c)).write_to(xp);
   ensure_equals("reordered #1", tree, xp);
@@ -141,10 +141,10 @@ void object::test<8>(int) {
 
 template<> template<>
 void object::test<9>(int) {
-  run_test(L"1,foo,77");
+  run_test("1,foo,77");
   stru::cf::nd_list c;
   c.push_back(S(Xany(1)));
-  c.push_back(S(Xany(L"foo")));
+  c.push_back(S(Xany("foo")));
   c.push_back(S(Xany(77)));
   C(M(c)).write_to(xp);
   ensure_equals("reordered #2", tree, xp);

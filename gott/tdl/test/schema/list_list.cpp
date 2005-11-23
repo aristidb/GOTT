@@ -61,33 +61,33 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"a_string");
+  run_test("a_string");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(), L"s"));
-  c.push_back(S(Xany(L"a_string"), L"xx"));
+  c.push_back(S(Xany(), "s"));
+  c.push_back(S(Xany("a_string"), "xx"));
   C(M(c)).write_to(xp);
   ensure_equals("string only", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
-  run_test(L"1,2,a");
+  run_test("1,2,a");
   stru::cf::nd_list i;
-  i.push_back(S(Xany(1), L"ii"));
-  i.push_back(S(Xany(2), L"ii"));
+  i.push_back(S(Xany(1), "ii"));
+  i.push_back(S(Xany(2), "ii"));
   stru::cf::nd_list c;
-  c.push_back(C(M(i, L"t"), L"s"));
-  c.push_back(S(Xany(L"a"), L"xx"));
+  c.push_back(C(M(i, L"t"), "s"));
+  c.push_back(S(Xany(L"a"), "xx"));
   C(M(c)).write_to(xp);
   ensure_equals("ints+string", tree, xp);
 }
 
 template<> template<>
 void object::test<3>(int) {
-  run_test(L"7000\n(4)");
+  run_test("7000\n(4)");
   stru::cf::nd_list c;
-  c.push_back(C(C(S(Xany(7000),L"ii"),L"t"),L"s"));
-  c.push_back(S(Xany(L"(4)"), L"xx"));
+  c.push_back(C(C(S(Xany(7000),"ii"),"t"),"s"));
+  c.push_back(S(Xany(L"(4)"), "xx"));
   C(M(c)).write_to(xp);
   ensure_equals("int+string", tree, xp);
 }
@@ -95,7 +95,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
@@ -107,7 +107,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"44");
+    run_test("44");
     fail("should be greedy");
   } catch (mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),

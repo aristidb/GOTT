@@ -65,16 +65,16 @@ namespace tut {
 template<> template<>
 void object::test<1>(int i) {
   try {
-  std::wstring out;
+  std::string out;
   unsigned mask = (i - 1) & 0xF;
   if (mask & 0x1)
-    out += L"1 ";
+    out += "1 ";
   if (mask & 0x2)
-    out += L"2 ";
+    out += "2 ";
   if (mask & 0x4)
-    out += L"3 ";
+    out += "3 ";
   if (mask & 0x8)
-    out += L"4 ";
+    out += "4 ";
 
   run_test(out);
 

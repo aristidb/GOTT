@@ -56,21 +56,21 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"first");
+  run_test("first");
   C(S(Xany(0))).write_to(xp);
   ensure_equals("first", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
-  run_test(L"second");
+  run_test("second");
   C(S(Xany(1))).write_to(xp);
   ensure_equals("second", tree, xp);
 }
 
 template<> template<>
 void object::test<3>(int) {
-  run_test(L"third");
+  run_test("third");
   C(S(Xany(2))).write_to(xp);
   ensure_equals("third", tree, xp);
 }
@@ -78,7 +78,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"d7");
+    run_test("d7");
     fail("out-of");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -89,7 +89,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -100,7 +100,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"second bar");
+    run_test("second bar");
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -111,7 +111,7 @@ void object::test<6>(int) {
 template<> template<>
 void object::test<7>(int) {
   try {
-    run_test(L"foo\nbar");
+    run_test("foo\nbar");
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 

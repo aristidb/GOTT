@@ -54,7 +54,7 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"foobar");
+  run_test("foobar");
   C(S(Xany(0), "foobar")).write_to(xp);
   ensure_equals("single foobar entity", tree, xp);
 }
@@ -62,7 +62,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   try {
-    run_test(L"d7");
+    run_test("d7");
     fail("non-foobar");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -73,7 +73,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -84,7 +84,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"foobar bar");
+    run_test("foobar bar");
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -95,7 +95,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"foo\nbar");
+    run_test("foo\nbar");
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 

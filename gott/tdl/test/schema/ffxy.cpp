@@ -54,7 +54,7 @@ struct schema_ffxy : tut::schema_basic {
     string test_data = prefix;
     for (int i = 0; i < n; ++i)
       test_data = test_data + "0 1 ";
-    run_test((std::wstring(test_data) + L"\nA").c_str());
+    run_test(test_data + "\nA");
   }
 };
 }

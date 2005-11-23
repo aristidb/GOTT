@@ -59,18 +59,18 @@ template<> template<>
 void object::test<1>(int t) {
   int n = t - 1; // minimum: 0
   
-  std::wostringstream w;
+  std::ostringstream w;
   for (int i = 0; i < n; ++i) {
     w << i;
     if (i < n - 1)
-      w << L',';
+      w << ',';
   }
   run_test(w.str());
 
   stru::cf::nd_list c;
   for (int i = 0; i < n; ++i) {
     wchar_t ch[2] = {'0'+i,0};
-    c.push_back(S(Xany(ch), L"el"));
+    c.push_back(S(Xany(ch), "el"));
   }
   C(M(c)).write_to(xp);
 
@@ -80,11 +80,11 @@ void object::test<1>(int t) {
 template<> template<>
 void object::test<8>(int n) {
   try {
-    std::wostringstream w;
+    std::ostringstream w;
     for (int i = 0; i < n; ++i) {
       w << i;
       if (i < n - 1)
-        w << L',';
+        w << ',';
     }
     run_test(w.str());
     fail("too many");
@@ -97,7 +97,7 @@ void object::test<8>(int n) {
 template<> template<>
 void object::test<15>(int) {
   try {
-    run_test(L"1 2 3");
+    run_test("1 2 3");
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
@@ -107,8 +107,8 @@ void object::test<15>(int) {
 
 template<> template<>
 void object::test<16>(int) {
-  run_test(L"zzzz");
-  C(C(S(Xany(L"zzzz"),L"el"))).write_to(xp);
+  run_test("zzzz");
+  C(C(S(Xany("zzzz"),"el"))).write_to(xp);
   ensure_equals("string", tree, xp);
 }
 

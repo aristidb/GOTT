@@ -49,15 +49,15 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"data");
-  C(S(Xany(L"data")), L"doc").write_to(xp);
+  run_test("data");
+  C(S(Xany("data")), "doc").write_to(xp);
   ensure_equals("single entity", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &) {}
 }
@@ -65,7 +65,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"foo bar");
+    run_test("foo bar");
     fail("overfilled #1");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()),  
@@ -76,7 +76,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"foo\nbar");
+    run_test("foo\nbar");
     fail("overfilled #2");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 

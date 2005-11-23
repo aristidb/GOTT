@@ -72,7 +72,7 @@ namespace tut {
 // Empty document
 template<> template<>
 void object::test<1>(int) {
-  std::wistringstream data(L"");
+  std::istringstream data("");
   parse(data);
   B(); D(); U(); E();
   ensure_equals("empty", range(ev), range(xp));
@@ -81,7 +81,7 @@ void object::test<1>(int) {
 // Very simple document
 template<> template<>
 void object::test<2>(int) {
-  std::wistringstream data(L"hallodu");
+  std::istringstream data("hallodu");
   parse(data);
   B(); D(); N(L"hallodu"); U(); E();
   ensure_equals("single-word", range(ev), range(xp));
@@ -90,7 +90,7 @@ void object::test<2>(int) {
 // One-line document with more than one element
 template<> template<>
 void object::test<3>(int) {
-  std::wistringstream data(L"  hallodu, foobar zulu");
+  std::istringstream data("  hallodu, foobar zulu");
   parse(data);
   B(); D(); N(L"hallodu"); N(L"foobar"); D(); N(L"zulu"); U(); U(); E();
   ensure_equals("multiple-word", range(ev), range(xp));
@@ -99,7 +99,7 @@ void object::test<3>(int) {
 // Empty multi-line document with funny spaces
 template<> template<>
 void object::test<4>(int) {
-  std::wistringstream data(L"\n\n          \n     \n\n\n");
+  std::istringstream data("\n\n          \n     \n\n\n");
   parse(data);
   B(); D(); U(); E();
   ensure_equals("quasi-empty", range(ev), range(xp));
@@ -108,7 +108,7 @@ void object::test<4>(int) {
 // Two simple documents
 template<> template<>
 void object::test<5>(int) {
-  std::wistringstream data(L"\n\n\nfoobar      \n***\n  zumwinkel");
+  std::istringstream data("\n\n\nfoobar      \n***\n  zumwinkel");
   parse(data);
   parse(data);
 
@@ -121,7 +121,7 @@ void object::test<5>(int) {
 // Indentation
 template<> template<>
 void object::test<6>(int) {
-  std::wistringstream data(L"\n\n  \n       fobar\n");
+  std::istringstream data("\n\n  \n       fobar\n");
   parse(data);
   B(); D(); N(L"fobar"); U(); E();
 
@@ -131,7 +131,7 @@ void object::test<6>(int) {
 // Indentation #2 (reduced)
 template<> template<>
 void object::test<7>(int) {
-  std::wistringstream data(L"\n  x");
+  std::istringstream data("\n  x");
   parse(data);
   B(); D(); N(L"x"); U(); E();
 
@@ -142,7 +142,7 @@ void object::test<7>(int) {
 // Simple comment
 template<> template<>
 void object::test<8>(int) {
-  std::wistringstream data(L"\n\n#__ mycomment,\n");
+  std::istringstream data("\n\n#__ mycomment,\n");
   parse(data);
   B(); D(); C(L"__ mycomment,", true); U(); E();
 
@@ -152,7 +152,7 @@ void object::test<8>(int) {
 // Newlined char
 template<> template<>
 void object::test<9>(int) {
-  std::wistringstream data(L"\na");
+  std::istringstream data("\na");
   parse(data);
   B(); D(); N(L"a"); U(); E();
 
@@ -162,7 +162,7 @@ void object::test<9>(int) {
 // Wiki test #1
 template<> template<>
 void object::test<10>(int) {
-  std::wistringstream data(L"\
+  std::istringstream data("\
 #?schema footype\n\
 a\n\
   plugin\n\
@@ -199,7 +199,7 @@ a\n\
 // Wiki test #2
 template<> template<>
 void object::test<11>(int) {
-  std::wistringstream data(L"\
+  std::istringstream data("\
 module foo\n\
 \n\
 schema footype\n\
@@ -240,7 +240,7 @@ type multi\n\
 // Wiki test #3
 template<> template<>
 void object::test<12>(int) {
-  std::wistringstream data(L"\
+  std::istringstream data("\
 #?schema songDB\n\
 TITLE:    Home\n\
 ARTIST:   \"Dixie Chicks\"\n\
@@ -278,7 +278,7 @@ RIPPED:   T");
 // Old CVS #1
 template<> template<>
 void object::test<13>(int) {
-  std::wistringstream data(L"\
+  std::istringstream data("\
 a, b c\n\
   d #comment\n\
  \"J\"\n\
@@ -313,7 +313,7 @@ a `\n\
 // Simple block test
 template<> template<>
 void object::test<14>(int) {
-  std::wistringstream data(L"\
+  std::istringstream data("\
 a `\n\
   ahllo\n\
   du\n\

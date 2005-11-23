@@ -60,11 +60,11 @@ namespace tut {
 template<> template<>
 void object::test<1>(int n) {
   try {
-    std::wostringstream w;
+    std::ostringstream w;
     for (int i = 1; i < n; ++i) {
       w << i;
       if (i < n - 1)
-        w << L',';
+        w << ',';
     }
     run_test(w.str());
     fail("too few");
@@ -84,7 +84,7 @@ void object::test<1>(int n) {
 template<> template<>
 void object::test<12>(int) {
   try {
-    run_test(L"1 2 3");
+    run_test("1 2 3");
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
@@ -95,7 +95,7 @@ void object::test<12>(int) {
 template<> template<>
 void object::test<13>(int) {
   try {
-    run_test(L"zzzz");
+    run_test("zzzz");
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
@@ -107,11 +107,11 @@ template<> template<>
 void object::test<14>(int t) {
   int n = t - 2; // minimum: 12
   
-  std::wostringstream w;
+  std::ostringstream w;
   for (int i = 0; i < n; ++i) {
     w << i;
     if (i < n - 1)
-      w << L',';
+      w << ',';
   }
   run_test(w.str());
 

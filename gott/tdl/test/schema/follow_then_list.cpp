@@ -59,25 +59,25 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"4\n 5");
+  run_test("4\n 5");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"4"), L"s"));
-  c.push_back(S(Xany(5), L"i"));
-  C(M(c, L"foll"), L"doc").write_to(xp);
+  c.push_back(S(Xany("4"), "s"));
+  c.push_back(S(Xany(5), "i"));
+  C(M(c, "foll"), "doc").write_to(xp);
   ensure_equals("single follow_then_list entity", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
-  run_test(L"d7");
-  C(C(S(Xany(L"d7"), L"s"), L"foll"), L"doc").write_to(xp);
+  run_test("d7");
+  C(C(S(Xany("d7"), "s"), "foll"), "doc").write_to(xp);
   ensure_equals("just string", tree, xp);
 }
 
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -87,18 +87,18 @@ void object::test<3>(int) {
 
 template<> template<>
 void object::test<4>(int) {
-  run_test(L"foo -77");
+  run_test("foo -77");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"foo"), L"s"));
-  c.push_back(S(Xany(-77), L"i"));
-  C(M(c, L"foll"), L"doc").write_to(xp);
+  c.push_back(S(Xany("foo"), "s"));
+  c.push_back(S(Xany(-77), "i"));
+  C(M(c, "foll"), "doc").write_to(xp);
   ensure_equals("followed string", tree, xp);
 }
 
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"4 99,y");
+    run_test("4 99,y");
     fail("stuff");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -108,7 +108,7 @@ void object::test<5>(int) {
 
 template<> template<>
 void object::test<6>(int) {
-  run_test(L"x 1 2 3");
+  run_test("x 1 2 3");
   C(M(stru::cf::nd_list() 
         << S(Xany("x"), "s") 
         << S(Xany(1), "i")

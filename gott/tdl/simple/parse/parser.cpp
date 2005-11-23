@@ -23,8 +23,9 @@
 #include <boost/algorithm/string.hpp>
 #include <gott/string/string.hpp>
 #include <gott/string/buffer.hpp>
+#include <gott/string/convert.hpp>
 
-using std::wistream;
+using std::istream;
 using gott::string;
 using gott::range;
 using gott::tdl::simple::parser;
@@ -73,7 +74,7 @@ struct internal_line_logger {
 };
   
 class exec_parse {
-  wistream &stream;
+  istream &stream;
   parser &parse;
   unsigned indent;
   bool up, started_document;
@@ -98,7 +99,7 @@ class exec_parse {
   bool read_line();
 
 public:
-  exec_parse(wistream &s, parser &p, line_logger *l) 
+  exec_parse(istream &s, parser &p, line_logger *l) 
     : stream(s), parse(p), up(false), 
       started_document(false), buff_indent(0), ln(l) {}
   void run_parse();
@@ -109,7 +110,7 @@ class cancellor {};
 
 line_logger::~line_logger() {}
 
-void parser::parse(std::wistream &s) {
+void parser::parse(istream &s) {
   exec_parse x(s, *this, ll);
   x.run_parse();
 }
@@ -127,7 +128,7 @@ void exec_parse::run_parse() {
 }
 
 bool exec_parse::read_line() {
-  std::wstring line;
+  std::string line;
   if (!getline(stream, line))
     return false;
   current_line = line;
@@ -252,8 +253,8 @@ void exec_parse::block() {
     str += "\n";
 
     unsigned ind = 0;
-    wchar_t c;
-    while (stream.get(c) && c == L' ' && ind < indent - 1)
+    char c;
+    while (stream.get(c) && c == ' ' && ind < indent - 1)
       ++ind;
     stream.putback(c);
 
@@ -300,6 +301,8 @@ string exec_parse::read_quoted(string::utf8_range &unread) {
   return s;
 }
 
+static const gott::utf32_t newline = gott::to_utf32_char("\n", gott::ascii);
+
 string exec_parse::read_paren(string::utf8_range &unread) {
   string::utf8_range whole = unread;
   struct balancer {
@@ -321,11 +324,11 @@ string exec_parse::read_paren(string::utf8_range &unread) {
 
   gott::string_buffer result = string(range(whole.begin(), unread.begin()));
   if (unread.empty() && !balance) { // multi-line
-    result += L'\n';
-    wchar_t c;
+    result += newline;
+    char c;
     while (!balance && stream.get(c)) {
-      result += c;
-      if (c == L'\n')
+      result += gott::to_utf32_char(&c, gott::utf8);
+      if (c == '\n')
         ln.start_line();
       balance(c);
     }
@@ -363,9 +366,9 @@ void exec_parse::get_indent() {
     return;
   }
   
-  wchar_t c;
+  char c;
   unsigned x = 1;
-  while (stream.get(c) && c == L' ')
+  while (stream.get(c) && c == ' ')
     ++x;
   if (stream) stream.putback(c);
   indent = x;

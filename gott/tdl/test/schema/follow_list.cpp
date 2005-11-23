@@ -59,7 +59,7 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"4\n 5 x");
+  run_test("4\n 5 x");
   stru::cf::nd_list c;
   c.push_back(S(Xany(4), L"i"));
   c.push_back(S(Xany(5), L"i"));
@@ -70,7 +70,7 @@ void object::test<1>(int) {
 
 template<> template<>
 void object::test<2>(int) {
-  run_test(L"d7");
+  run_test("d7");
   C(C(S(Xany(L"d7"), L"s"))).write_to(xp);
   ensure_equals("just string", tree, xp);
 }
@@ -78,7 +78,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -88,7 +88,7 @@ void object::test<3>(int) {
 
 template<> template<>
 void object::test<4>(int) {
-  run_test(L"-77 foo");
+  run_test("-77 foo");
   stru::cf::nd_list c;
   c.push_back(S(Xany(-77), L"i"));
   c.push_back(S(Xany(L"foo"), L"s"));
@@ -99,7 +99,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int) {
   try {
-    run_test(L"4");
+    run_test("4");
     fail("just one integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
@@ -110,7 +110,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   try {
-    run_test(L"4 99,y");
+    run_test("4 99,y");
     fail("stuff");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", 
@@ -120,7 +120,7 @@ void object::test<6>(int) {
 
 template<> template<>
 void object::test<7>(int) {
-  run_test(L"1 2 3 4 5 6 7 8 9 10 foo");
+  run_test("1 2 3 4 5 6 7 8 9 10 foo");
   stru::cf::nd_list c;
   for (int i = 1; i <= 10; ++i)
     c.Add(S(Xany(i), "i"));

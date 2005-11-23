@@ -57,7 +57,7 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"77\n102342\n9");
+  run_test("77\n102342\n9");
   stru::cf::nd_list c;
   c.push_back(S(Xany(77), L"el"));
   c.push_back(S(Xany(102342), L"el"));
@@ -69,7 +69,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()), 
@@ -80,7 +80,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"1,2,3,4");
+    run_test("1,2,3,4");
     fail("too many");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
@@ -91,7 +91,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"1 2 3");
+    run_test("1 2 3");
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),

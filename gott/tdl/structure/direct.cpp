@@ -67,7 +67,7 @@ namespace {
   };
 }
 
-void gott::tdl::structure::direct_struc(std::wistream &in, 
+void gott::tdl::structure::direct_struc(std::istream &in, 
                                               writable_structure &out) {
   my_parser(out).parse(in);
 }

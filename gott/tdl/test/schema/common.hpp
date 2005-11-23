@@ -33,12 +33,12 @@ struct schema_basic {
   gott::tdl::structure::tree tree, xp;
   gott::tdl::schema::match match;
   gott::tdl::schema::rule_t grammar;
-  std::wstring rest;
+  std::string rest;
   schema_basic() : match(tree) {}
   schema_basic(gott::tdl::schema::rule_t const &r) : match(tree), grammar(r) {}
-  void run_test(std::wstring const &input) {
+  void run_test(std::string const &input) {
     match.add(grammar);
-    std::wistringstream stream(input);
+    std::istringstream stream(input);
     match.parse(stream);
     rest = stream.str().c_str() + stream.tellg();
   }

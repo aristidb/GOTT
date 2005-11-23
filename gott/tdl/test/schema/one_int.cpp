@@ -63,15 +63,15 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  run_test(L"1\n");
-  C(C(S(Xany(1), L"el"))).write_to(xp);
+  run_test("1\n");
+  C(C(S(Xany(1), "el"))).write_to(xp);
   ensure_equals("one int", tree, xp);
 }
 
 template<> template<>
 void object::test<2>(int) {
   try {
-    run_test(L"");
+    run_test("");
     fail("empty");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()), 
@@ -82,7 +82,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   try {
-    run_test(L"1 2 3");
+    run_test("1 2 3");
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
@@ -93,7 +93,7 @@ void object::test<3>(int) {
 template<> template<>
 void object::test<4>(int) {
   try {
-    run_test(L"zzzz");
+    run_test("zzzz");
     fail("string");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
@@ -104,7 +104,7 @@ void object::test<4>(int) {
 template<> template<>
 void object::test<5>(int t) {
   int n = t - 3; // minimum: 2 elements
-  std::wostringstream w;
+  std::ostringstream w;
   for (int i = 1; i <= n; ++i)
     w << i << '\n';
   try {

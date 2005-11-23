@@ -58,6 +58,17 @@ GOTT_EXPORT
 utf32_t to_utf32_char(char const *mbc, char const *&end, encoding enc);
 
 /**
+ * Convert a single encoded character to UTF32.
+ * \param mbc The encoded character.
+ * \param enc The encoding of the input character.
+ * \return The decoded character.
+ */
+inline utf32_t to_utf32_char(char const *mbc, encoding enc) {
+  char const *ignore;
+  return to_utf32_char(mbc, ignore, enc);
+}
+
+/**
  * Write a UTF32 character to a UTF8 buffer.
  * \param ch The input UTF8 character.
  * \param out The pointer to the memory to be written to. 
