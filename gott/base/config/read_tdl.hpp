@@ -61,7 +61,7 @@ private:
   string current_id;
   Vector<int> add_len;
   int next_child;
-  bool dirty;
+  bool dirty, peer;
 };
 
 }}
