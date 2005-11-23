@@ -120,6 +120,14 @@ void select_loop::run(){
     else {
       t = 0;
     }
+    for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end(); num_fd && it!=e;++it)  {
+      if( it->second.on_write )
+        FD_SET( it->first, &write_fds );
+      if( it->second.on_read )
+        FD_SET( it->first, &read_fds );
+      if( it->second.on_exception )
+        FD_SET( it->first, &except_fds );
+    }
 
     n = callbacks.rbegin()->first + 1;
   }

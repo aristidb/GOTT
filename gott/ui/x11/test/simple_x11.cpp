@@ -164,8 +164,8 @@ int main(int, char **){
     window win( con, gott::rect( 30,30,123,230), gott::string("simple_x11.cpp title"), size_t(gott::ui::window_flags::Defaults) );
     win.on_draw().connect( &draw );
     loop.add_read_fd( con.get_descriptor(), boost::bind( &uicontext::process_read, &con ) );
-    //loop.add_timer( deadline_timer( microsec_clock::local_time() + seconds(10), boost::bind( &resize_window, &win ) ) );
-    //loop.add_timer( deadline_timer( microsec_clock::local_time() + seconds(7), boost::bind( &move_window, &win ) ) );
+    loop.add_timer( deadline_timer( microsec_clock::local_time() + seconds(10), boost::bind( &resize_window, &win ) ) );
+    loop.add_timer( deadline_timer( microsec_clock::local_time() + seconds(7), boost::bind( &move_window, &win ) ) );
     loop.run();
   }
 }
