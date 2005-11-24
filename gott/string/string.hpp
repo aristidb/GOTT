@@ -115,7 +115,7 @@ public:
 
   /**
    * Construct std::string from string using unicode encoding.
-   * Use to_string if you need a different encoding.
+   * Use to_string() if you need a different encoding.
    */
   GOTT_LOCAL operator std::string() const {
     return to_string(*this);
@@ -123,7 +123,7 @@ public:
 
   /**
    * Construct std::wstring from string using unicode encoding.
-   * Use to_wstring if you need a different encoding.
+   * Use to_wstring() if you need a different encoding.
    */
   GOTT_LOCAL operator std::wstring() const {
     return to_wstring(*this);
@@ -236,6 +236,7 @@ private:
 #ifndef NO_STDLIB
 /**
  * Print out a string.
+ * @relates string
  */
 GOTT_EXPORT 
 std::basic_ostream<char, std::char_traits<char> > &
@@ -244,6 +245,7 @@ operator<<(std::basic_ostream<char, std::char_traits<char> > &,
 
 /**
  * Print out a string.
+ * @relates string
  */
 GOTT_EXPORT 
 std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &
@@ -253,6 +255,7 @@ operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &,
 
 /**
  * Concatenate two strings.
+ * @relates string
  */
 GOTT_LOCAL inline string operator +(string const &a, string const &b) {
   string const arr[2] = {a, b};
@@ -261,11 +264,13 @@ GOTT_LOCAL inline string operator +(string const &a, string const &b) {
 
 /**
  * Compare two strings for equality.
+ * @relates string
  */
 GOTT_EXPORT bool operator==(string const &, string const &);
 
 /**
  * Compare two strings for inequality.
+ * @relates string
  */
 inline bool operator!=(string const &a, string const &b) {
   return !(a == b);
@@ -278,6 +283,7 @@ inline bool operator!=(string const &a, string const &b) {
  *   - == 0 : Both strings are equal.
  *   -  < 0 : @p a is lexicographically smaller than @p b.
  *   -  > 0 : @p a is lexicographically greater than @p b.
+ * @relates string
  */
 GOTT_EXPORT int compare(string const &a, string const &b);
 
@@ -285,6 +291,7 @@ GOTT_EXPORT int compare(string const &a, string const &b);
  * Compare two strings lexicographically,
  * \param a,b Strings to be compared.
  * \return Whether @p a is smaller than @p b.
+ * @relates string
  */
 inline bool operator<(string const &a, string const &b) {
   return compare(a, b) < 0;
@@ -294,6 +301,7 @@ inline bool operator<(string const &a, string const &b) {
  * Compare two strings lexicographically,
  * \param a,b Strings to be compared.
  * \return Whether @p a is smaller than or equal to @p b.
+ * @relates string
  */
 inline bool operator<=(string const &a, string const &b) {
   return compare(a, b) <= 0;
@@ -303,6 +311,7 @@ inline bool operator<=(string const &a, string const &b) {
  * Compare two strings lexicographically,
  * \param a,b Strings to be compared.
  * \return Whether @p a is greater than @p b.
+ * @relates string
  */
 inline bool operator>(string const &a, string const &b) {
   return compare(a, b) > 0;
@@ -312,6 +321,7 @@ inline bool operator>(string const &a, string const &b) {
  * Compare two strings lexicographically,
  * \param a,b Strings to be compared.
  * \return Whether @p a is greater than or equal to @p b.
+ * @relates string
  */
 inline bool operator>=(string const &a, string const &b) {
   return compare(a, b) >= 0;

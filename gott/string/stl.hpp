@@ -35,6 +35,7 @@ class string;
  * \param str The string to convert.
  * \param enc The encoding of the resulting string.
  * \return The encoded STL-string.
+ * @relates string
  */
 std::string to_string(string const &str, encoding enc = utf8) GOTT_EXPORT;
 
@@ -43,6 +44,7 @@ std::string to_string(string const &str, encoding enc = utf8) GOTT_EXPORT;
  * \param str The string to convert.
  * \param enc The encoding of the resulting string.
  * \return The encoded STL-wide-string.
+ * @relates string
  */
 std::wstring to_wstring(string const &str, encoding enc = utf32) GOTT_EXPORT;
 
