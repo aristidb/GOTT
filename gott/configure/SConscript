@@ -33,6 +33,8 @@ def CheckOptimization(context):
 
 	if optimize == 'full':
 		level = '-O3'
+	elif optimize == 'some':
+		level = '-O2'
 
 	context.env.Append(CCFLAGS = level)
 	result = context.TryLink("#ifdef __OPTIMIZE__\nint main() {}\n#endif\n", '.cpp')
@@ -44,7 +46,7 @@ def CheckOptimization(context):
 def CheckDebug(context):
 	context.Message('Checking if compiler supports gcc-style debug flags... ')
 	lastCCFLAGS = context.env['CCFLAGS'][:]
-	context.env.Append(CCFLAGS = ['-g','-O0'])
+	context.env.Append(CCFLAGS = ['-g'])
 	result = context.TryCompile("void func() {}\n", '.cpp')
 	if not result:
 		context.env.Replace(CCFLAGS = lastCCFLAGS)
