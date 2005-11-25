@@ -22,6 +22,7 @@
 #define GOTT_UTIL_THUNK_HPP
 
 #include <gott/visibility.hpp>
+#include <gott/range.hpp>
 #include <cstddef>
 #include <memory>
 
@@ -33,19 +34,48 @@ struct thunk_t {
   virtual bool done() const = 0;
   virtual Out call() = 0;
   virtual std::size_t size() const = 0;
+
+  range_t<Out *> consume_all() {
+    std::size_t len = size();
+    Out *buf = new Out[len];
+    for (std::size_t i = 0; i < len; ++i)
+      buf[i] = call();
+    return range(buf, len);
+  }
+
+  template<class T>
+  range_t<T> send(range_t<T> const &out) {
+    T it = out.begin();
+    while (it != out.end() && !done())
+      *it++ = call();
+    return range(out.begin(), it);
+  }
 };
 
 template<class Out, class In, class Context>
 struct concrete_thunk_t;
 
 template<class Out, class Context, class In>
-std::auto_ptr<thunk_t<Out> > thunk(In const &data, Context con = Context()) {
+std::auto_ptr<thunk_t<Out> > thunk(In data,
+    typename Context::template select<Out, In>::type con = 
+    typename Context::template select<Out, In>::type()) {
   return std::auto_ptr<thunk_t<Out> >(
       new concrete_thunk_t<Out, In, Context>(data, con));
 }
 
-struct integer_to_digits {};
-struct integer_to_string {};
+#define GOTT_REDEFINE_THUNK_CONTEXT(tag, real_tag) \
+  struct tag { \
+    template<class Out, class In> \
+    struct select { \
+      typedef real_tag type; \
+    }; \
+  };
+
+#define GOTT_DEFINE_THUNK_CONTEXT(tag) GOTT_REDEFINE_THUNK_CONTEXT(tag, tag)
+
+GOTT_DEFINE_THUNK_CONTEXT(integer_to_digits)
+GOTT_DEFINE_THUNK_CONTEXT(integer_to_string)
+GOTT_DEFINE_THUNK_CONTEXT(thunk_cast)
 
 template<class Out, class Int>
 struct concrete_thunk_t<Out, Int, integer_to_digits> : thunk_t<Out> {
@@ -96,6 +126,26 @@ struct concrete_thunk_t<CharType, Int, integer_to_string> : thunk_t<CharType> {
   std::size_t size() const {
     return helper.size();
   }
+};
+
+template<class New, class Delegate>
+struct concrete_thunk_t<New, Delegate, thunk_cast> : thunk_t<New> {
+  concrete_thunk_t(Delegate d, thunk_cast)
+  : delegate(d) {}
+
+  bool done() const {
+    return delegate->done();
+  }
+
+  New call() {
+    return New(delegate->call());
+  }
+
+  std::size_t size() const {
+    return delegate->size();
+  }
+
+  Delegate delegate;
 };
 
 }

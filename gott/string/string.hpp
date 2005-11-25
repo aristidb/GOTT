@@ -36,15 +36,9 @@
 #ifndef NO_STDLIB
 #include <iosfwd>
 #include <string>
-
-#ifdef _MSC_VER
-#include <gott/thunk.hpp>
-#endif
 #endif
 
 namespace gott {
-
-template<class> struct thunk_t;
 
 class string_buffer;
 template<class> class range_t;
@@ -72,6 +66,13 @@ public:
   }
 
   /**
+   * Construct from encoded string.
+   */
+  GOTT_LOCAL string(range_t<char *> in, encoding enc = utf8) {
+    set_up(to_utf8_alloc(in, enc), true);
+  }
+
+  /**
    * Construct from encoded c-string.
    */
   GOTT_LOCAL string(char const *in, encoding enc = utf8) {
@@ -86,16 +87,18 @@ public:
   }
 
   /**
+   * Construct from encoded wide string.
+   */
+  GOTT_LOCAL string(range_t<wchar_t *> in, encoding enc = utf32) {
+    set_up(to_utf8_alloc(in.cast<char const *>(), enc), true);
+  }
+
+  /**
    * Construct from encoded wide c-string.
    */
   GOTT_LOCAL string(wchar_t const *in, encoding enc = utf32) {
     set_up(to_utf8_alloc(zero_terminated(in).cast<char const *>(), enc), true);
   }
-
-  /**
-   * Construct string from thunk.
-   */
-  string(thunk_t<utf8_t> &);
 
 #ifndef NO_STDLIB
   /**
@@ -130,12 +133,21 @@ public:
   }
 #endif
   
-  enum literal_tag { utf8_literal };
+  enum literal_tag { 
+    utf8_literal ///< Designates that a UTF8 string is a literal.
+  };
 
   /**
    * Construct from UTF8-c-literal. Shares memory.
    */
   GOTT_LOCAL string(range_t<utf8_t const *> in, literal_tag) {
+    set_up(in, false);
+  }
+
+  /**
+   * Construct from UTF8-c-literal. Shares memory.
+   */
+  GOTT_LOCAL string(range_t<utf8_t *> in, literal_tag) {
     set_up(in, false);
   }
 
@@ -146,7 +158,9 @@ public:
     set_up(to_utf8_alloc(range(b).cast<char const *>(), utf32), true);
   }
 
-  enum concat_tag { concatenate };
+  enum concat_tag { 
+    concatenate  ///< Designates that many strings should be concatenated.
+  };
 
   /**
    * Concatenate.
@@ -171,11 +185,18 @@ public:
   GOTT_LOCAL string(range_t<utf8_iterator> const &r) {
     foreign(r.call<utf8_t const *>(&utf8_iterator::ptr));
   }
-  
+
   /**
    * Construct from character range.
    */
   GOTT_LOCAL string(range_t<utf8_t const *> const &r) {
+    foreign(r);
+  }
+
+  /**
+   * Construct from character range.
+   */
+  GOTT_LOCAL string(range_t<utf8_t *> const &r) {
     foreign(r);
   }
 

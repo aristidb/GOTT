@@ -36,9 +36,9 @@ using gott::integer_to_string;
 static string build_string(schema::detail::stream_position const &p,
                             Vector<string> const &t) {
   Vector<string> out;
-  out.Add(*thunk<gott::utf8_t, integer_to_string>(p.line));
+  out.Add(thunk<gott::utf8_t, integer_to_string>(p.line)->consume_all());
   out.Add(":");
-  out.Add(*thunk<gott::utf8_t, integer_to_string>(p.pos + 1));
+  out.Add(thunk<gott::utf8_t, integer_to_string>(p.pos + 1)->consume_all());
   out.Add(" : mismatch in ");
   gott::range_t<string const *> tg = range(t);
   if (tg.begin() != tg.end())

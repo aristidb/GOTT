@@ -19,16 +19,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "thunk.hpp"
+#include <gott/string/string.hpp>
 #include <iostream>
-#include <boost/scoped_ptr.hpp>
 
 using namespace gott;
-using namespace std;
-using namespace boost;
+using std::cout;
+using std::endl;
 
 int main() {
-  scoped_ptr<thunk_t<char> > itos(thunk<char, integer_to_string>(123));
-  while (!itos->done())
-    cout << itos->call();
-  cout << endl;
+  std::auto_ptr<thunk_t<char> > itos = thunk<char, integer_to_string>(12340);
+  cout << string(thunk<gott::utf8_t, thunk_cast>(itos)->consume_all()) << endl;
 }

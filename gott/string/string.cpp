@@ -81,14 +81,6 @@ void string::foreign(range_t<utf8_t const *> const &d) {
   p = new representation(d, representation::foreign_copy);
 }
 
-string::string(thunk_t<utf8_t> &thk) : p(0) {
-  std::size_t len = thk.size();
-  utf8_t *buf = new utf8_t[len];
-  for (std::size_t i = 0; i < len; ++i)
-    buf[i] = thk.call();
-  p = new representation(range(buf, len));
-}
-
 range_t<gott::utf8_t const *> string::as_utf8() const {
   return range(p->data, p->size);
 }
