@@ -35,15 +35,13 @@ struct thunk_t {
   virtual Out call() = 0;
   virtual std::size_t size() const = 0;
 
-  range_t<Out *> consume() {
+  range_t<Out *> consume_alloc() {
     std::size_t len = size();
     Out *buf = new Out[len];
     for (std::size_t i = 0; i < len; ++i)
       buf[i] = call();
     return range(buf, len);
   }
-
-  operator range_t<Out *>() { return consume(); }
 
   template<class T>
   range_t<T> send(range_t<T> const &out) {

@@ -42,10 +42,14 @@ typedef boost::uint32_t utf32_t;
 enum encoding {
   // Full Unicode
   utf8,
-  utf16be, utf16 = utf16be, utf16le,
-  utf32be, utf32 = utf32be, utf32le,
+  utf16be, utf16le,
+  utf32be, utf32le,
   utf7,
   c99,java,
+  // Proprietary (TODO)
+  utf16 = utf16le,
+  utf32 = utf32le,
+  wide = utf32,
   // European
   ascii,
   iso8859_1, iso8859_2, iso8859_3, iso8859_4, iso8859_5, iso8859_6, iso8859_7,

@@ -29,6 +29,10 @@
 #include <gott/visibility.hpp>
 #include <gott/range.hpp>
 
+#ifndef NO_GOTT_THUNK
+#include <gott/thunk.hpp>
+#endif
+
 #ifndef NO_NTL
 #include <ntl.h>
 #endif
@@ -82,21 +86,21 @@ public:
   /**
    * Construct from encoded wide string.
    */
-  GOTT_LOCAL string(range_t<wchar_t const *> in, encoding enc = utf32) {
+  GOTT_LOCAL string(range_t<wchar_t const *> in, encoding enc = wide) {
     set_up(to_utf8_alloc(in.cast<char const *>(), enc), true);
   }
 
   /**
    * Construct from encoded wide string.
    */
-  GOTT_LOCAL string(range_t<wchar_t *> in, encoding enc = utf32) {
+  GOTT_LOCAL string(range_t<wchar_t *> in, encoding enc = wide) {
     set_up(to_utf8_alloc(in.cast<char const *>(), enc), true);
   }
 
   /**
    * Construct from encoded wide c-string.
    */
-  GOTT_LOCAL string(wchar_t const *in, encoding enc = utf32) {
+  GOTT_LOCAL string(wchar_t const *in, encoding enc = wide) {
     set_up(to_utf8_alloc(zero_terminated(in).cast<char const *>(), enc), true);
   }
 
@@ -111,7 +115,7 @@ public:
   /**
    * Construct string from std::wstring.
    */
-  GOTT_LOCAL string(std::wstring const &s, encoding enc = utf32) {
+  GOTT_LOCAL string(std::wstring const &s, encoding enc = wide) {
     set_up(to_utf8_alloc(range(&s[0], s.length()).cast<char const *>(), enc), 
         true);
   }
@@ -130,6 +134,34 @@ public:
    */
   GOTT_LOCAL operator std::wstring() const {
     return to_wstring(*this);
+  }
+#endif
+
+#ifndef GOTT_NO_THUNK
+  GOTT_LOCAL string(thunk_t<utf8_t> &thk) {
+    set_up(thk.consume_alloc(), true);
+  }
+
+  GOTT_LOCAL string(thunk_t<char> &thk, encoding enc = utf8) {
+    if (enc == utf8)
+      set_up(thk.consume_alloc().cast<utf8_t const *>(), true);
+    else {
+      range_t<char *> rng = thk.consume_alloc();
+      set_up(to_utf8_alloc(rng, enc), true);
+      delete rng.begin();
+    }
+  }
+
+  GOTT_LOCAL string(thunk_t<wchar_t> &thk, encoding enc = wide) {
+    range_t<wchar_t *> rng = thk.consume_alloc();
+    set_up(to_utf8_alloc(rng.cast<char const *>(), enc), true);
+    delete rng.begin();
+  }
+
+  GOTT_LOCAL string(thunk_t<utf32_t> &thk) {
+    range_t<utf32_t *> rng = thk.consume_alloc();
+    set_up(to_utf8_alloc(rng.cast<char const *>(), utf32), true);
+    delete rng.begin();
   }
 #endif
   

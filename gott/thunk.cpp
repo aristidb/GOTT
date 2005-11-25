@@ -28,5 +28,5 @@ using std::endl;
 
 int main() {
   std::auto_ptr<thunk_t<char> > itos = integer_to_string<char>(12340);
-  cout << string(thunk_cast<gott::utf8_t>(itos)->consume()) << endl;
+  cout << string(*thunk_cast<gott::utf8_t>(itos)) << endl;
 }
