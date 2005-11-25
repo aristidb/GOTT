@@ -44,7 +44,8 @@ struct config_type {
 match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra, 
     Vector<schema::rule_t> const &o_children, 
     schema::match &m) 
-: schema::item(ra, m), next_child(-1), dirty(false), peer(false) {
+: schema::item(ra, m), next_child(-1), 
+  dirty(false), peer(false), may_leave(false) {
   for (Vector<schema::rule_t>::const_iterator it = o_children.begin(); 
       it != o_children.end(); ++it)
     children.Add(it->attributes().tags()[0], *it);
@@ -66,6 +67,9 @@ bool match_config_tdl::play(ev::down const &) {
 }
 
 bool match_config_tdl::play(ev::up const &) {
+  if (!may_leave)
+    return false;
+
   std::cout << "up => ";
   if (next_child < 0) {
     std::cout << '$' << current_id << std::endl;
@@ -88,6 +92,7 @@ bool match_config_tdl::play(ev::node const &n) {
     return false;
 
   peer = true;
+  may_leave = false;
   
   add_len.Add(n.get_data().size());
   if (current_id == string()) 
@@ -105,6 +110,7 @@ bool match_config_tdl::play(ev::node const &n) {
 bool match_config_tdl::play(ev::child_succeed const &) {
   dirty = true;
   peer = true;
+  may_leave = true;
   std::cout << "child_succeed => " << current_id << std::endl;
   return true;
 }
