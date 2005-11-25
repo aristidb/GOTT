@@ -3,7 +3,7 @@ import os
 cppdef = Split(ARGUMENTS.get('def', ''))
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
 cflags = Split(ARGUMENTS.get('cflags', ''))
-release = int(ARGUMENTS.get('release', 0))
+release = int(ARGUMENTS.get('release', 1))
 if release:
 	debug = 0
 	optimize = 'full'

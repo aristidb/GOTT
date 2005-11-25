@@ -27,18 +27,30 @@
 
 using namespace gott;
 using namespace gott::tdl;
+using namespace gott::tdl::schema;
 
 int main() {
-  schema::rule_t conf = 
-    schema::rule("document",
-      schema::rule("config",
-        Vector<schema::rule_t>() <<
-        schema::rule("node", schema::rule_attr(schema::tag = "conf::int", 
-            schema::repatcher = new structure::repatch_integer())) <<
-        schema::rule("node", schema::rule_attr(schema::tag = "conf::string"))
-  ));
+  std::cerr 
+    <<
+    "Simple config test: TDL configuration\n"
+    "There are the following keys:\n"
+    "  - conf::int : an integer\n"
+    "  - conf::string : an arbitrary string\n"
+    "  - get::more::stuff : a list of integers\n"
+    ;
+  
+  rule_t conf = 
+    rule("document",
+      rule("list", rule_attr(tag = "container"),
+        rule("config", rule_attr(outer = list(), tag = "element"),
+          Vector<rule_t>() <<
+          rule("node", rule_attr(tag = "conf::int", 
+              repatcher = new structure::repatch_integer())) <<
+          rule("node", rule_attr(tag = "conf::string")) <<
+          rule("list", rule_attr(tag = "get::more::stuff"),
+            rule("node", rule_attr(outer = list()))))));
   structure::tree out;
-  schema::match m(conf, out);
+  match m(conf, out);
   m.parse(std::cin);
   structure::direct_print<char> wrt(std::cout);
   out.copy_to(wrt);
