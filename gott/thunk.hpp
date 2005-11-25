@@ -35,13 +35,15 @@ struct thunk_t {
   virtual Out call() = 0;
   virtual std::size_t size() const = 0;
 
-  range_t<Out *> consume_all() {
+  range_t<Out *> consume() {
     std::size_t len = size();
     Out *buf = new Out[len];
     for (std::size_t i = 0; i < len; ++i)
       buf[i] = call();
     return range(buf, len);
   }
+
+  operator range_t<Out *>() { return consume(); }
 
   template<class T>
   range_t<T> send(range_t<T> const &out) {
@@ -55,31 +57,24 @@ struct thunk_t {
 template<class Out, class In, class Context>
 struct concrete_thunk_t;
 
-template<class Out, class Context, class In>
-std::auto_ptr<thunk_t<Out> > thunk(In data,
-    typename Context::template select<Out, In>::type con = 
-    typename Context::template select<Out, In>::type()) {
-  return std::auto_ptr<thunk_t<Out> >(
-      new concrete_thunk_t<Out, In, Context>(data, con));
-}
+#define GOTT_REDEFINE_THUNK_CONTEXT(tag, context) \
+  template<class Out, class In> \
+  std::auto_ptr<thunk_t<Out> > tag(In data, context con = context()) { \
+    return std::auto_ptr<thunk_t<Out> >( \
+        new concrete_thunk_t<Out, In, context>(data, con)); \
+  }
 
-#define GOTT_REDEFINE_THUNK_CONTEXT(tag, real_tag) \
-  struct tag { \
-    template<class Out, class In> \
-    struct select { \
-      typedef real_tag type; \
-    }; \
-  };
-
-#define GOTT_DEFINE_THUNK_CONTEXT(tag) GOTT_REDEFINE_THUNK_CONTEXT(tag, tag)
+#define GOTT_DEFINE_THUNK_CONTEXT(tag) \
+  struct tag ## _tag {}; \
+  GOTT_REDEFINE_THUNK_CONTEXT(tag, tag ## _tag)
 
 GOTT_DEFINE_THUNK_CONTEXT(integer_to_digits)
 GOTT_DEFINE_THUNK_CONTEXT(integer_to_string)
 GOTT_DEFINE_THUNK_CONTEXT(thunk_cast)
 
 template<class Out, class Int>
-struct concrete_thunk_t<Out, Int, integer_to_digits> : thunk_t<Out> {
-  concrete_thunk_t(Int const &v, integer_to_digits) : data(v), div(1) {
+struct concrete_thunk_t<Out, Int, integer_to_digits_tag> : thunk_t<Out> {
+  concrete_thunk_t(Int const &v, integer_to_digits_tag) : data(v), div(1) {
     while (div <= data)
       div *= 10;
   }
@@ -109,11 +104,12 @@ struct concrete_thunk_t<Out, Int, integer_to_digits> : thunk_t<Out> {
 };
 
 template<class CharType, class Int>
-struct concrete_thunk_t<CharType, Int, integer_to_string> : thunk_t<CharType> {
-  concrete_thunk_t(Int const &v, integer_to_string) 
-  : helper(v, integer_to_digits()) {}
+struct concrete_thunk_t<CharType, Int, integer_to_string_tag> 
+: thunk_t<CharType> {
+  concrete_thunk_t(Int const &v, integer_to_string_tag) 
+  : helper(v, integer_to_digits_tag()) {}
   
-  concrete_thunk_t<CharType, Int, integer_to_digits> helper;
+  concrete_thunk_t<CharType, Int, integer_to_digits_tag> helper;
 
   bool done() const { 
     return helper.done(); 
@@ -129,8 +125,8 @@ struct concrete_thunk_t<CharType, Int, integer_to_string> : thunk_t<CharType> {
 };
 
 template<class New, class Delegate>
-struct concrete_thunk_t<New, Delegate, thunk_cast> : thunk_t<New> {
-  concrete_thunk_t(Delegate d, thunk_cast)
+struct concrete_thunk_t<New, Delegate, thunk_cast_tag> : thunk_t<New> {
+  concrete_thunk_t(Delegate d, thunk_cast_tag)
   : delegate(d) {}
 
   bool done() const {

@@ -27,6 +27,6 @@ using std::cout;
 using std::endl;
 
 int main() {
-  std::auto_ptr<thunk_t<char> > itos = thunk<char, integer_to_string>(12340);
-  cout << string(thunk<gott::utf8_t, thunk_cast>(itos)->consume_all()) << endl;
+  std::auto_ptr<thunk_t<char> > itos = integer_to_string<char>(12340);
+  cout << string(thunk_cast<gott::utf8_t>(itos)->consume()) << endl;
 }
