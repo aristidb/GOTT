@@ -69,7 +69,7 @@ int main() {
   *p.read_write() -= 2;
 
   { // DIRRTY - undefined behaviour
-    property<int>::read_write_reference r = p.read_write();
+    read_write_reference<int> r = p.read_write();
     p.set(10);
     *r -= 10;
   }
@@ -106,7 +106,7 @@ int main() {
   
   stream_property streamed(external_storage<int>(read, write));
   for (;;) {
-    stream_property::read_write_reference r = streamed.read_write();
+    read_write_reference<int> r = streamed.read_write();
     *r *= 2;
     if (*r == 10)
       break;

@@ -136,7 +136,7 @@ void draw(agg::rendering_buffer& buf, gott::rect const& r )
 }
 
 deadline_timer move_window( window *win ) {
-  gott::properties::property<gott::rect>::read_write_reference reg = win->region().read_write();
+  gott::properties::read_write_reference<gott::rect> reg = win->region().read_write();
   std::cout <<"move_window from (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height << ")";
   reg->left += 80 - rand()%90;
   reg->top += 80 - rand()%90;
@@ -147,7 +147,7 @@ deadline_timer move_window( window *win ) {
 }
 
 deadline_timer resize_window( window *win ) {
-  gott::properties::property<gott::rect>::read_write_reference reg = win->region().read_write();
+  gott::properties::read_write_reference<gott::rect> reg = win->region().read_write();
   std::cout <<"resize_window (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height  << ")";
   reg->width = 10 + rand()%180;
   reg->height= 10 + rand()%180;

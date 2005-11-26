@@ -61,10 +61,6 @@ class concrete_property
 : public
     property_chooser<Type, policy<Notification>::class_type::has_signal>::type {
 public:
-  typedef typename property<Type>::value_type value_type;
-  typedef typename property<Type>::const_pointer const_pointer;
-  typedef typename property<Type>::pointer pointer;
-
   typedef typename policy<Storage>::class_type storage_policy;
   typedef typename policy<Lock>::class_type lock_policy;
   typedef typename policy<Notification>::class_type notification_policy;
@@ -103,7 +99,7 @@ public:
    * \param n [optional] The notification policy.
    * \param l [optional] The locking policy.
    */
-  concrete_property(value_type const &v,
+  concrete_property(Type const &v,
            notification_p n = notification_policy(),
            lock_p l = lock_policy())
   : storage(v), notifier(n), lock(l) {

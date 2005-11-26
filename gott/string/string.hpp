@@ -148,20 +148,20 @@ public:
     else {
       range_t<char *> rng = thk.consume_alloc();
       set_up(to_utf8_alloc(rng, enc), true);
-      delete rng.begin();
+      delete [] rng.begin();
     }
   }
 
   GOTT_LOCAL string(thunk_t<wchar_t> &thk, encoding enc = wide) {
     range_t<wchar_t *> rng = thk.consume_alloc();
     set_up(to_utf8_alloc(rng.cast<char const *>(), enc), true);
-    delete rng.begin();
+    delete [] rng.begin();
   }
 
-  GOTT_LOCAL string(thunk_t<utf32_t> &thk) {
+   GOTT_LOCAL string(thunk_t<utf32_t> &thk) {
     range_t<utf32_t *> rng = thk.consume_alloc();
     set_up(to_utf8_alloc(rng.cast<char const *>(), utf32), true);
-    delete rng.begin();
+    delete [] rng.begin();
   }
 #endif
   

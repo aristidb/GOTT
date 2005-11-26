@@ -41,10 +41,6 @@ template<
 > 
 class translation_property : public property<NewType> {
 public:
-  typedef typename property<NewType>::value_type value_type;
-  typedef typename property<NewType>::const_pointer const_pointer;
-  typedef typename property<NewType>::pointer pointer;
-  
   typedef typename policy<Translation>::class_type translation_policy;
 
 private:
@@ -79,17 +75,15 @@ private:
   }
 
   void end_read(annotated_const_pointer p) const {
-    translator.template const_unbox<typename property<OldType>::read_reference>
-      (p);
+    translator.template const_unbox<read_reference<OldType> >(p);
   }
 
   void end_write(annotated_pointer p) {
-    translator.template unbox<typename property<OldType>::write_reference>(p);
+    translator.template unbox<write_reference<OldType> >(p);
   }
   
   void end_read_write(annotated_pointer p) {
-    translator.template unbox<typename property<OldType>::read_write_reference>
-      (p);
+    translator.template unbox<read_write_reference<OldType> >(p);
   }
   
   property<OldType> &bound;

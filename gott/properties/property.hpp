@@ -27,6 +27,119 @@
 namespace gott {
 namespace properties {
 
+template<class Type> class property;
+
+/**
+ * A read-only reference to a property's value. Reference-counted.
+ */
+template<class Type>
+class read_reference {
+public:
+  Type const *operator->() const {
+    return ptr.first;
+  }
+
+  Type const &operator*() const {
+    return *ptr.first;
+  }
+    
+  read_reference(property<Type> const &p)
+  : container(p), ptr(p.begin_read()), ref_count(new unsigned long(1)) {}
+
+  read_reference(read_reference const &o)
+    : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
+    { ++*ref_count; }
+
+  ~read_reference() {
+    if (--*ref_count == 0)
+      container.end_read(ptr);
+  }
+
+  void operator=(read_reference const &o) {
+    ~read_reference();
+    new (this) read_reference(o);
+  }
+
+private:
+  property<Type> const &container;
+  typename property<Type>::annotated_const_pointer ptr;
+  unsigned long *ref_count;
+};
+
+/**
+ * A write-only reference to a property's value. Reference-counted.
+ */
+template<class Type>
+class write_reference {
+public:
+  Type *operator->() {
+    return ptr.first;
+  }
+
+  Type &operator*() {
+    return *ptr.first;
+  }
+  
+  write_reference(property<Type> &p)
+  : container(p), ptr(p.begin_write()), ref_count(new unsigned long(1)) {}
+
+  write_reference(write_reference const &o)
+    : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
+    { ++*ref_count; }
+
+  ~write_reference() {
+    if (--*ref_count == 0)
+      container.end_write(ptr);
+  }
+
+  void operator=(write_reference const &o) {
+    ~write_reference();
+    new (this) write_reference(o);
+  }
+
+private:
+  property<Type> &container;
+  typename property<Type>::annotated_pointer ptr;
+  unsigned long *ref_count;
+};
+
+/**
+ * A reference to a property's value. Reference-counted.
+ */
+template<class Type>
+class read_write_reference {
+public:
+  Type *operator->() {
+    return ptr.first;
+  }
+
+  Type &operator*() {
+    return *ptr.first;
+  }
+    
+  read_write_reference(property<Type> &p)
+  : container(p), ptr(p.begin_read_write()), ref_count(new unsigned long(1)){}
+
+  read_write_reference(read_write_reference const &o)
+  : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
+  { ++*ref_count; }
+
+  void operator=(read_write_reference const &o) {
+    ~read_write_reference();
+    new (this) read_write_reference(o);
+  }
+
+  ~read_write_reference() {
+    if (--*ref_count == 0)
+      container.end_read_write(ptr);
+  }
+
+private:
+  property<Type> &container;
+  typename property<Type>::annotated_pointer ptr;
+  unsigned long *ref_count;
+};
+
 /**
  * Abstract property base class. Properties somehow store a value which you can
  * set, read and change. They might emit a signal whenever their value is 
@@ -36,122 +149,14 @@ namespace properties {
 template<class Type>
 class property {
 public:
-  typedef Type value_type;
-  typedef Type *pointer;
-  typedef Type &reference;
-  typedef Type const *const_pointer;
-  typedef Type const &const_reference;
-
-  typedef std::pair<pointer, void *> annotated_pointer;
-  typedef std::pair<const_pointer, void *> annotated_const_pointer;
-
-  /**
-   * A read-only reference to a property's value. Reference-counted.
-   */
-  struct read_reference {
-    const_pointer operator->() const {
-      return ptr.first;
-    }
-
-    const_reference operator*() const {
-      return *ptr.first;
-    }
-    
-    read_reference(property const &p)
-    : container(p), ptr(p.begin_read()), ref_count(new unsigned long(1)) {}
-
-    read_reference(read_reference const &o)
-      : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
-      { ++*ref_count; }
-
-    ~read_reference() {
-      if (--*ref_count == 0)
-        container.end_read(ptr);
-    }
-
-    void operator=(read_reference const &o) {
-      ~read_reference();
-      new (this) read_reference(o);
-    }
-
-    property const &container;
-    annotated_const_pointer ptr;
-    unsigned long *ref_count;
-  };
-
-  /**
-   * A write-only reference to a property's value. Reference-counted.
-   */
-  struct write_reference {
-    pointer operator->() {
-      return ptr.first;
-    }
-
-    reference operator*() {
-      return *ptr.first;
-    }
-    
-    write_reference(property &p)
-    : container(p), ptr(p.begin_write()), ref_count(new unsigned long(1)) {}
-
-    write_reference(write_reference const &o)
-      : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
-      { ++*ref_count; }
-
-    ~write_reference() {
-      if (--*ref_count == 0)
-        container.end_write(ptr);
-    }
-
-    void operator=(write_reference const &o) {
-      ~write_reference();
-      new (this) write_reference(o);
-    }
-
-    property &container;
-    annotated_pointer ptr;
-    unsigned long *ref_count;
-  };
-
-  /**
-   * A reference to a property's value. Reference-counted.
-   */
-  struct read_write_reference {
-    pointer operator->() {
-      return ptr.first;
-    }
-
-    reference operator*() {
-      return *ptr.first;
-    }
-    
-    read_write_reference(property &p)
-    : container(p), ptr(p.begin_read_write()), ref_count(new unsigned long(1)){}
-
-    read_write_reference(read_write_reference const &o)
-      : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
-      { ++*ref_count; }
-
-    void operator=(read_write_reference const &o) {
-      ~read_write_reference();
-      new (this) read_write_reference(o);
-    }
-
-    ~read_write_reference() {
-      if (--*ref_count == 0)
-        container.end_read_write(ptr);
-    }
-
-    property &container;
-    annotated_pointer ptr;
-    unsigned long *ref_count;
-  };
+  typedef std::pair<Type *, void *> annotated_pointer;
+  typedef std::pair<Type const *, void *> annotated_const_pointer;
 
   /**
    * Access the value for reading.
    * \return A read_reference to the value.
    */
-  read_reference read() const { 
+  read_reference<Type> read() const { 
     return *this; 
   }
 
@@ -159,7 +164,7 @@ public:
    * Access the value for changing.
    * \return A read_write_reference to the value.
    */
-  read_write_reference read_write() {
+  read_write_reference<Type> read_write() {
     return *this; 
   }
 
@@ -168,7 +173,7 @@ public:
    * behaviour.
    * \return A write_reference to the value.
    */
-  write_reference write() {
+  write_reference<Type> write() {
     return *this;
   }
 
@@ -176,7 +181,7 @@ public:
    * Set the value to another value.
    * \param v The new value.
    */
-  void set(const_reference v) {
+  void set(Type const &v) {
     *write() = v;
   }
 
@@ -184,7 +189,7 @@ public:
    * Get the value.
    * \return The value.
    */
-  value_type get() const {
+  Type get() const {
     return *read();
   }
 
@@ -192,13 +197,13 @@ public:
    * Get the value.
    * \see get()
    */
-  value_type operator()() const { return get(); }
+  Type operator()() const { return get(); }
 
   /**
    * Set the value to another value.
    * \see set()
    */
-  const_reference operator() (value_type const &v) {
+  Type operator() (Type const &v) {
     return *read_write() = v;
   }
 
@@ -209,7 +214,7 @@ public:
    */
   template<class F> 
   void apply_change(F func) {
-    read_write_reference x(read_write());
+    read_write_reference<Type> x(read_write());
     *x = func(*x);
   }
 
@@ -234,7 +239,7 @@ public:
   /// Destructor.
   virtual ~property() {}
 
-protected:
+private:
   virtual annotated_const_pointer begin_read() const = 0;
   virtual annotated_pointer begin_write() = 0;
   virtual annotated_pointer begin_read_write() = 0;
@@ -242,6 +247,10 @@ protected:
   virtual void end_read(annotated_const_pointer) const = 0;
   virtual void end_write(annotated_pointer) = 0;
   virtual void end_read_write(annotated_pointer) = 0;
+
+  friend class read_reference<Type>;
+  friend class write_reference<Type>;
+  friend class read_write_reference<Type>;
 };
 
 template<class T>

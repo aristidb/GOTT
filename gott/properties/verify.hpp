@@ -90,7 +90,7 @@ public:
   check_range(Type const &s, Type const &b) : small(s), big(b) {}
 
   bool operator()(property<Type> &prop, context &con) {
-    typename property<Type>::read_reference r = prop.read();
+    read_reference<Type> r = prop.read();
     if (*r < small) {
       con = small;
       return false;
