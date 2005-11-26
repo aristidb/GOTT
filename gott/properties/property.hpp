@@ -28,6 +28,13 @@ namespace gott {
 namespace properties {
 
 template<class Type> class property;
+template<class Type> class read_property;
+template<class Type> class write_property;
+
+template<class Type> struct annotated {
+  typedef std::pair<Type *, void *> pointer;
+  typedef std::pair<Type const *, void *> const_pointer;
+};
 
 /**
  * A read-only reference to a property's value. Reference-counted.
@@ -43,7 +50,7 @@ public:
     return *ptr.first;
   }
     
-  read_reference(property<Type> const &p)
+  read_reference(read_property<Type> const &p)
   : container(p), ptr(p.begin_read()), ref_count(new unsigned long(1)) {}
 
   read_reference(read_reference const &o)
@@ -61,8 +68,8 @@ public:
   }
 
 private:
-  property<Type> const &container;
-  typename property<Type>::annotated_const_pointer ptr;
+  read_property<Type> const &container;
+  typename annotated<Type>::const_pointer ptr;
   unsigned long *ref_count;
 };
 
@@ -80,7 +87,7 @@ public:
     return *ptr.first;
   }
   
-  write_reference(property<Type> &p)
+  write_reference(write_property<Type> &p)
   : container(p), ptr(p.begin_write()), ref_count(new unsigned long(1)) {}
 
   write_reference(write_reference const &o)
@@ -98,8 +105,8 @@ public:
   }
 
 private:
-  property<Type> &container;
-  typename property<Type>::annotated_pointer ptr;
+  write_property<Type> &container;
+  typename annotated<Type>::pointer ptr;
   unsigned long *ref_count;
 };
 
@@ -136,53 +143,23 @@ public:
 
 private:
   property<Type> &container;
-  typename property<Type>::annotated_pointer ptr;
+  typename annotated<Type>::pointer ptr;
   unsigned long *ref_count;
 };
 
 /**
- * Abstract property base class. Properties somehow store a value which you can
- * set, read and change. They might emit a signal whenever their value is 
- * changed.
+ * Abstract read-only property base class.
  * \param Type The value's type.
  */
 template<class Type>
-class property {
+class read_property {
 public:
-  typedef std::pair<Type *, void *> annotated_pointer;
-  typedef std::pair<Type const *, void *> annotated_const_pointer;
-
   /**
    * Access the value for reading.
-   * \return A read_reference to the value.
+   * \return A read_reference<Type> to the value.
    */
   read_reference<Type> read() const { 
     return *this; 
-  }
-
-  /**
-   * Access the value for changing.
-   * \return A read_write_reference to the value.
-   */
-  read_write_reference<Type> read_write() {
-    return *this; 
-  }
-
-  /**
-   * Access the value for writing. Reading the value results in undefined
-   * behaviour.
-   * \return A write_reference to the value.
-   */
-  write_reference<Type> write() {
-    return *this;
-  }
-
-  /**
-   * Set the value to another value.
-   * \param v The new value.
-   */
-  void set(Type const &v) {
-    *write() = v;
   }
 
   /**
@@ -198,6 +175,77 @@ public:
    * \see get()
    */
   Type operator()() const { return get(); }
+
+  /**
+   * Read the value to a function or functor.
+   * \param func The function/functor to call.
+   */
+  template<class F>
+  void apply_read(F func) const {
+    func(*read());
+  }
+
+protected:
+  typedef typename annotated<Type>::const_pointer annotated_const_pointer;
+
+private:
+  virtual annotated_const_pointer begin_read() const = 0;
+  virtual void end_read(annotated_const_pointer) const = 0;
+  friend class read_reference<Type>;
+};
+
+template<class Type>
+class write_property {
+public:
+  /**
+   * Access the value for writing. Reading the value results in undefined
+   * behaviour.
+   * \return A write_reference<Type> to the value.
+   */
+  write_reference<Type> write() {
+    return *this;
+  }
+
+  /**
+   * Set the value to another value.
+   * \param v The new value.
+   */
+  void set(Type const &v) {
+    *write() = v;
+  }
+
+  /**
+   * Set the value to the result of a function or functor.
+   * \param func The function/functor to call.
+   */
+  template<class F>
+  void apply_write(F func) {
+    *write() = func();
+  }
+
+protected:
+  typedef typename annotated<Type>::pointer annotated_pointer;
+
+private:
+  virtual annotated_pointer begin_write() = 0;
+  virtual void end_write(annotated_pointer) = 0;
+  friend class write_reference<Type>;
+};
+
+/**
+ * Abstract read & write property base class. 
+ * \param Type The value's type.
+ */
+template<class Type>
+class property : public read_property<Type>, public write_property<Type> {
+public:
+  /**
+   * Access the value for changing.
+   * \return A read_write_reference<Type> to the value.
+   */
+  read_write_reference<Type> read_write() {
+    return *this; 
+  }
 
   /**
    * Set the value to another value.
@@ -218,38 +266,12 @@ public:
     *x = func(*x);
   }
 
-  /**
-   * Read the value to a function or functor.
-   * \param func The function/functor to call.
-   */
-  template<class F>
-  void apply_read(F func) const {
-    func(*read());
-  }
-
-  /**
-   * Set the value to the result of a function or functor.
-   * \param func The function/functor to call.
-   */
-  template<class F>
-  void apply_write(F func) {
-    *write() = func();
-  }
-
   /// Destructor.
   virtual ~property() {}
 
 private:
-  virtual annotated_const_pointer begin_read() const = 0;
-  virtual annotated_pointer begin_write() = 0;
-  virtual annotated_pointer begin_read_write() = 0;
-  
-  virtual void end_read(annotated_const_pointer) const = 0;
-  virtual void end_write(annotated_pointer) = 0;
-  virtual void end_read_write(annotated_pointer) = 0;
-
-  friend class read_reference<Type>;
-  friend class write_reference<Type>;
+  virtual typename annotated<Type>::pointer begin_read_write() = 0;
+  virtual void end_read_write(typename annotated<Type>::pointer) = 0;
   friend class read_write_reference<Type>;
 };
 
