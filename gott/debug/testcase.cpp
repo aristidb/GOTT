@@ -46,11 +46,11 @@ int main() {
 
   ::gott::util::debug::tracefilter t2(-1,::gott::util::debug::TracefilterFlags(
                                       ::gott::util::debug::TF_ALLFIELDS));
-  std::wcout << t2(std::clock());
+  std::cout << t2(std::clock());
 
   ::gott::util::debug::tracefilter t1(-1,::gott::util::debug::TracefilterFlags(
                                       ::gott::util::debug::TF_ALLFIELDS
                                       | ::gott::util::debug::TF_GROUPBYFUNC));
-  std::wcout << t1(std::clock());
+  std::cout << t1(std::clock());
   return 0;
 }

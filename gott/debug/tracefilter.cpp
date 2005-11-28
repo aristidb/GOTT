@@ -34,8 +34,8 @@ tracefilter::tracefilter(int timeoffset, TracefilterFlags flags)
     filteroffset = clock_t(-1);
 }
 
-std::wstring tracefilter::operator () (clock_t requesttime) {
-  std::wstringstream output;
+std::string tracefilter::operator () (clock_t requesttime) {
+  std::ostringstream output;
   
   // FILTER
   for (unsigned int i = 0, e = traceobject::tracedfuncs.size(); i < e; i++) {
@@ -110,7 +110,7 @@ std::wstring tracefilter::operator () (clock_t requesttime) {
     output << std::endl;
   }
 
-  return std::wstring(output.str());
+  return output.str();
 }
 
 }}}

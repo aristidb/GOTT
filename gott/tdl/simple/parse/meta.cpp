@@ -46,21 +46,21 @@ meta_parser::meta_parser() : p(new IMPL) {
 
 meta_parser::~meta_parser() {}
 
-void meta_parser::parse(std::wistream &in, line_logger *) {
+void meta_parser::parse(std::istream &in, line_logger *) {
   while (in) {
-    if (in.peek() != L'#') {
-      if (in.peek() != L'\n')
+    if (in.peek() != '#') {
+      if (in.peek() != '\n')
         break;
       else
         in.get();
     } else {
       in.get();
-      if (in.peek() != L'?') {
-        in.putback(L'#');
+      if (in.peek() != '?') {
+        in.putback('#');
         break;
       }
       in.get();
-      std::wstring s;
+      std::string s;
       getline(in, s);
       p->exec(s);
     }

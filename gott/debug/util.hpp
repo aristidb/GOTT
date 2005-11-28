@@ -27,8 +27,8 @@ namespace gott {
 namespace debug {
 
 struct brace {
-  std::wostream &stream;
-  brace(std::wostream &s) : stream(s) {
+  std::ostream &stream;
+  brace(std::ostream &s) : stream(s) {
     stream << L"{\n";
   }
 

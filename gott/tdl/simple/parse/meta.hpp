@@ -75,7 +75,7 @@ public:
    * \param s The stream to read from.
    * \param l (optional) The line-logger callback.
    */
-  void parse(std::wistream &s, line_logger *l = 0) GOTT_EXPORT;
+  void parse(std::istream &s, line_logger *l = 0) GOTT_EXPORT;
 
 private:
   class IMPL;

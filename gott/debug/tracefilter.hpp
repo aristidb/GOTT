@@ -47,7 +47,7 @@ public:
   tracefilter(int timeoffset = -1,
               TracefilterFlags flags = TF_ALLFIELDS);
   
-  std::wstring operator ()(clock_t requesttime);
+  std::string operator ()(clock_t requesttime);
   
 private:
   tracenodes filteredfuncs;

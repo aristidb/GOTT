@@ -235,7 +235,11 @@ GOTT_EXPORT bool operator!=(Xany const &lhs, Xany const &rhs);
  */
 struct GOTT_EXPORT printable : virtual operations_base {
   virtual void print(std::ostream &, Xany const &) const = 0;
+
+#ifdef HAVE_WIDE_STDLIB
   virtual void print(std::wostream &, Xany const &) const = 0;
+#endif
+
   virtual ~printable() = 0;
 };
 
@@ -244,9 +248,11 @@ template<class T> struct printer : printable {
     s << Xany_cast<T>(v);
   }
 
+#ifdef HAVE_WIDE_STDLIB
   void print(std::wostream &s, Xany const &v) const {
     s << Xany_cast<T>(v);
   }
+#endif
 };
 
 /**

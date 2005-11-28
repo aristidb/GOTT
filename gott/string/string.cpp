@@ -98,11 +98,13 @@ std::ostream &gott::operator<<(std::ostream &stream, string const &s) {
   return stream;
 }
 
+#ifdef HAVE_WIDE_STDLIB
 std::wostream &gott::operator<<(std::wostream &stream, string const &s) {
   for (utf8_iterator it = s.as_utf32().begin(); it < s.as_utf32().end(); ++it)
     stream << wchar_t(*it);
   return stream;
 }
+#endif
 #endif
 
 bool gott::operator==(string const &a, string const &b) {

@@ -31,13 +31,13 @@ namespace simple {
 
 class writer {
 public:
-  GOTT_EXPORT writer(std::wostream &, unsigned = 4);
+  GOTT_EXPORT writer(std::ostream &, unsigned = 4);
   GOTT_EXPORT void down();
   GOTT_EXPORT void up();
-  GOTT_EXPORT void node(std::wstring const &content, 
+  GOTT_EXPORT void node(std::string const &content, 
                    bool quote = false, 
                    bool block = false);
-  GOTT_EXPORT void comment(std::wstring const &content, bool on_new_line);
+  GOTT_EXPORT void comment(std::string const &content, bool on_new_line);
   GOTT_EXPORT void end_document();
 
   GOTT_EXPORT class non_conformant_block {};

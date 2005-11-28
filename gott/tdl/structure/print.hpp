@@ -53,6 +53,7 @@ private:
   boost::scoped_ptr<IMPL> p;
 };
 
+#ifdef HAVE_WIDE_STDLIB
 /**
  * Print a (copyable) structure object to a (wide) stream.
  * \param o The stream to write to.
@@ -60,6 +61,7 @@ private:
  */
 GOTT_EXPORT
 std::wostream &operator<<(std::wostream &o, copyable_structure const &s);
+#endif
 
 /**
  * Print a (copyable) structure object to a (normal) stream.

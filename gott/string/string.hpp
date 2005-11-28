@@ -112,6 +112,7 @@ public:
     set_up(to_utf8_alloc(range(&s[0], s.length()), enc), true);
   }
 
+#ifdef HAVE_WIDE_STDLIB
   /**
    * Construct string from std::wstring.
    */
@@ -119,6 +120,7 @@ public:
     set_up(to_utf8_alloc(range(&s[0], s.length()).cast<char const *>(), enc), 
         true);
   }
+#endif
 
   /**
    * Construct std::string from string using unicode encoding.
@@ -128,6 +130,7 @@ public:
     return to_string(*this);
   }
 
+#ifdef HAVE_WIDE_STDLIB
   /**
    * Construct std::wstring from string using unicode encoding.
    * Use to_wstring() if you need a different encoding.
@@ -135,6 +138,7 @@ public:
   GOTT_LOCAL operator std::wstring() const {
     return to_wstring(*this);
   }
+#endif
 #endif
 
 #ifndef GOTT_NO_THUNK

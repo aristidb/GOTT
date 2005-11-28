@@ -26,7 +26,7 @@
 
 using std::pair;
 using std::ostream;
-using std::wistringstream;
+using std::istringstream;
 using gott::tdl::simple::meta_parser;
 using gott::string;
 
@@ -46,7 +46,7 @@ struct meta_basic {
     xp.push_back(pair<string,string>(cmd, param));
   }
   void run_test() {
-    wistringstream x(data);
+    istringstream x(data);
     parser.parse(x);
     rest = x.str().c_str() + x.tellg();
   }

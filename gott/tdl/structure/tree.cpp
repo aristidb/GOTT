@@ -332,17 +332,20 @@ stru::operator<<(std::basic_ostream<Ch> &s, tree::iterator const &i) {
 
 template std::ostream &
   stru::operator<< <char>(std::ostream &, tree::iterator const &);
+
+#ifdef HAVE_WIDE_STDLIB
 template std::wostream &
   stru::operator<< <wchar_t>(std::wostream&,tree::iterator const &);
+#endif
 
 #ifdef DEBUG
 #include <iostream>
 
-using std::wostream;
+using std::ostream;
 
-void tree::dump(wostream &stream) {
+void tree::dump(ostream &stream) {
   struct visitor {
-    wostream &out;
+    ostream &out;
     unsigned level;
     intrusive_ptr<node> pp;
     void ind() {
@@ -352,26 +355,26 @@ void tree::dump(wostream &stream) {
     void operator()(intrusive_ptr<node> p) {
       ind();
       if (p == pp)
-        out << L'*';
+        out << '*';
       if (p->data.empty())
-        out << L'-';
+        out << '-';
       else
         out << p->data;
 
-      out << L'(' << p->ttag << L')';
-      out << L" : ";
+      out << '(' << p->ttag << ')';
+      out << " : ";
       for (Vector<string>::iterator it = p->tags.begin(); 
            it != p->tags.end(); ++it)
-        out << *it << L' ';
-      out << L"{\n";
+        out << *it << ' ';
+      out << "{\n";
       level += 2;
       for (p = p->child0; p; p = p->sibling)
         operator()(p);
       level -= 2;
       ind();
-      out << L"}\n";
+      out << "}\n";
     }
-    visitor(wostream &oo, intrusive_ptr<node> p) : out(oo), level(0), pp(p) {}
+    visitor(ostream &oo, intrusive_ptr<node> p) : out(oo), level(0), pp(p) {}
   };
   visitor v(stream, p->pos);
   v(p->root);

@@ -82,9 +82,11 @@ std::ostream &gott::tdl::structure::operator<<(std::ostream &o,
   return o;
 }
 
+#ifdef HAVE_WIDE_STDLIB
 std::wostream &gott::tdl::structure::operator<<(std::wostream &o, 
                                                 copyable_structure const &s) {
   direct_print<wchar_t> p(o);
   s.copy_to(p);
   return o;
 }
+#endif

@@ -52,7 +52,5 @@ int main() {
   structure::tree out;
   match m(conf, out);
   m.parse(std::cin);
-  structure::direct_print<char> wrt(std::cout);
-  out.copy_to(wrt);
-  std::cout << '\n';
+  std::cout << out << '\n';
 }
