@@ -92,7 +92,9 @@ GOTT_XANY_DECLARE_PROMOTER(std::string, string);
 
 GOTT_XANY_DECLARE_PROMOTER(wchar_t const *, string);
 GOTT_XANY_DECLARE_PROMOTER(wchar_t *, string);
+#ifdef HAVE_WIDE_STDLIB
 GOTT_XANY_DECLARE_PROMOTER(std::wstring, string);
+#endif
 
 }}
 

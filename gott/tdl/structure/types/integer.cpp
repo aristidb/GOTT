@@ -20,7 +20,7 @@
 
 #include "integer.hpp"
 #include <gott/tdl/exceptions.hpp>
-#include <cwctype>
+#include <cctype>
 
 namespace structure = gott::tdl::structure;
 
@@ -38,7 +38,7 @@ repatch_integer::deferred_write(writable_structure &s) const {
     void data(xany::Xany const &x) {
       if (x.compatible<long>())
         target.data(x);
-      else if (x.compatible<std::wstring>()) {
+      else if (x.compatible<string>()) {
         string input = xany::Xany_cast<string>(x);
         long result;
         if (!is_integer(input, result))
@@ -52,26 +52,26 @@ repatch_integer::deferred_write(writable_structure &s) const {
       long sign = 1;
       val = 0;
   
-      string::utf32_range rng = s.as_utf32();
+      string::utf8_range rng = s.as_utf8();
   
       if (rng.empty())
         return false;
 
-      if (*rng.begin() == L'-') {
+      if (*rng.begin() == '-') {
         ++rng.begin();
         sign = -1;
         if (rng.empty())
           return false;
       }
   
-      if (!std::iswdigit(*rng.begin()))
+      if (!std::isdigit(*rng.begin()))
         return false;
     
 //    if (*it == L'0' && it[1] == L'x')
 //      return is_hex(it + 2, s.end(), v, sign)
 
-      for (; !rng.empty() && std::iswdigit(*rng.begin()); ++rng.begin())
-        val = val * 10 + (*rng.begin() - L'0');
+      for (; !rng.empty() && std::isdigit(*rng.begin()); ++rng.begin())
+        val = val * 10 + (*rng.begin() - '0');
 
       val *= sign;
       return true;

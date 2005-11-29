@@ -44,7 +44,7 @@ repatch_enumeration::deferred_write(writable_structure &s) const {
     : simple_repatcher_context(s), alternatives(a) {}
 
     void data(xany::Xany const &x) {
-      if (x.compatible<std::wstring>()) {
+      if (x.compatible<string>()) {
         string input = xany::Xany_cast<string>(x);
         Vector<string>::const_iterator it;
         if ((it = find(range(alternatives), input)) == alternatives.end())

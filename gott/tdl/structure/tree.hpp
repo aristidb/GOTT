@@ -177,7 +177,7 @@ public:
   GOTT_EXPORT ~tree();
 
 #ifdef DEBUG
-  GOTT_EXPORT void dump(std::wostream &);
+  GOTT_EXPORT void dump(std::ostream &);
 #endif
 
 private:

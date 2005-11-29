@@ -39,6 +39,7 @@ class string;
  */
 std::string to_string(string const &str, encoding enc = utf8) GOTT_EXPORT;
 
+#ifdef HAVE_WIDE_STDLIB
 /**
  * Convert a string to a STL-wide-string with a specific encoding.
  * \param str The string to convert.
@@ -47,6 +48,7 @@ std::string to_string(string const &str, encoding enc = utf8) GOTT_EXPORT;
  * @relates string
  */
 std::wstring to_wstring(string const &str, encoding enc = utf32) GOTT_EXPORT;
+#endif
 
 }
 

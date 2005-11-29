@@ -22,7 +22,7 @@
 #include <gott/string/string.hpp>
 #include <gott/string/stl.hpp>
 
-using std::wistream;
+using std::istream;
 using gott::tdl::simple::meta_parser;
 
 static bool pass(gott::string const &, gott::string const &) {
@@ -46,7 +46,7 @@ meta_parser::meta_parser() : p(new IMPL) {
 
 meta_parser::~meta_parser() {}
 
-void meta_parser::parse(std::istream &in, line_logger *) {
+void meta_parser::parse(istream &in, line_logger *) {
   while (in) {
     if (in.peek() != '#') {
       if (in.peek() != '\n')
