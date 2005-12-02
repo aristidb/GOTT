@@ -69,7 +69,7 @@ enum ev_t {
   flag_directory = 0x40000000,
   /// Event is sent only once.
   flag_oneshot = 0x80000000,
-  all_evens = file_access | file_modify | file_attrib | file_close_write 
+  all_events = file_access | file_modify | file_attrib | file_close_write 
     | file_close_nowrite | file_open | file_moved_from | file_moved_to
     | subfile_delete | subfile_create | file_delete
 };

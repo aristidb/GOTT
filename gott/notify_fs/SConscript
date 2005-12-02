@@ -1,0 +1,5 @@
+import glob
+Import('shrd')
+Import('env')
+shrd.SharedLibrary('notify_fs', ['watch.cpp', 'engine.cpp'])
+env.Program('test', 'test.cpp', LIBS = ['ntl', 'string', 'notify_fs'])
