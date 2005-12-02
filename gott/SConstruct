@@ -54,5 +54,5 @@ shrd.Append(CPPDEFINES = 'BUILDING_DLL')
 
 Export('shrd')
 
-SConscript(dirs = ['.', 'base', 'ui', 'graphics',
+SConscript(dirs = ['.', 'base', 'ui', 'graphics', 'notify_fs',
 		   'tools/autobuild', 'contrib/ntl'])
