@@ -19,17 +19,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "document.hpp"
-#include <gott/debug/assert.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_document;
 
-match_document::match_document(rule_attr_t const &a, Vector<rule_t> const &sr, 
+match_document::match_document(rule_attr_t const &a, Vector<rule_t> const &sr,
                                match &m)
-: happy_once(a, m), sub(sr[0]), state(first) {
-  GOTT_ASSERT_2(sr.GetCount(), 1, std::equal_to<int>(), "one parameter");
+: happy_once(a, m), sub(deflatten(sr)), state(first) {}
+
+schema::rule_t match_document::deflatten(Vector<rule_t> const &children) {
+  if (children.GetCount() == 1)
+    if (children[0].attributes().outer() == one())
+      return children[0];
+  return rule("ordered", rule_attr(coat = false), children);
 }
 
 bool match_document::play(ev::begin_parse const &) {

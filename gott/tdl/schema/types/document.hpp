@@ -37,9 +37,11 @@ public:
 
   static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &)
   { return false; }
-  
+
 private:
-  rule_t const &sub;
+  static rule_t deflatten(Vector<rule_t> const &children);
+
+  rule_t sub;
   enum { first, begun_parse, opened, closed } state;
 
   bool play(ev::begin_parse const &);
