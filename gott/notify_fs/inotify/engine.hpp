@@ -18,31 +18,28 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "watch.hpp"
-#include "inotify/engine.hpp"
-#include <gott/base/events/select_loop.hpp>
-#include <boost/bind.hpp>
-#include <iostream>
+#ifndef GOTT_NOTIFY_FS_INOTIFY_ENGINE_HPP
+#define GOTT_NOTIFY_FS_INOTIFY_ENGINE_HPP
 
-using namespace gott::notify_fs;
-using namespace gott::events;
+#include "../engine.hpp"
+#include <ntl.h>
 
-void output(event const &ev, int context) {
-  std::cout << context;
-  std::cout << "ev" << std::hex << ev.flags;
-  std::cout << " cookie" << ev.cookie;
-  std::cout << " name " << ev.name;
-  std::cout << std::endl;
-}
+namespace gott {
+namespace notify_fs {
 
-int main() {
-  static inotify_engine ee;
-  default_engine = &ee;
-  watch w("/tmp/testfile", all_events);
-  watch w2("/tmp", all_events);
-  w.on_fire().connect(boost::bind(&output, _1, 1));
-  w2.on_fire().connect(boost::bind(&output, _1, 2));
-  select_loop loop;
-  loop.add_read_fd(ee.fd, boost::bind(&inotify_engine::notify, &ee));
-  loop.run();
-}
+class GOTT_EXPORT inotify_engine : public engine {
+public:
+  inotify_engine();
+  ~inotify_engine();
+  watch_implementation *watch_alloc(string const &, ev_t, watch &);
+
+//private:
+public: //FIXME => private
+  int fd;
+  void notify();
+  VectorMap<boost::uint32_t, watch_implementation *> watches;
+};
+
+}}
+
+#endif

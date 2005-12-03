@@ -1,0 +1,138 @@
+// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Content: Filesystem notification library
+// Authors: Aristid Breitkreuz
+//
+// This file is part of the Gott Project (http://gott.sf.net)
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#include "engine.hpp"
+#include "../watch.hpp"
+
+#include <algorithm>
+
+#include <unistd.h>
+extern "C" {
+#include "inotify.h"
+#include "inotify-syscalls.h"
+}
+
+#include <iostream>
+
+using gott::notify_fs::inotify_engine;
+using gott::notify_fs::watch_implementation;
+using gott::notify_fs::ev_t;
+using gott::notify_fs::watch;
+
+inotify_engine::inotify_engine() : fd(inotify_init()) {
+  if (fd < 0) {
+    std::cout << "Failed to load Inotify!" << std::endl;
+    throw 0;
+  }
+  std::cout << "Inotify up and running..." << std::endl;
+}
+
+inotify_engine::~inotify_engine() {
+  close(fd);
+  std::cout << "Shut down Inotify." << std::endl;
+}
+
+typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
+
+namespace {
+struct inotify_watch : watch_implementation {
+  inotify_engine &eng;
+  boost::uint32_t wd;
+  watch &context;
+
+  inotify_watch(inotify_engine *e, char const *path, ev_t mask, watch &w)
+  : eng(*e), wd(inotify_add_watch(eng.fd, path, mask)), context(w) {}
+
+  ~inotify_watch() {
+    std::cout << "Remove watch " << wd << std::endl;
+    eng.watches.Remove(wd);
+    inotify_rm_watch(eng.fd, wd);
+  }
+};
+}
+
+watch_implementation *
+inotify_engine::watch_alloc(gott::string const &path, ev_t mask, watch &w) {
+  char *c_path = new char[path.size() + 1];
+  c_path[path.size()] = '\0';
+  std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path);
+  inotify_watch *p = new inotify_watch(this, c_path, mask, w);
+  std::cout << "Add watch: " << p->wd << std::endl;
+  watches.Add(p->wd, p);
+  return p;
+}
+
+#if 0 // reference
+int read_events (queue_t q, int fd)
+{
+	char buffer[16384];
+	size_t buffer_i;
+	struct inotify_event *pevent, *event;
+	ssize_t r;
+	size_t event_size;
+	int count = 0;
+
+	r = read (fd, buffer, 16384);
+
+	if (r <= 0) {
+		perror ("read(fd, buffer, 16384) = ");
+		return r;
+	}
+
+	buffer_i = 0;
+	printf("read = %d\n", r);
+
+	printf("sizeof inotify_event = %d\n", sizeof(struct inotify_event));
+	while (buffer_i < r) {
+		/* Parse events and queue them ! */
+		pevent = (struct inotify_event *)&buffer[buffer_i];
+		event_size = sizeof(struct inotify_event) + pevent->len;
+		printf("pevent->len = %d\n", pevent->len);
+		event = malloc(event_size);
+		memmove(event, pevent, event_size);
+		queue_enqueue(event, q);
+		buffer_i += event_size;
+		count++;
+	}
+
+	return count;
+}
+#endif
+
+void inotify_engine::notify() {
+  std::cout << "New events:" << std::endl;
+  char buffer[16384];
+  ssize_t r = read(fd, buffer, sizeof(buffer));
+  if (r <= 0) {
+    std::cout << "Communication problems with inotify!" << std::endl;
+    return;
+  }
+  for (size_t i = 0; i < size_t(r);) {
+    inotify_event *pevent = reinterpret_cast<inotify_event *>(buffer + i);
+    i += sizeof(inotify_event) + pevent->len;
+    event ev = {
+      static_cast<inotify_watch *>(watches.Get(pevent->wd))->context,
+      ev_t(pevent->mask),
+      pevent->cookie,
+      pevent->name
+    };
+    ev.context.on_fire().emit(ev);
+  }
+}

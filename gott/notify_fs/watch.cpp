@@ -25,6 +25,6 @@ using gott::notify_fs::watch;
 using gott::notify_fs::watch_implementation;
 
 watch::watch(gott::string const &path, gott::notify_fs::ev_t mask) 
-: p(default_engine->watch_alloc(path, mask, fire)) {}
+: p(default_engine->watch_alloc(path, mask, *this)) {}
 
 watch_implementation::~watch_implementation() {}

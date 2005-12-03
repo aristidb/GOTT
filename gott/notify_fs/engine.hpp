@@ -27,16 +27,16 @@
 namespace gott {
 namespace notify_fs {
 
+class watch;
 class watch_implementation;
 
 class GOTT_EXPORT engine {
 public:
   virtual ~engine() = 0;
-  virtual watch_implementation *
-    watch_alloc(string const &, ev_t, sigc::signal1<void, event const &>) = 0;
+  virtual watch_implementation *watch_alloc(string const &, ev_t, watch &) = 0;
 };
 
-extern engine *default_engine;
+GOTT_EXPORT extern engine *default_engine;
 
 }}
 
