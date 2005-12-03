@@ -19,18 +19,32 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "ordered.hpp"
+#include "../rule.hpp"
 
 namespace schema = gott::tdl::schema;
 namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_ordered;
 
-match_ordered::match_ordered(rule_attr_t const &a, Vector<rule_t> const&r,match&m)
-: happy_once(a, m), subrules(r, 1), pos(subrules.begin()) {
+match_ordered::match_ordered(rule_attr_t const &a, Vector<rule_t> const&r,
+                             match  &m)
+: happy_once(a, m), subrules(deflatten(r)), pos(subrules.begin()) {
   if (pos != subrules.end())
     matcher().add(*pos);
   else
     be_happy();
+}
+
+Vector<schema::rule_t> match_ordered::deflatten(Vector<rule_t> const &in) {
+  Vector<rule_t> out;
+  out.AddN(in.GetCount());
+  for (int i = 0; i < in.GetCount(); ++i) {
+    if (in[i].attributes().outer() == one())
+      out[i] = in[i];
+    else
+      out[i] = rule("list", rule_attr(coat = false), in[i]);
+  }
+  return out;
 }
 
 match_ordered::~match_ordered() {}

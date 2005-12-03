@@ -39,8 +39,8 @@ public:
 
   typedef
     boost::variant<
-      std::size_t,
-      std::pair<std::size_t, std::size_t>,
+      size_t,
+      pair<std::size_t, std::size_t>,
       callback
     >
   type_t;
@@ -76,6 +76,22 @@ slotcfg::~slotcfg() {}
 
 void slotcfg::operator=(slotcfg const &b) {
   p.reset(new IMPL(b.p->m, b.p->type, b.p->count));
+}
+
+bool slotcfg::operator==(slotcfg const &b) const {
+  if (p->m != b.p->m)
+    return false;
+  switch (p->type.which()) {
+  case 0:
+    return get<size_t>(p->type) == get<size_t>(b.p->type);
+  case 1:
+    return get<pair<size_t, size_t> >(p->type)
+      == get<pair<size_t, size_t> >(b.p->type);
+  case 2:
+    return get<callback>(&p->type) == get<callback>(&b.p->type);
+  default:
+    return false;
+  }
 }
 
 void slotcfg::add() {

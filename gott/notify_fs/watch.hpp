@@ -26,6 +26,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <sigc++/signal.h>
+#include <stdexcept>
 
 namespace gott {
 namespace notify_fs {
@@ -43,6 +44,12 @@ public:
 private:
   sigc::signal1<void, event const &> fire;
   boost::scoped_ptr<watch_implementation> p;
+};
+
+class GOTT_EXPORT watch_installation_failure : public std::runtime_error {
+public:
+  watch_installation_failure(gott::string const &file);
+  ~watch_installation_failure() throw();
 };
 
 class GOTT_EXPORT watch_implementation {

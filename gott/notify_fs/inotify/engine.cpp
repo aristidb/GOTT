@@ -31,6 +31,7 @@ extern "C" {
 
 #include <iostream>
 
+using gott::string;
 using gott::notify_fs::inotify_engine;
 using gott::notify_fs::watch_implementation;
 using gott::notify_fs::ev_t;
@@ -52,13 +53,26 @@ inotify_engine::~inotify_engine() {
 typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
 
 namespace {
+boost::int32_t get_watch(inotify_engine &eng, string const &path, 
+    ev_t mask) {
+  char *c_path = new char[path.size() + 1];
+  c_path[path.size()] = '\0';
+  std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path);
+  boost::int32_t result = inotify_add_watch(eng.fd, c_path, mask);
+  delete [] c_path;
+  return result;
+}
+
 struct inotify_watch : watch_implementation {
   inotify_engine &eng;
-  boost::uint32_t wd;
+  boost::int32_t wd;
   watch &context;
 
-  inotify_watch(inotify_engine *e, char const *path, ev_t mask, watch &w)
-  : eng(*e), wd(inotify_add_watch(eng.fd, path, mask)), context(w) {}
+  inotify_watch(inotify_engine *e, string const &path, ev_t mask, watch &w)
+  : eng(*e), wd(get_watch(eng, path, mask)), context(w) {
+    if (wd < 0)
+      throw gott::notify_fs::watch_installation_failure(path);
+  }
 
   ~inotify_watch() {
     std::cout << "Remove watch " << wd << std::endl;
@@ -69,11 +83,8 @@ struct inotify_watch : watch_implementation {
 }
 
 watch_implementation *
-inotify_engine::watch_alloc(gott::string const &path, ev_t mask, watch &w) {
-  char *c_path = new char[path.size() + 1];
-  c_path[path.size()] = '\0';
-  std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path);
-  inotify_watch *p = new inotify_watch(this, c_path, mask, w);
+inotify_engine::watch_alloc(string const &path, ev_t mask, watch &w) {
+  inotify_watch *p = new inotify_watch(this, path, mask, w);
   std::cout << "Add watch: " << p->wd << std::endl;
   watches.Add(p->wd, p);
   return p;

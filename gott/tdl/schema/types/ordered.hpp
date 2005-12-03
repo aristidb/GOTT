@@ -37,6 +37,8 @@ public:
   static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &);
 
 private:
+  static Vector<rule_t> deflatten(Vector<rule_t> const &);
+
   Vector<rule_t> subrules;
   Vector<rule_t>::iterator pos;
 
