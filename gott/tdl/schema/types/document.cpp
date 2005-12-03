@@ -33,6 +33,8 @@ schema::rule_t match_document::deflatten(Vector<rule_t> const &children) {
   if (children.GetCount() == 1)
     if (children[0].attributes().outer() == one())
       return children[0];
+    else
+      return rule("list", rule_attr(coat = false), children);
   return rule("ordered", rule_attr(coat = false), children);
 }
 

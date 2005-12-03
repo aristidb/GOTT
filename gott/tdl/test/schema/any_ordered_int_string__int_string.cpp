@@ -38,11 +38,10 @@ namespace {
 struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {
   schema_any_ordered_integer_string__integer_string()
   : tut::schema_basic(
-      rule("document", RA(),
-        Vector<rule_t>() <<
-         rule("any", RA(),
+      rule("document",
+         rule("any",
            Vector<rule_t>() <<
-           rule("ordered", RA(),
+           rule("ordered",
              Vector<rule_t>() <<
              rule("node", RA("int", true, new stru::repatch_integer())) <<
              rule("node", RA("string"))) <<

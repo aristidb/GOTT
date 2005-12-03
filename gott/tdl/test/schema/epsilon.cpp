@@ -32,17 +32,13 @@ using stru::cf::M;
 using schema::slotcfg;
 using schema::rule_t;
 
-typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_epsilon : tut::schema_basic {
   schema_epsilon()
   : tut::schema_basic(
-      rule("document", RA(), Vector<rule_t>() <<
-        rule("list", RA(), Vector<rule_t>() <<
-          rule("node", 
-            RA(Vector<gott::string>(), true, Xany(), 0,
-               slotcfg(), slotcfg(slotcfg::exactly, 0))))))
+      rule("document", rule("node", 
+           rule_attr(schema::outer = schema::exactly(0)))))
   {}
 };
 }
@@ -71,7 +67,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   run_test("");
-  C(S(Xany())).write_to(xp);
+  S(Xany()).write_to(xp);
   ensure_equals("empty", tree, xp);
 }
 

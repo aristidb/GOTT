@@ -39,10 +39,10 @@ namespace {
 struct schema_12plus_int : tut::schema_basic {
   schema_12plus_int() 
   : tut::schema_basic(
-      rule("document", rule("list", rule("node", rule_attr(
+      rule("document", rule("node", rule_attr(
                schema::tag = "el",
                schema::repatcher = new stru::repatch_integer(),
-               schema::outer = schema::at_least(12))))))
+               schema::outer = schema::at_least(12)))))
   {}
 };
 }
@@ -106,7 +106,7 @@ void object::test<13>(int) {
 template<> template<>
 void object::test<14>(int t) {
   int n = t - 2; // minimum: 12
-  
+
   std::ostringstream w;
   for (int i = 0; i < n; ++i) {
     w << i;
@@ -118,7 +118,7 @@ void object::test<14>(int t) {
   stru::cf::nd_list c;
   for (int i = 0; i < n; ++i)
     c.push_back(S(Xany(i), L"el"));
-  C(M(c)).write_to(xp);
+  M(c).write_to(xp);
 
   ensure_equals("enough", tree, xp);
 }

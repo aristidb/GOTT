@@ -40,14 +40,10 @@ namespace {
 struct schema_5to8int : tut::schema_basic {
   schema_5to8int()
   : tut::schema_basic(
-      rule("document", RA(),
-        Vector<rule_t>() <<
-         rule("list", RA(),
-           Vector<rule_t>() <<
-           rule("node",
+      rule("document", rule("node",
              RA(Vector<string>() << "el", true, Xany(), 
                 new stru::repatch_integer(), 
-                slotcfg(), slotcfg(slotcfg::range, 5, 8))))))
+                slotcfg(), slotcfg(slotcfg::range, 5, 8)))))
   {}
 };
 }
@@ -87,7 +83,7 @@ void object::test<6>(int t) {
   stru::cf::nd_list c;
   for (int i = 1; i < t; ++i)
     c.push_back(S(Xany(-i), "el"));
-  C(M(c)).write_to(xp);
+  M(c).write_to(xp);
   ensure_equals("in range", tree, xp);
 }
 

@@ -37,7 +37,7 @@ struct schema_max7string : tut::schema_basic {
   : tut::schema_basic(
       rule("document", RA(),
         Vector<rule_t>() <<
-         rule("list", RA(),
+         rule("ordered", RA(),
            Vector<rule_t>() <<
            rule("node",
              RA(Vector<string>() << "el", true, Xany(), 0, 
@@ -101,7 +101,7 @@ void object::test<15>(int) {
     fail("going down");
   } catch (schema::mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
-                  "1:1 : mismatch in document>list>node(el) after token 1");
+                  "1:1 : mismatch in document>ordered>list>node(el) after token 1");
   }
 }
 
