@@ -36,7 +36,7 @@ public:
 
 template<>
 inline unsigned GetHashValue(gott::plugin::QID const &q) {
-  return GetHashValue((gott::atom &) q);
+  return GetHashValue((gott::atom const &) q);
 }
 
 #endif
