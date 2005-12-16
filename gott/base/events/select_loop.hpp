@@ -27,8 +27,8 @@
 #include <sys/select.h> 
 #include <boost/function.hpp>
 #include <gott/visibility.hpp>
-#include <gott/base/events/deadline_timer.hpp>
-
+#include "deadline_timer.hpp"
+#include "main_loop.hpp"
 
 // TODO: wrong namespace, and wrong place for this file?
 namespace gott{namespace events{
@@ -37,9 +37,9 @@ namespace gott{namespace events{
  * \brief select_loop encapsulates a main loop that uses pselect to dispatch events
  * select_loop is not copyable.
  */
-class GOTT_EXPORT select_loop {
+class select_loop : public main_loop {
   private:
-    struct GOTT_LOCAL handler {  // is local allowed here?
+    struct handler {  // is local allowed here?
       boost::function<void()> on_read, on_write, on_exception;
     };
     fd_set read_fds, write_fds, except_fds;
@@ -53,13 +53,13 @@ class GOTT_EXPORT select_loop {
 
     timeval handle_timed_events();
   public:
-    select_loop();
-    ~select_loop();
+    select_loop() GOTT_EXPORT;
+    ~select_loop() GOTT_EXPORT;
 
     /**
      * \brief add a gott::events::deadline_timer to the looop
      */
-    void add_timer( deadline_timer const& timer );
+    void add_timer( deadline_timer const& timer ) GOTT_EXPORT;
     /**
      * \name callback registration and removal methods
      * There are three possible incomming events for each 
@@ -72,26 +72,29 @@ class GOTT_EXPORT select_loop {
      * \param[in] fd file descriptor of the socket to watch
      * \param[in] on_read callback called whenever data is waiting at the socket.
      */
-    void add_read_fd( int fd, boost::function<void()> on_read );
+    void add_read_fd( int fd, boost::function<void()> on_read ) GOTT_EXPORT;
     /**
      * \brief adds a file descriptor to watch and registers a write callback.
      * If the file descriptor already exists only the write callback is replaced.
      * \param[in] fd file descriptor of the socket to watch
      * \param[in] on_write called whenever the socket is ready for writing
      */
-    void add_write_fd( int fd, boost::function<void()> on_write );
+    void add_write_fd( int fd, boost::function<void()> on_write ) GOTT_EXPORT;
     /**
      * \brief adds a file descriptor to watch and registers a write callback.
      * If the file descriptor already exists only the excetion callback is replaced.
      * \param[in] fd file descriptor of the socket to watch
      * \param[in] on_exception  will be called if exceptions happen on that socket
      */
-    void add_exception_fd( int fd, boost::function<void()> on_exception );
-    void add_fd( int fd, boost::function<void()> on_read, boost::function<void()> on_write, boost::function<void()> on_exception );
-    void remove_fd( int fd );
+    void add_exception_fd( int fd, boost::function<void()> on_exception ) GOTT_EXPORT;
+    void add_fd( int fd, boost::function<void()> on_read, boost::function<void()> on_write, boost::function<void()> on_exception ) GOTT_EXPORT;
+    void remove_fd( int fd ) GOTT_EXPORT;
     //\}
 
-    void run();
+    void run() GOTT_EXPORT;
+
+private:
+    void *do_feature(std::type_info const &);
 };
 
 }}

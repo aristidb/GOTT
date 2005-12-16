@@ -28,6 +28,9 @@ select_loop::select_loop() {
   FD_ZERO(&except_fds);
 }
 
+void *select_loop::do_feature(std::type_info const &type) {
+  return 0;
+}
 
 void select_loop::add_timer( deadline_timer const& timer ) {
   if( ! timer.timer.is_not_a_date_time() ) {
