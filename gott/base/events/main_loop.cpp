@@ -21,10 +21,12 @@
 #include "main_loop.hpp"
 #include "fd_manager.hpp"
 #include "timer_manager.hpp"
+#include "signal_manager.hpp"
 
 using gott::events::main_loop;
 using gott::events::fd_manager;
 using gott::events::timer_manager;
+using gott::events::signal_manager;
 
 main_loop::main_loop() {}
 main_loop::~main_loop() {}
@@ -34,3 +36,6 @@ fd_manager::~fd_manager() {}
 
 timer_manager::timer_manager() {}
 timer_manager::~timer_manager() {}
+
+signal_manager::signal_manager() {}
+signal_manager::~signal_manager() {}

@@ -23,6 +23,7 @@
 #include <gott/base/events/select_loop.hpp>
 #include <boost/bind.hpp>
 #include <iostream>
+#include <signal.h>
 
 using namespace gott::notify_fs;
 using namespace gott::events;
@@ -45,5 +46,7 @@ int main() {
   boost::scoped_ptr<main_loop> loop(new select_loop);
   loop->feature<fd_manager>()
     .add_read_fd(ee.fd, boost::bind(&inotify_engine::notify, &ee));
+  loop->feature<signal_manager>().on_signal(SIGINT).connect(
+    boost::bind(&main_loop::quit, boost::ref(*loop)));
   loop->run();
 }

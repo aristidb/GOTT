@@ -27,17 +27,19 @@
 #include <queue>
 #include <sys/select.h> 
 #include <boost/function.hpp>
+#include <boost/optional/optional.hpp>
 #include <gott/visibility.hpp>
 #include "deadline_timer.hpp"
 #include "main_loop.hpp"
 #include "fd_manager.hpp"
 #include "timer_manager.hpp"
+#include "sigselfpipe.hpp"
 
 // TODO: wrong namespace, and wrong place for this file?
 namespace gott{namespace events{
 
 /**
- * Encapsulates a main loop that uses pselect to dispatch events.
+ * Encapsulates a main loop that uses select to dispatch events.
  * Not copyable.
  */
 class GOTT_EXPORT select_loop 
@@ -54,6 +56,8 @@ class GOTT_EXPORT select_loop
         queue_type;
     callback_map callbacks;
     queue_type timed_events;
+    volatile bool running; // thread-safe?!
+    ::boost::optional<sigselfpipe> sigmgr;
 
     GOTT_LOCAL select_loop( select_loop const& cp );
     GOTT_LOCAL select_loop& operator=( select_loop const& cp );
@@ -75,6 +79,7 @@ class GOTT_EXPORT select_loop
     void remove_fd( int fd );
 
     void run();
+    void quit();
 
 private:
     GOTT_LOCAL void *do_feature(std::type_info const &);

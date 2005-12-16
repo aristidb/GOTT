@@ -19,11 +19,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include "select_loop.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/utility/in_place_factory.hpp>
 
 namespace gott{namespace events{
-select_loop::select_loop() {
+select_loop::select_loop() : running(false) {
   FD_ZERO(&read_fds);
   FD_ZERO(&write_fds);
   FD_ZERO(&except_fds);
@@ -33,6 +34,10 @@ void *select_loop::do_feature(std::type_info const &type) {
   GOTT_EVENTS_FEATURE(type,select_loop);
   GOTT_EVENTS_FEATURE(type,fd_manager);
   GOTT_EVENTS_FEATURE(type,timer_manager);
+  if (type == typeid(signal_manager)) {
+    if (!sigmgr) sigmgr = boost::in_place(this);
+    return static_cast<signal_manager *>(sigmgr.get_ptr());
+  }
   return 0;
 }
 
@@ -101,6 +106,8 @@ timeval select_loop::handle_timed_events(){
 }
 
 void select_loop::run(){
+  running = true;
+
   using namespace boost::posix_time;
   size_t n = callbacks.rbegin()->first + 1;
   timeval next_event = handle_timed_events(), *t=0; 
@@ -109,7 +116,8 @@ void select_loop::run(){
     t = &next_event;
 
   int num_fd;
-  while( ( !timed_events.empty() || !callbacks.empty() )  
+  while( running
+      && ( !timed_events.empty() || !callbacks.empty() )  
       && ( num_fd = select( n, &read_fds, &write_fds, &except_fds, t ) ) != -1 ) 
   {
     for( callback_map::const_iterator it = callbacks.begin(), 
@@ -147,6 +155,12 @@ void select_loop::run(){
 
     n = callbacks.rbegin()->first + 1;
   }
+
+  running = false;
+}
+
+void select_loop::quit() {
+  running = false;
 }
 
 select_loop::~select_loop() {

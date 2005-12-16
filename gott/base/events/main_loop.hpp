@@ -39,6 +39,8 @@ public:
   virtual ~main_loop() = 0;
   /// Run the main loop until there is nothing to do.
   virtual void run() = 0;
+  /// Quit the main loop.
+  virtual void quit() = 0;
 
   /**
    * Get a concrete feature of the main loop.
