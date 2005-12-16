@@ -18,19 +18,27 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "main_loop.hpp"
-#include "fd_manager.hpp"
-#include "timer_manager.hpp"
+#ifndef GOTT_BASE_EVENTS_TIMER_MANAGER_HPP
+#define GOTT_BASE_EVENTS_TIMER_MANAGER_HPP
 
-using gott::events::main_loop;
-using gott::events::fd_manager;
-using gott::events::timer_manager;
+#include "deadline_timer.hpp"
 
-main_loop::main_loop() {}
-main_loop::~main_loop() {}
+namespace gott {
+namespace events {
 
-fd_manager::fd_manager() {}
-fd_manager::~fd_manager() {}
+/**
+ * Feature for main_loops able to deal with timer events.
+ */
+class GOTT_EXPORT timer_manager {
+public:
+  /// Constructor.
+  timer_manager();
+  /// Pure virtual destructor.
+  virtual ~timer_manager() = 0;
+  /// Add a #deadline_timer.
+  virtual void add_timer(deadline_timer const &) = 0;
+};
 
-timer_manager::timer_manager() {}
-timer_manager::~timer_manager() {}
+}}
+
+#endif

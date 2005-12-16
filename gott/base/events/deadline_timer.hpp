@@ -73,12 +73,20 @@ struct GOTT_LOCAL deadline_timer{
    * \brief constructs an invalid deadline_timer.
    */
   deadline_timer() : timer(boost::date_time::not_a_date_time) {}
-  deadline_timer( time_type const& t, handler_type const&  h) : timer(t),handler(h){}
+  deadline_timer( time_type const& t, handler_type const&  h) 
+    : timer(t),handler(h){}
 
   static const deadline_timer no_timer;
 };
-inline GOTT_LOCAL bool operator<( deadline_timer const& left, deadline_timer const& right ) { return left.timer < right.timer; } 
-inline GOTT_LOCAL bool operator>( deadline_timer const& left, deadline_timer const& right ) { return left.timer > right.timer; } 
+
+inline GOTT_LOCAL 
+bool operator<( deadline_timer const& left, deadline_timer const& right ) { 
+  return left.timer < right.timer; 
+} 
+inline GOTT_LOCAL 
+bool operator>( deadline_timer const& left, deadline_timer const& right ) { 
+  return left.timer > right.timer; 
+} 
 
 }}
 

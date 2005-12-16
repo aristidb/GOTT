@@ -1,4 +1,4 @@
-// Copyright (C) 2004-2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: GOTT main loop
 // Authors: Aristid Breitkreuz
 //
@@ -28,25 +28,54 @@
 namespace gott {
 namespace events {
 
+/**
+ * Basic main loop interface class. For a single thread only.
+ */
 class GOTT_EXPORT main_loop {
 public:
+  /// Constructor.
+  main_loop();
+  /// Pure virtual destructor.
   virtual ~main_loop() = 0;
+  /// Run the main loop until there is nothing to do.
   virtual void run() = 0;
 
+  /**
+   * Get a concrete feature of the main loop.
+   * \return
+   *   - 0 if the feature is not available
+   *   - a pointer to the feature
+   */
   template<class T>
   GOTT_LOCAL T *feature_ptr() { 
     return static_cast<T *>(do_feature(typeid(T)));
   }
+
+  /**
+   * Get a concrete feature of the main loop.
+   * \return
+   *   - 0 if the feature is not available.
+   *   - A pointer to the feature.
+   */
   template<class T>
   GOTT_LOCAL T const *feature_ptr() const { 
     return static_cast<T const *>(
         const_cast<main_loop *>(this)->do_feature(typeid(T)));
   }
+
+  /// Exception thrown if a requested feature is not available.
   class GOTT_EXPORT bad_feature : std::runtime_error {
     GOTT_LOCAL
     bad_feature() 
       : std::runtime_error("Requested main_loop feature not available") {}
+    friend class main_loop;
   };
+
+  /**
+   * Get a concrete feature of the main loop.
+   * \return A pointer to the feature.
+   * \throw #bad_feature if the feature is not available.
+   */
   template<class T>
   GOTT_LOCAL T &feature() {
     T *p = feature_ptr<T>();
@@ -54,6 +83,12 @@ public:
       throw bad_feature();
     return *p;
   }
+
+  /**
+   * Get a concrete feature of the main loop.
+   * \return A pointer to the feature.
+   * \throw #bad_feature if the feature is not available.
+   */
   template<class T>
   GOTT_LOCAL T const &feature() const {
     T const *p = feature_ptr<T>();
@@ -61,9 +96,15 @@ public:
       throw bad_feature();
     return *p;
   }
+
 protected:
   virtual void *do_feature(std::type_info const &) = 0;
 };
+
+//TODO faster please
+#define GOTT_EVENTS_FEATURE(var,T) \
+  if (var == typeid(T)) \
+    return static_cast<T *>(this);
 
 }}
 

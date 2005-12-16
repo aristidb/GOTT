@@ -1,6 +1,7 @@
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
 // Content: GOTT select loop
 // Authors: Andreas Pokorny
+//          Aristid Breitkreuz
 //
 // This file is part of the Gott Project (http://gott.sf.net)
 //
@@ -29,6 +30,9 @@ select_loop::select_loop() {
 }
 
 void *select_loop::do_feature(std::type_info const &type) {
+  GOTT_EVENTS_FEATURE(type,select_loop);
+  GOTT_EVENTS_FEATURE(type,fd_manager);
+  GOTT_EVENTS_FEATURE(type,timer_manager);
   return 0;
 }
 
@@ -37,23 +41,26 @@ void select_loop::add_timer( deadline_timer const& timer ) {
     timed_events.push( timer );
   }
 }
-void select_loop::add_read_fd( int fd, boost::function<void()> fun ) {
+void select_loop::add_read_fd( int fd, boost::function<void()> const &fun ) {
   FD_SET(fd, &read_fds);
   callbacks[fd].on_read = fun;
 }
 
-void select_loop::add_write_fd( int fd, boost::function<void()> fun ) {
+void select_loop::add_write_fd( int fd, boost::function<void()> const &fun ) {
   FD_SET(fd, &write_fds);
   callbacks[fd].on_write = fun;
 }
 
 
-void select_loop::add_exception_fd( int fd, boost::function<void()> fun ) {
+void select_loop::add_exception_fd(int fd, boost::function<void()> const &fun) {
   FD_SET(fd, &except_fds);
   callbacks[fd].on_exception = fun;
 }
 
-void select_loop::add_fd( int fd, boost::function<void()> o_r, boost::function<void()> o_w, boost::function<void()> o_e ) {
+void select_loop::add_fd(int fd, 
+    boost::function<void()> const &o_r, 
+    boost::function<void()> const &o_w, 
+    boost::function<void()> const &o_e) {
   FD_SET(fd, &read_fds);
   FD_SET(fd, &write_fds);
   FD_SET(fd, &except_fds);
@@ -61,7 +68,6 @@ void select_loop::add_fd( int fd, boost::function<void()> o_r, boost::function<v
   callbacks[fd].on_write = o_w;
   callbacks[fd].on_exception = o_e;
 }
-
 
 void select_loop::remove_fd( int fd ) {
   callback_map::iterator it = callbacks.find( fd );
@@ -80,7 +86,8 @@ timeval select_loop::handle_timed_events(){
   if( ! timed_events.empty() ){
     ptime now( microsec_clock::local_time() );
     time_duration td = timed_events.top().timer - now;
-    for( ; td.is_negative() || td.total_seconds() == 0 ; td = timed_events.top().timer - now  ) {
+    for( ; td.is_negative() || td.total_seconds() == 0 ; 
+        td = timed_events.top().timer - now  ) {
       deadline_timer::handler_type cp = timed_events.top().handler;
       timed_events.pop();
       add_timer( cp() );
@@ -105,7 +112,10 @@ void select_loop::run(){
   while( ( !timed_events.empty() || !callbacks.empty() )  
       && ( num_fd = select( n, &read_fds, &write_fds, &except_fds, t ) ) != -1 ) 
   {
-    for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end(); num_fd && it!=e;++it)  {
+    for( callback_map::const_iterator it = callbacks.begin(), 
+          e = callbacks.end(); 
+       num_fd && it!=e;
+       ++it)  {
       if( FD_ISSET( it->first, &read_fds ) ) {
         --num_fd;
         it->second.on_read();
@@ -123,7 +133,10 @@ void select_loop::run(){
     else {
       t = 0;
     }
-    for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end(); num_fd && it!=e;++it)  {
+    for( callback_map::const_iterator it = callbacks.begin(), 
+           e = callbacks.end(); 
+         num_fd && it!=e;
+         ++it)  {
       if( it->second.on_write )
         FD_SET( it->first, &write_fds );
       if( it->second.on_read )
@@ -137,7 +150,9 @@ void select_loop::run(){
 }
 
 select_loop::~select_loop() {
-  for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end(); it!=e;++it)  {
+  for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end();
+      it!=e;
+      ++it)  {
     FD_CLR(it->first,&read_fds);
     FD_CLR(it->first,&write_fds);
     FD_CLR(it->first,&except_fds);

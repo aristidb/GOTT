@@ -42,7 +42,8 @@ int main() {
   watch w2("/tmp", all_events);
   w.on_fire().connect(boost::bind(&output, _1, 1));
   w2.on_fire().connect(boost::bind(&output, _1, 2));
-  select_loop loop;
-  loop.add_read_fd(ee.fd, boost::bind(&inotify_engine::notify, &ee));
-  loop.run();
+  boost::scoped_ptr<main_loop> loop(new select_loop);
+  loop->feature<fd_manager>()
+    .add_read_fd(ee.fd, boost::bind(&inotify_engine::notify, &ee));
+  loop->run();
 }
