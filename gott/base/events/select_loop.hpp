@@ -78,6 +78,10 @@ class GOTT_EXPORT select_loop
         boost::function<void()> const &on_exception );
     void remove_fd( int fd );
 
+    sigc::signal1<void,int> &on_signal(int sig) {
+      return feature<signal_manager>().on_signal(sig);
+    }
+
     void run();
     void quit();
 
