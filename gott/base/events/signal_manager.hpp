@@ -45,9 +45,13 @@ public:
   virtual sigc::signal1<void, int> &on_signal(int sig) = 0;
 
 protected:
-  static void register_signal(int sig, signal_manager *handler);
-  static void unregister_all(signal_manager *handler);
-  static signal_manager *find(int sig);
+  virtual void immediate_action(int sig) = 0;
+
+  static void register_signal(int sig, signal_manager *handler) GOTT_LOCAL;
+  static void unregister_all(signal_manager *handler) GOTT_LOCAL;
+  static signal_manager *find(int sig) GOTT_LOCAL;
+private:
+  static void signal_handler(int sig) GOTT_LOCAL;
 };
 
 }}

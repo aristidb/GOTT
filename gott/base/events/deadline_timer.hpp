@@ -27,7 +27,7 @@
 namespace gott{namespace events{
 
 /**
- * \brief timed event structure, similar to http://asio.sourceforge.net/asio-0.3.4/doc/reference/a00114.html
+ * \brief timed event structure. similar to http://asio.sourceforge.net/asio-0.3.4/doc/reference/a00114.html
  *
  * The deadline_timer carries a boost::date_time::posix_time::ptime object and a function object
  * returing a deadline_timer. An event loop will try to call the handler when the specified 

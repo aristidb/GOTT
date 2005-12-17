@@ -50,14 +50,12 @@ signl_t &sigselfpipe::on_signal(int sig) {
   if (pos < 0) {
     signal_manager::register_signal(sig, this);
     pos = handlers.FindAdd(sig);
-    signal(sig, signal_handler);
   }
   return handlers[pos];
 }
 
-void sigselfpipe::signal_handler(int sig) {
-  write(static_cast<sigselfpipe *>(signal_manager::find(sig))->selfpipe[1], 
-      &sig, sizeof(sig));
+void sigselfpipe::immediate_action(int sig) {
+  write(selfpipe[1], &sig, sizeof(sig));
 }
 
 void sigselfpipe::notify_in() {

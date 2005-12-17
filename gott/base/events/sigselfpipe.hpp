@@ -40,7 +40,7 @@ private:
   int selfpipe[2];
   void notify_in();
   VectorMap<int, sigc::signal1<void,int> > handlers;
-  static void signal_handler(int); 
+  void immediate_action(int);
 };
 
 }}

@@ -21,6 +21,7 @@
 #include "signal_manager.hpp"
 #include <stdexcept>
 #include <ntl.h>
+#include <signal.h>
 
 using gott::events::signal_manager;
 
@@ -36,6 +37,7 @@ void signal_manager::register_signal(int sig, signal_manager *handler) {
     throw std::runtime_error(
         "cannot register more than one signal_manager per signal");
   handlers.Add(sig, handler);
+  signal(sig, signal_handler);
 }
 
 void signal_manager::unregister_all(signal_manager *handler) {
@@ -46,4 +48,8 @@ void signal_manager::unregister_all(signal_manager *handler) {
 
 signal_manager *signal_manager::find(int sig) {
   return handlers.Get(sig);
+}
+
+void signal_manager::signal_handler(int sig) {
+  find(sig)->immediate_action(sig);
 }
