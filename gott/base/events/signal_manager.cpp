@@ -18,19 +18,32 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "main_loop.hpp"
-#include "fd_manager.hpp"
-#include "timer_manager.hpp"
+#include "signal_manager.hpp"
+#include <stdexcept>
+#include <ntl.h>
 
-using gott::events::main_loop;
-using gott::events::fd_manager;
-using gott::events::timer_manager;
+using gott::events::signal_manager;
 
-main_loop::main_loop() {}
-main_loop::~main_loop() {}
+signal_manager::signal_manager() {}
+signal_manager::~signal_manager() {}
 
-fd_manager::fd_manager() {}
-fd_manager::~fd_manager() {}
+namespace {
+VectorMap<int, signal_manager *> handlers;
+}
 
-timer_manager::timer_manager() {}
-timer_manager::~timer_manager() {}
+void signal_manager::register_signal(int sig, signal_manager *handler) {
+  if (handlers.Find(sig) >= 0)
+    throw std::runtime_error(
+        "cannot register more than one signal_manager per signal");
+  handlers.Add(sig, handler);
+}
+
+void signal_manager::unregister_all(signal_manager *handler) {
+  for (int i = 0; i < handlers.GetCount(); ++i)
+    if (handlers[i] == handler)
+      handlers.Unlink(i);
+}
+
+signal_manager *signal_manager::find(int sig) {
+  return handlers.Get(sig);
+}

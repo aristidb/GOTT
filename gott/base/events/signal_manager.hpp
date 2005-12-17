@@ -18,19 +18,38 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "main_loop.hpp"
-#include "fd_manager.hpp"
-#include "timer_manager.hpp"
+#ifndef GOTT_BASE_EVENTS_SIGNAL_MANAGER_HPP
+#define GOTT_BASE_EVENTS_SIGNAL_MANAGER_HPP
 
-using gott::events::main_loop;
-using gott::events::fd_manager;
-using gott::events::timer_manager;
+#include <gott/visibility.hpp>
+#include <sigc++/signal.h>
 
-main_loop::main_loop() {}
-main_loop::~main_loop() {}
+namespace gott {
+namespace events {
 
-fd_manager::fd_manager() {}
-fd_manager::~fd_manager() {}
+/**
+ * Feature for main_loops able to deal with operating system signals.
+ */
+class GOTT_EXPORT signal_manager {
+public:
+  /// Constructor.
+  signal_manager();
+  /// Pure virtual destructor.
+  virtual ~signal_manager() = 0;
 
-timer_manager::timer_manager() {}
-timer_manager::~timer_manager() {}
+  /**
+   * In-program signal for signal notifications. Each signal should be 
+   * associated to a single main_loop or signal_manager - or a 
+   * std::runtime_error will be thrown.
+   */
+  virtual sigc::signal1<void, int> &on_signal(int sig) = 0;
+
+protected:
+  static void register_signal(int sig, signal_manager *handler);
+  static void unregister_all(signal_manager *handler);
+  static signal_manager *find(int sig);
+};
+
+}}
+
+#endif

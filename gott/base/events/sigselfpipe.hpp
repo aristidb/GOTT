@@ -18,19 +18,31 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "main_loop.hpp"
+#ifndef GOTT_BASE_EVENTS_SIGSELFPIPE_HPP
+#define GOTT_BASE_EVENTS_SIGSELFPIPE_HPP
+
+#include "signal_manager.hpp"
 #include "fd_manager.hpp"
-#include "timer_manager.hpp"
+#include <ntl.h>
 
-using gott::events::main_loop;
-using gott::events::fd_manager;
-using gott::events::timer_manager;
+namespace gott {
+namespace events {
 
-main_loop::main_loop() {}
-main_loop::~main_loop() {}
+/**
+ * Default feature implementation for signals.
+ */
+class GOTT_LOCAL sigselfpipe : public signal_manager {
+public:
+  sigselfpipe(fd_manager *fdm);
+  ~sigselfpipe();
+  sigc::signal1<void,int> &on_signal(int);
+private:
+  int selfpipe[2];
+  void notify_in();
+  VectorMap<int, sigc::signal1<void,int> > handlers;
+  static void signal_handler(int); 
+};
 
-fd_manager::fd_manager() {}
-fd_manager::~fd_manager() {}
+}}
 
-timer_manager::timer_manager() {}
-timer_manager::~timer_manager() {}
+#endif
