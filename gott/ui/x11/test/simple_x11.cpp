@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
+#include <csignal>
 #include <utility>
 #include <boost/bind.hpp>
 #include <gott/ui/window_base.hpp>
@@ -166,6 +167,8 @@ int main(int, char **){
     loop.add_read_fd( con.get_descriptor(), boost::bind( &uicontext::process_read, &con ) );
     loop.add_timer( deadline_timer( microsec_clock::local_time() + seconds(10), boost::bind( &resize_window, &win ) ) );
     loop.add_timer( deadline_timer( microsec_clock::local_time() + seconds(7), boost::bind( &move_window, &win ) ) );
+    loop.on_signal(SIGINT).connect(boost::bind(&select_loop::quit, &loop));
     loop.run();
   }
+  std::cout << "Bye." << std::endl;
 }
