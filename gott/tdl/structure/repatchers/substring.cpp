@@ -44,7 +44,8 @@ writable_structure *repatch_substring::deferred_write(
       string s = xany::Xany_cast<string>(x);
       long len = s.length();
       if (left > len || right > len || right < -len)
-        throw failed_repatch("repatch_substring: substring range out of bounds");
+        throw failed_repatch(
+            "repatch_substring: substring range out of bounds");
       string::utf32_range in = s.as_utf32(), out;
       if (right > 0) 
         out = offset(simply(in.begin()), left, right);

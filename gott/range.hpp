@@ -48,6 +48,11 @@ template<class T> struct range_t {
   value_type End;
 
   /**
+   * Construct range with null-iterators. This is a defined state.
+   */
+  range_t() : Begin(value_type()), End(value_type()) {}
+
+  /**
    * Construct range from two iterators.
    */
   range_t(value_type const &a, value_type const &b) : Begin(a), End(b) {}
