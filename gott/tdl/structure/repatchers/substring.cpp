@@ -45,13 +45,14 @@ writable_structure *repatch_substring::deferred_write(
       long len = s.length();
       if (left > len || right > len || right < -len)
         throw failed_repatch("repatch_substring: substring range out of bounds");
-      string::utf32_range r = s.as_utf32();
-      string out;
-      if (right > 0)
-        out = offset(simply(r.begin()), left, right);
+      string::utf32_range in = s.as_utf32(), out;
+      if (right > 0) 
+        out = offset(simply(in.begin()), left, right);
       else
-        out = offset(r, left, right);
-      target.data(xany::Xany(out));
+        out = offset(in, left, right);
+      if (out.end() < out.begin())
+        throw failed_repatch("repatch_substring: invalid substring");
+      target.data(xany::Xany(string(out)));
     }
   };
   return new context(target, left, right);
