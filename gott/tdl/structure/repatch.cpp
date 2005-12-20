@@ -20,6 +20,9 @@
 
 #include "repatch.hpp"
 #include "../exceptions.hpp"
+#include <gott/range_algo.hpp>
+#include <boost/checked_delete.hpp>
+#include <boost/bind.hpp>
 
 namespace structure = gott::tdl::structure;
 using structure::repatcher;
@@ -27,6 +30,7 @@ using structure::failed_repatch;
 using structure::writable_structure;
 using structure::simple_repatcher_context;
 using structure::repatch_nothing;
+using structure::repatcher_chain;
 
 repatcher::repatcher() {}
 repatcher::~repatcher() {}
@@ -58,4 +62,51 @@ repatch_nothing::~repatch_nothing() {}
 writable_structure *
 repatch_nothing::deferred_write(writable_structure &s) const {
   return new simple_repatcher_context(s);
+}
+
+repatcher_chain::repatcher_chain() {}
+repatcher_chain::~repatcher_chain() {
+  for_each(range(el), boost::checked_deleter<repatcher>());
+}
+
+repatcher_chain::repatcher_chain(repatcher_chain const &o) 
+: concrete_repatcher<repatcher_chain>() {
+  el.AddN(o.el.GetCount());
+  transform(range(o.el), range(el), boost::bind(&repatcher::clone, _1));
+}
+
+void repatcher_chain::push_back(repatcher const &r) {
+  el.push_back(r.clone());
+}
+
+writable_structure *
+repatcher_chain::deferred_write(writable_structure &s) const {
+  struct context : public writable_structure {
+    Vector<writable_structure *> out;
+    range_t<Vector<writable_structure *>::iterator> outr;
+    context(Vector<repatcher *> const &el, writable_structure &target) {
+      out.AddN(el.GetCount());
+      int i = el.GetCount() - 1;
+      out[i] = el[i]->deferred_write(target);
+      while (--i >= 0)
+        out[i] = el[i]->deferred_write(*out[i + 1]);
+      outr = range(out);
+    }
+    ~context() {
+      for_each(outr, boost::checked_deleter<writable_structure>());
+    }
+    void begin() {
+      for_each(outr, boost::bind(&writable_structure::begin, _1));
+    }
+    void end() {
+      for_each(outr, boost::bind(&writable_structure::end, _1));
+    }
+    void data(xany::Xany const &x) {
+      for_each(outr, boost::bind(&writable_structure::data, _1, x));
+    }
+    void add_tag(string const &s) {
+      for_each(outr, boost::bind(&writable_structure::add_tag, _1, s));
+    }
+  };
+  return new context(el, s);
 }

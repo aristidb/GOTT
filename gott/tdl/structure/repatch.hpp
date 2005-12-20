@@ -34,7 +34,12 @@ class GOTT_EXPORT repatcher {
 public:
   repatcher();
   virtual ~repatcher() = 0;
+  virtual repatcher *clone() const = 0;
   virtual writable_structure *deferred_write(writable_structure &) const = 0;
+};
+
+template<class T> class concrete_repatcher : public repatcher {
+  repatcher *clone() const { return new T(*static_cast<T const *>(this)); }
 };
 
 class GOTT_EXPORT simple_repatcher_context : public writable_structure {
@@ -50,11 +55,22 @@ public:
   void add_tag(string const &t);
 };
 
-class GOTT_EXPORT repatch_nothing : public repatcher {
+class GOTT_EXPORT repatch_nothing : public concrete_repatcher<repatch_nothing> {
 public:
   repatch_nothing();
   ~repatch_nothing();
   writable_structure *deferred_write(writable_structure &) const;
+};
+
+class GOTT_EXPORT repatcher_chain : public concrete_repatcher<repatcher_chain> {
+public:
+  repatcher_chain();
+  ~repatcher_chain();
+  repatcher_chain(repatcher_chain const &);
+  void push_back(repatcher const &r);
+  writable_structure *deferred_write(writable_structure &) const;
+private:
+  Vector<repatcher *> el;
 };
 
 }}}

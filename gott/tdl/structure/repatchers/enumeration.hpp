@@ -29,7 +29,8 @@ namespace gott {
 namespace tdl {
 namespace structure {
 
-class GOTT_EXPORT repatch_enumeration : public repatcher {
+class GOTT_EXPORT repatch_enumeration 
+: public concrete_repatcher<repatch_enumeration> {
 public:
   repatch_enumeration(Vector<string> pick_ &);
   ~repatch_enumeration();

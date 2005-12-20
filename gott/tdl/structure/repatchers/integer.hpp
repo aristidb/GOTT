@@ -27,7 +27,7 @@ namespace gott {
 namespace tdl {
 namespace structure {
 
-class GOTT_EXPORT repatch_integer : public repatcher {
+class GOTT_EXPORT repatch_integer : public concrete_repatcher<repatch_integer> {
 public:
   repatch_integer();
   ~repatch_integer();
