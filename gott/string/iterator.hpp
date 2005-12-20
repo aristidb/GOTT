@@ -147,7 +147,7 @@ public:
   /**
    * Construct from pointer to UTF8-formatted memory.
    */
-  utf8_iterator(utf8_t const *c) : current(c) {}
+  utf8_iterator(utf8_t const *c = 0) : current(c) {}
 
   /**
    * Retrieve the current memory position.
