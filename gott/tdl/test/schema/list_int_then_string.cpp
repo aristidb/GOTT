@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
-#include <gott/tdl/structure/types/integer.hpp>
+#include <gott/tdl/structure/repatchers/integer.hpp>
 #include <gott/string/string.hpp>
 
 namespace schema = gott::tdl::schema;

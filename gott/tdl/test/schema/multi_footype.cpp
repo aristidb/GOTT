@@ -21,7 +21,7 @@
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/schema/types/named.hpp>
-#include <gott/tdl/structure/types/integer.hpp>
+#include <gott/tdl/structure/repatchers/integer.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;

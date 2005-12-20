@@ -19,8 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
-#include <gott/tdl/structure/types/enumeration.hpp>
-#include <gott/tdl/structure/types/integer.hpp>
+#include <gott/tdl/structure/repatchers/enumeration.hpp>
+#include <gott/tdl/structure/repatchers/integer.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;

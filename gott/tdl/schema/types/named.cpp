@@ -21,7 +21,7 @@
 #include "named.hpp"
 #include "../event.hpp"
 #include <gott/string/string.hpp>
-#include <gott/tdl/structure/types/enumeration.hpp>
+#include <gott/tdl/structure/repatchers/enumeration.hpp>
 #include <gott/debug/assert.hpp>
 
 using gott::xany::Xany;

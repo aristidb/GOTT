@@ -21,6 +21,7 @@
 
 namespace gott {
 class string;
+class string_buffer;
 
 namespace xany {
 
@@ -95,6 +96,7 @@ GOTT_XANY_DECLARE_PROMOTER(wchar_t *, string);
 #ifdef HAVE_WIDE_STDLIB
 GOTT_XANY_DECLARE_PROMOTER(std::wstring, string);
 #endif
+GOTT_XANY_DECLARE_PROMOTER(string_buffer, string);
 
 }}
 
