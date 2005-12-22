@@ -79,6 +79,10 @@ void repatcher_chain::push_back(repatcher const &r) {
   el.push_back(r.clone());
 }
 
+void repatcher_chain::push_back_alloc(repatcher *r) {
+  el.push_back(r);
+}
+
 writable_structure *
 repatcher_chain::deferred_write(writable_structure &s) const {
   struct context : public writable_structure {

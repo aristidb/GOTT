@@ -33,6 +33,7 @@ public:
   repatch_substring(long left, long right);
   ~repatch_substring();
   writable_structure *deferred_write(writable_structure &) const;
+  static void reg() GOTT_LOCAL;
 private:
   long left, right;
 };

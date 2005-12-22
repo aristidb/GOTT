@@ -19,6 +19,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "repatcher_by_name.hpp"
+#include "repatch.hpp"
+#include <gott/range_algo.hpp>
+#include <boost/bind.hpp>
 
 using gott::tdl::structure::repatcher_getter;
 using gott::tdl::structure::repatcher_by_name_t;
@@ -34,4 +37,27 @@ repatcher_by_name_t::~repatcher_by_name_t() {}
 repatcher_by_name_t &gott::tdl::structure::repatcher_by_name() {
   static repatcher_by_name_t instance;
   return instance;
+}
+
+void repatcher_by_name_t::add(
+    string const &name, 
+    boost::function<repatcher_getter *()> const &func) {
+  repo.Add(name, func);
+}
+
+repatcher_getter *repatcher_by_name_t::get_alloc(string const &name) const {
+  return repo.Get(name)();
+}
+
+repatcher_getter *repatcher_by_name_t::chain_alloc(
+    Vector<string> const &names) const {
+  //FIXME need _getter!
+#if 0
+  repatcher_chain *result = new repatcher_chain;
+  using boost::bind;
+  for_each(range(names), 
+      bind(&repatcher_chain::push_back_alloc, result, 
+        bind(&repatcher_by_name_t::get_alloc, this, _1)));
+  return result;
+#endif
 }

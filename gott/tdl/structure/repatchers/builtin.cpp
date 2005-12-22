@@ -18,30 +18,24 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_TDL_STRUCTURE_TYPES_FIND_LITERAL_HPP
-#define GOTT_UTIL_TDL_STRUCTURE_TYPES_FIND_LITERAL_HPP
-
+#include "integer.hpp"
+#include "enumeration.hpp"
+#include "substring.hpp"
+#include "find_literal.hpp"
+#include "../repatcher_by_name.hpp"
 #include "../repatch.hpp"
 
-namespace gott {
-namespace tdl {
-namespace structure {
+namespace {
+struct builtin_repatchers {
+  builtin_repatchers();
+} auto_reg;
+}
 
-class GOTT_EXPORT repatch_find_literal 
-: public concrete_repatcher<repatch_find_literal> {
-public:
-  struct type {
-    enum location { start, end, whole, substring };
-  };
-  repatch_find_literal(type::location, string const &);
-  ~repatch_find_literal();
-  writable_structure *deferred_write(writable_structure &) const;
-  static void reg() GOTT_LOCAL;
-private:
-  type::location loc;
-  string literal;
-};
+using namespace gott::tdl::structure;
 
-}}}
-
-#endif
+builtin_repatchers::builtin_repatchers() {
+  repatch_integer::reg();
+  repatch_enumeration::reg();
+  repatch_substring::reg();
+  repatch_find_literal::reg();
+}

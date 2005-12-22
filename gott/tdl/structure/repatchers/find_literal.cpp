@@ -66,3 +66,7 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
   };
   return new context(loc, literal, target);
 }
+
+void repatch_find_literal::reg() {
+  //...
+}

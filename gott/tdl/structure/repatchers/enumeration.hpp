@@ -35,7 +35,7 @@ public:
   repatch_enumeration(Vector<string> pick_ &);
   ~repatch_enumeration();
   writable_structure *deferred_write(writable_structure &) const;
-
+  static void reg() GOTT_LOCAL;
 private:
   Vector<string> alternatives;
 };

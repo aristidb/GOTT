@@ -58,3 +58,7 @@ writable_structure *repatch_substring::deferred_write(
   };
   return new context(target, left, right);
 }
+
+void repatch_substring::reg() {
+  //...
+}

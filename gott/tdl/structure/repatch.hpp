@@ -68,6 +68,7 @@ public:
   ~repatcher_chain();
   repatcher_chain(repatcher_chain const &);
   void push_back(repatcher const &r);
+  void push_back_alloc(repatcher *);
   writable_structure *deferred_write(writable_structure &) const;
 private:
   Vector<repatcher *> el;

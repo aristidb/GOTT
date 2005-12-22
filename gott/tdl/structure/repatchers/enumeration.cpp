@@ -56,3 +56,7 @@ repatch_enumeration::deferred_write(writable_structure &s) const {
   };
   return new context(s, alternatives);
 }
+
+void repatch_enumeration::reg() {
+  //...
+}

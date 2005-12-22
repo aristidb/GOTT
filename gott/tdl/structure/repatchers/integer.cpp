@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "integer.hpp"
+#include "../repatcher_by_name.hpp"
 #include <gott/tdl/exceptions.hpp>
 #include <cctype>
 
@@ -78,4 +79,27 @@ repatch_integer::deferred_write(writable_structure &s) const {
     }
   };
   return new context(s);
+}
+
+void repatch_integer::reg() {
+  struct getter : public repatcher_getter {
+    bool begun;
+    bool ended;
+    void begin() { 
+      if (begun) fail();
+      begun = true;
+    }
+    void end() {
+      if (!begun || ended) fail();
+      ended = true;
+    }
+    void data(xany::Xany const &) { fail(); }
+    void add_tag(string const &) { fail(); }
+    void fail() {
+      throw std::invalid_argument("repatch_integer arguments");
+    }
+    repatcher *result_alloc() const { return new repatch_integer(); }
+    static repatcher_getter *alloc() { return new getter; }
+  };
+  repatcher_by_name().add("integer", &getter::alloc);
 }

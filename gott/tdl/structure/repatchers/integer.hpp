@@ -32,6 +32,7 @@ public:
   repatch_integer();
   ~repatch_integer();
   writable_structure *deferred_write(writable_structure &) const;
+  static void reg() GOTT_LOCAL;
 };
 
 }}}
