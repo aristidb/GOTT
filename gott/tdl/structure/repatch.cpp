@@ -95,18 +95,10 @@ repatcher_chain::deferred_write(writable_structure &s) const {
     ~context() {
       for_each(outr, boost::checked_deleter<writable_structure>());
     }
-    void begin() {
-      for_each(outr, boost::bind(&writable_structure::begin, _1));
-    }
-    void end() {
-      for_each(outr, boost::bind(&writable_structure::end, _1));
-    }
-    void data(xany::Xany const &x) {
-      for_each(outr, boost::bind(&writable_structure::data, _1, x));
-    }
-    void add_tag(string const &s) {
-      for_each(outr, boost::bind(&writable_structure::add_tag, _1, s));
-    }
+    void begin() { out[0]->begin(); }
+    void end() { out[0]->end(); }
+    void data(xany::Xany const &x) { out[0]->data(x); }
+    void add_tag(string const &s) { out[0]->add_tag(s); }
   };
   return new context(el, s);
 }

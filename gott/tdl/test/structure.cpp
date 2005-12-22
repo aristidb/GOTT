@@ -30,9 +30,7 @@ namespace cf = stru::cf;
 using gott::xany::Xany;
 
 namespace tut {
-struct structure_basic {
-
-};
+struct structure_basic { };
 
 typedef test_group<structure_basic> tf;
 typedef tf::object object;
