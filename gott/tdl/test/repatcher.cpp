@@ -89,7 +89,6 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   scoped_ptr<repatcher_getter> re_g(repatcher_by_name().get_alloc("integer"));
-  re_g->begin(); re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
   direct_print<char> out(std::cout);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
@@ -100,6 +99,25 @@ void object::test<3>(int) {
 
 template<> template<>
 void object::test<4>(int) {
+  scoped_ptr<repatcher_getter> re_g(
+      repatcher_by_name().get_alloc("enumeration"));
+  re_g->begin(); re_g->data(Xany("v1")); re_g->end();
+  re_g->begin(); re_g->data(Xany("v2")); re_g->end();
+  scoped_ptr<repatcher> re(re_g->result_alloc());
+  direct_print<char> out(std::cout);
+  scoped_ptr<writable_structure> ind(re->deferred_write(out));
+  ind->begin();
+    ind->begin();
+    ind->data(Xany("v1"));
+    ind->end();
+    ind->begin();
+    ind->data(Xany("v2"));
+    ind->end();
+  ind->end();
+}
+
+template<> template<>
+void object::test<5>(int) {
   no_test();
 }
 

@@ -19,7 +19,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "substring.hpp"
+#include "../repatcher_by_name.hpp"
 #include <gott/tdl/exceptions.hpp>
+#include <boost/optional.hpp>
+#include <boost/none.hpp>
 #include <stdexcept>
 
 using gott::tdl::structure::repatch_substring;
@@ -60,5 +63,70 @@ writable_structure *repatch_substring::deferred_write(
 }
 
 void repatch_substring::reg() {
-  //...
+  struct getter : public repatcher_getter {
+    getter() 
+    : begun_outer(false), ended_outer(false), pos(outer) {}
+    bool begun_outer;
+    bool ended_outer;
+    enum { outer, inner, p_left, p_right } pos;
+    long left, right;
+    boost::optional<long> delayed;
+    void begin() {
+      if (begun_outer) {
+        if (pos != outer) fail();
+        pos = inner;
+      }
+      begun_outer = true;
+    }
+    void end() {
+      if (!begun_outer || ended_outer) fail();
+      if (pos == outer)
+        ended_outer = true;
+      else
+        pos = outer;
+    }
+    void data(xany::Xany const &x) {
+      if (delayed)
+        fail();
+      switch (inner) {
+      case p_left:
+        left = xany::Xany_cast<long>(x);
+        break;
+      case p_right:
+        right = xany::Xany_cast<long>(x);
+        break;
+      case inner:
+        delayed = xany::Xany_cast<long>(x);
+        break;
+      case outer:
+        fail();
+      }
+    }
+    void add_tag(string const &s) {
+      if (!begun_outer || ended_outer) fail();
+      if (pos != inner)
+        return;
+      if (s == "left")
+        pos = p_left;
+      else if (s == "right")
+        pos = p_right;
+      else
+        return;
+      if (delayed) {
+        if (pos == p_left)
+          left = *delayed;
+        else if (pos == p_right)
+          right = *delayed;
+        delayed = boost::none;
+      }
+    }
+    void fail() {
+      throw std::invalid_argument("repatch_substring arguments");
+    }
+    repatcher *result_alloc() const {
+      return new repatch_substring(left, right);
+    }
+    static repatcher_getter *alloc() { return new getter; }
+  };
+  repatcher_by_name().add("substring", &getter::alloc);
 }

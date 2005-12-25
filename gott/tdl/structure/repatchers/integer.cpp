@@ -83,17 +83,9 @@ repatch_integer::deferred_write(writable_structure &s) const {
 
 void repatch_integer::reg() {
   struct getter : public repatcher_getter {
-    getter() : begun(false), ended(false) {}
-    bool begun;
-    bool ended;
-    void begin() { 
-      if (begun) fail();
-      begun = true;
-    }
-    void end() {
-      if (!begun || ended) fail();
-      ended = true;
-    }
+    getter() {}
+    void begin() { fail(); }
+    void end() { fail(); }
     void data(xany::Xany const &) { fail(); }
     void add_tag(string const &) { fail(); }
     void fail() {

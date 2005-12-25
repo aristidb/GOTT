@@ -19,13 +19,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "enumeration.hpp"
+#include "../repatcher_by_name.hpp"
 #include <gott/tdl/exceptions.hpp>
 #include <gott/range_algo.hpp>
+#include <gott/xany/xany.hpp>
 
 namespace structure = gott::tdl::structure;
 
 using structure::repatch_enumeration;
 using structure::writable_structure;
+using gott::string;
 
 repatch_enumeration::repatch_enumeration(Vector<string> pick_ &x) 
 : alternatives(x) {}
@@ -58,5 +61,30 @@ repatch_enumeration::deferred_write(writable_structure &s) const {
 }
 
 void repatch_enumeration::reg() {
-  //...
+  struct getter : public repatcher_getter {
+    getter() : inner(false) {}
+    bool inner;
+    Vector<string> all_strings;
+    void begin() {
+      if (inner) fail();
+      inner = true;
+    }
+    void end() {
+      if (!inner) fail();
+      inner = false;
+    }
+    void data(xany::Xany const &x) {
+      if (!inner) fail();
+      all_strings.Add(xany::Xany_cast<string>(x));
+    }
+    void add_tag(string const &) {}
+    void fail() {
+      throw std::invalid_argument("repatch_enumeration arguments");
+    }
+    repatcher *result_alloc() const {
+      return new repatch_enumeration(all_strings);
+    }
+    static repatcher_getter *alloc() { return new getter; }
+  };
+  repatcher_by_name().add("enumeration", &getter::alloc);
 }
