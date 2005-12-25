@@ -83,6 +83,7 @@ repatch_integer::deferred_write(writable_structure &s) const {
 
 void repatch_integer::reg() {
   struct getter : public repatcher_getter {
+    getter() : begun(false), ended(false) {}
     bool begun;
     bool ended;
     void begin() { 

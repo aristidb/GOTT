@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <gott/tdl/structure/repatch.hpp>
+#include <gott/tdl/structure/repatcher_by_name.hpp>
 #include <gott/tdl/structure/repatchers/find_literal.hpp>
 #include <gott/tdl/structure/repatchers/substring.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
@@ -32,6 +33,7 @@
 
 using namespace gott::tdl::structure;
 using namespace gott::xany;
+using boost::scoped_ptr;
 
 namespace tut {
 struct repatcher_test { };
@@ -59,8 +61,8 @@ template<> template<>
 void object::test<1>(int) {
   std::ostringstream o;
   direct_print<char> out(o);
-  boost::scoped_ptr<repatcher> re(strip_paren());
-  boost::scoped_ptr<writable_structure> ind(re->deferred_write(out));
+  scoped_ptr<repatcher> re(strip_paren());
+  scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin();
   ind->data(Xany("(hallo)"));
   ind->end();
@@ -71,8 +73,8 @@ template<> template<>
 void object::test<2>(int) {
   std::ostringstream o;
   direct_print<char> out(o);
-  boost::scoped_ptr<repatcher> re(strip_paren());
-  boost::scoped_ptr<writable_structure> ind(re->deferred_write(out));
+  scoped_ptr<repatcher> re(strip_paren());
+  scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin();
   try {
     ind->data(Xany("(hallo"));
@@ -86,6 +88,18 @@ void object::test<2>(int) {
 
 template<> template<>
 void object::test<3>(int) {
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name().get_alloc("integer"));
+  re_g->begin(); re_g->end();
+  scoped_ptr<repatcher> re(re_g->result_alloc());
+  direct_print<char> out(std::cout);
+  scoped_ptr<writable_structure> ind(re->deferred_write(out));
+  ind->begin();
+  ind->data(Xany("-44"));
+  ind->end();
+}
+
+template<> template<>
+void object::test<4>(int) {
   no_test();
 }
 
