@@ -32,9 +32,7 @@ namespace config {
 /**
  * Matcher for a single config item.
  * Matches one TDL item (which may configure more than one item).
- * user-data: VectorMap<QID, rule_t>
- * format:
- * sub-qid {%follow% {%ordered% sub-qid}} data
+ * Tag is key and key is tag. 
  */
 class match_config_tdl : public tdl::schema::item {
 public:
