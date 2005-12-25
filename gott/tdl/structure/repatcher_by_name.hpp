@@ -35,6 +35,10 @@ class GOTT_EXPORT repatcher_getter : public writable_structure {
 public:
   repatcher_getter();
   ~repatcher_getter();
+  /**
+   * Allocate a repatcher of the promised type with the given arguments.
+   * Only call this once!
+   */
   virtual repatcher *result_alloc() const = 0;
 };
 
@@ -48,7 +52,7 @@ public:
   GOTT_EXPORT
   repatcher_getter *get_alloc(string const &) const;
   GOTT_EXPORT
-  repatcher_getter *chain_alloc(Vector<string> const &) const;
+  repatcher_getter *chain_alloc() const;
 
 private:
   VectorMap<string, boost::function<repatcher_getter *()> > repo;

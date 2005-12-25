@@ -22,6 +22,7 @@
 #include "repatch.hpp"
 #include <gott/range_algo.hpp>
 #include <boost/bind.hpp>
+#include <boost/scoped_ptr.hpp>
 
 using gott::tdl::structure::repatcher_getter;
 using gott::tdl::structure::repatcher_by_name_t;
@@ -52,15 +53,67 @@ repatcher_getter *repatcher_by_name_t::get_alloc(string const &name) const {
   return repo[pos]();
 }
 
-repatcher_getter *repatcher_by_name_t::chain_alloc(
-    Vector<string> const &names) const {
-  //FIXME need _getter!
-#if 0
-  repatcher_chain *result = new repatcher_chain;
-  using boost::bind;
-  for_each(range(names), 
-      bind(&repatcher_chain::push_back_alloc, result, 
-        bind(&repatcher_by_name_t::get_alloc, this, _1)));
-  return result;
-#endif
+repatcher_getter *repatcher_by_name_t::chain_alloc() const {
+  struct getter : repatcher_getter {
+    getter(repatcher_by_name_t const &r) 
+    : ref(r), pos(outer), result(new repatcher_chain) {}
+    repatcher_by_name_t const &ref;
+    string what;
+    boost::scoped_ptr<repatcher_getter> where;
+    repatcher_chain *result;
+    enum { outer, inner1, inner2 } pos;
+    unsigned inner2_level;
+    void begin() {
+      switch (pos) {
+      case outer:
+        pos = inner1; break;
+      case inner1:
+        where.reset(ref.get_alloc(what));
+        inner2_level = 0;
+        pos = inner2; break;
+      case inner2:
+        ++inner2_level;
+        where->begin();
+      }
+    }
+    void end() {
+      switch (pos) {
+      case inner2:
+        if (inner2_level) {
+          where->end();
+          --inner2_level;
+        } else {
+          result->push_back_alloc(where->result_alloc());
+          where.reset();
+          pos = inner1;
+        }
+        break;
+      case inner1:
+        pos = outer; break;
+      case outer:
+        fail();
+      }
+    }
+    void data(xany::Xany const &x) {
+      switch (pos) {
+      case outer:
+        fail();
+      case inner1:
+        what = xany::Xany_cast<string>(x); break;
+      case inner2:
+        where->data(x); break;
+      }
+    }
+    void add_tag(string const &s) {
+      if (pos == inner2)
+        where->add_tag(s);
+    }
+    void fail() {
+      throw std::invalid_argument("chain_alloc: invalid input");
+    }
+    repatcher *result_alloc() const {
+      return result;
+    }
+  };
+  return new getter(*this);
 }

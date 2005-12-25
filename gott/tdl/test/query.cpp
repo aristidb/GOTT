@@ -26,7 +26,6 @@
 #include <gott/tut/tut.h>
 #include <gott/range.hpp>
 
-using std::wcout;
 using std::flush;
 using std::endl;
 

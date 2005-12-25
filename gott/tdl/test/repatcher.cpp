@@ -163,6 +163,34 @@ void object::test<6>(int) {
 
 template<> template<>
 void object::test<7>(int) {
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name().chain_alloc());
+  re_g->begin();
+    re_g->data(Xany("substring"));
+    re_g->begin();
+      re_g->begin();
+        re_g->add_tag("left");
+        re_g->data(Xany(1));
+      re_g->end();
+      re_g->begin();
+        re_g->add_tag("right");
+        re_g->data(Xany(0));
+      re_g->end();
+    re_g->end();
+  re_g->end();
+  re_g->begin();
+    re_g->data(Xany("integer"));
+    re_g->begin(); re_g->end();
+  re_g->end();
+  scoped_ptr<repatcher> re(re_g->result_alloc());
+  direct_print<char> out(std::cout);
+  scoped_ptr<writable_structure> ind(re->deferred_write(out));
+  ind->begin();
+    ind->data(Xany("x077"));
+  ind->end();
+}
+
+template<> template<>
+void object::test<8>(int) {
   no_test();
 }
 
