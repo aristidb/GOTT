@@ -64,31 +64,23 @@ writable_structure *repatch_substring::deferred_write(
 
 void repatch_substring::reg() {
   struct getter : public repatcher_getter {
-    getter() 
-    : begun_outer(false), ended_outer(false), pos(outer) {}
-    bool begun_outer;
-    bool ended_outer;
+    getter() : pos(outer) {}
     enum { outer, inner, p_left, p_right } pos;
     long left, right;
     boost::optional<long> delayed;
     void begin() {
-      if (begun_outer) {
-        if (pos != outer) fail();
-        pos = inner;
-      }
-      begun_outer = true;
+      if (pos != outer) fail();
+      pos = inner;
     }
     void end() {
-      if (!begun_outer || ended_outer) fail();
-      if (pos == outer)
-        ended_outer = true;
-      else
-        pos = outer;
+      if (pos == outer || pos == inner)
+        fail();
+      pos = outer;
     }
     void data(xany::Xany const &x) {
       if (delayed)
         fail();
-      switch (inner) {
+      switch (pos) {
       case p_left:
         left = xany::Xany_cast<long>(x);
         break;
@@ -103,7 +95,6 @@ void repatch_substring::reg() {
       }
     }
     void add_tag(string const &s) {
-      if (!begun_outer || ended_outer) fail();
       if (pos != inner)
         return;
       if (s == "left")

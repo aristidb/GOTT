@@ -19,8 +19,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "find_literal.hpp"
+#include "../repatcher_by_name.hpp"
 #include <gott/tdl/exceptions.hpp>
+#include <gott/xany/xany.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/optional.hpp>
 
 using gott::tdl::structure::repatch_find_literal;
 using gott::tdl::structure::writable_structure;
@@ -66,7 +69,43 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
   };
   return new context(loc, literal, target);
 }
-
+#include <iostream>
 void repatch_find_literal::reg() {
-  //...
+  struct getter : public repatcher_getter {
+    getter() : pos(outer) {}
+    enum { outer, inner, p_left, p_right } pos;
+    boost::optional<type::location> loc;
+    boost::optional<string> literal;
+    bool has_loc, has_literal;
+    void begin() {
+      if (pos != outer) fail();
+      pos = inner;
+    }
+    void end() {
+      if (pos == outer) fail();
+      pos = outer;
+    }
+    void data(xany::Xany const &x) {
+      std::cerr << "<<<" << x.type().name() << ">>>\n";
+      if (x.compatible<type::location>()) {
+        if (loc) fail();
+        loc = xany::Xany_cast<type::location>(x);
+       } else if (x.compatible<string>()) {
+        if (literal) fail();
+        literal = xany::Xany_cast<string>(x);
+      } else
+        fail();
+    }
+    void add_tag(string const &) {}
+    void fail() const {
+      throw std::invalid_argument("repatch_find_literal arguments");
+    }
+    repatcher *result_alloc() const {
+      if (!loc || !literal)
+        fail();
+      return new repatch_find_literal(*loc, *literal);
+    }
+    static repatcher_getter *alloc() { return new getter; }
+  };
+  repatcher_by_name().add("find_literal", &getter::alloc);
 }

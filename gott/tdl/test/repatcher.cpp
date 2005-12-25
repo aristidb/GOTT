@@ -118,6 +118,51 @@ void object::test<4>(int) {
 
 template<> template<>
 void object::test<5>(int) {
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name().get_alloc("substring"));
+  re_g->begin();
+    re_g->add_tag("left");
+    re_g->data(Xany(2));
+  re_g->end();
+  re_g->begin();
+    re_g->data(Xany(3));
+    re_g->add_tag("right");
+  re_g->end();
+  scoped_ptr<repatcher> re(re_g->result_alloc());
+  direct_print<char> out(std::cout);
+  scoped_ptr<writable_structure> ind(re->deferred_write(out));
+  ind->begin();
+    ind->data(Xany("123456789"));
+  ind->end();
+}
+
+template<> template<>
+void object::test<6>(int) {
+  scoped_ptr<repatcher_getter> re_g(
+      repatcher_by_name().get_alloc("find_literal"));
+  re_g->begin(); re_g->data(Xany("foo")); re_g->end();
+  re_g->begin(); re_g->data(Xany(repatch_find_literal::type::end)); re_g->end();
+  scoped_ptr<repatcher> re(re_g->result_alloc());
+  direct_print<char> out(std::cout);
+  scoped_ptr<writable_structure> ind(re->deferred_write(out));
+  ind->begin(); 
+  ind->begin(); ind->data(Xany("barfoo")); ind->end();
+
+  bool expected_failure = false;
+  ind->begin();
+      try {
+      ind->data(Xany("foobar")); 
+      } catch (failed_repatch const &) {
+        expected_failure = true;
+      }
+    ind->end();
+  ind->end();
+
+  if (!expected_failure)
+    fail();
+}
+
+template<> template<>
+void object::test<7>(int) {
   no_test();
 }
 

@@ -19,11 +19,17 @@
 #ifndef GOTT_UTIL_XANY_PROMOTE_HPP
 #define GOTT_UTIL_XANY_PROMOTE_HPP
 
+#include <boost/type_traits/is_enum.hpp>
+
 namespace gott {
 class string;
 class string_buffer;
 
 namespace xany {
+
+enum fundamental_class {
+  no_class, enum_class
+};
 
 /**
  * Allows for less rigid and more efficient typing in xany::Xany.
@@ -35,7 +41,10 @@ namespace xany {
  * mapped to long. Because of advanced mapping techniques such as proxying, you
  * don't notice though.
  */
-template<class T> 
+template<class T, 
+  fundamental_class is_enum = boost::is_enum<T>::value 
+  ? enum_class
+  : no_class> 
 struct promote {
   typedef T type;
   typedef T &reference;
@@ -64,7 +73,7 @@ struct standard_promote {
 };
 
 #define GOTT_XANY_DECLARE_PROMOTER(Old, New) \
-  template<> struct promote<Old> : standard_promote<Old, New> {}
+  template<> struct promote<Old, no_class> : standard_promote<Old, New> {}
 
 template<class ElementT, class New>
 struct array_promote {
@@ -76,7 +85,10 @@ struct array_promote {
 
 #define GOTT_XANY_ARRAY_PROMOTER(OldE, New) \
   template<int Size> \
-  struct promote<OldE [Size]> : array_promote<OldE, New> {}
+  struct promote<OldE [Size], no_class> : array_promote<OldE, New> {}
+
+template<class T>
+struct promote<T, enum_class> : standard_promote<T, long> {};
 
 GOTT_XANY_DECLARE_PROMOTER(char, long);
 GOTT_XANY_DECLARE_PROMOTER(short, long);

@@ -46,7 +46,10 @@ void repatcher_by_name_t::add(
 }
 
 repatcher_getter *repatcher_by_name_t::get_alloc(string const &name) const {
-  return repo.Get(name)();
+  int pos = repo.Find(name);
+  if (pos < 0)
+    throw std::bad_exception();
+  return repo[pos]();
 }
 
 repatcher_getter *repatcher_by_name_t::chain_alloc(
