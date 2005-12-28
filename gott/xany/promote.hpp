@@ -20,6 +20,7 @@
 #define GOTT_UTIL_XANY_PROMOTE_HPP
 
 #include <boost/type_traits/is_enum.hpp>
+#include <string>
 
 namespace gott {
 class string;

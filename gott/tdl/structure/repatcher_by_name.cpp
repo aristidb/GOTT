@@ -60,8 +60,8 @@ repatcher_getter *repatcher_by_name_t::chain_alloc() const {
     repatcher_by_name_t const &ref;
     string what;
     boost::scoped_ptr<repatcher_getter> where;
-    repatcher_chain *result;
     enum { outer, inner1, inner2 } pos;
+    repatcher_chain *result;
     unsigned inner2_level;
     void begin() {
       switch (pos) {

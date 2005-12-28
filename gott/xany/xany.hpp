@@ -19,6 +19,7 @@
 #ifndef GOTT_TDL_UTIL_XANY_HPP
 #define GOTT_TDL_UTIL_XANY_HPP
 
+#include "promote.hpp"
 #include <gott/string/string.hpp>
 #include <typeinfo>
 #include <algorithm>
@@ -26,9 +27,10 @@
 #include <cstddef>
 #include <stdexcept>
 #include <iosfwd>
-#include <gott/xany/promote.hpp>
 
 #include <gott/visibility.hpp>
+
+#include <iostream>
 
 namespace gott {
 namespace xany {
@@ -54,13 +56,18 @@ template<class T> struct operations;
 
 template<> struct operations<void> : operations_base {};
 
+template<class T> struct GOTT_EXPORT spelled_t {};
+
+template<class T>
+inline std::type_info const &spell() {
+  return typeid(spelled_t<T>);
+}
+
 /**
  * Typeless objects.
  * Has two special features:
  *   - Type promotion (see xany::promote).
  *   - Runtime-typed operations (see xany::operations_base).
- *
- * TODO: visibility-safety for free for all (optional)
  */
 class Xany {
   template<class T> class holder;
@@ -138,19 +145,34 @@ public:
   }
 
   /**
+   * Returns the object's spelled type.
+   */
+  std::type_info const &spelled_type() const {
+    return place ? place->spelled_type() : spell<void>();
+  }
+
+  /**
    * Checks for type compatibilty.
    */
   template<class T>
   bool compatible() const {
     if (!place)
       return false;
-    return typeid(typename promote<T>::type) == place->type();
+#ifdef BUG_FIXED_GCC_TEMPLATE_TYPEINFO
+    std::type_info const &desire = spell<typename promote<T>::type>();
+    std::type_info const &actual = place->spelled_type();
+#else
+    std::type_info const &desire = typeid(typename promote<T>::type);
+    std::type_info const &actual = place->type();
+#endif
+    return desire == actual;
   }
 
 private:
   struct placeholder {
     virtual ~placeholder() {}
     virtual std::type_info const &type() const = 0;
+    virtual std::type_info const &spelled_type() const = 0;
     virtual placeholder *clone() const = 0;
     virtual operations_base &get_operations() const = 0;
   };
@@ -159,6 +181,9 @@ private:
     holder(T const &v) : value(v) {}
     std::type_info const &type() const { 
       return typeid(T); 
+    }
+    std::type_info const &spelled_type() const {
+      return spell<T>();
     }
     placeholder *clone() const { 
       return new holder(value); 
