@@ -61,8 +61,8 @@ public:
    */
   template<class T>
   GOTT_LOCAL T const *feature_ptr() const { 
-    return static_cast<T const *>(
-        const_cast<main_loop *>(this)->do_feature(typeid(T)));
+    return const_cast<T const *>(
+        const_cast<main_loop *>(this)->feature_ptr(typeid(T)));
   }
 
   /// Exception thrown if a requested feature is not available.
