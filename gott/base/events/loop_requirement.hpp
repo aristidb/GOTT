@@ -18,48 +18,58 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_BASE_EVENTS_AUTO_LOOP_HPP
-#define GOTT_BASE_EVENTS_AUTO_LOOP_HPP
+#ifndef GOTT_BASE_EVENTS_LOOP_REQUIREMENT_HPP
+#define GOTT_BASE_EVENTS_LOOP_REQUIREMENT_HPP
 
-#include <typeinfo>
 #include <gott/visibility.hpp>
-#include <sigc++/signal.h>
-#include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <typeinfo>
+#include <boost/shared_ptr.hpp>
 
 namespace gott {
 namespace events {
-class main_loop;
-class loop_requirement;
+class auto_loop;
 
-/**
- * Responsible for automatically creating any needed main_loops.
- */
-class auto_loop : boost::noncopyable {
+class loop_requirement {
 public:
-  auto_loop() GOTT_EXPORT;
-  ~auto_loop() GOTT_EXPORT;
-
-  /**
-   * Create and run the requested main_loops but do not use this thread.
-   */
-  void spawn_noblock() GOTT_EXPORT;
-
-  /**
-   * Create and run the requested main_loops using the current thread.
-   */
-  void spawn_block() GOTT_EXPORT;
-
+  enum combiner_t { combine_and, combine_or };
   GOTT_EXPORT
-  sigc::signal1<void, main_loop &> &add(loop_requirement const &);
+  loop_requirement(
+      loop_requirement const &, 
+      loop_requirement const &,
+      combiner_t);
+
+  enum feature_flag_t { feature };
+  GOTT_EXPORT
+  loop_requirement(std::type_info const &, feature_flag_t);
 
 public: // internal
-  bool try_feature(std::type_info const &, loop_requirement const *);
+  bool do_try(auto_loop &) const;
 
 private:
+  bool do_try(auto_loop &, loop_requirement const *) const;
+  
   class IMPL;
-  boost::scoped_ptr<IMPL> p;
+  boost::shared_ptr<IMPL> p;
+
+  loop_requirement();
 };
+
+inline loop_requirement operator&&(
+    loop_requirement const &lhs, 
+    loop_requirement const &rhs) {
+  return loop_requirement(lhs, rhs, loop_requirement::combine_and);
+}
+
+inline loop_requirement operator||(
+    loop_requirement const &lhs,
+    loop_requirement const &rhs) {
+  return loop_requirement(lhs, rhs, loop_requirement::combine_or);
+}
+
+template<class T>
+loop_requirement feature() {
+  return loop_requirement(typeid(T), loop_requirement::feature);
+}
 
 }}
 

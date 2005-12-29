@@ -21,8 +21,13 @@
 #include "auto_loop.hpp"
 
 using gott::events::auto_loop;
+using gott::events::main_loop;
 
-auto_loop::auto_loop() {}
+class auto_loop::IMPL {
+
+};
+
+auto_loop::auto_loop() : p(new IMPL) {}
 auto_loop::~auto_loop() {}
 
 void auto_loop::spawn_noblock() {
@@ -31,4 +36,12 @@ void auto_loop::spawn_noblock() {
 
 void auto_loop::spawn_block() {
 
+}
+
+sigc::signal1<void, main_loop &> &auto_loop::add(loop_requirement const &e) {
+
+}
+
+bool auto_loop::try_feature(std::type_info const &, loop_requirement const *) {
+  return false;
 }
