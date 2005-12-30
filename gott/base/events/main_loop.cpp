@@ -31,6 +31,8 @@ main_loop::~main_loop() {}
 
 fd_manager::fd_manager() {}
 fd_manager::~fd_manager() {}
+gott::QID const fd_manager::qid("gott::events::fd_manager");
 
 timer_manager::timer_manager() {}
 timer_manager::~timer_manager() {}
+gott::QID const timer_manager::qid("gott::events::timer_manager");

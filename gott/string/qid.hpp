@@ -18,10 +18,25 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "qid.hpp"
+#ifndef GOTT_STRING_QID_HPP
+#define GOTT_STRING_QID_HPP
 
-using gott::plugin::QID;
+#include "atom.hpp"
 
-QID::QID(atom const &a) : atom(a) {}
+namespace gott {
 
-QID::~QID() {}
+class QID : public atom, Moveable<QID> {
+public:
+  template<class T>
+  QID(T const &x) : atom(x) {}
+  ~QID() GOTT_EXPORT;
+};
+
+}
+
+template<>
+inline unsigned GetHashValue(gott::QID const &q) {
+  return GetHashValue((gott::atom const &) q);
+}
+
+#endif

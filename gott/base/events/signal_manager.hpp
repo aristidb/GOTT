@@ -22,6 +22,7 @@
 #define GOTT_BASE_EVENTS_SIGNAL_MANAGER_HPP
 
 #include <gott/visibility.hpp>
+#include <gott/string/qid.hpp>
 #include <sigc++/signal.h>
 
 namespace gott {
@@ -36,6 +37,8 @@ public:
   signal_manager();
   /// Pure virtual destructor.
   virtual ~signal_manager() = 0;
+
+  static QID const qid;
 
   /**
    * In-program signal for signal notifications. Each signal should be 

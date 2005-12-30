@@ -25,12 +25,12 @@
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
+class QID;
 namespace xany { class Xany; }
 
 namespace plugin {
 
 class hook;
-class QID;
 
 class plugin_configuration {
 public:

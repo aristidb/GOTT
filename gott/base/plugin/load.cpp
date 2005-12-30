@@ -22,7 +22,7 @@
 
 using gott::string;
 using gott::plugin::plugin_base;
-using gott::plugin::QID;
+using gott::QID;
 using gott::plugin::system_configuration;
 using gott::plugin::plugin_configuration;
 

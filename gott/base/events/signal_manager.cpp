@@ -28,6 +28,8 @@ using gott::events::signal_manager;
 signal_manager::signal_manager() {}
 signal_manager::~signal_manager() {}
 
+gott::QID const signal_manager::qid("gott::events::signal_manager");
+
 namespace {
 VectorMap<int, signal_manager *> handlers;
 }

@@ -19,13 +19,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "plugin_configuration.hpp"
-#include "qid.hpp"
+#include <gott/string/qid.hpp>
 #include <boost/variant.hpp>
 #include <gott/xany/xany.hpp>
 
 using gott::plugin::plugin_configuration;
 using gott::plugin::hook;
-using gott::plugin::QID;
+using gott::QID;
 using gott::xany::Xany;
 using boost::variant;
 

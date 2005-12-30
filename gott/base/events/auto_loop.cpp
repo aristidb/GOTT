@@ -42,6 +42,6 @@ sigc::signal1<void, main_loop &> &auto_loop::add(loop_requirement const &e) {
 
 }
 
-bool auto_loop::try_feature(std::type_info const &, loop_requirement const *) {
+bool auto_loop::try_feature(QID const &, loop_requirement const *) {
   return false;
 }

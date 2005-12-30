@@ -22,6 +22,7 @@
 #define GOTT_BASE_EVENTS_TIMER_MANAGER_HPP
 
 #include "deadline_timer.hpp"
+#include <gott/string/qid.hpp>
 
 namespace gott {
 namespace events {
@@ -35,6 +36,9 @@ public:
   timer_manager();
   /// Pure virtual destructor.
   virtual ~timer_manager() = 0;
+  
+  static QID const qid;
+  
   /// Add a #deadline_timer.
   virtual void add_timer(deadline_timer const &) = 0;
 };

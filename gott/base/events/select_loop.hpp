@@ -86,7 +86,7 @@ class GOTT_EXPORT select_loop
     void quit();
 
 private:
-    GOTT_LOCAL void *do_feature(std::type_info const &);
+    GOTT_LOCAL void *do_feature(gott::QID const &);
 };
 
 }}

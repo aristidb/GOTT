@@ -22,7 +22,7 @@
 #define GOTT_BASE_EVENTS_LOOP_REQUIREMENT_HPP
 
 #include <gott/visibility.hpp>
-#include <typeinfo>
+#include <gott/string/qid.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace gott {
@@ -32,6 +32,7 @@ class auto_loop;
 class loop_requirement {
 public:
   enum combiner_t { combine_and, combine_or };
+
   GOTT_EXPORT
   loop_requirement(
       loop_requirement const &, 
@@ -40,7 +41,7 @@ public:
 
   enum feature_flag_t { feature };
   GOTT_EXPORT
-  loop_requirement(std::type_info const &, feature_flag_t);
+  loop_requirement(QID const &, feature_flag_t);
 
 public: // internal
   bool do_try(auto_loop &) const;
@@ -54,21 +55,40 @@ private:
   loop_requirement();
 };
 
+/**
+ * Requirement for a main_loop to fulfill two other requirements.
+ */
 inline loop_requirement operator&&(
     loop_requirement const &lhs, 
     loop_requirement const &rhs) {
   return loop_requirement(lhs, rhs, loop_requirement::combine_and);
 }
 
+/**
+ * Requirement for a main_loop to fulfill at least one of two other 
+ * requirements.
+ */
 inline loop_requirement operator||(
     loop_requirement const &lhs,
     loop_requirement const &rhs) {
   return loop_requirement(lhs, rhs, loop_requirement::combine_or);
 }
 
+/**
+ * Requirement for a main_loop to have a certain feature.
+ * \param T The required feature class.
+ */
 template<class T>
 loop_requirement feature() {
-  return loop_requirement(typeid(T), loop_requirement::feature);
+  return loop_requirement(T::qid, loop_requirement::feature);
+}
+
+/**
+ * Requirement for a main_loop to have a certain feature.
+ * \param qid The QID of the required feature.
+ */
+inline loop_requirement feature(QID const &qid) {
+  return loop_requirement(qid, loop_requirement::feature);
 }
 
 }}

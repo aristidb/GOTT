@@ -30,7 +30,7 @@ using gott::events::loop_requirement;
 class loop_requirement::IMPL {
 public:
   typedef tuple<loop_requirement, loop_requirement, combiner_t> combined;
-  typedef tuple<std::type_info const &, feature_flag_t> feature;
+  typedef tuple<QID const &, feature_flag_t> feature;
   typedef 
     variant<
       feature,
@@ -48,7 +48,7 @@ loop_requirement::loop_requirement(
 : p(new IMPL(IMPL::combined(lhs, rhs, comb))) {}
 
 loop_requirement::loop_requirement(
-    std::type_info const &id,
+    QID const &id,
     feature_flag_t indicator)
 : p(new IMPL(IMPL::feature(id, indicator))) {}
 

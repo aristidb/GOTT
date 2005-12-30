@@ -24,12 +24,13 @@
 #include <gott/visibility.hpp>
 
 namespace gott {
+class QID;
+
 namespace plugin {
 
 class system_configuration;
 class plugin_configuration;
 class hook;
-class QID;
 
 class GOTT_EXPORT plugin_base {
 public:

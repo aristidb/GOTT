@@ -21,13 +21,14 @@
 #ifndef GOTT_BASE_EVENTS_AUTO_LOOP_HPP
 #define GOTT_BASE_EVENTS_AUTO_LOOP_HPP
 
-#include <typeinfo>
 #include <gott/visibility.hpp>
 #include <sigc++/signal.h>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
+class QID;
+
 namespace events {
 class main_loop;
 class loop_requirement;
@@ -50,11 +51,16 @@ public:
    */
   void spawn_block() GOTT_EXPORT;
 
+  /**
+   * Add a requirement and if necessary a main_loop.
+   * \return A reference to a signal emitted when the main_loop for the 
+   *         requirement is spawned.
+   */
   GOTT_EXPORT
   sigc::signal1<void, main_loop &> &add(loop_requirement const &);
 
 public: // internal
-  bool try_feature(std::type_info const &, loop_requirement const *);
+  bool try_feature(QID const &, loop_requirement const *);
 
 private:
   class IMPL;

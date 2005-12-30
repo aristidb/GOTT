@@ -21,9 +21,9 @@
 #ifndef GOTT_BASE_EVENTS_MAIN_LOOP_HPP
 #define GOTT_BASE_EVENTS_MAIN_LOOP_HPP
 
-#include <typeinfo>
 #include <stdexcept>
 #include <gott/visibility.hpp>
+#include <gott/string/qid.hpp>
 
 namespace gott {
 namespace events {
@@ -50,7 +50,7 @@ public:
    */
   template<class T>
   GOTT_LOCAL T *feature_ptr() { 
-    return static_cast<T *>(do_feature(typeid(T)));
+    return static_cast<T *>(do_feature(T::qid));
   }
 
   /**
@@ -62,7 +62,7 @@ public:
   template<class T>
   GOTT_LOCAL T const *feature_ptr() const { 
     return const_cast<T const *>(
-        const_cast<main_loop *>(this)->feature_ptr(typeid(T)));
+        const_cast<main_loop *>(this)->feature_ptr<T>());
   }
 
   /// Exception thrown if a requested feature is not available.
@@ -100,12 +100,12 @@ public:
   }
 
 protected:
-  virtual void *do_feature(std::type_info const &) = 0;
+  virtual void *do_feature(gott::QID const &) = 0;
 };
 
 //TODO faster please
 #define GOTT_EVENTS_FEATURE(var,T) \
-  if (var == typeid(T)) \
+  if (var == T::qid) \
     return static_cast<T *>(this);
 
 }}

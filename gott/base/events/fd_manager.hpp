@@ -22,6 +22,7 @@
 #define GOTT_BASE_EVENTS_FD_MANAGER_HPP
 
 #include <gott/visibility.hpp>
+#include <gott/string/qid.hpp>
 #include <boost/function.hpp>
 
 namespace gott {
@@ -36,6 +37,8 @@ public:
   fd_manager();
   /// Pure virtual destructor.
   virtual ~fd_manager() = 0;
+
+  static QID const qid;
 
   /**
    * Adds a file descriptor to watch and register a callback for incoming data 
