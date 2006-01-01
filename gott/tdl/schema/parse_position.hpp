@@ -49,6 +49,7 @@ public:
 
   struct GOTT_EXPORT acceptor {
     virtual void operator()(ev::token const &) = 0;
+    virtual ~acceptor() = 0;
   };
 
   void replay(acceptor &);

@@ -104,6 +104,8 @@ void positioning::seek_and_forget(id const &x) {
   forget(x);
 }
 
+positioning::acceptor::~acceptor() {}
+
 void positioning::replay(acceptor &acc) {
   if (p->replay) {
     p->replay = false;

@@ -25,6 +25,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/optional.hpp>
 
+#include <iostream>
+
 using gott::tdl::structure::repatch_find_literal;
 using gott::tdl::structure::writable_structure;
 namespace algo = boost::algorithm;
@@ -47,7 +49,7 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
       if (!x.compatible<string>())
         throw failed_repatch("repatch_find_literal: need input string");
       string s = xany::Xany_cast<string>(x);
-      bool fail = false;
+      bool fail = true;
       switch (loc) {
       case type::start:
         fail = !algo::starts_with(s.as_utf32(), literal.as_utf32());
@@ -62,14 +64,18 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
         fail = !algo::contains(s.as_utf32(), literal.as_utf32());
         break;
       }
-      if (fail)
-        throw failed_repatch("repatch_find_literal: condition not true");
+      std::cout << "Searched for " << literal << " in " << s <<
+        (fail ? " - BAH: " : " - and found: ") << loc << std::endl;
+      if (fail) {
+        throw failed_repatch("repatch_find_literal " + literal 
+            + ": condition not true");
+      }
       target.data(x);
     }
   };
   return new context(loc, literal, target);
 }
-#include <iostream>
+
 void repatch_find_literal::reg() {
   struct getter : public repatcher_getter {
     getter() : pos(outer) {}

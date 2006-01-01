@@ -289,8 +289,11 @@ template<class T> struct printer : printable {
 template<class Ch, class ChT>
 std::basic_ostream<Ch, ChT> &
 operator<<(std::basic_ostream<Ch, ChT> &s, Xany const &v) {
-  if (!v.empty())
-    dynamic_cast<printable const &>(v.get_operations()).print(s, v);
+  if (!v.empty()) {
+    printable const &printer = 
+      dynamic_cast<printable const &>(v.get_operations());
+    printer.print(s, v);
+  }
   return s;
 }
 

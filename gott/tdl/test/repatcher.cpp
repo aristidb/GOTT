@@ -80,7 +80,7 @@ void object::test<2>(int) {
     ind->data(Xany("(hallo"));
   } catch (failed_repatch const &e) {
     ensure_equals(std::string(e.what()), 
-        "repatch_find_literal: condition not true");
+        "repatch_find_literal ): condition not true");
     ensure_equals(o.str(), "");
   }
   ind->end();

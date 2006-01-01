@@ -88,6 +88,7 @@ void object::test<2>(int) {
   ensure_equals("root[1]", sel, selection<tree::iterator>(xp.get_root()));
 }
 
+template<> template<>
 void object::test<3>(int) {
   selection<tree::iterator> x1(tree_obj.get_root());
   selection<tree::iterator> sel(x1.find(0));
@@ -98,6 +99,7 @@ void object::test<3>(int) {
   ensure_equals("root[0]", sel, selection<tree::iterator>(xp.get_root()));
 }
 
+template<> template<>
 void object::test<4>(int) {
   selection<tree::iterator> x1(tree_obj.get_root());
   selection<tree::iterator> x2(x1.find(0));
