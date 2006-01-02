@@ -23,6 +23,7 @@
 #include "print.hpp"
 #include <gott/range_algo.hpp>
 #include <boost/bind.hpp>
+#include <boost/weak_ptr.hpp>
 #include <sstream>
 #include <gott/autoconv.hpp>
 #include <gott/string/string.hpp>
@@ -30,6 +31,7 @@
 using std::pair;
 using boost::shared_ptr;
 using boost::scoped_ptr;
+using boost::weak_ptr;
 using gott::xany::Xany;
 using gott::string;
 
@@ -44,6 +46,9 @@ writable_structure::~writable_structure() {}
 revocable_structure::~revocable_structure() {}
 copyable_structure::~copyable_structure() {}
 
+NTL_MOVEABLE(shared_ptr<tree::node>)
+NTL_MOVEABLE(weak_ptr<tree::node>)
+
 class tree::IMPL {
 public:
   IMPL() : current_tag(0) {}
@@ -51,19 +56,19 @@ public:
   typedef unsigned long tag;
   
   static boost::shared_ptr<node> erase(boost::shared_ptr<node>);
-  boost::shared_ptr<node> root, pos;
+  shared_ptr<node> root;
+  weak_ptr<node> pos;
   tag current_tag;
-  VectorMap<tag, boost::shared_ptr<node> > tagpos;
+  VectorMap<tag, boost::weak_ptr<node> > tagpos;
 
   bool del_since(boost::shared_ptr<node> &, tag);
 };
 
-NTL_MOVEABLE(shared_ptr<tree::node>);
-
 struct tree::node {
   Xany data;
   Vector<string> tags;
-  shared_ptr<node> child0, lastchild, dad, sibling, last;
+  shared_ptr<node> child0, lastchild, sibling, last;
+  weak_ptr<node> dad;
   size_t size;
   IMPL::tag ttag;
   
@@ -84,7 +89,7 @@ struct tree::node {
     typedef int tag_position;
     typedef pair<tag_container_ptr, tag_position> tag_range_type;
     
-    index(shared_ptr<node> const &n) : parent(n), built(false) {}
+    index(weak_ptr<node> const &n) : parent(n), built(false) {}
 
     void build_all() {
       if (!built) {
@@ -117,7 +122,7 @@ struct tree::node {
 };
 
 shared_ptr<tree::node> tree::IMPL::erase(shared_ptr<node> x) {
-  --x->dad->size;
+  --x->dad.lock()->size;
 
   if (x->sibling) 
     x->sibling->last = x->last;
@@ -125,11 +130,11 @@ shared_ptr<tree::node> tree::IMPL::erase(shared_ptr<node> x) {
   if (x->last) 
     x->last->sibling = x->sibling;
   
-  if (x->dad->child0 == x) 
-    x->dad->child0 = x->sibling;
+  if (x->dad.lock()->child0 == x) 
+    x->dad.lock()->child0 = x->sibling;
     
-  if (x->dad->lastchild == x) 
-    x->dad->lastchild = x->last;
+  if (x->dad.lock()->lastchild == x) 
+    x->dad.lock()->lastchild = x->last;
   
   return x->sibling;
 }
@@ -138,7 +143,7 @@ tree::tree() : p(new IMPL) {}
 tree::~tree() {}
 
 void tree::begin() {
-  if (!p->pos) {
+  if (!p->root) {
     p->root = shared_ptr<node>(new node(p->current_tag));
     p->pos = p->root;
     return;
@@ -147,31 +152,31 @@ void tree::begin() {
   shared_ptr<node> nn(new node(p->current_tag));
   nn->dad = p->pos;
 
-  if (!p->pos->child0) {
-    p->pos->child0 = nn;
-    p->pos->lastchild = nn;
+  if (!p->pos.lock()->child0) {
+    p->pos.lock()->child0 = nn;
+    p->pos.lock()->lastchild = nn;
   } else {
-    p->pos->lastchild->sibling = nn;
-    nn->last = p->pos->lastchild;
-    p->pos->lastchild = nn;
+    p->pos.lock()->lastchild->sibling = nn;
+    nn->last = p->pos.lock()->lastchild;
+    p->pos.lock()->lastchild = nn;
   }
   
-  ++p->pos->size;
+  ++p->pos.lock()->size;
   
   p->pos = nn;
 }
 
 void tree::end() {
-  if (p->pos != p->root)
-    p->pos = p->pos->dad;
+  if (p->pos.lock() != p->root)
+    p->pos = p->pos.lock()->dad;
 }
 
 void tree::data(Xany const &x) {
-  p->pos->data = x;
+  p->pos.lock()->data = x;
 }
 
 void tree::add_tag(string const &s) {
-  p->pos->tags.push_back(s);
+  p->pos.lock()->tags.push_back(s);
 }
 
 revocable_structure::pth tree::point() {
@@ -214,7 +219,7 @@ tree::iterator tree::iterator::operator[](size_type x) const {
 
 tree::iterator tree::iterator::first_child() const { return n->child0; }
 
-tree::iterator tree::iterator::up() const { return n->dad; }
+tree::iterator tree::iterator::up() const { return n->dad.lock(); }
 tree::iterator tree::iterator::next() const { return n->sibling; }
 
 Xany const &tree::iterator::get_data() const { return n->data; }
@@ -337,14 +342,15 @@ void tree::dump(ostream &stream) {
   struct visitor {
     ostream &out;
     unsigned level;
-    shared_ptr<node> pp;
+    weak_ptr<node> pp;
     void ind() {
       for (unsigned x = 0; x < level; ++x)
         out << L' ';
     }
-    void operator()(shared_ptr<node> p) {
+    void operator()(weak_ptr<node> p_) {
       ind();
-      if (p == pp)
+      shared_ptr<node> p = p_.lock();
+      if (p == pp.lock())
         out << '*';
       if (p->data.empty())
         out << '-';
@@ -364,7 +370,7 @@ void tree::dump(ostream &stream) {
       ind();
       out << "}\n";
     }
-    visitor(ostream &oo, shared_ptr<node> p) : out(oo), level(0), pp(p) {}
+    visitor(ostream &oo, weak_ptr<node> p) : out(oo), level(0), pp(p) {}
   };
   visitor v(stream, p->pos);
   v(p->root);
