@@ -28,7 +28,7 @@
 #include <gott/string/string.hpp>
 
 using std::pair;
-using boost::intrusive_ptr;
+using boost::shared_ptr;
 using boost::scoped_ptr;
 using gott::xany::Xany;
 using gott::string;
@@ -50,21 +50,20 @@ public:
 
   typedef unsigned long tag;
   
-  static boost::intrusive_ptr<node> erase(boost::intrusive_ptr<node>);
-  boost::intrusive_ptr<node> root, pos;
+  static boost::shared_ptr<node> erase(boost::shared_ptr<node>);
+  boost::shared_ptr<node> root, pos;
   tag current_tag;
-  VectorMap<tag, boost::intrusive_ptr<node> > tagpos;
+  VectorMap<tag, boost::shared_ptr<node> > tagpos;
 
-  bool del_since(boost::intrusive_ptr<node> &, tag);
+  bool del_since(boost::shared_ptr<node> &, tag);
 };
 
-NTL_MOVEABLE(intrusive_ptr<tree::node>);
+NTL_MOVEABLE(shared_ptr<tree::node>);
 
 struct tree::node {
-  size_t use_count;
   Xany data;
   Vector<string> tags;
-  intrusive_ptr<node> child0, lastchild, dad, sibling, last;
+  shared_ptr<node> child0, lastchild, dad, sibling, last;
   size_t size;
   IMPL::tag ttag;
   
@@ -72,12 +71,12 @@ struct tree::node {
   scoped_ptr<index> indx;
 
   class index {
-    typedef Vector<intrusive_ptr<node> > v_pn;
-    typedef VectorMap<string, intrusive_ptr<node> > hmm_spn;
+    typedef Vector<shared_ptr<node> > v_pn;
+    typedef VectorMap<string, shared_ptr<node> > hmm_spn;
     
     v_pn by_no;
     hmm_spn by_name;
-    intrusive_ptr<node> parent;
+    shared_ptr<node> parent;
     bool built;
 
   public:
@@ -85,12 +84,12 @@ struct tree::node {
     typedef int tag_position;
     typedef pair<tag_container_ptr, tag_position> tag_range_type;
     
-    index(intrusive_ptr<node> const &n) : parent(n), built(false) {}
+    index(shared_ptr<node> const &n) : parent(n), built(false) {}
 
     void build_all() {
       if (!built) {
         by_no.Reserve(parent->size);
-        for (intrusive_ptr<node> i = parent->child0; i; i = i->sibling) {
+        for (shared_ptr<node> i = parent->child0; i; i = i->sibling) {
           by_no.Add(i);
           add_entry(i);
         }
@@ -98,12 +97,12 @@ struct tree::node {
       }
     }
 
-    void add_entry(intrusive_ptr<node> const &x) {
+    void add_entry(shared_ptr<node> const &x) {
       for (Vector<string>::iterator i= x->tags.begin(); i != x->tags.end();++i)
         by_name.Add(*i, x);
     }
 
-    intrusive_ptr<node> get_at(size_t i) {
+    shared_ptr<node> get_at(size_t i) {
       return by_no[i];
     }
 
@@ -112,21 +111,12 @@ struct tree::node {
     }
   };
   
-  node(IMPL::tag t) : use_count(0), size(0), ttag(t) {}
-
+  node(IMPL::tag t) : size(0), ttag(t) {}
+  
   bool equals(node const &) const;
 };
 
-void stru::intrusive_ptr_add_ref(tree::node *p) {
-  ++p->use_count;
-}
-
-void stru::intrusive_ptr_release(tree::node *p) {
-  if (!--p->use_count)
-    delete p;
-}
-
-intrusive_ptr<tree::node> tree::IMPL::erase(intrusive_ptr<node> x) {
+shared_ptr<tree::node> tree::IMPL::erase(shared_ptr<node> x) {
   --x->dad->size;
 
   if (x->sibling) 
@@ -149,12 +139,12 @@ tree::~tree() {}
 
 void tree::begin() {
   if (!p->pos) {
-    p->root = intrusive_ptr<node>(new node(p->current_tag));
+    p->root = shared_ptr<node>(new node(p->current_tag));
     p->pos = p->root;
     return;
   }
   
-  intrusive_ptr<node> nn(new node(p->current_tag));
+  shared_ptr<node> nn(new node(p->current_tag));
   nn->dad = p->pos;
 
   if (!p->pos->child0) {
@@ -198,8 +188,8 @@ void tree::get_rid_of(revocable_structure::pth const &x) {
   p->tagpos.RemoveKey(x);
 }
 
-bool tree::IMPL::del_since(intrusive_ptr<node> &n, tag t) {
-  for (intrusive_ptr<node> i = n->child0; i;)
+bool tree::IMPL::del_since(shared_ptr<node> &n, tag t) {
+  for (shared_ptr<node> i = n->child0; i;)
     if (del_since(i, t)) 
       i = erase(i);
     else
@@ -209,7 +199,7 @@ bool tree::IMPL::del_since(intrusive_ptr<node> &n, tag t) {
 }
 
 tree::iterator::iterator() {}
-tree::iterator::iterator(boost::intrusive_ptr<node> const &nn) : n(nn) {}
+tree::iterator::iterator(boost::shared_ptr<node> const &nn) : n(nn) {}
 
 tree::iterator::size_type tree::iterator::size() const {
   return n->size;
@@ -273,7 +263,7 @@ void tree::copy_to(writable_structure &target) const {
   struct {
     writable_structure &target;
     
-    void operator()(intrusive_ptr<node> p) {
+    void operator()(shared_ptr<node> p) {
       target.begin();
       target.data(p->data);
       for_each(range(p->tags), bind(&writable_structure::add_tag, &target,_1));
@@ -299,7 +289,7 @@ bool tree::node::equals(node const &o) const {
   if (!equal(range(tags), range(o.tags)))
     return false;
 
-  intrusive_ptr<node> p = child0, q = o.child0;
+  shared_ptr<node> p = child0, q = o.child0;
   while (p && q) {
     if (!p->equals(*q))
       return false;
@@ -347,12 +337,12 @@ void tree::dump(ostream &stream) {
   struct visitor {
     ostream &out;
     unsigned level;
-    intrusive_ptr<node> pp;
+    shared_ptr<node> pp;
     void ind() {
       for (unsigned x = 0; x < level; ++x)
         out << L' ';
     }
-    void operator()(intrusive_ptr<node> p) {
+    void operator()(shared_ptr<node> p) {
       ind();
       if (p == pp)
         out << '*';
@@ -374,7 +364,7 @@ void tree::dump(ostream &stream) {
       ind();
       out << "}\n";
     }
-    visitor(ostream &oo, intrusive_ptr<node> p) : out(oo), level(0), pp(p) {}
+    visitor(ostream &oo, shared_ptr<node> p) : out(oo), level(0), pp(p) {}
   };
   visitor v(stream, p->pos);
   v(p->root);

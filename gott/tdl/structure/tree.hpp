@@ -22,7 +22,7 @@
 #define GOTT_UTIL_TDL_STRUCTURE_TREE_HPP
 
 #include "structure.hpp"
-#include <boost/intrusive_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <ntl.h>
 
@@ -32,6 +32,7 @@ namespace structure {
 
 /**
  * The default implementation of the (whole) structure concept.
+ * \todo GET RID OF THIS CLASS
  */
 class tree : public revocable_structure, public copyable_structure {
 public: // unfortunately
@@ -109,11 +110,11 @@ public: // Iterators
 
   private:  
     iterator();
-    iterator(boost::intrusive_ptr<node> const &);
+    iterator(boost::shared_ptr<node> const &);
     friend class tree;
     friend class tagged_iterator;
 
-    boost::intrusive_ptr<node> n;
+    boost::shared_ptr<node> n;
   };
 
   /**
@@ -183,9 +184,6 @@ public:
 private:
   class IMPL;
   boost::scoped_ptr<IMPL> p;
-
-  GOTT_EXPORT friend void intrusive_ptr_add_ref(node *);
-  GOTT_EXPORT friend void intrusive_ptr_release(node *);
 };
 
 /**
