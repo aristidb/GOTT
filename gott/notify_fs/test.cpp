@@ -20,7 +20,7 @@
 
 #include "watch.hpp"
 #include "inotify/engine.hpp"
-#include <gott/base/events/select_loop.hpp>
+#include <gott/events/select_loop.hpp>
 #include <boost/bind.hpp>
 #include <iostream>
 #include <signal.h>

@@ -33,7 +33,7 @@ env = Environment(
   CXX = cxx, 
   CCFLAGS = cflags, 
   CPPPATH=['#/..', '#/contrib/ntl'], 
-  LIBPATH=Split('#/contrib/ntl #/tdl #/xany #/string #/base/plugin #/base/events #/base/config #/ui #/ui/x11 #/graphics #/notify_fs' ),
+  LIBPATH=Split('#/contrib/ntl #/tdl #/xany #/string #/plugin #/events #/configuration #/ui #/ui/x11 #/graphics #/notify_fs' ),
   CPPDEFINES=cppdef)
 
 Export('env')
@@ -56,7 +56,9 @@ Export('shrd')
 
 SConscript(dirs = [
 '.', 
-'base', 
+'configuration', 
+'plugin',
+'events',
 #'ui', 
 'graphics', 
 'notify_fs',
