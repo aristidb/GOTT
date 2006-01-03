@@ -33,7 +33,10 @@ using gott::tdl::simple::line_logger;
 
 parser::~parser() {}
 
-namespace {
+namespace gott {
+namespace tdl {
+namespace simple {
+namespace detail {
 struct internal_line_logger {
   line_logger *ref;
   unsigned p;
@@ -106,14 +109,16 @@ public:
 };
 
 class cancellor {};
-}
+}}}}
 
 line_logger::~line_logger() {}
 
 void parser::parse(istream &s) {
-  exec_parse x(s, *this, ll);
+  detail::exec_parse x(s, *this, ll);
   x.run_parse();
 }
+
+using gott::tdl::simple::detail::exec_parse;
 
 void exec_parse::run_parse() {
   parse.begin_parse();
