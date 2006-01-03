@@ -1,4 +1,4 @@
-// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2005-2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: GOTT main loop
 // Authors: Aristid Breitkreuz
 //
@@ -39,7 +39,7 @@ public:
   
   static QID const qid;
   
-  /// Add a #deadline_timer.
+  /// Add a deadline_timer.
   virtual void add_timer(deadline_timer const &) = 0;
 };
 

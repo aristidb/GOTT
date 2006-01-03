@@ -1,4 +1,4 @@
-// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2005-2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: GOTT main loop spawner
 // Authors: Aristid Breitkreuz
 //
@@ -52,12 +52,24 @@ public:
   void spawn_block() GOTT_EXPORT;
 
   /**
+   * Specify the maximal number of main_loops created.
+   * \param n The maximum or 0 if there shall be no maximum.
+   */
+  void maximal_loop_count(unsigned n);
+
+  /**
    * Add a requirement and if necessary a main_loop.
    * \return A reference to a signal emitted when the main_loop for the 
    *         requirement is spawned.
    */
   GOTT_EXPORT
   sigc::signal1<void, main_loop &> &add(loop_requirement const &);
+  
+  /**
+   * Join all main_loop threads. Useful in combination with spawn_noblock.
+   */
+  GOTT_EXPORT
+  void join_all();
 
 public: // internal
   bool try_feature(QID const &, loop_requirement const *);

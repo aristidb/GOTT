@@ -1,5 +1,5 @@
 // Copyright (C) 2005-2006 by Aristid Breitkreuz (aribrei@arcor.de)
-// Content: GOTT main loop spawner
+// Content: GOTT main loop spawner test program
 // Authors: Aristid Breitkreuz
 //
 // This file is part of the Gott Project (http://gott.sf.net)
@@ -20,31 +20,27 @@
 
 #include "auto_loop.hpp"
 #include "loop_requirement.hpp"
-#include <stdexcept>
+#include "timer_manager.hpp"
+#include "main_loop.hpp"
 
-using gott::events::auto_loop;
-using gott::events::main_loop;
+using namespace gott::events;
+using namespace boost::posix_time;
 
-class auto_loop::IMPL {
-
-};
-
-auto_loop::auto_loop() : p(new IMPL) {}
-auto_loop::~auto_loop() {}
-
-void auto_loop::spawn_noblock() {
-
+deadline_timer timefunc() {
+  std::cout << "beep!" << std::endl;
+  return deadline_timer(microsec_clock::local_time() + seconds(3), &timefunc);
 }
 
-void auto_loop::spawn_block() {
-
+void init_timer(main_loop &m) {
+  m.feature<timer_manager>().add_timer(
+      deadline_timer(
+        microsec_clock::local_time(),
+        &timefunc
+        ));
 }
 
-sigc::signal1<void, main_loop &> &auto_loop::add(loop_requirement const &e) {
-  if (!e.do_try(*this))
-    throw std::runtime_error("could not find suitable main loop");
-}
-
-bool auto_loop::try_feature(QID const &, loop_requirement const *) {
-  return false;
+int main() {
+  auto_loop loops;
+  loops.add(feature<timer_manager>()).connect(&init_timer);
+  loops.spawn_block();
 }

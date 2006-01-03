@@ -1,4 +1,4 @@
-// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2005-2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: GOTT main loop
 // Authors: Aristid Breitkreuz
 //
@@ -76,7 +76,7 @@ public:
   /**
    * Get a concrete feature of the main loop.
    * \return A pointer to the feature.
-   * \throw #bad_feature if the feature is not available.
+   * \throw main_loop::bad_feature if the feature is not available.
    */
   template<class T>
   GOTT_LOCAL T &feature() {
@@ -89,7 +89,7 @@ public:
   /**
    * Get a concrete feature of the main loop.
    * \return A pointer to the feature.
-   * \throw #bad_feature if the feature is not available.
+   * \throw main_loop::bad_feature if the feature is not available.
    */
   template<class T>
   GOTT_LOCAL T const &feature() const {

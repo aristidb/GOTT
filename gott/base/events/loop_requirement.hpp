@@ -1,4 +1,4 @@
-// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2005-2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: GOTT main loop spawner
 // Authors: Aristid Breitkreuz
 //
@@ -29,6 +29,9 @@ namespace gott {
 namespace events {
 class auto_loop;
 
+/**
+ * A formulated requirement for a main_loop.
+ */
 class loop_requirement {
 public:
   enum combiner_t { combine_and, combine_or };
@@ -50,13 +53,17 @@ private:
   bool do_try(auto_loop &, loop_requirement const *) const;
   
   class IMPL;
-  boost::shared_ptr<IMPL> p;
+  boost::shared_ptr<IMPL const> p;
 
   loop_requirement();
 };
 
 /**
  * Requirement for a main_loop to fulfill two other requirements.
+ * \param lhs First checked requirement.
+ * \param rhs Second checked requirement.
+ * \return A requirement object.
+ * \relates loop_requirement
  */
 inline loop_requirement operator&&(
     loop_requirement const &lhs, 
@@ -67,6 +74,10 @@ inline loop_requirement operator&&(
 /**
  * Requirement for a main_loop to fulfill at least one of two other 
  * requirements.
+ * \param lhs First checked requirement.
+ * \param rhs Second checked requirement.
+ * \return A requirement object.
+ * \relates loop_requirement
  */
 inline loop_requirement operator||(
     loop_requirement const &lhs,
@@ -77,6 +88,7 @@ inline loop_requirement operator||(
 /**
  * Requirement for a main_loop to have a certain feature.
  * \param T The required feature class.
+ * \relates loop_requirement
  */
 template<class T>
 loop_requirement feature() {
@@ -86,6 +98,7 @@ loop_requirement feature() {
 /**
  * Requirement for a main_loop to have a certain feature.
  * \param qid The QID of the required feature.
+ * \relates loop_requirement
  */
 inline loop_requirement feature(QID const &qid) {
   return loop_requirement(qid, loop_requirement::feature);

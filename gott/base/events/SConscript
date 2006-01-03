@@ -1,6 +1,9 @@
 import glob
 
 Import('shrd')
+Import('env')
 
-shrd.SharedLibrary('events', glob.glob('*.cpp'), LIBS='boost_date_time')
-
+libobj = glob.glob('*.cpp')
+libobj.remove('auto_loop_test.cpp')
+shrd.SharedLibrary('events', libobj, LIBS='boost_date_time')
+env.Program('auto_loop', 'auto_loop_test.cpp', LIBS=['ntl','string','events'])
