@@ -37,24 +37,46 @@
 using gott::string;
 using gott::range_t;
 
+#ifdef DEBUG
+#include <fstream>
+namespace {
+std::ofstream &sizes() {
+  static std::ofstream out("sizes.log");
+  return out;
+}
+}
+#endif
+
 class string::representation {
 public:
   representation(range_t<utf8_t const *> d, bool o = true)
-  : ref_count(1), size(d.size()), length(0), owned(o), data(d.begin()) {}
+  : ref_count(1), size(d.size()), length(0), owned(o), data(d.begin()) {
+#ifdef DEBUG
+    if (owned)
+      sizes() << "string/standard:" << long(data) << ' ' << size << '\n';
+#endif
+  }
 
   enum foreign_tag { foreign_copy };
 
   representation(range_t<utf8_t const *> const &x, foreign_tag)
   : ref_count(1), size(x.size()), length(0), owned(true),
-      data(new utf8_t[x.size()]) {
+      data(new utf8_t[size]) {
+#ifdef DEBUG
+    sizes() << "string/foreign:" << long(data) << ' ' << size << '\n';
+#endif
     utf8_t *out = const_cast<utf8_t *>(data);
     for (utf8_t const *it = x.begin(); it != x.end(); ++it)
       *out++ = *it;
   }
 
   ~representation() {
-    if (owned) 
+    if (owned) {
+#ifdef DEBUG
+      sizes() << "~string/*:" << long(data) << ' ' << size << '\n';
+#endif
       delete [] data;
+    }
   }
 
   std::size_t ref_count;
