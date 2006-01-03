@@ -71,6 +71,12 @@ public:
   GOTT_EXPORT
   void join_all();
 
+  /**
+   * Quit all main_loops.
+   */
+  GOTT_EXPORT
+  void quit_all();
+
 public: // internal
   bool try_feature(QID const &, loop_requirement const *);
 

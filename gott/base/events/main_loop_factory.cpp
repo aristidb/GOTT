@@ -1,5 +1,5 @@
 // Copyright (C) 2005-2006 by Aristid Breitkreuz (aribrei@arcor.de)
-// Content: GOTT main loop spawner
+// Content: GOTT main loop
 // Authors: Aristid Breitkreuz
 //
 // This file is part of the Gott Project (http://gott.sf.net)
@@ -18,40 +18,21 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "auto_loop.hpp"
+#include "main_loop_factory.hpp"
 #include "loop_requirement.hpp"
-#include <stdexcept>
+#include "main_loop.hpp"
+#include <gott/string/qid.hpp>
 
-using gott::events::auto_loop;
+using gott::events::main_loop_factory;
 using gott::events::main_loop;
 
-class auto_loop::IMPL {
+main_loop_factory::main_loop_factory() {}
+main_loop_factory::~main_loop_factory() {}
 
-};
-
-auto_loop::auto_loop() : p(new IMPL) {}
-auto_loop::~auto_loop() {}
-
-void auto_loop::spawn_noblock() {
-
+bool main_loop_factory::try_add(loop_requirement const &req) {
+  req.do_try(*this);  
 }
 
-void auto_loop::spawn_block() {
+bool main_loop_factory::try_add_feature(QID const &qid) {
 
-}
-
-void auto_loop::quit_all() {
-
-}
-
-void auto_loop::join_all() {
-
-}
-
-sigc::signal1<void, main_loop &> &auto_loop::add(loop_requirement const &e) {
-  
-}
-
-bool auto_loop::try_feature(QID const &, loop_requirement const *) {
-  return false;
 }

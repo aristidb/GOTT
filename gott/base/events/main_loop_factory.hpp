@@ -1,5 +1,5 @@
 // Copyright (C) 2005-2006 by Aristid Breitkreuz (aribrei@arcor.de)
-// Content: GOTT main loop spawner
+// Content: GOTT main loop
 // Authors: Aristid Breitkreuz
 //
 // This file is part of the Gott Project (http://gott.sf.net)
@@ -18,40 +18,28 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "auto_loop.hpp"
-#include "loop_requirement.hpp"
-#include <stdexcept>
+#ifndef GOTT_BASE_EVENTS_MAIN_LOOP_FACTORY
+#define GOTT_BASE_EVENTS_MAIN_LOOP_FACTORY
 
-using gott::events::auto_loop;
-using gott::events::main_loop;
+#include <gott/visibility.hpp>
+#include <boost/noncopyable.hpp>
 
-class auto_loop::IMPL {
+namespace gott { class QID;
+namespace events {
+class loop_requirement;
+class main_loop;
 
+class main_loop_factory : boost::noncopyable {
+public:
+  GOTT_EXPORT main_loop_factory();
+  GOTT_EXPORT ~main_loop_factory();
+  GOTT_EXPORT bool try_add(loop_requirement const &);
+  GOTT_EXPORT main_loop *get_alloc() const;
+
+public: // internal
+  bool try_add_feature(QID const &);
 };
 
-auto_loop::auto_loop() : p(new IMPL) {}
-auto_loop::~auto_loop() {}
+}}
 
-void auto_loop::spawn_noblock() {
-
-}
-
-void auto_loop::spawn_block() {
-
-}
-
-void auto_loop::quit_all() {
-
-}
-
-void auto_loop::join_all() {
-
-}
-
-sigc::signal1<void, main_loop &> &auto_loop::add(loop_requirement const &e) {
-  
-}
-
-bool auto_loop::try_feature(QID const &, loop_requirement const *) {
-  return false;
-}
+#endif

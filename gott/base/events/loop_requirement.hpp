@@ -27,7 +27,7 @@
 
 namespace gott {
 namespace events {
-class auto_loop;
+class main_loop_factory;
 
 /**
  * A formulated requirement for a main_loop.
@@ -47,11 +47,9 @@ public:
   loop_requirement(QID const &, feature_flag_t);
 
 public: // internal
-  bool do_try(auto_loop &) const;
+  bool do_try(main_loop_factory &) const;
 
 private:
-  bool do_try(auto_loop &, loop_requirement const *) const;
-  
   class IMPL;
   boost::shared_ptr<IMPL const> p;
 

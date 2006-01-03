@@ -21,10 +21,14 @@
 #include "auto_loop.hpp"
 #include "loop_requirement.hpp"
 #include "timer_manager.hpp"
+#include "signal_manager.hpp"
 #include "main_loop.hpp"
+#include <signal.h>
+#include <boost/bind.hpp>
 
 using namespace gott::events;
 using namespace boost::posix_time;
+using boost::bind;
 
 deadline_timer timefunc() {
   std::cout << "beep!" << std::endl;
@@ -39,8 +43,14 @@ void init_timer(main_loop &m) {
         ));
 }
 
+void init_sig(main_loop &m, auto_loop *pa) {
+  m.feature<signal_manager>().on_signal(SIGINT).connect(
+      bind(&auto_loop::quit_all, pa));
+}
+
 int main() {
   auto_loop loops;
   loops.add(feature<timer_manager>()).connect(&init_timer);
+  loops.add(feature<signal_manager>()).connect(bind(&init_sig, _1, &loops));
   loops.spawn_block();
 }

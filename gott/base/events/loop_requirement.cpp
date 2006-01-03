@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "loop_requirement.hpp"
-#include "auto_loop.hpp"
+#include "main_loop_factory.hpp"
 #include <boost/variant.hpp>
 #include <boost/tuple/tuple.hpp>
 
@@ -52,21 +52,17 @@ loop_requirement::loop_requirement(
     feature_flag_t indicator)
 : p(new IMPL(IMPL::feature(id, indicator))) {}
 
-bool loop_requirement::do_try(auto_loop &x) const {
-  return do_try(x, this);
-}
-
-bool loop_requirement::do_try(auto_loop &x, loop_requirement const *w) const {
+bool loop_requirement::do_try(main_loop_factory &x) const {
   if (p->data.type() == typeid(IMPL::combined)) {
     IMPL::combined const &comb = boost::get<IMPL::combined>(p->data);
     switch (comb.get<2>()) {
     case combine_and:
-      return comb.get<0>().do_try(x, w) && comb.get<1>().do_try(x, w);
+      return comb.get<0>().do_try(x) && comb.get<1>().do_try(x);
     case combine_or:
-      return comb.get<0>().do_try(x, w) || comb.get<1>().do_try(x, w);
+      return comb.get<0>().do_try(x) || comb.get<1>().do_try(x);
     default: throw 0;
     }
   } else if (p->data.type() == typeid(IMPL::feature)) {
-    return x.try_feature(boost::get<IMPL::feature>(p->data).get<0>(), w);
+    return x.try_add_feature(boost::get<IMPL::feature>(p->data).get<0>());
   } else throw 0;
 }
