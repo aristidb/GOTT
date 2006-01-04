@@ -154,6 +154,8 @@ private:
 template<class Type>
 class read_property {
 public:
+  virtual ~read_property() {}
+
   /**
    * Access the value for reading.
    * \return A read_reference<Type> to the value.
@@ -197,6 +199,8 @@ private:
 template<class Type>
 class write_property {
 public:
+  virtual ~write_property() {}
+
   /**
    * Access the value for writing. Reading the value results in undefined
    * behaviour.

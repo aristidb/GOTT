@@ -27,13 +27,14 @@ using gott::plugin::system_configuration;
 using gott::plugin::plugin_configuration;
 
 plugin_base *gott::plugin::load_plugin(
-    QID const &name,
-    string const &version,
-    system_configuration &sysc,
-    plugin_configuration const &plgc) {
+    QID const &/*name*/,
+    string const &/*version*/,
+    system_configuration &/*sysc*/,
+    plugin_configuration const &/*plgc*/) {
   //TODO implement me
+  throw 0;
 }
 
-void gott::plugin::unload_plugin(plugin_base *p) {
+void gott::plugin::unload_plugin(plugin_base *) {
   //TODO implement me
 }

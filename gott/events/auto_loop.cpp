@@ -33,25 +33,27 @@ auto_loop::auto_loop() : p(new IMPL) {}
 auto_loop::~auto_loop() {}
 
 void auto_loop::spawn_noblock() {
-
+  //TODO implement me
 }
 
 void auto_loop::spawn_block() {
-
+  //TODO implement me
 }
 
 void auto_loop::quit_all() {
-
+  //TODO implement me
 }
 
 void auto_loop::join_all() {
-
+  //TODO implement me
 }
 
-sigc::signal1<void, main_loop &> &auto_loop::add(loop_requirement const &e) {
-  
+sigc::signal1<void, main_loop &> &auto_loop::add(loop_requirement const &) {
+  //TODO implement me
+  throw 0;
 }
 
 bool auto_loop::try_feature(QID const &, loop_requirement const *) {
+  //TODO implement me
   return false;
 }

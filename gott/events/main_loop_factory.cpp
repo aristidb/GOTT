@@ -30,9 +30,10 @@ main_loop_factory::main_loop_factory() {}
 main_loop_factory::~main_loop_factory() {}
 
 bool main_loop_factory::try_add(loop_requirement const &req) {
-  req.do_try(*this);  
+  return req.do_try(*this);
 }
 
-bool main_loop_factory::try_add_feature(QID const &qid) {
-
+bool main_loop_factory::try_add_feature(QID const &) {
+  //TODO implement me
+  return false;
 }
