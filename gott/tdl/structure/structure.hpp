@@ -80,13 +80,13 @@ public:
    * Revert to an acquired time-point.
    * \param pt The time-point to revert to.
    */
-  virtual void revert(pth const &pt) = 0;
+  virtual void revert(pth pt) = 0;
 
   /**
    * "Destroy" a time-point.
    * \param pt The time point to get rid of.
    */
-  virtual void get_rid_of(pth const &pt) = 0;
+  virtual void get_rid_of(pth pt) = 0;
 
   GOTT_EXPORT virtual ~revocable_structure() = 0;
 };

@@ -41,6 +41,7 @@ private:
   rule_t const &sub;
   positioning::id last;
   slotcfg cfg;
+  bool cancelled;
 
   expect expectation() const;
   bool play(ev::child_fail const &);

@@ -25,17 +25,20 @@
 #include <gott/tdl/structure/tree.hpp>
 #include <gott/tdl/structure/comfort.hpp>
 #include <gott/tdl/structure/print.hpp>
+#include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/string/string.hpp>
 #include <gott/tut/tut.h>
 
 namespace tut {
 struct schema_basic {
   gott::tdl::structure::tree tree, xp;
+  gott::tdl::structure::revocable_adapter rtree;
   gott::tdl::schema::match match;
   gott::tdl::schema::rule_t grammar;
   std::string rest;
-  schema_basic() : match(tree) {}
-  schema_basic(gott::tdl::schema::rule_t const &r) : match(tree), grammar(r) {}
+  schema_basic() : rtree(tree), match(rtree) {}
+  schema_basic(gott::tdl::schema::rule_t const &r) 
+    : rtree(tree), match(rtree), grammar(r) {}
   void run_test(std::string const &input) {
     match.add(grammar);
     std::istringstream stream(input);

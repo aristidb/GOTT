@@ -37,8 +37,8 @@ struct ignore_struct : tdl::structure::revocable_structure {
   void add_tag(gott::string const &) {}
 
   pth point() { return pth(); }
-  void revert(pth const &) {}
-  void get_rid_of(pth const &) {}
+  void revert(pth) {}
+  void get_rid_of(pth) {}
 };
 
 struct test_base {

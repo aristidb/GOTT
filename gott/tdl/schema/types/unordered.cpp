@@ -89,5 +89,5 @@ bool match_unordered::accept_empty(rule_attr_t const &,
 }
 
 gott::string match_unordered::name() const {
-  return L"unordered";
+  return "unordered";
 }

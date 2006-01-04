@@ -161,8 +161,8 @@ private: // Inherited interface
   void end();
   
   pth point();
-  void revert(pth const &);
-  void get_rid_of(pth const &);
+  void revert(pth);
+  void get_rid_of(pth);
 
 public:
   GOTT_EXPORT void copy_to(writable_structure &ws) const;

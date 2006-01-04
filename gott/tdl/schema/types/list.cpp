@@ -29,7 +29,7 @@ using schema::slotcfg;
 using schema::match_list;
 
 match_list::match_list(rule_attr_t const &a, Vector<rule_t> const &r, match &m)
-: item(a, m), sub(r[0]), cfg(r[0].attributes().outer()) {
+: item(a, m), sub(r[0]), cfg(r[0].attributes().outer()), cancelled(false) {
   GOTT_ASSERT_2(r.GetCount(), 1, std::equal_to<int>(), "1 child");
   last = m.pos().current();
   if (accept_more(expectation()))
@@ -37,7 +37,7 @@ match_list::match_list(rule_attr_t const &a, Vector<rule_t> const &r, match &m)
 }
 
 match_list::~match_list() {
-  if (expectation() != nothing)
+  if (expectation() != nothing || cancelled)
     matcher().pos().forget(last);
 }
 
@@ -67,8 +67,10 @@ bool match_list::full() {
 
 bool match_list::empty() {
   matcher().pos().seek(last);
-  if (expectation() != need)
+  if (expectation() != need) {
     cfg.cancel();
+    cancelled = true;
+  }
 
   return true;
 }
@@ -78,7 +80,7 @@ item::expect match_list::expectation() const {
 }
 
 gott::string match_list::name() const {
-  return L"list";
+  return "list";
 }
 
 bool match_list::accept_empty(rule_attr_t const &, Vector<rule_t> const &c) {

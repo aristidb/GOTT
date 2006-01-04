@@ -184,12 +184,12 @@ revocable_structure::pth tree::point() {
   return p->current_tag;
 }
 
-void tree::revert(revocable_structure::pth const &mp) {
+void tree::revert(revocable_structure::pth mp) {
   p->del_since(p->root, mp);
   p->pos = p->tagpos.Get(mp);
 }
 
-void tree::get_rid_of(revocable_structure::pth const &x) {
+void tree::get_rid_of(revocable_structure::pth x) {
   p->tagpos.RemoveKey(x);
 }
 

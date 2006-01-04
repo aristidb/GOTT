@@ -55,7 +55,7 @@ typedef tf::object object;
 }
 
 namespace {
-  tut::tf multi_footype_test("list_list");
+  tut::tf multi_footype_test("schema::list_list");
 }
 
 namespace tut {
