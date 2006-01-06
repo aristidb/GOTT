@@ -19,7 +19,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <gott/tdl/structure/structure.hpp>
-#include <gott/tdl/structure/tree.hpp>
+#include <gott/tdl/structure/container.hpp>
+#include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/tdl/structure/comfort.hpp>
 #include <gott/tdl/structure/print.hpp>
 #include <gott/tut/tut.h>
@@ -43,7 +44,7 @@ tut::tf stru("structure");
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
-  stru::tree p1, p2;
+  stru::container p1, p2;
   stru::writable_structure &w = p1;
   w.begin();
     w.data(Xany("hallo"));
@@ -54,7 +55,7 @@ void object::test<1>(int) {
 
 template<> template<>
 void object::test<2>(int) {
-  stru::tree p1, p2;
+  stru::container p1, p2;
   stru::writable_structure &w = p2;
   cf::S(Xany("hallo")).write_to(p1);
   w.begin();
@@ -65,8 +66,9 @@ void object::test<2>(int) {
 
 template<> template<>
 void object::test<3>(int) {
-  stru::tree p1, p2;
-  stru::revocable_structure &w = p1;
+  stru::container p1, p2;
+  stru::revocable_adapter a(p1);
+  stru::revocable_structure &w = a;
   w.begin();
     w.begin();
       stru::revocable_structure::pth p = w.point();
@@ -74,6 +76,7 @@ void object::test<3>(int) {
       w.begin();
         w.add_tag(L"--!");
       w.revert(p);
+      w.get_rid_of(p);
       w.data(Xany("77"));
     w.end();
   w.end();
@@ -83,7 +86,7 @@ void object::test<3>(int) {
 
 template<> template<>
 void object::test<4>(int) {
-  stru::tree p1, p2;
+  stru::container p1, p2;
   stru::writable_structure &w = p1;
   w.begin();
     w.begin();
@@ -100,7 +103,7 @@ void object::test<4>(int) {
 
 template<> template<>
 void object::test<5>(int) {
-  stru::tree p1;
+  stru::container p1;
   stru::writable_structure &w = p1;
   w.begin();
     w.begin();

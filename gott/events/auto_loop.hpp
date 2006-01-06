@@ -81,8 +81,8 @@ public: // internal
   bool try_feature(QID const &, loop_requirement const *);
 
 private:
-  class IMPL;
-  boost::scoped_ptr<IMPL> p;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}

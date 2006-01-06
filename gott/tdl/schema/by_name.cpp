@@ -31,7 +31,7 @@ by_name_t &schema::by_name() {
   return m;
 }
 
-class by_name_t::IMPL {
+class by_name_t::impl {
 public:
   typedef VectorMap<string, abstract_rule> mapping; 
   mapping items;
@@ -44,7 +44,7 @@ public:
   }
 };
 
-by_name_t::by_name_t() : p(new IMPL) {
+by_name_t::by_name_t() : p(new impl) {
 }
 
 by_name_t::~by_name_t() {

@@ -68,8 +68,8 @@ public:
 #endif
 
 private:
-  class IMPL;
-  boost::scoped_ptr<IMPL> p;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}}

@@ -57,7 +57,7 @@ class rule_t;
  * TODO: Split?!
  */
 class match : public simple::parser {
-  class IMPL;
+  class impl;
 
 public:
   /**
@@ -121,8 +121,8 @@ private:
   void comment(string const &, bool);
 
 private:
-  class IMPL;
-  boost::scoped_ptr<IMPL> pIMPL;
+  class impl;
+  boost::scoped_ptr<impl> pimpl;
 
   match();
 };

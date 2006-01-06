@@ -22,7 +22,7 @@
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/exceptions.hpp>
-#include <gott/tdl/structure/tree.hpp>
+#include <gott/tdl/structure/container.hpp>
 #include <gott/tdl/structure/comfort.hpp>
 #include <gott/tdl/structure/print.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
@@ -31,7 +31,7 @@
 
 namespace tut {
 struct schema_basic {
-  gott::tdl::structure::tree tree, xp;
+  gott::tdl::structure::container tree, xp;
   gott::tdl::structure::revocable_adapter rtree;
   gott::tdl::schema::match match;
   gott::tdl::schema::rule_t grammar;

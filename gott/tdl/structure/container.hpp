@@ -1,4 +1,4 @@
-// Copyright (C) 2004-2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: TDL Data Structures
 // Authors: Aristid Breitkreuz
 //
@@ -18,8 +18,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_TDL_STRUCTURE_PRINT_HPP
-#define GOTT_UTIL_TDL_STRUCTURE_PRINT_HPP
+#ifndef GOTT_TDL_STRUCTURE_CONTAINER_HPP
+#define GOTT_TDL_STRUCTURE_CONTAINER_HPP
 
 #include "structure.hpp"
 #include <boost/scoped_ptr.hpp>
@@ -29,46 +29,46 @@ namespace tdl {
 namespace structure {
 
 /**
- * A structure writer callback directly writing to a stream. Does not support
- * backtracking, of course.
+ * Generic container.
  */
-template<class Ch>
-class direct_print : public writable_structure {
+class container : public writable_structure, public copyable_structure {
 public:
-  /**
-   * Constructor.
-   * \param out The stream to write to.
-   * \param step The indentation width.
-   */
-  GOTT_EXPORT direct_print(std::basic_ostream<Ch> &out, unsigned step = 4);
-  GOTT_EXPORT ~direct_print();
+  /// Constructor.
+  GOTT_EXPORT container();
+
+  /// Copy-Constructor.
+  GOTT_EXPORT container(container const &);
+
+  /// Destructor.
+  GOTT_EXPORT ~container();
+
+  /// Assignment-Operator.
+  GOTT_EXPORT void operator=(container const &);
+
+  /// Clear the container.
+  GOTT_EXPORT void clear();
+
+  /// Compare to another container.
+  GOTT_EXPORT bool operator==(container const &) const;
+
+  /// Compare to another container.
+  inline bool operator!=(container const &o) const {
+    return !operator==(o);
+  }
+
+  /// Copy contents to another structure.
+  GOTT_EXPORT void copy_to(writable_structure &w) const;
 
 private:
   void begin();
   void end();
-  void data(xany::Xany const &);
   void add_tag(string const &);
+  void data(xany::Xany const &);
 
+private:
   class impl;
   boost::scoped_ptr<impl> p;
 };
-
-#ifdef HAVE_WIDE_STDLIB
-/**
- * Print a (copyable) structure object to a (wide) stream.
- * \param o The stream to write to.
- * \param s The structure to print.
- */
-GOTT_EXPORT
-std::wostream &operator<<(std::wostream &o, copyable_structure const &s);
-#endif
-
-/**
- * Print a (copyable) structure object to a (normal) stream.
- * @copydoc operator<<(std::wostream &, copyable_structure const &)
- */
-GOTT_EXPORT
-std::ostream &operator<<(std::ostream &o, copyable_structure const &s);
 
 }}}
 

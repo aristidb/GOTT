@@ -27,7 +27,7 @@ using boost::variant;
 using boost::tuple;
 using gott::events::loop_requirement;
 
-class loop_requirement::IMPL {
+class loop_requirement::impl {
 public:
   typedef tuple<loop_requirement, loop_requirement, combiner_t> combined;
   typedef tuple<QID const &, feature_flag_t> feature;
@@ -38,23 +38,23 @@ public:
     > data_t;
   data_t data;
 
-  IMPL(data_t const &d) : data(d) {}
+  impl(data_t const &d) : data(d) {}
 };
 
 loop_requirement::loop_requirement(
     loop_requirement const &lhs,
     loop_requirement const &rhs,
     combiner_t comb)
-: p(new IMPL(IMPL::combined(lhs, rhs, comb))) {}
+: p(new impl(impl::combined(lhs, rhs, comb))) {}
 
 loop_requirement::loop_requirement(
     QID const &id,
     feature_flag_t indicator)
-: p(new IMPL(IMPL::feature(id, indicator))) {}
+: p(new impl(impl::feature(id, indicator))) {}
 
 bool loop_requirement::do_try(main_loop_factory &x) const {
-  if (p->data.type() == typeid(IMPL::combined)) {
-    IMPL::combined const &comb = boost::get<IMPL::combined>(p->data);
+  if (p->data.type() == typeid(impl::combined)) {
+    impl::combined const &comb = boost::get<impl::combined>(p->data);
     switch (comb.get<2>()) {
     case combine_and:
       return comb.get<0>().do_try(x) && comb.get<1>().do_try(x);
@@ -62,7 +62,7 @@ bool loop_requirement::do_try(main_loop_factory &x) const {
       return comb.get<0>().do_try(x) || comb.get<1>().do_try(x);
     default: throw 0;
     }
-  } else if (p->data.type() == typeid(IMPL::feature)) {
-    return x.try_add_feature(boost::get<IMPL::feature>(p->data).get<0>());
+  } else if (p->data.type() == typeid(impl::feature)) {
+    return x.try_add_feature(boost::get<impl::feature>(p->data).get<0>());
   } else throw 0;
 }

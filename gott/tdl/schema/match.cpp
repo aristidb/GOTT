@@ -43,9 +43,9 @@ using gott::tdl::schema::match;
 using gott::tdl::schema::positioning;
 using structure::writable_structure;
 
-class match::IMPL {
+class match::impl {
 public:
-  IMPL(structure::revocable_structure &x, match &r);
+  impl(structure::revocable_structure &x, match &r);
 
   void add(rule_t const &);
 
@@ -126,81 +126,81 @@ public:
 };
 
 match::match(structure::revocable_structure &p) 
-: parser(0), pIMPL(new IMPL(p, *this)) {
+: parser(0), pimpl(new impl(p, *this)) {
   set_line_logger(get_debug());
 }
 
 match::match(rule_t const &rf, structure::revocable_structure &p)
-: parser(0), pIMPL(new IMPL(p, *this)) {
+: parser(0), pimpl(new impl(p, *this)) {
   set_line_logger(get_debug());
-  pIMPL->add(rf);
+  pimpl->add(rf);
 }
 
 match::~match() {}
 
 void match::add(rule_t const &rf) {
-  pIMPL->add(rf);
+  pimpl->add(rf);
 }
 
 structure::revocable_structure &match::revocable_structure() const {
-  return pIMPL->base_struc;
+  return pimpl->base_struc;
 }
 
 structure::writable_structure &match::direct_structure() const {
-  shared_ptr<writable_structure> s = pIMPL->direct_structure_non_base();
+  shared_ptr<writable_structure> s = pimpl->direct_structure_non_base();
   if (s)
     return *s;
-  return pIMPL->base_struc;
+  return pimpl->base_struc;
 }
 
 simple::line_logger *match::get_debug() const {
-  return &pIMPL->ln;
+  return &pimpl->ln;
 }
 
 positioning &match::pos() const {
-  return pIMPL->pos;
+  return pimpl->pos;
 }
 
 void match::parental_requirement(ev::event const &event, unsigned count) {
-  pIMPL->parental_requirement(event, count);
+  pimpl->parental_requirement(event, count);
 }
 
 // Parser forwarding
 
 void match::begin_parse() {
-  pIMPL->handle_token(ev::begin_parse());
+  pimpl->handle_token(ev::begin_parse());
 }
 
 void match::down() {
-  pIMPL->handle_token(ev::down());
+  pimpl->handle_token(ev::down());
 }
 
 void match::node(string const &s) {
-  pIMPL->handle_token(ev::node(s));
+  pimpl->handle_token(ev::node(s));
 }
 
 void match::up() {
-  pIMPL->handle_token(ev::up());
+  pimpl->handle_token(ev::up());
 }
 
 void match::end_parse() {
-  pIMPL->handle_token(ev::end_parse());
+  pimpl->handle_token(ev::end_parse());
 }
 
 void match::comment(string const &, bool) {}
 
 // Implementation
 
-match::IMPL::IMPL(structure::revocable_structure &p, match &r)
+match::impl::impl(structure::revocable_structure &p, match &r)
 : base_struc(p), pos(base_struc), ref(r) {}
 
-shared_ptr<writable_structure> match::IMPL::direct_structure_non_base() {
+shared_ptr<writable_structure> match::impl::direct_structure_non_base() {
   if (parse.IsEmpty()) 
     return shared_ptr<writable_structure>();
   return parse.back().structure;
 }
 
-void match::IMPL::add(rule_t const &f) {
+void match::impl::add(rule_t const &f) {
   shared_ptr<writable_structure> struc = direct_structure_non_base();
 
   if (structure::repatcher const *r = f.attributes().repatcher())
@@ -218,7 +218,7 @@ void match::IMPL::add(rule_t const &f) {
 }
 
 template<class T>
-void match::IMPL::handle_token(T const &e) {
+void match::impl::handle_token(T const &e) {
   shadow_names.clear();
   range_t<Stack::iterator> in = range(parse);
   while (!in.empty())
@@ -235,18 +235,18 @@ void match::IMPL::handle_token(T const &e) {
     replay_buffer();
 }
 
-void match::IMPL::replay_buffer() {
+void match::impl::replay_buffer() {
   struct acc : positioning::acceptor {
-    match::IMPL *tt;
+    match::impl *tt;
     void operator() (ev::token const &t) {
       tt->handle_event(t, true);
     }
-    acc(match::IMPL *t) : tt(t) {}
+    acc(match::impl *t) : tt(t) {}
   } a(this);
   pos.replay(a);
 }
 
-void match::IMPL::handle_event(ev::event const &event, bool token) {
+void match::impl::handle_event(ev::event const &event, bool token) {
 #ifdef VERBOSE
   std::cout << event << '{' << std::endl;
   struct close { ~close() { std::cout << '}' << std::endl; } } x; (void)x;
@@ -258,7 +258,7 @@ void match::IMPL::handle_event(ev::event const &event, bool token) {
       break;
 }
 
-bool match::IMPL::handle_item(ev::event const &event, bool token) {
+bool match::impl::handle_item(ev::event const &event, bool token) {
 #ifdef VERBOSE
   std::cout << get_name(*parse.back().the_item) << '{' << std::endl;
   struct close { ~close() { std::cout << '}' << std::endl; } } x; (void)x;
@@ -272,7 +272,7 @@ bool match::IMPL::handle_item(ev::event const &event, bool token) {
   }
 }
 
-bool match::IMPL::try_play(ev::event const &event, item &current) {
+bool match::impl::try_play(ev::event const &event, item &current) {
   try {
     return event.play(current);
   } catch (structure::failed_repatch &) {
@@ -280,7 +280,7 @@ bool match::IMPL::try_play(ev::event const &event, item &current) {
   }
 }
 
-bool match::IMPL::consume_event(bool) {
+bool match::impl::consume_event(bool) {
 #ifdef VERBOSE
   std::cout << "consume" << std::endl;
 #endif
@@ -289,7 +289,7 @@ bool match::IMPL::consume_event(bool) {
   return true;
 }
 
-bool match::IMPL::pass_event(bool) {
+bool match::impl::pass_event(bool) {
 #ifdef VERBOSE
   std::cout << "pass" << std::endl;
 #endif
@@ -302,7 +302,7 @@ bool match::IMPL::pass_event(bool) {
   }
 }
 
-void match::IMPL::succeed_item() {
+void match::impl::succeed_item() {
   parse.back().the_item->finish();
   parse.pop_back();
 
@@ -310,7 +310,7 @@ void match::IMPL::succeed_item() {
     handle_event(ev::child_succeed(), false);
 }
 
-void match::IMPL::fail_item() {
+void match::impl::fail_item() {
   parse.pop_back();
 
   if (!parse.IsEmpty())
@@ -319,15 +319,15 @@ void match::IMPL::fail_item() {
     fail_all();
 }
 
-void match::IMPL::fail_all() {
+void match::impl::fail_all() {
   throw mismatch(ln, shadow_names);
 }
 
-void match::IMPL::parental_requirement(ev::event const &event, unsigned count) {
+void match::impl::parental_requirement(ev::event const &event, unsigned count) {
   miss = deferred_miss(event, count);
 }
 
-void match::IMPL::real_parental_requirement() {
+void match::impl::real_parental_requirement() {
   Stack::iterator it = parse.end();
   if (it == parse.begin())
     fail_all();
@@ -337,7 +337,7 @@ void match::IMPL::real_parental_requirement() {
   fail_all();
 }
 
-string match::IMPL::get_name(item const &rl) {
+string match::impl::get_name(item const &rl) {
   static string const s_open("("), s_close(")"), sep(",");
   Vector<string> out;
   out.Reserve(1 + 

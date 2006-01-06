@@ -26,9 +26,9 @@ namespace gott {
 namespace tdl {
 namespace simple {
   
-class writer::IMPL {
+class writer::impl {
 public:
-  IMPL(ostream &os, unsigned i)
+  impl(ostream &os, unsigned i)
   : stream(os), level(0), indentation_width(i), newline(false), 
     last_block(false) {}
 
@@ -43,9 +43,9 @@ public:
   void print_as_block(string const &s);
 };
 
-writer::writer(ostream &os, unsigned i) : p(new IMPL(os, i)) {}
+writer::writer(ostream &os, unsigned i) : p(new impl(os, i)) {}
 
-void writer::IMPL::indent() {
+void writer::impl::indent() {
   for (unsigned i = 2; i < level; ++i)
     for (unsigned j = 0; j < indentation_width / 2; ++j)
       stream << ' ';
@@ -86,7 +86,7 @@ static string::const_iterator pos_to_it(string const &s,
   return s.begin() + p;
 }
 
-void writer::IMPL::print_as_block(string const &s) {
+void writer::impl::print_as_block(string const &s) {
   if (newline) stream << L'\n';
 
   indent();

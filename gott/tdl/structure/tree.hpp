@@ -141,10 +141,10 @@ public: // Iterators
     GOTT_EXPORT iterator get() const;
   
   private:
-    class IMPL;
-    boost::scoped_ptr<IMPL> const pIMPL;
+    class impl;
+    boost::scoped_ptr<impl> const pimpl;
 
-    tagged_iterator(IMPL *);
+    tagged_iterator(impl *);
     friend class iterator;
   };
 
@@ -182,8 +182,8 @@ public:
 #endif
 
 private:
-  class IMPL;
-  boost::scoped_ptr<IMPL> p;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 /**

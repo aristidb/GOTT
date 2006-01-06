@@ -150,8 +150,8 @@ protected:
     // an implementation must supply attributes
 
 private:
-  class IMPL;
-  boost::scoped_ptr<IMPL> pIMPL;
+  class impl;
+  boost::scoped_ptr<impl> pimpl;
 
   item() GOTT_LOCAL;
 };

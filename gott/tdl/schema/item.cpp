@@ -33,12 +33,12 @@ using schema::rule_attr_t;
 namespace ev = schema::ev;
 using gott::tdl::structure::writable_structure;
 
-class item::IMPL {
+class item::impl {
 public:
   match *cont;
   rule_attr_t attrib;
 
-  IMPL(match &m, rule_attr_t const &a) 
+  impl(match &m, rule_attr_t const &a) 
   : cont(&m), attrib(a) {
     start_structure();
     add_tags();
@@ -63,17 +63,17 @@ private:
 };
 
 item::item(rule_attr_t const &a, match &m) 
-: pIMPL(new IMPL(m, a)) {
+: pimpl(new impl(m, a)) {
 }
 
 void item::finish() {
-  pIMPL->end_structure();
+  pimpl->end_structure();
 }
 
 item::~item() {}
 
-rule_attr_t const &item::attributes() const { return pIMPL->attrib; }
-match &item::matcher() { return *pIMPL->cont; }
+rule_attr_t const &item::attributes() const { return pimpl->attrib; }
+match &item::matcher() { return *pimpl->cont; }
 
 bool item::play(ev::begin_parse const &) { return play_other(); }
 bool item::play(ev::down const &) { return play_other(); }

@@ -49,9 +49,9 @@ copyable_structure::~copyable_structure() {}
 NTL_MOVEABLE(shared_ptr<tree::node>)
 NTL_MOVEABLE(weak_ptr<tree::node>)
 
-class tree::IMPL {
+class tree::impl {
 public:
-  IMPL() : current_tag(0) {}
+  impl() : current_tag(0) {}
 
   typedef unsigned long tag;
   
@@ -70,7 +70,7 @@ struct tree::node {
   shared_ptr<node> child0, lastchild, sibling, last;
   weak_ptr<node> dad;
   size_t size;
-  IMPL::tag ttag;
+  impl::tag ttag;
   
   class index;
   scoped_ptr<index> indx;
@@ -116,12 +116,12 @@ struct tree::node {
     }
   };
   
-  node(IMPL::tag t) : size(0), ttag(t) {}
+  node(impl::tag t) : size(0), ttag(t) {}
   
   bool equals(node const &) const;
 };
 
-shared_ptr<tree::node> tree::IMPL::erase(shared_ptr<node> x) {
+shared_ptr<tree::node> tree::impl::erase(shared_ptr<node> x) {
   --x->dad.lock()->size;
 
   if (x->sibling) 
@@ -139,7 +139,7 @@ shared_ptr<tree::node> tree::IMPL::erase(shared_ptr<node> x) {
   return x->sibling;
 }
 
-tree::tree() : p(new IMPL) {}
+tree::tree() : p(new impl) {}
 tree::~tree() {}
 
 void tree::begin() {
@@ -193,7 +193,7 @@ void tree::get_rid_of(revocable_structure::pth x) {
   p->tagpos.RemoveKey(x);
 }
 
-bool tree::IMPL::del_since(shared_ptr<node> &n, tag t) {
+bool tree::impl::del_since(shared_ptr<node> &n, tag t) {
   for (shared_ptr<node> i = n->child0; i;)
     if (del_since(i, t)) 
       i = erase(i);
@@ -231,11 +231,11 @@ bool tree::iterator::contents_equal(iterator const &o) const {
   return n->equals(*o.n);
 }
 
-class tree::tagged_iterator::IMPL {
+class tree::tagged_iterator::impl {
 public:
   tree::node::index::tag_range_type range;
 
-  IMPL(tree::node::index::tag_range_type const &r) 
+  impl(tree::node::index::tag_range_type const &r) 
     : range(r) {}
 };
 
@@ -243,25 +243,25 @@ tree::tagged_iterator tree::iterator::with_tag(string const &s) const {
   if (!n->indx)
     n->indx.reset(new tree::node::index(n));
   n->indx->build_all();
-  return new tagged_iterator::IMPL(n->indx->with_name(s));
+  return new tagged_iterator::impl(n->indx->with_name(s));
 }
 
-tree::tagged_iterator::tagged_iterator(IMPL *p) : pIMPL(p) {}
+tree::tagged_iterator::tagged_iterator(impl *p) : pimpl(p) {}
 tree::tagged_iterator::tagged_iterator(tagged_iterator const &o) 
-: pIMPL(new IMPL(*o.pIMPL)) {}
+: pimpl(new impl(*o.pimpl)) {}
 
 tree::tagged_iterator::~tagged_iterator() {}
 
 void tree::tagged_iterator::operator++() {
-  pIMPL->range.second = pIMPL->range.first->FindNext(pIMPL->range.second);
+  pimpl->range.second = pimpl->range.first->FindNext(pimpl->range.second);
 }
 
 tree::tagged_iterator::operator bool() const {
-  return pIMPL->range.second > 0;
+  return pimpl->range.second > 0;
 }
 
 tree::iterator tree::tagged_iterator::get() const {
-  return (*pIMPL->range.first)[pIMPL->range.second];
+  return (*pimpl->range.first)[pimpl->range.second];
 }
 
 void tree::copy_to(writable_structure &target) const {

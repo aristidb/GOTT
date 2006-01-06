@@ -31,7 +31,7 @@ namespace structure = gott::tdl::structure;
 using structure::revocable_structure;
 using schema::positioning;
 
-class positioning::IMPL {
+class positioning::impl {
 public:
   typedef Vector<ev::token_t> buffer_t;
 
@@ -49,11 +49,11 @@ public:
       return unconsumed;
   }
 
-  IMPL(revocable_structure &s)
+  impl(revocable_structure &s)
     : struc(s), unconsumed(0), consumed(-1), replay(false), in_pass(false) {}
 };
 
-positioning::positioning(revocable_structure &s) : p(new IMPL(s)) {}
+positioning::positioning(revocable_structure &s) : p(new impl(s)) {}
 positioning::~positioning() {}
 
 template<class T>

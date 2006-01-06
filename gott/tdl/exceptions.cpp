@@ -24,25 +24,25 @@
 
 using gott::tdl::tdl_exception;
 
-class tdl_exception::IMPL {
+class tdl_exception::impl {
 public:
-  IMPL(string const &s) : len(s.size() + 1), msg(new char[len]) {
+  impl(string const &s) : len(s.size() + 1), msg(new char[len]) {
     copy(s.as_utf8().cast<char const *>(), msg);
     msg[s.size()] = '\0';
   }
-  IMPL(IMPL const &o) : len(o.len), msg(new char[len]) {
+  impl(impl const &o) : len(o.len), msg(new char[len]) {
     copy(range(o.msg, len), msg);
   }
-  ~IMPL() throw() { delete [] msg; }
+  ~impl() throw() { delete [] msg; }
   std::size_t len;
   char *msg;
 };
 
 tdl_exception::tdl_exception(string const &msg)
-: p(new IMPL(msg)) {}
+: p(new impl(msg)) {}
 
 tdl_exception::tdl_exception(tdl_exception const &o)
-: std::exception(), p(new IMPL(*o.p)) {}
+: std::exception(), p(new impl(*o.p)) {}
 
 tdl_exception::~tdl_exception() throw() {}
 

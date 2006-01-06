@@ -31,9 +31,9 @@ static bool pass(gott::string const &, gott::string const &) {
 
 NTL_MOVEABLE(meta_parser::callback);
 
-class meta_parser::IMPL {
+class meta_parser::impl {
 public:
-  IMPL() : def(pass) {}
+  impl() : def(pass) {}
 
   callback def;
   typedef VectorMap<string, callback> cb_t;
@@ -41,7 +41,7 @@ public:
   void exec(string const &);
 };
 
-meta_parser::meta_parser() : p(new IMPL) {
+meta_parser::meta_parser() : p(new impl) {
 }
 
 meta_parser::~meta_parser() {}
@@ -67,7 +67,7 @@ void meta_parser::parse(istream &in, line_logger *) {
   }
 }
 
-void meta_parser::IMPL::exec(string const &line_) {
+void meta_parser::impl::exec(string const &line_) {
   string::utf32_range line = line_.as_utf32();
   utf8_iterator pos = line.begin();
   for (; pos != line.end(); ++pos)

@@ -45,17 +45,17 @@ struct entry {
 const revocable_structure::pth nowhere = -1;
 }
 
-class revocable_adapter::IMPL {
+class revocable_adapter::impl {
 public:
   writable_structure &out;
   pth pos;
   pth blocking;
   std::vector<entry> blocked;
-  IMPL(writable_structure &o) : out(o), pos(0), blocking(nowhere) {}
+  impl(writable_structure &o) : out(o), pos(0), blocking(nowhere) {}
 };
 
 revocable_adapter::revocable_adapter(writable_structure &out) 
-: p(new IMPL(out)) {}
+: p(new impl(out)) {}
 revocable_adapter::~revocable_adapter() {}
 
 void revocable_adapter::begin() {

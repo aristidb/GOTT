@@ -44,8 +44,8 @@ public:
   hook const &find_hook(QID const &) const GOTT_EXPORT;
 
 private:
-  class IMPL;
-  boost::scoped_ptr<IMPL> p;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}

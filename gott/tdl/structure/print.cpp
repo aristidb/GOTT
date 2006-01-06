@@ -27,9 +27,9 @@ using gott::xany::Xany;
 using gott::tdl::structure::direct_print;
 
 template<class C>
-class direct_print<C>::IMPL {
+class direct_print<C>::impl {
 public:
-  IMPL(basic_ostream<C> &o, unsigned s)
+  impl(basic_ostream<C> &o, unsigned s)
   : out(o), level(-s), step(s), line_ended(true), tag_printed(false) {}
   
   basic_ostream<C> &out;
@@ -40,7 +40,7 @@ public:
 
 template<class C>
 direct_print<C>::direct_print(basic_ostream<C> &o, unsigned s) 
-: p(new IMPL(o, s)) {}
+: p(new impl(o, s)) {}
 
 template<class C> direct_print<C>::~direct_print() {}
 

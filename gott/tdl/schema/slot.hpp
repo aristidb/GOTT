@@ -141,8 +141,8 @@ public:
   item::expect expectation() const GOTT_EXPORT;
 
 private:
-  class IMPL;
-  boost::scoped_ptr<IMPL> p;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 namespace {

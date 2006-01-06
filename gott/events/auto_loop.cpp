@@ -25,11 +25,11 @@
 using gott::events::auto_loop;
 using gott::events::main_loop;
 
-class auto_loop::IMPL {
+class auto_loop::impl {
 
 };
 
-auto_loop::auto_loop() : p(new IMPL) {}
+auto_loop::auto_loop() : p(new impl) {}
 auto_loop::~auto_loop() {}
 
 void auto_loop::spawn_noblock() {

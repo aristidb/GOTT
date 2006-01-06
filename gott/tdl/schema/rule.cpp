@@ -30,7 +30,7 @@ using sh::rule_t;
 using sh::rule_attr_t;
 using sh::item;
 
-class rule_t::IMPL {
+class rule_t::impl {
 public:
   struct immediate {
     abstract_rule abstract;
@@ -46,10 +46,10 @@ public:
 
   boost::variant<immediate, rule_t const *> data;
 
-  IMPL(abstract_rule const &ar, rule_attr_t const &a, Vector<rule_t> pick_ &c)
+  impl(abstract_rule const &ar, rule_attr_t const &a, Vector<rule_t> pick_ &c)
   : data(immediate(ar, a, c)) {}
 
-  IMPL(rule_t const *p)
+  impl(rule_t const *p)
   : data(p) {}
 };
 
@@ -57,11 +57,11 @@ rule_t::rule_t() {}
 
 rule_t::rule_t(abstract_rule const &ar, rule_attr_t const &a,
     Vector<rule_t> pick_ &c)
-: p(new IMPL(ar, a, c)) {}
+: p(new impl(ar, a, c)) {}
 
 rule_t::rule_t(rule_t const &o) : p(o.p) {}
 
-rule_t::rule_t(rule_t const *ptr) : p(new IMPL(ptr)) {}
+rule_t::rule_t(rule_t const *ptr) : p(new impl(ptr)) {}
 
 rule_t::~rule_t() {}
 
@@ -73,7 +73,7 @@ item *rule_t::get(match &m) const {
   switch (p->data.which()) {
   case 0: // immediate
     { 
-      IMPL::immediate const &im = boost::get<IMPL::immediate>(p->data);
+      impl::immediate const &im = boost::get<impl::immediate>(p->data);
       return im.abstract.constructor(im.attr, im.children ,m); 
     }
   case 1: // indirect
@@ -85,7 +85,7 @@ item *rule_t::get(match &m) const {
 rule_attr_t const &rule_t::attributes() const {
   switch (p->data.which()) {
   case 0: // immediate
-    return boost::get<IMPL::immediate>(p->data).attr;
+    return boost::get<impl::immediate>(p->data).attr;
   case 1: // indirect
     return boost::get<rule_t const *>(p->data)->attributes();
   }
@@ -96,7 +96,7 @@ bool rule_t::accept_empty() const {
   switch (p->data.which()) {
   case 0: // immediate
     { 
-      IMPL::immediate const &imm = boost::get<IMPL::immediate>(p->data);
+      impl::immediate const &imm = boost::get<impl::immediate>(p->data);
       return imm.abstract.accept_empty(imm.attr, imm.children);
     }
   case 1: // indirect

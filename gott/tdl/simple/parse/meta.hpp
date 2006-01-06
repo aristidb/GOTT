@@ -18,8 +18,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_TDL_SIMPLE_META_HPP
-#define GOTT_UTIL_TDL_SIMPLE_META_HPP
+#ifndef GOTT_UTIL_TDL_SimplE_META_HPP
+#define GOTT_UTIL_TDL_SimplE_META_HPP
 
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -78,8 +78,8 @@ public:
   void parse(std::istream &s, line_logger *l = 0) GOTT_EXPORT;
 
 private:
-  class IMPL;
-  boost::scoped_ptr<IMPL> p;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}}

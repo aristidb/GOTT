@@ -38,8 +38,8 @@ public:
   char const *what() const throw();
 
 private:
-  class IMPL;
-  boost::scoped_ptr<IMPL> p;
+  class impl;
+  boost::scoped_ptr<impl> p;
 
   tdl_exception() GOTT_LOCAL;
 };

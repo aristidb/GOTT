@@ -65,8 +65,8 @@ public:
   rule_t get(string const &name, rule_attr_t const &att, 
              Vector<rule_t> pick_ &children) const;
 
-  class IMPL;
-  boost::scoped_ptr<IMPL> p;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 GOTT_EXPORT by_name_t &by_name();

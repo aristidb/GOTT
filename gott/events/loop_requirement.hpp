@@ -50,8 +50,8 @@ public: // internal
   bool do_try(main_loop_factory &) const;
 
 private:
-  class IMPL;
-  boost::shared_ptr<IMPL const> p;
+  class impl;
+  boost::shared_ptr<impl const> p;
 
   loop_requirement();
 };

@@ -29,7 +29,7 @@ using gott::QID;
 using gott::xany::Xany;
 using boost::variant;
 
-class plugin_configuration::IMPL {
+class plugin_configuration::impl {
 public:
   typedef variant<Xany, hook const *> entry;
   typedef VectorMap<QID, entry> mapping;
@@ -37,9 +37,9 @@ public:
   mapping parameters;
 };
 
-NTL_MOVEABLE(plugin_configuration::IMPL::entry);
+NTL_MOVEABLE(plugin_configuration::impl::entry);
 
-plugin_configuration::plugin_configuration() : p(new IMPL) {}
+plugin_configuration::plugin_configuration() : p(new impl) {}
 
 plugin_configuration::~plugin_configuration() {}
 

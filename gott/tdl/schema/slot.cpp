@@ -33,7 +33,7 @@ using schema::item;
 using schema::rule_t;
 using schema::slotcfg;
 
-class slotcfg::IMPL {
+class slotcfg::impl {
 public:
   mode m;
 
@@ -50,32 +50,32 @@ public:
   enum { cancelled = size_t(-1) };
   size_t count;
 
-  IMPL(mode mm, type_t tt = size_t(1), size_t cc = 0)
+  impl(mode mm, type_t tt = size_t(1), size_t cc = 0)
   : m(mm), type(tt), count(cc) {}
 };
 
 slotcfg::slotcfg() 
-: p(new IMPL(one)) {}
+: p(new impl(one)) {}
 
 slotcfg::slotcfg(slotcfg const &b)
-: p(new IMPL(b.p->m, b.p->type, b.p->count)) {}
+: p(new impl(b.p->m, b.p->type, b.p->count)) {}
 
 slotcfg::slotcfg(simple_mode mm) 
-: p(new IMPL(mm)) {}
+: p(new impl(mm)) {}
 
 slotcfg::slotcfg(sized_mode mm, size_t s)
-: p(new IMPL(mm, s)) {}
+: p(new impl(mm, s)) {}
 
 slotcfg::slotcfg(range_mode mm, size_t a, size_t b)
-: p(new IMPL(mm, make_pair(a, b))) {}
+: p(new impl(mm, make_pair(a, b))) {}
 
 slotcfg::slotcfg(function_mode mm, callback const &cb)
-: p(new IMPL(mm, cb)) {}
+: p(new impl(mm, cb)) {}
 
 slotcfg::~slotcfg() {}
 
 void slotcfg::operator=(slotcfg const &b) {
-  p.reset(new IMPL(b.p->m, b.p->type, b.p->count));
+  p.reset(new impl(b.p->m, b.p->type, b.p->count));
 }
 
 bool slotcfg::operator==(slotcfg const &b) const {
@@ -103,7 +103,7 @@ slotcfg::mode slotcfg::get_mode() const {
 }
 
 item::expect slotcfg::expectation() const {
-  if (p->count == IMPL::cancelled)
+  if (p->count == impl::cancelled)
     return item::nothing;
   
   switch (p->m) {
@@ -173,7 +173,7 @@ item::expect slotcfg::expectation() const {
 }
 
 void slotcfg::cancel() {
-  p->count = IMPL::cancelled;
+  p->count = impl::cancelled;
 }
 
 bool slotcfg::prefix_optional() const {

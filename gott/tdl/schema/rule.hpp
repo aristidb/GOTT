@@ -74,8 +74,8 @@ public:
   bool accept_empty() const;
 
 private:
-  class IMPL;
-  boost::shared_ptr<IMPL const> p;
+  class impl;
+  boost::shared_ptr<impl const> p;
 };
 
 template<class T>

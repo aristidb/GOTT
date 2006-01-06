@@ -18,8 +18,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_TDL_SIMPLE_LINE_LOGGER_HPP
-#define GOTT_UTIL_TDL_SIMPLE_LINE_LOGGER_HPP
+#ifndef GOTT_UTIL_TDL_SimplE_LINE_LOGGER_HPP
+#define GOTT_UTIL_TDL_SimplE_LINE_LOGGER_HPP
 
 #include <gott/visibility.hpp>
 
