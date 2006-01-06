@@ -92,7 +92,7 @@ class exec_parse {
   void block();
   
   void get_indent();
-  void restore_indent(unsigned);
+  void restore_indent(unsigned, unsigned);
   void skip_whitespace(string::utf8_range &);
   static bool border(char);
   string read_quoted(string::utf8_range &);
@@ -248,6 +248,7 @@ void exec_parse::block() {
   
   get_indent();
 
+  unsigned ind = 0;
   do {
     if (!read_line())
       break;
@@ -257,7 +258,7 @@ void exec_parse::block() {
     str += current_line;
     str += "\n";
 
-    unsigned ind = 0;
+    ind = 0;
     char c;
     while (stream.get(c) && c == ' ' && ind < indent - 1)
       ++ind;
@@ -269,7 +270,7 @@ void exec_parse::block() {
 
   parse.node(str);
 
-  restore_indent(old_indent);
+  restore_indent(ind + 1, old_indent);
 }
 
 void exec_parse::skip_whitespace(string::utf8_range &unread) {
@@ -370,18 +371,16 @@ void exec_parse::get_indent() {
     ln.set_char(indent - 1);
     return;
   }
-  
   char c;
   unsigned x = 1;
   while (stream.get(c) && c == ' ')
     ++x;
   if (stream) stream.putback(c);
   indent = x;
-  
   ln.set_char(indent - 1);
 }
 
-void exec_parse::restore_indent(unsigned x) {
-  buff_indent = indent;
-  indent = x;
+void exec_parse::restore_indent(unsigned ind, unsigned old) {
+  buff_indent = ind;
+  indent = old;
 }

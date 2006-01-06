@@ -34,22 +34,22 @@ struct spb : gott::tdl::simple::parser {
   typedef std::pair<event_id, string> event;
   Vector<event> xp, ev;
 
-  void begin_parse() { ev.push_back(event(b, L"")); }
-  void end_parse() { ev.push_back(event(e, L"")); }
-  void down() { ev.push_back(event(d, L"")); }
-  void up() { ev.push_back(event(u, L"")); }
+  void begin_parse() { ev.push_back(event(b, "")); }
+  void end_parse() { ev.push_back(event(e, "")); }
+  void down() { ev.push_back(event(d, "")); }
+  void up() { ev.push_back(event(u, "")); }
   void node(string const &w) { ev.push_back(event(n, w)); }
   void comment(string const &w, bool nl) { 
-    ev.push_back(event(c, (nl ? L"\n" : L"") + w)); 
+    ev.push_back(event(c, (nl ? "\n" : "") + w)); 
   }
 
-  void B() { xp.push_back(event(b, L"")); }
-  void E() { xp.push_back(event(e, L"")); }
-  void D() { xp.push_back(event(d, L"")); }
-  void U() { xp.push_back(event(u, L"")); }
+  void B() { xp.push_back(event(b, "")); }
+  void E() { xp.push_back(event(e, "")); }
+  void D() { xp.push_back(event(d, "")); }
+  void U() { xp.push_back(event(u, "")); }
   void N(string const &w) { xp.push_back(event(n, w)); }
   void C(string const &w, bool nl) { 
-    xp.push_back(event(c, (nl ? L"\n" : L"") + w)); 
+    xp.push_back(event(c, (nl ? "\n" : "") + w)); 
   }
 };
 
@@ -64,7 +64,7 @@ tut::tf spp("simple::parse");
 }
 
 std::ostream &operator<<(std::ostream &o, tut::spb::event const &e) {
-  return o << "bedunc"[e.first] << e.second << ' ';
+  return o << "bedunc"[e.first] << e.second;
 }
 
 namespace tut {
@@ -83,7 +83,7 @@ template<> template<>
 void object::test<2>(int) {
   std::istringstream data("hallodu");
   parse(data);
-  B(); D(); N(L"hallodu"); U(); E();
+  B(); D(); N("hallodu"); U(); E();
   ensure_equals("single-word", range(ev), range(xp));
 }
 
@@ -92,7 +92,7 @@ template<> template<>
 void object::test<3>(int) {
   std::istringstream data("  hallodu, foobar zulu");
   parse(data);
-  B(); D(); N(L"hallodu"); N(L"foobar"); D(); N(L"zulu"); U(); U(); E();
+  B(); D(); N("hallodu"); N("foobar"); D(); N("zulu"); U(); U(); E();
   ensure_equals("multiple-word", range(ev), range(xp));
 }
 
@@ -108,12 +108,12 @@ void object::test<4>(int) {
 // Two simple documents
 template<> template<>
 void object::test<5>(int) {
-  std::istringstream data("\n\n\nfoobar      \n***\n  zumwinkel");
+  std::istringstream data("\n\n\nfoobar      \n***\n  zumwinke");
   parse(data);
   parse(data);
 
-  B(); D(); N(L"foobar"); U(); E();
-  B(); D(); N(L"zumwinkel"); U(); E();
+  B(); D(); N("foobar"); U(); E();
+  B(); D(); N("zumwinke"); U(); E();
 
   ensure_equals("dual stream #1", range(ev), range(xp));
 }
@@ -123,7 +123,7 @@ template<> template<>
 void object::test<6>(int) {
   std::istringstream data("\n\n  \n       fobar\n");
   parse(data);
-  B(); D(); N(L"fobar"); U(); E();
+  B(); D(); N("fobar"); U(); E();
 
   ensure_equals("indented #1", range(ev), range(xp));
 }
@@ -133,7 +133,7 @@ template<> template<>
 void object::test<7>(int) {
   std::istringstream data("\n  x");
   parse(data);
-  B(); D(); N(L"x"); U(); E();
+  B(); D(); N("x"); U(); E();
 
   ensure_equals("indented #2", range(ev), range(xp));
 }
@@ -144,7 +144,7 @@ template<> template<>
 void object::test<8>(int) {
   std::istringstream data("\n\n#__ mycomment,\n");
   parse(data);
-  B(); D(); C(L"__ mycomment,", true); U(); E();
+  B(); D(); C("__ mycomment,", true); U(); E();
 
   ensure_equals("own-line comment", range(ev), range(xp));
 }
@@ -154,7 +154,7 @@ template<> template<>
 void object::test<9>(int) {
   std::istringstream data("\na");
   parse(data);
-  B(); D(); N(L"a"); U(); E();
+  B(); D(); N("a"); U(); E();
 
   ensure_equals("newlined char", range(ev), range(xp));
 }
@@ -179,16 +179,16 @@ a\n\
   
   B();
     D();
-      C(L"?schema footype", true);
-      N(L"a");
+      C("?schema footype", true);
+      N("a");
       D();
-        N(L"plugin");
-        D(); N(L"a"); N(L"q"); U();
-        N(L"4"); N(L"plugin");
-        D(); N(L"b"); U();
-        N(L"sum");
-        D(); N(L"7"); U();
-        N(L"-2");
+        N("plugin");
+        D(); N("a"); N("q"); U();
+        N("4"); N("plugin");
+        D(); N("b"); U();
+        N("sum");
+        D(); N("7"); U();
+        N("-2");
       U();
     U();
   E();
@@ -216,20 +216,20 @@ type multi\n\
   );
   parse(data);
   B(); D();
-    N(L"module"); D(); N(L"foo"); U();
-    N(L"schema"); D(); N(L"footype"); U();
-    N(L"type"); D(); 
-      N(L"footype");
-      N(L"named"); D(); N(L"a"); N(L"multi"); U();
+    N("module"); D(); N("foo"); U();
+    N("schema"); D(); N("footype"); U();
+    N("type"); D(); 
+      N("footype");
+      N("named"); D(); N("a"); N("multi"); U();
     U();
-    N(L"type");
+    N("type");
     D();
-      N(L"multi");
-      N(L"unordered");
+      N("multi");
+      N("unordered");
       D();
-        N(L"$"); D(); N(L"list"); D(); N(L"named"); D(); N(L"plugin"); N(L"list"); D(); N(L"string"); U(); U(); U(); U();
-        N(L"named"); D(); N(L"sum"); D(); N(L"integer"); D(); N(L"(> 0)"); U(); U(); U();
-        N(L"$"); D(); N(L"list"); D(); N(L"integer"); U(); U();
+        N("$"); D(); N("list"); D(); N("named"); D(); N("plugin"); N("list"); D(); N("string"); U(); U(); U(); U();
+        N("named"); D(); N("sum"); D(); N("integer"); D(); N("(> 0)"); U(); U(); U();
+        N("$"); D(); N("list"); D(); N("integer"); U(); U();
       U();
     U();
   U(); E();
@@ -258,17 +258,17 @@ RATING:   7\n\
 RIPPED:   T");
   parse(data);
   string dataset[3][4] = {
-    {L"Home",  L"Dixie Chicks", L"9", L"T"},
-    {L"Fly",   L"Dixie Chicks", L"8", L"T"},
-    {L"Roses", L"Kathy Mattea", L"7", L"T"}
+    {"Home",  "Dixie Chicks", "9", "T"},
+    {"Fly",   "Dixie Chicks", "8", "T"},
+    {"Roses", "Kathy Mattea", "7", "T"}
   };
   B(); D();
-    C(L"?schema songDB", true);
+    C("?schema songDB", true);
     for (unsigned i = 0; i < 3; ++i) {
-      N(L"TITLE:"); D(); N(dataset[i][0]); U();
-      N(L"ARTIST:"); D(); N(dataset[i][1]); U();
-      N(L"RATING:"); D(); N(dataset[i][2]); U();
-      N(L"RIPPED:"); D(); N(dataset[i][3]); U();
+      N("TITLE:"); D(); N(dataset[i][0]); U();
+      N("ARTIST:"); D(); N(dataset[i][1]); U();
+      N("RATING:"); D(); N(dataset[i][2]); U();
+      N("RIPPED:"); D(); N(dataset[i][3]); U();
     }
   U(); E();
 
@@ -298,13 +298,13 @@ a `\n\
   );
   parse(data);
   B(); D();
-    N(L"a"); N(L"b"); D(); 
-      N(L"c"); N(L"d"); C(L"comment", false); N(L"J");
+    N("a"); N("b"); D(); 
+      N("c"); N("d"); C("comment", false); N("J");
     U();
-    N(L"e"); D(); N(L"f"); D(); N(L"g"); U(); U();
-    N(L"h"); D(); N(L"i"); D(); N(L"j"); U(); N(L"k"); U();
-    N(L"l"); D(); N(L"i"); N(L"j"); N(L"k"); U();
-    N(L"a"); D(); N(L"ahllo\n du\n"); N(L"pferd"); U();
+    N("e"); D(); N("f"); D(); N("g"); U(); U();
+    N("h"); D(); N("i"); D(); N("j"); U(); N("k"); U();
+    N("l"); D(); N("i"); N("j"); N("k"); U();
+    N("a"); D(); N("ahllo\n du\n"); N("pferd"); U();
   U(); E();
 
   ensure_equals("Old CVS test #1", range(ev), range(xp));
@@ -321,17 +321,59 @@ a `\n\
   );
   parse(data);
   B(); D();
-    N(L"a"); 
+    N("a"); 
     D(); 
-      N(L"ahllo\ndu\n"); N(L"pferd"); 
+      N("ahllo\ndu\n"); N("pferd"); 
     U();
   U(); E();
 
   ensure_equals("simple block", range(ev), range(xp));
 }
 
+// Simple block test Variant
 template<> template<>
 void object::test<15>(int) {
+  std::istringstream data("\
+a `\n\
+   ahllo\n\
+   du\n\
+  pferd\n"
+  );
+  parse(data);
+  B(); D();
+    N("a"); 
+    D(); 
+      N("ahllo\ndu\n"); N("pferd"); 
+    U();
+  U(); E();
+
+  ensure_equals("simple block var", range(ev), range(xp));
+}
+
+template<> template<>
+void object::test<16>(int) {
+  std::istringstream data(
+    "a b `\n"
+    "  cX\n"
+    "  TT\n"
+    "c\n");
+  parse(data);
+  B(); D();
+    N("a");
+    D();
+      N("b");
+      D();
+        N("cX\nTT\n");
+      U();
+    U();
+    N("c");
+  U(); E();
+
+  ensure_equals("second block", range(ev), range(xp));
+}
+
+template<> template<>
+void object::test<17>(int) {
   no_test();
 }
 
