@@ -19,7 +19,6 @@ module_test_obj = [
     'test/simple_parse.cpp', 
     'test/simple_parse_meta.cpp',
     'test/structure.cpp',
-    'test/query.cpp',
     'test/repatcher.cpp'
   ] + glob.glob('test/schema/*.cpp')
 env.Program('module_test', module_test_obj, LIBS=['ntl', 'xany', 'string', 'tdl'])
