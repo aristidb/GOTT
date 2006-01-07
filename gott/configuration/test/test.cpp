@@ -21,7 +21,8 @@
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
 #include <gott/tdl/schema/match.hpp>
-#include <gott/tdl/structure/tree.hpp>
+#include <gott/tdl/structure/container.hpp>
+#include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/tdl/structure/print.hpp>
 #include <iostream>
 
@@ -49,8 +50,9 @@ int main() {
           rule("node", rule_attr(tag = "conf::string")) <<
           rule("list", rule_attr(tag = "get::more::stuff"),
             rule("node", rule_attr(outer = list()))))));
-  structure::tree out;
-  match m(conf, out);
+  structure::container out;
+  structure::revocable_adapter r(out);
+  match m(conf, r);
   m.parse(std::cin);
   std::cout << out << '\n';
 }
