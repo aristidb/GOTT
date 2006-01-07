@@ -24,7 +24,7 @@
 #include <gott/string/string.hpp>
 #include <gott/range_algo.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/checked_delete.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
 
 using gott::string;
@@ -35,7 +35,11 @@ using graphics::point;
 struct path::node {
   virtual ~node() {}
   virtual node *append(node *other);
-  virtual node *clone() = 0;
+  virtual node *clone() const = 0;
+
+  friend inline path::node *new_clone(path::node const &n) {
+    return n.clone();
+  }
 };
 
 typedef boost::scoped_ptr<path::node> node_p;
@@ -47,24 +51,16 @@ namespace {
 
 template<class T>
 struct concrete_node : path::node {
-  path::node *clone() { return new T(static_cast<T &>(*this)); }
+  path::node *clone() const { return new T(static_cast<T const &>(*this)); }
 };
 
 struct appended : concrete_node<appended> {
-  typedef std::vector<path::node *> children_list;
+  typedef boost::ptr_vector<path::node> children_list;
 
-  appended(children_list const &c) : children(c) {}
+  appended(std::auto_ptr<boost::ptr_vector<path::node> > c) : children(c) {}
 
-  appended(appended const &o) : concrete_node<appended>() {
-    children.resize(o.children.size());
-    
-    for (std::size_t i = 0; i < children.size(); ++i)
-      children[i] = o.children[i]->clone();
-  }
-
-  ~appended() {
-    gott::for_each(gott::range(children), &boost::checked_delete<node>);
-  }
+  appended(appended const &o) 
+  : concrete_node<appended>(), children(o.children.clone()) {}
 
   path::node *append(path::node *other) {
     children.push_back(other);
@@ -80,7 +76,7 @@ path::node *path::node::append(node *other) {
   ::appended::children_list c;
   c.push_back(this);
   c.push_back(other);
-  return new ::appended(c);
+  return new ::appended(c.release());
 }
 
 path &path::operator+=(path const &o) {

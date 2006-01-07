@@ -21,7 +21,6 @@
 #include "repatch.hpp"
 #include "../exceptions.hpp"
 #include <gott/range_algo.hpp>
-#include <boost/checked_delete.hpp>
 #include <boost/bind.hpp>
 
 namespace structure = gott::tdl::structure;
@@ -65,15 +64,10 @@ repatch_nothing::deferred_write(writable_structure &s) const {
 }
 
 repatcher_chain::repatcher_chain() {}
-repatcher_chain::~repatcher_chain() {
-  for_each(range(el), boost::checked_deleter<repatcher>());
-}
+repatcher_chain::~repatcher_chain() {}
 
 repatcher_chain::repatcher_chain(repatcher_chain const &o) 
-: concrete_repatcher<repatcher_chain>() {
-  el.resize(o.el.size());
-  transform(range(o.el), range(el), boost::bind(&repatcher::clone, _1));
-}
+: concrete_repatcher<repatcher_chain>(), el(o.el.clone()) {}
 
 void repatcher_chain::push_back(repatcher const &r) {
   el.push_back(r.clone());
@@ -86,21 +80,18 @@ void repatcher_chain::push_back_alloc(repatcher *r) {
 writable_structure *
 repatcher_chain::deferred_write(writable_structure &s) const {
   struct context : public writable_structure {
-    std::vector<writable_structure *> out;
-    context(std::vector<repatcher *> const &el, writable_structure &target) {
-      out.resize(el.size());
+    boost::ptr_vector<writable_structure> out;
+    context(boost::ptr_vector<repatcher> const &el, writable_structure &target)
+    : out(el.size()) {
       int i = el.size() - 1;
-      out[i] = el[i]->deferred_write(target);
+      out.push_back(el[i].deferred_write(target));
       while (--i >= 0)
-        out[i] = el[i]->deferred_write(*out[i + 1]);
+        out.insert(out.begin(), el[i].deferred_write(out[0]));
     }
-    ~context() {
-      for_each(range(out), boost::checked_deleter<writable_structure>());
-    }
-    void begin() { out[0]->begin(); }
-    void end() { out[0]->end(); }
-    void data(xany::Xany const &x) { out[0]->data(x); }
-    void add_tag(string const &s) { out[0]->add_tag(s); }
+    void begin() { out[0].begin(); }
+    void end() { out[0].end(); }
+    void data(xany::Xany const &x) { out[0].data(x); }
+    void add_tag(string const &s) { out[0].add_tag(s); }
   };
   return new context(el, s);
 }

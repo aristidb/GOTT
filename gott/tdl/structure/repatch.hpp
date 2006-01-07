@@ -23,6 +23,8 @@
 
 #include "structure.hpp"
 #include <vector>
+#include <boost/noncopyable.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace gott {
 namespace tdl {
@@ -38,6 +40,10 @@ public:
   virtual repatcher *clone() const = 0;
   virtual writable_structure *deferred_write(writable_structure &) const = 0;
 };
+
+inline repatcher *new_clone(repatcher const &r) {
+  return r.clone();
+}
 
 template<class T> class concrete_repatcher : public repatcher {
   repatcher *clone() const { return new T(*static_cast<T const *>(this)); }
@@ -72,7 +78,7 @@ public:
   void push_back_alloc(repatcher *);
   writable_structure *deferred_write(writable_structure &) const;
 private:
-  std::vector<repatcher *> el;
+  boost::ptr_vector<repatcher> el;
 };
 
 }}}
