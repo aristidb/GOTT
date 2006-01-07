@@ -22,6 +22,7 @@
 #include <gott/string/qid.hpp>
 #include <boost/variant.hpp>
 #include <gott/xany/xany.hpp>
+#include <map>
 
 using gott::plugin::plugin_configuration;
 using gott::plugin::hook;
@@ -32,29 +33,27 @@ using boost::variant;
 class plugin_configuration::impl {
 public:
   typedef variant<Xany, hook const *> entry;
-  typedef VectorMap<QID, entry> mapping;
+  typedef std::map<QID, entry> mapping;
 
   mapping parameters;
 };
-
-NTL_MOVEABLE(plugin_configuration::impl::entry);
 
 plugin_configuration::plugin_configuration() : p(new impl) {}
 
 plugin_configuration::~plugin_configuration() {}
 
 void plugin_configuration::add_hook(QID const &id, hook const &h) {
-  p->parameters.Add(id, &h);
+  p->parameters[id] = &h;
 }
 
 hook const &plugin_configuration::find_hook(QID const &id) const {
-  return *boost::get<hook const *>(p->parameters.Get(id));
+  return *boost::get<hook const *>(p->parameters[id]);
 }
 
 void plugin_configuration::add_param(QID const &id, Xany const &pp) {
-  p->parameters.Add(id, pp);
+  p->parameters[id] = pp;
 }
 
 Xany const &plugin_configuration::find_param(QID const &id) const {
-  return boost::get<Xany>(p->parameters.Get(id));
+  return boost::get<Xany>(p->parameters[id]);
 }

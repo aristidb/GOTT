@@ -76,7 +76,7 @@ struct inotify_watch : watch_implementation {
 
   ~inotify_watch() {
     std::cout << "Remove watch from " << &eng.watches << " : " << wd << std::endl;
-    eng.watches.UnlinkKey(wd);
+    eng.watches.erase(wd);
     inotify_rm_watch(eng.fd, wd);
   }
 };
@@ -86,7 +86,7 @@ watch_implementation *
 inotify_engine::watch_alloc(string const &path, ev_t mask, watch &w) {
   inotify_watch *p = new inotify_watch(this, path, mask, w);
   std::cout << "Add watch to " << &watches << " : " << p->wd << std::endl;
-  watches.Add(p->wd, p);
+  watches[p->wd] = p;
   return p;
 }
 
@@ -139,7 +139,7 @@ void inotify_engine::notify() {
     inotify_event *pevent = reinterpret_cast<inotify_event *>(buffer + i);
     i += sizeof(inotify_event) + pevent->len;
     event ev = {
-      static_cast<inotify_watch *>(watches.Get(pevent->wd))->context,
+      static_cast<inotify_watch *>(watches[pevent->wd])->context,
       ev_t(pevent->mask),
       pevent->cookie,
       pevent->name

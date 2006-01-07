@@ -34,9 +34,4 @@ public:
 
 }
 
-template<>
-inline unsigned GetHashValue(gott::QID const &q) {
-  return GetHashValue((gott::atom const &) q);
-}
-
 #endif

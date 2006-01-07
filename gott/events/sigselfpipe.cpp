@@ -31,7 +31,6 @@ using gott::events::signal_manager;
 using gott::events::sigselfpipe;
 
 typedef sigc::signal1<void, int> signl_t;
-NTL_MOVEABLE(signl_t)
 
 sigselfpipe::sigselfpipe(fd_manager *fdm) {
   if (pipe(selfpipe) == -1)
@@ -46,12 +45,12 @@ sigselfpipe::~sigselfpipe() {
 }
 
 signl_t &sigselfpipe::on_signal(int sig) {
-  int pos = handlers.Find(sig);
-  if (pos < 0) {
+  std::map<int, signl_t>::iterator pos = handlers.find(sig);
+  if (pos == handlers.end()) {
     signal_manager::register_signal(sig, this);
-    pos = handlers.FindAdd(sig);
+    return handlers[sig];
   }
-  return handlers[pos];
+  return pos->second;
 }
 
 void sigselfpipe::immediate_action(int sig) {
@@ -61,5 +60,5 @@ void sigselfpipe::immediate_action(int sig) {
 void sigselfpipe::notify_in() {
   int sig;
   read(selfpipe[0], &sig, sizeof(sig));
-  handlers.FindPtr(sig)->emit(sig);
+  handlers[sig].emit(sig);
 }

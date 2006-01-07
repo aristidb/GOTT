@@ -20,8 +20,8 @@
 
 #include "signal_manager.hpp"
 #include <stdexcept>
-#include <ntl.h>
 #include <signal.h>
+#include <map>
 
 using gott::events::signal_manager;
 
@@ -31,25 +31,30 @@ signal_manager::~signal_manager() {}
 gott::QID const signal_manager::qid("gott::events::signal_manager");
 
 namespace {
-VectorMap<int, signal_manager *> handlers;
+  typedef std::map<int, signal_manager *> handler_map;
+  handler_map handlers;
 }
 
 void signal_manager::register_signal(int sig, signal_manager *handler) {
-  if (handlers.Find(sig) >= 0)
+  if (handlers.find(sig) != handlers.end())
     throw std::runtime_error(
         "cannot register more than one signal_manager per signal");
-  handlers.Add(sig, handler);
+  handlers[sig] = handler;
   signal(sig, signal_handler);
 }
 
 void signal_manager::unregister_all(signal_manager *handler) {
-  for (int i = 0; i < handlers.GetCount(); ++i)
-    if (handlers[i] == handler)
-      handlers.Unlink(i);
+  handler_map::iterator it = handlers.begin();
+  while (it != handlers.end())
+    if (it->second == handler) {
+      handler_map::iterator del = it++;
+      handlers.erase(del);
+    } else
+      ++it;
 }
 
 signal_manager *signal_manager::find(int sig) {
-  return handlers.Get(sig);
+  return handlers[sig];
 }
 
 void signal_manager::signal_handler(int sig) {

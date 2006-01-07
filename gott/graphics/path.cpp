@@ -22,8 +22,10 @@
 #include "font.hpp"
 #include "transformations.hpp"
 #include <gott/string/string.hpp>
+#include <gott/range_algo.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <ntl.h>
+#include <boost/checked_delete.hpp>
+#include <vector>
 
 using gott::string;
 namespace graphics = gott::graphics;
@@ -37,7 +39,6 @@ struct path::node {
 };
 
 typedef boost::scoped_ptr<path::node> node_p;
-NTL_MOVEABLE(node_p);
 
 path::~path() { delete head; }
 path::path(path const &o) : head(o.head->clone()) {}
@@ -50,17 +51,26 @@ struct concrete_node : path::node {
 };
 
 struct appended : concrete_node<appended> {
-  typedef Vector<node_p > children_list;
+  typedef std::vector<path::node *> children_list;
+
   appended(children_list const &c) : children(c) {}
+
   appended(appended const &o) : concrete_node<appended>() {
-    children.AddN(o.children.GetCount());
-    for (int i = 0; i < o.children.GetCount(); ++i) // FIXME/ALERT: int
-      children[i].reset(o.children[i]->clone());
+    children.resize(o.children.size());
+    
+    for (std::size_t i = 0; i < children.size(); ++i)
+      children[i] = o.children[i]->clone();
   }
+
+  ~appended() {
+    gott::for_each(gott::range(children), &boost::checked_delete<node>);
+  }
+
   path::node *append(path::node *other) {
-    children.Add().reset(other);
+    children.push_back(other);
     return this;
   }
+
   children_list children;
 };
 
@@ -68,9 +78,8 @@ struct appended : concrete_node<appended> {
 
 path::node *path::node::append(node *other) {
   ::appended::children_list c;
-  c.AddN(2);
-  c[0].reset(this);
-  c[1].reset(other);
+  c.push_back(this);
+  c.push_back(other);
   return new ::appended(c);
 }
 

@@ -22,7 +22,7 @@
 #define GOTT_NOTIFY_FS_INOTIFY_ENGINE_HPP
 
 #include "../engine.hpp"
-#include <ntl.h>
+#include <map>
 
 namespace gott {
 namespace notify_fs {
@@ -37,7 +37,7 @@ public:
 public: //FIXME => private
   int fd;
   void notify();
-  VectorMap<boost::uint32_t, watch_implementation *> watches;
+  std::map<boost::uint32_t, watch_implementation *> watches;
 };
 
 }}

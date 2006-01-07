@@ -23,7 +23,7 @@
 
 #include "signal_manager.hpp"
 #include "fd_manager.hpp"
-#include <ntl.h>
+#include <map>
 
 namespace gott {
 namespace events {
@@ -39,7 +39,7 @@ public:
 private:
   int selfpipe[2];
   void notify_in();
-  VectorMap<int, sigc::signal1<void,int> > handlers;
+  std::map<int, sigc::signal1<void,int> > handlers;
   void immediate_action(int);
 };
 
