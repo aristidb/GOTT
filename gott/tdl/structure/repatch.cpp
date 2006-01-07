@@ -71,7 +71,7 @@ repatcher_chain::~repatcher_chain() {
 
 repatcher_chain::repatcher_chain(repatcher_chain const &o) 
 : concrete_repatcher<repatcher_chain>() {
-  el.AddN(o.el.GetCount());
+  el.resize(o.el.size());
   transform(range(o.el), range(el), boost::bind(&repatcher::clone, _1));
 }
 
@@ -86,18 +86,16 @@ void repatcher_chain::push_back_alloc(repatcher *r) {
 writable_structure *
 repatcher_chain::deferred_write(writable_structure &s) const {
   struct context : public writable_structure {
-    Vector<writable_structure *> out;
-    range_t<Vector<writable_structure *>::iterator> outr;
-    context(Vector<repatcher *> const &el, writable_structure &target) {
-      out.AddN(el.GetCount());
-      int i = el.GetCount() - 1;
+    std::vector<writable_structure *> out;
+    context(std::vector<repatcher *> const &el, writable_structure &target) {
+      out.resize(el.size());
+      int i = el.size() - 1;
       out[i] = el[i]->deferred_write(target);
       while (--i >= 0)
         out[i] = el[i]->deferred_write(*out[i + 1]);
-      outr = range(out);
     }
     ~context() {
-      for_each(outr, boost::checked_deleter<writable_structure>());
+      for_each(range(out), boost::checked_deleter<writable_structure>());
     }
     void begin() { out[0]->begin(); }
     void end() { out[0]->end(); }

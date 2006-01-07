@@ -31,9 +31,9 @@ using schema::rule_t;
 using schema::slotcfg;
 typedef schema::rule_attr_t RA;
 typedef stru::repatch_enumeration E;
-typedef Vector<gott::string> VN;
+typedef std::vector<gott::string> VN;
 #define L(i) \
-  RA(Vector<string>() << #i, true, Xany(), new E(VN() << #i), \
+  RA(Vector<string>() << #i, true, Xany(), new E(VN(1,#i)), \
      slotcfg(), slotcfg(slotcfg::optional))
 
 namespace {

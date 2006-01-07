@@ -30,7 +30,7 @@ using structure::repatch_enumeration;
 using structure::writable_structure;
 using gott::string;
 
-repatch_enumeration::repatch_enumeration(Vector<string> pick_ &x) 
+repatch_enumeration::repatch_enumeration(std::vector<string> const &x) 
 : alternatives(x) {}
 
 repatch_enumeration::~repatch_enumeration() {}
@@ -41,15 +41,15 @@ const char failure_message[] =
 writable_structure *
 repatch_enumeration::deferred_write(writable_structure &s) const {
   struct context : simple_repatcher_context {
-    Vector<string> const &alternatives;
+    std::vector<string> const &alternatives;
 
-    context(writable_structure &s, Vector<string> const &a) 
+    context(writable_structure &s, std::vector<string> const &a) 
     : simple_repatcher_context(s), alternatives(a) {}
 
     void data(xany::Xany const &x) {
       if (x.compatible<string>()) {
         string input = xany::Xany_cast<string>(x);
-        Vector<string>::const_iterator it;
+        std::vector<string>::const_iterator it;
         if ((it = find(range(alternatives), input)) == alternatives.end())
           throw failed_repatch(failure_message);
         target.data(xany::Xany(long(it - alternatives.begin())));
@@ -64,7 +64,7 @@ void repatch_enumeration::reg() {
   struct getter : public repatcher_getter {
     getter() : inner(false) {}
     bool inner;
-    Vector<string> all_strings;
+    std::vector<string> all_strings;
     void begin() {
       if (inner) fail();
       inner = true;
@@ -75,7 +75,7 @@ void repatch_enumeration::reg() {
     }
     void data(xany::Xany const &x) {
       if (!inner) fail();
-      all_strings.Add(xany::Xany_cast<string>(x));
+      all_strings.push_back(xany::Xany_cast<string>(x));
     }
     void add_tag(string const &) {}
     void fail() {

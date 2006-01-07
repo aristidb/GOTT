@@ -43,7 +43,7 @@ match_named::match_named(rule_attr_t const &a, Vector<rule_t> const &s, match &m
   rewritten(
       rule("follow", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() <<
         rule("node", rule_attr_t(rule_attr_t::simple, false, 
-          new structure::repatch_enumeration(Vector<string>() << tag))) <<
+          new structure::repatch_enumeration(std::vector<string>(1, tag)))) <<
         s[0])) {
   GOTT_ASSERT_2(s.GetCount(), 1, std::equal_to<int>(), "one parameter");
   matcher().add(rewritten);

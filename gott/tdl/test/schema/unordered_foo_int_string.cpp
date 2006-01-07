@@ -40,7 +40,7 @@ struct schema_unordered_foo_integer_string : tut::schema_basic {
       rule("document", RA(), Vector<rule_t>() <<
         rule("unordered", RA(), Vector<rule_t>() <<
           rule("node", RA("foo", true, 
-               new stru::repatch_enumeration(Vector<string>() | "foo"))) <<
+               new stru::repatch_enumeration(std::vector<string>(1,"foo")))) <<
           rule("node", RA(RA::simple, true, new stru::repatch_integer())) <<
           rule("node", RA())))) {}
 };

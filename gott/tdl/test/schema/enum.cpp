@@ -20,10 +20,15 @@
 
 #include "common.hpp"
 #include <gott/tdl/structure/repatchers/enumeration.hpp>
+#include <boost/assign/list_of.hpp>
+
+using boost::assign::list_of;
+using std::vector;
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
 namespace simple = gott::tdl::simple;
+using gott::string;
 using gott::xany::Xany;
 
 using stru::cf::S;
@@ -37,9 +42,9 @@ struct schema_enumeration : tut::schema_basic {
   schema_enumeration() 
   : tut::schema_basic(
     rule("document", rule_attr_t(), Vector<rule_t>() <<
-      rule("node", rule_attr_t(Vector<gott::string>(), true, Xany(),
-             new repatch_enumeration(Vector<gott::string>() <<
-               "first" << "second" << "third")))))
+      rule("node", rule_attr_t(Vector<string>(), true, Xany(),
+             new repatch_enumeration(
+               list_of("first")("second")("third").operator vector<string>())))))
   {}
 };
 }

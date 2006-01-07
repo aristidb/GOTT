@@ -38,7 +38,8 @@ struct schema_literal : tut::schema_basic {
       rule("document", rule_attr_t(), Vector<schema::rule_t>() <<
         rule("node", 
           rule_attr_t(L"foobar", true, 
-            new stru::repatch_enumeration(Vector<string>() | "foobar"))))) {}
+            new stru::repatch_enumeration(std::vector<string>(1, "foobar"))))))
+  {}
 };
 }
 

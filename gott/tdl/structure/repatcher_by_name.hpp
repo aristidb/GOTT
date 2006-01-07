@@ -24,6 +24,7 @@
 #include "structure.hpp"
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
+#include <map>
 
 namespace gott {
 namespace tdl {
@@ -55,7 +56,7 @@ public:
   repatcher_getter *chain_alloc() const;
 
 private:
-  VectorMap<string, boost::function<repatcher_getter *()> > repo;
+  std::map<string, boost::function<repatcher_getter *()> > repo;
 };
 
 GOTT_EXPORT repatcher_by_name_t &repatcher_by_name();

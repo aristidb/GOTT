@@ -22,6 +22,7 @@
 #define GOTT_UTIL_TDL_STRUCTURE_REPATCH_HPP
 
 #include "structure.hpp"
+#include <vector>
 
 namespace gott {
 namespace tdl {
@@ -71,7 +72,7 @@ public:
   void push_back_alloc(repatcher *);
   writable_structure *deferred_write(writable_structure &) const;
 private:
-  Vector<repatcher *> el;
+  std::vector<repatcher *> el;
 };
 
 }}}

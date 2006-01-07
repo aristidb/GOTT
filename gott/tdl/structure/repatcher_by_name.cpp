@@ -27,8 +27,6 @@
 using gott::tdl::structure::repatcher_getter;
 using gott::tdl::structure::repatcher_by_name_t;
 
-NTL_MOVEABLE(boost::function<repatcher_getter *()>)
-
 repatcher_getter::repatcher_getter() {}
 repatcher_getter::~repatcher_getter() {}
 
@@ -43,14 +41,15 @@ repatcher_by_name_t &gott::tdl::structure::repatcher_by_name() {
 void repatcher_by_name_t::add(
     string const &name, 
     boost::function<repatcher_getter *()> const &func) {
-  repo.Add(name, func);
+  repo[name] = func;
 }
 
 repatcher_getter *repatcher_by_name_t::get_alloc(string const &name) const {
-  int pos = repo.Find(name);
-  if (pos < 0)
-    throw std::bad_exception();
-  return repo[pos]();
+  std::map<string, boost::function<repatcher_getter *()> >::const_iterator it =
+    repo.find(name);
+  if (it == repo.end())
+    throw 0;
+  return it->second();
 }
 
 repatcher_getter *repatcher_by_name_t::chain_alloc() const {
