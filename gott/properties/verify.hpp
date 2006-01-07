@@ -61,7 +61,7 @@ private:
   sigc::connection change;
 
   void action() {
-    typename Check::context con;
+    typename Check::context con = typename Check::context();
     if (!check(prop, con))
       failure(prop, con);
     else

@@ -20,6 +20,7 @@
 
 #include "revocable_adapter.hpp"
 #include <vector>
+#include <set>
 
 using gott::tdl::structure::revocable_adapter;
 using gott::tdl::structure::revocable_structure;
@@ -51,6 +52,7 @@ public:
   pth pos;
   pth blocking;
   std::vector<entry> blocked;
+  std::set<int> active;
   impl(writable_structure &o) : out(o), pos(0), blocking(nowhere) {}
 };
 
@@ -93,6 +95,7 @@ void revocable_adapter::data(Xany const &x) {
 revocable_structure::pth revocable_adapter::point() {
   if (p->blocking == nowhere)
     p->blocking = p->pos;
+  p->active.insert(p->pos);
   return p->pos;
 }
 
@@ -104,7 +107,8 @@ void revocable_adapter::revert(pth pp) {
 }
 
 void revocable_adapter::get_rid_of(pth pp) {
-  if (pp == p->blocking) {
+  p->active.erase(pp);
+  if (p->active.empty()) {
     p->blocking = nowhere;
     for (std::vector<entry>::iterator it = p->blocked.begin(); 
         it != p->blocked.end(); ++it)

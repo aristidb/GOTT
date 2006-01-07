@@ -21,7 +21,9 @@
 #include "parse_position.hpp"
 #include "event.hpp"
 #include <gott/tdl/structure/structure.hpp>
-#include <ntl.h>
+#include <vector>
+#include <set>
+#include <cstddef>
 #include <gott/debug/assert.hpp>
 
 using std::size_t;
@@ -33,14 +35,45 @@ using schema::positioning;
 
 class positioning::impl {
 public:
-  typedef Vector<ev::token_t> buffer_t;
+  typedef std::vector<ev::token_t> buffer_t;
 
   revocable_structure &struc;
 
-  buffer_t buffer;
+  buffer_t buffer_real;
+  std::set<std::size_t> blocks;
+
+  ev::token_t &buffer(unsigned long pos) {
+    return buffer_real[pos - base];
+  }
+
+  unsigned long buffer_size() {
+    return buffer_real.size() + base;
+  }
+
+  template<class T>
+  void buffer_add(T const &x) {
+    buffer_real.push_back(x);
+  }
+  
+  void add_block(std::size_t p) {
+    blocks.insert(p);
+  }
+
+  void remove_block(std::size_t p) {
+    blocks.erase(p);
+  }
+
+  void clean_blocked() {
+    if (blocks.empty()) {
+      base += buffer_real.size();
+      buffer_real.clear();
+    }
+  }
+  
   long unconsumed, consumed, seeked;
   bool replay, in_replay;
   bool in_pass;
+  unsigned long base;
 
   long current() {
     if (in_pass)
@@ -50,7 +83,8 @@ public:
   }
 
   impl(revocable_structure &s)
-    : struc(s), unconsumed(0), consumed(-1), replay(false), in_pass(false) {}
+  : struc(s), unconsumed(0), consumed(-1), replay(false), in_pass(false), 
+    base(0) {}
 };
 
 positioning::positioning(revocable_structure &s) : p(new impl(s)) {}
@@ -58,8 +92,8 @@ positioning::~positioning() {}
 
 template<class T>
 void positioning::add(T const &t) {
-  p->unconsumed = p->buffer.size();
-  p->buffer.Add(t);
+  p->unconsumed = p->buffer_size();
+  p->buffer_add(t);
   p->in_pass = false;
 }
 
@@ -82,6 +116,7 @@ bool positioning::proceeded(id const &x) const {
 }
 
 positioning::id positioning::current() {
+  p->add_block(p->current());
   return id(p->current(), p->struc.point());
 }
 
@@ -96,6 +131,7 @@ void positioning::seek(id const &x) {
 }
 
 void positioning::forget(id const &x) {
+  p->remove_block(x.first);
   p->struc.get_rid_of(x.second);
 }
 
@@ -113,9 +149,9 @@ void positioning::replay(acceptor &acc) {
     p->in_pass = false;
     p->consumed = p->seeked;
     for (p->unconsumed = p->consumed + 1;
-         p->unconsumed < long(p->buffer.size());
+         p->unconsumed < long(p->buffer_size());
          ++p->unconsumed) {
-      acc(get(p->buffer[int(p->unconsumed)])); // NTL-Vector::operator[](int)
+      acc(get(p->buffer(int(p->unconsumed)))); // NTL-Vector::operator[](int)
       if (p->replay)
         break;
 
@@ -123,7 +159,8 @@ void positioning::replay(acceptor &acc) {
                     "Gotta consume token");
     }
     p->in_replay = false;
-  }
+  } else
+    p->clean_blocked();
 }
 
 bool positioning::want_replay() const {
