@@ -48,8 +48,14 @@ void auto_loop::join_all() {
   //TODO implement me
 }
 
-sigc::signal1<void, main_loop &> &auto_loop::add(loop_requirement const &) {
+auto_loop::thread_descriptor auto_loop::add(loop_requirement const &) {
   //TODO implement me
+  return 0;
+}
+
+sigc::signal1<void, main_loop &> &
+auto_loop::before_run(thread_descriptor const &) {
+  // TODO implement me
   throw 0;
 }
 

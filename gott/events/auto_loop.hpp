@@ -25,6 +25,7 @@
 #include <sigc++/signal.h>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <cstddef>
 
 namespace gott {
 class QID;
@@ -58,12 +59,29 @@ public:
   void maximal_loop_count(unsigned n);
 
   /**
+   * Calculate the number of threads that would be spawned if spawn_noblock
+   * was to be called now.
+   * \return The number of threads.
+   */
+  std::size_t thread_count() const;
+
+  typedef std::size_t thread_descriptor;
+
+  /**
    * Add a requirement and if necessary a main_loop.
-   * \return A reference to a signal emitted when the main_loop for the 
-   *         requirement is spawned.
+   * \return A descriptor of the thread that will be spawned for this 
+   *         requirement.
    */
   GOTT_EXPORT
-  sigc::signal1<void, main_loop &> &add(loop_requirement const &);
+  thread_descriptor add(loop_requirement const &);
+
+  /**
+   * Get the signal emitted before a main_loop is run.
+   * \param td The descriptor of the thread where the main_loop will be run.
+   * \return A reference to the signal.
+   */
+  GOTT_EXPORT
+  sigc::signal1<void, main_loop &> &before_run(thread_descriptor const &td);
   
   /**
    * Join all main_loop threads. Useful in combination with spawn_noblock.
