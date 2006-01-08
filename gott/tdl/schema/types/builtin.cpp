@@ -27,6 +27,7 @@
 #include "ordered.hpp"
 #include "node.hpp"
 #include "unordered.hpp"
+#include "tree.hpp"
 #include <gott/string/string.hpp>
 
 namespace {
@@ -48,4 +49,5 @@ builtin_types::builtin_types() {
   REG(ordered);
   REG(node);
   REG(unordered);
+  REG(tree);
 }

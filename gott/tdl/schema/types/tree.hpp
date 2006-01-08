@@ -1,4 +1,4 @@
-// Copyright (C) 2004-2006 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: TDL Schema engine
 // Authors: Aristid Breitkreuz
 //
@@ -18,39 +18,35 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_UTIL_TDL_SCHEMA_LIST_HPP
-#define GOTT_UTIL_TDL_SCHEMA_LIST_HPP
+#ifndef GOTT_UTIL_TDL_SCHEMA_TREE_HPP
+#define GOTT_UTIL_TDL_SCHEMA_TREE_HPP
 
 #include "../match.hpp"
 #include "../rule.hpp"
-#include "../slot.hpp"
-#include "../parse_position.hpp"
 
 namespace gott {
 namespace tdl {
 namespace schema {
 
-class match_list : public item {
+class match_tree : public item {
 public:
-  match_list(rule_attr_t const &, Vector<rule_t> const &, match &);
-  ~match_list();
+  match_tree(rule_attr_t const &, Vector<rule_t> const &, match &);
 
-  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &s);
-
+  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &) 
+  { return false; }
+  
 private:
-  rule_t const &sub;
-  positioning::id last;
-  slotcfg cfg;
-  bool cancelled;
+  unsigned level;
+  enum { fresh, titled, used } level_state;
+  bool fresh_level;
 
-  expect expectation() const;
-  bool play(ev::child_fail const &);
-  bool play(ev::child_succeed const &);
+  item::expect expectation() const;
+  bool play(ev::node const &);
+  bool play(ev::down const &);
+  bool play(ev::up const &);
   string name() const;
-
-  bool full();
-  bool empty();
 };
 
 }}}
+
 #endif
