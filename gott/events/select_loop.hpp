@@ -56,7 +56,7 @@ class GOTT_EXPORT select_loop
         queue_type;
     callback_map callbacks;
     queue_type timed_events;
-    volatile bool running; // thread-safe?!
+    bool running;
     ::boost::optional<sigselfpipe> sigmgr;
 
     GOTT_LOCAL select_loop( select_loop const& cp );
