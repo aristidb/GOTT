@@ -1,4 +1,4 @@
-// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: GOTT main loop
 // Authors: Aristid Breitkreuz
 //
@@ -18,15 +18,31 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef GOTT_EVENTS_EPOLL_LOOP_HPP
+#define GOTT_EVENTS_EPOLL_LOOP_HPP
+
 #include "main_loop.hpp"
-#include "fd_manager.hpp"
 
-using gott::events::main_loop;
-using gott::events::fd_manager;
+namespace gott {
+namespace events {
 
-main_loop::main_loop() {}
-main_loop::~main_loop() {}
+class GOTT_EXPORT epoll_loop
+: public main_loop {
+public:
+  epoll_loop();
+  ~epoll_loop();
 
-fd_manager::fd_manager() {}
-fd_manager::~fd_manager() {}
-gott::QID const fd_manager::qid("gott::events::fd_manager");
+  void run();
+  void quit();
+
+private:
+  void *do_feature(QID const &);
+
+private:
+  bool running;
+  int epoll_fd;
+};
+
+}}
+
+#endif

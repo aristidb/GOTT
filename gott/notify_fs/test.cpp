@@ -1,4 +1,4 @@
-// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2005-2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: Filesystem notification library
 // Authors: Aristid Breitkreuz
 //
@@ -21,6 +21,10 @@
 #include "watch.hpp"
 #include "inotify/engine.hpp"
 #include <gott/events/select_loop.hpp>
+//#include <gott/events/epoll_loop.hpp>
+#include <gott/events/fd_manager.hpp>
+#include <gott/events/signal_manager.hpp>
+#include <gott/events/timer_manager.hpp>
 #include <boost/bind.hpp>
 #include <iostream>
 #include <signal.h>
@@ -36,6 +40,10 @@ void output(event const &ev, int context) {
   std::cout << std::endl;
 }
 
+void blink() {
+  std::cout << "blink" << std::endl;
+}
+
 int main() {
   static inotify_engine ee;
   default_engine = &ee;
@@ -43,10 +51,14 @@ int main() {
   watch w2("/tmp", all_events);
   w.on_fire().connect(boost::bind(&output, _1, 1));
   w2.on_fire().connect(boost::bind(&output, _1, 2));
-  boost::scoped_ptr<main_loop> loop(new select_loop);
-  loop->feature<fd_manager>()
-    .add_read_fd(ee.fd, boost::bind(&inotify_engine::notify, &ee));
+  boost::scoped_ptr<main_loop> loop(
+      new select_loop);
+      //new epoll_loop);
+  loop->feature<fd_manager>().add_read_fd(
+    ee.fd, boost::bind(&inotify_engine::notify, &ee));
   loop->feature<signal_manager>().on_signal(SIGINT).connect(
     boost::bind(&main_loop::quit, boost::ref(*loop)));
+  loop->feature<timer_manager>().add_timer(
+    periodic_timer(boost::posix_time::seconds(2), &blink));
   loop->run();
 }

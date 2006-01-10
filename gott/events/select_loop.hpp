@@ -2,6 +2,7 @@
 #define GOTT_BASE_EVENTS_SELECT_LOOP_HPP_INCLUDED
 
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
+// Copyright (C) 2005-2006 by Aristid Breitkreuz aribrei@arcor.de
 // Content: GOTT select loop
 // Authors: Andreas Pokorny
 //          Aristid Breitkreuz
@@ -35,7 +36,6 @@
 #include "timer_manager.hpp"
 #include "sigselfpipe.hpp"
 
-// TODO: wrong namespace, and wrong place for this file?
 namespace gott{namespace events{
 
 /**
@@ -43,31 +43,22 @@ namespace gott{namespace events{
  * Not copyable.
  */
 class GOTT_EXPORT select_loop 
-    : public main_loop, public fd_manager, public timer_manager {
+    : public main_loop, public fd_manager, public standard_timer_manager {
   private:
     struct GOTT_LOCAL handler {
       boost::function<void()> on_read, on_write, on_exception;
     };
     fd_set read_fds, write_fds, except_fds;
-    typedef std::map<int, handler > callback_map;
-    typedef std::priority_queue<
-          deadline_timer,std::vector<deadline_timer>,
-          std::greater<deadline_timer> > 
-        queue_type;
+    typedef std::map<int, handler> callback_map;
     callback_map callbacks;
-    queue_type timed_events;
     bool running;
     ::boost::optional<sigselfpipe> sigmgr;
 
     GOTT_LOCAL select_loop( select_loop const& cp );
     GOTT_LOCAL select_loop& operator=( select_loop const& cp );
-
-    GOTT_LOCAL timeval handle_timed_events();
   public:
     select_loop();
     ~select_loop();
-
-    void add_timer( deadline_timer const &timer );
 
     void add_read_fd(int fd, boost::function<void()> const &on_read);
     void add_write_fd( int fd, boost::function<void()> const &on_write);

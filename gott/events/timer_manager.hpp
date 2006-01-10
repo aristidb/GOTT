@@ -23,6 +23,8 @@
 
 #include "deadline_timer.hpp"
 #include <gott/string/qid.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace gott {
 namespace events {
@@ -41,6 +43,26 @@ public:
   
   /// Add a deadline_timer.
   virtual void add_timer(deadline_timer const &) = 0;
+
+  /// Check if there are timers to be scheduled sometime.
+  virtual bool has_timers() const = 0;
+};
+
+class standard_timer_manager : public timer_manager {
+public:
+  standard_timer_manager();
+  ~standard_timer_manager();
+
+  void add_timer(deadline_timer const &);
+  bool has_timers() const;
+
+public:
+  void handle_pending_timers();
+  boost::posix_time::time_duration time_left() const;
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}

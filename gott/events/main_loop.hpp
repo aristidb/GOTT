@@ -100,7 +100,7 @@ public:
   }
 
 protected:
-  virtual void *do_feature(gott::QID const &) = 0;
+  virtual void *do_feature(QID const &) = 0;
 };
 
 //TODO faster please

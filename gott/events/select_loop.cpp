@@ -40,11 +40,6 @@ void *select_loop::do_feature(gott::QID const &type) {
   return 0;
 }
 
-void select_loop::add_timer( deadline_timer const& timer ) {
-  if( ! timer.timer.is_not_a_date_time() ) {
-    timed_events.push( timer );
-  }
-}
 void select_loop::add_read_fd( int fd, boost::function<void()> const &fun ) {
   FD_SET(fd, &read_fds);
   callbacks[fd].on_read = fun;
@@ -83,42 +78,35 @@ void select_loop::remove_fd( int fd ) {
   }
 }
 
-timeval select_loop::handle_timed_events(){
-  using namespace boost::posix_time;
-  timeval ret;
-  ret.tv_sec = ret.tv_usec = 0;
-  if( ! timed_events.empty() ){
-    ptime now( microsec_clock::local_time() );
-    time_duration td = timed_events.top().timer - now;
-    for( ; td.is_negative() || td.total_seconds() == 0 ; 
-        td = timed_events.top().timer - now  ) {
-      deadline_timer::handler_type cp = timed_events.top().handler;
-      timed_events.pop();
-      add_timer( cp() );
-    }
-    ret.tv_sec = td.total_seconds();
-    ret.tv_usec = td.fractional_seconds();
+//    ret.tv_sec = td.total_seconds();
+//    ret.tv_usec = td.fractional_seconds();
     //long    tv_sec;   seconds 
     //long    tv_usec;  microseconds 
-  }
-  return ret;
-}
 
 void select_loop::run(){
   running = true;
 
   using namespace boost::posix_time;
   size_t n = callbacks.rbegin()->first + 1;
-  timeval next_event = handle_timed_events(), *t=0; 
-
-  if( next_event.tv_sec ||next_event.tv_usec ) 
-    t = &next_event;
+  timeval next_event, *t; 
 
   int num_fd;
-  while( running
-      && ( !timed_events.empty() || !callbacks.empty() )  
-      && ( num_fd = select( n, &read_fds, &write_fds, &except_fds, t ) ) != -1 ) 
-  {
+  while(running) {
+    handle_pending_timers();
+
+    if (has_timers()) {
+      boost::posix_time::time_duration td = time_left();
+      next_event.tv_sec = td.total_seconds();
+      next_event.tv_usec = td.fractional_seconds();
+      t = &next_event;
+    } else
+      t = 0;
+    
+    if (!t && callbacks.empty())
+      break;
+    if ((num_fd = select(n, &read_fds, &write_fds, &except_fds, t)) == -1)
+      break;
+
     for( callback_map::const_iterator it = callbacks.begin(), 
           e = callbacks.end(); 
        num_fd && it!=e;
@@ -131,14 +119,6 @@ void select_loop::run(){
         --num_fd,it->second.on_write();
       if( FD_ISSET( it->first, &except_fds) ) 
         --num_fd,it->second.on_exception();
-    }
-    next_event = handle_timed_events();
-
-    if( next_event.tv_sec ||next_event.tv_usec )  {
-      t = &next_event;
-    }
-    else {
-      t = 0;
     }
     for( callback_map::const_iterator it = callbacks.begin(), 
            e = callbacks.end(); 

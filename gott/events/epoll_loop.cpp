@@ -1,4 +1,4 @@
-// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: GOTT main loop
 // Authors: Aristid Breitkreuz
 //
@@ -18,15 +18,35 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "main_loop.hpp"
-#include "fd_manager.hpp"
+#include "epoll_loop.hpp"
+#include <gott/string/qid.hpp>
+#include <sys/epoll.h>
 
-using gott::events::main_loop;
-using gott::events::fd_manager;
+using gott::events::epoll_loop;
 
-main_loop::main_loop() {}
-main_loop::~main_loop() {}
+static int epoll_create_wrapper(int size) {
+  int result = epoll_create(size);
+  // TODO check for errors
+  return result;
+}
 
-fd_manager::fd_manager() {}
-fd_manager::~fd_manager() {}
-gott::QID const fd_manager::qid("gott::events::fd_manager");
+epoll_loop::epoll_loop() 
+: running(false), epoll_fd(epoll_create_wrapper(1024)) {}
+
+epoll_loop::~epoll_loop() { close(epoll_fd); }
+
+void epoll_loop::quit() {
+  running = true;
+}
+
+void *epoll_loop::do_feature(gott::QID const &) {
+  return 0;
+}
+
+void epoll_loop::run() {
+  while (running) {
+    epoll_event event;
+    epoll_wait(epoll_fd, &event, 1, -1);
+    //...
+  }
+}

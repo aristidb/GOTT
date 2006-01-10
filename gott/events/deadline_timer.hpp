@@ -2,8 +2,10 @@
 #define GOTT_BASE_EVENTS_DEADLINE_TIMER_HPP_INCLUDED
 
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
+// Copyright (C) 2006 by Aristid Breitkreuz aribrei@arcor.de
 // Content: GOTT select loop
 // Authors: Andreas Pokorny
+//          Aristid Breitkreuz
 //
 // This file is part of the Gott Project (http://gott.sf.net)
 //
@@ -21,7 +23,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
+#include <gott/visibility.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/function.hpp>
 namespace gott{namespace events{
@@ -37,7 +39,7 @@ namespace gott{namespace events{
  * In this example do_something will be called every 10 seconds ( + time to execute do_something ).
  * \code
  *   using namespace gott::events;
- *   using namespace boost::date_time::posix_time;
+ *   using namespace boost::posix_time;
  *   deadline_timer do_something() {
  *      // do something 
  *      return deadline_timer( microsec_clock::local_time() + seconds(10), &do_something );
@@ -78,6 +80,29 @@ struct GOTT_LOCAL deadline_timer{
 
   static const deadline_timer no_timer;
 };
+
+namespace detail {
+  using namespace boost::posix_time;
+  struct periodic_timeval_functor {
+    boost::function<void ()> delegate;
+    time_duration interval;
+    deadline_timer operator() () const {
+      delegate();
+      return deadline_timer(microsec_clock::local_time() + interval, 
+          deadline_timer::handler_type(*this));
+    }
+  };
+}
+
+inline deadline_timer periodic_timer(boost::posix_time::time_duration interval,
+      boost::function<void ()> const &delegate,
+      bool start_now = true) {
+  using namespace boost::posix_time;
+  detail::periodic_timeval_functor func = { delegate, interval };
+  return deadline_timer(
+      microsec_clock::local_time() + (start_now ? seconds(0) : interval),
+      deadline_timer::handler_type(func));
+}
 
 inline GOTT_LOCAL 
 bool operator<( deadline_timer const& left, deadline_timer const& right ) { 
