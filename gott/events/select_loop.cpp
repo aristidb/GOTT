@@ -122,7 +122,7 @@ void select_loop::run(){
     }
     for( callback_map::const_iterator it = callbacks.begin(), 
            e = callbacks.end(); 
-         num_fd && it!=e;
+         it!=e;
          ++it)  {
       if( it->second.on_write )
         FD_SET( it->first, &write_fds );

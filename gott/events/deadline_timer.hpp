@@ -26,6 +26,7 @@
 #include <gott/visibility.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/function.hpp>
+
 namespace gott{namespace events{
 
 /**

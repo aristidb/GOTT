@@ -37,8 +37,8 @@ public:
       deadline_timer, 
       std::vector<deadline_timer>,
       std::greater<deadline_timer> >
-    pending_t;
-  pending_t pending;
+    scheduled_t;
+  scheduled_t scheduled;
 };
 
 standard_timer_manager::standard_timer_manager() : p(new impl) {}
@@ -47,29 +47,34 @@ standard_timer_manager::~standard_timer_manager() {}
 void standard_timer_manager::add_timer(deadline_timer const &tm) {
   if (tm.timer.is_not_a_date_time())
     return;
-  p->pending.push(tm);
+  p->scheduled.push(tm);
 }
 
 bool standard_timer_manager::has_timers() const {
-  return !p->pending.empty();
+  return !p->scheduled.empty();
 }
 
 void standard_timer_manager::handle_pending_timers() {
-  impl::pending_t &pending = p->pending;
+  impl::scheduled_t &scheduled = p->scheduled;
 
-  pxtime::ptime now(pxtime::microsec_clock::local_time());
+  pxtime::ptime now = pxtime::microsec_clock::local_time();
 
-  while (!pending.empty()) {
-    deadline_timer const &current = pending.top();
-    pxtime::time_duration time_left = now - current.timer;
-    if (time_left > pxtime::seconds(0))
+  while (!scheduled.empty()) {
+    deadline_timer const &current = scheduled.top();
+
+    if (now < current.timer)
       break;
-    add_timer(current.handler());
-    pending.pop();
+
+    deadline_timer new_timer = current.handler();
+    scheduled.pop();
+    scheduled.push(new_timer);
   }
 }
 
 boost::posix_time::time_duration standard_timer_manager::time_left() const {
-  pxtime::ptime now(pxtime::microsec_clock::local_time());
-  return now - p->pending.top().timer;
+  pxtime::ptime now = pxtime::microsec_clock::local_time();
+  pxtime::time_duration ret = p->scheduled.top().timer - now;
+  if (ret < pxtime::seconds(0))
+    return pxtime::seconds(0);
+  return ret;
 }

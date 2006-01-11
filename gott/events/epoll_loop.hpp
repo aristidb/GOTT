@@ -22,12 +22,15 @@
 #define GOTT_EVENTS_EPOLL_LOOP_HPP
 
 #include "main_loop.hpp"
+#include "fd_manager.hpp"
+#include <boost/scoped_ptr.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace gott {
 namespace events {
 
 class GOTT_EXPORT epoll_loop
-: public main_loop {
+: boost::noncopyable, public main_loop {
 public:
   epoll_loop();
   ~epoll_loop();
@@ -39,8 +42,8 @@ private:
   void *do_feature(QID const &);
 
 private:
-  bool running;
-  int epoll_fd;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}

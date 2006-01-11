@@ -21,7 +21,7 @@
 #include "watch.hpp"
 #include "inotify/engine.hpp"
 #include <gott/events/select_loop.hpp>
-//#include <gott/events/epoll_loop.hpp>
+#include <gott/events/epoll_loop.hpp>
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/signal_manager.hpp>
 #include <gott/events/timer_manager.hpp>
@@ -41,7 +41,7 @@ void output(event const &ev, int context) {
 }
 
 void blink() {
-  std::cout << "blink" << std::endl;
+  std::cout << boost::posix_time::microsec_clock::local_time() << " blink" << std::endl;
 }
 
 int main() {
@@ -59,6 +59,6 @@ int main() {
   loop->feature<signal_manager>().on_signal(SIGINT).connect(
     boost::bind(&main_loop::quit, boost::ref(*loop)));
   loop->feature<timer_manager>().add_timer(
-    periodic_timer(boost::posix_time::seconds(2), &blink));
+    periodic_timer(boost::posix_time::seconds(3), &blink));
   loop->run();
 }
