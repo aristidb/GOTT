@@ -54,7 +54,7 @@ int main() {
   boost::scoped_ptr<main_loop> loop(
       new select_loop);
       //new epoll_loop);
-#if 0
+#if 1
   loop->feature<fd_manager>().add_fd(
     ee.fd, fd_manager::read, boost::bind(&inotify_engine::notify, &ee));
 #endif

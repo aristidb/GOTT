@@ -23,7 +23,7 @@
 #include <gott/string/qid.hpp>
 #include <sys/epoll.h>
 #include <set>
-#include <boost/ptr_container/ptr_map.hpp>
+#include <map>
 #include <boost/optional/optional.hpp>
 #include <boost/utility/in_place_factory.hpp>
 #include <climits>
@@ -52,7 +52,7 @@ public:
     fd_entry(unsigned m, boost::function<void (unsigned)> const &cb, bool w)
     : mask(m), callback(cb), wait(w) {}
   };
-  boost::ptr_map<int, fd_entry> fd_map;
+  std::map<int, fd_entry> fd_map;
   std::set<int> wait_fds;
 
   boost::optional<sigselfpipe> sigmgr;
@@ -86,8 +86,7 @@ void *epoll_loop::do_feature(gott::QID const &qid) {
 
 void epoll_loop::add_fd(int fd, unsigned mask, 
     boost::function<void (unsigned)> const &cb, bool wait) {
-  impl::fd_entry *e = new impl::fd_entry(mask, cb, wait);
-  p->fd_map.insert(fd, e);
+  p->fd_map.insert(std::make_pair(fd, impl::fd_entry(mask, cb, wait)));
 
   if (wait)
     p->wait_fds.insert(fd);
@@ -100,7 +99,7 @@ void epoll_loop::add_fd(int fd, unsigned mask,
     ev.events |= EPOLLOUT;
   if (mask & fd_manager::exception)
     ev.events |= EPOLLERR | EPOLLHUP;
-  ev.data.ptr = e;
+  ev.data.fd = fd;
 
   int result = epoll_ctl(p->epoll_fd, EPOLL_CTL_ADD, fd, &ev);
   if (result == -1)
@@ -108,8 +107,10 @@ void epoll_loop::add_fd(int fd, unsigned mask,
 }
 
 void epoll_loop::remove_fd(int fd) {
-  boost::ptr_map<int, impl::fd_entry>::iterator it = p->fd_map.find(fd);
-  if (it->wait)
+  std::map<int, impl::fd_entry>::iterator it = p->fd_map.find(fd);
+  if (it == p->fd_map.end())
+    throw fd_manager::installation_error();
+  if (it->second.wait)
     p->wait_fds.erase(fd);
   p->fd_map.erase(it);
   int result = epoll_ctl(p->epoll_fd, EPOLL_CTL_DEL, fd, 0);
@@ -129,11 +130,15 @@ void epoll_loop::run() {
     if (!has_wait_timers() && p->wait_fds.empty())
       break;
     
-    epoll_event event;
-    int ready = epoll_wait(p->epoll_fd, &event, 1, timeout);
-    if (ready > 0) {
-      impl::fd_entry &e = *static_cast<impl::fd_entry *>(event.data.ptr);
-      e.callback(e.mask);
+    epoll_event event[64];
+    int ready = epoll_wait(p->epoll_fd, event, 64, timeout);
+    for (int i = 0; i < ready; ++i) {
+      int fd = event[i].data.fd;
+      std::map<int, impl::fd_entry>::iterator it = p->fd_map.find(fd);
+      if (it != p->fd_map.end()) {
+        impl::fd_entry &e = it->second;
+        e.callback(e.mask);
+      }
     }
   }
 }
