@@ -36,11 +36,13 @@ struct path::node {
   virtual ~node() {}
   virtual node *append(node *other);
   virtual node *clone() const = 0;
-
-  friend inline path::node *new_clone(path::node const &n) {
-    return n.clone();
-  }
 };
+
+namespace gott { namespace graphics {
+path::node *new_clone(path::node const &n) {
+  return n.clone();
+}
+}}
 
 typedef boost::scoped_ptr<path::node> node_p;
 
