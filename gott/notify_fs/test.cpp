@@ -52,10 +52,10 @@ int main() {
   w.on_fire().connect(boost::bind(&output, _1, 1));
   w2.on_fire().connect(boost::bind(&output, _1, 2));
   boost::scoped_ptr<main_loop> loop(
-      new select_loop);
-      //new epoll_loop);
-  loop->feature<fd_manager>().add_read_fd(
-    ee.fd, boost::bind(&inotify_engine::notify, &ee));
+      //new select_loop);
+      new epoll_loop);
+  loop->feature<fd_manager>().add_fd(
+    ee.fd, fd_manager::read, boost::bind(&inotify_engine::notify, &ee));
   loop->feature<signal_manager>().on_signal(SIGINT).connect(
     boost::bind(&main_loop::quit, boost::ref(*loop)));
   loop->feature<timer_manager>().add_timer(

@@ -29,7 +29,8 @@ namespace gott {
 namespace events {
 
 /**
- * Feature for main_loops able to watch file descriptors (UNIX).
+ * Feature for main_loops able to watch file descriptors (*NIX) or sockets 
+ * (*NIX + Win32).
  */
 class GOTT_EXPORT fd_manager {
 public:
@@ -40,51 +41,53 @@ public:
 
   static QID const qid;
 
-  /**
-   * Adds a file descriptor to watch and register a callback for incoming data 
-   * events. If the file descriptor already exists only the ready-for-reading
-   * callback is replaced.
-   * \param fd File descriptor of the socket / device to watch.
-   * \param on_read The callback called whenever data is waiting at the file.
-   */
-  virtual void add_read_fd(int fd, 
-      boost::function<void()> const &on_read) = 0;
+  /// Event on a file descriptor.
+  enum event {
+    /// A read has occurred.
+    read = 1,
+    /// A write has occurred.
+    write = 2,
+    /// Something other happened.
+    exception = 4,
+    /// Anything happened.
+    any = read | write | exception
+  };
+
+  class GOTT_EXPORT installation_error {};
 
   /**
-   * Adds a file descriptor to watch and registers a write callback.
-   * If the file descriptor already exists only the write callback is replaced.
-   * \param fd File descriptor of the socket / device to watch.
-   * \param on_write The callback called whenever the file is ready for writing.
+   * Add a file descriptor to watch.
+   * \param fd The file descriptor of the soon watched object.
+   * \param mask Any combination of read, write and exception.
+   *           Determines which events are caught for this descriptor.
+   * \param cb Callback called whenever an event happens on this descriptor
+   *           and it is in the @p mask. Its parameter will be a combination
+   *           of the events that occurred.
+   * \throw installation_error If the descriptor is already registered or
+   *           something else happens.
    */
-  virtual void add_write_fd(int fd, 
-      boost::function<void()> const &on_write) = 0;
+  virtual void add_fd(int fd, unsigned mask, 
+      boost::function<void (unsigned)> const &cb) = 0;
+
+#if 0
+  /**
+   * Change an already watched file descriptor to watch.
+   * \param fd The file descriptor of the watched object.
+   * \param mask Any combination of read, write and exception.
+   *           Determines which events are caught for this descriptor.
+   * \param cb Callback called whenever an event happens on this descriptor
+   *           and it is in the @p mask.
+   * \throw installation_error If the descriptor is not yet registered or
+   *           something else happens.
+   */ 
+  virtual void change_fd(int fd, unsigned mask,
+      boost::function<void (event)> const &cb) = 0;
+#endif
 
   /**
-   * Adds a file descriptor to watch and registers an exception callback. If the
-   * file descriptor already exists only the exception callback is replaced.
-   * \param fd File descriptor of the socket / device to watch.
-   * \param on_exception The callback called whenever exceptions happen on that 
-   *                     file.
-   */
-  virtual void add_exception_fd(int fd, 
-      boost::function<void()> const &on_exception) = 0;
-
-  /**
-   * Adds a file descriptor to watch and installs callbacks for any event.
-   * \param fd File descriptor of the socket / device to watch.
-   * \param on_read The callback called whenever data is waiting at the file.
-   * \param on_write The callback called whenever the file is ready for writing.
-   * \param on_exception  The callback called whenever exceptions happen on that
-   *                      file.
-   */
-  virtual void add_fd(int fd, 
-      boost::function<void()> const &on_read,
-      boost::function<void()> const &on_write, 
-      boost::function<void()> const &on_exception) = 0;
-
-  /**
-   * Removes a file descriptor from the watch set.
-   * \param fd File descriptor of the socket / device to remove.
+   * Remove a file descriptor from the set of watched objects.
+   * \param fd The file descriptor of the watched objects.
+   * \throw installation_error If the registered was not registered.
    */
   virtual void remove_fd(int fd) = 0;
 };

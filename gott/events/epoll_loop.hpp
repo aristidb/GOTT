@@ -23,6 +23,7 @@
 
 #include "main_loop.hpp"
 #include "fd_manager.hpp"
+#include "timer_manager.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -30,13 +31,19 @@ namespace gott {
 namespace events {
 
 class GOTT_EXPORT epoll_loop
-: boost::noncopyable, public main_loop {
+: boost::noncopyable,
+  public main_loop,
+  public fd_manager,
+  public standard_timer_manager {
 public:
   epoll_loop();
   ~epoll_loop();
 
   void run();
   void quit();
+
+  void add_fd(int fd, unsigned mask, boost::function<void (unsigned)> const &);
+  void remove_fd(int fd);
 
 private:
   void *do_feature(QID const &);

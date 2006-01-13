@@ -19,9 +19,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "epoll_loop.hpp"
+#include "sigselfpipe.hpp"
 #include <gott/string/qid.hpp>
 #include <sys/epoll.h>
-#include <map>
+#include <boost/ptr_container/ptr_map.hpp>
+#include <boost/optional/optional.hpp>
+#include <boost/utility/in_place_factory.hpp>
+#include <climits>
+
+#include <iostream>
 
 using gott::events::epoll_loop;
 
@@ -38,6 +44,17 @@ public:
 
   bool running;
   int epoll_fd;
+
+  struct fd_entry {
+    unsigned mask;
+    boost::function<void (unsigned)> callback;
+
+    fd_entry(unsigned m, boost::function<void (unsigned)> const &cb)
+    : mask(m), callback(cb) {}
+  };
+  boost::ptr_map<int, fd_entry> fd_map;
+
+  boost::optional<sigselfpipe> sigmgr;
 
   class entry {
     epoll_event event;
@@ -56,14 +73,59 @@ void epoll_loop::quit() {
   p->running = false;
 }
 
-void *epoll_loop::do_feature(gott::QID const &) {
+void *epoll_loop::do_feature(gott::QID const &qid) {
+  GOTT_EVENTS_FEATURE(qid, fd_manager);
+  GOTT_EVENTS_FEATURE(qid, timer_manager);
+  if (qid == signal_manager::qid) {
+    if (!p->sigmgr) p->sigmgr = boost::in_place(this);
+    return p->sigmgr.get_ptr();
+  }
   return 0;
 }
 
+void epoll_loop::add_fd(int fd, unsigned mask, 
+    boost::function<void (unsigned)> const &cb) {
+  impl::fd_entry *e = new impl::fd_entry(mask, cb);
+  p->fd_map.insert(fd, e);
+
+  epoll_event ev;
+  ev.events = 0;
+  if (mask & fd_manager::read)
+    ev.events |= EPOLLIN | EPOLLPRI;
+  if (mask & fd_manager::write)
+    ev.events |= EPOLLOUT;
+  if (mask & fd_manager::exception)
+    ev.events |= EPOLLERR | EPOLLHUP;
+  ev.data.ptr = e;
+
+  int result = epoll_ctl(p->epoll_fd, EPOLL_CTL_ADD, fd, &ev);
+  if (result == -1)
+    throw fd_manager::installation_error();
+}
+
+void epoll_loop::remove_fd(int fd) {
+//  p->fd_map.erase(fd); SHOULD work
+  p->fd_map.erase(p->fd_map.find(fd));
+  int result = epoll_ctl(p->epoll_fd, EPOLL_CTL_DEL, fd, 0);
+  if (result == -1)
+    throw fd_manager::installation_error();
+}
+
 void epoll_loop::run() {
+  p->running = true;
   while (p->running) {
+    int timeout = -1;
+    if (has_timers()) {
+      handle_pending_timers();
+      timeout = int(std::min(time_left().total_milliseconds(), long(INT_MAX)));
+    } else if (p->fd_map.empty())
+      break;
+    
     epoll_event event;
-    epoll_wait(p->epoll_fd, &event, 1, -1);
-    //...
+    int ready = epoll_wait(p->epoll_fd, &event, 1, timeout);
+    if (ready > 0) {
+      impl::fd_entry &e = *static_cast<impl::fd_entry *>(event.data.ptr);
+      e.callback(e.mask);
+    }
   }
 }

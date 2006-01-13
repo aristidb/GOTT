@@ -44,40 +44,35 @@ namespace gott{namespace events{
  */
 class GOTT_EXPORT select_loop 
     : public main_loop, public fd_manager, public standard_timer_manager {
-  private:
-    struct GOTT_LOCAL handler {
-      boost::function<void()> on_read, on_write, on_exception;
-    };
-    fd_set read_fds, write_fds, except_fds;
-    typedef std::map<int, handler> callback_map;
-    callback_map callbacks;
-    bool running;
-    ::boost::optional<sigselfpipe> sigmgr;
+private:
+  struct GOTT_LOCAL handler {
+    boost::function<void (unsigned)> callback;
+    unsigned mask;
+  };
+  fd_set read_fds, write_fds, except_fds;
+  typedef std::map<int, handler> callback_map;
+  callback_map callbacks;
+  bool running;
+  ::boost::optional<sigselfpipe> sigmgr;
 
-    GOTT_LOCAL select_loop( select_loop const& cp );
-    GOTT_LOCAL select_loop& operator=( select_loop const& cp );
-  public:
-    select_loop();
-    ~select_loop();
+  GOTT_LOCAL select_loop( select_loop const& cp );
+  GOTT_LOCAL select_loop& operator=( select_loop const& cp );
+public:
+  select_loop();
+  ~select_loop();
 
-    void add_read_fd(int fd, boost::function<void()> const &on_read);
-    void add_write_fd( int fd, boost::function<void()> const &on_write);
-    void add_exception_fd(int fd, boost::function<void()> const &on_exception);
-    void add_fd(int fd, 
-        boost::function<void()> const &on_read, 
-        boost::function<void()> const &on_write, 
-        boost::function<void()> const &on_exception );
-    void remove_fd( int fd );
+  void add_fd(int, unsigned, boost::function<void (unsigned)> const &);
+  void remove_fd(int);
 
-    sigc::signal1<void,int> &on_signal(int sig) {
-      return feature<signal_manager>().on_signal(sig);
-    }
+  sigc::signal1<void,int> &on_signal(int sig) {
+    return feature<signal_manager>().on_signal(sig);
+  }
 
-    void run();
-    void quit();
+  void run();
+  void quit();
 
 private:
-    GOTT_LOCAL void *do_feature(gott::QID const &);
+  GOTT_LOCAL void *do_feature(gott::QID const &);
 };
 
 }}

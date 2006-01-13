@@ -35,7 +35,8 @@ typedef sigc::signal1<void, int> signl_t;
 sigselfpipe::sigselfpipe(fd_manager *fdm) {
   if (pipe(selfpipe) == -1)
     throw std::runtime_error("pipe() failed");
-  fdm->add_read_fd(selfpipe[0], boost::bind(&sigselfpipe::notify_in, this));
+  fdm->add_fd(selfpipe[0], fd_manager::read, 
+      boost::bind(&sigselfpipe::notify_in, this));
 }
 
 sigselfpipe::~sigselfpipe() {

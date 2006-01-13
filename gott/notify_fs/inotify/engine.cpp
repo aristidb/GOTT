@@ -137,12 +137,32 @@ void inotify_engine::notify() {
   }
   for (size_t i = 0; i < size_t(r);) {
     inotify_event *pevent = reinterpret_cast<inotify_event *>(buffer + i);
+    if (i + sizeof(inotify_event) >= sizeof(buffer) 
+        || i + sizeof(inotify_event) + pevent->len >= sizeof(buffer)) {
+      std::cout << "inotify: moveback" << std::endl;
+      size_t rest = sizeof(buffer) - i;
+      memmove(pevent, buffer, rest);
+      i = 0;
+      r = read(fd, buffer + rest, sizeof(buffer) - rest);
+      if (r <= 0) {
+        std::cout << "Communication problems with inotify!" << std::endl;
+        return;
+      }
+      r += rest;
+      continue;
+    }
     i += sizeof(inotify_event) + pevent->len;
+    if (pevent->mask & IN_Q_OVERFLOW)
+      return;
+    if (pevent->wd == -1) {
+      std::cout << "inotify: Common event " << pevent->mask << std::endl;
+      continue;
+    }
     event ev = {
       static_cast<inotify_watch *>(watches[pevent->wd])->context,
       ev_t(pevent->mask),
       pevent->cookie,
-      pevent->name
+      pevent->len ? pevent->name : ""
     };
     ev.context.on_fire().emit(ev);
   }

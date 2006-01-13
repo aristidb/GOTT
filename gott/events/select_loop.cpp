@@ -40,48 +40,33 @@ void *select_loop::do_feature(gott::QID const &type) {
   return 0;
 }
 
-void select_loop::add_read_fd( int fd, boost::function<void()> const &fun ) {
-  FD_SET(fd, &read_fds);
-  callbacks[fd].on_read = fun;
-}
+void select_loop::add_fd(int fd, unsigned mask, 
+    boost::function<void (unsigned)> const &fun) {
+  if (callbacks.find(fd) != callbacks.end())
+    throw fd_manager::installation_error();
 
-void select_loop::add_write_fd( int fd, boost::function<void()> const &fun ) {
-  FD_SET(fd, &write_fds);
-  callbacks[fd].on_write = fun;
-}
+  handler h;
+  h.callback = fun;
+  h.mask = mask;
+  callbacks.insert(std::make_pair(fd, h));
 
-
-void select_loop::add_exception_fd(int fd, boost::function<void()> const &fun) {
-  FD_SET(fd, &except_fds);
-  callbacks[fd].on_exception = fun;
-}
-
-void select_loop::add_fd(int fd, 
-    boost::function<void()> const &o_r, 
-    boost::function<void()> const &o_w, 
-    boost::function<void()> const &o_e) {
-  FD_SET(fd, &read_fds);
-  FD_SET(fd, &write_fds);
-  FD_SET(fd, &except_fds);
-  callbacks[fd].on_read = o_r;
-  callbacks[fd].on_write = o_w;
-  callbacks[fd].on_exception = o_e;
+  if (mask & fd_manager::read)
+    FD_SET(fd, &read_fds);
+  if (mask & fd_manager::write)
+    FD_SET(fd, &write_fds);
+  if (mask & fd_manager::exception)
+    FD_SET(fd, &except_fds);
 }
 
 void select_loop::remove_fd( int fd ) {
   callback_map::iterator it = callbacks.find( fd );
-  if( it != callbacks.end() ) {
-    callbacks.erase( it );
-    FD_CLR(fd,&read_fds);
-    FD_CLR(fd,&write_fds);
-    FD_CLR(fd,&except_fds);
-  }
+  if (it == callbacks.end())
+    throw fd_manager::installation_error();
+  callbacks.erase( it );
+  FD_CLR(fd,&read_fds);
+  FD_CLR(fd,&write_fds);
+  FD_CLR(fd,&except_fds);
 }
-
-//    ret.tv_sec = td.total_seconds();
-//    ret.tv_usec = td.fractional_seconds();
-    //long    tv_sec;   seconds 
-    //long    tv_usec;  microseconds 
 
 void select_loop::run(){
   running = true;
@@ -111,24 +96,27 @@ void select_loop::run(){
           e = callbacks.end(); 
        num_fd && it!=e;
        ++it)  {
-      if( FD_ISSET( it->first, &read_fds ) ) {
-        --num_fd;
-        it->second.on_read();
-      }
-      if( FD_ISSET( it->first, &write_fds) ) 
-        --num_fd,it->second.on_write();
+      unsigned mask = 0;
+      if( FD_ISSET( it->first, &read_fds ) ) 
+        mask |= fd_manager::read;
+      if( FD_ISSET( it->first, &write_fds) )
+        mask |= fd_manager::write;
       if( FD_ISSET( it->first, &except_fds) ) 
-        --num_fd,it->second.on_exception();
+        mask |= fd_manager::exception;
+      if (mask) {
+        --num_fd;
+        it->second.callback(mask);
+      }
     }
     for( callback_map::const_iterator it = callbacks.begin(), 
            e = callbacks.end(); 
          it!=e;
          ++it)  {
-      if( it->second.on_write )
+      if( it->second.mask & fd_manager::write )
         FD_SET( it->first, &write_fds );
-      if( it->second.on_read )
+      if( it->second.mask & fd_manager::read )
         FD_SET( it->first, &read_fds );
-      if( it->second.on_exception )
+      if( it->second.mask & fd_manager::exception )
         FD_SET( it->first, &except_fds );
     }
 

@@ -30,6 +30,7 @@ namespace events {
 
 /**
  * Default feature implementation for signals.
+ * \todo main_loop does not quit when active
  */
 class GOTT_LOCAL sigselfpipe : public signal_manager {
 public:
