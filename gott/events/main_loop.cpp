@@ -22,11 +22,6 @@
 #include "fd_manager.hpp"
 
 using gott::events::main_loop;
-using gott::events::fd_manager;
 
 main_loop::main_loop() {}
 main_loop::~main_loop() {}
-
-fd_manager::fd_manager() {}
-fd_manager::~fd_manager() {}
-gott::QID const fd_manager::qid("gott::events::fd_manager");

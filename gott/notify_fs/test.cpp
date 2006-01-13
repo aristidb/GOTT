@@ -52,13 +52,19 @@ int main() {
   w.on_fire().connect(boost::bind(&output, _1, 1));
   w2.on_fire().connect(boost::bind(&output, _1, 2));
   boost::scoped_ptr<main_loop> loop(
-      //new select_loop);
-      new epoll_loop);
+      new select_loop);
+      //new epoll_loop);
+#if 1
   loop->feature<fd_manager>().add_fd(
     ee.fd, fd_manager::read, boost::bind(&inotify_engine::notify, &ee));
+#endif
+#if 1
   loop->feature<signal_manager>().on_signal(SIGINT).connect(
     boost::bind(&main_loop::quit, boost::ref(*loop)));
+#endif
+#if 1
   loop->feature<timer_manager>().add_timer(
     periodic_timer(boost::posix_time::seconds(3), &blink));
+#endif
   loop->run();
 }

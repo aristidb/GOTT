@@ -26,6 +26,7 @@
 #include <map> 
 #include <algorithm>
 #include <queue>
+#include <set>
 #include <sys/select.h> 
 #include <boost/function.hpp>
 #include <boost/optional/optional.hpp>
@@ -51,6 +52,7 @@ private:
   };
   fd_set read_fds, write_fds, except_fds;
   typedef std::map<int, handler> callback_map;
+  std::set<int> wait_fds;
   callback_map callbacks;
   bool running;
   ::boost::optional<sigselfpipe> sigmgr;
@@ -61,7 +63,8 @@ public:
   select_loop();
   ~select_loop();
 
-  void add_fd(int, unsigned, boost::function<void (unsigned)> const &);
+  void add_fd(int, unsigned, boost::function<void (unsigned)> const &, 
+      bool = true);
   void remove_fd(int);
 
   sigc::signal1<void,int> &on_signal(int sig) {

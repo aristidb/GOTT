@@ -18,42 +18,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef GOTT_EVENTS_EPOLL_LOOP_HPP
-#define GOTT_EVENTS_EPOLL_LOOP_HPP
-
-#include "main_loop.hpp"
 #include "fd_manager.hpp"
-#include "timer_manager.hpp"
-#include <boost/scoped_ptr.hpp>
-#include <boost/noncopyable.hpp>
 
-namespace gott {
-namespace events {
+using gott::events::fd_manager;
 
-class GOTT_EXPORT epoll_loop
-: boost::noncopyable,
-  public main_loop,
-  public fd_manager,
-  public standard_timer_manager {
-public:
-  epoll_loop();
-  ~epoll_loop();
+fd_manager::fd_manager() {}
+fd_manager::~fd_manager() {}
 
-  void run();
-  void quit();
-
-  void add_fd(int fd, unsigned mask, boost::function<void (unsigned)> const &,
-      bool wait = true);
-  void remove_fd(int fd);
-
-private:
-  void *do_feature(QID const &);
-
-private:
-  class impl;
-  boost::scoped_ptr<impl> p;
-};
-
-}}
-
-#endif
+gott::QID const fd_manager::qid("gott::events::fd_manager");

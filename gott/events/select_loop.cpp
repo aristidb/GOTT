@@ -41,9 +41,12 @@ void *select_loop::do_feature(gott::QID const &type) {
 }
 
 void select_loop::add_fd(int fd, unsigned mask, 
-    boost::function<void (unsigned)> const &fun) {
+    boost::function<void (unsigned)> const &fun, bool wait) {
   if (callbacks.find(fd) != callbacks.end())
     throw fd_manager::installation_error();
+
+  if (wait)
+    wait_fds.insert(fd);
 
   handler h;
   h.callback = fun;
@@ -62,6 +65,7 @@ void select_loop::remove_fd( int fd ) {
   callback_map::iterator it = callbacks.find( fd );
   if (it == callbacks.end())
     throw fd_manager::installation_error();
+  wait_fds.erase(fd);
   callbacks.erase( it );
   FD_CLR(fd,&read_fds);
   FD_CLR(fd,&write_fds);
@@ -87,7 +91,7 @@ void select_loop::run(){
     } else
       t = 0;
     
-    if (!t && callbacks.empty())
+    if (!t && wait_fds.empty())
       break;
     if ((num_fd = select(n, &read_fds, &write_fds, &except_fds, t)) == -1)
       break;

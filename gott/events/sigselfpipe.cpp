@@ -36,7 +36,7 @@ sigselfpipe::sigselfpipe(fd_manager *fdm) {
   if (pipe(selfpipe) == -1)
     throw std::runtime_error("pipe() failed");
   fdm->add_fd(selfpipe[0], fd_manager::read, 
-      boost::bind(&sigselfpipe::notify_in, this));
+      boost::bind(&sigselfpipe::notify_in, this), false);
 }
 
 sigselfpipe::~sigselfpipe() {

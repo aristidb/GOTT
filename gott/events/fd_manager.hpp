@@ -1,4 +1,4 @@
-// Copyright (C) 2005 by Aristid Breitkreuz (aribrei@arcor.de)
+// Copyright (C) 2005-2006 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: GOTT main loop
 // Authors: Aristid Breitkreuz
 //
@@ -63,11 +63,13 @@ public:
    * \param cb Callback called whenever an event happens on this descriptor
    *           and it is in the @p mask. Its parameter will be a combination
    *           of the events that occurred.
+   * \param wait Specifies whether the main_loop::run shall wait for the
+   *           descriptor to be removed.
    * \throw installation_error If the descriptor is already registered or
    *           something else happens.
    */
   virtual void add_fd(int fd, unsigned mask, 
-      boost::function<void (unsigned)> const &cb) = 0;
+      boost::function<void (unsigned)> const &cb, bool wait = true) = 0;
 
 #if 0
   /**

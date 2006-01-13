@@ -22,12 +22,11 @@
 #include "sigselfpipe.hpp"
 #include <gott/string/qid.hpp>
 #include <sys/epoll.h>
+#include <set>
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/utility/in_place_factory.hpp>
 #include <climits>
-
-#include <iostream>
 
 using gott::events::epoll_loop;
 
@@ -48,11 +47,13 @@ public:
   struct fd_entry {
     unsigned mask;
     boost::function<void (unsigned)> callback;
+    bool wait;
 
-    fd_entry(unsigned m, boost::function<void (unsigned)> const &cb)
-    : mask(m), callback(cb) {}
+    fd_entry(unsigned m, boost::function<void (unsigned)> const &cb, bool w)
+    : mask(m), callback(cb), wait(w) {}
   };
   boost::ptr_map<int, fd_entry> fd_map;
+  std::set<int> wait_fds;
 
   boost::optional<sigselfpipe> sigmgr;
 
@@ -84,9 +85,12 @@ void *epoll_loop::do_feature(gott::QID const &qid) {
 }
 
 void epoll_loop::add_fd(int fd, unsigned mask, 
-    boost::function<void (unsigned)> const &cb) {
-  impl::fd_entry *e = new impl::fd_entry(mask, cb);
+    boost::function<void (unsigned)> const &cb, bool wait) {
+  impl::fd_entry *e = new impl::fd_entry(mask, cb, wait);
   p->fd_map.insert(fd, e);
+
+  if (wait)
+    p->wait_fds.insert(fd);
 
   epoll_event ev;
   ev.events = 0;
@@ -104,8 +108,10 @@ void epoll_loop::add_fd(int fd, unsigned mask,
 }
 
 void epoll_loop::remove_fd(int fd) {
-//  p->fd_map.erase(fd); SHOULD work
-  p->fd_map.erase(p->fd_map.find(fd));
+  boost::ptr_map<int, impl::fd_entry>::iterator it = p->fd_map.find(fd);
+  if (it->wait)
+    p->wait_fds.erase(fd);
+  p->fd_map.erase(it);
   int result = epoll_ctl(p->epoll_fd, EPOLL_CTL_DEL, fd, 0);
   if (result == -1)
     throw fd_manager::installation_error();
@@ -118,7 +124,7 @@ void epoll_loop::run() {
     if (has_timers()) {
       handle_pending_timers();
       timeout = int(std::min(time_left().total_milliseconds(), long(INT_MAX)));
-    } else if (p->fd_map.empty())
+    } else if (p->wait_fds.empty())
       break;
     
     epoll_event event;
