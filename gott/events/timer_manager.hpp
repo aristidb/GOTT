@@ -55,6 +55,7 @@ public:
 
   void add_timer(deadline_timer const &);
   bool has_timers() const;
+  bool has_wait_timers() const;
 
 public:
   void handle_pending_timers();

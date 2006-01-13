@@ -39,6 +39,9 @@ public:
       std::greater<deadline_timer> >
     scheduled_t;
   scheduled_t scheduled;
+  unsigned waitfor;
+
+  impl() : waitfor(0) {}
 };
 
 standard_timer_manager::standard_timer_manager() : p(new impl) {}
@@ -47,11 +50,17 @@ standard_timer_manager::~standard_timer_manager() {}
 void standard_timer_manager::add_timer(deadline_timer const &tm) {
   if (tm.timer.is_not_a_date_time())
     return;
+  if (tm.wait)
+    ++p->waitfor;
   p->scheduled.push(tm);
 }
 
 bool standard_timer_manager::has_timers() const {
   return !p->scheduled.empty();
+}
+
+bool standard_timer_manager::has_wait_timers() const {
+  return p->waitfor > 0;
 }
 
 void standard_timer_manager::handle_pending_timers() {
@@ -66,8 +75,10 @@ void standard_timer_manager::handle_pending_timers() {
       break;
 
     deadline_timer new_timer = current.handler();
+    if (current.wait)
+      --p->waitfor;
     scheduled.pop();
-    scheduled.push(new_timer);
+    add_timer(new_timer);
   }
 }
 

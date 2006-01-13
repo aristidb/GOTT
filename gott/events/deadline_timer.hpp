@@ -29,6 +29,8 @@
 
 namespace gott{namespace events{
 
+//TODO -> -> ->
+
 /**
  * \brief timed event structure. similar to http://asio.sourceforge.net/asio-0.3.4/doc/reference/a00114.html
  *
@@ -71,13 +73,21 @@ struct GOTT_LOCAL deadline_timer{
   typedef boost::function<deadline_timer ()> handler_type;
   time_type timer;
   handler_type handler;
+  bool wait;
 
   /**
    * \brief constructs an invalid deadline_timer.
    */
   deadline_timer() : timer(boost::date_time::not_a_date_time) {}
-  deadline_timer( time_type const& t, handler_type const&  h) 
-    : timer(t),handler(h){}
+
+  /**
+   * Construct a deadline_timer.
+   * \param t The time when the timer is triggered.
+   * \param h The timer's callback.
+   * \param w Whether the timer lets main_loop::run wait.
+   */
+  deadline_timer( time_type const& t, handler_type const&  h, bool w = true) 
+    : timer(t),handler(h),wait(w){}
 
   static const deadline_timer no_timer;
 };
@@ -87,22 +97,30 @@ namespace detail {
   struct periodic_timeval_functor {
     boost::function<void ()> delegate;
     time_duration interval;
+    bool wait;
     deadline_timer operator() () const {
       delegate();
       return deadline_timer(microsec_clock::local_time() + interval, 
-          deadline_timer::handler_type(*this));
+          deadline_timer::handler_type(*this), wait);
     }
   };
 }
 
+/**
+ * Construct a periodic timer.
+ * \param interval The time between triggers.
+ * \param delegate The callback.
+ * \param start_now Does not wait for interval to pass if set.
+ * \param wait Whether the timer lets main_loop::run wait.
+ */
 inline deadline_timer periodic_timer(boost::posix_time::time_duration interval,
       boost::function<void ()> const &delegate,
-      bool start_now = true) {
+      bool start_now = true, bool wait = true) {
   using namespace boost::posix_time;
-  detail::periodic_timeval_functor func = { delegate, interval };
+  detail::periodic_timeval_functor func = { delegate, interval, wait };
   return deadline_timer(
       microsec_clock::local_time() + (start_now ? seconds(0) : interval),
-      deadline_timer::handler_type(func));
+      deadline_timer::handler_type(func), wait);
 }
 
 inline GOTT_LOCAL 

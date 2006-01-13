@@ -124,7 +124,9 @@ void epoll_loop::run() {
     if (has_timers()) {
       handle_pending_timers();
       timeout = int(std::min(time_left().total_milliseconds(), long(INT_MAX)));
-    } else if (p->wait_fds.empty())
+    } 
+    
+    if (!has_wait_timers() && p->wait_fds.empty())
       break;
     
     epoll_event event;

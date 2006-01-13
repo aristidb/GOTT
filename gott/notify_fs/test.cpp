@@ -54,7 +54,7 @@ int main() {
   boost::scoped_ptr<main_loop> loop(
       new select_loop);
       //new epoll_loop);
-#if 1
+#if 0
   loop->feature<fd_manager>().add_fd(
     ee.fd, fd_manager::read, boost::bind(&inotify_engine::notify, &ee));
 #endif
@@ -64,7 +64,7 @@ int main() {
 #endif
 #if 1
   loop->feature<timer_manager>().add_timer(
-    periodic_timer(boost::posix_time::seconds(3), &blink));
+    periodic_timer(boost::posix_time::seconds(3), &blink, true, true));
 #endif
   loop->run();
 }

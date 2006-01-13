@@ -91,7 +91,7 @@ void select_loop::run(){
     } else
       t = 0;
     
-    if (!t && wait_fds.empty())
+    if (!has_wait_timers() && wait_fds.empty())
       break;
     if ((num_fd = select(n, &read_fds, &write_fds, &except_fds, t)) == -1)
       break;
