@@ -43,7 +43,9 @@ int main() {
   b.erase(range(b.begin() + 2, 4));
   range_t<wchar_t const *> r = zero_terminated(L"test ");
 #ifdef NO_STDLIB
-  std::copy(r.begin(), r.end(), b.insert(b.begin(), r.size()).begin());
+  range<wchar_t const *> o = b.insert(b.begin(), r.size());
+  for (wchar_t const *it = r.begin(); it != r.end(); ++it)
+    *o.Begin++ = *it;
 #else
   copy(r, b.insert(b.begin(), r.size()));
 #endif
