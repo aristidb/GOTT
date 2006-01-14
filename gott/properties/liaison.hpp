@@ -46,8 +46,8 @@ public:
     right_to_left(right.on_change().connect(
           sigc::bind(&liaison::right_changed, this))),
     conversion(c)
-  {}
-
+  {} 
+  
   ~liaison() {
     left_to_right.disconnect();
     right_to_left.disconnect();
@@ -78,7 +78,7 @@ private:
   void right_changed() {
     left_to_right.block();
     left.set(conversion.right_to_left(right.get()));
-    right_to_left.unblock();
+    left_to_right.unblock();
   }
 };
 
