@@ -1,7 +1,10 @@
 import os
 
 cppdef = Split(ARGUMENTS.get('def', ''))
-cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
+cxx = os.environ['CXX']
+if not cxx:
+	cxx = Environment()['CXX']
+cxx = ARGUMENTS.get('cxx', cxx)
 cflags = Split(ARGUMENTS.get('cflags', Environment()['CXXFLAGS']))
 release = int(ARGUMENTS.get('release', 0))
 if release:
