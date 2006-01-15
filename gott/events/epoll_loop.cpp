@@ -26,6 +26,7 @@
 #include <map>
 #include <boost/optional/optional.hpp>
 #include <boost/utility/in_place_factory.hpp>
+#include <boost/cstdint.hpp>
 #include <climits>
 
 using gott::events::epoll_loop;
@@ -124,7 +125,8 @@ void epoll_loop::run() {
     int timeout = -1;
     if (has_timers()) {
       handle_pending_timers();
-      timeout = int(std::min(time_left().total_milliseconds(), long(INT_MAX)));
+      timeout = int(std::min(time_left().total_milliseconds(), 
+            boost::int64_t(INT_MAX)));
     } 
     
     if (!has_wait_timers() && p->wait_fds.empty())
