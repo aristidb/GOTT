@@ -35,20 +35,29 @@ namespace events {
 template<class Message, int Size = -1>
 class message_queue : boost::noncopyable {
 public:
+  /// Default-Constructor.
   message_queue() {}
 
 public:
-  void push(Message const &m) {
+  /**
+   * Add a message to the end of this queue.
+   * \param msg The message to add.
+   */
+  void push(Message const &msg) {
     boost::mutex::scoped_lock lock(monitor_lock);
 
     while (full_unsafe())
       not_full.wait();
 
-    push_unsafe(m);
+    push_unsafe(msg);
 
     not_empty.notify_one();
   }
 
+  /**
+   * Get and remove the first element of this queue.
+   * \return The removed element.
+   */
   Message pop() {
     boost::mutex::scoped_lock lock(monitor_lock);
 
@@ -57,24 +66,27 @@ public:
 
     Message result = pop_unsafe();
 
-    not_full.notify_one();
+    if (size != -1)
+      not_full.notify_one();
 
     return result;
   }
 
-  bool empty() {
+  /// Check whether the queue is empty.
+  bool empty() const {
     boost::mutex::scoped_lock lock(monitor_lock);
     return empty_unsafe();
   }
 
-  bool full() {
+  /// Check whether the queue is full.
+  bool full() const {
     boost::mutex::scoped_lock lock(monitor_lock);
     return full_unsafe();
   }
 
 private:
-  void push_unsafe(Message const &m) {
-    queue.push(m);
+  void push_unsafe(Message const &msg) {
+    queue.push(msg);
   }
 
   Message pop_unsafe() {
@@ -83,11 +95,11 @@ private:
     return result;
   }
 
-  bool empty_unsafe() {
+  bool empty_unsafe() const {
     return queue.empty();
   }
 
-  bool full_unsafe() {
+  bool full_unsafe() const {
     if (Size == -1)
       return false;
     return queue.size() >= Size;
