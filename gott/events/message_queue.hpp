@@ -56,8 +56,8 @@ public:
   }
 
   /**
-   * Get and remove the first element of this queue.
-   * \return The removed element.
+   * Get and remove the first message of this queue.
+   * \return The removed message.
    */
   Message pop() {
     boost::mutex::scoped_lock lock(monitor_lock);
@@ -106,7 +106,7 @@ public:
 
   /**
    * Send messages to a callback until it returns false.
-   * \param The receiving callback.
+   * \param func The receiving callback.
    */
   void wait_for_all(boost::function<bool (Message const &)> const &func) {
     boost::mutex::scoped_lock lock(monitor_lock);
