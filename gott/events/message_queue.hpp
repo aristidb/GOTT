@@ -24,6 +24,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/function.hpp>
 #include <queue>
 
 namespace gott {
@@ -47,7 +48,7 @@ public:
     boost::mutex::scoped_lock lock(monitor_lock);
 
     while (full_unsafe())
-      not_full.wait();
+      not_full.wait(lock);
 
     push_unsafe(msg);
 
@@ -62,7 +63,7 @@ public:
     boost::mutex::scoped_lock lock(monitor_lock);
 
     while (empty_unsafe())
-      not_empty().wait();
+      not_empty().wait(lock);
 
     Message result = pop_unsafe();
 
@@ -70,6 +71,23 @@ public:
       not_full.notify_one();
 
     return result;
+  }
+
+  /**
+   * Wait until there are elements available and then send them all at once
+   * to a supplied callback.
+   * \param func The callback to send the messages to.
+   */
+  void wait_for_many(boost::function<void (Message const &)> const &func) {
+    boost::mutex::scoped_lock lock(monitor_lock);
+
+    while (empty_unsafe())
+      not_empty().wait(lock);
+
+    while (!empty_unsafe())
+      func(pop_unsafe());
+
+    not_full.notify_all();
   }
 
   /// Check whether the queue is empty.
