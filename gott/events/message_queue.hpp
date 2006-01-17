@@ -46,13 +46,9 @@ public:
    */
   void push(Message const &msg) {
     boost::mutex::scoped_lock lock(monitor_lock);
-
-    while (full_unsafe())
-      not_full.wait(lock);
-
+    wait_notfull();
     push_unsafe(msg);
-
-    not_empty.notify_one();
+    slot_filled();
   }
 
   /**
@@ -61,16 +57,20 @@ public:
    */
   Message pop() {
     boost::mutex::scoped_lock lock(monitor_lock);
-
-    while (empty_unsafe())
-      not_empty.wait(lock);
-
+    wait_nonempty(lock);
     Message result = pop_unsafe();
-
-    if (size != -1)
-      not_full.notify_one();
-
+    slot_free();
     return result;
+  }
+
+  /**
+   * Get the first message of this queue but do not remove it.
+   * \return A constant reference to the message to glance at.
+   */
+  Message const &peek() const {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    wait(lock);
+    return peek_unsafe();
   }
 
   /// Check whether the queue is empty.
@@ -86,40 +86,84 @@ public:
   }
 
 public:
-
-  /**
-   * Wait until there are messages available and then send them all at once
-   * to a supplied callback.
-   * \param func The callback to send the messages to.
-   */
-  void wait_for_many(boost::function<void (Message const &)> const &func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
-
-    while (empty_unsafe())
-      not_empty.wait(lock);
-
-    while (!empty_unsafe())
-      func(pop_unsafe());
-
-    not_full.notify_all();
-  }
-
   /**
    * Send messages to a callback until it returns false.
    * \param func The receiving callback.
    */
-  void wait_for_all(boost::function<bool (Message const &)> const &func) {
+  template<class T>
+  void wait_for_all(T func) {
     boost::mutex::scoped_lock lock(monitor_lock);
 
     for (;;) {
-      while (empty_unsafe())
-        not_empty.wait(lock);
+      wait_nonempty(lock);
 
+      Message m = pop_unsafe();
+      slot_free();
+
+      if (!func(m))
+        break;
+    }
+  }
+
+  /**
+   * Wait until there are messages available and then send them all at once
+   * to a supplied callback.
+   * \param func The receiving callback.
+   */
+  template<class T>
+  void wait_for_many(T func) {
+    boost::mutex::scoped_lock lock(monitor_lock);
+
+    wait_nonempty(lock);
+
+    while (!empty_unsafe())
+      func(pop_unsafe());
+
+    many_free();
+  }
+
+  /**
+   * Wait until there are messages available and them send them to a supplied
+   * callback until the callback returns false.
+   * \param func The receiving callback.
+   */
+  template<class T>
+  void wait_for_many_break(T func) {
+    boost::mutex::scoped_lock lock(monitor_lock);
+
+    wait_nonempty(lock);
+
+    while (!empty_unsafe())
       if (!func(pop_unsafe()))
         break;
 
-      not_full.notify_one();
-    }
+    many_free();
+  }
+
+private:
+  void wait_nonempty(boost::mutex::scoped_lock &lock) const {
+    while (empty_unsafe())
+      not_empty().wait(lock);
+  }
+
+  void wait_notfull(boost::mutex::scoped_lock &lock) const {
+    while (full_unsafe())
+      not_full().wait(lock);
+  }
+
+private:
+  void slot_free() {
+    if (Size != -1)
+      not_full().notify_one();
+  }
+
+  void many_free() {
+    if (Size != -1)
+      not_full().notify_all();
+  }
+
+  void slot_filled() {
+    not_empty().notify_one();
   }
 
 private:
@@ -131,6 +175,10 @@ private:
     Message result = queue.top();
     queue.pop();
     return result;
+  }
+
+  Message const &peek_unsafe() const {
+    return queue.top();
   }
 
   bool empty_unsafe() const {
@@ -145,9 +193,18 @@ private:
 
 private:
   boost::mutex monitor_lock;
-  boost::condition not_empty;
-  boost::condition not_full;
 
+  boost::condition &not_empty() {
+    return cond[0];
+  }
+
+  boost::condition &not_full() {
+    return cond[1];
+  }
+
+private:
+  boost::condition cond[Size == -1 ? 1 : 2];
+  
 private:
   std::queue<Message> queue;
 };
