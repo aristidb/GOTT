@@ -18,24 +18,20 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "message_queue.hpp"
+#include <gott/events/message_queue.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <iostream>
 
 using gott::events::message_queue;
+namespace bll = boost::lambda;
 
 typedef message_queue<int, 50> mq_t;
 
-bool consume(int val) {
-  if (val == 0)
-    return false;
-  std::cout << val << std::endl;
-  return true;
-}
-
 void consumer(mq_t &mq) {
-  mq.wait_for_all(&consume);
+  mq.wait_for_all(std::cout << bll::_1 << ' ', bll::_1 != 0);
+  std::cout << std::endl;
 }
 
 int main() {

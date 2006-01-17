@@ -141,6 +141,42 @@ public:
   }
 
 private:
+  template<class T, class U>
+  struct add_predicate {
+    add_predicate(T f, U p) : func(f), pred(p) {}
+    T func;
+    U pred;
+    bool operator() (Message const &m) const {
+      if (!pred(m))
+        return false;
+      func(m);
+      return true;
+    }
+  };
+
+public:
+  /**
+   * Send message to a callback until a predicate decides it should not.
+   * \param func The receiving callback.
+   * \param pred The predicate. Return false to make this function return.
+   */
+  template<class T, class U>
+  void wait_for_all(T func, U pred) {
+    wait_for_all(add_predicate<T, U>(func, pred));
+  }
+
+  /**
+   * Wait until there are messages available and them send them to a supplied
+   * callback until a predicate returns false.
+   * \param func The receiving callback.
+   * \param pred The predicate.
+   */
+  template<class T, class U>
+  void wait_for_many_break(T func, U pred) {
+    wait_for_many_break(add_predicate<T, U>(func, pred));
+  }
+
+private:
   void wait_nonempty(boost::mutex::scoped_lock &lock) const {
     while (empty_unsafe())
       not_empty().wait(lock);
