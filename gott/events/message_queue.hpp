@@ -46,7 +46,7 @@ public:
    */
   void push(Message const &msg) {
     boost::mutex::scoped_lock lock(monitor_lock);
-    wait_notfull();
+    wait_notfull(lock);
     push_unsafe(msg);
     slot_filled();
   }
@@ -69,7 +69,7 @@ public:
    */
   Message const &peek() const {
     boost::mutex::scoped_lock lock(monitor_lock);
-    wait(lock);
+    wait_nonempty(lock);
     return peek_unsafe();
   }
 
@@ -172,13 +172,13 @@ private:
   }
 
   Message pop_unsafe() {
-    Message result = queue.top();
+    Message result = queue.front();
     queue.pop();
     return result;
   }
 
   Message const &peek_unsafe() const {
-    return queue.top();
+    return queue.front();
   }
 
   bool empty_unsafe() const {
@@ -194,16 +194,11 @@ private:
 private:
   boost::mutex monitor_lock;
 
-  boost::condition &not_empty() {
-    return cond[0];
-  }
-
-  boost::condition &not_full() {
-    return cond[1];
-  }
-
 private:
-  boost::condition cond[Size == -1 ? 1 : 2];
+  boost::condition &not_empty() const { return cond[0]; }
+  boost::condition &not_full() const { return cond[1]; }
+
+  mutable boost::condition cond[Size == -1 ? 1 : 2];
   
 private:
   std::queue<Message> queue;
