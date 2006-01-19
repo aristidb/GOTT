@@ -20,32 +20,32 @@
 
 #include <gott/events/message_queue.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <iostream>
 
 using gott::events::message_queue;
-namespace bll = boost::lambda;
+using namespace boost::lambda;
+using boost::ref;
 
 typedef message_queue<int, 4> mq_t;
 
 void consumer(mq_t &mq) {
-  mq.wait_for_all(std::cout << bll::_1 << ' ', bll::_1 != 0);
+  mq.wait_for_all(std::cout << _1 << ' ', _1 != 0);
   std::cout << std::endl;
   mq.wait_for_all(
     (
-      bll::bind(&mq_t::push, &mq, bll::_1 + 1), 
-      std::cout << bll::_1 << '\n'
+      bind(&mq_t::push, ref(mq), _1 + 1), 
+      std::cout << _1 << '\n'
     ),
-    bll::_1 != 5
+    _1 != 5
   );
 }
 
 int main() {
   mq_t mq;
   
-  boost::thread thrd(boost::bind(&consumer, boost::ref(mq)));
+  boost::thread thrd(bind(&consumer, ref(mq)));
   
   for (int i = 80; i >= 0; --i)
     mq.push(i);

@@ -25,7 +25,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/function.hpp>
-#include <queue>
+#include <deque>
 
 namespace gott {
 namespace events {
@@ -217,12 +217,12 @@ private:
 
 private:
   void push_unsafe(Message const &msg) {
-    queue.push(msg);
+    queue.push_back(msg);
   }
 
   Message pop_unsafe() {
     Message result = queue.front();
-    queue.pop();
+    queue.pop_front();
     return result;
   }
 
@@ -250,7 +250,7 @@ private:
   mutable boost::condition cond[Size == -1 ? 1 : 2];
   
 private:
-  std::queue<Message> queue;
+  std::deque<Message> queue;
 };
 
 }}
