@@ -129,7 +129,7 @@ public:
   }
 
   /**
-   * Wait until there are messages available and them send them to a supplied
+   * Wait until there are messages available and then send them to a supplied
    * callback until the callback returns false.
    * \param func The receiving callback.
    */
@@ -151,6 +151,52 @@ public:
       lock.lock();
 
     many_free();
+  }
+
+public:
+  /**
+   * Remove the first message if a callback returns true.
+   * \return Whether a message was removed.
+   */
+  template<class T>
+  bool pop_if(T func) {
+    boost::mutex::scoped_lock lock(monitor_lock);
+
+    wait_nonempty(lock);
+
+    Message const &m = peek_unsafe();
+    lock.unlock();
+    bool result = func(m);
+    lock.lock();
+
+    if (result) {
+      pop_unsafe();
+      slot_free();
+    }
+    return result;
+  }
+
+  /**
+   * Wait until there are messages available and then send them to a supplied
+   * callback and remove only those for which the callback returned true.
+   * \param func The filtering and receiving callback.
+   */
+  template<class T>
+  void filter(T func) {
+    boost::mutex::scoped_lock lock(monitor_lock);
+
+    wait_nonempty(lock);
+
+    typename std::deque<Message>::iterator it = queue.begin();
+    while (it != queue.end()) {
+      lock.unlock();
+      bool result = func(*it);
+      lock.lock();
+      if (result)
+        it = queue.erase(it);
+      else
+        ++it;
+    }
   }
 
 private:
@@ -179,7 +225,7 @@ public:
   }
 
   /**
-   * Wait until there are messages available and them send them to a supplied
+   * Wait until there are messages available and then send them to a supplied
    * callback until a predicate returns false.
    * \param func The receiving callback.
    * \param pred The predicate.
@@ -187,6 +233,17 @@ public:
   template<class T, class U>
   void wait_for_many_break(T func, U pred) {
     wait_for_many_break(add_predicate<T, U>(func, pred));
+  }
+
+  /**
+   * Wait until there are messages available and then send them to a supplied
+   * callback and remove them only if a predicate returns true.
+   * \param func The receiving callback.
+   * \param pred The predicate.
+   */
+  template<class T, class U>
+  void filter(T func, U pred) {
+    filter(add_predicate<T, U>(func, pred));
   }
 
 private:
