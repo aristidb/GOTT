@@ -34,9 +34,12 @@ void consumer(mq_t &mq) {
   mq.wait_for_all(std::cout << bll::_1 << ' ', bll::_1 != 0);
   std::cout << std::endl;
   mq.wait_for_all(
-      (bll::bind(&mq_t::push, &mq, bll::_1 + 1), 
-       std::cout << bll::_1 << '\n'),
-      bll::_1 != 5);
+    (
+      bll::bind(&mq_t::push, &mq, bll::_1 + 1), 
+      std::cout << bll::_1 << '\n'
+    ),
+    bll::_1 != 5
+  );
 }
 
 int main() {
