@@ -100,8 +100,10 @@ public:
       Message m = pop_unsafe();
       slot_free();
 
+      lock.unlock();
       if (!func(m))
         break;
+      lock.lock();
     }
   }
 
@@ -116,8 +118,12 @@ public:
 
     wait_nonempty(lock);
 
-    while (!empty_unsafe())
-      func(pop_unsafe());
+    while (!empty_unsafe()) {
+      Message m = pop_unsafe();
+      lock.unlock();
+      func(m);
+      lock.lock();
+    }
 
     many_free();
   }
@@ -133,9 +139,16 @@ public:
 
     wait_nonempty(lock);
 
-    while (!empty_unsafe())
-      if (!func(pop_unsafe()))
+    while (!empty_unsafe()) {
+      Message m = pop_unsafe();
+      lock.unlock();
+      if (!func(m))
         break;
+      lock.lock();
+    }
+
+    if (!lock.locked())
+      lock.lock();
 
     many_free();
   }
