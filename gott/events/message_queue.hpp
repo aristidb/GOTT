@@ -30,6 +30,16 @@
 namespace gott {
 namespace events {
 
+/// Return type of a filter callback.
+enum message_filter_result { 
+  /// The message is not accepted and should be ignored.
+  message_out_filter, 
+  /// The message is accepted by the filter and should be removed.
+  message_in_filter, 
+  /// The message is not accepted and do not process further messages.
+  message_quit 
+};
+
 /**
  * Thread-safe message queue.
  * \param Message The type of the messages.
@@ -178,16 +188,6 @@ public:
     return result;
   }
 
-  /// Return type of a filter callback.
-  enum filter_result { 
-    /// The message is not accepted and should be ignored.
-    out_filter, 
-    /// The message is accepted by the filter and should be removed.
-    in_filter, 
-    /// The message is not accepted and do not process further messages.
-    quit 
-  };
-
 private:
   template<class T>
   bool filter_unsafe(T func) {
@@ -195,14 +195,14 @@ private:
 
     typename std::deque<Message>::iterator it = queue.begin();
     while (it != queue.end()) {
-      filter_result result = func(*it);
+      message_filter_result result = func(*it);
 
-      if (result == quit) {
+      if (result == message_quit) {
         do_again = false;
         break;
       }
 
-      if (result == in_filter)
+      if (result == message_in_filter)
         it = queue.erase(it);
       else
         ++it;
@@ -216,8 +216,9 @@ private:
 public:
   /**
    * Wait until there are messages available and then send them to a supplied
-   * callback, which returns a filter_result and remove only those for which the
-   * callback returned in_filter. If the callback returned quit, return early.
+   * callback, which returns a message_filter_result and remove only those for which the
+   * callback returned message_in_filter. If the callback returned 
+   * message_quit, return early.
    * The callback must not access the message queue.
    * Returns immediately if there is data available but none gets through the
    * filter and none is classified as quit-message.
@@ -232,8 +233,8 @@ public:
   }
 
   /**
-   * Send all messages to a callback until it returns quit and remove those
-   * messages for which the callback returned in_filter.
+   * Send all messages to a callback until it returns message_quit and remove 
+   * those messages for which the callback returned message_in_filter.
    * The callback must not access the message queue.
    * \param func The filtering and receiving callback.
    */
@@ -283,8 +284,9 @@ public:
 
   /**
    * Wait until there are messages available and then send them to a supplied
-   * callback and remove them only if a predicate returns in_filter. Returns
-   * if the messages are exhausted or the predicate returns quit.
+   * callback and remove them only if a predicate returns message_in_filter. 
+   * Returns if the messages are exhausted or the predicate returns 
+   * message_quit.
    * Neither the callback nor the predicate must access the message queue.
    * \param func The receiving callback.
    * \param pred The predicate.
@@ -292,17 +294,22 @@ public:
    */
   template<class T, class U>
   bool filter(T func, U pred) {
-    return filter(add_predicate<T, U, filter_result, in_filter>(func, pred));
+    return filter(
+        add_predicate<T, U, message_filter_result, message_in_filter>
+          (func, pred));
   }
 
   /**
-   * Send all messages through a predicate until the same returns quit and if
-   * the predicate returns in_filter, remove them and send them to a callback.
+   * Send all messages through a predicate until the same returns message_quit 
+   * and if the predicate returns message_in_filter, remove them and send them 
+   * to a callback.
    * Neither the callback nor the predicate must access the message queue.
    */
   template<class T, class U>
   void filter_all(T func, U pred) {
-    filter_all(add_predicate<T, U, filter_result, in_filter>(func, pred));
+    filter_all(
+        add_predicate<T, U, message_filter_result, message_in_filter>
+          (func, pred));
   }
 
 private:
@@ -369,6 +376,33 @@ private:
 private:
   std::deque<Message> queue;
 };
+
+template<class QuitPred, class FilterPred>
+class message_filter_adapter {
+public:
+  message_filter_adapter(QuitPred q, FilterPred fi)
+  : quit(q), filter(fi) {}
+
+  template<class Message>
+  message_filter_result operator() (Message const &m) const {
+    if (quit(m))
+      return message_quit;
+    else if (filter(m))
+      return message_in_filter;
+    else
+      return message_out_filter;
+  }
+
+private:
+  QuitPred quit;
+  FilterPred filter;
+};
+
+template<class T, class U>
+message_filter_adapter<T, U> 
+message_filter(T quit, U filter) {
+  return message_filter_adapter<T, U>(quit, filter);
+}
 
 }}
 

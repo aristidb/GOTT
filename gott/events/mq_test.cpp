@@ -27,6 +27,8 @@
 #include <iostream>
 
 using gott::events::message_queue;
+using gott::events::message_filter;
+
 using namespace boost::lambda;
 using boost::ref;
 using namespace std;
@@ -54,7 +56,7 @@ void consumer(mq_t &mq) {
   step2.wait();
   cout << "Got over barrier!" << endl;
 
-  for (int i = 2; i < 10; ++i)
+  for (int i = 1; i < 10; ++i)
     mq.push(i);
   mq.push(0);
 }
@@ -71,18 +73,7 @@ int main() {
 
   step2.wait();
 
-  mq.filter_all(
-    cout << _1 << ' ',
-    if_then_else_return(
-      _1 == 0,
-      mq_t::quit,
-      if_then_else_return(
-        _1 % 2 == 0, 
-        mq_t::in_filter, 
-        mq_t::out_filter
-      )
-    )
-  );
+  mq.filter_all(cout << _1 << ' ', message_filter(_1 == 0, _1 % 2 == 0));
 
   cout << "/ " << flush;
 
