@@ -20,26 +20,43 @@
 
 #include <gott/events/message_queue.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/thread/barrier.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#include <boost/lambda/if.hpp>
 #include <iostream>
 
 using gott::events::message_queue;
 using namespace boost::lambda;
 using boost::ref;
+using namespace std;
 
-typedef message_queue<int, 4> mq_t;
+typedef message_queue<int, 10> mq_t;
+//typedef message_queue<int> mq_t;
+
+boost::barrier step2(2);
 
 void consumer(mq_t &mq) {
-  mq.wait_for_all(std::cout << _1 << ' ', _1 != 0);
-  std::cout << std::endl;
+  mq.wait_for_all(cout << _1 << ' ', _1 != 0);
+
+  cout << endl;
+
   mq.wait_for_all(
     (
       bind(&mq_t::push, ref(mq), _1 + 1), 
-      std::cout << _1 << '\n'
+      cout << _1 << '\n'
     ),
     _1 != 5
   );
+
+  cout << endl;
+
+  step2.wait();
+  cout << "Got over barrier!" << endl;
+
+  for (int i = 2; i < 10; ++i)
+    mq.push(i);
+  mq.push(0);
 }
 
 int main() {
@@ -51,6 +68,26 @@ int main() {
     mq.push(i);
 
   mq.push(0);
+
+  step2.wait();
+
+  mq.filter_all(
+    cout << _1 << ' ',
+    if_then_else_return(
+      _1 == 0,
+      mq_t::quit,
+      if_then_else_return(
+        _1 % 2 == 0, 
+        mq_t::in_filter, 
+        mq_t::out_filter
+      )
+    )
+  );
+
+  cout << "/ " << flush;
+
+  mq.wait_for_all(cout << _1 << ' ', _1 < 9);
+  cout << endl;
 
   thrd.join();
 }

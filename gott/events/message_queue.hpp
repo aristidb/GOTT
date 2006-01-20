@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  021110307  USA
 
 #ifndef GOTT_EVENTS_MESSAGE_QUEUE_HPP
 #define GOTT_EVENTS_MESSAGE_QUEUE_HPP
@@ -32,8 +32,10 @@ namespace events {
 
 /**
  * Thread-safe message queue.
+ * \param Message The type of the messages.
+ * \param Size The maximal size of the queue or 0 (default value) if unlimited.
  */
-template<class Message, int Size = -1>
+template<class Message, unsigned Size = 0>
 class message_queue : boost::noncopyable {
 public:
   /// Default-Constructor.
@@ -176,40 +178,84 @@ public:
     return result;
   }
 
-  /**
-   * Wait until there are messages available and then send them to a supplied
-   * callback and remove only those for which the callback returned true.
-   * \param func The filtering and receiving callback.
-   */
-  template<class T>
-  void filter(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+  /// Return type of a filter callback.
+  enum filter_result { 
+    /// The message is not accepted and should be ignored.
+    out_filter, 
+    /// The message is accepted by the filter and should be removed.
+    in_filter, 
+    /// The message is not accepted and do not process further messages.
+    quit 
+  };
 
-    wait_nonempty(lock);
+private:
+  template<class T>
+  bool filter_unsafe(T func) {
+    bool do_again = true;
 
     typename std::deque<Message>::iterator it = queue.begin();
     while (it != queue.end()) {
-      lock.unlock();
-      bool result = func(*it);
-      lock.lock();
-      if (result)
+      filter_result result = func(*it);
+
+      if (result == quit) {
+        do_again = false;
+        break;
+      }
+
+      if (result == in_filter)
         it = queue.erase(it);
       else
         ++it;
     }
+
+    any_change().notify_all();
+
+    return do_again;
   }
 
-private:
-  template<class T, class U>
+public:
+  /**
+   * Wait until there are messages available and then send them to a supplied
+   * callback, which returns a filter_result and remove only those for which the
+   * callback returned in_filter. If the callback returned quit, return early.
+   * The callback must not access the message queue.
+   * Returns immediately if there is data available but none gets through the
+   * filter and none is classified as quit-message.
+   * \param func The filtering and receiving callback.
+   * \return Whether no filter returned quit.
+   */
+  template<class T>
+  bool filter(T func) {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    wait_nonempty(lock);
+    return filter_unsafe(func);
+  }
+
+  /**
+   * Send all messages to a callback until it returns quit and remove those
+   * messages for which the callback returned in_filter.
+   * The callback must not access the message queue.
+   * \param func The filtering and receiving callback.
+   */
+  template<class T>
+  void filter_all(T func) {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    wait_nonempty(lock);
+    while (filter_unsafe(func))
+      any_change().wait(lock);
+  }
+
+  template<class T, class U, class R, R True>
   struct add_predicate {
     add_predicate(T f, U p) : func(f), pred(p) {}
     T func;
     U pred;
-    bool operator() (Message const &m) const {
-      if (!pred(m))
-        return false;
+    R operator() (Message const &m) const {
+      R result = pred(m);
+      if (result != True)
+        return result;
       func(m);
-      return true;
+      return True;
     }
   };
 
@@ -221,7 +267,7 @@ public:
    */
   template<class T, class U>
   void wait_for_all(T func, U pred) {
-    wait_for_all(add_predicate<T, U>(func, pred));
+    wait_for_all(add_predicate<T, U, bool, true>(func, pred));
   }
 
   /**
@@ -232,18 +278,31 @@ public:
    */
   template<class T, class U>
   void wait_for_many_break(T func, U pred) {
-    wait_for_many_break(add_predicate<T, U>(func, pred));
+    wait_for_many_break(add_predicate<T, U, bool, true>(func, pred));
   }
 
   /**
    * Wait until there are messages available and then send them to a supplied
-   * callback and remove them only if a predicate returns true.
+   * callback and remove them only if a predicate returns in_filter. Returns
+   * if the messages are exhausted or the predicate returns quit.
+   * Neither the callback nor the predicate must access the message queue.
    * \param func The receiving callback.
    * \param pred The predicate.
+   * \return Whether no filter returned quit.
    */
   template<class T, class U>
-  void filter(T func, U pred) {
-    filter(add_predicate<T, U>(func, pred));
+  bool filter(T func, U pred) {
+    return filter(add_predicate<T, U, filter_result, in_filter>(func, pred));
+  }
+
+  /**
+   * Send all messages through a predicate until the same returns quit and if
+   * the predicate returns in_filter, remove them and send them to a callback.
+   * Neither the callback nor the predicate must access the message queue.
+   */
+  template<class T, class U>
+  void filter_all(T func, U pred) {
+    filter_all(add_predicate<T, U, filter_result, in_filter>(func, pred));
   }
 
 private:
@@ -259,12 +318,12 @@ private:
 
 private:
   void slot_free() {
-    if (Size != -1)
+    if (Size != 0)
       not_full().notify_one();
   }
 
   void many_free() {
-    if (Size != -1)
+    if (Size != 0)
       not_full().notify_all();
   }
 
@@ -275,11 +334,13 @@ private:
 private:
   void push_unsafe(Message const &msg) {
     queue.push_back(msg);
+    any_change().notify_all();
   }
 
   Message pop_unsafe() {
     Message result = queue.front();
     queue.pop_front();
+    any_change().notify_all();
     return result;
   }
 
@@ -292,19 +353,18 @@ private:
   }
 
   bool full_unsafe() const {
-    if (Size == -1)
-      return false;
-    return queue.size() >= Size;
+    return Size != 0 ? queue.size() >= (Size == 0 ? 1 : Size) : false;
   }
 
 private:
-  boost::mutex monitor_lock;
+  mutable boost::mutex monitor_lock;
 
 private:
   boost::condition &not_empty() const { return cond[0]; }
-  boost::condition &not_full() const { return cond[1]; }
+  boost::condition &not_full() const { return cond[2]; }
+  boost::condition &any_change() const { return cond[1]; }
 
-  mutable boost::condition cond[Size == -1 ? 1 : 2];
+  mutable boost::condition cond[Size == 0 ? 2 : 3];
   
 private:
   std::deque<Message> queue;
