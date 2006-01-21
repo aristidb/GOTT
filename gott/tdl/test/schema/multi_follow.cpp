@@ -80,19 +80,19 @@ void object::test<1>(int i) {
 
   nd_list inner1;
   if (mask & 0x1)
-    inner1.Add(S(Xany(0), "1"));
+    inner1.push_back(S(Xany(0), "1"));
   if (mask & 0x2)
-    inner1.Add(S(Xany(0), "2"));
+    inner1.push_back(S(Xany(0), "2"));
   
   nd_list inner2;
   if (mask & 0x4)
-    inner2.Add(S(Xany(0), "3"));
+    inner2.push_back(S(Xany(0), "3"));
   if (mask & 0x8)
-    inner2.Add(S(Xany(0), "4"));
+    inner2.push_back(S(Xany(0), "4"));
 
   nd_list outer;
-  outer.Add(M(inner1, "inner1"));
-  outer.Add(M(inner2, "inner2"));
+  outer.push_back(M(inner1, "inner1"));
+  outer.push_back(M(inner2, "inner2"));
 
   C(M(outer, "outer")).write_to(xp);
   ensure_equals("masked", tree, xp);

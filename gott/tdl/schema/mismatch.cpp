@@ -32,29 +32,29 @@ using gott::string;
 using gott::integer_to_string;
 
 static string build_string(schema::detail::stream_position const &p,
-                            Vector<string> const &t) {
-  Vector<string> out;
-  out.Add(string(*integer_to_string<gott::utf8_t>(p.line)));
-  out.Add(":");
-  out.Add(string(*integer_to_string<gott::utf8_t>(p.pos + 1)));
-  out.Add(" : mismatch in ");
-  gott::range_t<string const *> tg = range(t);
+                            std::vector<string> const &t) {
+  std::vector<string> out;
+  out.push_back(string(*integer_to_string<gott::utf8_t>(p.line)));
+  out.push_back(":");
+  out.push_back(string(*integer_to_string<gott::utf8_t>(p.pos + 1)));
+  out.push_back(" : mismatch in ");
+  gott::range_t<std::vector<string>::const_iterator> tg = range(t);
   if (tg.begin() != tg.end())
-    out.Add(*tg.Begin++);
+    out.push_back(*tg.Begin++);
   for (; tg.begin() != tg.end(); ++tg.Begin) {
-    out.Add(">");
-    out.Add(*tg.begin());
+    out.push_back(">");
+    out.push_back(*tg.begin());
   }
   if (p.line_new > p.line || p.current > p.native_end)
-    out.Add(" after token ");
+    out.push_back(" after token ");
   else
-    out.Add(" at token ");
-  out.Add(p.tok);
-  return string(range(out).cast<string const *>(), string::concatenate);
+    out.push_back(" at token ");
+  out.push_back(p.tok);
+  return string(range(out), string::concatenate);
 }
 
 mismatch::mismatch(detail::stream_position const &p, 
-                   Vector<string> const &t)
+                   std::vector<string> const &t)
 : tdl_exception(build_string(p, t)) {}
 
 mismatch::~mismatch() throw() {}

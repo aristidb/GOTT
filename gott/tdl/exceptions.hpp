@@ -23,7 +23,7 @@
 
 #include <gott/visibility.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <ntl.h>
+#include <vector>
 
 namespace gott {
 class string;
@@ -54,7 +54,7 @@ namespace detail { struct stream_position; }
  */
 struct GOTT_EXPORT mismatch : public tdl_exception {
   GOTT_LOCAL
-  mismatch(detail::stream_position const &p, Vector<string> const &);
+  mismatch(detail::stream_position const &p, std::vector<string> const &);
   ~mismatch() throw();
 };
 

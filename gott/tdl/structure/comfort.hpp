@@ -21,9 +21,9 @@
 #ifndef GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 #define GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 
-#include <ntl.h>
 #include <gott/xany/xany.hpp>
 #include <gott/visibility.hpp>
+#include <vector>
 
 namespace gott {
 class string;
@@ -38,9 +38,9 @@ class writable_structure;
  */
 namespace cf {
 
-typedef Vector<string> tag_list;
+typedef std::vector<string> tag_list;
 class node_inserter_t;
-typedef Array<node_inserter_t> nd_list;
+typedef std::vector<node_inserter_t> nd_list;
 
 /**
  * General concatenateable structure generator.

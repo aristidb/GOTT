@@ -120,7 +120,7 @@ public:
 
   typedef Vector<entry> Stack;
   Stack parse;
-  Vector<string> shadow_names;
+  std::vector<string> shadow_names;
 
   static string get_name(item const &);
 };
@@ -222,7 +222,7 @@ void match::impl::handle_token(T const &e) {
   shadow_names.clear();
   range_t<Stack::iterator> in = range(parse);
   while (!in.empty())
-    shadow_names.Add(get_name(*in.Begin++->the_item));
+    shadow_names.push_back(get_name(*in.Begin++->the_item));
 
   if (miss) {    
     real_parental_requirement();

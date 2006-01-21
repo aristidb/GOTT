@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "common.hpp"
+#include <boost/assign/list_of.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -51,13 +52,15 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
+  using namespace boost::assign;
+
   run_test("hallo du,sau du dummes schwein");
-  C(MD(Xany("hallo"), nd_list() <<
-        S(Xany("du")) <<
-        MD(Xany("sau"), nd_list() <<
-          MD(Xany("du"), nd_list() <<
-            MD(Xany("dummes"), nd_list() <<
-              S(Xany("schwein"))))))).write_to(xp);
+  C(MD(Xany("hallo"), list_of
+        (S(Xany("du")))
+        (MD(Xany("sau"), list_of
+          (MD(Xany("du"), list_of
+            (MD(Xany("dummes"), list_of
+              (S(Xany("schwein"))))))))))).write_to(xp);
   ensure_equals(tree, xp);
 }
 

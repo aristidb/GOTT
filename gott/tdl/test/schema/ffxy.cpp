@@ -73,10 +73,19 @@ namespace tut {
 template<> template<>
 void object::test<1>(int n) { // test #1: no int, test #2: two int...
   run("", n - 1);
+  nd_list ii;
+  ii.push_back(S(Xany(0), "int1"));
+  ii.push_back(S(Xany(1), "int2"));
+
   nd_list c;
   for (int i = 1; i < n; ++i)
-    c.Add(M(nd_list() << S(Xany(0), "int1") << S(Xany(1), "int2"), "xy"));
-  C(C(C(M(nd_list() << M(c, "o") << S(Xany("A")))))).write_to(xp);
+    c.push_back(M(ii, "xy"));
+
+  nd_list o;
+  o.push_back(M(c, "o"));
+  o.push_back(S(Xany("A")));
+
+  C(C(C(M(o)))).write_to(xp);
   ensure_equals(tree, xp);
 }
 

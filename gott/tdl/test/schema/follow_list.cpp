@@ -123,8 +123,8 @@ void object::test<7>(int) {
   run_test("1 2 3 4 5 6 7 8 9 10 foo");
   stru::cf::nd_list c;
   for (int i = 1; i <= 10; ++i)
-    c.Add(S(Xany(i), "i"));
-  c.Add(S(Xany("foo"), "s"));
+    c.push_back(S(Xany(i), "i"));
+  c.push_back(S(Xany("foo"), "s"));
   C(M(c)).write_to(xp);
   ensure_equals(tree, xp);
 }

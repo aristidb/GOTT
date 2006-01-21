@@ -109,11 +109,12 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   run_test("x 1 2 3");
-  C(M(stru::cf::nd_list() 
-        << S(Xany("x"), "s") 
-        << S(Xany(1), "i")
-        << S(Xany(2), "i")
-        << S(Xany(3), "i"), "foll"), "doc").write_to(xp);
+  stru::cf::nd_list c;
+  c.push_back(S(Xany("x"), "s"));
+  c.push_back(S(Xany(1), "i"));
+  c.push_back(S(Xany(2), "i"));
+  c.push_back(S(Xany(3), "i"));
+  C(M(c, "foll"), "doc").write_to(xp);
   ensure_equals("multiple", tree, xp);
 }
 
