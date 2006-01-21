@@ -32,20 +32,20 @@ namespace tdl {
 namespace schema {
 
 class match_unordered : public item {
-  struct element : Moveable<element> {
+  struct element {
     rule_t generator;
     slotcfg slot;
 
     element(rule_t const &g) : generator(g), slot(g.attributes().outer()) {}
   };
 public:
-  match_unordered(rule_attr_t const &, Vector<rule_t> const &, match &);
+  match_unordered(rule_attr_t const &, std::vector<rule_t> const &, match &);
   ~match_unordered();
 
-  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &);
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
 
 private:
-  typedef Vector<element> list_t;
+  typedef std::vector<element> list_t;
   list_t children;
   list_t::iterator pos;
   positioning::id last;

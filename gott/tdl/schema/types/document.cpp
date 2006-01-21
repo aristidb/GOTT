@@ -25,12 +25,12 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_document;
 
-match_document::match_document(rule_attr_t const &a, Vector<rule_t> const &sr,
-                               match &m)
+match_document::match_document(rule_attr_t const &a, 
+    std::vector<rule_t> const &sr, match &m)
 : happy_once(a, m), sub(deflatten(sr)), state(first) {}
 
-schema::rule_t match_document::deflatten(Vector<rule_t> const &children) {
-  if (children.GetCount() == 1)
+schema::rule_t match_document::deflatten(std::vector<rule_t> const &children) {
+  if (children.size() == 1)
     if (children[0].attributes().outer() == one())
       return children[0];
     else

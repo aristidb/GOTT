@@ -34,14 +34,14 @@ namespace schema {
 // Matches the first applicable of an arbitrary number of rule_ts.
 class match_any : public happy_once {
 public:
-  match_any(rule_attr_t const &, Vector<rule_t> const &, match &);
+  match_any(rule_attr_t const &, std::vector<rule_t> const &, match &);
   ~match_any();
 
-  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &);
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
 
 private:
-  Vector<rule_t> v;
-  Vector<rule_t>::iterator pos;
+  std::vector<rule_t> v;
+  std::vector<rule_t>::iterator pos;
   positioning::id begin;
 
   bool play(ev::child_fail const &);

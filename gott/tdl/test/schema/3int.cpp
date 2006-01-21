@@ -38,7 +38,7 @@ namespace {
 struct schema_3int : tut::schema_basic {
   schema_3int() 
   : tut::schema_basic(
-      rule("document", rule("node", schema::rule_attr(
+      rule_one("document", rule("node", schema::rule_attr(
                schema::tag = "el",
                schema::repatcher = new stru::repatch_integer(), 
                schema::outer = slotcfg(slotcfg::exactly, 3))))) {}

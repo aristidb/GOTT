@@ -31,16 +31,16 @@ namespace schema {
 
 class match_ordered : public happy_once {
 public:
-  match_ordered(rule_attr_t const &, Vector<rule_t> const &, match &);
+  match_ordered(rule_attr_t const &, std::vector<rule_t> const &, match &);
   ~match_ordered();
 
-  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &);
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
 
 private:
-  static Vector<rule_t> deflatten(Vector<rule_t> const &);
+  static std::vector<rule_t> deflatten(std::vector<rule_t> const &);
 
-  Vector<rule_t> subrules;
-  Vector<rule_t>::iterator pos;
+  std::vector<rule_t> subrules;
+  std::vector<rule_t>::iterator pos;
 
   bool play(ev::child_succeed const &);
   string name() const;

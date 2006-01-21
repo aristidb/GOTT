@@ -63,7 +63,7 @@ public:
    */
   GOTT_EXPORT 
   rule_t get(string const &name, rule_attr_t const &att, 
-             Vector<rule_t> pick_ &children) const;
+             std::vector<rule_t> const &children) const;
 
   class impl;
   boost::scoped_ptr<impl> p;

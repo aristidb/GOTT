@@ -26,7 +26,7 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_ordered;
 
-match_ordered::match_ordered(rule_attr_t const &a, Vector<rule_t> const&r,
+match_ordered::match_ordered(rule_attr_t const &a, std::vector<rule_t> const&r,
                              match  &m)
 : happy_once(a, m), subrules(deflatten(r)), pos(subrules.begin()) {
   if (pos != subrules.end())
@@ -35,14 +35,14 @@ match_ordered::match_ordered(rule_attr_t const &a, Vector<rule_t> const&r,
     be_happy();
 }
 
-Vector<schema::rule_t> match_ordered::deflatten(Vector<rule_t> const &in) {
-  Vector<rule_t> out;
-  out.AddN(in.GetCount());
-  for (int i = 0; i < in.GetCount(); ++i) {
+std::vector<schema::rule_t> match_ordered::deflatten(
+    std::vector<rule_t> const &in) {
+  std::vector<rule_t> out(in.size());
+  for (std::size_t i = 0; i < in.size(); ++i) {
     if (in[i].attributes().outer() == one())
       out[i] = in[i];
     else
-      out[i] = rule("list", rule_attr(coat = false), in[i]);
+      out[i] = rule_one("list", rule_attr(coat = false), in[i]);
   }
   return out;
 }
@@ -58,9 +58,9 @@ bool match_ordered::play(ev::child_succeed const &) {
 }
 
 bool match_ordered::accept_empty(rule_attr_t const &, 
-                                 Vector<rule_t> const &children) {
+                                 std::vector<rule_t> const &children) {
   bool accept = true;
-  for (Vector<rule_t>::const_iterator it = children.begin(); 
+  for (std::vector<rule_t>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
     accept &= it->accept_empty();
   return accept;

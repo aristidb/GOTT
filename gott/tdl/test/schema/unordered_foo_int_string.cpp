@@ -21,6 +21,7 @@
 #include "common.hpp"
 #include <gott/tdl/structure/repatchers/enumeration.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
+#include <boost/assign/list_of.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -37,12 +38,12 @@ namespace {
 struct schema_unordered_foo_integer_string : tut::schema_basic {
   schema_unordered_foo_integer_string() 
   : tut::schema_basic(
-      rule("document", RA(), Vector<rule_t>() <<
-        rule("unordered", RA(), Vector<rule_t>() <<
-          rule("node", RA("foo", true, 
-               new stru::repatch_enumeration(std::vector<string>(1,"foo")))) <<
-          rule("node", RA(RA::simple, true, new stru::repatch_integer())) <<
-          rule("node", RA())))) {}
+      rule_one("document",
+        rule("unordered", RA(), boost::assign::list_of
+          (rule("node", RA("foo", true,
+               new stru::repatch_enumeration(std::vector<string>(1,"foo")))))
+          (rule("node", RA(RA::simple, true, new stru::repatch_integer())))
+          (rule("node", RA()))))) {}
 };
 }
 

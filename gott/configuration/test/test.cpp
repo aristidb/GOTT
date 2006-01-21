@@ -24,11 +24,13 @@
 #include <gott/tdl/structure/container.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/tdl/structure/print.hpp>
+#include <boost/assign/list_of.hpp>
 #include <iostream>
 
 using namespace gott;
 using namespace gott::tdl;
 using namespace gott::tdl::schema;
+using namespace boost::assign;
 
 int main() {
   std::cerr 
@@ -41,15 +43,16 @@ int main() {
     ;
   
   rule_t conf = 
-    rule("document",
+    rule_one("document",
       rule("list", rule_attr(tag = "container"),
-        rule("config", rule_attr(outer = list(), tag = "element"),
-          Vector<rule_t>() <<
-          rule("node", rule_attr(tag = "conf::int", 
-              repatcher = new structure::repatch_integer())) <<
-          rule("node", rule_attr(tag = "conf::string")) <<
-          rule("list", rule_attr(tag = "get::more::stuff"),
-            rule("node", rule_attr(outer = list()))))));
+        list_of(rule("config", rule_attr(outer = list(), tag = "element"),
+          list_of
+          (rule("node", rule_attr(tag = "conf::int", 
+              repatcher = new structure::repatch_integer())))
+          (rule("node", rule_attr(tag = "conf::string")))
+          (rule("list", rule_attr(tag = "get::more::stuff"),
+            list_of(rule("node", rule_attr(outer = list())))))))));
+
   structure::container out;
   structure::revocable_adapter r(out);
   match m(conf, r);

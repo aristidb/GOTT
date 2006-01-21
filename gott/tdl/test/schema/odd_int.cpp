@@ -45,10 +45,8 @@ namespace {
 struct schema_odd_int : tut::schema_basic {
   schema_odd_int() 
   : tut::schema_basic(
-      rule("document", RA(),
-        Vector<rule_t>() <<
-         rule("list", RA(),
-           Vector<rule_t>() <<
+      rule_one("document",
+         rule_one("list",
            rule("node",
              RA(std::vector<string>(1, "el"), true, Xany(), 
                 new stru::repatch_integer(), 

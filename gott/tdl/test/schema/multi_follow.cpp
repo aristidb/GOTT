@@ -20,6 +20,9 @@
 
 #include "common.hpp"
 #include <gott/tdl/structure/repatchers/enumeration.hpp>
+#include <boost/assign/list_of.hpp>
+
+using namespace boost::assign;
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -41,14 +44,14 @@ namespace {
 struct schema_multi_follow : tut::schema_basic {
   schema_multi_follow() 
   : tut::schema_basic(
-      rule("document", RA(), Vector<rule_t>() <<
-        rule("follow", RA("outer"), Vector<rule_t>() <<
-          rule("follow", RA("inner1"), Vector<rule_t>() <<
-            rule("node", L(1)) <<
-            rule("node", L(2))) <<
-          rule("follow", RA("inner2"), Vector<rule_t>() <<
-            rule("node", L(3)) <<
-            rule("node", L(4)))))) {}
+      rule_one("document",
+        rule("follow", RA("outer"),  list_of
+          (rule("follow", RA("inner1"), list_of
+            (rule("node", L(1)))
+            (rule("node", L(2)))))
+          (rule("follow", RA("inner2"), list_of
+            (rule("node", L(3)))
+            (rule("node", L(4)))))))) {}
 };
 }
 

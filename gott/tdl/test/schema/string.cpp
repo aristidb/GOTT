@@ -32,7 +32,7 @@ namespace {
 struct schema_string : tut::schema_basic {
   schema_string() 
   : tut::schema_basic(
-      rule("document", schema::rule_attr_t("doc"), Vector<schema::rule_t>() <<
+      rule_one("document", schema::rule_attr_t("doc"),
         rule("node", schema::rule_attr_t()))) {}
 };
 }

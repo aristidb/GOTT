@@ -20,7 +20,7 @@
 
 #include "common.hpp"
 #include <gott/tdl/structure/repatchers/integer.hpp>
-
+#include <boost/assign/list_of.hpp>
 
 using namespace gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -34,18 +34,17 @@ namespace {
 struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() 
   : tut::schema_basic(
-    rule("document", rule_attr_t(), Vector<rule_t>() <<
-      rule("ordered", rule_attr_t(), Vector<rule_t>() <<
-        rule("list", rule_attr_t("s"), Vector<rule_t>() <<
-          rule("list", 
+    rule_one("document",
+      rule("ordered", rule_attr_t(), boost::assign::list_of
+        (rule_one("list", rule_attr_t("s"),
+          rule_one("list", 
             rule_attr_t(std::vector<string>(1, "t"), true, Xany(), 0,
               slotcfg(), slotcfg(slotcfg::list)),
-            Vector<rule_t>() <<
             rule("node",
               rule_attr_t(std::vector<string>(1, "ii"), true, Xany(), 
                 new stru::repatch_integer(),
-                slotcfg(), slotcfg(slotcfg::list))))) <<
-        rule("node", rule_attr_t("xx"))))) {}
+                slotcfg(), slotcfg(slotcfg::list))))))
+        (rule("node", rule_attr_t("xx")))))) {}
 };
 }
 

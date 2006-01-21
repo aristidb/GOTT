@@ -38,8 +38,8 @@ namespace {
 struct schema_some_string : tut::schema_basic {
   schema_some_string()
   : tut::schema_basic(
-      rule("document", RA(), Vector<rule_t>() <<
-        rule("list", RA(), Vector<rule_t>() <<
+      rule_one("document", RA(),
+        rule_one("list", RA(),
           rule("node", 
             RA(std::vector<string>(1, "el"), true, Xany(), 0, 
                slotcfg(), slotcfg(slotcfg::some)))))) {}

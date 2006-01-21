@@ -27,9 +27,10 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_node;
 
-match_node::match_node(rule_attr_t const &a, Vector<rule_t> const &r, match &m)
+match_node::match_node(rule_attr_t const &a, std::vector<rule_t> const &r, 
+    match &m)
 : happy_once(a, m) {
-  GOTT_ASSERT_2(r.GetCount(), 0, std::equal_to<int>(), "no children");
+  GOTT_ASSERT_2(r.size(), 0, std::equal_to<int>(), "no children");
 }
 
 bool match_node::play(ev::node const &n) {

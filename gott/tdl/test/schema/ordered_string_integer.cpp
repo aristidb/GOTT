@@ -20,6 +20,7 @@
 
 #include "common.hpp"
 #include <gott/tdl/structure/repatchers/integer.hpp>
+#include <boost/assign/list_of.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -36,10 +37,10 @@ namespace {
 struct schema_ordered_string_integer : tut::schema_basic {
   schema_ordered_string_integer()
  : tut::schema_basic(
-      rule("document", RA(), Vector<rule_t>() <<
-        rule("ordered", RA(), Vector<rule_t>() <<
-         rule("node", RA()) <<
-         rule("node", RA("i", true, new stru::repatch_integer()))))) {}
+      rule_one("document",
+        rule("ordered", RA(), boost::assign::list_of
+         (rule("node", RA()))
+         (rule("node", RA("i", true, new stru::repatch_integer())))))) {}
 };
 }
 

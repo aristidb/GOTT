@@ -37,7 +37,7 @@ namespace {
 struct schema_integer : tut::schema_basic {
   schema_integer() 
   : tut::schema_basic(
-      rule("document", rule_attr(), Vector<schema::rule_t>() <<
+      rule_one("document", 
         rule("node", rule_attr(tag = "i", repatcher = 
             new stru::repatch_integer()))))
   {}

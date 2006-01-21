@@ -33,9 +33,7 @@ using schema::rule;
 namespace {
 struct schema_tree : tut::schema_basic {
   schema_tree() 
-  : tut::schema_basic(
-      rule("document", Vector<schema::rule_t>() <<
-        rule("tree")))
+  : tut::schema_basic(rule_one("document", rule("tree")))
   {}
 };
 }

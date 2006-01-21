@@ -20,6 +20,9 @@
 
 #include "common.hpp"
 #include <gott/tdl/structure/repatchers/integer.hpp>
+#include <boost/assign/list_of.hpp>
+
+using namespace boost::assign;
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -37,10 +40,10 @@ namespace {
 struct schema_follow_integer_integer : tut::schema_basic {
   schema_follow_integer_integer() 
   : tut::schema_basic(
-      rule("document", RA("doc"), Vector<rule_t>() <<
-        rule("follow", RA("foll"), Vector<rule_t>() <<
-          rule("node", RA("int1", true, new I())) <<
-          rule("node", RA("int2", true, new I()))))) {}
+      rule_one("document", RA("doc"),
+        rule("follow", RA("foll"), list_of
+          (rule("node", RA("int1", true, new I())))
+          (rule("node", RA("int2", true, new I())))))) {}
 };
 }
 

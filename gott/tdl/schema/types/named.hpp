@@ -37,11 +37,11 @@ public:
   static GOTT_EXPORT
   rule_attr_t attributes(string const &s, bool cc = true);
   
-  match_named(rule_attr_t const &, Vector<rule_t> const &, match &);
+  match_named(rule_attr_t const &, std::vector<rule_t> const &, match &);
 
   ~match_named();
 
-  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &) 
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
   { return false; }
 
 private:

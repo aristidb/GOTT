@@ -21,6 +21,7 @@
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
+#include <boost/assign/list_of.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -38,13 +39,13 @@ namespace {
 struct schema_follow_list : tut::schema_basic {
   schema_follow_list() 
   : tut::schema_basic(
-      rule("document", RA(), Vector<rule_t>() <<
-        rule("follow", RA(), Vector<rule_t>() <<
-          rule("node", 
+      rule_one("document",
+        rule("follow", RA(), boost::assign::list_of
+          (rule("node", 
             RA(std::vector<string>(1,"i"),true,Xany(),
               new stru::repatch_integer(),
-               slotcfg(), slotcfg(slotcfg::list))) <<
-          rule("node", RA("s"))))) {}
+               slotcfg(), slotcfg(slotcfg::list))))
+          (rule("node", RA("s")))))) {}
 };
 }
 

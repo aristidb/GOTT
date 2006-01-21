@@ -22,6 +22,9 @@
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/repatchers/enumeration.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
+#include <boost/assign/list_of.hpp>
+
+using namespace boost::assign;
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -39,18 +42,16 @@ struct recursive : tut::schema_basic {
   rule_t rec;
   
   recursive() {
-    grammar = rule("document", rule_attr_t(), Vector<rule_t>() << rule_t(&rec));
+    grammar = rule_one("document", rule_t(&rec));
     rec = 
-      rule("ordered", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>()
-          <<
-        rule("node", rule_attr_t(rule_attr_t::simple, true, 
-            new stru::repatch_integer())) <<
-        rule("list", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() 
-          <<
-          rule("ordered", 
+      rule("ordered", rule_attr_t(rule_attr_t::simple, false), list_of
+        (rule("node", rule_attr_t(rule_attr_t::simple, true, 
+            new stru::repatch_integer())))
+        (rule_one("list", rule_attr_t(rule_attr_t::simple, false),
+           rule_one("ordered", 
                 rule_attr_t(std::vector<string>(), false, Xany(), 0,
                   slotcfg(), slotcfg(slotcfg::optional)),
-                Vector<rule_t>() << rule_t(&rec))));
+                rule_t(&rec)))));
   }
 };
 }

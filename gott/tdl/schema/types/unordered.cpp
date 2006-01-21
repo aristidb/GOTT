@@ -27,7 +27,7 @@ namespace ev = gott::tdl::schema::ev;
 using schema::item;
 using schema::match_unordered;
 
-match_unordered::match_unordered(rule_attr_t const &a, Vector<rule_t> const &r,
+match_unordered::match_unordered(rule_attr_t const &a, std::vector<rule_t> const &r,
                                  match &m) 
 : item(a, m), last(m.pos().current()), all_happy(true) {
   copy(range(r), std::back_inserter(children));
@@ -45,9 +45,9 @@ match_unordered::~match_unordered() {
 bool match_unordered::play(ev::child_succeed const &) {
   pos->slot.add();
   if (pos->slot.expectation() == item::nothing) 
-    children.Remove(pos - children.begin());
+    children.erase(pos);
 
-  if (!children.IsEmpty()) {
+  if (!children.empty()) {
     pos = children.begin();
     matcher().pos().forget(last);
     last = matcher().pos().current();
@@ -73,15 +73,15 @@ bool match_unordered::play(ev::child_fail const &) {
 }
 
 item::expect match_unordered::expectation() const {
-  if (children.IsEmpty() && all_happy)
+  if (children.empty() && all_happy)
     return nothing;
   return need;
 }
 
 bool match_unordered::accept_empty(rule_attr_t const &, 
-                                   Vector<rule_t> const &children) {
+                                   std::vector<rule_t> const &children) {
   bool accept = true;
-  for (Vector<rule_t>::const_iterator it = children.begin(); 
+  for (std::vector<rule_t>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
     accept &= it->attributes().outer().prefix_optional() 
               || it->accept_empty();

@@ -21,6 +21,7 @@
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
+#include <boost/assign/list_of.hpp>
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -30,7 +31,8 @@ using gott::string;
 
 using stru::cf::S;
 using stru::cf::C;
-using schema::rule_t;
+using schema::rule;
+using schema::rule_one;
 using schema::slotcfg;
 typedef schema::rule_attr_t RA;
 
@@ -38,12 +40,12 @@ namespace {
 struct schema_unordered_list_integer_string : tut::schema_basic {
   schema_unordered_list_integer_string()
   : tut::schema_basic(
-      rule("document", RA(), Vector<rule_t>() <<
-        rule("unordered", RA(), Vector<rule_t>() <<
-          rule("node",
+      rule_one("document",
+        rule("unordered", RA(), boost::assign::list_of
+          (rule("node",
             RA(std::vector<string>(),true,Xany(),new stru::repatch_integer(),
-               slotcfg(), slotcfg(slotcfg::list))) <<
-          rule("node", RA())))) {}
+               slotcfg(), slotcfg(slotcfg::list))))
+          (rule("node"))))) {}
 };
 }
 

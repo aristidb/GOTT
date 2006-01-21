@@ -37,9 +37,9 @@ namespace {
 struct schema_list_string : tut::schema_basic {
   schema_list_string() 
   : tut::schema_basic(
-      rule("document", RA(), Vector<rule_t>() <<
-        rule("list", RA(), Vector<rule_t>() <<
-          rule("node", 
+      rule_one("document",
+        rule_one("list",
+          rule("node",
             RA(std::vector<string>(1, "el"), true, Xany(), 0, 
                slotcfg(), slotcfg(slotcfg::list)))))) {}
 };

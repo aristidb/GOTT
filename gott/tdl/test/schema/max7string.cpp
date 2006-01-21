@@ -35,10 +35,8 @@ namespace {
 struct schema_max7string : tut::schema_basic {
   schema_max7string() 
   : tut::schema_basic(
-      rule("document", RA(),
-        Vector<rule_t>() <<
-         rule("ordered", RA(),
-           Vector<rule_t>() <<
+      rule_one("document", 
+        rule_one("ordered",
            rule("node",
              RA(std::vector<string>(1, "el"), true, Xany(), 0, 
                 slotcfg(), slotcfg(slotcfg::maximum, 7)))))) {}

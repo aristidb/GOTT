@@ -35,8 +35,8 @@ namespace {
 struct schema_named_string : tut::schema_basic {
   schema_named_string() 
   : tut::schema_basic(
-      rule("document", RA("doc"), Vector<rule_t>() <<
-        rule("named", schema::match_named::attributes("ND"), Vector<rule_t>()<<
+      rule_one("document", RA("doc"),
+        rule_one("named", schema::match_named::attributes("ND"),
           rule("node", RA("S"))))) {}
 };
 }

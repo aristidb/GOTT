@@ -22,6 +22,9 @@
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/schema/types/named.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
+#include <boost/assign/list_of.hpp>
+
+using namespace boost::assign;
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -38,30 +41,28 @@ struct schema_multi_footype : tut::schema_basic {
   rule_t multi, footype;
 
   schema_multi_footype() 
-  : tut::schema_basic(rule("document", RA("--doc--"), 
-        Vector<rule_t>() << rule_t(&footype))) {
-    footype = rule("named", schema::match_named::attributes("a"),
-        Vector<rule_t>() << rule_t(&multi));
+  : tut::schema_basic(rule_one("document", RA("--doc--"), 
+        rule_t(&footype))) {
+    footype = rule_one("named", schema::match_named::attributes("a"),
+        rule_t(&multi));
 
     multi =
-      rule("unordered", RA("--unordered--"), Vector<rule_t>() <<
-        rule("named", schema::match_named::attributes("plugin"), 
-          Vector<rule_t>() << 
-          rule("list", RA(RA::simple, false), Vector<rule_t>() <<
+      rule("unordered", RA("--unordered--"), list_of
+        (rule_one("named", schema::match_named::attributes("plugin"), 
+          rule_one("list", RA(RA::simple, false),
             rule("node", 
               RA(std::vector<string>(1, "plugin-data"), true, Xany(), 0,
-                slotcfg(), slotcfg(slotcfg::list))))) <<
-        rule("named", schema::match_named::attributes("sum"),
-          Vector<rule_t>() <<
-          rule("list", RA(RA::simple, false), Vector<rule_t>() <<
+                slotcfg(), slotcfg(slotcfg::list))))))
+        (rule_one("named", schema::match_named::attributes("sum"),
+          rule_one("list", RA(RA::simple, false),
             rule("node", 
               RA(std::vector<string>(1, "sum-data"), true, Xany(),
                  new stru::repatch_integer(),
-                 slotcfg(), slotcfg(slotcfg::some))))) <<
-        rule("node", 
+                 slotcfg(), slotcfg(slotcfg::some))))))
+        (rule("node", 
           RA(std::vector<string>(1, "--other--"), true, Xany(), 
              new stru::repatch_integer(),
-             slotcfg(), slotcfg(slotcfg::some))));
+             slotcfg(), slotcfg(slotcfg::some)))));
   }
 };
 }

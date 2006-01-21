@@ -33,13 +33,13 @@ namespace schema {
 
 class match_follow_ordered : public item {
 public:
-  match_follow_ordered(rule_attr_t const &, Vector<rule_t> const &, match &);
+  match_follow_ordered(rule_attr_t const &, std::vector<rule_t> const &,match&);
   ~match_follow_ordered();
 
-  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &);
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
   
 private:
-  struct active_element : Moveable<active_element> {
+  struct active_element {
     rule_t generator;
     slotcfg slot;
     bool accept_empty, rest_accept_empty;
@@ -51,7 +51,7 @@ private:
   void init_accept_empty();
   bool search_insertible() const;
 
-  typedef Vector<active_element> container;
+  typedef std::vector<active_element> container;
   container children;
   mutable container::iterator pos;
   int opened;

@@ -33,13 +33,13 @@ namespace schema {
 // Matches a whole tdl document that contains the given sub-type
 class match_document : public happy_once {
 public:
-  match_document(rule_attr_t const &, Vector<rule_t> const &, match &);
+  match_document(rule_attr_t const &, std::vector<rule_t> const &, match &);
 
-  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &)
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &)
   { return false; }
 
 private:
-  static rule_t deflatten(Vector<rule_t> const &children);
+  static rule_t deflatten(std::vector<rule_t> const &children);
 
   rule_t sub;
   enum { first, begun_parse, opened, closed } state;

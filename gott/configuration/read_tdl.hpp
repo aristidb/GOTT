@@ -37,12 +37,12 @@ namespace config {
 class match_config_tdl : public tdl::schema::item {
 public:
   match_config_tdl(tdl::schema::rule_attr_t const &, 
-      Vector<tdl::schema::rule_t> const &, 
+      std::vector<tdl::schema::rule_t> const &, 
       tdl::schema::match &);
 
   static bool accept_empty(
       tdl::schema::rule_attr_t const &, 
-      Vector<tdl::schema::rule_t> const &)
+      std::vector<tdl::schema::rule_t> const &)
   { return true; }
 
 private:

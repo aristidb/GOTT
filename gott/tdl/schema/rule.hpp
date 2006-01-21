@@ -24,7 +24,7 @@
 #include "rule_attr.hpp"
 #include <boost/shared_ptr.hpp>
 #include <gott/visibility.hpp>
-#include <ntl.h>
+#include <vector>
 
 namespace gott {
 class string;
@@ -39,17 +39,19 @@ class match;
 
 template<class T>
 item *
-construct_item(rule_attr_t const &att, Vector<rule_t> const&children, match &m) {
+construct_item(rule_attr_t const &att, std::vector<rule_t> const &children, 
+    match &m) {
   return new T(att, children, m);
 }
 
 typedef 
-item *(*item_constructor)(rule_attr_t const &, Vector<rule_t> const &, match &);
+item *(*item_constructor)(rule_attr_t const &, std::vector<rule_t> const &, 
+    match &);
 
 typedef
-bool (*item_check)(rule_attr_t const &, Vector<rule_t> const &);
+bool (*item_check)(rule_attr_t const &, std::vector<rule_t> const &);
 
-struct abstract_rule : Moveable<abstract_rule> {
+struct abstract_rule {
   explicit abstract_rule(item_constructor c, item_check ae) 
   : constructor(c), accept_empty(ae) {}
   item_constructor constructor;
@@ -59,10 +61,10 @@ struct abstract_rule : Moveable<abstract_rule> {
 /**
  * Rule-factory to produce item objects.
  */
-class GOTT_EXPORT rule_t : Moveable<rule_t> {
+class GOTT_EXPORT rule_t {
 public:
   rule_t();
-  rule_t(abstract_rule const &, rule_attr_t const &, Vector<rule_t> pick_ &);
+  rule_t(abstract_rule const &, rule_attr_t const &, std::vector<rule_t>const&);
   rule_t(rule_t const &);
   explicit rule_t(rule_t const *);
   ~rule_t();
@@ -79,26 +81,27 @@ private:
 };
 
 template<class T>
-rule_t rule(rule_attr_t const &a, Vector<rule_t> const &c = Vector<rule_t>()) {
+rule_t rule(rule_attr_t const &a, 
+    std::vector<rule_t> const &c = std::vector<rule_t>()) {
   return rule_t(abstract_rule(&construct_item<T>, &T::accept_any), a, c);
 }
 
 rule_t rule(string const &name, rule_attr_t const &a = rule_attr_t(), 
-    Vector<rule_t> const &c = Vector<rule_t>()) GOTT_EXPORT;
+    std::vector<rule_t> const &c = std::vector<rule_t>()) GOTT_EXPORT;
 
 inline
-rule_t rule(string const &name, rule_attr_t const &a, rule_t const &c) {
-  return rule(name, a, Vector<rule_t>() << c);
+rule_t rule_one(string const &name, rule_attr_t const &a, rule_t const &c) {
+  return rule(name, a, std::vector<rule_t>(1, c));
 }
 
 inline
-rule_t rule(string const &name, Vector<rule_t> const &c) {
+rule_t rule(string const &name, std::vector<rule_t> const &c) {
   return rule(name, rule_attr_t(), c);
 }
 
 inline
-rule_t rule(string const &name, rule_t const &c) {
-  return rule(name, rule_attr_t(), Vector<rule_t>() << c);
+rule_t rule_one(string const &name, rule_t const &c) {
+  return rule(name, rule_attr_t(), std::vector<rule_t>(1, c));
 }
 
 }}}

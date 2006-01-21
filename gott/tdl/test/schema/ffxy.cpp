@@ -20,6 +20,9 @@
 
 #include "common.hpp"
 #include <gott/tdl/structure/repatchers/integer.hpp>
+#include <boost/assign/list_of.hpp>
+
+using namespace boost::assign;
 
 namespace schema = gott::tdl::schema;
 namespace stru = gott::tdl::structure;
@@ -29,7 +32,8 @@ using gott::string;
 using schema::slotcfg;
 
 using namespace stru::cf;
-using schema::rule_t;
+using schema::rule;
+using schema::rule_one;
 typedef schema::rule_attr_t RA;
 typedef stru::repatch_integer I;
 
@@ -37,18 +41,18 @@ namespace {
 struct schema_ffxy : tut::schema_basic {
   schema_ffxy() 
   : tut::schema_basic(
-      rule("document", RA(), Vector<rule_t>() <<
-        rule("ordered", RA(), Vector<rule_t>() <<
-          rule("follow", RA(), Vector<rule_t>() <<
-            rule("ordered", RA(), Vector<rule_t>() <<
-              rule("follow", RA("o"), Vector<rule_t>() <<
+      rule_one("document",
+        rule_one("ordered",
+          rule_one("follow",
+            rule("ordered", RA(), list_of
+              (rule_one("follow", RA("o"),
                 rule("follow", 
                   RA(std::vector<string>(1, "xy"), true, Xany(), 0,
                      slotcfg(), slotcfg(slotcfg::list)),
-                  Vector<rule_t>() <<
-                    rule("node", RA("int1", true, new I())) <<
-                    rule("node", RA("int2", true, new I())))) <<
-              rule("node", RA())))))) {}
+                  list_of
+                    (rule("node", RA("int1", true, new I())))
+                    (rule("node", RA("int2", true, new I()))))))
+              (rule("node"))))))) {}
 
   void run(string prefix, int n) {
     string test_data = prefix;

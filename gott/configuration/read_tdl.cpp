@@ -42,10 +42,10 @@ struct config_type {
 }
 
 match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra, 
-    Vector<schema::rule_t> const &o_children, 
+    std::vector<schema::rule_t> const &o_children, 
     schema::match &m) 
 : schema::item(ra, m), dirty(false), peer(false), may_leave(false) {
-  for (Vector<schema::rule_t>::const_iterator it = o_children.begin(); 
+  for (std::vector<schema::rule_t>::const_iterator it = o_children.begin(); 
       it != o_children.end(); ++it)
     children.insert(std::make_pair(it->attributes().tags()[0], *it));
   next_child = children.end();

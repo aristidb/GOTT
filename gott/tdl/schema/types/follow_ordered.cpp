@@ -27,11 +27,12 @@ using schema::item;
 using schema::match_follow_ordered;
 
 match_follow_ordered::match_follow_ordered(rule_attr_t const &a, 
-                                           Vector<rule_t> const &c, match &m)
+                                           std::vector<rule_t> const &c, 
+                                           match &m)
 : item(a, m), opened(0), saw_up(false), last(m.pos().current()), 
     unhappy(false) {
-  for (Vector<rule_t>::const_iterator it = c.begin(); it != c.end(); ++it)
-    children.Add(*it);
+  for (std::vector<rule_t>::const_iterator it = c.begin(); it != c.end(); ++it)
+    children.push_back(*it);
   pos = children.begin();
   init_accept_empty();
   if (expectation() == nothing)
@@ -42,7 +43,7 @@ match_follow_ordered::match_follow_ordered(rule_attr_t const &a,
 
 void match_follow_ordered::init_accept_empty() {
   bool rest_accept_empty = true;
-  for (int i = children.GetCount() - 1; i >= 0; --i) {
+  for (int i = children.size() - 1; i >= 0; --i) {
     active_element &e = children[i];
     e.rest_accept_empty = rest_accept_empty;
     e.accept_empty = e.generator.accept_empty();
@@ -119,9 +120,9 @@ item::expect match_follow_ordered::expectation() const {
 }
 
 bool match_follow_ordered::accept_empty(rule_attr_t const &,
-                                        Vector<rule_t> const &children) {
+                                        std::vector<rule_t> const &children) {
   bool accept = true;
-  for (Vector<rule_t>::const_iterator it = children.begin(); 
+  for (std::vector<rule_t>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
     accept &= it->attributes().outer().prefix_optional() || it->accept_empty();
   return accept;

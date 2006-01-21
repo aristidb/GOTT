@@ -30,9 +30,9 @@ namespace schema {
 
 class match_tree : public item {
 public:
-  match_tree(rule_attr_t const &, Vector<rule_t> const &, match &);
+  match_tree(rule_attr_t const &, std::vector<rule_t> const &, match &);
 
-  static bool accept_empty(rule_attr_t const &, Vector<rule_t> const &) 
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
   { return false; }
   
 private:

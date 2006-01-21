@@ -26,9 +26,9 @@ using gott::tdl::schema::match_tree;
 using gott::tdl::schema::item;
 namespace ev = gott::tdl::schema::ev;
 
-match_tree::match_tree(rule_attr_t const &a, Vector<rule_t> const &c, match &m)
+match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match &m)
 : item(a, m), level(0), fresh_level(true) {
-  GOTT_ASSERT_2(c.GetCount(), 0, std::equal_to<int>(), "no children");
+  GOTT_ASSERT_2(c.size(), 0, std::equal_to<int>(), "no children");
 }
 
 gott::string match_tree::name() const {

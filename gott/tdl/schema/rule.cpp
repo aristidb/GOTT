@@ -29,24 +29,26 @@ namespace sh = gott::tdl::schema;
 using sh::rule_t;
 using sh::rule_attr_t;
 using sh::item;
+using std::vector;
 
 class rule_t::impl {
 public:
   struct immediate {
     abstract_rule abstract;
     rule_attr_t attr;
-    Vector<rule_t> children;
+    vector<rule_t> children;
 
-    immediate(abstract_rule const &ar, rule_attr_t const &a, Vector<rule_t> pick_ &c)
+    immediate(abstract_rule const &ar, rule_attr_t const &a, 
+        vector<rule_t> const &c)
     : abstract(ar), attr(a), children(c) {}
 
     immediate(immediate const &o)
-    : abstract(o.abstract), attr(o.attr), children(o.children, 1) {}
+    : abstract(o.abstract), attr(o.attr), children(o.children) {}
   };
 
   boost::variant<immediate, rule_t const *> data;
 
-  impl(abstract_rule const &ar, rule_attr_t const &a, Vector<rule_t> pick_ &c)
+  impl(abstract_rule const &ar, rule_attr_t const &a, vector<rule_t> const &c)
   : data(immediate(ar, a, c)) {}
 
   impl(rule_t const *p)
@@ -56,7 +58,7 @@ public:
 rule_t::rule_t() {}
 
 rule_t::rule_t(abstract_rule const &ar, rule_attr_t const &a,
-    Vector<rule_t> pick_ &c)
+    vector<rule_t> const &c)
 : p(new impl(ar, a, c)) {}
 
 rule_t::rule_t(rule_t const &o) : p(o.p) {}
@@ -105,6 +107,7 @@ bool rule_t::accept_empty() const {
   throw 0;
 }
 
-rule_t sh::rule(string const &id, rule_attr_t const &a, Vector<rule_t> pick_ &c) {
+rule_t sh::rule(string const &id, rule_attr_t const &a, vector<rule_t> const &c)
+{
   return by_name().get(id, a, c);
 }
