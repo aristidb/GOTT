@@ -33,7 +33,7 @@ using namespace boost::lambda;
 using boost::ref;
 using namespace std;
 
-typedef message_queue<int, 10> mq_t;
+typedef message_queue<int, 6> mq_t; // 6 is the minimum size indeed (filter)
 //typedef message_queue<int> mq_t;
 
 boost::barrier step2(2);

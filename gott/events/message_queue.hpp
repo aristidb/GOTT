@@ -202,13 +202,12 @@ private:
         break;
       }
 
-      if (result == message_in_filter)
+      if (result == message_in_filter) {
         it = queue.erase(it);
-      else
+        slot_free();
+      } else
         ++it;
     }
-
-    any_change().notify_all();
 
     return do_again;
   }
@@ -216,8 +215,8 @@ private:
 public:
   /**
    * Wait until there are messages available and then send them to a supplied
-   * callback, which returns a message_filter_result and remove only those for which the
-   * callback returned message_in_filter. If the callback returned 
+   * callback, which returns a message_filter_result and remove only those for 
+   * which the callback returned message_in_filter. If the callback returned 
    * message_quit, return early.
    * The callback must not access the message queue.
    * Returns immediately if there is data available but none gets through the
@@ -243,7 +242,7 @@ public:
     boost::mutex::scoped_lock lock(monitor_lock);
     wait_nonempty(lock);
     while (filter_unsafe(func))
-      any_change().wait(lock);
+      new_data().wait(lock);
   }
 
   template<class T, class U, class R, R True>
@@ -341,13 +340,12 @@ private:
 private:
   void push_unsafe(Message const &msg) {
     queue.push_back(msg);
-    any_change().notify_all();
+    new_data().notify_all();
   }
 
   Message pop_unsafe() {
     Message result = queue.front();
     queue.pop_front();
-    any_change().notify_all();
     return result;
   }
 
@@ -369,7 +367,7 @@ private:
 private:
   boost::condition &not_empty() const { return cond[0]; }
   boost::condition &not_full() const { return cond[2]; }
-  boost::condition &any_change() const { return cond[1]; }
+  boost::condition &new_data() const { return cond[1]; }
 
   mutable boost::condition cond[Size == 0 ? 2 : 3];
   
