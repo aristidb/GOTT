@@ -25,7 +25,6 @@
 #include <gott/string/string.hpp>
 #include <gott/visibility.hpp>
 #include <boost/variant.hpp>
-#include <ntl.h>
 
 namespace gott {
 namespace tdl {
