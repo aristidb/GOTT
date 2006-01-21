@@ -226,8 +226,8 @@ public:
   /**
    * Wait until there are messages available and then send them to a supplied
    * callback, which returns a message_filter_result and remove only those for 
-   * which the callback returned message_in_filter. If the callback returned 
-   * message_quit, return early.
+   * which the callback returned message_in_filter or message_quit. If the 
+   * callback returned message_quit, return early.
    * The callback must not access the message queue.
    * Returns immediately if there is data available but none gets through the
    * filter and none is classified as quit-message.
@@ -243,7 +243,8 @@ public:
 
   /**
    * Send all messages to a callback until it returns message_quit and remove 
-   * those messages for which the callback returned message_in_filter.
+   * those messages for which the callback returned message_in_filter or
+   * message_quit.
    * The callback must not access the message queue.
    * \param func The filtering and receiving callback.
    */
@@ -293,7 +294,8 @@ public:
 
   /**
    * Wait until there are messages available and then send them to a supplied
-   * callback and remove them only if a predicate returns message_in_filter. 
+   * callback and remove them only if a predicate returns message_in_filter
+   * or message_quit. 
    * Returns if the messages are exhausted or the predicate returns 
    * message_quit.
    * Neither the callback nor the predicate must access the message queue.
@@ -309,9 +311,10 @@ public:
   }
 
   /**
-   * Send all messages through a predicate until the same returns message_quit 
+   * Send all messages through a predicate until the same returns message_quit
    * and if the predicate returns message_in_filter, remove them and send them 
-   * to a callback.
+   * to a callback. The message for which the predicate returns message_quit 
+   * is also removed. 
    * Neither the callback nor the predicate must access the message queue.
    */
   template<class T, class U>
