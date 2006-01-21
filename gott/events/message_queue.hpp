@@ -58,7 +58,7 @@ public:
    */
   void push(Message const &msg) {
     boost::mutex::scoped_lock lock(monitor_lock);
-    wait_notfull(lock);
+    wait_for_space_internal(lock);
     push_unsafe(msg);
     slot_filled();
   }
@@ -69,7 +69,7 @@ public:
    */
   Message pop() {
     boost::mutex::scoped_lock lock(monitor_lock);
-    wait_nonempty(lock);
+    wait_for_data_internal(lock);
     Message result = pop_unsafe();
     slot_free();
     return result;
@@ -81,7 +81,7 @@ public:
    */
   Message const &peek() const {
     boost::mutex::scoped_lock lock(monitor_lock);
-    wait_nonempty(lock);
+    wait_for_data_internal(lock);
     return peek_unsafe();
   }
 
@@ -104,6 +104,7 @@ public:
   void drop() {
     boost::mutex::scoped_lock lock(monitor_lock);
     queue.clear();
+    many_free();
   }
   
   /**
@@ -115,7 +116,7 @@ public:
     boost::mutex::scoped_lock lock(monitor_lock);
 
     for (;;) {
-      wait_nonempty(lock);
+      wait_for_data_internal(lock);
 
       Message m = pop_unsafe();
       slot_free();
@@ -136,7 +137,7 @@ public:
   void wait_for_many(T func) {
     boost::mutex::scoped_lock lock(monitor_lock);
 
-    wait_nonempty(lock);
+    wait_for_data_internal(lock);
 
     while (!empty_unsafe()) {
       Message m = pop_unsafe();
@@ -157,7 +158,7 @@ public:
   void wait_for_many_break(T func) {
     boost::mutex::scoped_lock lock(monitor_lock);
 
-    wait_nonempty(lock);
+    wait_for_data_internal(lock);
 
     while (!empty_unsafe()) {
       Message m = pop_unsafe();
@@ -182,7 +183,7 @@ public:
   bool pop_if(T func) {
     boost::mutex::scoped_lock lock(monitor_lock);
 
-    wait_nonempty(lock);
+    wait_for_data_internal(lock);
 
     Message const &m = peek_unsafe();
     lock.unlock();
@@ -237,7 +238,7 @@ public:
   template<class T>
   bool filter(T func) {
     boost::mutex::scoped_lock lock(monitor_lock);
-    wait_nonempty(lock);
+    wait_for_data_internal(lock);
     return filter_unsafe(func);
   }
 
@@ -251,9 +252,9 @@ public:
   template<class T>
   void filter_all(T func) {
     boost::mutex::scoped_lock lock(monitor_lock);
-    wait_nonempty(lock);
+    wait_for_data_internal(lock);
     while (filter_unsafe(func))
-      new_data().wait(lock);
+      wait_for_new_data_internal(lock);
   }
 
   template<class T, class U, class R, R True>
@@ -324,15 +325,44 @@ public:
           (func, pred));
   }
 
+public:
+  /**
+   * Waits until there is data available.
+   */
+  void wait_for_data() const {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    wait_for_data_internal(lock);
+  }
+
+  /**
+   * Waits until there is space available.
+   */
+  void wait_for_space() const {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    wait_for_space(lock);
+  }
+
+  /**
+   * Waits until new data floats in.
+   */
+  void wait_for_new_data() const {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    wait_for_new_data_internal(lock);
+  }
+
 private:
-  void wait_nonempty(boost::mutex::scoped_lock &lock) const {
+  void wait_for_data_internal(boost::mutex::scoped_lock &lock) const {
     while (empty_unsafe())
       not_empty().wait(lock);
   }
 
-  void wait_notfull(boost::mutex::scoped_lock &lock) const {
+  void wait_for_space_internal(boost::mutex::scoped_lock &lock) const {
     while (full_unsafe())
       not_full().wait(lock);
+  }
+
+  void wait_for_new_data_internal(boost::mutex::scoped_lock &lock) const {
+    new_data().wait(lock);
   }
 
 private:
