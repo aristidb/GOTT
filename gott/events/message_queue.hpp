@@ -99,6 +99,14 @@ public:
 
 public:
   /**
+   * Clear the message queue.
+   */
+  void drop() {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    queue.clear();
+  }
+  
+  /**
    * Send messages to a callback until it returns false.
    * \param func The receiving callback.
    */
@@ -198,6 +206,8 @@ private:
       message_filter_result result = func(*it);
 
       if (result == message_quit) {
+        queue.erase(it);
+        slot_free();
         do_again = false;
         break;
       }
