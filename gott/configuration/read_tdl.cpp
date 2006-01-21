@@ -44,20 +44,20 @@ struct config_type {
 match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra, 
     Vector<schema::rule_t> const &o_children, 
     schema::match &m) 
-: schema::item(ra, m), next_child(-1), 
-  dirty(false), peer(false), may_leave(false) {
+: schema::item(ra, m), dirty(false), peer(false), may_leave(false) {
   for (Vector<schema::rule_t>::const_iterator it = o_children.begin(); 
       it != o_children.end(); ++it)
-    children.Add(it->attributes().tags()[0], *it);
+    children.insert(std::make_pair(it->attributes().tags()[0], *it));
+  next_child = children.end();
 }
 
 bool match_config_tdl::play(ev::down const &) {
   peer = false;
 
-  if (next_child >= 0 && !dirty)
-    matcher().add(children[next_child]);
+  if (next_child != children.end() && !dirty)
+    matcher().add(next_child->second);
   else {
-    add_len.Top() += 2;
+    add_len.back() += 2;
     current_id = current_id + "::";
   }
 
@@ -71,7 +71,7 @@ bool match_config_tdl::play(ev::up const &) {
     return false;
 
   std::cout << "up => ";
-  if (next_child < 0) {
+  if (next_child == children.end()) {
     std::cout << '$' << current_id << std::endl;
     return false;
   }
@@ -79,8 +79,8 @@ bool match_config_tdl::play(ev::up const &) {
   dirty = false;
   peer = false;
 
-  current_id = offset(current_id.as_utf8(), 0, -add_len.Top());
-  add_len.Pop();
+  current_id = offset(current_id.as_utf8(), 0, -add_len.back());
+  add_len.pop_back();
   
   std::cout << current_id << std::endl;
   
@@ -94,7 +94,7 @@ bool match_config_tdl::play(ev::node const &n) {
   peer = true;
   may_leave = false;
   
-  add_len.Add(n.get_data().size());
+  add_len.push_back(n.get_data().size());
   if (current_id == string()) 
     current_id = n.get_data();
   else
@@ -102,7 +102,7 @@ bool match_config_tdl::play(ev::node const &n) {
 
   std::cout << "node => " << current_id << std::endl;
 
-  next_child = children.Find(current_id);
+  next_child = children.find(current_id);
 
   return true;
 }
@@ -116,7 +116,7 @@ bool match_config_tdl::play(ev::child_succeed const &) {
 }
 
 schema::item::expect match_config_tdl::expectation() const {
-  if (next_child < 0)
+  if (next_child == children.end())
     if (current_id == string())
       return maybe;
     else

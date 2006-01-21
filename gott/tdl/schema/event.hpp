@@ -123,8 +123,6 @@ public:
 
 typedef boost::variant<begin_parse, down, node, up, end_parse> token_t;
 
-NTL_MOVEABLE(token_t);
-
 token const &get(token_t const &);
 
 /// The base class for notification events.

@@ -25,7 +25,7 @@
 
 namespace gott {
 
-class QID : public atom, Moveable<QID> {
+class QID : public atom {
 public:
   template<class T>
   QID(T const &x) : atom(x) {}

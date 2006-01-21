@@ -45,7 +45,7 @@ typedef std::vector<node_inserter_t> nd_list;
 /**
  * General concatenateable structure generator.
  */
-class node_inserter_t : Moveable<node_inserter_t> {
+class node_inserter_t {
 public:
   /**
    * Actually writes the structure in spe.

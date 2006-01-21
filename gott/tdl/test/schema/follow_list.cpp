@@ -41,7 +41,8 @@ struct schema_follow_list : tut::schema_basic {
       rule("document", RA(), Vector<rule_t>() <<
         rule("follow", RA(), Vector<rule_t>() <<
           rule("node", 
-            RA(Vector<string>() << "i",true,Xany(),new stru::repatch_integer(),
+            RA(std::vector<string>(1,"i"),true,Xany(),
+              new stru::repatch_integer(),
                slotcfg(), slotcfg(slotcfg::list))) <<
           rule("node", RA("s"))))) {}
 };

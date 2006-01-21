@@ -20,7 +20,7 @@
 
 #include "meta.hpp"
 #include <gott/string/string.hpp>
-#include <gott/string/stl.hpp>
+#include <map>
 
 using std::istream;
 using gott::tdl::simple::meta_parser;
@@ -29,14 +29,12 @@ static bool pass(gott::string const &, gott::string const &) {
   return false;
 }
 
-NTL_MOVEABLE(meta_parser::callback);
-
 class meta_parser::impl {
 public:
   impl() : def(pass) {}
 
   callback def;
-  typedef VectorMap<string, callback> cb_t;
+  typedef std::map<string, callback> cb_t;
   cb_t cb;
   void exec(string const &);
 };
@@ -79,9 +77,9 @@ void meta_parser::impl::exec(string const &line_) {
     ;
   string param(range(pos, line.end()));
 
-  int i = cb.Find(cmd);
+  cb_t::const_iterator it = cb.find(cmd);
 
-  if (i < 0 || !cb[i](cmd, param))
+  if (it == cb.end() || !it->second(cmd, param))
     def(cmd, param);
 }
 
@@ -90,5 +88,5 @@ void meta_parser::set_default(callback const &f) {
 }
 
 void meta_parser::set_specific(string const &cmd, callback const &f) {
-  p->cb.Add(cmd, f);
+  p->cb.insert(impl::cb_t::value_type(cmd, f));
 }

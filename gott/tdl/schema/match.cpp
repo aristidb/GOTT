@@ -32,6 +32,7 @@
 #include <gott/debug/assert.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
+#include <ntl.h>
 
 //#define VERBOSE
 
@@ -339,21 +340,23 @@ void match::impl::real_parental_requirement() {
 
 string match::impl::get_name(item const &rl) {
   static string const s_open("("), s_close(")"), sep(",");
-  Vector<string> out;
-  out.Reserve(1 + 
-      (rl.attributes().tags().GetCount() > 0 
-       ? 1 + rl.attributes().tags().GetCount() * 2
+  std::vector<string> out;
+  std::vector<string> const &tags = rl.attributes().tags();
+  out.reserve(1 + 
+      (tags.size() > 0 
+       ? 1 + tags.size() * 2
        : 0));
-  out.Add(rl.name());
-  if (rl.attributes().tags().GetCount() > 0) {
-    out.Add(s_open);
-    range_t<string const *> r = range(rl.attributes().tags());
-    out.Add(*r.begin());
-    for (string const *it = r.begin() + 1; it != r.end(); ++it) {
-      out.Add(sep);
-      out.Add(*it);
+  out.push_back(rl.name());
+  if (tags.size() > 0) {
+    out.push_back(s_open);
+    range_t<std::vector<string>::const_iterator> r = range(tags);
+    out.push_back(*r.begin());
+    for (std::vector<string>::const_iterator it = r.begin() + 1; 
+        it != r.end(); ++it) {
+      out.push_back(sep);
+      out.push_back(*it);
     }
-    out.Add(s_close);
+    out.push_back(s_close);
   }
-  return string(range(out).cast<string const *>(), string::concatenate);
+  return string(range(out), string::concatenate);
 }

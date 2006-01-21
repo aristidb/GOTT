@@ -31,7 +31,7 @@
 #include <boost/parameter.hpp>
 #include <gott/string/string.hpp>
 #include <iosfwd>
-#include <ntl.h>
+#include <vector>
 
 namespace gott {
 namespace tdl {
@@ -48,25 +48,25 @@ public:
       structure::repatcher const *rr = 0) 
   : c(cc), r(rr) {}
 
-  explicit rule_attr_t(Vector<string> const &l, bool cc = true, 
+  explicit rule_attr_t(std::vector<string> const &l, bool cc = true, 
       structure::repatcher const *rr = 0)
   : c(cc), t(l), r(rr) {}
 
   explicit rule_attr_t(string const &s, bool cc = true, 
       structure::repatcher const *rr = 0)
-  : c(cc), t(Vector<string>() << s), r(rr) {}
+  : c(cc), t(std::vector<string>(1, s)), r(rr) {}
 
-  explicit rule_attr_t(Vector<string> const &l, bool cc, 
+  explicit rule_attr_t(std::vector<string> const &l, bool cc, 
                      xany::Xany const &x, structure::repatcher const *rr = 0,
                      slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
   : c(cc), t(l), u(x), r(rr), i(I), o(O) {}
 
   rule_attr_t(rule_attr_t const &o_)
-  : c(o_.c), t(o_.t, 1), u(o_.u), r(o_.r), i(o_.i), o(o_.o) {}
+  : c(o_.c), t(o_.t), u(o_.u), r(o_.r), i(o_.i), o(o_.o) {}
 
   bool coat() const { return c; }
 
-  Vector<string> const &tags() const { return t; }
+  std::vector<string> const &tags() const { return t; }
 
   xany::Xany const &user() const { return u; }
 
@@ -82,7 +82,7 @@ public:
 
 private:
   bool c;
-  Vector<string> t;
+  std::vector<string> t;
   xany::Xany u;
   boost::shared_ptr<structure::repatcher const> r;
   slotcfg i;
@@ -110,11 +110,11 @@ BOOST_PARAMETER_FUN(rule_attr_t, rule_attr, 0, 6, rule_attr_params);
 template<class Args>
 rule_attr_t rule_attr_with_named_params(Args const &args) {
   struct combine_strip {
-    Vector<string> operator() (string const &s) const { 
+    std::vector<string> operator() (string const &s) const { 
       if (s != "")
-        return Vector<string>() << s; 
+        return std::vector<string>(1, s); 
       else
-        return Vector<string>();
+        return std::vector<string>();
     }
   };
   return rule_attr_t(

@@ -41,7 +41,7 @@ struct schema_unordered_list_integer_string : tut::schema_basic {
       rule("document", RA(), Vector<rule_t>() <<
         rule("unordered", RA(), Vector<rule_t>() <<
           rule("node",
-            RA(Vector<string>(),true,Xany(),new stru::repatch_integer(),
+            RA(std::vector<string>(),true,Xany(),new stru::repatch_integer(),
                slotcfg(), slotcfg(slotcfg::list))) <<
           rule("node", RA())))) {}
 };

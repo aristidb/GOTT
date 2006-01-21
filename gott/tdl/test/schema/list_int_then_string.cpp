@@ -43,7 +43,7 @@ struct schema_list_int_then_string : tut::schema_basic {
         rule("ordered", RA("ord"), Vector<rule_t>() <<
           rule("list", RA("list"), Vector<rule_t>() <<
             rule("node", 
-              RA(Vector<gott::string>() << "int", true, Xany(),
+              RA(std::vector<gott::string>(1, "int"), true, Xany(),
                 new stru::repatch_integer(),
                 slotcfg(), slotcfg(slotcfg::list)))) <<
           rule("node", RA("string"))))) {}

@@ -40,7 +40,7 @@ struct schema_max7string : tut::schema_basic {
          rule("ordered", RA(),
            Vector<rule_t>() <<
            rule("node",
-             RA(Vector<string>() << "el", true, Xany(), 0, 
+             RA(std::vector<string>(1, "el"), true, Xany(), 0, 
                 slotcfg(), slotcfg(slotcfg::maximum, 7)))))) {}
 };
 }

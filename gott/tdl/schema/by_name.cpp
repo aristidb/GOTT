@@ -21,6 +21,7 @@
 #include "by_name.hpp"
 #include "../exceptions.hpp"
 #include <gott/string/string.hpp>
+#include <map>
 
 namespace tdl = gott::tdl;
 namespace schema = tdl::schema;
@@ -33,14 +34,14 @@ by_name_t &schema::by_name() {
 
 class by_name_t::impl {
 public:
-  typedef VectorMap<string, abstract_rule> mapping; 
+  typedef std::map<string, abstract_rule> mapping; 
   mapping items;
 
   abstract_rule const &get(string const &name) {
-    int i = items.Find(name);
-    if (i < 0)
+    mapping::const_iterator it = items.find(name);
+    if (it == items.end())
       throw unregistered_type(name);
-    return items[i];
+    return it->second;
   }
 };
 
@@ -51,7 +52,7 @@ by_name_t::~by_name_t() {
 }
 
 void by_name_t::add(string const &name, abstract_rule const &type) {
-  p->items.Add(name, type);
+  p->items.insert(impl::mapping::value_type(name, type));
 }
 
 schema::rule_t by_name_t::get(string const &n, rule_attr_t const &a, 

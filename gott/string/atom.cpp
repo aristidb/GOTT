@@ -19,14 +19,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "atom.hpp"
+#include <set>
 
 using gott::atom;
 using gott::string;
 
 static string atomize(string const &n) {
-  static Index<string> table;
-  int pos = table.FindAdd(n);
-  return table[pos];
+  static std::set<string> table;
+  return *table.insert(n).first;
 }
 
 atom::atom(string const &n) : string(atomize(n)) {}

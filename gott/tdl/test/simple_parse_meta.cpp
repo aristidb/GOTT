@@ -22,7 +22,7 @@
 #include <gott/tut/tut.h>
 #include <sstream>
 #include <gott/string/string.hpp>
-#include <gott/string/stl.hpp>
+#include <vector>
 
 using std::pair;
 using std::ostream;
@@ -31,13 +31,12 @@ using gott::tdl::simple::meta_parser;
 using gott::string;
 
 typedef pair<string, string> twostring;
-NTL_MOVEABLE(twostring);
 
 namespace tut {
 struct meta_basic {
   meta_parser parser;
   string data, rest;
-  Vector<pair<string, string> > xp, ev;
+  std::vector<twostring> xp, ev;
   bool operator() (string const &cmd, string const &param) {
     ev.push_back(pair<string,string>(cmd, param));
     return true;
@@ -57,8 +56,10 @@ typedef test_group<meta_basic> tf;
 typedef tf::object object;
 }
 
+namespace gott {
 ostream &operator<<(ostream &o, pair<string,string> const &x) {
   return o << x.first << "::" << x.second << '\n';
+}
 }
 
 namespace {

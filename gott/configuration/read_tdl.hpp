@@ -24,7 +24,7 @@
 #include <gott/tdl/schema/item.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/rule_attr.hpp>
-#include <ntl.h>
+#include <map>
 
 namespace gott {
 namespace config {
@@ -55,10 +55,11 @@ private:
 
   string name() const;
 
-  VectorMap<string, tdl::schema::rule_t> children;
+  typedef std::map<string, tdl::schema::rule_t> children_t;
+  children_t children;
   string current_id;
-  Vector<int> add_len;
-  int next_child;
+  std::vector<int> add_len;
+  children_t::const_iterator next_child;
   bool dirty, peer, may_leave;
 };
 

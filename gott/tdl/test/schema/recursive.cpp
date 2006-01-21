@@ -41,12 +41,14 @@ struct recursive : tut::schema_basic {
   recursive() {
     grammar = rule("document", rule_attr_t(), Vector<rule_t>() << rule_t(&rec));
     rec = 
-      rule("ordered", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() <<
+      rule("ordered", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>()
+          <<
         rule("node", rule_attr_t(rule_attr_t::simple, true, 
             new stru::repatch_integer())) <<
-        rule("list", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() <<
+        rule("list", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() 
+          <<
           rule("ordered", 
-                rule_attr_t(Vector<string>(), false, Xany(), 0,
+                rule_attr_t(std::vector<string>(), false, Xany(), 0,
                   slotcfg(), slotcfg(slotcfg::optional)),
                 Vector<rule_t>() << rule_t(&rec))));
   }

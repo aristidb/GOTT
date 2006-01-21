@@ -40,7 +40,7 @@ struct schema_list_string : tut::schema_basic {
       rule("document", RA(), Vector<rule_t>() <<
         rule("list", RA(), Vector<rule_t>() <<
           rule("node", 
-            RA(Vector<string>() << "el", true, Xany(), 0, 
+            RA(std::vector<string>(1, "el"), true, Xany(), 0, 
                slotcfg(), slotcfg(slotcfg::list)))))) {}
 };
 }

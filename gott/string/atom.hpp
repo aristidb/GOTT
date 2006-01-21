@@ -29,7 +29,7 @@ namespace gott {
  * Atom class.
  * Atoms are strings with fast comparison and fast hashing but slow constructor.
  */
-class atom : public string, Moveable<atom> {
+class atom : public string {
 public:
   /// Copy-Constructor (fast).
   GOTT_EXPORT atom(atom const &);

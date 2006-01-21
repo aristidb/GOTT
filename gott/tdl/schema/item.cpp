@@ -51,7 +51,7 @@ public:
 
 private:
   void add_tags() {
-    for (Vector<string>::const_iterator it = attrib.tags().begin();
+    for (std::vector<string>::const_iterator it = attrib.tags().begin();
          it != attrib.tags().end(); ++it)
       cont->direct_structure().add_tag(*it);
   }

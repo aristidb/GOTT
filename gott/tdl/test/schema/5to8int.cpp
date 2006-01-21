@@ -41,7 +41,7 @@ struct schema_5to8int : tut::schema_basic {
   schema_5to8int()
   : tut::schema_basic(
       rule("document", rule("node",
-             RA(Vector<string>() << "el", true, Xany(), 
+             RA(std::vector<string>(1, "el"), true, Xany(), 
                 new stru::repatch_integer(), 
                 slotcfg(), slotcfg(slotcfg::range, 5, 8)))))
   {}

@@ -50,7 +50,7 @@ struct schema_odd_int : tut::schema_basic {
          rule("list", RA(),
            Vector<rule_t>() <<
            rule("node",
-             RA(Vector<string>() << "el", true, Xany(), 
+             RA(std::vector<string>(1, "el"), true, Xany(), 
                 new stru::repatch_integer(), 
                 slotcfg(), slotcfg(slotcfg::function, odd)))))) {}
 };

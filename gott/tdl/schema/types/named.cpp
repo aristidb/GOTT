@@ -34,14 +34,15 @@ using schema::rule_attr_t;
 using schema::match_named;
 
 rule_attr_t match_named::attributes(string const &s, bool cc) {
-  return rule_attr_t(Vector<string>() << s, cc, Xany(s));
+  return rule_attr_t(std::vector<string>(1, s), cc, Xany(s));
 }
 
 match_named::match_named(rule_attr_t const &a, Vector<rule_t> const &s, match &m) 
 : happy_once(a, m), 
   tag(Xany_cast<string>(a.user())),
   rewritten(
-      rule("follow", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() <<
+      rule("follow", rule_attr_t(rule_attr_t::simple, false), Vector<rule_t>() 
+        <<
         rule("node", rule_attr_t(rule_attr_t::simple, false, 
           new structure::repatch_enumeration(std::vector<string>(1, tag)))) <<
         s[0])) {

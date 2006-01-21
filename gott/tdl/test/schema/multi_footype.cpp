@@ -49,17 +49,17 @@ struct schema_multi_footype : tut::schema_basic {
           Vector<rule_t>() << 
           rule("list", RA(RA::simple, false), Vector<rule_t>() <<
             rule("node", 
-              RA(Vector<string>() << "plugin-data", true, Xany(), 0,
+              RA(std::vector<string>(1, "plugin-data"), true, Xany(), 0,
                 slotcfg(), slotcfg(slotcfg::list))))) <<
         rule("named", schema::match_named::attributes("sum"),
           Vector<rule_t>() <<
           rule("list", RA(RA::simple, false), Vector<rule_t>() <<
             rule("node", 
-              RA(Vector<string>() << "sum-data", true, Xany(),
+              RA(std::vector<string>(1, "sum-data"), true, Xany(),
                  new stru::repatch_integer(),
                  slotcfg(), slotcfg(slotcfg::some))))) <<
         rule("node", 
-          RA(Vector<string>() << "--other--", true, Xany(), 
+          RA(std::vector<string>(1, "--other--"), true, Xany(), 
              new stru::repatch_integer(),
              slotcfg(), slotcfg(slotcfg::some))));
   }

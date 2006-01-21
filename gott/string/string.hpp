@@ -33,10 +33,6 @@
 #include <gott/thunk.hpp>
 #endif
 
-#ifndef NO_NTL
-#include <ntl.h>
-#endif
-
 #ifndef NO_STDLIB
 #include <iosfwd>
 #include <string>
@@ -50,7 +46,7 @@ template<class> class range_t;
 /**
  * UTF-8 string literals storage class.
  */
-class GOTT_EXPORT string : Moveable<string> {
+class GOTT_EXPORT string {
 public:
   typedef range_t<utf8_t const *> utf8_range;
   typedef range_t<utf8_iterator> utf32_range;
@@ -385,13 +381,5 @@ inline bool operator>=(string const &a, string const &b) {
 }
 
 }
-
-#ifndef NO_NTL
-template<>
-inline unsigned GetHashValue(gott::string const &s) {
-  gott::range_t<gott::utf8_t const *> r = s.as_utf8();
-  return memhash(r.Begin, r.size());
-}
-#endif
 
 #endif

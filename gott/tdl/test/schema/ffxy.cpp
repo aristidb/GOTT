@@ -43,7 +43,7 @@ struct schema_ffxy : tut::schema_basic {
             rule("ordered", RA(), Vector<rule_t>() <<
               rule("follow", RA("o"), Vector<rule_t>() <<
                 rule("follow", 
-                  RA(Vector<string>() << "xy", true, Xany(), 0,
+                  RA(std::vector<string>(1, "xy"), true, Xany(), 0,
                      slotcfg(), slotcfg(slotcfg::list)),
                   Vector<rule_t>() <<
                     rule("node", RA("int1", true, new I())) <<
