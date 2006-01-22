@@ -35,8 +35,8 @@ env = Environment(
   ENV = os.environ, # FIXME: security hole?
   CXX = cxx, 
   CCFLAGS = cflags, 
-  CPPPATH=['#/..', '#/contrib/ntl'], 
-  LIBPATH=Split('#/contrib/ntl #/tdl #/xany #/string #/plugin #/events #/configuration #/ui #/ui/x11 #/graphics #/notify_fs' ),
+  CPPPATH=['#/..'], 
+  LIBPATH=Split('#/tdl #/xany #/string #/plugin #/events #/configuration #/ui #/ui/x11 #/graphics #/notify_fs'),
   CPPDEFINES=cppdef)
 
 Export('env')
@@ -65,6 +65,5 @@ SConscript(dirs = [
 #'ui', 
 'graphics', 
 'notify_fs',
-'tools/autobuild',
-'contrib/ntl']
+'tools/autobuild']
 )

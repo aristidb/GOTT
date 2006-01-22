@@ -5,4 +5,4 @@ Import('env')
 
 shrd.SharedLibrary('config', glob.glob('*.cpp'))
 env.Program('config_test', glob.glob('test/*.cpp'), 
-  LIBS = ['ntl', 'string', 'xany', 'tdl', 'config'])
+  LIBS = ['string', 'xany', 'tdl', 'config'])
