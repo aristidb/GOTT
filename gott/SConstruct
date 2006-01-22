@@ -43,7 +43,7 @@ Export('env')
 Export('optimize')
 Export('debug')
 
-conf = SConscript('configure/SConscript')
+conf = SConscript('buildconf/SConscript')
 env = conf.Finish()
 
 env.ParseConfig('pkg-config --libs sigc++-2.0')
