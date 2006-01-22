@@ -28,6 +28,7 @@
 #include "buffer.hpp"
 #include <gott/visibility.hpp>
 #include <gott/range.hpp>
+#include <boost/shared_ptr.hpp>
 
 #ifndef NO_GOTT_THUNK
 #include <gott/thunk.hpp>
@@ -242,9 +243,7 @@ public:
    * Swap with another string.
    */
   GOTT_LOCAL void swap(string &other) {
-    class representation *tmp = p;
-    p = other.p;
-    other.p = tmp;
+    p.swap(other.p);
   }
 
   /**
@@ -280,7 +279,7 @@ public:
 
 private:
   class representation;
-  representation *p;
+  boost::shared_ptr<representation> p;
 
   void set_up(range_t<utf8_t const *> const &d, bool o);
   void foreign(range_t<utf8_t const *> const &x);

@@ -40,13 +40,13 @@ using gott::range_t;
 class string::representation {
 public:
   representation(range_t<utf8_t const *> d, bool o = true)
-  : ref_count(1), size(d.size()), length(0), owned(o), data(d.begin()) {
+  : size(d.size()), length(0), owned(o), data(d.begin()) {
   }
 
   enum foreign_tag { foreign_copy };
 
   representation(range_t<utf8_t const *> const &x, foreign_tag)
-  : ref_count(1), size(x.size()), length(0), owned(true),
+  : size(x.size()), length(0), owned(true),
       data(new utf8_t[size]) {
     utf8_t *out = const_cast<utf8_t *>(data);
     for (utf8_t const *it = x.begin(); it != x.end(); ++it)
@@ -59,28 +59,22 @@ public:
     }
   }
 
-  std::size_t ref_count;
   std::size_t size;
   std::size_t length;
   bool owned;
   utf8_t const *data;
 };
 
-string::string(string const &o) : p(o.p) {
-  ++p->ref_count;
-}
+string::string(string const &o) : p(o.p) {}
 
-string::~string() {
-  if (--p->ref_count == 0)
-    delete p;
-}
+string::~string() {}
 
 void string::set_up(range_t<utf8_t const *> const &d, bool o) {
-  p = new representation(d, o);
+  p.reset(new representation(d, o));
 }
 
 void string::foreign(range_t<utf8_t const *> const &d) {
-  p = new representation(d, representation::foreign_copy);
+  p.reset(new representation(d, representation::foreign_copy));
 }
 
 range_t<gott::utf8_t const *> string::as_utf8() const {
