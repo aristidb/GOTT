@@ -1,3 +1,6 @@
 import glob
 Import('shrd')
-shrd.SharedLibrary('graphics', glob.glob('*.cpp'))
+my_shrd = shrd.Copy()
+my_shrd.ParseConfig('pkg-config --libs sigc++-2.0')
+my_shrd.ParseConfig('pkg-config --cflags sigc++-2.0')
+my_shrd.SharedLibrary('graphics', glob.glob('*.cpp'))

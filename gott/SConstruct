@@ -46,12 +46,6 @@ Export('debug')
 conf = SConscript('buildconf/SConscript')
 env = conf.Finish()
 
-env.ParseConfig('pkg-config --libs sigc++-2.0')
-env.ParseConfig('pkg-config --cflags sigc++-2.0')
-
-#env.ParseConfig('pkg-config --libs libagg')
-#env.ParseConfig('pkg-config --cflags libagg')
-
 shrd = env.Copy()
 shrd.Append(CPPDEFINES = 'BUILDING_DLL')
 

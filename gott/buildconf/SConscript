@@ -69,16 +69,8 @@ conf.CompilerVisibility()
 Import('debug')
 if debug == 1:
 	conf.Debug()
-if 0:
-	if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
-		print 'Boost headers are not installed'
-		Exit(1)
-	if not conf.CheckLib('boost_thread'):
-		print 'Boost.Thread library is not installed'
-		Exit(1)
-	if not conf.CheckLib('boost_date_time'):
-		print 'Boost.DateTime library is not installed'
-		Exit(1)
+if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
+	print 'Boost headers are not installed'
+	Exit(1)
 
 Return('conf')
-print 'Finished configuration'
