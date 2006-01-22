@@ -32,7 +32,6 @@
 #include <gott/debug/assert.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
-#include <ntl.h>
 
 //#define VERBOSE
 
@@ -75,10 +74,8 @@ public:
     deferred_miss(ev::event const &e, unsigned c) 
     : event(e.clone()), count(c) {}
 
-    deferred_miss(deferred_miss pick_ &o)
-    : event(o.event), count(o.count) {
-      const_cast<deferred_miss &>(o).event = 0;
-    }
+    deferred_miss(deferred_miss const &o)
+    : event(o.event->clone()), count(o.count) {}
 
     ~deferred_miss() { delete event; }
 
@@ -97,29 +94,18 @@ public:
   match &ref;
   detail::stream_position ln;
 
-  struct entry : Moveable<entry> {
-    item *the_item;
+  struct entry {
+    shared_ptr<item> the_item;
     shared_ptr<writable_structure> structure;
 
     entry() {}
-
-    entry(entry pick_ &o) : the_item(o.the_item), structure(o.structure) {
-      entry &x = const_cast<entry &>(o);
-      x.the_item = 0;
-      x.structure.reset();
-    }
-
-    ~entry() {
-      delete the_item;
-    }
-
     entry(item *r) : the_item(r) {}
 
     entry(item *r, shared_ptr<writable_structure> const &s) 
     : the_item(r), structure(s) {}
   };
 
-  typedef Vector<entry> Stack;
+  typedef std::vector<entry> Stack;
   Stack parse;
   std::vector<string> shadow_names;
 
@@ -196,7 +182,7 @@ match::impl::impl(structure::revocable_structure &p, match &r)
 : base_struc(p), pos(base_struc), ref(r) {}
 
 shared_ptr<writable_structure> match::impl::direct_structure_non_base() {
-  if (parse.IsEmpty()) 
+  if (parse.empty()) 
     return shared_ptr<writable_structure>();
   return parse.back().structure;
 }
@@ -207,15 +193,16 @@ void match::impl::add(rule_t const &f) {
   if (structure::repatcher const *r = f.attributes().repatcher())
     struc.reset(r->deferred_write(struc ? *struc : base_struc));
 
-  int current = parse.GetCount();
-  parse.Add().structure = struc;
+  int current = parse.size();
+  parse.push_back(entry());
+  parse[current].structure = struc;
 
   item *the_item = f.get(ref);
   GOTT_ASSERT_2(the_item,(item*)0,std::not_equal_to<item*>(),"Acquired rule_t");
   GOTT_ASSERT_2(the_item->attributes(), f.attributes(), 
       std::equal_to<rule_attr_t>(), "Rule attributes");
 
-  parse[current].the_item = the_item;
+  parse[current].the_item.reset(the_item);
 }
 
 template<class T>
@@ -252,9 +239,9 @@ void match::impl::handle_event(ev::event const &event, bool token) {
   std::cout << event << '{' << std::endl;
   struct close { ~close() { std::cout << '}' << std::endl; } } x; (void)x;
 #endif
-  if (parse.IsEmpty()) 
+  if (parse.empty()) 
     fail_all();
-  while (!parse.IsEmpty()) 
+  while (!parse.empty()) 
     if (handle_item(event, token)) 
       break;
 }
@@ -307,14 +294,14 @@ void match::impl::succeed_item() {
   parse.back().the_item->finish();
   parse.pop_back();
 
-  if (!parse.IsEmpty())
+  if (!parse.empty())
     handle_event(ev::child_succeed(), false);
 }
 
 void match::impl::fail_item() {
   parse.pop_back();
 
-  if (!parse.IsEmpty())
+  if (!parse.empty())
     handle_event(ev::child_fail(), false);
   else
     fail_all();
