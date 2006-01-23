@@ -53,7 +53,8 @@ Export('shrd')
 
 SConscript(dirs = [
 '.', 
-'configuration', 
+'syswrap',
+'configuration',
 'plugin',
 'events',
 #'ui', 
