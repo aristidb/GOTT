@@ -1,5 +1,5 @@
 All snapshots shall be named:
 gott-snapshot-YYYY-MM-DD.tar.gz
-   
+    
 They shall include all files known by monotone
 
