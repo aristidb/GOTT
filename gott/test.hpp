@@ -1,0 +1,1 @@
+struct autodoc_test{};
