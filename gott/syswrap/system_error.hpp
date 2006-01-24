@@ -7,6 +7,9 @@
 
 namespace gott {
 
+/**
+ * Exception base class for system errors.
+ */
 class GOTT_EXPORT system_error : public std::runtime_error {
 protected:
   system_error(std::string const &);
