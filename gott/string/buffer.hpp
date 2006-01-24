@@ -57,6 +57,7 @@ public:
 
   /**
    * Construct buffer from string.
+   * \param x The string to construct the buffer from.
    */
   string_buffer(string const &x) : data(0) {
     string_buffer empty;
