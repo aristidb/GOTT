@@ -67,6 +67,7 @@ public:
   
   /**
    * Construct buffer from string.
+   * \param x The utf8 character range to construct the buffer from.
    */
   string_buffer(range_t<utf32_t const *> const &x) : data(0) {
     string_buffer empty;
