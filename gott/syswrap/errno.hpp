@@ -3,12 +3,12 @@
 #define GOTT_SYSWRAP_ERRNO_HPP
 
 #include <gott/visibility.hpp>
-#include <stdexcept>
+#include "system_error.hpp"
 
 namespace gott {
 GOTT_EXPORT void throw_errno_exception();
 
-class GOTT_EXPORT errno_exception : public std::runtime_error {
+class GOTT_EXPORT errno_exception : public system_error {
 public:
   GOTT_LOCAL int number() const { return num; }
   ~errno_exception() throw();
