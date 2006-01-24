@@ -27,7 +27,8 @@ namespace gott {
 
 /**
  * Atom class.
- * Atoms are strings with fast comparison and fast hashing but slow constructor.
+ * Atoms are strings with fast comparison and fast hashing but slow constructor
+ * and medium-slow copying.
  */
 class atom : public string {
 public:
@@ -43,11 +44,13 @@ public:
 
 /**
  * Compare two atoms for equality (fast).
+ * \relates atom
  */
 GOTT_EXPORT bool operator==(atom const &, atom const &);
 
 /**
  * Compare two atoms for inequality (fast).
+ * \relates atom
  */
 inline bool operator!=(atom const &a, atom const &b) {
   return !(a == b);
