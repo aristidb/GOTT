@@ -166,20 +166,36 @@ inline bool operator==(utf8_iterator a, utf8_iterator b) {
 }
 
 /**
- * Compare two utf8_iterators for inequality.
+ * Compare two utf8_iterator objects for inequality.
+ * \relates utf8_iterator
  */
 inline bool operator!=(utf8_iterator a, utf8_iterator b) {
   return !(a == b);
 }
 
+/**
+ * Compares two utf8_iterator objects.
+ * \relates utf8_iterator
+ */
 inline bool operator<(utf8_iterator a, utf8_iterator b) {
   return a.ptr() < b.ptr();
 }
 
+/**
+ * Compares two utf8_iterator objects.
+ * \relates utf8_iterator
+ */
 inline bool operator>(utf8_iterator a, utf8_iterator b) {
   return a.ptr() > b.ptr();
 }
 
+/**
+ * Substract two utf8_iterator objects.
+ * \param a The utf8_iterator to substract from.
+ * \param b The utf8_iterator to substract.
+ * \return The difference in complete characters.
+ * \relates utf8_iterator
+ */
 inline std::ptrdiff_t operator-(utf8_iterator a, utf8_iterator b) {
   if (a < b)
     return -(b - a);

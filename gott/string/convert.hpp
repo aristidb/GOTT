@@ -27,6 +27,11 @@
 
 namespace gott {
 
+/** \defgroup encoding Basic encoding handling functions
+ * Those are various functions for conveniently handling encoding.
+ * @{
+ */
+
 /**
  * Allocate and fill a buffer containing the UTF8 representation of the
  * encoded input string.
@@ -122,6 +127,8 @@ std::size_t utf8_len(utf32_t ch);
  */
 GOTT_EXPORT
 std::size_t enc_len(utf32_t ch, encoding enc);
+
+//@}
 
 }
 
