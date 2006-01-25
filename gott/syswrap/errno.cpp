@@ -6,8 +6,6 @@
 
 #include <string>
 
-#include <iostream>
-
 using gott::errno_exception;
 
 void gott::throw_errno_exception() {
