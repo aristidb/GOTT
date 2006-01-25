@@ -160,6 +160,7 @@ private:
 
 /**
  * Compare two utf8_iterators for equality.
+ * \relates utf8_iterator
  */
 inline bool operator==(utf8_iterator a, utf8_iterator b) {
   return a.ptr() == b.ptr();
