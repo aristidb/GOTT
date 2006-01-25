@@ -16,11 +16,10 @@
 " Config Note:   I chose not to deviate from the cvscommand.vim defaults, but
 "                I do recommend tweaking the user variables. I personally use:
 "
-"                let MTCommandEnableBufferSetup=1
-"                let MTCommandCommitOnWrite=1
-"                let MTCommandEdit='split'
-"                let MTCommandNameResultBuffers=1
-"                let MTCommandAutoSVK='svk'
+                let MTCommandEnableBufferSetup=1
+                let MTCommandCommitOnWrite=1
+                let MTCommandEdit='split'
+                let MTCommandNameResultBuffers=1
 "
 " Section: Documentation {{{1
 "
@@ -39,15 +38,6 @@
 " Command documentation {{{2
 "
 " MTAdd           Performs "monotone add" on the current file.
-"
-" MTAnnotate      Performs "monotone annotate" on the current file.  If an
-"                  argument is given, the argument is used as a revision
-"                  number to display.  If not given an argument, it uses the
-"                  most recent version of the file on the current branch.
-"                  Additionally, if the current buffer is a MTAnnotate buffer
-"                  already, the version number just prior to the one on the
-"                  current line is used.  This allows one to navigate back to
-"                  examine the previous version of a line.
 "
 " MTCommit        This is a two-stage command.  The first step opens a buffer to
 "                  accept a log message.  When that buffer is written, it is
@@ -188,13 +178,6 @@
 "   side-by-side.  If not set, it defaults to 'horizontal' for all but
 "   MTVimDiff windows.
 "
-" MTCommandAutoSVK
-"   This variable is a hack to allow monotonecommand.vim to work for basic svk
-"   operations. It MUST be used in combination with
-"   MTCommandEnableBufferSetup. During buffer setup, the script will stat
-"   .monotone/entries, and if it doesn't exist, it sets the monotone executable name
-"   (b:MTCommandMTExec) to the value of MTCommandAutoSVK. This hack works
-"   only because of the similarity in commandlines between monotone and svk.
 "
 " Event documentation {{{2
 "   For additional customization, monotonecommand.vim uses User event autocommand
@@ -494,13 +477,13 @@ function! s:MTGetStatusVars(revisionVar, branchVar, repositoryVar)
   let realFileName = fnamemodify(s:MTResolveLink(fileName), ':t')
   let oldCwd=s:MTChangeToCurrentFileDir(fileName)
 
-  let monotoneCommand = s:MTGetOption("MTCommandMTExec", "monotone") . " info " . escape(realFileName, ' *?\')
+  let monotoneCommand = s:MTGetOption("MTCommandMTExec", "monotone") . " status " . escape(realFileName, ' *?\')
   let statustext=system(monotoneCommand)
   if(v:shell_error)
     execute 'cd' escape(oldCwd, ' ')
     return ""
   endif
-  let revision=substitute(statustext, '^\_.*Revision:\s*\(\d\+\)\_.*', '\1', "")
+  let revision=substitute(statustext, '^\_.*old_revision\s*\[\([0-9a-f]\+\)\]\_.*', '\1', "")
 
   " We can still be in a MT-controlled directory without this being a MT
   " file
@@ -543,15 +526,6 @@ function! s:MTSetupBuffer()
 
   if !filereadable(expand("%"))
     return -1
-  endif
-
-  " check for MTCommandAutoSVK to do evil overriding
-  if s:MTGetOption("MTCommandAutoSVK", 'unset') != 'unset'
-    " The first thing we do is check for a .monotone file, if it's not there, then
-    " we go into svk mode MUAHAHAHAHA
-    if !filereadable('.monotone/entries')
-      let b:MTCommandMTExec = s:MTGetOption("MTCommandAutoSVK", 'svk')
-    endif
   endif
 
   let revision=""
@@ -665,60 +639,6 @@ function! s:MTAdd()
   return s:MTMarkOrigBufferForSetup(s:MTDoCommand('add', 'monotoneadd', ''))
 endfunction
 
-" Function: s:MTAnnotate(...) {{{2
-function! s:MTAnnotate(...)
-  let monotoneBufferCheck=s:MTCurrentBufferCheck()
-  if monotoneBufferCheck == -1 
-    echo "Original buffer no longer exists, aborting."
-    return -1
-  endif
-
-  let fileName=bufname(monotoneBufferCheck)
-  let realFileName = fnamemodify(s:MTResolveLink(fileName), ':t')
-  let oldCwd=s:MTChangeToCurrentFileDir(fileName)
-
-  let currentLine=line(".")
-
-  if a:0 == 0
-    " we already are in a MT Annotate buffer
-    if &filetype == "MTAnnotate"
-      let revision = substitute(getline("."),'\(^[0-9.]*\).*','\1','')
-      let revmin = substitute(revision,'^[0-9.]*\.\([0-9]\+\)','\1','') + 0 -1 
-      let revmaj = substitute(revision,'^\([0-9.]*\)\.[0-9]\+','\1','')
-      if revmin == 0
-        " Jump to ancestor branch
-        let revision = substitute(revmaj,'^\([0-9.]*\)\.[0-9]\+','\1','')
-      else
-        let revision=revmaj . "." .  revmin
-      endif
-    else
-      let revision=MTGetRevision()
-      if revision == ""
-        echo "Unable to obtain status for " . fileName
-        execute 'cd' escape(oldCwd, ' ')
-        return -1
-      endif
-    endif
-  else
-    let revision=a:1
-  endif
-
-  if revision == "NEW"
-    echo "No annotatation available for new file " . fileName
-    execute 'cd' escape(oldCwd, ' ')
-    return -1
-  endif
-
-  let resultBuffer=s:MTCreateCommandBuffer('annotate -r ' . revision . ' "' . realFileName . '"', 'monotoneannotate', revision, monotoneBufferCheck) 
-  if resultBuffer !=  -1
-    exec currentLine
-    set filetype=MTAnnotate
-  endif
-
-  execute 'cd' escape(oldCwd, ' ')
-  return resultBuffer
-endfunction
-
 " Function: s:MTCommit() {{{2
 function! s:MTCommit()
   let monotoneBufferCheck=s:MTCurrentBufferCheck()
@@ -771,8 +691,10 @@ function! s:MTCommit()
 
   let fullname = newCwd 
   if strlen(newCwd) > 0
-    fullname = fullname . "/"
-  fullname = fullname . realFileName
+    let fullname = fullname . "/"
+  endif
+  let fullname = fullname . realFileName
+
   let monotoneCommand = s:MTGetOption("MTCommandMTExec", "monotone") . " status " . escape(fullname, ' *?\')
   let statustext=system(monotoneCommand)
 
@@ -844,11 +766,11 @@ function! s:MTFinishCommit(messageFile, targetDir, targetFile, origBuffNR)
     if strlen(a:targetDir) > 0
       execute 'cd' escape(a:targetDir, ' ')
     endif
-    let resultBuffer=s:MTCreateCommandBuffer('commit -F "' . a:messageFile . '" "'. a:targetFile . '"', 'monotonecommit', '', a:origBuffNR)
+
+    execute '!monotone ' . 'commit --message-file="' . a:messageFile . '" "'. a:targetFile . '"'
     execute 'cd' escape(oldCwd, ' ')
     execute 'bw' escape(a:messageFile, ' *?\')
     silent execute 'call delete("' . a:messageFile . '")'
-    return s:MTMarkOrigBufferForSetup(resultBuffer)
   else
     echoerr "Can't read message file; no commit is possible."
     return -1
@@ -1061,7 +983,6 @@ com! MTReload unlet! loaded_monotonecommand | runtime plugin/monotonecommand.vim
 
 " Section: Plugin command mappings {{{1
 nnoremap <silent> <Plug>MTAdd :MTAdd<CR>
-nnoremap <silent> <Plug>MTAnnotate :MTAnnotate<CR>
 nnoremap <silent> <Plug>MTCommit :MTCommit<CR>
 nnoremap <silent> <Plug>MTDiff :MTDiff<CR>
 nnoremap <silent> <Plug>MTGotoOriginal :MTGotoOriginal<CR>
@@ -1079,9 +1000,6 @@ nnoremap <silent> <Plug>MTCommitDiff :MTCommitDiff<CR>
 " Section: Default mappings {{{1
 if !hasmapto('<Plug>MTAdd')
   nmap <unique> <Leader>sa <Plug>MTAdd
-endif
-if !hasmapto('<Plug>MTAnnotate')
-  nmap <unique> <Leader>sn <Plug>MTAnnotate
 endif
 if !hasmapto('<Plug>MTClearAndGotoOriginal')
   nmap <unique> <Leader>sG <Plug>MTClearAndGotoOriginal
@@ -1120,7 +1038,6 @@ endif
 " Section: Menu items {{{1
 silent! aunmenu Plugin.MT
 amenu <silent> &Plugin.MT.&Add        <Plug>MTAdd
-amenu <silent> &Plugin.MT.A&nnotate   <Plug>MTAnnotate
 amenu <silent> &Plugin.MT.&Commit     <Plug>MTCommit
 amenu <silent> &Plugin.MT.&Diff       <Plug>MTDiff
 amenu <silent> &Plugin.MT.&Log        <Plug>MTLog
