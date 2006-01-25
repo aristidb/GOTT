@@ -769,7 +769,11 @@ function! s:MTCommit()
 
   silent put='--This line, and those below, will be ignored--'
 
-  let monotoneCommand = s:MTGetOption("MTCommandMTExec", "monotone") . " status " . escape(newCwd ."/". realFileName, ' *?\')
+  let fullname = newCwd 
+  if strlen(newCwd) > 0
+    fullname = fullname . "/"
+  fullname = fullname . realFileName
+  let monotoneCommand = s:MTGetOption("MTCommandMTExec", "monotone") . " status " . escape(fullname, ' *?\')
   let statustext=system(monotoneCommand)
 
   silent put=statustext
