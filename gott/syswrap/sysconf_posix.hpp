@@ -42,9 +42,9 @@ const len_t posix_stream_max = _POSIX_STREAM_MAX;
 
 const len_t posix_symloop_max = _POSIX_SYMLOOP_MAX;
 
-const len_t tty_name_max = _POSIX_TTY_NAME_MAX;
+const len_t posix_tty_name_max = _POSIX_TTY_NAME_MAX;
 
-const len_t timezone_name_max = _SC_TZNAME_MAX;
+const len_t posix_timezone_name_max = _POSIX_TZNAME_MAX;
 
 const len_t posix_version_ct = _POSIX_VERSION;
 
