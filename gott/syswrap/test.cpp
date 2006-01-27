@@ -3,6 +3,7 @@
 #include "errno.hpp"
 #include "scoped_unix_file.hpp"
 #include "open_unix.hpp"
+#include "sysconf_posix.hpp"
 #include <iostream>
 #include <errno.h>
 
