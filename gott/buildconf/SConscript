@@ -72,5 +72,7 @@ if debug == 1:
 if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 	print 'Boost headers are not installed'
 	Exit(1)
+if conf.CheckCHeader('unistd.h', '<>'):
+	conf.env.Append(CPPDEFINES = 'HAS_UNISTD_H')
 
 Return('conf')
