@@ -21,9 +21,9 @@ int main() {
   close(666);
   throw_catch();
   gott::scoped_unix_file f(gott::creat_unix("testfile", 00666));
-  gott::write_unix(f.access(), "Zero-terminated file.");
+  gott::write_unix(f.access(), "Zero-terminated file.\n");
   f.reset(gott::open_unix("testfile", O_RDONLY));
   char buf[1024];
   std::size_t len = gott::read_unix(f.access(), buf);
-  std::cout << "Read " << len << " characters: " << buf << std::endl;
+  std::cout << "Read " << len << " characters: " << buf;
 }
