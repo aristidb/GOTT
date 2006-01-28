@@ -3,6 +3,7 @@
 #include "errno.hpp"
 #include "scoped_unix_file.hpp"
 #include "open_unix.hpp"
+#include "read_write_unix.hpp"
 #include "sysconf_posix.hpp"
 #include <iostream>
 #include <errno.h>
@@ -20,5 +21,9 @@ int main() {
   close(666);
   throw_catch();
   gott::scoped_unix_file f(gott::creat_unix("testfile", 00666));
-  std::cout << f.access() << std::endl;
+  gott::write_unix(f.access(), "Zero-terminated file.");
+  f.reset(gott::open_unix("testfile", O_RDONLY));
+  char buf[1024];
+  std::size_t len = gott::read_unix(f.access(), buf);
+  std::cout << "Read " << len << " characters: " << buf << std::endl;
 }
