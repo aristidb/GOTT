@@ -21,7 +21,9 @@
 #include "epoll_loop.hpp"
 #include "sigselfpipe.hpp"
 #include <gott/string/qid.hpp>
-#include <sys/epoll.h>
+#include <gott/syswrap/epoll_linux.hpp>
+#include <gott/syswrap/scoped_unix_file.hpp>
+#include <gott/syswrap/system_error.hpp>
 #include <set>
 #include <map>
 #include <boost/optional/optional.hpp>
@@ -32,18 +34,11 @@
 using gott::events::epoll_loop;
 
 class epoll_loop::impl {
-  static int epoll_create_wrapper(int size) {
-    int result = epoll_create(size);
-    // TODO check for errors
-    return result;
-  }
-
 public:
-  impl() : running(false), epoll_fd(epoll_create_wrapper(1024)) {}
-  ~impl() { close(epoll_fd); }
+  impl() : running(false), epoll_conn(epoll_create_linux(1024)) {}
 
   bool running;
-  int epoll_fd;
+  scoped_unix_file epoll_conn;
 
   struct fd_entry {
     unsigned mask;
@@ -102,9 +97,11 @@ void epoll_loop::add_fd(int fd, unsigned mask,
     ev.events |= EPOLLERR | EPOLLHUP;
   ev.data.fd = fd;
 
-  int result = epoll_ctl(p->epoll_fd, EPOLL_CTL_ADD, fd, &ev);
-  if (result == -1)
+  try {
+    epoll_ctl_linux(p->epoll_conn.access(), EPOLL_CTL_ADD, fd, &ev);
+  } catch (system_error const &) {
     throw fd_manager::installation_error();
+  }
 }
 
 void epoll_loop::remove_fd(int fd) {
@@ -114,9 +111,11 @@ void epoll_loop::remove_fd(int fd) {
   if (it->second.wait)
     p->wait_fds.erase(fd);
   p->fd_map.erase(it);
-  int result = epoll_ctl(p->epoll_fd, EPOLL_CTL_DEL, fd, 0);
-  if (result == -1)
+  try {
+    epoll_ctl_linux(p->epoll_conn.access(), EPOLL_CTL_DEL, fd, 0);
+  } catch (system_error const &) {
     throw fd_manager::installation_error();
+  }
 }
 
 void epoll_loop::run() {
@@ -133,7 +132,7 @@ void epoll_loop::run() {
       break;
     
     epoll_event event[64];
-    int ready = epoll_wait(p->epoll_fd, event, 64, timeout);
+    int ready = epoll_wait_linux(p->epoll_conn.access(), event, 64, timeout);
     for (int i = 0; i < ready; ++i) {
       int fd = event[i].data.fd;
       std::map<int, impl::fd_entry>::iterator it = p->fd_map.find(fd);

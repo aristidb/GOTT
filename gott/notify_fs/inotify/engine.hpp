@@ -22,6 +22,7 @@
 #define GOTT_NOTIFY_FS_INOTIFY_ENGINE_HPP
 
 #include "../engine.hpp"
+#include <gott/syswrap/scoped_unix_file.hpp>
 #include <map>
 
 namespace gott {
@@ -35,7 +36,7 @@ public:
 
 //private:
 public: //FIXME => private
-  int fd;
+  scoped_unix_file conn;
   void notify();
   std::map<boost::uint32_t, watch_implementation *> watches;
 };

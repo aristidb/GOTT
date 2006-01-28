@@ -56,7 +56,7 @@ int main() {
       //new epoll_loop);
 #if 1
   loop->feature<fd_manager>().add_fd(
-    ee.fd, fd_manager::read, boost::bind(&inotify_engine::notify, &ee));
+    ee.conn.access(),fd_manager::read,boost::bind(&inotify_engine::notify,&ee));
 #endif
 #if 1
   loop->feature<signal_manager>().on_signal(SIGINT).connect(

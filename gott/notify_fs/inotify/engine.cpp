@@ -20,9 +20,8 @@
 
 #include "engine.hpp"
 #include "../watch.hpp"
-
+#include <gott/syswrap/read_write_unix.hpp>
 #include <algorithm>
-
 #include <unistd.h>
 extern "C" {
 #include "inotify.h"
@@ -37,16 +36,11 @@ using gott::notify_fs::watch_implementation;
 using gott::notify_fs::ev_t;
 using gott::notify_fs::watch;
 
-inotify_engine::inotify_engine() : fd(inotify_init()) {
-  if (fd < 0) {
-    std::cout << "Failed to load Inotify!" << std::endl;
-    throw 0;
-  }
+inotify_engine::inotify_engine() : conn(inotify_init()) {
   std::cout << "Inotify up and running..." << std::endl;
 }
 
 inotify_engine::~inotify_engine() {
-  close(fd);
   std::cout << "Shut down Inotify." << std::endl;
 }
 
@@ -58,7 +52,7 @@ boost::int32_t get_watch(inotify_engine &eng, string const &path,
   char *c_path = new char[path.size() + 1];
   c_path[path.size()] = '\0';
   std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path);
-  boost::int32_t result = inotify_add_watch(eng.fd, c_path, mask);
+  boost::int32_t result = inotify_add_watch(eng.conn.access(), c_path, mask);
   delete [] c_path;
   return result;
 }
@@ -77,7 +71,7 @@ struct inotify_watch : watch_implementation {
   ~inotify_watch() {
     std::cout << "Remove watch from " << &eng.watches << " : " << wd << std::endl;
     eng.watches.erase(wd);
-    inotify_rm_watch(eng.fd, wd);
+    inotify_rm_watch(eng.conn.access(), wd);
   }
 };
 }
@@ -130,11 +124,7 @@ int read_events (queue_t q, int fd)
 void inotify_engine::notify() {
   std::cout << "New events:" << std::endl;
   char buffer[16384];
-  ssize_t r = read(fd, buffer, sizeof(buffer));
-  if (r <= 0) {
-    std::cout << "Communication problems with inotify!" << std::endl;
-    return;
-  }
+  size_t r = read_unix(conn.access(), buffer, sizeof(buffer));
   for (size_t i = 0; i < size_t(r);) {
     inotify_event *pevent = reinterpret_cast<inotify_event *>(buffer + i);
     if (i + sizeof(inotify_event) >= sizeof(buffer) 
@@ -143,12 +133,7 @@ void inotify_engine::notify() {
       size_t rest = sizeof(buffer) - i;
       memmove(pevent, buffer, rest);
       i = 0;
-      r = read(fd, buffer + rest, sizeof(buffer) - rest);
-      if (r <= 0) {
-        std::cout << "Communication problems with inotify!" << std::endl;
-        return;
-      }
-      r += rest;
+      r = read_unix(conn.access(), buffer + rest, sizeof(buffer) - rest) + rest;
       continue;
     }
     i += sizeof(inotify_event) + pevent->len;

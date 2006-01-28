@@ -20,6 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "select_loop.hpp"
+#include <gott/syswrap/select_unix.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/utility/in_place_factory.hpp>
 
@@ -93,8 +94,7 @@ void select_loop::run(){
     
     if (!has_wait_timers() && wait_fds.empty())
       break;
-    if ((num_fd = select(n, &read_fds, &write_fds, &except_fds, t)) == -1)
-      break;
+    num_fd = select_unix(n, &read_fds, &write_fds, &except_fds, t);
 
     for( callback_map::const_iterator it = callbacks.begin(), 
           e = callbacks.end(); 
