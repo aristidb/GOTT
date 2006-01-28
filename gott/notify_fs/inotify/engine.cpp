@@ -21,12 +21,10 @@
 #include "engine.hpp"
 #include "../watch.hpp"
 #include <gott/syswrap/read_write_unix.hpp>
+#include <gott/syswrap/inotify_linux.hpp>
+#include <gott/syswrap/system_error.hpp>
 #include <algorithm>
 #include <unistd.h>
-extern "C" {
-#include "inotify.h"
-#include "inotify-syscalls.h"
-}
 
 #include <iostream>
 
@@ -36,7 +34,7 @@ using gott::notify_fs::watch_implementation;
 using gott::notify_fs::ev_t;
 using gott::notify_fs::watch;
 
-inotify_engine::inotify_engine() : conn(inotify_init()) {
+inotify_engine::inotify_engine() : conn(inotify_init_linux()) {
   std::cout << "Inotify up and running..." << std::endl;
 }
 
@@ -52,7 +50,13 @@ boost::int32_t get_watch(inotify_engine &eng, string const &path,
   char *c_path = new char[path.size() + 1];
   c_path[path.size()] = '\0';
   std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path);
-  boost::int32_t result = inotify_add_watch(eng.conn.access(), c_path, mask);
+  boost::uint32_t result;
+  try {
+    result = gott::inotify_add_watch_linux(eng.conn.access(), c_path, mask);
+  } catch (gott::system_error const &) {
+    delete [] c_path;
+    throw gott::notify_fs::watch_installation_failure(path);
+  }
   delete [] c_path;
   return result;
 }
@@ -63,15 +67,13 @@ struct inotify_watch : watch_implementation {
   watch &context;
 
   inotify_watch(inotify_engine *e, string const &path, ev_t mask, watch &w)
-  : eng(*e), wd(get_watch(eng, path, mask)), context(w) {
-    if (wd < 0)
-      throw gott::notify_fs::watch_installation_failure(path);
-  }
+  : eng(*e), wd(get_watch(eng, path, mask)), context(w) {}
 
   ~inotify_watch() {
-    std::cout << "Remove watch from " << &eng.watches << " : " << wd << std::endl;
+    std::cout << "Remove watch from " << &eng.watches << " : " << wd 
+      << std::endl;
     eng.watches.erase(wd);
-    inotify_rm_watch(eng.conn.access(), wd);
+    gott::inotify_rm_watch_linux(eng.conn.access(), wd);
   }
 };
 }
