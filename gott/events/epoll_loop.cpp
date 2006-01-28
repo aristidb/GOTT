@@ -24,6 +24,8 @@
 #include <gott/syswrap/epoll_linux.hpp>
 #include <gott/syswrap/scoped_unix_file.hpp>
 #include <gott/syswrap/system_error.hpp>
+#include <gott/syswrap/errno.hpp>
+#include <errno.h>
 #include <set>
 #include <map>
 #include <boost/optional/optional.hpp>
@@ -132,14 +134,19 @@ void epoll_loop::run() {
       break;
     
     epoll_event event[64];
-    int ready = epoll_wait_linux(p->epoll_conn.access(), event, 64, timeout);
-    for (int i = 0; i < ready; ++i) {
-      int fd = event[i].data.fd;
-      std::map<int, impl::fd_entry>::iterator it = p->fd_map.find(fd);
-      if (it != p->fd_map.end()) {
-        impl::fd_entry &e = it->second;
-        e.callback(e.mask);
+    try {
+      int ready = epoll_wait_linux(p->epoll_conn.access(), event, 64, timeout);
+      for (int i = 0; i < ready; ++i) {
+        int fd = event[i].data.fd;
+        std::map<int, impl::fd_entry>::iterator it = p->fd_map.find(fd);
+        if (it != p->fd_map.end()) {
+          impl::fd_entry &e = it->second;
+          e.callback(e.mask);
+        }
       }
+    } catch (errno_exception const &e) {
+      if (e.number() != EINTR)
+        throw;
     }
   }
 }

@@ -51,9 +51,15 @@ int main() {
   watch w2("/tmp", all_events);
   w.on_fire().connect(boost::bind(&output, _1, 1));
   w2.on_fire().connect(boost::bind(&output, _1, 2));
+
   boost::scoped_ptr<main_loop> loop(
-      new select_loop);
-      //new epoll_loop);
+#if 0
+      new select_loop
+#else
+      new epoll_loop
+#endif
+  );
+
 #if 1
   loop->feature<fd_manager>().add_fd(
     ee.conn.access(),fd_manager::read,boost::bind(&inotify_engine::notify,&ee));

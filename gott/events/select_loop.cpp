@@ -21,6 +21,8 @@
 
 #include "select_loop.hpp"
 #include <gott/syswrap/select_unix.hpp>
+#include <gott/syswrap/errno.hpp>
+#include <errno.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/utility/in_place_factory.hpp>
 
@@ -94,24 +96,30 @@ void select_loop::run(){
     
     if (!has_wait_timers() && wait_fds.empty())
       break;
-    num_fd = select_unix(n, &read_fds, &write_fds, &except_fds, t);
+    try {
+      num_fd = select_unix(n, &read_fds, &write_fds, &except_fds, t);
 
-    for( callback_map::const_iterator it = callbacks.begin(), 
-          e = callbacks.end(); 
-       num_fd && it!=e;
-       ++it)  {
-      unsigned mask = 0;
-      if( FD_ISSET( it->first, &read_fds ) ) 
-        mask |= fd_manager::read;
-      if( FD_ISSET( it->first, &write_fds) )
-        mask |= fd_manager::write;
-      if( FD_ISSET( it->first, &except_fds) ) 
-        mask |= fd_manager::exception;
-      if (mask) {
-        --num_fd;
-        it->second.callback(mask);
+      for( callback_map::const_iterator it = callbacks.begin(), 
+            e = callbacks.end(); 
+         num_fd && it!=e;
+         ++it)  {
+        unsigned mask = 0;
+        if( FD_ISSET( it->first, &read_fds ) ) 
+          mask |= fd_manager::read;
+        if( FD_ISSET( it->first, &write_fds) )
+          mask |= fd_manager::write;
+        if( FD_ISSET( it->first, &except_fds) ) 
+          mask |= fd_manager::exception;
+        if (mask) {
+          --num_fd;
+          it->second.callback(mask);
+        }
       }
+    } catch (errno_exception const &e) {
+      if (e.number() != EINTR)
+        throw;
     }
+
     for( callback_map::const_iterator it = callbacks.begin(), 
            e = callbacks.end(); 
          it!=e;
