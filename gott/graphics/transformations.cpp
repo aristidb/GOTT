@@ -19,8 +19,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "transformations.hpp"
+#include <algorithm>
 
 namespace graphics = gott::graphics;
 using graphics::transformations;
 
-transformations transformations::identity;
+namespace math = boost::numeric::ublas;
+
+transformations const transformations::identity;
+
+transformations::transformations() 
+: mtx(math::identity_matrix<double>(3)) {}
+transformations::transformations(transformations const &o) : mtx(o.mtx) {}
+transformations::~transformations() {}

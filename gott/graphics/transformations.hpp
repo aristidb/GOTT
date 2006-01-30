@@ -22,6 +22,7 @@
 #define GOTT_GRAPHICS_TRANSFORMATIONS_HPP
 
 #include <gott/visibility.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 
 namespace gott {
 namespace graphics {
@@ -31,11 +32,14 @@ namespace graphics {
  */
 class transformations {
 public:
-  /// Constructor.
-  transformations() {}
+  /// Default-Constructor.
+  GOTT_EXPORT transformations();
+
+  /// Copy-Constructor.
+  GOTT_EXPORT transformations(transformations const &);
 
   /// Destructor.
-  ~transformations() {}
+  GOTT_EXPORT ~transformations();
   
   /**
    * Rotate.
@@ -67,7 +71,7 @@ public:
   GOTT_EXPORT static transformations const identity;
 
 private:
-  // ...
+  boost::numeric::ublas::matrix<double> mtx;
 };
 
 /**
