@@ -71,7 +71,14 @@ public:
   GOTT_EXPORT static transformations const identity;
 
 private:
-  boost::numeric::ublas::matrix<double> mtx;
+  typedef
+    boost::numeric::ublas::matrix<
+      double,
+      boost::numeric::ublas::row_major,
+      boost::numeric::ublas::bounded_array<double, 9>
+    >
+    matrix_t;
+  matrix_t mtx;
 };
 
 /**
