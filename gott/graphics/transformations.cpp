@@ -34,25 +34,32 @@ transformations::transformations()
 transformations::transformations(transformations const &o) : mtx(o.mtx) {}
 transformations::~transformations() {}
 
-void transformations::rotate(double phi) {
+void transformations::swap(transformations &x) {
+  mtx.swap(x.mtx);
+}
+
+transformations &transformations::rotate(double phi) {
   double sin_phi = std::sin(phi);
   double cos_phi = std::cos(phi);
   matrix_t helper(math::identity_matrix<double>(3));
   helper(0, 0) = cos_phi;  helper(0, 1) = sin_phi;
   helper(1, 0) = -sin_phi; helper(1, 1) = cos_phi;
   mtx = prod(mtx, helper);
+  return *this;
 }
 
-void transformations::translate(double dx, double dy) {
+transformations &transformations::translate(double dx, double dy) {
   matrix_t helper(math::identity_matrix<double>(3));
   helper(2, 0) = dx; helper(2, 1) = dy;
   mtx = prod(mtx, helper);
+  return *this;
 }
 
-void transformations::scale(double sx, double sy) {
+transformations &transformations::scale(double sx, double sy) {
   matrix_t helper(math::identity_matrix<double>(3));
   helper(0, 0) = sx; helper(1, 1) = sy;
   mtx = prod(mtx, helper);
+  return *this;
 }
 
 void transformations::apply(double &x, double &y) {

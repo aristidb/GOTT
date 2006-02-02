@@ -40,26 +40,35 @@ public:
 
   /// Destructor.
   GOTT_EXPORT ~transformations();
+
+  /// Assignment.
+  transformations &operator=(transformations x) {
+    x.swap(*this);
+    return *this;
+  }
+
+  /// Swapping.
+  GOTT_EXPORT void swap(transformations &);
   
   /**
    * Rotate.
    * \param rot Rotation (counter-clockwise) in radian.
    */
-  GOTT_EXPORT void rotate(double rot);
+  GOTT_EXPORT transformations &rotate(double rot);
 
   /**
    * Translate.
    * \param dx Shift to the right.
    * \param dy Shift upwards.
    */
- GOTT_EXPORT void translate(double dx, double dy);
+ GOTT_EXPORT transformations &translate(double dx, double dy);
 
   /**
    * Scale. 1.0 means no resize.
    * \param rx Ratio in x direction.
    * \param ry Ratio in y direction.
    */
-  GOTT_EXPORT void scale(double rx, double ry);
+  GOTT_EXPORT transformations &scale(double rx, double ry);
 
   /**
    * Apply all transformations to the point (x,y).
