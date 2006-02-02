@@ -4,10 +4,10 @@
 
 namespace g = gott::graphics;
 
-double const pi = 3.14159265;
+double const pi = 4 * std::atan(1.0);
 
 bool check(double isx, double isy, double expx, double expy, int test) {
-  double const epsilon = 1.0E-5;
+  double const epsilon = 1.0E-13;
   double dx = std::fabs(isx - expx);
   double dy = std::fabs(isy - expy);
   if (dx < epsilon && dy < epsilon)
