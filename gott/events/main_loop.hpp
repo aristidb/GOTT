@@ -33,7 +33,7 @@
  * the provisions above, a recipient may use your version of this file under
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
- * ***** END LICENSE BLOCK ***** *//
+ * ***** END LICENSE BLOCK ***** */
 
 #ifndef GOTT_BASE_EVENTS_MAIN_LOOP_HPP
 #define GOTT_BASE_EVENTS_MAIN_LOOP_HPP
