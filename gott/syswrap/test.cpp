@@ -61,4 +61,9 @@ int main() {
   char buf[1024];
   std::size_t len = gott::read_unix(f.access(), buf);
   std::cout << "Read " << len << " characters: " << buf;
+  std::cout << "Page size: " << gott::sys_conf::pagesize() << std::endl;
+  std::cout << "Compile time posix version: " << 
+    gott::sys_conf::posix_version_ct << std::endl;
+  std::cout << "Posix version: " << 
+    gott::sys_conf::posix_version() << std::endl;
 }
