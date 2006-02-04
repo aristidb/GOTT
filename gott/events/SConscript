@@ -41,8 +41,20 @@ Import('shrd')
 Import('env')
 
 conf = Configure(shrd.Copy())
-conf.CheckLib('boost_thread', language = 'c++')
-conf.CheckLib('boost_date_time', language = 'c++')
+
+    
+if not conf.CheckLib('boost_thread-mt', language = 'c++'):
+    if not conf.CheckLib('boost_thread', language = 'c++'):
+        print "cant find boost thread lib\n"
+        Exit(1)
+        
+
+if not conf.CheckLib('boost_date_time-mt', language = 'c++'):
+    if not conf.CheckLib('boost_date_time', language = 'c++'):
+        print "cant find boost date time lib\n"
+        Exit(1)
+
+
 my_shrd = conf.Finish()
 my_shrd.ParseConfig('pkg-config --libs sigc++-2.0')
 my_shrd.ParseConfig('pkg-config --cflags sigc++-2.0')
