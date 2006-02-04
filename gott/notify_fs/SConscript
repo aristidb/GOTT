@@ -39,7 +39,12 @@ import glob
 Import('env')
 
 env.SharedLibrary('notify_fs', ['watch.cpp', 'engine.cpp'])
+env = env.Copy()
 env.Append(LIBS = ['notify_fs'])
 env.SharedLibrary('notify_inotify', glob.glob('inotify/*.cpp'))
+env = env.Copy()
+env.Append(LIBS = ['notify_inotify'])
+
+Export('env')
 
 env.Program('test', 'test.cpp')

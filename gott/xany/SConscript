@@ -38,4 +38,7 @@
 Import('env')
 
 env.SharedLibrary('xany', 'xany.cpp')
+env = env.Copy()
 env.Append(LIBS = ['xany'])
+
+Export('env')

@@ -43,7 +43,7 @@ if os.environ.has_key('CXX'):
 	cxx = os.environ['CXX']
 cxx = ARGUMENTS.get('cxx', cxx)
 cflags = Split(ARGUMENTS.get('cflags', Environment()['CXXFLAGS']))
-release = int(ARGUMENTS.get('release', 0))
+release = int(ARGUMENTS.get('release', 1))
 if release:
 	debug = 0
 	optimize = 'full'
@@ -86,7 +86,6 @@ conf = SConscript('buildconf/SConscript')
 env = conf.Finish()
 
 dirs = [
-'.',
 'tools/autobuild',
 'debug',
 'syswrap',
@@ -98,10 +97,9 @@ dirs = [
 'notify_fs',
 'graphics',
 'plugin',
-'properties'
+'properties',
+'.'
 ]
 
-print 'Initial libs: ', env['LIBS']
 for x in dirs:
   SConscript(dirs = x)
-  print 'Libs after ', x, ': ', env['LIBS']

@@ -49,7 +49,10 @@ for root, dirs, _ in os.walk('.'):
 	source_files += glob.glob(root + '/*.cpp')
 
 env.SharedLibrary('tdl', source_files)
+env = env.Copy()
 env.Append(LIBS = 'tdl')
+
+Export('env')
 
 module_test_obj = [
     'test/test_tut.cpp', 

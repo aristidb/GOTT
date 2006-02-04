@@ -38,6 +38,9 @@
 import glob
 Import('env')
 env.SharedLibrary('graphics', glob.glob('*.cpp'))
+env = env.Copy()
 env.Append(LIBS = ['graphics'])
+
+Export('env')
 
 SConscript(dirs = ['test'])
