@@ -37,9 +37,4 @@
 
 Import('env')
 
-my_env = env.Copy()
-my_env.ParseConfig('pkg-config --libs sigc++-2.0')
-my_env.ParseConfig('pkg-config --cflags sigc++-2.0')
-my_env.Append(LIBS = ['string'])
-
-my_env.Program('test.cpp')
+env.Program('test.cpp', LIBS = ['string'])

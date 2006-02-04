@@ -40,32 +40,12 @@ import glob
 Import('shrd')
 Import('env')
 
-conf = Configure(shrd.Copy())
-
-    
-if not conf.CheckLib('boost_thread-mt', language = 'c++'):
-    if not conf.CheckLib('boost_thread', language = 'c++'):
-        print "cant find boost thread lib\n"
-        Exit(1)
-        
-
-if not conf.CheckLib('boost_date_time-mt', language = 'c++'):
-    if not conf.CheckLib('boost_date_time', language = 'c++'):
-        print "cant find boost date time lib\n"
-        Exit(1)
-
-
-my_shrd = conf.Finish()
-my_shrd.ParseConfig('pkg-config --libs sigc++-2.0')
-my_shrd.ParseConfig('pkg-config --cflags sigc++-2.0')
-
-my_env = env.Copy()
-my_env.ParseConfig('pkg-config --libs sigc++-2.0')
-my_env.ParseConfig('pkg-config --cflags sigc++-2.0')
+Import('boost_date_time_lib')
+Import('boost_thread_lib')
 
 libobj = glob.glob('*.cpp')
 libobj.remove('auto_loop_test.cpp')
 libobj.remove('mq_test.cpp')
-my_shrd.SharedLibrary('events', libobj)
-my_env.Program('auto_loop', 'auto_loop_test.cpp', LIBS=['syswrap','string','events'])
-my_env.Program('mq', 'mq_test.cpp', LIBS=['syswrap','string','events'])
+shrd.SharedLibrary('events', libobj, LIBS=[boost_date_time_lib, boost_thread_lib])
+env.Program('auto_loop', 'auto_loop_test.cpp', LIBS=['syswrap','string','events'])
+env.Program('mq', 'mq_test.cpp', LIBS=['syswrap','string','events'])
