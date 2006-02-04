@@ -36,13 +36,10 @@
 # ***** END LICENSE BLOCK *****
 
 import glob
-Import('shrd')
 Import('env')
 
 libobj = glob.glob('*.cpp')
 libobj.remove('test.cpp')
-shrd.SharedLibrary('syswrap', glob.glob('*.cpp'))
+env.SharedLibrary('syswrap', glob.glob('*.cpp'))
 
-my_env = env.Copy()
-my_env.Append(LIBS = 'syswrap')
-my_env.Program('test', 'test.cpp')
+env.Program('test', 'test.cpp')

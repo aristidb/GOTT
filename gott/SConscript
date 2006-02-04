@@ -36,8 +36,4 @@
 # ***** END LICENSE BLOCK *****
 
 Import('env')
-my_env = env.Copy()
-my_env.Append(LIBS = 'string')
-my_env.Program('thunk_test', 'thunk.cpp')
-
-SConscript(dirs = ['tdl', 'xany', 'properties', 'debug', 'string'])
+env.Program('thunk_test', 'thunk.cpp')

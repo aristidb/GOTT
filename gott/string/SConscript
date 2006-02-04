@@ -38,10 +38,8 @@
 import glob
 
 Import('env')
-Import('shrd')
 
-shrd.SharedLibrary('string', glob.glob('*.cpp'))
+env.SharedLibrary('string', glob.glob('*.cpp'))
+env.Append(LIBS = ['string'])
 
-my_env = env.Copy()
-my_env.Append(LIBS = ['string'])
-my_env.Program('string_test', glob.glob('test/*.cpp'))
+env.Program('string_test', glob.glob('test/*.cpp'))

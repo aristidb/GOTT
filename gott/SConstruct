@@ -72,6 +72,7 @@ env = Environment(
   ENV = os.environ, # FIXME: security hole?
   CXX = cxx, 
   CCFLAGS = cflags, 
+  SHCCFLAGS = ['-DBUILDING_DLL'],
   CPPPATH=['#/..'], 
   LIBPATH=Split('#/tdl #/xany #/string #/plugin #/events #/configuration #/ui #/ui/x11 #/graphics #/notify_fs #/syswrap'),
   LINKFLAGS=['-Wl,--as-needed'],
@@ -84,19 +85,23 @@ Export('debug')
 conf = SConscript('buildconf/SConscript')
 env = conf.Finish()
 
-shrd = env.Copy()
-shrd.Append(CPPDEFINES = 'BUILDING_DLL')
-
-Export('shrd')
-
-SConscript(dirs = [
-'.', 
+dirs = [
+'.',
+'tools/autobuild',
+'debug',
 'syswrap',
+'string',
+'xany',
+'tdl',
 'configuration',
-'plugin',
 'events',
-#'ui', 
-'graphics', 
 'notify_fs',
-'tools/autobuild']
-)
+'graphics',
+'plugin',
+'properties'
+]
+
+print 'Initial libs: ', env['LIBS']
+for x in dirs:
+  SConscript(dirs = x)
+  print 'Libs after ', x, ': ', env['LIBS']

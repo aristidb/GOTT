@@ -37,17 +37,13 @@
 
 import glob
 
-Import('shrd')
 Import('env')
 
 libobj = glob.glob('*.cpp')
 libobj.remove('auto_loop_test.cpp')
 libobj.remove('mq_test.cpp')
-my_shrd = shrd.Copy()
-my_shrd.Append(LIBS = ['syswrap','string'])
-my_shrd.SharedLibrary('events', libobj)
+env.SharedLibrary('events', libobj)
+env.Append(LIBS = ['events'])
 
-my_env = env.Copy()
-my_env.Append(LIBS = ['syswrap','string','events'])
-my_env.Program('auto_loop', 'auto_loop_test.cpp')
-my_env.Program('mq', 'mq_test.cpp')
+env.Program('auto_loop', 'auto_loop_test.cpp')
+env.Program('mq', 'mq_test.cpp')

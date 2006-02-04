@@ -36,9 +36,8 @@
 # ***** END LICENSE BLOCK *****
 
 import glob
-Import('shrd')
-my_shrd = shrd.Copy()
-my_shrd.Append(LIBS = ['string'])
-my_shrd.SharedLibrary('graphics', glob.glob('*.cpp'))
+Import('env')
+env.SharedLibrary('graphics', glob.glob('*.cpp'))
+env.Append(LIBS = ['graphics'])
 
 SConscript(dirs = ['test'])

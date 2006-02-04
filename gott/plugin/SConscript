@@ -37,8 +37,7 @@
 
 import glob
 
-Import('shrd')
+Import('env')
 
-my_shrd = shrd.Copy()
-my_shrd.Append(LIBS = ['string'])
-my_shrd.SharedLibrary('plugin', glob.glob('*.cpp'))
+env.SharedLibrary('plugin', glob.glob('*.cpp'))
+env.Append(LIBS = ['plugin'])

@@ -37,13 +37,9 @@
 
 import glob
 
-Import('shrd')
 Import('env')
 
-my_shrd = shrd.Copy()
-my_shrd.Append(LIBS = ['tdl'])
-my_shrd.SharedLibrary('config', glob.glob('*.cpp'))
+env.SharedLibrary('config', glob.glob('*.cpp'))
+env.Append(LIBS = ['config'])
 
-my_env = env.Copy()
-my_env.Append(LIBS = ['string', 'xany', 'tdl', 'config'])
-my_env.Program('config_test', glob.glob('test/*.cpp'))
+env.Program('config_test', glob.glob('test/*.cpp'))
