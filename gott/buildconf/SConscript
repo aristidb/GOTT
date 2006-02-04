@@ -109,8 +109,8 @@ if debug == 1:
 if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 	print 'Boost headers are not installed'
 	Exit(1)
-if not conf.CheckLib('boost_thread-mt', language = 'c++', autoadd = 0):
-  if not conf.CheckLib('boost_thread', language = 'c++', autoadd = 0):
+if not conf.CheckLib('boost_thread-mt', language = 'c++'):
+  if not conf.CheckLib('boost_thread', language = 'c++'):
     print 'Boost threading library is not installed'
     Exit(1)
   else:
@@ -134,7 +134,7 @@ Export('boost_date_time_lib')
 if conf.CheckCHeader('unistd.h', '<>'):
 	conf.env.Append(CPPDEFINES = 'HAS_UNISTD_H')
 
-conf.env.ParseConfig('pkg-config --libs sigc++-2.0')
 conf.env.ParseConfig('pkg-config --cflags sigc++-2.0')
+conf.env.ParseConfig('pkg-config --libs sigc++-2.0')
 
 Return('conf')

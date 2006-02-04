@@ -39,4 +39,6 @@ import glob
 
 Import('shrd')
 
-shrd.SharedLibrary('plugin', glob.glob('*.cpp'))
+my_shrd = shrd.Copy()
+my_shrd.Append(LIBS = ['string'])
+my_shrd.SharedLibrary('plugin', glob.glob('*.cpp'))

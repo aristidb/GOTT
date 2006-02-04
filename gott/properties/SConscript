@@ -37,4 +37,6 @@
 
 Import('env')
 
-env.Program('test.cpp', LIBS = ['string'])
+my_env = env.Copy()
+my_env.Append(LIBS = ['string'])
+my_env.Program('test.cpp')

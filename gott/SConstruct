@@ -74,6 +74,7 @@ env = Environment(
   CCFLAGS = cflags, 
   CPPPATH=['#/..'], 
   LIBPATH=Split('#/tdl #/xany #/string #/plugin #/events #/configuration #/ui #/ui/x11 #/graphics #/notify_fs #/syswrap'),
+  LINKFLAGS=['-Wl,--as-needed'],
   CPPDEFINES=cppdef)
 
 Export('env')

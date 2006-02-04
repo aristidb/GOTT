@@ -41,4 +41,7 @@ Import('env')
 Import('shrd')
 
 shrd.SharedLibrary('string', glob.glob('*.cpp'))
-env.Program('string_test', glob.glob('test/*.cpp'), LIBS=['string'])
+
+my_env = env.Copy()
+my_env.Append(LIBS = ['string'])
+my_env.Program('string_test', glob.glob('test/*.cpp'))

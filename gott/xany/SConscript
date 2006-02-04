@@ -36,4 +36,6 @@
 # ***** END LICENSE BLOCK *****
 
 Import('shrd')
-shrd.SharedLibrary('xany', 'xany.cpp')
+my_shrd = shrd.Copy()
+my_shrd.Append(LIBS = ['string'])
+my_shrd.SharedLibrary('xany', 'xany.cpp')

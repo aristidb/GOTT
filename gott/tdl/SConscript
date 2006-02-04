@@ -49,7 +49,9 @@ for root, dirs, _ in os.walk('.'):
 		dirs.remove('test')
 	source_files += glob.glob(root + '/*.cpp')
 
-shrd.SharedLibrary('tdl', source_files)
+my_shrd = shrd.Copy()
+my_shrd.Append(LIBS = ['xany', 'string'])
+my_shrd.SharedLibrary('tdl', source_files)
 
 module_test_obj = [
     'test/test_tut.cpp', 
@@ -58,7 +60,10 @@ module_test_obj = [
     'test/structure.cpp',
     'test/repatcher.cpp'
   ] + glob.glob('test/schema/*.cpp')
-env.Program('module_test', module_test_obj, LIBS=['xany', 'string', 'tdl'])
+
+my_env = env.Copy()
+my_env.Append(LIBS = ['xany', 'string', 'tdl'])
+my_env.Program('module_test', module_test_obj)
 
 unit_test_obj = glob.glob('test/unit/*.cpp')
-env.Program('unit_test', unit_test_obj, LIBS=['xany', 'string', 'tdl'])
+my_env.Program('unit_test', unit_test_obj)

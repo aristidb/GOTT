@@ -36,4 +36,6 @@
 # ***** END LICENSE BLOCK *****
 
 Import('env')
-env.Program('transformations', 'transformations.cpp', LIBS=['string', 'graphics'])
+my_env = env.Copy()
+my_env.Append(LIBS = ['string', 'graphics'])
+my_env.Program('transformations', 'transformations.cpp')

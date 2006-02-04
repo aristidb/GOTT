@@ -37,6 +37,8 @@
 
 import glob
 Import('shrd')
-shrd.SharedLibrary('graphics', glob.glob('*.cpp'))
+my_shrd = shrd.Copy()
+my_shrd.Append(LIBS = ['string'])
+my_shrd.SharedLibrary('graphics', glob.glob('*.cpp'))
 
 SConscript(dirs = ['test'])

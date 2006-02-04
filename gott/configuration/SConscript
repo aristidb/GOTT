@@ -40,6 +40,10 @@ import glob
 Import('shrd')
 Import('env')
 
-shrd.SharedLibrary('config', glob.glob('*.cpp'))
-env.Program('config_test', glob.glob('test/*.cpp'), 
-  LIBS = ['string', 'xany', 'tdl', 'config'])
+my_shrd = shrd.Copy()
+my_shrd.Append(LIBS = ['tdl'])
+my_shrd.SharedLibrary('config', glob.glob('*.cpp'))
+
+my_env = env.Copy()
+my_env.Append(LIBS = ['string', 'xany', 'tdl', 'config'])
+my_env.Program('config_test', glob.glob('test/*.cpp'))

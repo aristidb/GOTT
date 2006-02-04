@@ -39,6 +39,12 @@ import glob
 Import('shrd')
 Import('env')
 
-shrd.SharedLibrary('notify_fs', ['watch.cpp', 'engine.cpp'])
-shrd.SharedLibrary('notify_inotify', glob.glob('inotify/*.cpp'))
-env.Program('test', 'test.cpp', LIBS = ['syswrap', 'string', 'events', 'notify_fs', 'notify_inotify'])
+my_shrd = shrd.Copy()
+my_shrd.Append(LIBS = ['syswrap', 'string', 'events'])
+my_shrd.SharedLibrary('notify_fs', ['watch.cpp', 'engine.cpp'])
+my_shrd.Append(LIBS = ['notify_fs'])
+my_shrd.SharedLibrary('notify_inotify', glob.glob('inotify/*.cpp'))
+
+my_env = env.Copy()
+my_env.Append(LIBS = ['syswrap', 'string', 'events', 'notify_fs', 'notify_inotify'])
+my_env.Program('test', 'test.cpp')
