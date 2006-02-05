@@ -68,13 +68,19 @@ cflagsoverride = ARGUMENTS.get('cfoverride', 0)
 if cflagsoverride:
 	cflags = cflagsoverride
 
+libdirs_pre = open('libdirs.txt').readlines()
+
+libdirs = []
+for x in libdirs_pre:
+	libdirs += ['#/' + x[0:-1]]
+
 env = Environment(
   ENV = os.environ, # FIXME: security hole?
   CXX = cxx, 
   CCFLAGS = cflags, 
   SHCCFLAGS = ['-DBUILDING_DLL'],
   CPPPATH=['#/..'], 
-  LIBPATH=Split('#/tdl #/xany #/string #/plugin #/events #/configuration #/ui #/ui/x11 #/graphics #/notify_fs #/syswrap'),
+  LIBPATH=libdirs,
   LINKFLAGS=['-Wl,--as-needed'],
   CPPDEFINES=cppdef)
 
