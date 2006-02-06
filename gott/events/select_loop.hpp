@@ -1,6 +1,3 @@
-#ifndef GOTT_BASE_EVENTS_SELECT_LOOP_HPP_INCLUDED
-#define GOTT_BASE_EVENTS_SELECT_LOOP_HPP_INCLUDED
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -18,11 +15,11 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com )
- * Portions created by the Initial Developer are Copyright (C) 2___
+ * Portions created by the Initial Developer are Copyright (C) 2005
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *  Andreas Pokorny (andreas.pokorny@gmail.com )
+ *  Andreas Pokorny (andreas.pokorny@gmail.com)
  *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -38,6 +35,9 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+
+#ifndef GOTT_BASE_EVENTS_SELECT_LOOP_HPP_INCLUDED
+#define GOTT_BASE_EVENTS_SELECT_LOOP_HPP_INCLUDED
 
 #include <map> 
 #include <algorithm>

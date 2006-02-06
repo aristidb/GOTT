@@ -15,11 +15,11 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com )
- * Portions created by the Initial Developer are Copyright (C) 2___
+ * Portions created by the Initial Developer are Copyright (C) 2005
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *  Andreas Pokorny (andreas.pokorny@gmail.com )
+ *  Andreas Pokorny (andreas.pokorny@gmail.com)
  *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of

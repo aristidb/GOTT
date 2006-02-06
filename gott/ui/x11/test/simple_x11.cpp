@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2___
+ * Portions created by the Initial Developer are Copyright (C) 2005
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
