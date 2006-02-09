@@ -51,6 +51,12 @@ transformations::transformations()
 transformations::transformations(transformations const &o) : mtx(o.mtx) {}
 transformations::~transformations() {}
 
+transformations::transformations(double a, double b, double c, double d, 
+    double t_x, double t_y)
+: mtx(math::identity_matrix<double>(3)) {
+  matrix(a, b, c, d, t_x, t_y);
+}
+
 void transformations::swap(transformations &x) {
   mtx.swap(x.mtx);
 }
@@ -76,6 +82,26 @@ transformations &transformations::scale(double sx, double sy) {
   matrix_t helper(math::identity_matrix<double>(3));
   helper(0, 0) = sx; helper(1, 1) = sy;
   mtx = prod(mtx, helper);
+  return *this;
+}
+
+transformations &transformations::matrix(double a, double b, double c, 
+    double d, double t_x, double t_y) {
+  matrix_t helper(math::identity_matrix<double>(3));
+  helper(0,0) = a; helper(0,1) = b;
+  helper(1,0) = c; helper(1,1) = d;
+  helper(2,0) = t_x; helper(2,1) = t_y;
+  mtx = prod(mtx, helper);
+  return *this;
+}
+
+transformations &transformations::append(transformations const &o) {
+  mtx = prod(mtx, o.mtx);
+  return *this;
+}
+
+transformations &transformations::prepend(transformations const &o) {
+  mtx = prod(o.mtx, mtx);
   return *this;
 }
 

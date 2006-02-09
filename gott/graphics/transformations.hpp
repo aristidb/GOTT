@@ -52,6 +52,15 @@ public:
   /// Default-Constructor.
   GOTT_EXPORT transformations();
 
+  /** 
+   * Matrix-Constructor.
+   * \f[ \left( \begin{array}{ccc} 
+   * a & b & 0 \\ 
+   * c & d & 0 \\ 
+   * t_x & t_y & 1 \end{array} \right) \f]
+   */
+  GOTT_EXPORT transformations(double a, double b, double c, double d, double t_x, double t_y);
+
   /// Copy-Constructor.
   GOTT_EXPORT transformations(transformations const &);
 
@@ -86,6 +95,31 @@ public:
    * \param ry Ratio in y direction.
    */
   GOTT_EXPORT transformations &scale(double rx, double ry);
+
+  /**
+   * Multiply the current transformation matrix with another.
+   * \f[ \left( \begin{array}{ccc} 
+   * a & b & 0 \\ 
+   * c & d & 0 \\ 
+   * t_x & t_y & 1 \end{array} \right) \f]
+   */
+  GOTT_EXPORT transformations &matrix(
+      double a, double b, 
+      double c, double d,
+      double t_x, double t_y
+  );
+
+  /**
+   * Append other transformations.
+   * \param o The transformations to append.
+   */
+  transformations &append(transformations const &o);
+
+  /**
+   * Prepend other transformations.
+   * \param o The transformations to prepend.
+   */
+  transformations &prepend(transformations const &o);
 
   /**
    * Apply all transformations to the point (x,y).
@@ -134,6 +168,19 @@ inline transformations translate(double dx, double dy,
 inline transformations scale(double rx, double ry,
     transformations t = transformations()) {
   t.scale(rx, ry);
+  return t;
+}
+
+/**
+ * Matrix transformation.
+ * \f[ \left( \begin{array}{ccc} 
+ * a & b & 0 \\ 
+ * c & d & 0 \\ 
+ * t_x & t_y & 1 \end{array} \right) \f]
+ */
+inline transformations matrix(double a, double b, double c, double d, 
+    double t_x, double t_y, transformations t = transformations()) {
+  t.matrix(a, b, c, d, t_x, t_y);
   return t;
 }
 
