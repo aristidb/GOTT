@@ -36,7 +36,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "parser.hpp"
-#include "line_logger.hpp"
 #include <boost/algorithm/string.hpp>
 #include <gott/string/string.hpp>
 #include <gott/string/buffer.hpp>
@@ -46,50 +45,47 @@ using std::istream;
 using gott::string;
 using gott::range;
 using gott::tdl::simple::parser;
-using gott::tdl::simple::line_logger;
+
+gott::tdl::source_position const &parser::where() const {
+  return where_;
+}
 
 parser::~parser() {}
 
-namespace gott {
-namespace tdl {
-namespace simple {
-namespace detail {
+namespace {
 struct internal_line_logger {
-  line_logger *ref;
-  unsigned p;
-  unsigned rp;
+  gott::tdl::source_position &where;
+  unsigned token_line;
+  unsigned token_column;
   
-  internal_line_logger(line_logger *x) : ref(x) {}
+  internal_line_logger(gott::tdl::source_position &x) : where(x) {}
 
   void start_line() { 
-    p = 0; 
-    if (ref)
-      ref->start_line(); 
+    ++where.line;
+    where.column = 0;
   }
 
   void new_char() { 
-    ++p; 
-    if (ref)
-      ref->line_position(p); 
+    ++where.column;
   }
 
   void add_char(unsigned x) { 
-    p += x; 
-    if (ref)
-      ref->line_position(p); 
+    where.column += x;
   }
 
   void set_char(unsigned x) { 
-    p = x; 
-    if (ref)
-      ref->line_position(p); 
+    where.column = x;
   }
   
-  void start_token() { rp = p; }
+  void start_token() { 
+    token_line = where.line;
+    token_column = where.column;
+  }
   
   void end_token(string const &n) {
-    if (ref)
-      ref->token(rp, p, n);
+    where.token_line = token_line;
+    where.token_column = token_column;
+    where.token = n;
   }
 };
   
@@ -119,23 +115,19 @@ class exec_parse {
   bool read_line();
 
 public:
-  exec_parse(istream &s, parser &p, line_logger *l) 
+  exec_parse(istream &s, parser &p, gott::tdl::source_position &l) 
     : stream(s), parse(p), up(false), 
       started_document(false), buff_indent(0), ln(l) {}
   void run_parse();
 };
 
 class cancellor {};
-}}}}
-
-line_logger::~line_logger() {}
-
-void parser::parse(istream &s) {
-  detail::exec_parse x(s, *this, ll);
-  x.run_parse();
 }
 
-using gott::tdl::simple::detail::exec_parse;
+void parser::parse(istream &s) {
+  exec_parse x(s, *this, where_);
+  x.run_parse();
+}
 
 void exec_parse::run_parse() {
   parse.begin_parse();

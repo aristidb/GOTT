@@ -61,9 +61,9 @@ private:
   tdl_exception() GOTT_LOCAL;
 };
 
-namespace schema {
+class source_position;
 
-namespace detail { struct stream_position; }
+namespace schema {
 
 /**
  * Schema mismatch exception.
@@ -71,7 +71,7 @@ namespace detail { struct stream_position; }
  */
 struct GOTT_EXPORT mismatch : public tdl_exception {
   GOTT_LOCAL
-  mismatch(detail::stream_position const &p, std::vector<string> const &);
+  mismatch(source_position const &p, std::vector<string> const &);
   ~mismatch() throw();
 };
 

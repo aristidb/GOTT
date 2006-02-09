@@ -122,13 +122,6 @@ public:
    */
   void parental_requirement(ev::event const &, unsigned) GOTT_EXPORT;
 
-public:
-  /**
-   * Return a pointer to the internal line-logger.
-   * If this is passed to simple::parse, we can better report errors.
-   */
-  simple::line_logger *get_debug() const GOTT_EXPORT;
-
 private:
   void begin_parse();
   void down();

@@ -41,7 +41,6 @@
 #include "rule_attr.hpp"
 #include "event.hpp"
 #include "../exceptions.hpp"
-#include "stream_position.hpp"
 #include "parse_position.hpp"
 #include "../structure/repatch.hpp"
 #include <gott/range_algo.hpp>
@@ -109,7 +108,6 @@ public:
   positioning pos;
 
   match &ref;
-  detail::stream_position ln;
 
   struct entry {
     shared_ptr<item> the_item;
@@ -130,14 +128,11 @@ public:
 };
 
 match::match(structure::revocable_structure &p) 
-: parser(0), pimpl(new impl(p, *this)) {
-  set_line_logger(get_debug());
-}
+: pimpl(new impl(p, *this)) {}
 
 match::match(rule_t const &rf, structure::revocable_structure &p)
-: parser(0), pimpl(new impl(p, *this)) {
-  set_line_logger(get_debug());
-  pimpl->add(rf);
+: pimpl(new impl(p, *this)) {
+  add(rf);
 }
 
 match::~match() {}
@@ -155,10 +150,6 @@ structure::writable_structure &match::direct_structure() const {
   if (s)
     return *s;
   return pimpl->base_struc;
-}
-
-simple::line_logger *match::get_debug() const {
-  return &pimpl->ln;
 }
 
 positioning &match::pos() const {
@@ -325,7 +316,7 @@ void match::impl::fail_item() {
 }
 
 void match::impl::fail_all() {
-  throw mismatch(ln, shadow_names);
+  throw mismatch(ref.where(), shadow_names);
 }
 
 void match::impl::parental_requirement(ev::event const &event, unsigned count) {

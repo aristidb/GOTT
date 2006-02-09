@@ -38,17 +38,13 @@
 #ifndef GOTT_UTIL_TDL_SimplE_PARSER_H
 #define GOTT_UTIL_TDL_SimplE_PARSER_H
 
-#include <gott/visibility.hpp>
+#include <gott/tdl/source_position.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <iosfwd>
 
 namespace gott {
-class string;
-
 namespace tdl {
 namespace simple {
-
-class line_logger;
 
 /**
  * The callback interface to parse.
@@ -60,6 +56,12 @@ public:
    * \param s The stream to read a document from.
    */
   void parse(std::istream &s);
+
+  /**
+   * Returns the current position in the currently parsed TDL document.
+   * Undefined result if not in parse().
+   */
+  source_position const &where() const;
 
 public:
   // callbacks
@@ -83,13 +85,10 @@ public:
 
   virtual ~parser() = 0;
 
-protected:
-  GOTT_LOCAL parser(line_logger *l) : ll(l) {}
-  GOTT_LOCAL void set_line_logger(line_logger *l) { ll = l; }
-  
 private:
-  line_logger *ll;
+  source_position where_;
 };
 
 }}}
+
 #endif

@@ -46,16 +46,22 @@ namespace tdl {
 class source_position {
 public:
   source_position(
-      string const &file,
-      unsigned line,
-      unsigned column,
-      string const &token)
-    : file(file), line(line), column(column), token(token) {}
+      string const &file = string(),
+      unsigned line = 0,
+      unsigned column = 0,
+      string const &token = string(),
+      unsigned token_line = 0,
+      unsigned token_column = 0
+      )
+    : file(file), line(line), column(column), token(token), 
+    token_line(token_line), token_column(token_column) {}
 
   string file;
   unsigned line;
   unsigned column;
   string token;
+  unsigned token_line;
+  unsigned token_column;
 };
 
 }}
