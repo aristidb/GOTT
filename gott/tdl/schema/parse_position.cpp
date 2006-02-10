@@ -37,6 +37,7 @@
 
 #include "parse_position.hpp"
 #include "event.hpp"
+#include <gott/tdl/source_position.hpp>
 #include <gott/tdl/structure/structure.hpp>
 #include <vector>
 #include <set>
@@ -52,14 +53,14 @@ using schema::positioning;
 
 class positioning::impl {
 public:
-  typedef std::vector<ev::token_t> buffer_t;
+  typedef std::vector<std::pair<ev::token_t, source_position> > buffer_t;
 
   revocable_structure &struc;
 
   buffer_t buffer_real;
   std::set<std::size_t> blocks;
 
-  ev::token_t &buffer(unsigned long pos) {
+  buffer_t::value_type &buffer(unsigned long pos) {
     return buffer_real[pos - base];
   }
 
@@ -68,8 +69,8 @@ public:
   }
 
   template<class T>
-  void buffer_add(T const &x) {
-    buffer_real.push_back(x);
+  void buffer_add(T const &x, source_position const &w) {
+    buffer_real.push_back(buffer_t::value_type(x, w));
   }
   
   void add_block(std::size_t p) {
@@ -108,17 +109,17 @@ positioning::positioning(revocable_structure &s) : p(new impl(s)) {}
 positioning::~positioning() {}
 
 template<class T>
-void positioning::add(T const &t) {
+void positioning::add(T const &t, source_position const &w) {
   p->unconsumed = p->buffer_size();
-  p->buffer_add(t);
+  p->buffer_add(t, w);
   p->in_pass = false;
 }
 
-template void positioning::add(ev::begin_parse const &);
-template void positioning::add(ev::end_parse const &);
-template void positioning::add(ev::down const &);
-template void positioning::add(ev::up const &);
-template void positioning::add(ev::node const &);
+template void positioning::add(ev::begin_parse const &, source_position const &);
+template void positioning::add(ev::end_parse const &, source_position const &);
+template void positioning::add(ev::down const &, source_position const &);
+template void positioning::add(ev::up const &, source_position const &);
+template void positioning::add(ev::node const &, source_position const &);
 
 void positioning::consume() {
   ++p->consumed;
@@ -168,7 +169,8 @@ void positioning::replay(acceptor &acc) {
     for (p->unconsumed = p->consumed + 1;
          p->unconsumed < long(p->buffer_size());
          ++p->unconsumed) {
-      acc(get(p->buffer(int(p->unconsumed)))); // NTL-Vector::operator[](int)
+      impl::buffer_t::value_type &x = p->buffer(p->unconsumed);
+      acc(get(x.first), x.second);
       if (p->replay)
         break;
 

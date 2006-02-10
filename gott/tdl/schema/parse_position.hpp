@@ -65,7 +65,7 @@ public:
   void forget(id const &) GOTT_EXPORT;
 
   struct GOTT_EXPORT acceptor {
-    virtual void operator()(ev::token const &) = 0;
+    virtual void operator()(ev::token const &, source_position const &) = 0;
     virtual ~acceptor() = 0;
   };
 
@@ -73,7 +73,7 @@ public:
   bool want_replay() const;
 
   template<class T>
-  void add(T const &); // add a token but don't consume it yet
+  void add(T const &, source_position const &); // add a token but don't consume it yet
 
   void consume();
   void pass(); 

@@ -126,6 +126,8 @@ public:
   std::vector<string> shadow_names;
 
   static string get_name(item const &);
+
+  ::boost::optional<source_position> overwrite_where;
 };
 
 match::match(structure::revocable_structure &p) 
@@ -158,7 +160,9 @@ positioning &match::pos() const {
 }
 
 source_position const &match::where_out() const {
-  return where(); //FIXME
+  if (pimpl->overwrite_where)
+    return pimpl->overwrite_where.get();
+  return where();
 }
 
 void match::parental_requirement(ev::event const &event, unsigned count) {
@@ -230,7 +234,7 @@ void match::impl::handle_token(T const &e) {
     miss.reset();
   }
   
-  pos.add(e);
+  pos.add(e, ref.where_out());
   handle_event(e, true);
   while (pos.want_replay())
     replay_buffer();
@@ -238,12 +242,14 @@ void match::impl::handle_token(T const &e) {
 
 void match::impl::replay_buffer() {
   struct acc : positioning::acceptor {
-    match::impl *tt;
-    void operator() (ev::token const &t) {
-      tt->handle_event(t, true);
+    match::impl &tt;
+    void operator() (ev::token const &t, source_position const &w) {
+      tt.overwrite_where = w;
+      tt.handle_event(t, true);
+      tt.overwrite_where.reset();
     }
-    acc(match::impl *t) : tt(t) {}
-  } a(this);
+    acc(match::impl &t) : tt(t) {}
+  } a(*this);
   pos.replay(a);
 }
 
