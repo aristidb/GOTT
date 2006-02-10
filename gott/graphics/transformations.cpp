@@ -64,33 +64,31 @@ void transformations::swap(transformations &x) {
 transformations &transformations::rotate(double phi) {
   double sin_phi = std::sin(phi);
   double cos_phi = std::cos(phi);
-  matrix_t helper(math::identity_matrix<double>(3));
-  helper(0, 0) = cos_phi;  helper(0, 1) = sin_phi;
-  helper(1, 0) = -sin_phi; helper(1, 1) = cos_phi;
-  mtx = prod(mtx, helper);
-  return *this;
+  return matrix(cos_phi, sin_phi, -sin_phi, cos_phi, 0, 0);
 }
 
 transformations &transformations::translate(double dx, double dy) {
-  matrix_t helper(math::identity_matrix<double>(3));
-  helper(2, 0) = dx; helper(2, 1) = dy;
-  mtx = prod(mtx, helper);
-  return *this;
+  return matrix(1, 0, 0, 1, dx, dy);
 }
 
 transformations &transformations::scale(double sx, double sy) {
-  matrix_t helper(math::identity_matrix<double>(3));
-  helper(0, 0) = sx; helper(1, 1) = sy;
-  mtx = prod(mtx, helper);
-  return *this;
+  return matrix(sx, 0, 0, sy, 0, 0);
+}
+
+transformations &transformations::skew_x(double a) {
+  return matrix(1, 0, std::tan(a), 1, 0, 0);
+}
+
+transformations &transformations::skew_y(double a) {
+  return matrix(1, std::tan(a), 0, 1, 0, 0);
 }
 
 transformations &transformations::matrix(double a, double b, double c, 
     double d, double t_x, double t_y) {
   matrix_t helper(math::identity_matrix<double>(3));
-  helper(0,0) = a; helper(0,1) = b;
-  helper(1,0) = c; helper(1,1) = d;
-  helper(2,0) = t_x; helper(2,1) = t_y;
+  helper(0, 0) = a;   helper(0, 1) = b;
+  helper(1, 0) = c;   helper(1, 1) = d;
+  helper(2, 0) = t_x; helper(2, 1) = t_y;
   mtx = prod(mtx, helper);
   return *this;
 }

@@ -42,11 +42,14 @@
 namespace g = gott::graphics;
 
 double const pi = 4 * std::atan(1.0);
+double maximum_error = 0;
 
 bool check(double isx, double isy, double expx, double expy, int test) {
   double const epsilon = 1.0E-13;
   double dx = std::fabs(isx - expx);
   double dy = std::fabs(isy - expy);
+  maximum_error = std::max(maximum_error, dx);
+  maximum_error = std::max(maximum_error, dy);
   if (dx < epsilon && dy < epsilon)
     return true;
   std::cerr << "Test failed: " << test << '\n';
@@ -85,6 +88,8 @@ int main() {
   g::scale(1.0 / 8, 1.0 / 16).rotate(pi / 2).apply(x, y);
   std::cout << x << ' ' << y << std::endl;
   happy &= check(x, y, -1.0, 1.0, 6);
+
+  std::cout << "\nMaximum error: " << maximum_error << std::endl;
 
   return happy ? 0 : 1;
 }

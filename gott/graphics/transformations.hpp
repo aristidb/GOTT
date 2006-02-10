@@ -97,6 +97,18 @@ public:
   GOTT_EXPORT transformations &scale(double rx, double ry);
 
   /**
+   * Skew along the x-axis.
+   * \param a Skew angle (counter-clockwise) in radian.
+   */
+  GOTT_EXPORT transformations &skew_x(double a);
+
+  /**
+   * Skew along the y-axis.
+   * \param a Skew angle (counter-clockwise) in radian.
+   */
+  GOTT_EXPORT transformations &skew_y(double a);
+
+  /**
    * Multiply the current transformation matrix with another.
    * \f[ \left( \begin{array}{ccc} 
    * a & b & 0 \\ 
@@ -144,6 +156,7 @@ private:
 /**
  * Rotate.
  * \see transformations::rotate
+ * \relates transformations
  */
 inline 
 transformations rotate(double rot, transformations t = transformations()) {
@@ -154,6 +167,7 @@ transformations rotate(double rot, transformations t = transformations()) {
 /**
  * Translate.
  * \see transformations::translate
+ * \relates transformations
  */
 inline transformations translate(double dx, double dy, 
     transformations t = transformations()) {
@@ -164,6 +178,7 @@ inline transformations translate(double dx, double dy,
 /**
  * Scale.
  * \see transformations::scale
+ * \relates transformations
  */
 inline transformations scale(double rx, double ry,
     transformations t = transformations()) {
@@ -172,11 +187,31 @@ inline transformations scale(double rx, double ry,
 }
 
 /**
+ * Skew along the x-axis.
+ * \see transformations::skew_x
+ * \relates transformations
+ */
+inline transformations skew_x(double a, 
+    transformations t = transformations()) {
+  t.skew_x(a);
+  return t;
+}
+
+/**
+ * Skew along the y-axis.
+ * \see transformations::skew_y
+ * \relates transformations
+ */
+inline transformations skew_y(double a,
+    transformations t = transformations()) {
+  t.skew_y(a);
+  return t;
+}
+
+/**
  * Matrix transformation.
- * \f[ \left( \begin{array}{ccc} 
- * a & b & 0 \\ 
- * c & d & 0 \\ 
- * t_x & t_y & 1 \end{array} \right) \f]
+ * \see transformations::matrix
+ * \relates transformations
  */
 inline transformations matrix(double a, double b, double c, double d, 
     double t_x, double t_y, transformations t = transformations()) {
