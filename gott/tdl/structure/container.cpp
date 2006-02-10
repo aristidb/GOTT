@@ -47,14 +47,17 @@ using gott::tdl::structure::container;
 
 class container::impl {
 public:
-  impl() : current(&root) {
+  impl() : root(source_position()), current(&root) {
     parents.push(0);
   }
   class node {
   public:
+    node(source_position const &w) : where(w) {}
+
     Xany data;
     std::vector<string> tags;
     std::vector<node> children;
+    source_position where;
 
     void write(writable_structure *w) const;
     bool operator==(node const &o) const;
@@ -87,9 +90,9 @@ void container::clear() {
   p.reset(new impl);
 }
 
-void container::begin(source_position const &) { // TODO
+void container::begin(source_position const &w) {
   p->parents.push(p->current);
-  p->current->children.push_back(impl::node());
+  p->current->children.push_back(impl::node(w));
   p->current = &p->current->children.back();
 }
 
@@ -118,7 +121,7 @@ bool container::operator==(container const &x) const {
 
 
 void container::impl::node::write(writable_structure *w) const {
-  w->begin(source_position()); // TODO
+  w->begin(where);
   w->data(data);
   for_each(range(tags), boost::bind(&writable_structure::add_tag, w, _1));
   for_each(range(children), boost::bind(&node::write, _1, w));
