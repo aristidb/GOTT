@@ -54,7 +54,7 @@ namespace {
 
     void down() {
       if (!data)
-        s.begin();
+        s.begin(where());
       else
         data = false;
     }
@@ -71,7 +71,7 @@ namespace {
       if (data)
         s.end();
   
-      s.begin();
+      s.begin(where());
       s.data(Xany(x));
     
       data = true;

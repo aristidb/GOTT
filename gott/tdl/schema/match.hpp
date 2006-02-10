@@ -111,6 +111,14 @@ public:
    */
   structure::writable_structure &direct_structure() const GOTT_EXPORT;
 
+  /**
+   * Return the schema parsers current source_position. If not backtracking
+   * equivalent to simple::parser::where(), else equivalent to the result
+   * of simple::parser::where() when the current memorized data was actually
+   * read.
+   */
+  source_position const &where_out() const GOTT_EXPORT;
+
 public:
   /**
    * Return a reference to the back-tracking and book-keeping sub-engine.

@@ -61,7 +61,7 @@ direct_print<C>::direct_print(basic_ostream<C> &o, unsigned s)
 
 template<class C> direct_print<C>::~direct_print() {}
 
-template<class C> void direct_print<C>::begin() {
+template<class C> void direct_print<C>::begin(source_position const &) {
   p->level += p->step;
   if (!p->line_ended)
     p->out << '\n';

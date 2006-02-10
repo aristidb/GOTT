@@ -100,7 +100,7 @@ void repatch_find_literal::reg() {
     boost::optional<type::location> loc;
     boost::optional<string> literal;
     bool has_loc, has_literal;
-    void begin() {
+    void begin(source_position const &) {
       if (pos != outer) fail();
       pos = inner;
     }

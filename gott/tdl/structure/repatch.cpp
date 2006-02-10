@@ -56,8 +56,8 @@ failed_repatch::~failed_repatch() throw() {}
 
 simple_repatcher_context::~simple_repatcher_context() {}
 
-void simple_repatcher_context::begin() {
-  target.begin();
+void simple_repatcher_context::begin(source_position const &w) {
+  target.begin(w);
 }
 
 void simple_repatcher_context::end() {
@@ -105,7 +105,7 @@ repatcher_chain::deferred_write(writable_structure &s) const {
       while (--i >= 0)
         out.insert(out.begin(), el[i].deferred_write(out[0]));
     }
-    void begin() { out[0].begin(); }
+    void begin(source_position const &w) { out[0].begin(w); }
     void end() { out[0].end(); }
     void data(xany::Xany const &x) { out[0].data(x); }
     void add_tag(string const &s) { out[0].add_tag(s); }

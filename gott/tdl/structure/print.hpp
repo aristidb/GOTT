@@ -61,7 +61,7 @@ public:
   GOTT_EXPORT ~direct_print();
 
 private:
-  void begin();
+  void begin(source_position const &);
   void end();
   void data(xany::Xany const &);
   void add_tag(string const &);

@@ -85,7 +85,7 @@ void repatch_substring::reg() {
     enum { outer, inner, p_left, p_right } pos;
     long left, right;
     boost::optional<long> delayed;
-    void begin() {
+    void begin(source_position const &) {
       if (pos != outer) fail();
       pos = inner;
     }

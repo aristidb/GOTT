@@ -63,7 +63,7 @@ public:
   GOTT_EXPORT ~revocable_adapter();
 
 private:
-  void begin();
+  void begin(source_position const &);
   void end();
   void add_tag(string const &);
   void data(xany::Xany const &);

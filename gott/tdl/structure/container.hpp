@@ -77,7 +77,7 @@ public:
   GOTT_EXPORT void copy_to(writable_structure &w) const;
 
 private:
-  void begin();
+  void begin(source_position const &);
   void end();
   void add_tag(string const &);
   void data(xany::Xany const &);

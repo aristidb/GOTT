@@ -73,7 +73,7 @@ protected:
 public:
   simple_repatcher_context(writable_structure &x) : target(x) {}
   ~simple_repatcher_context();
-  void begin();
+  void begin(source_position const &);
   void end();
   void data(xany::Xany const &x);
   void add_tag(string const &t);

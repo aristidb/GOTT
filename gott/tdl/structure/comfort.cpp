@@ -39,6 +39,7 @@
 #include "structure.hpp"
 #include <boost/bind.hpp>
 #include <gott/range_algo.hpp>
+#include <gott/tdl/source_position.hpp>
 
 using gott::xany::Xany;
 namespace cf = gott::tdl::structure::cf;
@@ -54,7 +55,7 @@ node_inserter_t::node_inserter_t(Xany const &d, nd_list const &c,
 node_inserter_t::~node_inserter_t() {}
 
 void node_inserter_t::write_to(writable_structure &o) const {
-  o.begin();
+  o.begin(source_position());
     o.data(data);
     for (tag_list::const_iterator it=tags.begin(); it != tags.end(); ++it)
       o.add_tag(*it);

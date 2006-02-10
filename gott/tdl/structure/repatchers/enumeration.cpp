@@ -82,7 +82,7 @@ void repatch_enumeration::reg() {
     getter() : inner(false) {}
     bool inner;
     std::vector<string> all_strings;
-    void begin() {
+    void begin(source_position const &) {
       if (inner) fail();
       inner = true;
     }

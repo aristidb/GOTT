@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include <gott/tdl/source_position.hpp>
 #include <gott/tdl/structure/structure.hpp>
 #include <gott/tdl/structure/container.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
@@ -46,6 +47,7 @@
 namespace stru = gott::tdl::structure;
 namespace cf = stru::cf;
 using gott::xany::Xany;
+using gott::tdl::source_position;
 
 namespace tut {
 struct structure_basic { };
@@ -63,7 +65,7 @@ template<> template<>
 void object::test<1>(int) {
   stru::container p1, p2;
   stru::writable_structure &w = p1;
-  w.begin();
+  w.begin(source_position());
     w.data(Xany("hallo"));
   w.end();
   p1.copy_to(p2);
@@ -75,7 +77,7 @@ void object::test<2>(int) {
   stru::container p1, p2;
   stru::writable_structure &w = p2;
   cf::S(Xany("hallo")).write_to(p1);
-  w.begin();
+  w.begin(source_position());
     w.data(Xany("hallo"));
   w.end();
   ensure_equals("comfort vs simple", p1, p2);
@@ -86,11 +88,11 @@ void object::test<3>(int) {
   stru::container p1, p2;
   stru::revocable_adapter a(p1);
   stru::revocable_structure &w = a;
-  w.begin();
-    w.begin();
+  w.begin(source_position());
+    w.begin(source_position());
       stru::revocable_structure::pth p = w.point();
       w.data(Xany(8899.2));
-      w.begin();
+      w.begin(source_position());
         w.add_tag(L"--!");
       w.revert(p);
       w.get_rid_of(p);
@@ -105,10 +107,10 @@ template<> template<>
 void object::test<4>(int) {
   stru::container p1, p2;
   stru::writable_structure &w = p1;
-  w.begin();
-    w.begin();
+  w.begin(source_position());
+    w.begin(source_position());
       w.data(Xany(8899.2));
-      w.begin();
+      w.begin(source_position());
         w.add_tag(L"--!");
         w.data(Xany("77"));
       w.end();
@@ -122,10 +124,10 @@ template<> template<>
 void object::test<5>(int) {
   stru::container p1;
   stru::writable_structure &w = p1;
-  w.begin();
-    w.begin();
+  w.begin(source_position());
+    w.begin(source_position());
       w.data(Xany(8899.2));
-      w.begin();
+      w.begin(source_position());
         w.add_tag(L"--!");
         w.data(Xany("77"));
       w.end();

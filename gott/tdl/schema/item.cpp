@@ -55,9 +55,9 @@ public:
   match *cont;
   rule_attr_t attrib;
 
-  impl(match &m, rule_attr_t const &a) 
+  impl(match &m, rule_attr_t const &a, source_position const &w) 
   : cont(&m), attrib(a) {
-    start_structure();
+    start_structure(w);
     add_tags();
   }
 
@@ -73,14 +73,14 @@ private:
       cont->direct_structure().add_tag(*it);
   }
 
-  void start_structure() {
+  void start_structure(source_position const &w) {
     if (attrib.coat())
-      cont->direct_structure().begin();
+      cont->direct_structure().begin(w);
   }
 };
 
 item::item(rule_attr_t const &a, match &m) 
-: pimpl(new impl(m, a)) {
+: pimpl(new impl(m, a, m.where_out())) {
 }
 
 void item::finish() {

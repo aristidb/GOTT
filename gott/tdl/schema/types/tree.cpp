@@ -71,7 +71,7 @@ bool match_tree::play(ev::node const &n) {
     return false;
   if (level > 0 && level_state == titled) {
     matcher().direct_structure().end();
-    matcher().direct_structure().begin();
+    matcher().direct_structure().begin(matcher().where_out());
   }
   matcher().direct_structure().data(gott::xany::Xany(n.get_data()));
   level_state = titled;
@@ -81,7 +81,7 @@ bool match_tree::play(ev::node const &n) {
 bool match_tree::play(ev::down const &) {
   ++level;
   level_state = fresh;
-  matcher().direct_structure().begin();
+  matcher().direct_structure().begin(matcher().where_out());
   return true;
 }
 

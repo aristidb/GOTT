@@ -45,6 +45,8 @@ namespace gott {
 class string;
 
 namespace tdl {
+class source_position;
+
 namespace structure {
 
 /**
@@ -53,7 +55,6 @@ namespace structure {
  */
 class writable_structure {
 public:
-
   /**
    * Set the data of the current node.
    * \param x The value to write.
@@ -63,7 +64,7 @@ public:
   /**
    * Start a child of the current node.
    */
-  virtual void begin() = 0;
+  virtual void begin(source_position const &) = 0;
 
   /**
    * End a node.

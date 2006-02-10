@@ -79,7 +79,7 @@ repatcher_getter *repatcher_by_name_t::chain_alloc() const {
     enum { outer, inner1, inner2 } pos;
     repatcher_chain *result;
     unsigned inner2_level;
-    void begin() {
+    void begin(source_position const &w) {
       switch (pos) {
       case outer:
         pos = inner1; break;
@@ -89,7 +89,7 @@ repatcher_getter *repatcher_by_name_t::chain_alloc() const {
         pos = inner2; break;
       case inner2:
         ++inner2_level;
-        where->begin();
+        where->begin(w);
       }
     }
     void end() {

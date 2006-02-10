@@ -57,6 +57,7 @@ namespace simple = gott::tdl::simple;
 namespace structure = gott::tdl::structure;
 using gott::tdl::schema::match;
 using gott::tdl::schema::positioning;
+using gott::tdl::source_position;
 using structure::writable_structure;
 
 class match::impl {
@@ -154,6 +155,10 @@ structure::writable_structure &match::direct_structure() const {
 
 positioning &match::pos() const {
   return pimpl->pos;
+}
+
+source_position const &match::where_out() const {
+  return where(); //FIXME
 }
 
 void match::parental_requirement(ev::event const &event, unsigned count) {

@@ -36,9 +36,11 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "revocable_adapter.hpp"
+#include <gott/tdl/source_position.hpp>
 #include <vector>
 #include <set>
 
+using gott::tdl::source_position;
 using gott::tdl::structure::revocable_adapter;
 using gott::tdl::structure::revocable_structure;
 using gott::tdl::structure::writable_structure;
@@ -49,10 +51,12 @@ namespace {
 struct entry {
   enum type_t { begin, end, add_tag, data } type;
   Xany param;
+  source_position where;
   entry(type_t t, Xany p = Xany()) : type(t), param(p) {}
+  entry(type_t t, source_position const &w) : type(t), where(w) {}
   void play(writable_structure &o) {
     switch (type) {
-    case begin: o.begin(); break;
+    case begin: o.begin(where); break;
     case end: o.end(); break;
     case add_tag: o.add_tag(gott::xany::Xany_cast<string>(param)); break;
     case data: o.data(param); break;
@@ -77,11 +81,11 @@ revocable_adapter::revocable_adapter(writable_structure &out)
 : p(new impl(out)) {}
 revocable_adapter::~revocable_adapter() {}
 
-void revocable_adapter::begin() {
+void revocable_adapter::begin(source_position const &w) {
   if (p->blocking == nowhere)
-    p->out.begin();
+    p->out.begin(w);
   else
-    p->blocked.push_back(entry::begin);
+    p->blocked.push_back(entry(entry::begin, w));
   ++p->pos;
 }
 

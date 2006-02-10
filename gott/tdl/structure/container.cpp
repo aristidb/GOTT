@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "container.hpp"
+#include <gott/tdl/source_position.hpp>
 #include <vector>
 #include <stack>
 #include <boost/bind.hpp>
@@ -86,7 +87,7 @@ void container::clear() {
   p.reset(new impl);
 }
 
-void container::begin() {
+void container::begin(source_position const &) { // TODO
   p->parents.push(p->current);
   p->current->children.push_back(impl::node());
   p->current = &p->current->children.back();
@@ -117,7 +118,7 @@ bool container::operator==(container const &x) const {
 
 
 void container::impl::node::write(writable_structure *w) const {
-  w->begin();
+  w->begin(source_position()); // TODO
   w->data(data);
   for_each(range(tags), boost::bind(&writable_structure::add_tag, w, _1));
   for_each(range(children), boost::bind(&node::write, _1, w));

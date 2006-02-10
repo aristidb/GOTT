@@ -101,7 +101,7 @@ repatch_integer::deferred_write(writable_structure &s) const {
 void repatch_integer::reg() {
   struct getter : public repatcher_getter {
     getter() {}
-    void begin() { fail(); }
+    void begin(source_position const &) { fail(); }
     void end() { fail(); }
     void data(xany::Xany const &) { fail(); }
     void add_tag(string const &) { fail(); }
