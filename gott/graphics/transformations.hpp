@@ -38,6 +38,7 @@
 #ifndef GOTT_GRAPHICS_TRANSFORMATIONS_HPP
 #define GOTT_GRAPHICS_TRANSFORMATIONS_HPP
 
+#include "point.hpp"
 #include <gott/visibility.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
@@ -134,11 +135,15 @@ public:
   transformations &prepend(transformations const &o);
 
   /**
-   * Apply all transformations to the point (x,y).
-   * \param x [inout] The x-coordinate of the point.
-   * \param y [inout] The y-coordinate of the point.
+   * Apply all transformations to a point and return the transformed point.
+   * \param p The untransformed point.
+   * \return The transformed point.
    */
-  GOTT_EXPORT void apply(double &x, double &y);
+  GOTT_EXPORT point apply(point const &x);
+
+  void apply_to(point &x) {
+    x = apply(x);
+  }
 
   GOTT_EXPORT static transformations const identity;
 

@@ -103,9 +103,9 @@ transformations &transformations::prepend(transformations const &o) {
   return *this;
 }
 
-void transformations::apply(double &x, double &y) {
+graphics::point transformations::apply(graphics::point const &p) {
   math::vector<double, math::bounded_array<double, 3> > input(3), output(3);
-  input(0) = x; input(1) = y; input(2) = 1;
+  input(0) = p.x; input(1) = p.y; input(2) = 1;
   output = prod(input, mtx);
-  x = output(0); y = output(1);
+  return graphics::point(output(0), output(1));
 }
