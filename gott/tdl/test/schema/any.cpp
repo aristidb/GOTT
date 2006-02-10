@@ -152,7 +152,7 @@ void object::test<7>(int) {
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", string(mm.what()),
-       "1:1 : mismatch in document>any>follow>node(int4) after token 732");
+       "1:5 : mismatch in document>any>follow>node(int4) at token bar");
   }
 }
 
