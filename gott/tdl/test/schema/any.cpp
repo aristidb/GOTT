@@ -48,15 +48,15 @@ namespace simple = gott::tdl::simple;
 
 using gott::string;
 using gott::xany::Xany;
-using stru::cf::S;
-using stru::cf::C;
+using namespace stru::cf;
 using schema::rule_t;
+using schema::rule_one;
 
 typedef schema::rule_attr_t RA;
 
 namespace {
-struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {
-  schema_any_ordered_integer_string__integer_string()
+struct schema_any : tut::schema_basic {
+  schema_any()
   : tut::schema_basic(
       rule_one("document",
          rule("any", RA(),
@@ -65,28 +65,36 @@ struct schema_any_ordered_integer_string__integer_string : tut::schema_basic {
              list_of
              (rule("node", RA("int", true, new stru::repatch_integer())))
              (rule("node", RA("string")))))
+           (rule("ordered", RA(),
+             list_of
+             (rule("node", RA("string_1")))
+             (rule("node", RA("string_2")))))
            (rule("node", RA("int2", true, new stru::repatch_integer())))
-           (rule("node", RA("string2"))))))
+           (rule("node", RA("string2")))
+           (rule("follow", RA(), 
+             list_of
+             (rule("node", RA("int3", true, new stru::repatch_integer())))
+             (rule("node", RA("int4", true, new stru::repatch_integer()))))))))
   {}
 };
 }
 
 namespace tut {
-typedef test_group<schema_any_ordered_integer_string__integer_string> tf;
+typedef test_group<schema_any> tf;
 typedef tf::object object;
 }
 
 namespace {
-  tut::tf test_any_ordered_integer_string__integer_string("schema::any(ordered(integer,string),integer,string)");
+  tut::tf test_any("schema::any");
 }
 
 namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test("4\nx");
-  stru::cf::nd_list c;
-  c.push_back(S(Xany(4), L"int"));
-  c.push_back(S(Xany(L"x"), L"string"));
+  nd_list c;
+  c.push_back(S(Xany(4), "int"));
+  c.push_back(S(Xany("x"), "string"));
   C(C(M(c))).write_to(xp);
   ensure_equals("single ordered_integer_string entity", tree, xp);
 }
@@ -94,7 +102,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   run_test("d7");
-  C(C(S(Xany(L"d7"), L"string2"))).write_to(xp);
+  C(C(S(Xany("d7"), "string2"))).write_to(xp);
   ensure_equals("just string", tree, xp);
 }
 
@@ -115,8 +123,8 @@ void object::test<4>(int) {
     run_test("foo bar");
     fail("string following string");
   } catch (schema::mismatch const &mm) {
-    ensure_equals("correct error", 
-        string(mm.what()), "1:1 : mismatch in document after token foo");
+    ensure_equals("correct error", string(mm.what()), 
+      "1:1 : mismatch in document>any>ordered>node(string_2) after token foo");
   }
 }
 
@@ -150,6 +158,26 @@ void object::test<7>(int) {
 
 template<> template<>
 void object::test<8>(int) {
+  run_test("xxx,yyyy");
+  nd_list c;
+  c.push_back(S(Xany("xxx"), "string_1"));
+  c.push_back(S(Xany("yyyy"), "string_2"));
+  C(C(M(c))).write_to(xp);
+  ensure_equals("ordered_string_string", tree, xp);
+}
+
+template<> template<>
+void object::test<9>(int) {
+  run_test("4 5");
+  nd_list c;
+  c.push_back(S(Xany(4), "int3"));
+  c.push_back(S(Xany(5), "int4"));
+  C(C(M(c))).write_to(xp);
+  ensure_equals("follow", tree, xp);
+}
+
+template<> template<>
+void object::test<10>(int) {
   no_test();
 }
 
