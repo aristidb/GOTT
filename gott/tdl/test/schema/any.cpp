@@ -61,6 +61,10 @@ struct schema_any : tut::schema_basic {
       rule_one("document",
          rule("any", RA(),
            list_of
+           (rule("follow", RA(), 
+             list_of
+             (rule("node", RA("int3", true, new stru::repatch_integer())))
+             (rule("node", RA("int4", true, new stru::repatch_integer())))))
            (rule("ordered", RA(),
              list_of
              (rule("node", RA("int", true, new stru::repatch_integer())))
@@ -70,11 +74,7 @@ struct schema_any : tut::schema_basic {
              (rule("node", RA("string_1")))
              (rule("node", RA("string_2")))))
            (rule("node", RA("int2", true, new stru::repatch_integer())))
-           (rule("node", RA("string2")))
-           (rule("follow", RA(), 
-             list_of
-             (rule("node", RA("int3", true, new stru::repatch_integer())))
-             (rule("node", RA("int4", true, new stru::repatch_integer()))))))))
+           (rule("node", RA("string2"))))))
   {}
 };
 }
@@ -113,7 +113,7 @@ void object::test<3>(int) {
     fail("empty");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", string(mm.what()),
-        "0:1 : mismatch in document>any>ordered>node(int) after token ");
+        "0:1 : mismatch in document>any>follow>node(int3) after token ");
   }
 }
 
@@ -152,7 +152,7 @@ void object::test<7>(int) {
     fail("string following integer");
   } catch (schema::mismatch const &mm) {
     ensure_equals("correct error", string(mm.what()),
-       "1:1 : mismatch in document>any>ordered>node(string) after token 732");
+       "1:1 : mismatch in document>any>follow>node(int4) after token 732");
   }
 }
 
