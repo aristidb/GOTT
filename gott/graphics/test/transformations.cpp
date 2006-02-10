@@ -89,6 +89,14 @@ int main() {
   std::cout << x << ' ' << y << std::endl;
   happy &= check(x, y, -1.0, 1.0, 6);
 
+  g::skew_y(-pi / 4).apply(x, y);
+  std::cout << x << ' ' << y << std::endl;
+  happy &= check(x, y, -1.0, 2.0, 7);
+
+  g::skew_y(pi / 4).skew_x(pi / 4).apply(x, y);
+  std::cout << x << ' ' << y << std::endl;
+  happy &= check(x, y, 0, 1.0, 8);
+
   std::cout << "\nMaximum error: " << maximum_error << std::endl;
 
   return happy ? 0 : 1;
