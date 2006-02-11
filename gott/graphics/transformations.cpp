@@ -47,13 +47,13 @@ namespace math = boost::numeric::ublas;
 transformations const transformations::identity;
 
 transformations::transformations() 
-: mtx(math::identity_matrix<double>(3)) {}
+: mtx(math::identity_matrix<number>(3)) {}
 transformations::transformations(transformations const &o) : mtx(o.mtx) {}
 transformations::~transformations() {}
 
-transformations::transformations(double a, double b, double c, double d, 
-    double t_x, double t_y)
-: mtx(math::identity_matrix<double>(3)) {
+transformations::transformations(number a, number b, number c, number d, 
+    number t_x, number t_y)
+: mtx(math::identity_matrix<number>(3)) {
   matrix(a, b, c, d, t_x, t_y);
 }
 
@@ -61,50 +61,50 @@ void transformations::swap(transformations &x) {
   mtx.swap(x.mtx);
 }
 
-transformations &transformations::rotate(double phi) {
-  double sin_phi = std::sin(phi);
-  double cos_phi = std::cos(phi);
+transformations &transformations::rotate(angle phi) {
+  number sin_phi = std::sin(phi);
+  number cos_phi = std::cos(phi);
   return matrix(cos_phi, sin_phi, -sin_phi, cos_phi, 0, 0);
 }
 
-transformations &transformations::translate(double dx, double dy) {
+transformations &transformations::translate(distance dx, distance dy) {
   return matrix(1, 0, 0, 1, dx, dy);
 }
 
-transformations &transformations::scale(double sx, double sy) {
+transformations &transformations::scale(number sx, number sy) {
   return matrix(sx, 0, 0, sy, 0, 0);
 }
 
-transformations &transformations::skew_x(double a) {
+transformations &transformations::skew_x(angle a) {
   return matrix(1, 0, std::tan(a), 1, 0, 0);
 }
 
-transformations &transformations::skew_y(double a) {
+transformations &transformations::skew_y(angle a) {
   return matrix(1, std::tan(a), 0, 1, 0, 0);
 }
 
-transformations &transformations::matrix(double a, double b, double c, 
-    double d, double t_x, double t_y) {
-  matrix_t helper(math::identity_matrix<double>(3));
+transformations &transformations::matrix(number a, number b, number c, 
+    number d, number t_x, number t_y) {
+  matrix_t helper(math::identity_matrix<number>(3));
   helper(0, 0) = a;   helper(0, 1) = b;
   helper(1, 0) = c;   helper(1, 1) = d;
   helper(2, 0) = t_x; helper(2, 1) = t_y;
-  mtx.assign(math::prod(mtx, helper));
+  mtx = math::prod(mtx, helper);
   return *this;
 }
 
 transformations &transformations::append(transformations const &o) {
-  mtx.assign(math::prod(mtx, o.mtx));
+  mtx = math::prod(mtx, o.mtx);
   return *this;
 }
 
 transformations &transformations::prepend(transformations const &o) {
-  mtx.assign(math::prod(o.mtx, mtx));
+  mtx = math::prod(o.mtx, mtx);
   return *this;
 }
 
 graphics::point transformations::apply(graphics::point const &p) {
-  math::vector<double, math::bounded_array<double, 3> > input(3), output(3);
+  math::vector<number, math::bounded_array<number, 3> > input(3), output(3);
   input(0) = p.x; input(1) = p.y; input(2) = 1;
   output = math::prod(input, mtx);
   return graphics::point(output(0), output(1));

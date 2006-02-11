@@ -38,7 +38,7 @@
 #ifndef GOTT_GRAPHICS_TRANSFORMATIONS_HPP
 #define GOTT_GRAPHICS_TRANSFORMATIONS_HPP
 
-#include "point.hpp"
+#include "primitive_types.hpp"
 #include <gott/visibility.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
@@ -60,7 +60,8 @@ public:
    * c & d & 0 \\ 
    * t_x & t_y & 1 \end{array} \right) \f]
    */
-  GOTT_EXPORT transformations(double a, double b, double c, double d, double t_x, double t_y);
+  GOTT_EXPORT transformations(number a, number b, number c, number d,
+      number t_x, number t_y);
 
   /// Copy-Constructor.
   GOTT_EXPORT transformations(transformations const &);
@@ -81,33 +82,33 @@ public:
    * Rotate.
    * \param rot Rotation (counter-clockwise) in radian.
    */
-  GOTT_EXPORT transformations &rotate(double rot);
+  GOTT_EXPORT transformations &rotate(angle rot);
 
   /**
    * Translate.
    * \param dx Shift to the right.
    * \param dy Shift upwards.
    */
- GOTT_EXPORT transformations &translate(double dx, double dy);
+ GOTT_EXPORT transformations &translate(distance dx, distance dy);
 
   /**
    * Scale. 1.0 means no resize.
    * \param rx Ratio in x direction.
    * \param ry Ratio in y direction.
    */
-  GOTT_EXPORT transformations &scale(double rx, double ry);
+  GOTT_EXPORT transformations &scale(number rx, number ry);
 
   /**
    * Skew along the x-axis.
    * \param a Skew angle (counter-clockwise) in radian.
    */
-  GOTT_EXPORT transformations &skew_x(double a);
+  GOTT_EXPORT transformations &skew_x(angle a);
 
   /**
    * Skew along the y-axis.
    * \param a Skew angle (counter-clockwise) in radian.
    */
-  GOTT_EXPORT transformations &skew_y(double a);
+  GOTT_EXPORT transformations &skew_y(angle a);
 
   /**
    * Multiply the current transformation matrix with another.
@@ -117,9 +118,9 @@ public:
    * t_x & t_y & 1 \end{array} \right) \f]
    */
   GOTT_EXPORT transformations &matrix(
-      double a, double b, 
-      double c, double d,
-      double t_x, double t_y
+      number a, number b, 
+      number c, number d,
+      number t_x, number t_y
   );
 
   /**
@@ -150,9 +151,9 @@ public:
 private:
   typedef
     boost::numeric::ublas::matrix<
-      double,
+      number,
       boost::numeric::ublas::row_major,
-      boost::numeric::ublas::bounded_array<double, 9>
+      boost::numeric::ublas::bounded_array<number, 9>
     >
     matrix_t;
   matrix_t mtx;
@@ -164,7 +165,7 @@ private:
  * \relates transformations
  */
 inline 
-transformations rotate(double rot, transformations t = transformations()) {
+transformations rotate(angle rot, transformations t = transformations()) {
   t.rotate(rot);
   return t;
 }
@@ -174,7 +175,7 @@ transformations rotate(double rot, transformations t = transformations()) {
  * \see transformations::translate
  * \relates transformations
  */
-inline transformations translate(double dx, double dy, 
+inline transformations translate(distance dx, distance dy, 
     transformations t = transformations()) {
   t.translate(dx, dy);
   return t;
@@ -185,7 +186,7 @@ inline transformations translate(double dx, double dy,
  * \see transformations::scale
  * \relates transformations
  */
-inline transformations scale(double rx, double ry,
+inline transformations scale(distance rx, distance ry,
     transformations t = transformations()) {
   t.scale(rx, ry);
   return t;
@@ -196,7 +197,7 @@ inline transformations scale(double rx, double ry,
  * \see transformations::skew_x
  * \relates transformations
  */
-inline transformations skew_x(double a, 
+inline transformations skew_x(angle a, 
     transformations t = transformations()) {
   t.skew_x(a);
   return t;
@@ -207,7 +208,7 @@ inline transformations skew_x(double a,
  * \see transformations::skew_y
  * \relates transformations
  */
-inline transformations skew_y(double a,
+inline transformations skew_y(angle a,
     transformations t = transformations()) {
   t.skew_y(a);
   return t;
@@ -218,8 +219,8 @@ inline transformations skew_y(double a,
  * \see transformations::matrix
  * \relates transformations
  */
-inline transformations matrix(double a, double b, double c, double d, 
-    double t_x, double t_y, transformations t = transformations()) {
+inline transformations matrix(number a, number b, number c, number d, 
+    number t_x, number t_y, transformations t = transformations()) {
   t.matrix(a, b, c, d, t_x, t_y);
   return t;
 }

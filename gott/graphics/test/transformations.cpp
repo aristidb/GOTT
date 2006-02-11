@@ -41,14 +41,15 @@
 
 namespace g = gott::graphics;
 
-double const pi = 4 * std::atan(1.0);
-double maximum_error = 0;
+g::number const pi = 4 * std::atan(1.0);
+g::number maximum_error = 0;
 
-bool check(double isx, double isy, double expx, double expy, int test) {
+bool check(g::number isx, g::number isy, g::number expx, g::number expy, 
+    int test) {
   std::cout << isx << ' ' << isy << std::endl;
-  double const epsilon = 1.0E-13;
-  double dx = std::fabs(isx - expx);
-  double dy = std::fabs(isy - expy);
+  g::number const epsilon = 1.0E-13;
+  g::number dx = std::fabs(isx - expx);
+  g::number dy = std::fabs(isy - expy);
   maximum_error = std::max(maximum_error, dx);
   maximum_error = std::max(maximum_error, dy);
   if (dx < epsilon && dy < epsilon)

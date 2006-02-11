@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,17 +35,36 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_GRAPHICS_POINT_HPP
-#define GOTT_GRAPHICS_POINT_HPP
+#ifndef GOTT_GRAPHICS_PRIMITIVE_TYPES_HPP
+#define GOTT_GRAPHICS_PRIMITIVE_TYPES_HPP
 
 namespace gott {
 namespace graphics {
 
+/// The primary type for graphics calculations.
+typedef double number;
+/// The type for distances in local units.
+typedef number distance;
+/// The type for angles in radian (0 - 2*pi).
+typedef number angle;
+
+/**
+ * The type for points in local space.
+ */
 struct point {
 public:
-  point(double xx, double yy) : x(xx), y(yy) {}
-  double x;
-  double y;
+  /**
+   * Constructor from coordinates.
+   * \param x The x-axis coordinate.
+   * \param y The y-axis coordinate.
+   */
+  point(distance x, distance y) : x(x), y(y) {}
+
+  /// The x-axis coordinate.
+  distance x;
+
+  /// The y-axis coordinate.
+  distance y;
 };
 
 }}

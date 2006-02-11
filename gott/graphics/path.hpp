@@ -39,7 +39,7 @@
 #define GOTT_GRAPHICS_PATH_HPP
 
 #include <gott/visibility.hpp>
-#include "point.hpp"
+#include "primitive_types.hpp"
 
 namespace gott {
 
