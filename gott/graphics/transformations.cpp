@@ -89,23 +89,23 @@ transformations &transformations::matrix(double a, double b, double c,
   helper(0, 0) = a;   helper(0, 1) = b;
   helper(1, 0) = c;   helper(1, 1) = d;
   helper(2, 0) = t_x; helper(2, 1) = t_y;
-  mtx = prod(mtx, helper);
+  mtx.assign(math::prod(mtx, helper));
   return *this;
 }
 
 transformations &transformations::append(transformations const &o) {
-  mtx = prod(mtx, o.mtx);
+  mtx.assign(math::prod(mtx, o.mtx));
   return *this;
 }
 
 transformations &transformations::prepend(transformations const &o) {
-  mtx = prod(o.mtx, mtx);
+  mtx.assign(math::prod(o.mtx, mtx));
   return *this;
 }
 
 graphics::point transformations::apply(graphics::point const &p) {
   math::vector<double, math::bounded_array<double, 3> > input(3), output(3);
   input(0) = p.x; input(1) = p.y; input(2) = 1;
-  output = prod(input, mtx);
+  output = math::prod(input, mtx);
   return graphics::point(output(0), output(1));
 }
