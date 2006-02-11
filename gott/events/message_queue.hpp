@@ -79,6 +79,8 @@ struct care_priority<no_priority> {
  * \param Size The maximal size of the queue or 0 (default value) if unlimited.
  * \param PriorityCompare The type of the priority comparer.
  *                        Should return x1.priority < x2.priority.
+ *                        Pass no_priority if you want the queue to behave plain
+ *                        FIFO (no_priority is the default).
  */
 template<class Message, unsigned Size = 0, class PriorityCompare = no_priority>
 class message_queue : boost::noncopyable {
