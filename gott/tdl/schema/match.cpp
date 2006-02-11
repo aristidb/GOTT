@@ -65,8 +65,6 @@ public:
   impl(structure::revocable_structure &p, match &r)
   : base_struc(p), pos(base_struc), ref(r) {}
 
-  void add(rule_t const &);
-
   template<class T>
   void handle_token(T const &);
 
@@ -85,7 +83,6 @@ public:
 
   void fail_all();
 
-  void parental_requirement(ev::event const &, unsigned);
   void real_parental_requirement();
 
   struct deferred_miss {
@@ -130,64 +127,78 @@ public:
 };
 
 match::match(structure::revocable_structure &p) 
-: pimpl(new impl(p, *this)) {}
+: p(new impl(p, *this)) {}
 
 match::match(rule_t const &rf, structure::revocable_structure &p)
-: pimpl(new impl(p, *this)) {
+: p(new impl(p, *this)) {
   add(rf);
 }
 
 match::~match() {}
 
-void match::add(rule_t const &rf) {
-  pimpl->add(rf);
+void match::add(rule_t const &f) {
+  shared_ptr<writable_structure> struc = p->direct_structure_non_base();
+
+  if (structure::repatcher const *r = f.attributes().repatcher())
+    struc.reset(r->deferred_write(struc ? *struc : p->base_struc));
+
+  int current = p->parse.size();
+  p->parse.push_back(impl::entry());
+  p->parse[current].structure = struc;
+
+  item *the_item = f.get(*this);
+  GOTT_ASSERT_2(the_item,(item*)0,std::not_equal_to<item*>(),"Acquired rule_t");
+  GOTT_ASSERT_2(the_item->attributes(), f.attributes(), 
+      std::equal_to<rule_attr_t>(), "Rule attributes");
+
+  p->parse[current].the_item.reset(the_item);
 }
 
 structure::revocable_structure &match::revocable_structure() const {
-  return pimpl->base_struc;
+  return p->base_struc;
 }
 
 structure::writable_structure &match::direct_structure() const {
-  shared_ptr<writable_structure> s = pimpl->direct_structure_non_base();
+  shared_ptr<writable_structure> s = p->direct_structure_non_base();
   if (s)
     return *s;
-  return pimpl->base_struc;
+  return p->base_struc;
 }
 
 positioning &match::pos() const {
-  return pimpl->pos;
+  return p->pos;
 }
 
 source_position const &match::where_out() const {
-  if (pimpl->overwrite_where)
-    return pimpl->overwrite_where.get();
+  if (p->overwrite_where)
+    return p->overwrite_where.get();
   return where();
 }
 
 void match::parental_requirement(ev::event const &event, unsigned count) {
-  pimpl->parental_requirement(event, count);
+  p->miss = impl::deferred_miss(event, count);
 }
 
 // Parser forwarding
 
 void match::begin_parse() {
-  pimpl->handle_token(ev::begin_parse());
+  p->handle_token(ev::begin_parse());
 }
 
 void match::down() {
-  pimpl->handle_token(ev::down());
+  p->handle_token(ev::down());
 }
 
 void match::node(string const &s) {
-  pimpl->handle_token(ev::node(s));
+  p->handle_token(ev::node(s));
 }
 
 void match::up() {
-  pimpl->handle_token(ev::up());
+  p->handle_token(ev::up());
 }
 
 void match::end_parse() {
-  pimpl->handle_token(ev::end_parse());
+  p->handle_token(ev::end_parse());
 }
 
 void match::comment(string const &, bool) {}
@@ -198,24 +209,6 @@ shared_ptr<writable_structure> match::impl::direct_structure_non_base() {
   if (parse.empty()) 
     return shared_ptr<writable_structure>();
   return parse.back().structure;
-}
-
-void match::impl::add(rule_t const &f) {
-  shared_ptr<writable_structure> struc = direct_structure_non_base();
-
-  if (structure::repatcher const *r = f.attributes().repatcher())
-    struc.reset(r->deferred_write(struc ? *struc : base_struc));
-
-  int current = parse.size();
-  parse.push_back(entry());
-  parse[current].structure = struc;
-
-  item *the_item = f.get(ref);
-  GOTT_ASSERT_2(the_item,(item*)0,std::not_equal_to<item*>(),"Acquired rule_t");
-  GOTT_ASSERT_2(the_item->attributes(), f.attributes(), 
-      std::equal_to<rule_attr_t>(), "Rule attributes");
-
-  parse[current].the_item.reset(the_item);
 }
 
 template<class T>
@@ -324,10 +317,6 @@ void match::impl::fail_item() {
 
 void match::impl::fail_all() {
   throw mismatch(ref.where(), shadow_names);
-}
-
-void match::impl::parental_requirement(ev::event const &event, unsigned count) {
-  miss = deferred_miss(event, count);
 }
 
 void match::impl::real_parental_requirement() {

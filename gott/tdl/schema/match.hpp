@@ -140,7 +140,7 @@ private:
 
 private:
   class impl;
-  boost::scoped_ptr<impl> pimpl;
+  boost::scoped_ptr<impl> p;
 
   match();
 };
