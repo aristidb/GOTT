@@ -50,12 +50,15 @@ using namespace boost::lambda;
 using boost::ref;
 using namespace std;
 
-typedef message_queue<int, 6> mq_t; // 6 is the minimum size indeed (filter)
+typedef message_queue<int, 6> mq_t; 
+  // 6 is the minimum size indeed (filter)
 //typedef message_queue<int> mq_t;
 
-boost::barrier step2(2);
+typedef message_queue<int, 0, std::greater<int> > mq2_t;
 
-void consumer(mq_t &mq) {
+boost::barrier step2(2), step3(2);
+
+void consumer(mq_t &mq, mq2_t &mq2) {
   mq.wait_for_all(cout << _1 << ' ', _1 != 0);
 
   cout << endl;
@@ -76,12 +79,21 @@ void consumer(mq_t &mq) {
   for (int i = 1; i < 10; ++i)
     mq.push(i);
   mq.push(0);
+
+
+  for (int i = 0; i < 5; ++i)
+    mq2.push(i);
+  for (int i = 10; i >= 5; --i)
+    mq2.push(i);
+
+  step3.wait();
 }
 
 int main() {
   mq_t mq;
+  mq2_t mq2;
   
-  boost::thread thrd(bind(&consumer, ref(mq)));
+  boost::thread thrd(bind(&consumer, ref(mq), ref(mq2)));
   
   for (int i = 80; i >= 0; --i)
     mq.push(i);
@@ -95,6 +107,12 @@ int main() {
   cout << "/ " << flush;
 
   mq.wait_for_all(cout << _1 << ' ', _1 < 9);
+  cout << endl;
+
+  step3.wait();
+
+  cout << "Priority:" << endl;
+  mq2.wait_for_all(cout << _1 << ' ', _1 < 10);
   cout << endl;
 
   thrd.join();

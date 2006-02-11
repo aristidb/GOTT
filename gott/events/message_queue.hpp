@@ -43,6 +43,7 @@
 #include <boost/thread/condition.hpp>
 #include <boost/function.hpp>
 #include <deque>
+#include <algorithm>
 
 namespace gott {
 namespace events {
@@ -57,16 +58,33 @@ enum message_filter_result {
   message_quit 
 };
 
+struct no_priority {
+  template<class T>
+  bool operator()(T,T) { return false; } // never called
+};
+
+template<class T>
+struct care_priority {
+  enum { value = 1 };
+};
+
+template<>
+struct care_priority<no_priority> {
+  enum { value = 0 };
+};
+
 /**
  * Thread-safe message queue.
  * \param Message The type of the messages.
  * \param Size The maximal size of the queue or 0 (default value) if unlimited.
+ * \param PriorityCompare The type of the priority comparer.
+ *                        Should return x1.priority < x2.priority.
  */
-template<class Message, unsigned Size = 0>
+template<class Message, unsigned Size = 0, class PriorityCompare = no_priority>
 class message_queue : boost::noncopyable {
 public:
-  /// Default-Constructor.
-  message_queue() {}
+  /// Constructor.
+  message_queue(PriorityCompare p = PriorityCompare()) : pcmp(p) {}
 
 public:
   /**
@@ -237,6 +255,9 @@ private:
         ++it;
     }
 
+    if (care_priority<PriorityCompare>::value)
+      std::make_heap(queue.begin(), queue.end(), pcmp);
+
     return do_again;
   }
 
@@ -400,12 +421,19 @@ private:
 private:
   void push_unsafe(Message const &msg) {
     queue.push_back(msg);
+    if (care_priority<PriorityCompare>::value)
+      std::push_heap(queue.begin(), queue.end(), pcmp);
     new_data().notify_all();
   }
 
   Message pop_unsafe() {
     Message result = queue.front();
-    queue.pop_front();
+    if (!care_priority<PriorityCompare>::value) {
+      queue.pop_front();
+    } else {
+      std::pop_heap(queue.begin(), queue.end(), pcmp);
+      queue.pop_back();
+    }
     return result;
   }
 
@@ -433,6 +461,7 @@ private:
   
 private:
   std::deque<Message> queue;
+  PriorityCompare pcmp;
 };
 
 template<class QuitPred, class FilterPred>
