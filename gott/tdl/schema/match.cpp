@@ -62,7 +62,8 @@ using structure::writable_structure;
 
 class match::impl {
 public:
-  impl(structure::revocable_structure &x, match &r);
+  impl(structure::revocable_structure &p, match &r)
+  : base_struc(p), pos(base_struc), ref(r) {}
 
   void add(rule_t const &);
 
@@ -194,9 +195,6 @@ void match::end_parse() {
 void match::comment(string const &, bool) {}
 
 // Implementation
-
-match::impl::impl(structure::revocable_structure &p, match &r)
-: base_struc(p), pos(base_struc), ref(r) {}
 
 shared_ptr<writable_structure> match::impl::direct_structure_non_base() {
   if (parse.empty()) 

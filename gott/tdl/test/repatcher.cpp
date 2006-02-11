@@ -45,7 +45,6 @@
 #include <gott/tdl/structure/print.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <gott/tut/tut.h>
-#include <iostream>
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 
@@ -109,11 +108,16 @@ template<> template<>
 void object::test<3>(int) {
   scoped_ptr<repatcher_getter> re_g(repatcher_by_name().get_alloc("integer"));
   scoped_ptr<repatcher> re(re_g->result_alloc());
-  direct_print<char> out(std::cout);
+
+  std::ostringstream stream;
+  direct_print<char> out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
+
   ind->begin(source_position());
-  ind->data(Xany("-44"));
+  ind->data(Xany("-000044"));
   ind->end();
+
+  ensure_equals(stream.str(), "-44");
 }
 
 template<> template<>
@@ -123,8 +127,11 @@ void object::test<4>(int) {
   re_g->begin(source_position()); re_g->data(Xany("v1")); re_g->end();
   re_g->begin(source_position()); re_g->data(Xany("v2")); re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
-  direct_print<char> out(std::cout);
+
+  std::ostringstream stream;
+  direct_print<char> out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
+
   ind->begin(source_position());
     ind->begin(source_position());
       ind->data(Xany("v1"));
@@ -133,6 +140,8 @@ void object::test<4>(int) {
       ind->data(Xany("v2"));
     ind->end();
   ind->end();
+
+  ensure_equals(stream.str(), "    0\n    1");
 }
 
 template<> template<>
@@ -147,11 +156,15 @@ void object::test<5>(int) {
     re_g->add_tag("right");
   re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
-  direct_print<char> out(std::cout);
+
+  std::ostringstream stream;
+  direct_print<char> out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin(source_position());
     ind->data(Xany("123456789"));
   ind->end();
+
+  ensure_equals(stream.str(), "3");
 }
 
 template<> template<>
@@ -161,15 +174,20 @@ void object::test<6>(int) {
   re_g->begin(source_position()); re_g->data(Xany("foo")); re_g->end();
   re_g->begin(source_position()); re_g->data(Xany(repatch_find_literal::type::end)); re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
-  direct_print<char> out(std::cout);
+
+  std::ostringstream stream;
+  direct_print<char> out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin(source_position()); 
   ind->begin(source_position()); ind->data(Xany("barfoo")); ind->end();
+  ind->end();
+  ensure_equals(stream.str(), "    barfoo");
 
   bool expected_failure = false;
   ind->begin(source_position());
+    ind->begin(source_position());
       try {
-      ind->data(Xany("foobar")); 
+        ind->data(Xany("foobar")); 
       } catch (failed_repatch const &) {
         expected_failure = true;
       }
@@ -201,11 +219,15 @@ void object::test<7>(int) {
     re_g->begin(source_position()); re_g->end();
   re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
-  direct_print<char> out(std::cout);
+
+  std::ostringstream stream;
+  direct_print<char> out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin(source_position());
     ind->data(Xany("x077"));
   ind->end();
+
+  ensure_equals(stream.str(), "77");
 }
 
 template<> template<>
