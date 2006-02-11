@@ -42,11 +42,11 @@ namespace gott {
 namespace graphics {
 
 /// The primary type for graphics calculations.
-typedef double number;
+typedef float number;
 /// The type for distances in local units.
 typedef number distance;
 /// The type for angles in radian (0 - 2*pi).
-typedef number angle;
+typedef double angle;
 
 /**
  * The type for points in local space.

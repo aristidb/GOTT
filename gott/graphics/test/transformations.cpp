@@ -41,13 +41,13 @@
 
 namespace g = gott::graphics;
 
-g::number const pi = 4 * std::atan(1.0);
+g::angle const pi = 4 * std::atan(1.0);
 g::number maximum_error = 0;
 
 bool check(g::number isx, g::number isy, g::number expx, g::number expy, 
     int test) {
   std::cout << isx << ' ' << isy << std::endl;
-  g::number const epsilon = 1.0E-13;
+  g::number const epsilon = 1.0E-4;
   g::number dx = std::fabs(isx - expx);
   g::number dy = std::fabs(isy - expy);
   maximum_error = std::max(maximum_error, dx);
