@@ -40,7 +40,7 @@
 
 #include "property.hpp"
 #include <sigc++/connection.h>
-#include <sigc++/bind.h>
+#include <boost/lambda/bind.hpp>
 
 namespace gott {
 namespace properties {
@@ -59,9 +59,9 @@ public:
   : left(lhs),
     right(rhs), 
     left_to_right(left.on_change().connect(
-          sigc::bind(&liaison::left_changed, this))),
+          boost::lambda::bind(&liaison::left_changed, this))),
     right_to_left(right.on_change().connect(
-          sigc::bind(&liaison::right_changed, this))),
+          boost::lambda::bind(&liaison::right_changed, this))),
     conversion(c)
   {} 
   

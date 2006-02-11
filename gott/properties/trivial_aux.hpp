@@ -40,7 +40,6 @@
 
 #include <cstddef>
 #include <iostream>
-#include <sigc++/signal.h>
 
 namespace gott {
 namespace properties {

@@ -40,7 +40,7 @@
 
 #include "property.hpp"
 #include <sigc++/connection.h>
-#include <sigc++/bind.h>
+#include <boost/lambda/bind.hpp>
 
 namespace gott {
 namespace properties {
@@ -60,7 +60,8 @@ public:
       OnFailure f = OnFailure(),
       OnCorrect k = OnCorrect())
   : prop(p), check(c), failure(f), correct(k),
-    change(prop.on_change().connect(sigc::bind(&verify::action, this))) {}
+    change(prop.on_change().connect(
+          boost::lambda::bind(&verify::action, this))) {}
 
   OnCorrect &on_correct() { return correct; }
 
