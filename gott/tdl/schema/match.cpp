@@ -126,8 +126,6 @@ public:
   Stack parse;
   std::vector<string> shadow_names;
 
-  static string get_name(item const &);
-
   ::boost::optional<source_position> overwrite_where;
 };
 
@@ -225,7 +223,7 @@ void match::impl::handle_token(T const &e) {
   shadow_names.clear();
   range_t<Stack::iterator> in = range(parse);
   while (!in.empty())
-    shadow_names.push_back(get_name(*in.Begin++->the_item));
+    shadow_names.push_back(in.Begin++->the_item->long_name());
 
   if (miss) {    
     real_parental_requirement();
@@ -342,25 +340,3 @@ void match::impl::real_parental_requirement() {
   fail_all();
 }
 
-string match::impl::get_name(item const &rl) {
-  static string const s_open("("), s_close(")"), sep(",");
-  std::vector<string> out;
-  std::vector<string> const &tags = rl.attributes().tags();
-  out.reserve(1 + 
-      (tags.size() > 0 
-       ? 1 + tags.size() * 2
-       : 0));
-  out.push_back(rl.name());
-  if (tags.size() > 0) {
-    out.push_back(s_open);
-    range_t<std::vector<string>::const_iterator> r = range(tags);
-    out.push_back(*r.begin());
-    for (std::vector<string>::const_iterator it = r.begin() + 1; 
-        it != r.end(); ++it) {
-      out.push_back(sep);
-      out.push_back(*it);
-    }
-    out.push_back(s_close);
-  }
-  return string(range(out), string::concatenate);
-}

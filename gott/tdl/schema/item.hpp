@@ -85,9 +85,14 @@ public:
   virtual expect expectation() const = 0;
 
   /**
-   * A nice name for the rule_t.
+   * A nice name for the item.
    */
   virtual string name() const = 0;
+
+  /**
+   * A longer name for the item with some extra information.
+   */
+  virtual string long_name() const;
 
   // Event handlers
   // Tokens

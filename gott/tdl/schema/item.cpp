@@ -43,6 +43,7 @@
 #include <boost/bind.hpp>
 #include <gott/string/stl.hpp>
 
+using gott::string;
 namespace schema = gott::tdl::schema;
 using schema::match;
 using schema::item;
@@ -104,6 +105,32 @@ bool item::play(ev::child_fail const &) { return play_other(); }
 bool item::play_other() { return false; }
 
 bool item::miss_events(ev::event const &, unsigned) { return false; }
+
+string item::long_name() const {
+  static string const s_open("(");
+  static string const s_close(")");
+  static string const sep(",");
+
+  std::vector<string> out;
+  std::vector<string> const &tags = attributes().tags();
+  out.reserve(1 + 
+      (tags.size() > 0 
+       ? 1 + tags.size() * 2
+       : 0));
+  out.push_back(name());
+  if (tags.size() > 0) {
+    out.push_back(s_open);
+    range_t<std::vector<string>::const_iterator> r = range(tags);
+    out.push_back(*r.begin());
+    for (std::vector<string>::const_iterator it = r.begin() + 1; 
+        it != r.end(); ++it) {
+      out.push_back(sep);
+      out.push_back(*it);
+    }
+    out.push_back(s_close);
+  }
+  return string(range(out), string::concatenate);
+}
 
 std::ostream &schema::operator<<(std::ostream &s, rule_attr_t const &a) {
   s << '(' << (a.coat() ? "coat" : "flat");
