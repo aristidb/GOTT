@@ -43,17 +43,32 @@ namespace g = gott::graphics;
 
 g::angle const pi = 4 * std::atan(1.0);
 g::number maximum_error = 0;
+int worst_test = 0;
 
-bool check(g::number isx, g::number isy, g::number expx, g::number expy, 
+bool check(g::number &isx, g::number &isy, g::number expx, g::number expy, 
     int test) {
-  std::cout << isx << ' ' << isy << std::endl;
+  std::cout << test << ": " << isx << ' ' << isy << std::endl;
+
   g::number const epsilon = 1.0E-4;
+
   g::number dx = std::fabs(isx - expx);
   g::number dy = std::fabs(isy - expy);
-  maximum_error = std::max(maximum_error, dx);
-  maximum_error = std::max(maximum_error, dy);
+
+  isx = expx;
+  isy = expy;
+
+  if (dx > maximum_error) {
+    maximum_error = dx;
+    worst_test = test;
+  }
+  if (dy > maximum_error) {
+    maximum_error = dy;
+    worst_test = test;
+  }
+
   if (dx < epsilon && dy < epsilon)
     return true;
+
   std::cerr << "Test failed: " << test << '\n';
   std::cerr << "Error x: " << dx << '\n';
   std::cerr << "Error y: " << dy << '\n';
@@ -91,7 +106,8 @@ int main() {
   g::skew_y(pi / 4).skew_x(pi / 4).apply_to(p);
   happy &= check(p.x, p.y, 0, 1.0, 8);
 
-  std::cout << "\nMaximum error: " << maximum_error << std::endl;
+  std::cout << "\nMaximum error: " << maximum_error 
+    << " in test " << worst_test << std::endl;
 
   return happy ? 0 : 1;
 }
