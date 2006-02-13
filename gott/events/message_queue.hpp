@@ -236,8 +236,11 @@ public:
 
 private:
   template<class T>
-  bool filter_unsafe(T func) {
+  bool filter_unsafe(T func, bool strict_priority) {
     bool do_again = true;
+
+    if (care_priority<PriorityCompare>::value && strict_priority)
+      std::sort(queue.rbegin(), queue.rend(), pcmp);
 
     typename std::deque<Message>::iterator it = queue.begin();
     while (it != queue.end()) {
@@ -273,13 +276,16 @@ public:
    * Returns immediately if there is data available but none gets through the
    * filter and none is classified as quit-message.
    * \param func The filtering and receiving callback.
+   * \param strict_priority Whether all elements should be passed in correct
+   *             priority order. This might be slow. This parameter has no 
+   *             effect if PriorityCompare is no_priority.
    * \return Whether no filter returned quit.
    */
   template<class T>
-  bool filter(T func) {
+  bool filter(T func, bool strict_priority = false) {
     boost::mutex::scoped_lock lock(monitor_lock);
     wait_for_data_internal(lock);
-    return filter_unsafe(func);
+    return filter_unsafe(func, strict_priority);
   }
 
   /**
@@ -288,12 +294,15 @@ public:
    * message_quit.
    * The callback must not access the message queue.
    * \param func The filtering and receiving callback.
+   * \param strict_priority Whether all elements should be passed in correct
+   *             priority order. This might be slow. This parameter has no 
+   *             effect if PriorityCompare is no_priority.
    */
   template<class T>
-  void filter_all(T func) {
+  void filter_all(T func, bool strict_priority = false) {
     boost::mutex::scoped_lock lock(monitor_lock);
     wait_for_data_internal(lock);
-    while (filter_unsafe(func))
+    while (filter_unsafe(func, strict_priority))
       wait_for_new_data_internal(lock);
   }
 
@@ -342,13 +351,17 @@ public:
    * Neither the callback nor the predicate must access the message queue.
    * \param func The receiving callback.
    * \param pred The predicate.
+   * \param strict_priority Whether all elements should be passed in correct
+   *             priority order. This might be slow. This parameter has no 
+   *             effect if PriorityCompare is no_priority.
    * \return Whether no filter returned quit.
    */
   template<class T, class U>
-  bool filter(T func, U pred) {
+  bool filter(T func, U pred, bool strict_priority = false) {
     return filter(
         add_predicate<T, U, message_filter_result, message_in_filter>
-          (func, pred));
+          (func, pred),
+        strict_priority);
   }
 
   /**
@@ -357,12 +370,18 @@ public:
    * to a callback. The message for which the predicate returns message_quit 
    * is also removed. 
    * Neither the callback nor the predicate must access the message queue.
+   * \param func The receiving callback.
+   * \param pred The predicate.
+   * \param strict_priority Whether all elements should be passed in correct
+   *             priority order. This might be slow. This parameter has no 
+   *             effect if PriorityCompare is no_priority.
    */
   template<class T, class U>
-  void filter_all(T func, U pred) {
+  void filter_all(T func, U pred, bool strict_priority = false) {
     filter_all(
         add_predicate<T, U, message_filter_result, message_in_filter>
-          (func, pred));
+          (func, pred),
+        strict_priority);
   }
 
 public:
