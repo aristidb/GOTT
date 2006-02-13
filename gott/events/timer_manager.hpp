@@ -41,10 +41,14 @@
 #include "deadline_timer.hpp"
 #include <gott/string/qid.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <vector>
 
 namespace gott {
 namespace events {
+
+class main_loop;
 
 /**
  * Feature for main_loops able to deal with timer events.
@@ -63,6 +67,24 @@ public:
 
   /// Check if there are timers to be scheduled sometime.
   virtual bool has_timers() const = 0;
+
+public:
+  class proxy_t : boost::noncopyable {
+  public:
+    void add_timer(deadline_timer const &t) {
+      req.push_back(t);
+    }
+
+    GOTT_EXPORT void operator() (main_loop &m) const;
+
+  private:
+    std::vector<deadline_timer> req;
+  };
+
+  typedef boost::shared_ptr<proxy_t> proxy;
+  typedef proxy_t &proxy_ref;
+
+  GOTT_LOCAL static proxy_t *make_proxy() { return new proxy_t; }
 };
 
 class standard_timer_manager : public timer_manager {

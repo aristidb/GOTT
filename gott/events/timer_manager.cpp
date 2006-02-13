@@ -36,16 +36,26 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "timer_manager.hpp"
+#include "main_loop.hpp"
+#include <gott/range_algo.hpp>
 #include <queue>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/lambda/bind.hpp>
 
 namespace pxtime = boost::posix_time;
 using gott::events::timer_manager;
 using gott::events::standard_timer_manager;
 
+using namespace boost::lambda;
+
 timer_manager::timer_manager() {}
 timer_manager::~timer_manager() {}
 gott::QID const timer_manager::qid("gott::events::timer_manager");
+
+void timer_manager::proxy_t::operator() (main_loop &m) const {
+  timer_manager &t = m.feature<timer_manager>();
+  for_each(range(req), bind(&timer_manager::add_timer, &t, _1));
+}
 
 class standard_timer_manager::impl {
 public:

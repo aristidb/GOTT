@@ -38,7 +38,7 @@
 #ifndef GOTT_BASE_EVENTS_AUTO_LOOP_HPP
 #define GOTT_BASE_EVENTS_AUTO_LOOP_HPP
 
-#include <gott/visibility.hpp>
+#include "loop_requirement.hpp"
 #include <sigc++/signal.h>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -85,7 +85,7 @@ public:
   typedef std::size_t thread_descriptor;
 
   /**
-   * Add a requirement and if necessary a main_loop.
+   * Add a requirement and if necessary a fresh main_loop.
    * \return A descriptor of the thread that will be spawned for this 
    *         requirement.
    */
@@ -99,7 +99,7 @@ public:
    */
   GOTT_EXPORT
   sigc::signal1<void, main_loop &> &before_run(thread_descriptor const &td);
-  
+
   /**
    * Join all main_loop threads. Useful in combination with spawn_noblock.
    */
@@ -111,6 +111,35 @@ public:
    */
   GOTT_EXPORT
   void quit_all();
+
+private:
+  template<class Proxy>
+  class proxy_call_container {
+  public:
+    proxy_call_container(Proxy p) : proxy(p) {}
+
+    void operator() (main_loop &m) { (*proxy)(m); }
+
+  private:
+    Proxy proxy;
+  };
+
+public:
+  template<class Feature>
+  typename Feature::proxy_ref feature() {
+    typename Feature::proxy p(Feature::make_proxy());
+    before_run(add(events::feature<Feature>())).connect(
+        proxy_call_container<typename Feature::proxy>(p));
+    return *p;
+  }
+
+  template<class Feature>
+  typename Feature::proxy_ref feature(thread_descriptor const &td) {
+    typename Feature::proxy p(Feature::make_proxy());
+    before_run(td).connect(
+        proxy_call_container<typename Feature::proxy>(p));
+    return *p;
+  }
 
 public: // internal
   bool try_feature(QID const &, loop_requirement const *);

@@ -40,10 +40,14 @@
 
 #include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace gott {
 namespace events {
+
+class main_loop;
 
 /**
  * Feature for main_loops able to watch file descriptors (*NIX) or sockets 
@@ -109,6 +113,27 @@ public:
    * \throw installation_error If the registered was not registered.
    */
   virtual void remove_fd(int fd) = 0;
+
+public:
+  class GOTT_EXPORT proxy_t : boost::noncopyable {
+  public:
+    proxy_t();
+    ~proxy_t();
+
+    void add_fd(int fd, unsigned mask,
+        boost::function<void (unsigned)> const &cb, bool wait = true);
+
+    void operator() (main_loop &) const;
+
+  private:
+    struct impl;
+    boost::scoped_ptr<impl> p;
+  };
+
+  typedef boost::shared_ptr<proxy_t> proxy;
+  typedef proxy_t &proxy_ref;
+
+  GOTT_LOCAL static proxy_t *make_proxy() { return new proxy_t; }
 };
 
 }}

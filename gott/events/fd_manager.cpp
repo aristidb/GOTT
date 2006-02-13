@@ -36,10 +36,44 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "fd_manager.hpp"
+#include "main_loop.hpp"
+#include <map>
+#include <boost/tuple/tuple.hpp>
 
 using gott::events::fd_manager;
+
+using namespace boost;
+using namespace std;
 
 fd_manager::fd_manager() {}
 fd_manager::~fd_manager() {}
 
 gott::QID const fd_manager::qid("gott::events::fd_manager");
+
+struct fd_manager::proxy_t::impl {
+  typedef
+    map<int, 
+      tuple<
+        unsigned,
+        function<void (unsigned)>,
+        bool
+      > >
+    map_t;
+  map_t db;
+};
+
+fd_manager::proxy_t::proxy_t() : p(new impl) {}
+fd_manager::proxy_t::~proxy_t() {}
+
+void fd_manager::proxy_t::add_fd(int fd, unsigned mask, 
+    function<void (unsigned)> const &cb, bool wait) {
+  p->db[fd] = make_tuple(mask, cb, wait);
+}
+
+void fd_manager::proxy_t::operator() (main_loop &m) const {
+  fd_manager &f = m.feature<fd_manager>();
+  for (impl::map_t::const_iterator it =p->db.begin(); it != p->db.end(); ++it) {
+    impl::map_t::value_type::second_type const &t = it->second;
+    f.add_fd(it->first, t.get<0>(), t.get<1>(), t.get<2>());
+  }
+}

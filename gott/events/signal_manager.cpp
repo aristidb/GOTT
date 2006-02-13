@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "signal_manager.hpp"
+#include "main_loop.hpp"
 #include <stdexcept>
 #include <signal.h>
 #include <map>
@@ -76,4 +77,11 @@ signal_manager *signal_manager::find(int sig) {
 
 void signal_manager::signal_handler(int sig) {
   find(sig)->immediate_action(sig);
+}
+
+void signal_manager::proxy_t::operator() (main_loop &m) const {
+  signal_manager &s = m.feature<signal_manager>();
+  for (std::map<int, sigc::signal1<void, int> >::const_iterator it = db.begin();
+      it != db.end(); ++it)
+    s.on_signal(it->first).connect(it->second);
 }

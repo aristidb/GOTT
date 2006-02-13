@@ -41,9 +41,13 @@
 #include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>
 #include <sigc++/signal.h>
+#include <map>
+#include <boost/noncopyable.hpp>
 
 namespace gott {
 namespace events {
+
+class main_loop;
 
 /**
  * Feature for main_loops able to deal with operating system signals.
@@ -63,6 +67,24 @@ public:
    * std::runtime_error will be thrown.
    */
   virtual sigc::signal1<void, int> &on_signal(int sig) = 0;
+
+public:
+  class GOTT_LOCAL proxy_t : boost::noncopyable {
+  public:
+    sigc::signal1<void, int> &on_signal(int sig) {
+      return db[sig];
+    }
+
+    GOTT_EXPORT void operator() (main_loop &) const;
+
+  private:
+    std::map<int, sigc::signal1<void, int> > db;
+  };
+
+  typedef boost::shared_ptr<proxy_t> proxy;
+  typedef proxy_t &proxy_ref;
+
+  GOTT_LOCAL static proxy_t *make_proxy() { return new proxy_t; }
 
 protected:
   virtual void immediate_action(int sig) = 0;

@@ -67,7 +67,13 @@ void init_sig(main_loop &m, auto_loop *pa) {
 
 int main() {
   auto_loop loops;
-  loops.before_run(loops.add(feature<timer_manager>())).connect(&init_timer);
-  loops.before_run(loops.add(feature<signal_manager>())).connect(bind(&init_sig, _1, &loops));
+  loops.feature<timer_manager>().add_timer(
+      deadline_timer(
+        microsec_clock::local_time(),
+        &timefunc
+      ));
+  loops.before_run(
+      loops.add(feature<signal_manager>())
+    ).connect(bind(&init_sig, _1, &loops));
   loops.spawn_block();
 }
