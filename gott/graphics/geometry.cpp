@@ -1,3 +1,5 @@
+// TODO: DECIDE: DELETE THIS FILE?
+#if 0
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com
 // Content: GOTT simple geometry utility classes 
 // Authors: Andreas Pokorny
@@ -60,4 +62,4 @@ void rect::subtract_region( rect const& other ) {
   }
 }
 }
-
+#endif
