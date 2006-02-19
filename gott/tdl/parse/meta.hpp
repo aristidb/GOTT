@@ -46,7 +46,6 @@ namespace gott {
 class string;
 
 namespace tdl {
-namespace simple {
 
 class line_logger;
 
@@ -99,6 +98,6 @@ private:
   boost::scoped_ptr<impl> p;
 };
 
-}}}
+}}
 
 #endif

@@ -44,13 +44,13 @@
 using std::istream;
 using gott::string;
 using gott::range;
-using gott::tdl::simple::parser;
+using gott::tdl::abstract_tdl_parser;
 
-gott::tdl::source_position const &parser::where() const {
+gott::tdl::source_position const &abstract_tdl_parser::where() const {
   return where_;
 }
 
-parser::~parser() {}
+abstract_tdl_parser::~abstract_tdl_parser() {}
 
 namespace {
 struct internal_line_logger {
@@ -91,7 +91,7 @@ struct internal_line_logger {
   
 class exec_parse {
   istream &stream;
-  parser &parse;
+  abstract_tdl_parser &parse;
   unsigned indent;
   bool up, started_document;
   unsigned buff_indent;
@@ -115,7 +115,7 @@ class exec_parse {
   bool read_line();
 
 public:
-  exec_parse(istream &s, parser &p, gott::tdl::source_position &l) 
+  exec_parse(istream &s, abstract_tdl_parser &p, gott::tdl::source_position &l) 
     : stream(s), parse(p), up(false), 
       started_document(false), buff_indent(0), ln(l) {}
   void run_parse();
@@ -124,7 +124,8 @@ public:
 class cancellor {};
 }
 
-void parser::parse(istream &s) {
+void abstract_tdl_parser::parse(istream &s, source_position const &w) {
+  where_ = w;
   exec_parse x(s, *this, where_);
   x.run_parse();
 }

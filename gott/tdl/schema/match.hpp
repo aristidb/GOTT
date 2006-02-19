@@ -73,7 +73,7 @@ class rule_t;
  *
  * TODO: Split?!
  */
-class match : public simple::parser {
+class match : public abstract_tdl_parser {
   class impl;
 
 public:

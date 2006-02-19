@@ -43,7 +43,7 @@
 using gott::string;
 
 namespace tut {
-struct spb : gott::tdl::simple::parser {
+struct spb : gott::tdl::abstract_tdl_parser {
   enum event_id { b, e, d, u, n, c };
   typedef std::pair<event_id, string> event;
   std::vector<event> xp, ev;

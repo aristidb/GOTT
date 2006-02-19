@@ -44,18 +44,18 @@
 
 namespace gott {
 namespace tdl {
-namespace simple {
 
 /**
  * The callback interface to parse.
  */
-class GOTT_EXPORT parser {
+class GOTT_EXPORT abstract_tdl_parser {
 public:
   /**
    * Parse a TDL document. Does not treat the meta-data section specifically.
    * \param s The stream to read a document from.
+   * \param w The definition of the current position in the stream.
    */
-  void parse(std::istream &s);
+  void parse(std::istream &s, source_position const &w = source_position());
 
   /**
    * Returns the current position in the currently parsed TDL document.
@@ -83,12 +83,12 @@ public:
   virtual void end_parse() = 0;
     ///< Final call.
 
-  virtual ~parser() = 0;
+  virtual ~abstract_tdl_parser() = 0;
 
 private:
   source_position where_;
 };
 
-}}}
+}}
 
 #endif

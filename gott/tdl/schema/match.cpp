@@ -53,7 +53,6 @@
 
 using gott::string;
 using boost::shared_ptr;
-namespace simple = gott::tdl::simple;
 namespace structure = gott::tdl::structure;
 using gott::tdl::schema::match;
 using gott::tdl::schema::positioning;

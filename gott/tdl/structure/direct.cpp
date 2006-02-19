@@ -40,11 +40,11 @@
 #include <gott/string/string.hpp>
 
 using gott::xany::Xany;
-using gott::tdl::simple::parser;
+using gott::tdl::abstract_tdl_parser;
 using gott::tdl::structure::writable_structure;
 
 namespace {
-  class my_parser : public parser {
+  class my_parser : public abstract_tdl_parser {
     writable_structure &s;
     bool data;
 
@@ -84,6 +84,6 @@ namespace {
 }
 
 void gott::tdl::structure::direct_struc(std::istream &in, 
-                                              writable_structure &out) {
+                                        writable_structure &out) {
   my_parser(out).parse(in);
 }

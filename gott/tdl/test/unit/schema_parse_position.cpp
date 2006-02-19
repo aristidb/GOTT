@@ -62,7 +62,7 @@ struct test_base {
   ignore_struct no_stru;
   tdl::schema::match match;
   tdl::schema::positioning &pos;
-  tdl::simple::parser &parse;
+  tdl::abstract_tdl_parser &parse;
 
   test_base() 
   : match(no_stru), pos(match.pos()), parse(match) {

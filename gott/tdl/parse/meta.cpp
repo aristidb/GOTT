@@ -40,7 +40,7 @@
 #include <map>
 
 using std::istream;
-using gott::tdl::simple::meta_parser;
+using gott::tdl::meta_parser;
 
 static bool pass(gott::string const &, gott::string const &) {
   return false;

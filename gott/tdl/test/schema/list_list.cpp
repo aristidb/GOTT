@@ -41,7 +41,6 @@
 
 using namespace gott::tdl::schema;
 namespace stru = gott::tdl::structure;
-namespace simple = gott::tdl::simple;
 using gott::xany::Xany;
 using gott::string;
 using stru::cf::S;
