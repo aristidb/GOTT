@@ -40,7 +40,7 @@
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/structure/structure.hpp>
-#include <gott/tdl/simple/parse/parser.hpp>
+#include <gott/tdl/parse/parser.hpp>
 #include <gott/tut/tut.h>
 #include <gott/string/string.hpp>
 

@@ -38,7 +38,7 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_PARSE_HPP
 #define GOTT_UTIL_TDL_SCHEMA_PARSE_HPP
 
-#include <gott/tdl/simple/parse/parser.hpp>
+#include <gott/tdl/parse/parser.hpp>
 #include <gott/tdl/structure/structure.hpp>
 #include <gott/tdl/schema/ev_fwd.hpp>
 #include <boost/scoped_ptr.hpp>

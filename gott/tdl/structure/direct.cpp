@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "structure.hpp"
-#include "../simple/parse/parser.hpp"
+#include "../parse/parser.hpp"
 #include <gott/string/string.hpp>
 
 using gott::xany::Xany;

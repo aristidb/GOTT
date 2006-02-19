@@ -35,7 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <gott/tdl/simple/parse/meta.hpp>
+#include <gott/tdl/parse/meta.hpp>
 #include <gott/tut/tut.h>
 #include <sstream>
 #include <gott/string/string.hpp>
