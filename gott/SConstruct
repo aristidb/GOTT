@@ -92,6 +92,7 @@ conf = SConscript('buildconf/SConscript')
 env = conf.Finish()
 
 dirs = [
+'thread',
 'tools/autobuild',
 'debug',
 'syswrap',

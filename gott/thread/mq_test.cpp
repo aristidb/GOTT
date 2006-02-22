@@ -35,7 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <gott/events/message_queue.hpp>
+#include <gott/thread/message_queue.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -43,8 +43,8 @@
 #include <boost/lambda/if.hpp>
 #include <iostream>
 
-using gott::events::message_queue;
-using gott::events::message_filter;
+using gott::thread::message_queue;
+using gott::thread::message_filter;
 
 using namespace boost::lambda;
 using boost::ref;
@@ -58,7 +58,7 @@ typedef message_queue<int, 0, std::greater<int> > mq2_t;
 
 boost::barrier step2(2), step3(2);
 
-void consumer(mq_t &mq, mq2_t &mq2) {
+void consumer(volatile mq_t &mq, volatile mq2_t &mq2) {
   mq.wait_for_all(cout << _1 << ' ', _1 != 0);
 
   cout << endl;
@@ -90,8 +90,8 @@ void consumer(mq_t &mq, mq2_t &mq2) {
 }
 
 int main() {
-  mq_t mq;
-  mq2_t mq2;
+  volatile mq_t mq;
+  volatile mq2_t mq2;
   
   boost::thread thrd(bind(&consumer, ref(mq), ref(mq2)));
   

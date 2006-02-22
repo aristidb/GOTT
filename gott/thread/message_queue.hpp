@@ -46,7 +46,7 @@
 #include <algorithm>
 
 namespace gott {
-namespace events {
+namespace thread {
 
 /// Return type of a filter callback.
 enum message_filter_result { 
@@ -93,22 +93,22 @@ public:
    * Add a message to the end of this queue.
    * \param msg The message to add.
    */
-  void push(Message const &msg) {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    wait_for_space_internal(lock);
-    push_unsafe(msg);
-    slot_filled();
+  void push(Message const &msg) volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    unsafe().wait_for_space_u(lock);
+    unsafe().push_u(msg);
+    unsafe().slot_filled_u();
   }
 
   /**
    * Get and remove the first message of this queue.
    * \return The removed message.
    */
-  Message pop() {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    wait_for_data_internal(lock);
-    Message result = pop_unsafe();
-    slot_free();
+  Message pop() volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    unsafe().wait_for_data_u(lock);
+    Message result = unsafe().pop_u();
+    unsafe().slot_free_u();
     return result;
   }
 
@@ -116,32 +116,32 @@ public:
    * Get the first message of this queue but do not remove it.
    * \return A constant reference to the message to glance at.
    */
-  Message const &peek() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    wait_for_data_internal(lock);
-    return peek_unsafe();
+  Message const &peek() const volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    unsafe().wait_for_data_u(lock);
+    return unsafe().peek_u();
   }
 
   /// Check whether the queue is empty.
-  bool empty() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    return empty_unsafe();
+  bool empty() const volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    return unsafe().empty_u();
   }
 
   /// Check whether the queue is full.
-  bool full() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    return full_unsafe();
+  bool full() const volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    return unsafe().full_u();
   }
 
 public:
   /**
    * Clear the message queue.
    */
-  void drop() {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    queue.clear();
-    many_free();
+  void drop() volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    unsafe().queue.clear();
+    unsafe().many_free_u();
   }
   
   /**
@@ -149,14 +149,14 @@ public:
    * \param func The receiving callback.
    */
   template<class T>
-  void wait_for_all(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+  void wait_for_all(T func) volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
 
     for (;;) {
-      wait_for_data_internal(lock);
+      unsafe().wait_for_data_u(lock);
 
-      Message m = pop_unsafe();
-      slot_free();
+      Message m = unsafe().pop_u();
+      unsafe().slot_free_u();
 
       lock.unlock();
       if (!func(m))
@@ -171,19 +171,19 @@ public:
    * \param func The receiving callback.
    */
   template<class T>
-  void wait_for_many(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+  void wait_for_many(T func) volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
 
-    wait_for_data_internal(lock);
+    unsafe().wait_for_data_u(lock);
 
-    while (!empty_unsafe()) {
-      Message m = pop_unsafe();
+    while (!empty()) {
+      Message m = unsafe().pop_u();
       lock.unlock();
       func(m);
       lock.lock();
     }
 
-    many_free();
+    unsafe().many_free_u();
   }
 
   /**
@@ -192,13 +192,13 @@ public:
    * \param func The receiving callback.
    */
   template<class T>
-  void wait_for_many_break(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+  void wait_for_many_break(T func) volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
 
-    wait_for_data_internal(lock);
+    unsafe().wait_for_data_u(lock);
 
-    while (!empty_unsafe()) {
-      Message m = pop_unsafe();
+    while (!empty()) {
+      Message m = unsafe().pop_u();
       lock.unlock();
       if (!func(m))
         break;
@@ -208,7 +208,7 @@ public:
     if (!lock.locked())
       lock.lock();
 
-    many_free();
+    unsafe().many_free_u();
   }
 
 public:
@@ -217,26 +217,26 @@ public:
    * \return Whether a message was removed.
    */
   template<class T>
-  bool pop_if(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+  bool pop_if(T func) volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
 
-    wait_for_data_internal(lock);
+    unsafe().wait_for_data_u(lock);
 
-    Message const &m = peek_unsafe();
+    Message const &m = unsafe().peek_u();
     lock.unlock();
     bool result = func(m);
     lock.lock();
 
     if (result) {
-      pop_unsafe();
-      slot_free();
+      unsafe().pop_u();
+      unsafe().slot_free_u();
     }
     return result;
   }
 
 private:
   template<class T>
-  bool filter_unsafe(T func, bool strict_priority) {
+  bool filter_u(T func, bool strict_priority) {
     bool do_again = true;
 
     if (care_priority<PriorityCompare>::value && strict_priority)
@@ -248,14 +248,14 @@ private:
 
       if (result == message_quit) {
         queue.erase(it);
-        slot_free();
+        slot_free_u();
         do_again = false;
         break;
       }
 
       if (result == message_in_filter) {
         it = queue.erase(it);
-        slot_free();
+        slot_free_u();
       } else
         ++it;
     }
@@ -282,10 +282,10 @@ public:
    * \return Whether no filter returned quit.
    */
   template<class T>
-  bool filter(T func, bool strict_priority = false) {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    wait_for_data_internal(lock);
-    return filter_unsafe(func, strict_priority);
+  bool filter(T func, bool strict_priority = false) volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    unsafe().wait_for_data_u(lock);
+    return unsafe().filter_u(func, strict_priority);
   }
 
   /**
@@ -299,11 +299,11 @@ public:
    *             effect if PriorityCompare is no_priority.
    */
   template<class T>
-  void filter_all(T func, bool strict_priority = false) {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    wait_for_data_internal(lock);
-    while (filter_unsafe(func, strict_priority))
-      wait_for_new_data_internal(lock);
+  void filter_all(T func, bool strict_priority = false) volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    unsafe().wait_for_data_u(lock);
+    while (unsafe().filter_u(func, strict_priority))
+      unsafe().wait_for_new_data_u(lock);
   }
 
   template<class T, class U, class R, R True>
@@ -327,7 +327,7 @@ public:
    * \param pred The predicate. Return false to make this function return.
    */
   template<class T, class U>
-  void wait_for_all(T func, U pred) {
+  void wait_for_all(T func, U pred) volatile {
     wait_for_all(add_predicate<T, U, bool, true>(func, pred));
   }
 
@@ -338,7 +338,7 @@ public:
    * \param pred The predicate.
    */
   template<class T, class U>
-  void wait_for_many_break(T func, U pred) {
+  void wait_for_many_break(T func, U pred) volatile {
     wait_for_many_break(add_predicate<T, U, bool, true>(func, pred));
   }
 
@@ -357,7 +357,7 @@ public:
    * \return Whether no filter returned quit.
    */
   template<class T, class U>
-  bool filter(T func, U pred, bool strict_priority = false) {
+  bool filter(T func, U pred, bool strict_priority = false) volatile {
     return filter(
         add_predicate<T, U, message_filter_result, message_in_filter>
           (func, pred),
@@ -377,7 +377,7 @@ public:
    *             effect if PriorityCompare is no_priority.
    */
   template<class T, class U>
-  void filter_all(T func, U pred, bool strict_priority = false) {
+  void filter_all(T func, U pred, bool strict_priority = false) volatile {
     filter_all(
         add_predicate<T, U, message_filter_result, message_in_filter>
           (func, pred),
@@ -388,66 +388,66 @@ public:
   /**
    * Waits until there is data available.
    */
-  void wait_for_data() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    wait_for_data_internal(lock);
+  void wait_for_data() const volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    unsafe().wait_for_data_u(lock);
   }
 
   /**
    * Waits until there is space available.
    */
-  void wait_for_space() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    wait_for_space(lock);
+  void wait_for_space() const volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    unsafe().wait_for_space_u(lock);
   }
 
   /**
    * Waits until new data floats in.
    */
-  void wait_for_new_data() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    wait_for_new_data_internal(lock);
+  void wait_for_new_data() const volatile {
+    boost::mutex::scoped_lock lock(unsafe().monitor_lock);
+    unsafe().wait_for_new_data_u(lock);
   }
 
 private:
-  void wait_for_data_internal(boost::mutex::scoped_lock &lock) const {
-    while (empty_unsafe())
-      not_empty().wait(lock);
+  void wait_for_data_u(boost::mutex::scoped_lock &lock) const {
+    while (empty_u())
+      not_empty_u().wait(lock);
   }
 
-  void wait_for_space_internal(boost::mutex::scoped_lock &lock) const {
-    while (full_unsafe())
-      not_full().wait(lock);
+  void wait_for_space_u(boost::mutex::scoped_lock &lock) const {
+    while (full_u())
+      not_full_u().wait(lock);
   }
 
-  void wait_for_new_data_internal(boost::mutex::scoped_lock &lock) const {
-    new_data().wait(lock);
+  void wait_for_new_data_u(boost::mutex::scoped_lock &lock) const {
+    new_data_u().wait(lock);
   }
 
 private:
-  void slot_free() {
+  void slot_free_u() {
     if (Size != 0)
-      not_full().notify_one();
+      not_full_u().notify_one();
   }
 
-  void many_free() {
+  void many_free_u() {
     if (Size != 0)
-      not_full().notify_all();
+      not_full_u().notify_all();
   }
 
-  void slot_filled() {
-    not_empty().notify_one();
+  void slot_filled_u() {
+    not_empty_u().notify_one();
   }
 
 private:
-  void push_unsafe(Message const &msg) {
+  void push_u(Message const &msg) {
     queue.push_back(msg);
     if (care_priority<PriorityCompare>::value)
       std::push_heap(queue.begin(), queue.end(), pcmp);
-    new_data().notify_all();
+    new_data_u().notify_all();
   }
 
-  Message pop_unsafe() {
+  Message pop_u() {
     Message result = queue.front();
     if (!care_priority<PriorityCompare>::value) {
       queue.pop_front();
@@ -458,31 +458,36 @@ private:
     return result;
   }
 
-  Message const &peek_unsafe() const {
+  Message const &peek_u() const {
     return queue.front();
   }
 
-  bool empty_unsafe() const {
+  bool empty_u() const {
     return queue.empty();
   }
 
-  bool full_unsafe() const {
+  bool full_u() const {
     return Size != 0 ? queue.size() >= (Size == 0 ? 1 : Size) : false;
+  }
+
+private:
+  message_queue &unsafe() volatile {
+    return const_cast<message_queue &>(*this);
   }
 
 private:
   mutable boost::mutex monitor_lock;
 
 private:
-  boost::condition &not_empty() const { return cond[0]; }
-  boost::condition &not_full() const { return cond[2]; }
-  boost::condition &new_data() const { return cond[1]; }
+  boost::condition &not_empty_u() const { return cond[0]; }
+  boost::condition &not_full_u() const { return cond[2]; }
+  boost::condition &new_data_u() const { return cond[1]; }
 
   mutable boost::condition cond[Size == 0 ? 2 : 3];
   
 private:
   std::deque<Message> queue;
-  PriorityCompare pcmp;
+  PriorityCompare const pcmp;
 };
 
 template<class QuitPred, class FilterPred>
