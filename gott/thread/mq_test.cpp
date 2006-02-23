@@ -58,7 +58,7 @@ typedef message_queue<int, 0, std::greater<int> > mq2_t;
 
 boost::barrier step2(2), step3(2);
 
-void consumer(volatile mq_t &mq, volatile mq2_t &mq2) {
+void consumer( mq_t &mq,  mq2_t &mq2) {
   mq.wait_for_all(cout << _1 << ' ', _1 != 0);
 
   cout << endl;
@@ -90,8 +90,8 @@ void consumer(volatile mq_t &mq, volatile mq2_t &mq2) {
 }
 
 int main() {
-  volatile mq_t mq;
-  volatile mq2_t mq2;
+   mq_t mq;
+   mq2_t mq2;
   
   boost::thread thrd(bind(&consumer, ref(mq), ref(mq2)));
   
