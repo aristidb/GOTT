@@ -176,7 +176,7 @@ public:
 
     wait_for_data_u(lock);
 
-    while (!empty()) {
+    while (!empty_u()) {
       Message m = pop_u();
       lock.unlock();
       func(m);

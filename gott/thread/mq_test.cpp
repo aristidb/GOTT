@@ -42,6 +42,7 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/if.hpp>
 #include <iostream>
+#include <string>
 
 using gott::thread::message_queue;
 using gott::thread::message_filter;
@@ -56,9 +57,18 @@ typedef message_queue<int, 6> mq_t;
 
 typedef message_queue<int, 0, std::greater<int> > mq2_t;
 
+mq_t mq;
+mq2_t mq2;
+
+typedef message_queue<string> string_queue;
+string_queue sq, sq_out;
+
 boost::barrier step2(2), step3(2);
 
-void consumer( mq_t &mq,  mq2_t &mq2) {
+string::size_type (string::*str_find)(string const &, string::size_type) const
+    = &string::find;
+
+void consumer() {
   mq.wait_for_all(cout << _1 << ' ', _1 != 0);
 
   cout << endl;
@@ -89,11 +99,22 @@ void consumer( mq_t &mq,  mq2_t &mq2) {
   step3.wait();
 }
 
+string tag(string s, string f) {
+  return s + " @ " + f;
+}
+
+void filter_consumer(string filter) {
+  while (
+      sq.filter(
+        bind(&string_queue::push, ref(sq_out), bind(&tag, _1, filter)),
+        message_filter(
+          bind(str_find, _1, "quit_" + filter, 0) != string::npos,
+          bind(str_find, _1, filter, 0) != string::npos)))
+    boost::thread::yield();
+}
+
 int main() {
-   mq_t mq;
-   mq2_t mq2;
-  
-  boost::thread thrd(bind(&consumer, ref(mq), ref(mq2)));
+  boost::thread thrd(&consumer);
   
   for (int i = 80; i >= 0; --i)
     mq.push(i);
@@ -115,5 +136,21 @@ int main() {
   mq2.wait_for_all(cout << _1 << ' ', _1 < 10);
   cout << endl;
 
-  thrd.join();
+  boost::thread t1(bind(&filter_consumer, "a"));
+  boost::thread t2(bind(&filter_consumer, "b"));
+
+  sq.push("a1");
+  sq.push("a2");
+  sq.push("b3");
+  sq.push("a4");
+  sq.push("quit_b");
+  sq.push("a-1");
+  sq.push("quit_a");
+
+  t1.join();
+  t2.join();
+
+  cout << "Textual:" << endl;
+
+  sq_out.wait_for_many(cout << _1 << '\n');
 }
