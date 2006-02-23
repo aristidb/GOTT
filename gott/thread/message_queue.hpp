@@ -116,7 +116,7 @@ public:
    * Get the first message of this queue but do not remove it.
    * \return A constant reference to the message to glance at.
    */
-  Message const &peek() const {
+  Message peek() const {
     boost::mutex::scoped_lock lock(monitor_lock);
     wait_for_data_u(lock);
     return peek_u();
