@@ -98,7 +98,7 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
         "0:1 : mismatch in document>follow>node(i) after token ");
   }
@@ -119,7 +119,7 @@ void object::test<5>(int) {
   try {
     run_test("4");
     fail("just one integer");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", std::string(mm.what()), 
         "1:1 : mismatch in document>follow after token 4");
   }
@@ -130,7 +130,7 @@ void object::test<6>(int) {
   try {
     run_test("4 99,y");
     fail("stuff");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", 
         std::string(mm.what()), "1:6 : mismatch in document>follow at token y");
   }

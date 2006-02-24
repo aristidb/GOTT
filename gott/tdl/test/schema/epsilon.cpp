@@ -74,7 +74,7 @@ void object::test<1>(int) {
   try {
     run_test("77\n102342\n9");
     fail("content");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
                   "1:1 : mismatch in document at token 77");
   }
@@ -92,7 +92,7 @@ void object::test<3>(int) {
   try {
     run_test("1,2,3,4");
     fail("too many");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
                   "1:1 : mismatch in document at token 1");
   }
@@ -103,7 +103,7 @@ void object::test<4>(int) {
   try {
     run_test("1 2 3");
     fail("going down");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
                   "1:1 : mismatch in document at token 1");
   }

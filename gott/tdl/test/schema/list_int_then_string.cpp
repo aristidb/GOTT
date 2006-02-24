@@ -104,7 +104,7 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "0:1 : mismatch in document>ordered(ord)>list(list)>node(int)"
         " after token ");
@@ -116,7 +116,7 @@ void object::test<4>(int) {
   try {
     run_test("foo bar");
     fail("following");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document after token foo");
   }
@@ -127,7 +127,7 @@ void object::test<5>(int) {
   try {
     run_test("4");
     fail("just integer");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document>ordered(ord)>list(list)>node(int)"
         " after token 4");
@@ -139,7 +139,7 @@ void object::test<6>(int) {
   try {
     run_test("4,x,y");
     fail("too many strings");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", 
         gott::string(mm.what()), "1:5 : mismatch in document at token y");
   }

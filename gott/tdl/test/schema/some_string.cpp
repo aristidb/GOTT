@@ -88,7 +88,7 @@ void object::test<2>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()), 
                   "0:1 : mismatch in document>list>node(el) after token ");
   }
@@ -99,7 +99,7 @@ void object::test<3>(int) {
   try {
     run_test("1 2 3");
     fail("going down");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
                   "1:1 : mismatch in document>list>node(el) after token 1");
   }

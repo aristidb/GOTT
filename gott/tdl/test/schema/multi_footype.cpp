@@ -98,7 +98,7 @@ void object::test<1>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
       "0:1 : mismatch in document(--doc--)>named(a)>follow>node after token ");
   }

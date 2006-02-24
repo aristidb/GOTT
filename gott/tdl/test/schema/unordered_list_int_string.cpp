@@ -97,7 +97,7 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "0:1 : mismatch in document>unordered>node after token ");
   }
@@ -108,7 +108,7 @@ void object::test<4>(int) {
   try {
     run_test("list bar");
     fail("string following string");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document>unordered>node after token list");
   }
@@ -119,7 +119,7 @@ void object::test<5>(int) {
   try {
     run_test("list,list");
     fail("two strings");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "1:6 : mismatch in document>unordered>node at token list");
   }
@@ -130,7 +130,7 @@ void object::test<6>(int) {
   try {
     run_test("4,x,y");
     fail("int then two strings");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "1:5 : mismatch in document>unordered>node at token y");
   }
@@ -141,7 +141,7 @@ void object::test<7>(int) {
   try {
     run_test("732 bar");
     fail("string following integer");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
         "1:1 : mismatch in document>unordered>node after token 732");
   }

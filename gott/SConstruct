@@ -43,7 +43,7 @@ if os.environ.has_key('CXX'):
 	cxx = os.environ['CXX']
 cxx = ARGUMENTS.get('cxx', cxx)
 cflags = Split(ARGUMENTS.get('cflags', Environment()['CXXFLAGS']))
-release = int(ARGUMENTS.get('release', 1))
+release = int(ARGUMENTS.get('release', 0))
 if release:
 	debug = 0
 	optimize = 'full'

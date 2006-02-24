@@ -84,7 +84,7 @@ void object::test<1>(int n) {
     }
     run_test(w.str());
     fail("too few");
-  } catch(schema::mismatch const &m) {
+  } catch(tdl::mismatch const &m) {
     std::stringstream err;
     if (n == 1)
       err << "0:1";
@@ -102,7 +102,7 @@ void object::test<12>(int) {
   try {
     run_test("1 2 3");
     fail("going down");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
                   "1:1 : mismatch in document>list>node(el) after token 1");
   }
@@ -113,7 +113,7 @@ void object::test<13>(int) {
   try {
     run_test("zzzz");
     fail("string");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
                   "1:1 : mismatch in document>list>node(el) at token zzzz");
   }

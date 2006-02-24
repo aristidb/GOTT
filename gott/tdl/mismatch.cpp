@@ -35,14 +35,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "../exceptions.hpp"
+#include "exceptions.hpp"
 #include <gott/tdl/source_position.hpp>
 #include <gott/range.hpp>
 #include <gott/thunk.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace schema = tdl::schema;
-using schema::mismatch;
+using tdl::mismatch;
 using tdl::source_position;
 using gott::range;
 using gott::string;
@@ -54,13 +53,16 @@ static string build_string(source_position const &p,
   out.push_back(string(*integer_to_string<gott::utf8_t>(p.token_line)));
   out.push_back(":");
   out.push_back(string(*integer_to_string<gott::utf8_t>(p.token_column + 1)));
-  out.push_back(" : mismatch in ");
-  gott::range_t<std::vector<string>::const_iterator> tg = range(t);
-  if (tg.begin() != tg.end())
-    out.push_back(*tg.Begin++);
-  for (; tg.begin() != tg.end(); ++tg.Begin) {
-    out.push_back(">");
-    out.push_back(*tg.begin());
+  out.push_back(" : mismatch");
+  if (!t.empty()) {
+    out.push_back(" in ");
+    gott::range_t<std::vector<string>::const_iterator> tg = range(t);
+    if (tg.begin() != tg.end())
+      out.push_back(*tg.Begin++);
+    for (; tg.begin() != tg.end(); ++tg.Begin) {
+      out.push_back(">");
+      out.push_back(*tg.begin());
+    }
   }
   if (p.line > p.token_line || p.column > p.token_column + p.token.length())
     out.push_back(" after token ");
@@ -70,8 +72,10 @@ static string build_string(source_position const &p,
   return string(range(out), string::concatenate);
 }
 
-mismatch::mismatch(source_position const &p, 
-                   std::vector<string> const &t)
+mismatch::mismatch(source_position const &p, std::vector<string> const &t)
 : tdl_exception(build_string(p, t)) {}
+
+mismatch::mismatch(source_position const &p)
+: tdl_exception(build_string(p, std::vector<string>())) {}
 
 mismatch::~mismatch() throw() {}

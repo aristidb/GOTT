@@ -75,7 +75,7 @@ void object::test<2>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (schema::mismatch const &) {}
+  } catch (tdl::mismatch const &) {}
 }
 
 template<> template<>
@@ -83,7 +83,7 @@ void object::test<3>(int) {
   try {
     run_test("foo bar");
     fail("overfilled #1");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()),  
                   "1:1 : mismatch in document(doc) after token foo");
   }
@@ -94,7 +94,7 @@ void object::test<4>(int) {
   try {
     run_test("foo\nbar");
     fail("overfilled #2");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", gott::string(mm.what()), 
                   "2:1 : mismatch in document(doc) at token bar");
   }

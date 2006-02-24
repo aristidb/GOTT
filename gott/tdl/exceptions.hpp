@@ -64,17 +64,15 @@ private:
 
 class source_position;
 
-namespace schema {
-
-/**
- * Schema mismatch exception.
- * Thrown when a item failed to match and could not be backtracked.
- */
 struct GOTT_EXPORT mismatch : public tdl_exception {
   GOTT_LOCAL
   mismatch(source_position const &p, std::vector<gott::string> const &);
+  GOTT_LOCAL
+  mismatch(source_position const &p);
   ~mismatch() throw();
 };
+
+namespace schema {
 
 struct GOTT_EXPORT unregistered_type : public tdl_exception {
   unregistered_type(gott::string const &type) GOTT_LOCAL;

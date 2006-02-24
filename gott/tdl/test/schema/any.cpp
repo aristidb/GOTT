@@ -110,7 +110,7 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", string(mm.what()),
         "0:1 : mismatch in document>any>follow>node(int3) after token ");
   }
@@ -121,7 +121,7 @@ void object::test<4>(int) {
   try {
     run_test("foo bar");
     fail("string following string");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", string(mm.what()), 
       "1:1 : mismatch in document>any>ordered>node(string_2) after token foo");
   }
@@ -138,7 +138,7 @@ template<> template<>
 void object::test<6>(int) {
   try {
     run_test("4,x,y");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", 
         string(mm.what()), "1:5 : mismatch in document at token y");
   }
@@ -149,7 +149,7 @@ void object::test<7>(int) {
   try {
     run_test("732 bar");
     fail("string following integer");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", string(mm.what()),
        "1:5 : mismatch in document>any>follow>node(int4) at token bar");
   }

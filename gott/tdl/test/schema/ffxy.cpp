@@ -114,7 +114,7 @@ void object::test<10>(int n) {
   try {
     run("55 ", n - 10);
     fail("odd");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     return;
   }
 }

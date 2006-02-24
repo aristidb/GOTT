@@ -88,7 +88,7 @@ void object::test<1>(int n) {
       w << i%10 << ',' << 0 << '\n';
     run_test(w.str());
     fail("even");
-  } catch(schema::mismatch const &m) {
+  } catch(tdl::mismatch const &m) {
     std::stringstream err;
     err << n << ":3 : mismatch in document>list>node(el) after token 0";
     ensure_equals("correct error", m.what(), err.str());
@@ -100,7 +100,7 @@ void object::test<12>(int) {
   try {
     run_test("1 2 3");
     fail("going down");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
                   "1:1 : mismatch in document>list>node(el) after token 1");
   }
@@ -111,7 +111,7 @@ void object::test<13>(int) {
   try {
     run_test("zzzz");
     fail("string");
-  } catch (schema::mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", std::string(m.what()),
                   "1:1 : mismatch in document>list>node(el) at token zzzz");
   }

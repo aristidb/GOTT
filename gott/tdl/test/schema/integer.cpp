@@ -82,7 +82,7 @@ void object::test<2>(int) {
   try {
     run_test("d7");
     fail("non-integral");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", 
       std::string(mm.what()), "1:1 : mismatch in document>node(i) at token d7");
   }
@@ -93,7 +93,7 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", 
      std::string(mm.what()), "0:1 : mismatch in document>node(i) after token ");
   }
@@ -104,7 +104,7 @@ void object::test<4>(int) {
   try {
     run_test("4 bar");
     fail("overfilled #1");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", 
         std::string(mm.what()), "1:1 : mismatch in document after token 4");
   }
@@ -115,7 +115,7 @@ void object::test<5>(int) {
   try {
     run_test("4\nbar");
     fail("overfilled #2");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", 
         std::string(mm.what()), "2:1 : mismatch in document at token bar");
   }
@@ -133,7 +133,7 @@ void object::test<7>(int) {
   try {
     run_test("foo bar");
     fail("overfilled #1");
-  } catch (schema::mismatch const &mm) {
+  } catch (tdl::mismatch const &mm) {
     ensure_equals("correct error", 
      std::string(mm.what()), "1:1 : mismatch in document>node(i) at token foo");
   }

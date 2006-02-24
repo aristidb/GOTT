@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "parser.hpp"
+#include "../exceptions.hpp"
 #include <boost/algorithm/string.hpp>
 #include <gott/string/string.hpp>
 #include <gott/string/buffer.hpp>
@@ -300,11 +301,16 @@ string exec_parse::read_quoted(string::utf8_range &unread) {
   do {
     while (!unread.empty() && *unread.begin() != '"')
       ++unread.Begin;
-    if (++unread.Begin >= unread.end())
+    
+    if (++unread.Begin >= unread.end()) {
+      if (unread.end()[-1] != '"')
+        throw tdl::mismatch(ln.where);
       break;
+    }
     double_dquote = *unread.Begin++ == L'"';
   } while (double_dquote);
-  unread.Begin -= 1 + !double_dquote; // double_dquote still set if break was executed
+  unread.Begin -= 1 + !double_dquote; 
+    // double_dquote still set if break was executed
 
   ln.add_char(unread.begin() - whole.begin() + 1);
 

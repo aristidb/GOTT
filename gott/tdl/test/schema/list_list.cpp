@@ -112,7 +112,7 @@ void object::test<4>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
        "0:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
        " after token ");
@@ -124,7 +124,7 @@ void object::test<5>(int) {
   try {
     run_test("44");
     fail("should be greedy");
-  } catch (mismatch const &m) {
+  } catch (tdl::mismatch const &m) {
     ensure_equals("correct error", gott::string(m.what()),
         "1:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
         " after token 44");
