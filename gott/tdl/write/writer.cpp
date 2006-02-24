@@ -60,9 +60,30 @@ public:
     for (int i = 0; i < indentation; ++i)
       out << ' ';
   }
+
+  enum classification { standard, quoted };
+
+  classification classify(string const &s) {
+    string::utf32_range r = s.as_utf32();
+    while (!r.empty())
+      if (*r.Begin++ == ' ')
+        return quoted;
+    return standard;
+  }
+
+  void print_node(string const &s) {
+    switch (classify(s)) {
+    case quoted:
+      out << '"' << s << '"';
+      break;
+    default:
+      out << s;
+    }
+  }
 };
 
-tdl_writer::tdl_writer(std::ostream &out, unsigned width) : p(new impl(out, width)) {}
+tdl_writer::tdl_writer(std::ostream &out, unsigned width) 
+  : p(new impl(out, width)) {}
 
 tdl_writer::~tdl_writer() {}
 
@@ -76,13 +97,15 @@ void tdl_writer::up() {
 
 void tdl_writer::node(string const &s) {
   p->prepare_line();
-  p->out << s;
+  p->print_node(s);
   p->fresh_line = false;
 }
 
 void tdl_writer::comment(string const &s, bool new_line) {
   if (new_line || p->fresh_line)
     p->prepare_line();
+  else
+    p->out << ' ';
   p->out << '#' << s;
   p->fresh_line = false;
 }

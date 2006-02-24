@@ -81,7 +81,7 @@ namespace tut {
 
 TEST(1, "hallo du,sau", "hallo\n  du\n  sau")
 TEST(2, "test #comment1\n  #comment2\n  foo",
-      "test#comment1\n#comment2\n  foo")
+      "test #comment1\n#comment2\n  foo")
 TEST(3, "\"foo bar\"", "\"foo bar\"")
 
 template<> template<> void object::test<4>(int) { no_test(); }
