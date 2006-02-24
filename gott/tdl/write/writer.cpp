@@ -34,3 +34,55 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+
+#include "writer.hpp"
+#include <ostream>
+
+using tdl::tdl_writer;
+using gott::string;
+
+class tdl_writer::impl {
+public:
+  impl(std::ostream &out, unsigned width)
+    : indentation(-width), fresh_line(true), out(out), width(width) {}
+
+  int indentation;
+  bool fresh_line;
+
+  std::ostream &out;
+  unsigned width;
+
+  void prepare_line() {
+    if (!fresh_line) {
+      out << '\n';
+      fresh_line = true;
+    }
+    for (int i = 0; i < indentation; ++i)
+      out << ' ';
+  }
+};
+
+tdl_writer::tdl_writer(std::ostream &out, unsigned width) : p(new impl(out, width)) {}
+
+tdl_writer::~tdl_writer() {}
+
+void tdl_writer::down() {
+  p->indentation += p->width;
+}
+
+void tdl_writer::up() {
+  p->indentation -= p->width;
+}
+
+void tdl_writer::node(string const &s) {
+  p->prepare_line();
+  p->out << s;
+  p->fresh_line = false;
+}
+
+void tdl_writer::comment(string const &s, bool new_line) {
+  if (new_line || p->fresh_line)
+    p->prepare_line();
+  p->out << '#' << s;
+  p->fresh_line = false;
+}

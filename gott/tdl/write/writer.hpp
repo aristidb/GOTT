@@ -38,7 +38,34 @@
 #ifndef GOTT_TDL_WRITE_WRITER_HPP
 #define GOTT_TDL_WRITE_WRITER_HPP
 
+#include <gott/tdl/parse/parser.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/noncopyable.hpp>
+#include <iosfwd>
+
 namespace tdl {
+
+class tdl_writer : public abstract_tdl_parser, boost::noncopyable {
+public:
+  GOTT_EXPORT tdl_writer(std::ostream &, unsigned);
+
+  GOTT_EXPORT ~tdl_writer();
+
+  void begin_parse() {}
+  void end_parse() {}
+
+  GOTT_EXPORT void down();
+
+  GOTT_EXPORT void up();
+
+  GOTT_EXPORT void node(gott::string const &);
+
+  GOTT_EXPORT void comment(gott::string const &, bool);
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
+};
 
 }
 
