@@ -40,8 +40,8 @@
 #include <gott/tdl/exceptions.hpp>
 #include <cctype>
 
-namespace structure = gott::tdl::structure;
-
+using gott::string;
+namespace structure = tdl::structure;
 using structure::repatch_integer;
 using structure::writable_structure;
 
@@ -53,15 +53,15 @@ repatch_integer::deferred_write(writable_structure &s) const {
   struct context : simple_repatcher_context {
     context(writable_structure &s) : simple_repatcher_context(s) {}
 
-    void data(xany::Xany const &x) {
+    void data(gott::xany::Xany const &x) {
       if (x.compatible<long>())
         target.data(x);
       else if (x.compatible<string>()) {
-        string input = xany::Xany_cast<string>(x);
+        string input = gott::xany::Xany_cast<string>(x);
         long result;
         if (!is_integer(input, result))
           throw failed_repatch("repatch_integer: could not match integer");
-        target.data(xany::Xany(result));
+        target.data(gott::xany::Xany(result));
       } else
         throw failed_repatch("repatch_integer: could not match integer");
     }
@@ -103,7 +103,7 @@ void repatch_integer::reg() {
     getter() {}
     void begin(source_position const &) { fail(); }
     void end() { fail(); }
-    void data(xany::Xany const &) { fail(); }
+    void data(gott::xany::Xany const &) { fail(); }
     void add_tag(string const &) { fail(); }
     void fail() {
       throw std::invalid_argument("repatch_integer arguments");

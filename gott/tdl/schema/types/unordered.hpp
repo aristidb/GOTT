@@ -44,7 +44,6 @@
 #include "../slot.hpp"
 #include "../rule_attr.hpp"
 
-namespace gott {
 namespace tdl {
 namespace schema {
 
@@ -71,9 +70,9 @@ private:
   expect expectation() const;
   bool play(ev::child_succeed const &);
   bool play(ev::child_fail const &);
-  string name() const;
+  gott::string name() const;
 };
 
-}}}
+}}
 
 #endif

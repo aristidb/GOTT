@@ -44,6 +44,7 @@
 
 namespace gott {
 class string;
+}
 
 namespace tdl {
 
@@ -67,7 +68,7 @@ public:
    * \return The success of the handler.
    */
   typedef 
-    boost::function<bool (string const &cmd, string const &param)> 
+    boost::function<bool (gott::string const &cmd, gott::string const &param)> 
     callback;
 
   GOTT_EXPORT meta_parser();
@@ -84,7 +85,7 @@ public:
    * \param s The command to invocate this handler on.
    * \param f The handler to add.
    */
-  void set_specific(string const &s, callback const &f) GOTT_EXPORT;
+  void set_specific(gott::string const &s, callback const &f) GOTT_EXPORT;
 
   /**
    * Parses the meta-data section of a TDL document to a special parser.
@@ -98,6 +99,6 @@ private:
   boost::scoped_ptr<impl> p;
 };
 
-}}
+}
 
 #endif

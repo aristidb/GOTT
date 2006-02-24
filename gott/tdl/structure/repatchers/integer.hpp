@@ -40,7 +40,6 @@
 
 #include "../repatch.hpp"
 
-namespace gott {
 namespace tdl {
 namespace structure {
 
@@ -52,6 +51,6 @@ public:
   static void reg() GOTT_LOCAL;
 };
 
-}}}
+}}
 
 #endif

@@ -42,7 +42,6 @@
 #include "../rule.hpp"
 #include "../happy_once.hpp"
 
-namespace gott {
 namespace tdl {
 namespace schema {
 
@@ -55,9 +54,9 @@ public:
   
 private:
   bool play(ev::node const &);
-  string name() const;
+  gott::string name() const;
 };
 
-}}}
+}}
 
 #endif

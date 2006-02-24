@@ -44,9 +44,9 @@
 using std::istream;
 using gott::string;
 using gott::range;
-using gott::tdl::abstract_tdl_parser;
+using tdl::abstract_tdl_parser;
 
-gott::tdl::source_position const &abstract_tdl_parser::where() const {
+tdl::source_position const &abstract_tdl_parser::where() const {
   return where_;
 }
 
@@ -54,11 +54,11 @@ abstract_tdl_parser::~abstract_tdl_parser() {}
 
 namespace {
 struct internal_line_logger {
-  gott::tdl::source_position &where;
+  tdl::source_position &where;
   unsigned token_line;
   unsigned token_column;
   
-  internal_line_logger(gott::tdl::source_position &x) : where(x) {}
+  internal_line_logger(tdl::source_position &x) : where(x) {}
 
   void start_line() { 
     ++where.line;
@@ -115,7 +115,7 @@ class exec_parse {
   bool read_line();
 
 public:
-  exec_parse(istream &s, abstract_tdl_parser &p, gott::tdl::source_position &l) 
+  exec_parse(istream &s, abstract_tdl_parser &p, tdl::source_position &l) 
     : stream(s), parse(p), up(false), 
       started_document(false), buff_indent(0), ln(l) {}
   void run_parse();

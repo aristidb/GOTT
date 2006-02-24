@@ -44,6 +44,7 @@
 
 namespace gott {
 class string;
+}
 
 namespace tdl {
 namespace schema {
@@ -62,10 +63,10 @@ public:
    * \param name The name to find the type with.
    * \param type The type.
    */
-  GOTT_EXPORT void add(string const &name, abstract_rule const &type);
+  GOTT_EXPORT void add(gott::string const &name, abstract_rule const &type);
 
   template<class T>
-  void add(string const &name) {
+  void add(gott::string const &name) {
     item_constructor type_con = &construct_item<T>;
     item_check accept_empty = &T::accept_empty;
     add(name, abstract_rule(type_con, accept_empty));
@@ -79,15 +80,16 @@ public:
    * \return A rule_t for the wanted type.
    */
   GOTT_EXPORT 
-  rule_t get(string const &name, rule_attr_t const &att, 
+  rule_t get(gott::string const &name, rule_attr_t const &att, 
              std::vector<rule_t> const &children) const;
 
+private:
   class impl;
   boost::scoped_ptr<impl> p;
 };
 
 GOTT_EXPORT by_name_t &by_name();
 
-}}}
+}}
 
 #endif

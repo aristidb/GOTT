@@ -42,21 +42,20 @@
 #include <gott/string/string.hpp>
 #include <vector>
 
-namespace gott {
 namespace tdl {
 namespace structure {
 
 class GOTT_EXPORT repatch_enumeration 
 : public concrete_repatcher<repatch_enumeration> {
 public:
-  repatch_enumeration(std::vector<string> const &);
+  repatch_enumeration(std::vector<gott::string> const &);
   ~repatch_enumeration();
   writable_structure *deferred_write(writable_structure &) const;
   static void reg() GOTT_LOCAL;
 private:
-  std::vector<string> alternatives;
+  std::vector<gott::string> alternatives;
 };
 
-}}}
+}}
 
 #endif

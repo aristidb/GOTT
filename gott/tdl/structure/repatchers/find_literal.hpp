@@ -40,7 +40,6 @@
 
 #include "../repatch.hpp"
 
-namespace gott {
 namespace tdl {
 namespace structure {
 
@@ -50,15 +49,15 @@ public:
   struct type {
     enum location { start, end, whole, substring };
   };
-  repatch_find_literal(type::location, string const &);
+  repatch_find_literal(type::location, gott::string const &);
   ~repatch_find_literal();
   writable_structure *deferred_write(writable_structure &) const;
   static void reg() GOTT_LOCAL;
 private:
   type::location loc;
-  string literal;
+  gott::string literal;
 };
 
-}}}
+}}
 
 #endif

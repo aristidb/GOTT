@@ -38,7 +38,7 @@
 #include "../exceptions.hpp"
 #include <gott/string/string.hpp>
 
-using gott::tdl::schema::dont_accept;
+using tdl::schema::dont_accept;
 using gott::string;
 
 static string pizza(string const &x) {

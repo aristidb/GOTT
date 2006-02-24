@@ -37,7 +37,7 @@
 
 #include "structure.hpp"
 
-namespace s = gott::tdl::structure;
+namespace s = tdl::structure;
 
 s::writable_structure::~writable_structure() {}
 s::copyable_structure::~copyable_structure() {}

@@ -39,8 +39,8 @@
 #include "match.hpp"
 #include "item.hpp"
 
-namespace ev = gott::tdl::schema::ev;
-using gott::tdl::schema::item;
+namespace ev = tdl::schema::ev;
+using tdl::schema::item;
 using std::ostream;
 using boost::static_visitor;
 
@@ -102,7 +102,7 @@ void ev::child_fail::print(ostream &s) const {
   s << "notify:child_fail";
 }
 
-ev::node::node(string const &s) : data(s) {}
+ev::node::node(gott::string const &s) : data(s) {}
 
 gott::string const &ev::node::get_data() const { return data; }
 

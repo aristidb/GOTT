@@ -42,11 +42,12 @@
 #include "match.hpp"
 #include <boost/variant.hpp>
 
-namespace sh = gott::tdl::schema;
+namespace sh = tdl::schema;
 using sh::rule_t;
 using sh::rule_attr_t;
 using sh::item;
 using std::vector;
+using gott::string;
 
 class rule_t::impl {
 public:
@@ -124,7 +125,6 @@ bool rule_t::accept_empty() const {
   throw 0;
 }
 
-rule_t sh::rule(string const &id, rule_attr_t const &a, vector<rule_t> const &c)
-{
+rule_t sh::rule(string const &id, rule_attr_t const &a,vector<rule_t> const &c){
   return by_name().get(id, a, c);
 }

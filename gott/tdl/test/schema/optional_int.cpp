@@ -39,8 +39,8 @@
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
 
-namespace schema = gott::tdl::schema;
-namespace stru = gott::tdl::structure;
+namespace schema = tdl::schema;
+namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
 

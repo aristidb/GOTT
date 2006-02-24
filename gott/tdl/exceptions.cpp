@@ -39,23 +39,23 @@
 #include <gott/range_algo.hpp>
 #include <gott/string/string.hpp>
 
-using gott::tdl::tdl_exception;
+using tdl::tdl_exception;
 
 class tdl_exception::impl {
 public:
-  impl(string const &s) : len(s.size() + 1), msg(new char[len]) {
-    copy(s.as_utf8().cast<char const *>(), msg);
+  impl(gott::string const &s) : len(s.size() + 1), msg(new char[len]) {
+    gott::copy(s.as_utf8().cast<char const *>(), msg);
     msg[s.size()] = '\0';
   }
   impl(impl const &o) : len(o.len), msg(new char[len]) {
-    copy(range(o.msg, len), msg);
+    gott::copy(gott::range(o.msg, len), msg);
   }
   ~impl() throw() { delete [] msg; }
   std::size_t len;
   char *msg;
 };
 
-tdl_exception::tdl_exception(string const &msg)
+tdl_exception::tdl_exception(gott::string const &msg)
 : p(new impl(msg)) {}
 
 tdl_exception::tdl_exception(tdl_exception const &o)

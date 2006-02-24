@@ -42,8 +42,8 @@
 #include <boost/none.hpp>
 #include <stdexcept>
 
-using gott::tdl::structure::repatch_substring;
-using gott::tdl::structure::writable_structure;
+using tdl::structure::repatch_substring;
+using tdl::structure::writable_structure;
 
 repatch_substring::repatch_substring(long l, long r) : left(l), right(r) {
   if (left < 0)
@@ -58,22 +58,22 @@ writable_structure *repatch_substring::deferred_write(
     long left, right;
     context(writable_structure &target, long l, long r) 
       : simple_repatcher_context(target), left(l), right(r) {}
-    void data(xany::Xany const &x) {
-      if (!x.compatible<string>())
+    void data(gott::xany::Xany const &x) {
+      if (!x.compatible<gott::string>())
         throw failed_repatch("repatch_substring: need input string");
-      string s = xany::Xany_cast<string>(x);
+      gott::string s = gott::xany::Xany_cast<gott::string>(x);
       long len = s.length();
       if (left > len || right > len || right < -len)
         throw failed_repatch(
             "repatch_substring: substring range out of bounds");
-      string::utf32_range in = s.as_utf32(), out;
+      gott::string::utf32_range in = s.as_utf32(), out;
       if (right > 0) 
         out = offset(simply(in.begin()), left, right);
       else
         out = offset(in, left, right);
       if (out.end() < out.begin())
         throw failed_repatch("repatch_substring: invalid substring");
-      target.data(xany::Xany(string(out)));
+      target.data(gott::xany::Xany(gott::string(out)));
     }
   };
   return new context(target, left, right);
@@ -94,24 +94,24 @@ void repatch_substring::reg() {
         fail();
       pos = outer;
     }
-    void data(xany::Xany const &x) {
+    void data(gott::xany::Xany const &x) {
       if (delayed)
         fail();
       switch (pos) {
       case p_left:
-        left = xany::Xany_cast<long>(x);
+        left = gott::xany::Xany_cast<long>(x);
         break;
       case p_right:
-        right = xany::Xany_cast<long>(x);
+        right = gott::xany::Xany_cast<long>(x);
         break;
       case inner:
-        delayed = xany::Xany_cast<long>(x);
+        delayed = gott::xany::Xany_cast<long>(x);
         break;
       case outer:
         fail();
       }
     }
-    void add_tag(string const &s) {
+    void add_tag(gott::string const &s) {
       if (pos != inner)
         return;
       if (s == "left")

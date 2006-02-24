@@ -44,8 +44,6 @@
 #include <gott/tut/tut.h>
 #include <gott/string/string.hpp>
 
-namespace tdl = gott::tdl;
-
 namespace {
 struct ignore_struct : tdl::structure::revocable_structure {
   void data(gott::xany::Xany const &) {}

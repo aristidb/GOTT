@@ -43,7 +43,6 @@
 #include <gott/visibility.hpp>
 #include <boost/variant.hpp>
 
-namespace gott {
 namespace tdl {
 namespace schema {
 
@@ -109,16 +108,16 @@ public:
 
 /// The event class for the simple::parser::node token.
 class node : public token {
-  string data;
+  gott::string data;
 public:
-  node(string const &);
+  node(gott::string const &);
     // construct a node with the given data
 
   bool play(item &r) const;
   void print(std::ostream &s) const;
   event *clone() const { return new node(*this); }
 
-  string const &get_data() const GOTT_EXPORT;
+  gott::string const &get_data() const GOTT_EXPORT;
     // get the data of this node-event
 };
 
@@ -162,6 +161,6 @@ public:
   event *clone() const { return new child_fail; }
 };
 
-}}}}
+}}}
 
 #endif

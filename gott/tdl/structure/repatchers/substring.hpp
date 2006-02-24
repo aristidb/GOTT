@@ -40,7 +40,6 @@
 
 #include "../repatch.hpp"
 
-namespace gott {
 namespace tdl {
 namespace structure {
 
@@ -55,6 +54,6 @@ private:
   long left, right;
 };
 
-}}}
+}}
 
 #endif

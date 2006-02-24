@@ -44,12 +44,12 @@
 #include <gott/string/stl.hpp>
 
 using gott::string;
-namespace schema = gott::tdl::schema;
+namespace schema = tdl::schema;
 using schema::match;
 using schema::item;
 using schema::rule_attr_t;
 namespace ev = schema::ev;
-using gott::tdl::structure::writable_structure;
+using tdl::structure::writable_structure;
 
 class item::impl {
 public:
@@ -120,7 +120,9 @@ string item::long_name() const {
   out.push_back(name());
   if (tags.size() > 0) {
     out.push_back(s_open);
-    range_t<std::vector<string>::const_iterator> r = range(tags);
+    gott::range_t<std::vector<gott::string>::const_iterator> 
+      r = gott::range(tags);
+
     out.push_back(*r.begin());
     for (std::vector<string>::const_iterator it = r.begin() + 1; 
         it != r.end(); ++it) {
@@ -135,7 +137,7 @@ string item::long_name() const {
 std::ostream &schema::operator<<(std::ostream &s, rule_attr_t const &a) {
   s << '(' << (a.coat() ? "coat" : "flat");
   s << ",tags:" << range(a.tags());
-  if (dynamic_cast<xany::printable const *>(&a.user().get_operations()))
+  if (dynamic_cast<gott::xany::printable const *>(&a.user().get_operations()))
     s << ",user:" << a.user();
   s << ",repatcher:" << a.repatcher() << ')';
   return s;

@@ -41,7 +41,6 @@
 #include "../match.hpp"
 #include "../rule.hpp"
 
-namespace gott {
 namespace tdl {
 namespace schema {
 
@@ -61,9 +60,9 @@ private:
   bool play(ev::node const &);
   bool play(ev::down const &);
   bool play(ev::up const &);
-  string name() const;
+  gott::string name() const;
 };
 
-}}}
+}}
 
 #endif

@@ -45,8 +45,8 @@
 #include <iostream>
 
 using namespace gott;
-using namespace gott::tdl;
-using namespace gott::tdl::schema;
+using namespace tdl;
+using namespace tdl::schema;
 using namespace boost::assign;
 
 int main() {

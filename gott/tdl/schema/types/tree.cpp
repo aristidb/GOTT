@@ -39,9 +39,9 @@
 #include "../event.hpp"
 #include <gott/debug/assert.hpp>
 
-using gott::tdl::schema::match_tree;
-using gott::tdl::schema::item;
-namespace ev = gott::tdl::schema::ev;
+using tdl::schema::match_tree;
+using tdl::schema::item;
+namespace ev = tdl::schema::ev;
 
 match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match &m)
 : item(a, m), level(0), fresh_level(true) {

@@ -44,12 +44,13 @@
 
 namespace gott {
 class string;
+}
 
 namespace tdl {
 
 class GOTT_EXPORT tdl_exception : public std::exception {
 public:
-  tdl_exception(string const &msg) GOTT_LOCAL;
+  tdl_exception(gott::string const &msg) GOTT_LOCAL;
   tdl_exception(tdl_exception const &) GOTT_LOCAL;
   ~tdl_exception() throw();
   char const *what() const throw();
@@ -71,17 +72,17 @@ namespace schema {
  */
 struct GOTT_EXPORT mismatch : public tdl_exception {
   GOTT_LOCAL
-  mismatch(source_position const &p, std::vector<string> const &);
+  mismatch(source_position const &p, std::vector<gott::string> const &);
   ~mismatch() throw();
 };
 
 struct GOTT_EXPORT unregistered_type : public tdl_exception {
-  unregistered_type(string const &type) GOTT_LOCAL;
+  unregistered_type(gott::string const &type) GOTT_LOCAL;
   ~unregistered_type() throw();
 };
 
 struct GOTT_EXPORT dont_accept : public tdl_exception {
-  dont_accept(string const &desc);
+  dont_accept(gott::string const &desc);
   ~dont_accept() throw();
 };
 
@@ -90,11 +91,11 @@ struct GOTT_EXPORT dont_accept : public tdl_exception {
 namespace structure {
 
 struct GOTT_EXPORT failed_repatch : public tdl_exception {
-  failed_repatch(string const &desc);
+  failed_repatch(gott::string const &desc);
   ~failed_repatch() throw();
 };
 
 }
-}}
+}
 
 #endif

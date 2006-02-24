@@ -48,8 +48,8 @@
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
 
-using namespace gott::tdl::structure;
-using gott::tdl::source_position;
+using namespace tdl::structure;
+using tdl::source_position;
 using namespace gott::xany;
 using boost::scoped_ptr;
 

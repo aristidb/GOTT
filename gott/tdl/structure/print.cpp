@@ -41,7 +41,7 @@
 
 using std::basic_ostream;
 using gott::xany::Xany;
-using gott::tdl::structure::direct_print;
+using tdl::structure::direct_print;
 
 template<class C>
 class direct_print<C>::impl {
@@ -83,7 +83,7 @@ template<class C> void direct_print<C>::data(Xany const &x) {
   p->line_ended = false;
 }
 
-template<class C> void direct_print<C>::add_tag(string const &s) {
+template<class C> void direct_print<C>::add_tag(gott::string const &s) {
   if (p->tag_printed)
     p->out << ", ";
   else
@@ -92,16 +92,16 @@ template<class C> void direct_print<C>::add_tag(string const &s) {
   p->tag_printed = true;
 }
 
-std::ostream &gott::tdl::structure::operator<<(std::ostream &o, 
-                                               copyable_structure const &s) {
+std::ostream &tdl::structure::operator<<(std::ostream &o,
+    copyable_structure const &s) {
   direct_print<char> p(o);
   s.copy_to(p);
   return o;
 }
 
 #ifdef HAVE_WIDE_STDLIB
-std::wostream &gott::tdl::structure::operator<<(std::wostream &o, 
-                                                copyable_structure const &s) {
+std::wostream &tdl::structure::operator<<(std::wostream &o,
+    copyable_structure const &s) {
   direct_print<wchar_t> p(o);
   s.copy_to(p);
   return o;

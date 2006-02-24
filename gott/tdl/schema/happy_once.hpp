@@ -40,7 +40,6 @@
 
 #include "item.hpp"
 
-namespace gott {
 namespace tdl {
 namespace schema {
 
@@ -59,6 +58,6 @@ private:
   bool happy;
 };
 
-}}}
+}}
 
 #endif

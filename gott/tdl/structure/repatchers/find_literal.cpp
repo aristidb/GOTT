@@ -42,8 +42,9 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/optional.hpp>
 
-using gott::tdl::structure::repatch_find_literal;
-using gott::tdl::structure::writable_structure;
+using gott::string;
+using tdl::structure::repatch_find_literal;
+using tdl::structure::writable_structure;
 namespace algo = boost::algorithm;
 
 repatch_find_literal::repatch_find_literal(type::location l, string const &s)
@@ -60,10 +61,10 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
     type::location loc;
     string literal;
 
-    void data(xany::Xany const &x) {
+    void data(gott::xany::Xany const &x) {
       if (!x.compatible<string>())
         throw failed_repatch("repatch_find_literal: need input string");
-      string s = xany::Xany_cast<string>(x);
+      string s = gott::xany::Xany_cast<string>(x);
       bool fail = true;
       switch (loc) {
       case type::start:
@@ -104,13 +105,13 @@ void repatch_find_literal::reg() {
       if (pos == outer) fail();
       pos = outer;
     }
-    void data(xany::Xany const &x) {
+    void data(gott::xany::Xany const &x) {
       if (x.compatible<type::location>()) {
         if (loc) fail();
-        loc = xany::Xany_cast<type::location>(x);
+        loc = gott::xany::Xany_cast<type::location>(x);
        } else if (x.compatible<string>()) {
         if (literal) fail();
-        literal = xany::Xany_cast<string>(x);
+        literal = gott::xany::Xany_cast<string>(x);
       } else
         fail();
     }

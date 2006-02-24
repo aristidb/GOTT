@@ -43,6 +43,7 @@
 
 namespace gott {
 class string;
+}
 
 namespace tdl {
 class source_position;
@@ -59,7 +60,7 @@ public:
    * Set the data of the current node.
    * \param x The value to write.
    */
-  virtual void data(xany::Xany const &x) = 0;
+  virtual void data(gott::xany::Xany const &x) = 0;
 
   /**
    * Start a child of the current node.
@@ -75,7 +76,7 @@ public:
    * Add a tag to the node.
    * \param t The tag to add.
    */
-  virtual void add_tag(string const &t) = 0;
+  virtual void add_tag(gott::string const &t) = 0;
 
   GOTT_EXPORT virtual ~writable_structure() = 0;
 };
@@ -131,6 +132,6 @@ public:
 GOTT_EXPORT 
 void direct_struc(std::istream &stream, writable_structure &structure);
 
-}}}
+}}
 
 #endif

@@ -40,30 +40,29 @@
 
 #include <gott/string/string.hpp>
 
-namespace gott {
 namespace tdl {
 
 class source_position {
 public:
   source_position(
-      string const &file = string(),
+      gott::string const &file = gott::string(),
       unsigned line = 0,
       unsigned column = 0,
-      string const &token = string(),
+      gott::string const &token = gott::string(),
       unsigned token_line = 0,
       unsigned token_column = 0
       )
     : file(file), line(line), column(column), token(token), 
     token_line(token_line), token_column(token_column) {}
 
-  string file;
+  gott::string file;
   unsigned line;
   unsigned column;
-  string token;
+  gott::string token;
   unsigned token_line;
   unsigned token_column;
 };
 
-}}
+}
 
 #endif

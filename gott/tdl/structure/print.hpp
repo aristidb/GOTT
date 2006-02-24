@@ -41,7 +41,6 @@
 #include "structure.hpp"
 #include <boost/scoped_ptr.hpp>
 
-namespace gott {
 namespace tdl {
 namespace structure {
 
@@ -63,8 +62,8 @@ public:
 private:
   void begin(source_position const &);
   void end();
-  void data(xany::Xany const &);
-  void add_tag(string const &);
+  void data(gott::xany::Xany const &);
+  void add_tag(gott::string const &);
 
   class impl;
   boost::scoped_ptr<impl> p;
@@ -87,6 +86,6 @@ std::wostream &operator<<(std::wostream &o, copyable_structure const &s);
 GOTT_EXPORT
 std::ostream &operator<<(std::ostream &o, copyable_structure const &s);
 
-}}}
+}}
 
 #endif

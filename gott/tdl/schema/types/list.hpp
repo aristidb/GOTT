@@ -43,7 +43,6 @@
 #include "../slot.hpp"
 #include "../parse_position.hpp"
 
-namespace gott {
 namespace tdl {
 namespace schema {
 
@@ -63,11 +62,12 @@ private:
   expect expectation() const;
   bool play(ev::child_fail const &);
   bool play(ev::child_succeed const &);
-  string name() const;
+  gott::string name() const;
 
   bool full();
   bool empty();
 };
 
-}}}
+}}
+
 #endif

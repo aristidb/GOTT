@@ -48,7 +48,7 @@ struct builtin_repatchers {
 } auto_reg;
 }
 
-using namespace gott::tdl::structure;
+using namespace tdl::structure;
 
 builtin_repatchers::builtin_repatchers() {
   repatch_integer::reg();

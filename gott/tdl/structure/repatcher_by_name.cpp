@@ -41,8 +41,9 @@
 #include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
 
-using gott::tdl::structure::repatcher_getter;
-using gott::tdl::structure::repatcher_by_name_t;
+using gott::string;
+using tdl::structure::repatcher_getter;
+using tdl::structure::repatcher_by_name_t;
 
 repatcher_getter::repatcher_getter() {}
 repatcher_getter::~repatcher_getter() {}
@@ -50,7 +51,7 @@ repatcher_getter::~repatcher_getter() {}
 repatcher_by_name_t::repatcher_by_name_t() {}
 repatcher_by_name_t::~repatcher_by_name_t() {}
 
-repatcher_by_name_t &gott::tdl::structure::repatcher_by_name() {
+repatcher_by_name_t &tdl::structure::repatcher_by_name() {
   static repatcher_by_name_t instance;
   return instance;
 }
@@ -110,12 +111,12 @@ repatcher_getter *repatcher_by_name_t::chain_alloc() const {
         fail();
       }
     }
-    void data(xany::Xany const &x) {
+    void data(gott::xany::Xany const &x) {
       switch (pos) {
       case outer:
         fail();
       case inner1:
-        what = xany::Xany_cast<string>(x); break;
+        what = gott::xany::Xany_cast<string>(x); break;
       case inner2:
         where->data(x); break;
       }

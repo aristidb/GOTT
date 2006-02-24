@@ -43,7 +43,6 @@
 #include <boost/noncopyable.hpp>
 #include <map>
 
-namespace gott {
 namespace tdl {
 namespace structure {
 
@@ -66,18 +65,18 @@ public:
   ~repatcher_by_name_t();
 
   GOTT_EXPORT
-  void add(string const &, boost::function<repatcher_getter *()> const &);
+  void add(gott::string const &, boost::function<repatcher_getter *()> const &);
   GOTT_EXPORT
-  repatcher_getter *get_alloc(string const &) const;
+  repatcher_getter *get_alloc(gott::string const &) const;
   GOTT_EXPORT
   repatcher_getter *chain_alloc() const;
 
 private:
-  std::map<string, boost::function<repatcher_getter *()> > repo;
+  std::map<gott::string, boost::function<repatcher_getter *()> > repo;
 };
 
 GOTT_EXPORT repatcher_by_name_t &repatcher_by_name();
 
-}}}
+}}
 
 #endif

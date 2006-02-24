@@ -44,6 +44,7 @@
 
 namespace gott {
 class string;
+}
 
 namespace tdl {
 namespace structure { class repatcher; }
@@ -87,12 +88,12 @@ public:
   /**
    * A nice name for the item.
    */
-  virtual string name() const = 0;
+  virtual gott::string name() const = 0;
 
   /**
    * A longer name for the item with some extra information.
    */
-  virtual string long_name() const;
+  virtual gott::string long_name() const;
 
   // Event handlers
   // Tokens
@@ -178,6 +179,6 @@ private:
   item() GOTT_LOCAL;
 };
 
-}}}
+}}
 
 #endif

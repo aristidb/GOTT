@@ -39,15 +39,16 @@
 #include <gott/range_algo.hpp>
 #include "../rule_attr.hpp"
 
-namespace schema = gott::tdl::schema;
-namespace ev = gott::tdl::schema::ev;
+namespace schema = tdl::schema;
+namespace ev = tdl::schema::ev;
 using schema::item;
 using schema::match_unordered;
+using std::vector;
 
-match_unordered::match_unordered(rule_attr_t const &a, std::vector<rule_t> const &r,
-                                 match &m) 
+match_unordered::match_unordered(rule_attr_t const &a, vector<rule_t> const &r,
+    match &m) 
 : item(a, m), last(m.pos().current()), all_happy(true) {
-  copy(range(r), std::back_inserter(children));
+  gott::copy(gott::range(r), std::back_inserter(children));
 
   pos = children.begin();
 

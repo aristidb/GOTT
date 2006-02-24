@@ -39,8 +39,8 @@
 #include <gott/tdl/structure/repatchers/integer.hpp>
 #include <boost/assign/list_of.hpp>
 
-using namespace gott::tdl::schema;
-namespace stru = gott::tdl::structure;
+using namespace tdl::schema;
+namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
 using stru::cf::S;

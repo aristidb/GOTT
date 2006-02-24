@@ -41,7 +41,6 @@
 #include "item.hpp"
 #include <boost/function.hpp>
 
-namespace gott {
 namespace tdl {
 namespace schema {
 
@@ -177,7 +176,7 @@ inline slotcfg between(std::size_t min, std::size_t max) {
 }
 }
 
-}}}
+}}
 
 
 #endif

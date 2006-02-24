@@ -45,14 +45,13 @@
 #include "follow_ordered.hpp"
 #include "node.hpp"
 
-namespace gott {
 namespace tdl {
 namespace schema {
 
 class match_named : public happy_once {
 public:
   static GOTT_EXPORT
-  rule_attr_t attributes(string const &s, bool cc = true);
+  rule_attr_t attributes(gott::string const &s, bool cc = true);
   
   match_named(rule_attr_t const &, std::vector<rule_t> const &, match &);
 
@@ -62,12 +61,12 @@ public:
   { return false; }
 
 private:
-  virtual string name() const;
-  string tag;
+  gott::string name() const;
+  gott::string tag;
   rule_t rewritten;
   bool play(ev::child_succeed const &);
 };
   
-}}}
+}}
 
 #endif

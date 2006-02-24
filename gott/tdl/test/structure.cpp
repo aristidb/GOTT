@@ -44,10 +44,10 @@
 #include <gott/tut/tut.h>
 #include <sstream>
 
-namespace stru = gott::tdl::structure;
+namespace stru = tdl::structure;
 namespace cf = stru::cf;
 using gott::xany::Xany;
-using gott::tdl::source_position;
+using tdl::source_position;
 
 namespace tut {
 struct structure_basic { };

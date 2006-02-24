@@ -40,8 +40,8 @@
 #include <gott/string/string.hpp>
 
 using gott::xany::Xany;
-using gott::tdl::abstract_tdl_parser;
-using gott::tdl::structure::writable_structure;
+using tdl::abstract_tdl_parser;
+using tdl::structure::writable_structure;
 
 namespace {
   class my_parser : public abstract_tdl_parser {
@@ -83,7 +83,7 @@ namespace {
   };
 }
 
-void gott::tdl::structure::direct_struc(std::istream &in, 
+void tdl::structure::direct_struc(std::istream &in, 
                                         writable_structure &out) {
   my_parser(out).parse(in);
 }

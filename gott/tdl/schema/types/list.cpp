@@ -39,8 +39,8 @@
 #include "../rule_attr.hpp"
 #include <gott/debug/assert.hpp>
 
-namespace schema = gott::tdl::schema;
-namespace ev = gott::tdl::schema::ev;
+namespace schema = tdl::schema;
+namespace ev = tdl::schema::ev;
 using schema::item;
 using schema::slotcfg;
 using schema::match_list;

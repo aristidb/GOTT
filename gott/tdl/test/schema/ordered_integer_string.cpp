@@ -41,8 +41,8 @@
 
 using namespace boost::assign;
 
-namespace schema = gott::tdl::schema;
-namespace stru = gott::tdl::structure;
+namespace schema = tdl::schema;
+namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
 

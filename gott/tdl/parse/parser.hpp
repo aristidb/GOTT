@@ -42,7 +42,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <iosfwd>
 
-namespace gott {
 namespace tdl {
 
 /**
@@ -71,10 +70,10 @@ public:
   virtual void down() = 0;
     ///< Called when we open a new sub-layer.
  
-  virtual void node(string const &content) = 0;
+  virtual void node(gott::string const &content) = 0;
     ///< Called when a node has been read.
 
-  virtual void comment(string const &content, bool on_new_line) = 0;
+  virtual void comment(gott::string const &content, bool on_new_line) = 0;
     ///< Called when a comment has been read.
 
   virtual void up() = 0;
@@ -89,6 +88,6 @@ private:
   source_position where_;
 };
 
-}}
+}
 
 #endif

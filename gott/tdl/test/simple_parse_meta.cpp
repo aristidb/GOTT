@@ -44,7 +44,7 @@
 using std::pair;
 using std::ostream;
 using std::istringstream;
-using gott::tdl::meta_parser;
+using tdl::meta_parser;
 using gott::string;
 
 typedef pair<string, string> twostring;

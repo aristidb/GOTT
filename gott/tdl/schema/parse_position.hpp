@@ -43,9 +43,7 @@
 #include <utility>
 #include <boost/scoped_ptr.hpp>
 
-namespace gott {
 namespace tdl {
-
 namespace schema {
 
 /**
@@ -89,6 +87,6 @@ private:
   boost::scoped_ptr<impl> p;
 };
 
-}}}
+}}
 
 #endif

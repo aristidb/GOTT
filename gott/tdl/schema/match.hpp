@@ -43,7 +43,6 @@
 #include <gott/tdl/schema/ev_fwd.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace gott {
 namespace tdl {
 namespace structure { class repatcher; }
   
@@ -133,10 +132,10 @@ public:
 private:
   void begin_parse();
   void down();
-  void node(string const &);
+  void node(gott::string const &);
   void up();
   void end_parse();
-  void comment(string const &, bool);
+  void comment(gott::string const &, bool);
 
 private:
   class impl;
@@ -145,5 +144,6 @@ private:
   match();
 };
 
-}}}
+}}
+
 #endif

@@ -38,7 +38,6 @@
 #ifndef GOTT_TDL_SCHEMA_EV_FWD_HPP
 #define GOTT_TDL_SCHEMA_EV_FWD_HPP
 
-namespace gott {
 namespace tdl {
 namespace schema {
 namespace ev {
@@ -56,6 +55,6 @@ class node;
 class child_succeed;
 class child_fail;
 
-}}}}
+}}}
 
 #endif

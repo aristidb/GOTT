@@ -40,7 +40,7 @@
 #include <gott/range_algo.hpp>
 #include <boost/bind.hpp>
 
-namespace structure = gott::tdl::structure;
+namespace structure = tdl::structure;
 using structure::repatcher;
 using structure::failed_repatch;
 using structure::writable_structure;
@@ -51,7 +51,7 @@ using structure::repatcher_chain;
 repatcher::repatcher() {}
 repatcher::~repatcher() {}
 
-failed_repatch::failed_repatch(string const &s) : tdl_exception(s) {}
+failed_repatch::failed_repatch(gott::string const &s) : tdl_exception(s) {}
 failed_repatch::~failed_repatch() throw() {}
 
 simple_repatcher_context::~simple_repatcher_context() {}
@@ -64,11 +64,11 @@ void simple_repatcher_context::end() {
   target.end();
 }
 
-void simple_repatcher_context::data(xany::Xany const &x) {
+void simple_repatcher_context::data(gott::xany::Xany const &x) {
   target.data(x);
 }
 
-void simple_repatcher_context::add_tag(string const &s) {
+void simple_repatcher_context::add_tag(gott::string const &s) {
   target.add_tag(s);
 }
 
@@ -107,8 +107,8 @@ repatcher_chain::deferred_write(writable_structure &s) const {
     }
     void begin(source_position const &w) { out[0].begin(w); }
     void end() { out[0].end(); }
-    void data(xany::Xany const &x) { out[0].data(x); }
-    void add_tag(string const &s) { out[0].add_tag(s); }
+    void data(gott::xany::Xany const &x) { out[0].data(x); }
+    void add_tag(gott::string const &s) { out[0].add_tag(s); }
   };
   return new context(el, s);
 }

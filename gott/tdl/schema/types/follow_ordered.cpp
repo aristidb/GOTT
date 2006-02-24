@@ -38,8 +38,8 @@
 #include "follow_ordered.hpp"
 #include "../event.hpp"
 
-namespace schema = gott::tdl::schema;
-namespace ev = gott::tdl::schema::ev;
+namespace schema = tdl::schema;
+namespace ev = tdl::schema::ev;
 using schema::item;
 using schema::match_follow_ordered;
 

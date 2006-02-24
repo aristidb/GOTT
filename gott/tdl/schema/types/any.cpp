@@ -37,7 +37,7 @@
 
 #include "any.hpp"
 
-namespace schema = gott::tdl::schema;
+namespace schema = tdl::schema;
 namespace ev = schema::ev;
 using schema::match_any;
 using schema::item;

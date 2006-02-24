@@ -45,6 +45,7 @@
 
 namespace gott {
 class string;
+}
 
 namespace tdl {
 namespace schema {
@@ -103,24 +104,24 @@ rule_t rule(rule_attr_t const &a,
   return rule_t(abstract_rule(&construct_item<T>, &T::accept_any), a, c);
 }
 
-rule_t rule(string const &name, rule_attr_t const &a = rule_attr_t(), 
+rule_t rule(gott::string const &name, rule_attr_t const &a = rule_attr_t(), 
     std::vector<rule_t> const &c = std::vector<rule_t>()) GOTT_EXPORT;
 
 inline
-rule_t rule_one(string const &name, rule_attr_t const &a, rule_t const &c) {
+rule_t rule_one(gott::string const &name, rule_attr_t const &a,rule_t const&c) {
   return rule(name, a, std::vector<rule_t>(1, c));
 }
 
 inline
-rule_t rule(string const &name, std::vector<rule_t> const &c) {
+rule_t rule(gott::string const &name, std::vector<rule_t> const &c) {
   return rule(name, rule_attr_t(), c);
 }
 
 inline
-rule_t rule_one(string const &name, rule_t const &c) {
+rule_t rule_one(gott::string const &name, rule_t const &c) {
   return rule(name, rule_attr_t(), std::vector<rule_t>(1, c));
 }
 
-}}}
+}}
 
 #endif

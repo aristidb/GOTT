@@ -48,13 +48,13 @@
 
 namespace tut {
 struct schema_basic {
-  gott::tdl::structure::container tree, xp;
-  gott::tdl::structure::revocable_adapter rtree;
-  gott::tdl::schema::match match;
-  gott::tdl::schema::rule_t grammar;
+  tdl::structure::container tree, xp;
+  tdl::structure::revocable_adapter rtree;
+  tdl::schema::match match;
+  tdl::schema::rule_t grammar;
   std::string rest;
   schema_basic() : rtree(tree), match(rtree) {}
-  schema_basic(gott::tdl::schema::rule_t const &r) 
+  schema_basic(tdl::schema::rule_t const &r) 
     : rtree(tree), match(rtree), grammar(r) {}
   void run_test(std::string const &input) {
     match.add(grammar);

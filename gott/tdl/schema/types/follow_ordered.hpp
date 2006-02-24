@@ -44,7 +44,6 @@
 #include "../parse_position.hpp"
 #include "../rule_attr.hpp"
 
-namespace gott {
 namespace tdl {
 namespace schema {
 
@@ -82,9 +81,9 @@ private:
   bool play(ev::down const &);
   bool play(ev::up const &);
   bool miss_events(ev::event const &, unsigned);
-  string name() const;
+  gott::string name() const;
 };
 
-}}}
+}}
 
 #endif

@@ -41,8 +41,7 @@
 #include <gott/range_algo.hpp>
 #include <gott/xany/xany.hpp>
 
-namespace structure = gott::tdl::structure;
-
+namespace structure = tdl::structure;
 using structure::repatch_enumeration;
 using structure::writable_structure;
 using gott::string;
@@ -63,13 +62,13 @@ repatch_enumeration::deferred_write(writable_structure &s) const {
     context(writable_structure &s, std::vector<string> const &a) 
     : simple_repatcher_context(s), alternatives(a) {}
 
-    void data(xany::Xany const &x) {
+    void data(gott::xany::Xany const &x) {
       if (x.compatible<string>()) {
-        string input = xany::Xany_cast<string>(x);
+        string input = gott::xany::Xany_cast<string>(x);
         std::vector<string>::const_iterator it;
         if ((it = find(range(alternatives), input)) == alternatives.end())
           throw failed_repatch(failure_message);
-        target.data(xany::Xany(long(it - alternatives.begin())));
+        target.data(gott::xany::Xany(long(it - alternatives.begin())));
       } else
         throw failed_repatch(failure_message);
     }
@@ -90,9 +89,9 @@ void repatch_enumeration::reg() {
       if (!inner) fail();
       inner = false;
     }
-    void data(xany::Xany const &x) {
+    void data(gott::xany::Xany const &x) {
       if (!inner) fail();
-      all_strings.push_back(xany::Xany_cast<string>(x));
+      all_strings.push_back(gott::xany::Xany_cast<string>(x));
     }
     void add_tag(string const &) {}
     void fail() {

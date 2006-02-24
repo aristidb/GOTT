@@ -43,7 +43,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-namespace gott {
 namespace tdl {
 namespace structure {
 
@@ -75,8 +74,8 @@ public:
   ~simple_repatcher_context();
   void begin(source_position const &);
   void end();
-  void data(xany::Xany const &x);
-  void add_tag(string const &t);
+  void data(gott::xany::Xany const &x);
+  void add_tag(gott::string const &t);
 };
 
 class GOTT_EXPORT repatch_nothing : public concrete_repatcher<repatch_nothing> {
@@ -98,6 +97,6 @@ private:
   boost::ptr_vector<repatcher> el;
 };
 
-}}}
+}}
 
 #endif

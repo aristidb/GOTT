@@ -37,8 +37,8 @@
 
 #include "happy_once.hpp"
 
-using gott::tdl::schema::happy_once;
-using gott::tdl::schema::item;
+using tdl::schema::happy_once;
+using tdl::schema::item;
 
 happy_once::happy_once(rule_attr_t const &a, match &m) 
   : item(a, m), happy(false) {}

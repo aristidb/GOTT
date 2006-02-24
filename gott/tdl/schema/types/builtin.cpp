@@ -53,7 +53,7 @@ struct builtin_types {
 } auto_reg;
 }
 
-using namespace gott::tdl::schema;
+using namespace tdl::schema;
 
 #define REG(t) by_name().add<match_##t>(#t)
 

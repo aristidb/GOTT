@@ -40,10 +40,10 @@
 #include <vector>
 #include <set>
 
-using gott::tdl::source_position;
-using gott::tdl::structure::revocable_adapter;
-using gott::tdl::structure::revocable_structure;
-using gott::tdl::structure::writable_structure;
+using tdl::source_position;
+using tdl::structure::revocable_adapter;
+using tdl::structure::revocable_structure;
+using tdl::structure::writable_structure;
 using gott::xany::Xany;
 using gott::string;
 

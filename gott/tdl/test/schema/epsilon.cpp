@@ -38,8 +38,8 @@
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
 
-namespace schema = gott::tdl::schema;
-namespace stru = gott::tdl::structure;
+namespace schema = tdl::schema;
+namespace stru = tdl::structure;
 using gott::xany::Xany;
 
 using stru::cf::S;

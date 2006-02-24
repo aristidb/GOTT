@@ -43,7 +43,8 @@
 #include <vector>
 
 namespace gott {
-class string;
+class gott::string;
+}
 
 namespace tdl {
 namespace structure {
@@ -55,7 +56,7 @@ class writable_structure;
  */
 namespace cf {
 
-typedef std::vector<string> tag_list;
+typedef std::vector<gott::string> tag_list;
 class node_inserter_t;
 typedef std::vector<node_inserter_t> nd_list;
 
@@ -70,11 +71,11 @@ public:
    */
   GOTT_EXPORT void write_to(writable_structure &ws) const;
 
-  node_inserter_t(xany::Xany const &d, nd_list const &c, tag_list const &t);
+  node_inserter_t(gott::xany::Xany const &d, nd_list const &c, tag_list const &t);
   GOTT_EXPORT ~node_inserter_t();
 
 private:
-  xany::Xany data;
+  gott::xany::Xany data;
   nd_list children;
   tag_list tags;
 };
@@ -85,7 +86,7 @@ private:
  * \param tags The nodes's tags.
  */
 GOTT_EXPORT 
-node_inserter_t S(xany::Xany const &data, tag_list const &tags = tag_list());
+node_inserter_t S(gott::xany::Xany const &data, tag_list const &tags = tag_list());
 
 /**
  * Create a leaf node (generator).
@@ -93,7 +94,7 @@ node_inserter_t S(xany::Xany const &data, tag_list const &tags = tag_list());
  * \param tag The nodes's sole tag.
  */
 GOTT_EXPORT 
-node_inserter_t S(xany::Xany const &data, string const &tag);
+node_inserter_t S(gott::xany::Xany const &data, gott::string const &tag);
 
 /**
  * Create a node (generator) without data but with children.
@@ -109,7 +110,7 @@ node_inserter_t M(nd_list const &children, tag_list const &tags = tag_list());
  * \param tag The node's sole tag.
  */
 GOTT_EXPORT 
-node_inserter_t M(nd_list const &children, string const &tag);
+node_inserter_t M(nd_list const &children, gott::string const &tag);
 
 /**
  * Create a node (generator) with data and children.
@@ -118,7 +119,7 @@ node_inserter_t M(nd_list const &children, string const &tag);
  * \param tags The node's tags.
  */
 GOTT_EXPORT 
-node_inserter_t MD(xany::Xany const &data, nd_list const &children,
+node_inserter_t MD(gott::xany::Xany const &data, nd_list const &children,
                    tag_list const &tags = tag_list());
 
 /**
@@ -128,8 +129,8 @@ node_inserter_t MD(xany::Xany const &data, nd_list const &children,
  * \param tag The node's sole tag.
  */
 GOTT_EXPORT 
-node_inserter_t MD(xany::Xany const &data, nd_list const &children, 
-                   string const &tag);
+node_inserter_t MD(gott::xany::Xany const &data, nd_list const &children, 
+                   gott::string const &tag);
 
 /**
  * Create a node (generator) without data and with a single child.
@@ -146,8 +147,8 @@ node_inserter_t C(node_inserter_t const &child,
  * \param tag The node's sole tag.
  */
 GOTT_EXPORT 
-node_inserter_t C(node_inserter_t const &child, string const &tag);
+node_inserter_t C(node_inserter_t const &child, gott::string const &tag);
 
-}}}}
+}}}
 
 #endif

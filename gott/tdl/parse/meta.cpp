@@ -39,8 +39,9 @@
 #include <gott/string/string.hpp>
 #include <map>
 
+using gott::string;
 using std::istream;
-using gott::tdl::meta_parser;
+using tdl::meta_parser;
 
 static bool pass(gott::string const &, gott::string const &) {
   return false;
@@ -84,7 +85,7 @@ void meta_parser::parse(istream &in, line_logger *) {
 
 void meta_parser::impl::exec(string const &line_) {
   string::utf32_range line = line_.as_utf32();
-  utf8_iterator pos = line.begin();
+  gott::utf8_iterator pos = line.begin();
   for (; pos != line.end(); ++pos)
     if (*pos == L' ')
       break;

@@ -50,7 +50,6 @@
 #include <iosfwd>
 #include <vector>
 
-namespace gott {
 namespace tdl {
 namespace structure { class repatcher; }
 
@@ -65,17 +64,17 @@ public:
       structure::repatcher const *rr = 0) 
   : c(cc), r(rr) {}
 
-  explicit rule_attr_t(std::vector<string> const &l, bool cc = true, 
+  explicit rule_attr_t(std::vector<gott::string> const &l, bool cc = true, 
       structure::repatcher const *rr = 0)
   : c(cc), t(l), r(rr) {}
 
-  explicit rule_attr_t(string const &s, bool cc = true, 
+  explicit rule_attr_t(gott::string const &s, bool cc = true, 
       structure::repatcher const *rr = 0)
-  : c(cc), t(std::vector<string>(1, s)), r(rr) {}
+  : c(cc), t(1, s), r(rr) {}
 
-  explicit rule_attr_t(std::vector<string> const &l, bool cc, 
-                     xany::Xany const &x, structure::repatcher const *rr = 0,
-                     slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
+  explicit rule_attr_t(std::vector<gott::string> const &l, bool cc,
+      gott::xany::Xany const &x, structure::repatcher const *rr = 0,
+      slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
   : c(cc), t(l), u(x), r(rr), i(I), o(O) {}
 
   rule_attr_t(rule_attr_t const &o_)
@@ -83,9 +82,9 @@ public:
 
   bool coat() const { return c; }
 
-  std::vector<string> const &tags() const { return t; }
+  std::vector<gott::string> const &tags() const { return t; }
 
-  xany::Xany const &user() const { return u; }
+  gott::xany::Xany const &user() const { return u; }
 
   structure::repatcher const *repatcher() const { return r.get(); }
 
@@ -99,8 +98,8 @@ public:
 
 private:
   bool c;
-  std::vector<string> t;
-  xany::Xany u;
+  std::vector<gott::string> t;
+  gott::xany::Xany u;
   boost::shared_ptr<structure::repatcher const> r;
   slotcfg i;
   slotcfg o;
@@ -127,17 +126,17 @@ BOOST_PARAMETER_FUN(rule_attr_t, rule_attr, 0, 6, rule_attr_params);
 template<class Args>
 rule_attr_t rule_attr_with_named_params(Args const &args) {
   struct combine_strip {
-    std::vector<string> operator() (string const &s) const { 
+    std::vector<gott::string> operator() (gott::string const &s) const { 
       if (s != "")
-        return std::vector<string>(1, s); 
+        return std::vector<gott::string>(1, s); 
       else
-        return std::vector<string>();
+        return std::vector<gott::string>();
     }
   };
   return rule_attr_t(
       args[tags | combine_strip()(args[tag | ""])],
       args[coat | true],
-      args[user | xany::Xany()],
+      args[user | gott::xany::Xany()],
       args[repatcher | static_cast<structure::repatcher *>(0)],
       args[inner | slotcfg()],
       args[outer | slotcfg()]
@@ -146,6 +145,6 @@ rule_attr_t rule_attr_with_named_params(Args const &args) {
 
 GOTT_EXPORT std::ostream &operator<<(std::ostream &s, rule_attr_t const &a);
 
-}}}
+}}
 
 #endif

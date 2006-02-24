@@ -41,10 +41,11 @@
 #include <gott/range_algo.hpp>
 #include <gott/tdl/source_position.hpp>
 
+using gott::string;
 using gott::xany::Xany;
-namespace cf = gott::tdl::structure::cf;
+namespace cf = tdl::structure::cf;
 using cf::node_inserter_t;
-using gott::tdl::structure::writable_structure;
+using tdl::structure::writable_structure;
 using boost::bind;
 using boost::ref;
 
@@ -55,6 +56,7 @@ node_inserter_t::node_inserter_t(Xany const &d, nd_list const &c,
 node_inserter_t::~node_inserter_t() {}
 
 void node_inserter_t::write_to(writable_structure &o) const {
+  using namespace gott;
   o.begin(source_position());
     o.data(data);
     for (tag_list::const_iterator it=tags.begin(); it != tags.end(); ++it)
@@ -63,11 +65,11 @@ void node_inserter_t::write_to(writable_structure &o) const {
   o.end();
 }
 
-node_inserter_t cf::S(xany::Xany const &data, tag_list const &tags) {
+node_inserter_t cf::S(Xany const &data, tag_list const &tags) {
   return node_inserter_t(data, nd_list(), tags);
 }
 
-node_inserter_t cf::S(xany::Xany const &data, string const &tag) {
+node_inserter_t cf::S(Xany const &data, string const &tag) {
   return node_inserter_t(data, nd_list(), tag_list(1, tag));
 }
 
@@ -79,12 +81,12 @@ node_inserter_t cf::M(nd_list const &children, string const &tag) {
   return node_inserter_t(Xany(), children, tag_list(1, tag));
 }
 
-node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children, 
+node_inserter_t cf::MD(Xany const &data, nd_list const &children, 
                        tag_list const &tags) {
   return node_inserter_t(data, children, tags);
 }
 
-node_inserter_t cf::MD(xany::Xany const &data, nd_list const &children, 
+node_inserter_t cf::MD(Xany const &data, nd_list const &children, 
                        string const &tag) {
   return node_inserter_t(data, children, tag_list(1, tag));
 }

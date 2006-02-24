@@ -41,9 +41,9 @@
 #include <gott/thunk.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace schema = gott::tdl::schema;
+namespace schema = tdl::schema;
 using schema::mismatch;
-using gott::tdl::source_position;
+using tdl::source_position;
 using gott::range;
 using gott::string;
 using gott::integer_to_string;

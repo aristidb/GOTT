@@ -46,7 +46,7 @@
 
 using gott::string;
 namespace config = gott::config;
-namespace schema = gott::tdl::schema;
+namespace schema = tdl::schema;
 namespace ev = schema::ev;
 using config::match_config_tdl;
 

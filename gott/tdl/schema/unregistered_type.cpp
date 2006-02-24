@@ -39,8 +39,8 @@
 #include <gott/string/string.hpp>
 
 using gott::string;
-using gott::tdl::tdl_exception;
-using gott::tdl::schema::unregistered_type;
+using tdl::tdl_exception;
+using tdl::schema::unregistered_type;
 
 static string pizza(string const &type) {
   string const components[] = { "Type ", type, " not found in database" };

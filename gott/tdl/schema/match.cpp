@@ -53,10 +53,10 @@
 
 using gott::string;
 using boost::shared_ptr;
-namespace structure = gott::tdl::structure;
-using gott::tdl::schema::match;
-using gott::tdl::schema::positioning;
-using gott::tdl::source_position;
+namespace structure = tdl::structure;
+using tdl::schema::match;
+using tdl::schema::positioning;
+using tdl::source_position;
 using structure::writable_structure;
 
 class match::impl {
@@ -213,7 +213,7 @@ shared_ptr<writable_structure> match::impl::direct_structure_non_base() {
 template<class T>
 void match::impl::handle_token(T const &e) {
   shadow_names.clear();
-  range_t<Stack::iterator> in = range(parse);
+  gott::range_t<Stack::iterator> in = gott::range(parse);
   while (!in.empty())
     shadow_names.push_back(in.Begin++->the_item->long_name());
 

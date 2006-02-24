@@ -40,9 +40,9 @@
 #include <gott/string/string.hpp>
 #include <map>
 
-namespace tdl = gott::tdl;
 namespace schema = tdl::schema;
 using schema::by_name_t;
+using gott::string;
 
 by_name_t &schema::by_name() {
   static by_name_t m;

@@ -42,8 +42,8 @@
 using boost::assign::list_of;
 using std::vector;
 
-namespace schema = gott::tdl::schema;
-namespace stru = gott::tdl::structure;
+namespace schema = tdl::schema;
+namespace stru = tdl::structure;
 using gott::string;
 using gott::xany::Xany;
 

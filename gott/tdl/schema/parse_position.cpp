@@ -45,8 +45,8 @@
 #include <gott/debug/assert.hpp>
 
 using std::size_t;
-namespace schema = gott::tdl::schema;
-namespace structure = gott::tdl::structure;
+namespace schema = tdl::schema;
+namespace structure = tdl::structure;
 
 using structure::revocable_structure;
 using schema::positioning;

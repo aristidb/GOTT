@@ -42,8 +42,9 @@
 #include <boost/bind.hpp>
 #include <gott/range_algo.hpp>
 
+using gott::string;
 using gott::xany::Xany;
-using gott::tdl::structure::container;
+using tdl::structure::container;
 
 class container::impl {
 public:
@@ -67,6 +68,7 @@ public:
   };
   node root;
   node *current;
+  
   std::stack<node *> parents;
 };
 
@@ -105,11 +107,12 @@ void container::add_tag(string const &s) {
   p->current->tags.push_back(s);
 }
 
-void container::data(xany::Xany const &data) {
+void container::data(Xany const &data) {
   p->current->data = data;
 }
 
 void container::copy_to(writable_structure &w) const {
+  using namespace gott;
   for_each(range(p->root.children), boost::bind(&impl::node::write, _1, &w));
 }
 
@@ -121,6 +124,7 @@ bool container::operator==(container const &x) const {
 
 
 void container::impl::node::write(writable_structure *w) const {
+  using namespace gott;
   w->begin(where);
   w->data(data);
   for_each(range(tags), boost::bind(&writable_structure::add_tag, w, _1));
@@ -131,7 +135,7 @@ void container::impl::node::write(writable_structure *w) const {
 bool container::impl::node::operator==(node const &o) const {
   if (data != o.data)
     return false;
-  if (range(tags) != range(o.tags))
+  if (gott::range(tags) != gott::range(o.tags))
     return false;
-  return range(children) == range(o.children);
+  return gott::range(children) == gott::range(o.children);
 }

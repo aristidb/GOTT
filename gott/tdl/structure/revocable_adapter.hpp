@@ -42,7 +42,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace gott {
 namespace tdl {
 namespace structure {
 
@@ -65,8 +64,8 @@ public:
 private:
   void begin(source_position const &);
   void end();
-  void add_tag(string const &);
-  void data(xany::Xany const &);
+  void add_tag(gott::string const &);
+  void data(gott::xany::Xany const &);
 
   pth point();
   void revert(pth);
@@ -77,6 +76,6 @@ private:
   boost::scoped_ptr<impl> p;
 };
 
-}}}
+}}
 
 #endif
