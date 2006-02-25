@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "writer.hpp"
-#include <gott/string/convert.hpp>
+#include <boost/tokenizer.hpp>
 #include <ostream>
 
 using tdl::tdl_writer;
@@ -57,9 +57,9 @@ public:
     if (!fresh_line) {
       out << '\n';
       fresh_line = true;
+      for (int i = 0; i < indentation; ++i)
+        out << ' ';
     }
-    for (int i = 0; i < indentation; ++i)
-      out << ' ';
   }
 
 private:
@@ -134,8 +134,44 @@ public:
       }
       out << '"';
       break;
+    case block:
+      print_block(s);
+      break;
     default:
       out << s;
+    }
+  }
+
+private:
+  void print_block(string const &s) {
+    out << '`'; fresh_line = false;
+    indentation += 2 * width;
+    print_block_content(s);
+    indentation -= 2 * width;
+  }
+
+  void print_block_content(string const &s) {
+    typedef 
+      boost::char_separator<
+        gott::utf32_t
+      > 
+      separator_t;
+    typedef 
+      boost::tokenizer<
+        separator_t,
+        gott::utf8_iterator,
+        string
+      >
+      tokenizer_t;
+
+    gott::utf32_t const sep_data[] 
+      = { gott::to_utf32_char("\n", gott::ascii), 0 };
+    separator_t sep(sep_data);
+    tokenizer_t tokens(s.as_utf32(), sep);
+    for (tokenizer_t::iterator it = tokens.begin(); it != tokens.end(); ++it) {
+      prepare_line();
+      out << *it;
+      fresh_line = false;
     }
   }
 };

@@ -271,6 +271,14 @@ public:
   }
 
   /**
+   * Assign from iterator range.
+   */
+  template<class I>
+  void assign(I a, I b) {
+    operator=(string(range(a, b)));
+  }
+
+  /**
    * Get the internally used UTF8 string.
    */
   range_t<utf8_t const *> as_utf8() const;
