@@ -388,6 +388,18 @@ void object::test<16>(int) {
 
 template<> template<>
 void object::test<17>(int) {
+  std::istringstream data("a `\n  foo\n bar");
+  parse(data);
+  B(); D();
+    N("A");
+    N("foo\n");
+    D(); N("bar"); U();
+  U(); E();
+  ensure_equals("third block", range(ev), range(xp));
+}
+
+template<> template<>
+void object::test<18>(int) {
   no_test();
 }
 

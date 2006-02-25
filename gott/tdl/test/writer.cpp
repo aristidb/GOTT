@@ -88,9 +88,10 @@ TEST(5, "\"x,y\"", "\"x,y\"")
 TEST(6, "(x\n y,z)", "(x\n y,z)")
 TEST(7, "\"(\"\n)", "\"(\"\n)")
 TEST(8, "`\n  x\n  y", "`\n    x\n    y")
+TEST(9, "`\n  bar\n foo", "`\n    bar\n  foo")
 
 template<> template<> void object::test
-<9>(int) { no_test(); }
+<10>(int) { no_test(); }
 
 
 }
