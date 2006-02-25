@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "writer.hpp"
+#include <gott/string/convert.hpp>
 #include <ostream>
 
 using tdl::tdl_writer;
@@ -61,14 +62,23 @@ public:
       out << ' ';
   }
 
+private:
   enum classification { standard, quoted, paren };
 
   classification classify(string const &s) {
     string::utf32_range r = s.as_utf32();
     if (*r.begin() == '(' && balanced(s))
       return paren;
+    if (check_quoted(r))
+      return quoted;
+    return standard;
+  }
+
+  bool check_quoted(string::utf32_range r) {
     while (r.begin() < r.end()) {
-      char c = *r.Begin++;
+      char c;
+      char *p = &c;
+      gott::write_utf32_to_enc(*r.Begin++, p, gott::ascii);
       switch (c) {
       case ' ': case ',': case '"': case '#': case '(':
         return quoted;
@@ -76,14 +86,16 @@ public:
         break;
       }
     }
-    return standard;
   }
 
   bool balanced(string const &s) {
     int unbalance = 0;
     for (gott::utf8_iterator it = s.as_utf32().begin(); it < s.as_utf32().end();
-        ++it)
-      switch (*it) {
+        ++it) {
+      char c;
+      char *p = &c;
+      gott::write_utf32_to_enc(*it, p, gott::ascii);
+      switch (c) {
       case '(':
         ++unbalance; break;
       case ')':
@@ -91,9 +103,11 @@ public:
       default:
         break;
       }
+    }
     return unbalance == 0;
   }
 
+public:
   void print_node(string const &s) {
     switch (classify(s)) {
     case quoted:
