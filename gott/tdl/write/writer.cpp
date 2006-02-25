@@ -63,39 +63,39 @@ public:
   }
 
 private:
-  enum classification { standard, quoted, paren };
+  enum classification { standard, quoted, paren, block };
 
   classification classify(string const &s) {
-    string::utf32_range r = s.as_utf32();
-    if (*r.begin() == '(' && balanced(s))
+    string::utf8_range r = s.as_utf8();
+    if (*r.begin() == '(' && balanced(r))
       return paren;
-    if (check_quoted(r))
-      return quoted;
-    return standard;
+    if (!need_to_be_block(r)) {
+      if (check_quoted(r))
+        return quoted;
+      return standard;
+    } else {
+      if (check_block(r))
+        return block;
+      throw 0; // TODO: real exception
+    }
   }
 
-  bool check_quoted(string::utf32_range r) {
-    while (r.begin() < r.end()) {
-      char c;
-      char *p = &c;
-      gott::write_utf32_to_enc(*r.Begin++, p, gott::ascii);
-      switch (c) {
+  bool check_quoted(string::utf8_range r) {
+    while (!r.empty()) {
+      switch (*r.Begin++) {
       case ' ': case ',': case '"': case '#': case '(':
-        return quoted;
+        return true;
       default:
         break;
       }
     }
+    return false;
   }
 
-  bool balanced(string const &s) {
+  bool balanced(string::utf8_range r) {
     int unbalance = 0;
-    for (gott::utf8_iterator it = s.as_utf32().begin(); it < s.as_utf32().end();
-        ++it) {
-      char c;
-      char *p = &c;
-      gott::write_utf32_to_enc(*it, p, gott::ascii);
-      switch (c) {
+    while (!r.empty())
+      switch (*r.Begin++) {
       case '(':
         ++unbalance; break;
       case ')':
@@ -103,8 +103,20 @@ private:
       default:
         break;
       }
-    }
     return unbalance == 0;
+  }
+
+  bool need_to_be_block(string::utf8_range r) {
+    while (!r.empty())
+      if (*r.Begin++ == '\n')
+        return true;
+    return false;
+  }
+
+  bool check_block(string::utf8_range r) {
+    if (*r.begin() == ' ')
+      return false;
+    return true;
   }
 
 public:
