@@ -84,8 +84,12 @@ TEST(2, "test #comment1\n  #comment2\n  foo",
       "test #comment1\n#comment2\n  foo")
 TEST(3, "\"foo bar\"", "\"foo bar\"")
 TEST(4, "x \"y\"\"z\"", "x\n  \"y\"\"z\"")
+TEST(5, "\"x,y\"", "\"x,y\"")
+TEST(6, "(x\n y,z)", "(x\n y,z)")
+TEST(7, "\"(\"\n)", "\"(\"\n)")
 
-template<> template<> void object::test<5>(int) { no_test(); }
+template<> template<> void object::test
+<8>(int) { no_test(); }
 
 
 }

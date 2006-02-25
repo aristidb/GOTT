@@ -61,16 +61,37 @@ public:
       out << ' ';
   }
 
-  enum classification { standard, quoted };
+  enum classification { standard, quoted, paren };
 
   classification classify(string const &s) {
     string::utf32_range r = s.as_utf32();
+    if (*r.begin() == '(' && balanced(s))
+      return paren;
     while (r.begin() < r.end()) {
       char c = *r.Begin++;
-      if (c == ' ' || c == ',' || c == '"' || c == '#' || c == '(')
+      switch (c) {
+      case ' ': case ',': case '"': case '#': case '(':
         return quoted;
+      default:
+        break;
+      }
     }
     return standard;
+  }
+
+  bool balanced(string const &s) {
+    int unbalance = 0;
+    for (gott::utf8_iterator it = s.as_utf32().begin(); it < s.as_utf32().end();
+        ++it)
+      switch (*it) {
+      case '(':
+        ++unbalance; break;
+      case ')':
+        --unbalance; break;
+      default:
+        break;
+      }
+    return unbalance == 0;
   }
 
   void print_node(string const &s) {
