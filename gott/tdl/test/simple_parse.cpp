@@ -412,11 +412,12 @@ void object::test<18>(int) {
   ensure_equals("fourth block", range(ev), range(xp));
 }
 
+// TODO: add non-TDL input tests
+
 template<> template<>
 void object::test<19>(int) {
   no_test();
 }
 
-// further tests
 }
 
