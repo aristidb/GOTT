@@ -1,4 +1,4 @@
 /**
-\namespace gott::tdl::schema
+\namespace tdl::schema
 TDL Schema validation and application.
 */
