@@ -65,16 +65,27 @@ public:
 
   classification classify(string const &s) {
     string::utf32_range r = s.as_utf32();
-    while (!r.empty())
-      if (*r.Begin++ == ' ')
+    while (r.begin() < r.end()) {
+      char c = *r.Begin++;
+      if (c == ' ' || c == ',' || c == '"' || c == '#' || c == '(')
         return quoted;
+    }
     return standard;
   }
 
   void print_node(string const &s) {
     switch (classify(s)) {
     case quoted:
-      out << '"' << s << '"';
+      out << '"';
+      for (gott::utf8_iterator it = s.as_utf32().begin(); 
+          it < s.as_utf32().end(); ++it) {
+        char c = *it;
+        if (c == '"')
+          out << "\"\"";
+        else
+          out << c;
+      }
+      out << '"';
       break;
     default:
       out << s;

@@ -83,7 +83,7 @@ TEST(1, "hallo du,sau", "hallo\n  du\n  sau")
 TEST(2, "test #comment1\n  #comment2\n  foo",
       "test #comment1\n#comment2\n  foo")
 TEST(3, "\"foo bar\"", "\"foo bar\"")
-TEST(4, "x \"y\"\"z\"", "x\n  \"y\"\"z")
+TEST(4, "x \"y\"\"z\"", "x\n  \"y\"\"z\"")
 
 template<> template<> void object::test<5>(int) { no_test(); }
 
