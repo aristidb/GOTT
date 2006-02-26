@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include <gott/tdl/parse/parser.hpp>
+#include <gott/tdl/exceptions.hpp>
 #include <gott/tut/tut.h>
 #include <ostream>
 #include <gott/string/string.hpp>
@@ -412,10 +413,33 @@ void object::test<18>(int) {
   ensure_equals("fourth block", range(ev), range(xp));
 }
 
+template<> template<>
+void object::test<19>(int) {
+  std::istringstream data("`\n  foo\n bar");
+  parse(data);
+  B(); D();
+    N("foo\n");
+    D(); N("bar"); U();
+  U(); E();
+  ensure_equals(range(ev), range(xp));
+}
+
+template<> template<>
+void object::test<20>(int) {
+  std::istringstream data("\"");
+  try {
+    parse(data);
+  } catch (tdl::mismatch const &m) {
+    ensure_equals(m.what(), "1:1 : mismatch at token");
+    return;
+  }
+  fail();
+}
+
 // TODO: add non-TDL input tests
 
 template<> template<>
-void object::test<19>(int) {
+void object::test<21>(int) {
   no_test();
 }
 
