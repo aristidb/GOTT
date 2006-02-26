@@ -38,6 +38,7 @@
 #ifndef GOTT_UTIL_TDL_SimplE_META_HPP
 #define GOTT_UTIL_TDL_SimplE_META_HPP
 
+#include "../source_position.hpp"
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <gott/visibility.hpp>
@@ -47,8 +48,7 @@ class string;
 }
 
 namespace tdl {
-
-class line_logger;
+class source_position;
 
 /**
  * TDL Meta-data callback.
@@ -90,9 +90,15 @@ public:
   /**
    * Parses the meta-data section of a TDL document to a special parser.
    * \param s The stream to read from.
-   * \param l (optional) The line-logger callback.
+   * \param w The current source position in the stream.
    */
-  void parse(std::istream &s, line_logger *l = 0) GOTT_EXPORT;
+  source_position parse(std::istream &s, 
+      source_position const &w = source_position()) GOTT_EXPORT;
+
+  /**
+   * Returns the current position in the stream.
+   */
+  source_position const &where() const GOTT_EXPORT;
 
 private:
   class impl;

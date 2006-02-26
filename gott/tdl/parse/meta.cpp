@@ -36,12 +36,14 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "meta.hpp"
+#include "../source_position.hpp"
 #include <gott/string/string.hpp>
 #include <map>
 
 using gott::string;
 using std::istream;
 using tdl::meta_parser;
+using tdl::source_position;
 
 static bool pass(gott::string const &, gott::string const &) {
   return false;
@@ -51,6 +53,7 @@ class meta_parser::impl {
 public:
   impl() : def(pass) {}
 
+  source_position where;
   callback def;
   typedef std::map<string, callback> cb_t;
   cb_t cb;
@@ -62,7 +65,9 @@ meta_parser::meta_parser() : p(new impl) {
 
 meta_parser::~meta_parser() {}
 
-void meta_parser::parse(istream &in, line_logger *) {
+source_position meta_parser::parse(istream &in, source_position const &ww) {
+  source_position &w = p->where = ww;
+  w.column = w.token_column = 0;
   while (in) {
     if (in.peek() != '#') {
       if (in.peek() != '\n')
@@ -76,11 +81,20 @@ void meta_parser::parse(istream &in, line_logger *) {
         break;
       }
       in.get();
-      std::string s;
-      getline(in, s);
+      gott::string s;
+      {
+        std::string s_;
+        getline(in, s_);
+        s = s_;
+      }
+      {
+        w.token_line = w.line++;
+        w.token = s;
+      }
       p->exec(s);
     }
   }
+  return w;
 }
 
 void meta_parser::impl::exec(string const &line_) {
@@ -107,4 +121,8 @@ void meta_parser::set_default(callback const &f) {
 
 void meta_parser::set_specific(string const &cmd, callback const &f) {
   p->cb.insert(impl::cb_t::value_type(cmd, f));
+}
+
+source_position const &meta_parser::where() const {
+  return p->where;
 }
