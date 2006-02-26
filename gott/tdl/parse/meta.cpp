@@ -72,8 +72,10 @@ source_position meta_parser::parse(istream &in, source_position const &ww) {
     if (in.peek() != '#') {
       if (in.peek() != '\n')
         break;
-      else
+      else {
+        ++w.line;
         in.get();
+      }
     } else {
       in.get();
       if (in.peek() != '?') {
@@ -88,7 +90,7 @@ source_position meta_parser::parse(istream &in, source_position const &ww) {
         s = s_;
       }
       {
-        w.token_line = w.line++;
+        w.token_line = ++w.line;
         w.token = s;
       }
       p->exec(s);

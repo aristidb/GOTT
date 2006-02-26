@@ -45,6 +45,7 @@ using std::pair;
 using std::ostream;
 using std::istringstream;
 using tdl::meta_parser;
+using tdl::source_position;
 using gott::string;
 
 typedef pair<string, string> twostring;
@@ -54,6 +55,7 @@ struct meta_basic {
   meta_parser parser;
   string data, rest;
   std::vector<twostring> xp, ev;
+  source_position final_position;
   bool operator() (string const &cmd, string const &param) {
     ev.push_back(pair<string,string>(cmd, param));
     return true;
@@ -63,7 +65,7 @@ struct meta_basic {
   }
   void run_test() {
     istringstream x(data);
-    parser.parse(x);
+    final_position = parser.parse(x);
     rest = x.str().c_str() + x.tellg();
   }
   meta_basic() { parser.set_default(boost::ref(*this)); }
@@ -87,30 +89,36 @@ namespace tut {
 
 template<> template<>
 void object::test<1>(int) {
-  data = L"#?foobar qulux-dei zql";
+  data = "#?foobar qulux-dei zql";
   run_test();
   expect(L"foobar", L"qulux-dei zql");
   ensure_equals("simple meta declaration", range(ev), range(xp));
+  ensure_equals(final_position, 
+      source_position("", 1, 0, "foobar qulux-dei zql", 1, 0));
 }
 
 template<> template<>
 void object::test<2>(int) {
-  data = L"\n\n\n\n#?real     kluft\n\n\n\n\n   \n       \n\n#?delta_x yz";
+  data = "\n\n\n\n#?real     kluft\n\n\n\n\n   \n       \n\n#?delta_x yz";
   run_test();
-  expect(L"real", L"kluft");
+  expect("real", "kluft");
   ensure_equals("multi-line declaration", range(ev), range(xp));
   ensure_equals("multi-line declaration rest", rest, 
                 string(L"   \n       \n\n#?delta_x yz"));
+  ensure_equals(final_position,
+      source_position("", 9, 0, "real     kluft", 5, 0));
 }
 
 template<> template<>
 void object::test<3>(int) {
-  data = L"#?a\n#? b\n#\n#?c";
+  data = "#?a\n#? b\n#\n#?c";
   run_test();
-  expect(L"a");
-  expect(L"", L"b");
+  expect("a");
+  expect("", "b");
   ensure_equals("multi-line #2", range(ev), range(xp));
   ensure_equals("multi-line #2 rest", rest, string(L"#\n#?c"));
+  ensure_equals(final_position,
+      source_position("", 2, 0, " b", 2, 0));
 }
 
 template<> template<>

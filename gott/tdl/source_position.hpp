@@ -39,6 +39,7 @@
 #define GOTT_TDL_SOURCE_POSITION_HPP
 
 #include <gott/string/string.hpp>
+#include <ostream>
 
 namespace tdl {
 
@@ -62,6 +63,20 @@ public:
   unsigned token_line;
   unsigned token_column;
 };
+
+inline std::ostream &operator<<(std::ostream &out, source_position const &obj) {
+  return out << obj.file << " : " << obj.line << ':' << obj.column << '/' << 
+    obj.token_line << ':' << obj.token_column << " (" << obj.token << ')';
+}
+
+inline bool operator==(source_position const &a, source_position const &b) {
+  return a.line == b.line && a.column == b.column 
+    && a.token_line == b.token_line && a.file == b.file && a.token == b.token;
+}
+
+inline bool operator!=(source_position const &a, source_position const &b) {
+  return !(a == b);
+}
 
 }
 
