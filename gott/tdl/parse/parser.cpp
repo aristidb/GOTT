@@ -190,7 +190,7 @@ void exec_parse::normal_line(string const &s) {
 
   string::utf8_range unread = s.as_utf8();
   
-  while (!unread.empty()) {
+  while (unread.filled()) {
     skip_whitespace(unread);
   
     if (*unread.begin() == '#') {
@@ -221,7 +221,7 @@ void exec_parse::normal_line(string const &s) {
     skip_whitespace(unread);
     
     ln.start_token();
-    if (!unread.empty() && *unread.begin() == ',') {
+    if (unread.filled() && *unread.begin() == ',') {
       ln.new_char();
       ln.end_token(L",");
       ++unread.Begin;
@@ -285,7 +285,7 @@ void exec_parse::block() {
 }
 
 void exec_parse::skip_whitespace(string::utf8_range &unread) {
-  while (!unread.empty() && *unread.begin() == ' ') {
+  while (unread.filled() && *unread.begin() == ' ') {
     ln.new_char();
     ++unread.Begin;
   }
@@ -299,11 +299,12 @@ string exec_parse::read_quoted(string::utf8_range &unread) {
   string::utf8_range whole = unread;
   bool double_dquote = true;
   do {
-    while (!unread.empty() && *unread.begin() != '"')
+    while (unread.filled() && *unread.begin() != '"')
       ++unread.Begin;
     
-    if (++unread.Begin >= unread.end()) {
-      if (unread.end()[-1] != '"')
+    gott::utf8_t saved = *unread.Begin++;
+    if (!unread.filled()) {
+      if (saved != '"')
         throw tdl::mismatch(ln.where);
       break;
     }
@@ -341,11 +342,11 @@ string exec_parse::read_paren(string::utf8_range &unread) {
 
   ++unread.Begin; // skip (
 
-  for (; !unread.empty() && !balance; ++unread.Begin) 
+  for (; unread.filled() && !balance; ++unread.Begin) 
     balance(*unread.begin());
 
   gott::string_buffer result = string(range(whole.begin(), unread.begin()));
-  if (unread.empty() && !balance) { // multi-line
+  if (!unread.filled() && !balance) { // multi-line
     result += newline;
     char c;
     while (!balance && stream.get(c)) {
@@ -355,6 +356,8 @@ string exec_parse::read_paren(string::utf8_range &unread) {
       balance(c);
     }
   }
+  if (!balance)
+    throw tdl::mismatch(ln.where);
   ln.end_token(result);
   return result;
 }
@@ -369,7 +372,7 @@ string exec_parse::read_string(string::utf8_range &unread) {
     return read_paren(unread);
 
   string::utf8_range::value_type start = unread.begin();
-  while (!unread.empty() && !border(*unread.begin()))
+  while (unread.filled() && !border(*unread.begin()))
     ++unread.Begin;
   
   ln.add_char(unread.begin() - start);

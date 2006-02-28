@@ -121,10 +121,19 @@ template<class T> struct range_t {
   }
 
   /**
-   * Check if the range is empty.
+   * Check if the range is empty. Check if you are rather interested in
+   * filled().
    */
   bool empty() const {
     return begin() == end();
+  }
+
+  /**
+   * Check if the range contains data if used with data.begin < data.end
+   * conventions. This is not the opposite of empty().
+   */
+  bool filled() const {
+    return begin() < end();
   }
 };
 
