@@ -430,7 +430,7 @@ void object::test<20>(int) {
   try {
     parse(data);
   } catch (tdl::mismatch const &m) {
-    ensure_equals(m.what(), "0:1 : mismatch after token");
+    ensure_equals(m.what(), std::string("0:1 : mismatch after token "));
     return;
   }
   fail();
