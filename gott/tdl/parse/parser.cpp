@@ -211,12 +211,13 @@ void exec_parse::normal_line(string const &s) {
     }
   
     if (*unread.begin() == '`') {
+      started_document = true;
       block();
       break;
     }
     
-    parse.node(read_string(unread));
     started_document = true;
+    parse.node(read_string(unread));
 
     skip_whitespace(unread);
     

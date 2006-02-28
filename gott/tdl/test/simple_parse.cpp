@@ -415,11 +415,14 @@ void object::test<18>(int) {
 
 template<> template<>
 void object::test<19>(int) {
-  std::istringstream data("`\n  foo\n bar");
+  std::istringstream data("`\n  foo\n bar\n qux");
   parse(data);
   B(); D();
     N("foo\n");
-    D(); N("bar"); U();
+    D();
+      N("bar");
+      N("qux");
+    U();
   U(); E();
   ensure_equals(range(ev), range(xp));
 }
