@@ -446,6 +446,7 @@ void object::test<21>(int) {
     parse(data);
   } catch (tdl::mismatch const &m) {
     ensure_equals(m.what(), std::string("1:1 : mismatch after token x"));
+    return;
   }
   fail();
 }
