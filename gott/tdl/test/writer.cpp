@@ -89,11 +89,12 @@ TEST(6, "(x\n y,z)", "(x\n y,z)")
 TEST(7, "\"(\"\n)", "\"(\"\n)")
 TEST(8, "`\n  x\n  y", "`\n    x\n    y")
 TEST(9, "a `\n  bar\n foo", "a\n  `\n      bar\n  foo")
+TEST(10, "`\n  a\n b", "`\n    a\n  b")
 
 // TODO: add impossible tests
 
 template<> template<> void object::test
-<10>(int) { no_test(); }
+<11>(int) { no_test(); }
 
 
 }

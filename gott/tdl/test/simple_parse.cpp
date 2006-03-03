@@ -439,10 +439,21 @@ void object::test<20>(int) {
   fail();
 }
 
+template<> template<>
+void object::test<21>(int) {
+  std::istringstream data("x (");
+  try {
+    parse(data);
+  } catch (tdl::mismatch const &m) {
+    ensure_equals(m.what(), std::string("1:1 : mismatch after token x"));
+  }
+  fail();
+}
+
 // TODO: add non-TDL input tests
 
 template<> template<>
-void object::test<21>(int) {
+void object::test<22>(int) {
   no_test();
 }
 
