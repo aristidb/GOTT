@@ -40,6 +40,7 @@
 
 #include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>
+#include <gott/xany/xany.hpp>
 #include <sigc++/signal.h>
 #include <map>
 #include <boost/noncopyable.hpp>
@@ -48,16 +49,17 @@ namespace gott {
 namespace events {
 
 class main_loop;
+class inprocess_message_manager;
 
 /**
  * Feature for main_loops able to deal with operating system signals.
  */
-class GOTT_EXPORT signal_manager : boost::noncopyable {
+class GOTT_EXPORT signal_manager : boost::noncopyable, public sigc::trackable {
 public:
   /// Constructor.
-  signal_manager();
-  /// Pure virtual destructor.
-  virtual ~signal_manager() = 0;
+  signal_manager(inprocess_message_manager *);
+  /// Destructor.
+  ~signal_manager();
 
   static QID const qid;
 
@@ -66,7 +68,7 @@ public:
    * associated to a single main_loop or signal_manager - or a 
    * std::runtime_error will be thrown.
    */
-  virtual sigc::signal1<void, int> &on_signal(int sig) = 0;
+  sigc::signal1<void, int> &on_signal(int sig);
 
 public:
   class GOTT_LOCAL proxy_t : boost::noncopyable {
@@ -86,14 +88,18 @@ public:
 
   GOTT_LOCAL static proxy_t *make_proxy() { return new proxy_t; }
 
-protected:
-  virtual void immediate_action(int sig) = 0;
-
+private:
   static void register_signal(int sig, signal_manager *handler) GOTT_LOCAL;
   static void unregister_all(signal_manager *handler) GOTT_LOCAL;
   static signal_manager *find(int sig) GOTT_LOCAL;
-private:
   static void signal_handler(int sig) GOTT_LOCAL;
+
+  void immediate_action(int sig);
+  void receive_message(gott::xany::Xany const &);
+
+private:
+  inprocess_message_manager *message_manager;
+  std::map<int, sigc::signal1<void, int> > handlers;
 };
 
 }}

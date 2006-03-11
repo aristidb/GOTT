@@ -37,13 +37,16 @@
 
 #include "selfpipe_message_manager.hpp"
 #include <gott/syswrap/pipe_unix.hpp>
+#include <gott/syswrap/read_write_unix.hpp>
+#include <boost/bind.hpp>
 
 using gott::events::selfpipe_message_manager;
+using gott::xany::Xany;
 
 selfpipe_message_manager::selfpipe_message_manager(fd_manager *fdm) {
   pipe_unix(selfpipe);
   fdm->add_fd(selfpipe[0], fd_manager::read, 
-      boost::bind(&selfpipe_mesage_manager::notify_in, this), false);
+      boost::bind(&selfpipe_message_manager::notify_in, this), false);
 }
 
 selfpipe_message_manager::~selfpipe_message_manager() {
@@ -52,4 +55,13 @@ selfpipe_message_manager::~selfpipe_message_manager() {
 }
 
 void selfpipe_message_manager::notify_in() {
+  Xany *pv;
+  read_unix(selfpipe[0], &pv, sizeof(pv));
+  on_receive_.emit(*pv);
+}
+
+void selfpipe_message_manager::send(Xany const &v) {
+  Xany *pv = new Xany(v);
+  outgoing.reset(pv);
+  write_unix(selfpipe[1], &pv, sizeof(pv));
 }

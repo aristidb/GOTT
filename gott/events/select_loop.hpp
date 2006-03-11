@@ -52,7 +52,8 @@
 #include "main_loop.hpp"
 #include "fd_manager.hpp"
 #include "timer_manager.hpp"
-#include "sigselfpipe.hpp"
+#include "selfpipe_message_manager.hpp"
+#include "signal_manager.hpp"
 
 namespace gott{namespace events{
 
@@ -61,8 +62,9 @@ namespace gott{namespace events{
  * Not copyable.
  */
 class GOTT_EXPORT select_loop 
-    : boost::noncopyable,
-      public main_loop, public fd_manager, public standard_timer_manager {
+    : public main_loop,
+      public fd_manager, 
+      public standard_timer_manager {
 private:
   struct GOTT_LOCAL handler {
     boost::function<void (unsigned)> callback;
@@ -73,7 +75,6 @@ private:
   std::set<int> wait_fds;
   callback_map callbacks;
   bool running;
-  ::boost::optional<sigselfpipe> sigmgr;
 
 public:
   select_loop();
@@ -82,10 +83,6 @@ public:
   void add_fd(int, unsigned, boost::function<void (unsigned)> const &, 
       bool = true);
   void remove_fd(int);
-
-  sigc::signal1<void,int> &on_signal(int sig) {
-    return feature<signal_manager>().on_signal(sig);
-  }
 
   void run();
   void quit_local();

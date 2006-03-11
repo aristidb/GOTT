@@ -40,20 +40,27 @@
 
 #include "inprocess_message_manager.hpp"
 #include "fd_manager.hpp"
+#include <boost/thread/tss.hpp>
 
 namespace gott {
 namespace events {
 
 class GOTT_EXPORT selfpipe_message_manager : public inprocess_message_manager {
 public:
-  selfpipe_message_manager(fd_manager &fdm);
+  selfpipe_message_manager(fd_manager *fdm);
   ~selfpipe_message_manager();
 
   void send(gott::xany::Xany const &);
-  sigc::signal1<void, gott::xany::Xany const &> &on_receive();
+  GOTT_LOCAL
+  sigc::signal1<void, gott::xany::Xany const &> &on_receive() {
+    return on_receive_;
+  }
 
 private:
   int selfpipe[2];
+  sigc::signal1<void, gott::xany::Xany const &> on_receive_;
+  boost::thread_specific_ptr<gott::xany::Xany> outgoing;
+
   GOTT_LOCAL void notify_in();
 };
 

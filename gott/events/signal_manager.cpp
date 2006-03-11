@@ -37,46 +37,82 @@
 
 #include "signal_manager.hpp"
 #include "main_loop.hpp"
+#include "inprocess_message_manager.hpp"
 #include <stdexcept>
 #include <signal.h>
 #include <map>
 
 using gott::events::signal_manager;
+using gott::xany::Xany;
 
-signal_manager::signal_manager() {}
-signal_manager::~signal_manager() {}
+signal_manager::signal_manager(inprocess_message_manager *mm)
+: message_manager(mm) {
+  message_manager->on_receive().connect(
+      sigc::mem_fun(this, &signal_manager::receive_message));
+}
+signal_manager::~signal_manager() {
+  unregister_all(this);
+}
 
 gott::QID const signal_manager::qid("gott::events::signal_manager");
 
+sigc::signal1<void, int> &signal_manager::on_signal(int sig) {
+  std::map<int, sigc::signal1<void, int> >::iterator pos = handlers.find(sig);
+  if (pos == handlers.end()) {
+    register_signal(sig, this);
+    return handlers[sig];
+  }
+  return pos->second;
+}
+
 namespace {
   typedef std::map<int, signal_manager *> handler_map;
-  handler_map handlers;
+  handler_map sys_handlers;
 }
 
 void signal_manager::register_signal(int sig, signal_manager *handler) {
-  if (handlers.find(sig) != handlers.end())
+  if (sys_handlers.find(sig) != sys_handlers.end())
     throw std::runtime_error(
         "cannot register more than one signal_manager per signal");
-  handlers[sig] = handler;
+  sys_handlers[sig] = handler;
   signal(sig, signal_handler);
 }
 
 void signal_manager::unregister_all(signal_manager *handler) {
-  handler_map::iterator it = handlers.begin();
-  while (it != handlers.end())
+  handler_map::iterator it = sys_handlers.begin();
+  while (it != sys_handlers.end())
     if (it->second == handler) {
       handler_map::iterator del = it++;
-      handlers.erase(del);
+      sys_handlers.erase(del);
     } else
       ++it;
 }
 
 signal_manager *signal_manager::find(int sig) {
-  return handlers[sig];
+  return sys_handlers[sig];
 }
 
 void signal_manager::signal_handler(int sig) {
   find(sig)->immediate_action(sig);
+}
+
+namespace {
+  struct signal_msg { 
+    int sig; 
+    bool operator==(signal_msg const &o) const { return sig == o.sig; };
+  };
+}
+
+void signal_manager::immediate_action(int sig) {
+  signal_msg s = { sig };
+  message_manager->send(Xany(s));
+}
+
+void signal_manager::receive_message(Xany const &m) {
+  if (m.compatible<signal_msg>()) {
+    int sig = xany::Xany_cast<signal_msg>(m).sig;
+    handlers[sig].emit(sig);
+  }
 }
 
 void signal_manager::proxy_t::operator() (main_loop &m) const {

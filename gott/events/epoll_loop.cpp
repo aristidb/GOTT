@@ -36,7 +36,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "epoll_loop.hpp"
-#include "sigselfpipe.hpp"
 #include <gott/string/qid.hpp>
 #include <gott/syswrap/epoll_linux.hpp>
 #include <gott/syswrap/scoped_unix_file.hpp>
@@ -54,7 +53,10 @@ using gott::events::epoll_loop;
 
 class epoll_loop::impl {
 public:
-  impl() : running(false), epoll_conn(epoll_create_linux(1024)) {}
+  impl() 
+    : running(false),
+    epoll_conn(epoll_create_linux(1024))
+  {}
 
   bool running;
   scoped_unix_file epoll_conn;
@@ -70,8 +72,6 @@ public:
   std::map<int, fd_entry> fd_map;
   std::set<int> wait_fds;
 
-  boost::optional<sigselfpipe> sigmgr;
-
   class entry {
     epoll_event event;
     boost::function<void ()> read, write, exception;
@@ -81,7 +81,7 @@ public:
 
 
 epoll_loop::epoll_loop() 
-: p(new impl) {}
+: p(new impl), message_mgr(this), sig_mgr(&message_mgr) {}
 
 epoll_loop::~epoll_loop() {}
 
@@ -92,10 +92,10 @@ void epoll_loop::quit_local() {
 void *epoll_loop::do_feature(gott::QID const &qid) {
   GOTT_EVENTS_FEATURE(qid, fd_manager);
   GOTT_EVENTS_FEATURE(qid, timer_manager);
-  if (qid == signal_manager::qid) {
-    if (!p->sigmgr) p->sigmgr = boost::in_place(this);
-    return p->sigmgr.get_ptr();
-  }
+  if (qid == inprocess_message_manager::qid)
+    return &message_mgr;
+  if (qid == signal_manager::qid)
+    return &sig_mgr;
   return 0;
 }
 

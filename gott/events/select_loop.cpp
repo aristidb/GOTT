@@ -53,10 +53,6 @@ select_loop::select_loop() : running(false) {
 void *select_loop::do_feature(gott::QID const &type) {
   GOTT_EVENTS_FEATURE(type,fd_manager);
   GOTT_EVENTS_FEATURE(type,timer_manager);
-  if (type == signal_manager::qid) {
-    if (!sigmgr) sigmgr = boost::in_place(this);
-    return static_cast<signal_manager *>(sigmgr.get_ptr());
-  }
   return 0;
 }
 

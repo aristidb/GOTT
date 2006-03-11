@@ -41,6 +41,8 @@
 #include "main_loop.hpp"
 #include "fd_manager.hpp"
 #include "timer_manager.hpp"
+#include "selfpipe_message_manager.hpp"
+#include "signal_manager.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -48,8 +50,7 @@ namespace gott {
 namespace events {
 
 class GOTT_EXPORT epoll_loop
-: boost::noncopyable,
-  public main_loop,
+: public main_loop,
   public fd_manager,
   public standard_timer_manager {
 public:
@@ -69,6 +70,8 @@ private:
 private:
   class impl;
   boost::scoped_ptr<impl> p;
+  selfpipe_message_manager message_mgr;
+  signal_manager sig_mgr;
 };
 
 }}
