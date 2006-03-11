@@ -40,7 +40,7 @@
 
 #include "inprocess_message_manager.hpp"
 #include "fd_manager.hpp"
-#include <boost/thread/tss.hpp>
+#include <gott/thread/message_queue.hpp>
 
 namespace gott {
 namespace events {
@@ -59,7 +59,7 @@ public:
 private:
   int selfpipe[2];
   sigc::signal1<void, gott::xany::Xany const &> on_receive_;
-  boost::thread_specific_ptr<gott::xany::Xany> outgoing;
+  gott::thread::message_queue<gott::xany::Xany> queue;  
 
   GOTT_LOCAL void notify_in();
 };
