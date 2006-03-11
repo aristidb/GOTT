@@ -85,7 +85,7 @@ epoll_loop::epoll_loop()
 
 epoll_loop::~epoll_loop() {}
 
-void epoll_loop::quit() {
+void epoll_loop::quit_local() {
   p->running = false;
 }
 

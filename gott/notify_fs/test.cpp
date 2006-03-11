@@ -83,7 +83,7 @@ int main() {
 #endif
 #if 1
   loop->feature<signal_manager>().on_signal(SIGINT).connect(
-    boost::bind(&main_loop::quit, boost::ref(*loop)));
+    boost::bind(&main_loop::quit_local, boost::ref(*loop)));
 #endif
 #if 1
   loop->feature<timer_manager>().add_timer(

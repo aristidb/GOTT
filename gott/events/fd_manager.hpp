@@ -74,7 +74,7 @@ public:
     any = read | write | exception
   };
 
-  class GOTT_EXPORT installation_error {};
+  class GOTT_EXPORT installation_error {}; // FIXME
 
   /**
    * Add a file descriptor to watch.

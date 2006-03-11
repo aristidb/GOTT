@@ -57,7 +57,7 @@ public:
   ~epoll_loop();
 
   void run();
-  void quit();
+  void quit_local();
 
   void add_fd(int fd, unsigned mask, boost::function<void (unsigned)> const &,
       bool wait = true);

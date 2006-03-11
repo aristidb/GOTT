@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com )
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -44,6 +44,7 @@
 #include <queue>
 #include <set>
 #include <sys/select.h> 
+#include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
 #include <boost/optional/optional.hpp>
 #include <gott/visibility.hpp>
@@ -60,7 +61,8 @@ namespace gott{namespace events{
  * Not copyable.
  */
 class GOTT_EXPORT select_loop 
-    : public main_loop, public fd_manager, public standard_timer_manager {
+    : boost::noncopyable,
+      public main_loop, public fd_manager, public standard_timer_manager {
 private:
   struct GOTT_LOCAL handler {
     boost::function<void (unsigned)> callback;
@@ -73,8 +75,6 @@ private:
   bool running;
   ::boost::optional<sigselfpipe> sigmgr;
 
-  GOTT_LOCAL select_loop( select_loop const& cp );
-  GOTT_LOCAL select_loop& operator=( select_loop const& cp );
 public:
   select_loop();
   ~select_loop();
@@ -88,7 +88,7 @@ public:
   }
 
   void run();
-  void quit();
+  void quit_local();
 
 private:
   GOTT_LOCAL void *do_feature(gott::QID const &);

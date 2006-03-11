@@ -155,7 +155,7 @@ void select_loop::run(){
   running = false;
 }
 
-void select_loop::quit() {
+void select_loop::quit_local() {
   running = false;
 }
 
