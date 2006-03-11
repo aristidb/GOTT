@@ -187,6 +187,25 @@ public:
     return desire == actual;
   }
 
+  /**
+   * Empty this container and create a handle for creating a container with
+   * the same value again, using recreate(). Leaks if not fed to recreate().
+   */
+  void *release() {
+    void *result = place;
+    place = 0;
+    return result;
+  }
+
+  /**
+   * Set to value stored in handle created with release().
+   */
+  void recreate(void *p) {
+    if (place)
+      delete place;
+    place = static_cast<placeholder *>(p);
+  }
+
 private:
   struct placeholder {
     virtual ~placeholder() {}
