@@ -62,7 +62,7 @@ public:
   static QID const qid;
 
   /**
-   * Send a message to the message_queue. Thread-safe.
+   * Send a message to the main_loop. Thread-safe.
    */
   virtual void send(gott::xany::Xany const &) = 0;
   
