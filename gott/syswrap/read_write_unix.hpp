@@ -60,7 +60,7 @@ GOTT_EXPORT std::size_t read_unix(int fd, void *buf, std::size_t len);
  */
 template<class T, std::size_t len>
 std::size_t read_unix(int fd, T (&buf)[len]) {
-  return read(fd, &buf, sizeof(T) * len);
+  return read_unix(fd, &buf, sizeof(T) * len);
 }
 
 /**
@@ -80,7 +80,7 @@ GOTT_EXPORT std::size_t write_unix(int fd, void const *buf, std::size_t len);
  */
 template<class T, std::size_t len>
 std::size_t write_unix(int fd, T const (&buf)[len]) {
-  return write(fd, &buf, sizeof(T) * len);
+  return write_unix(fd, &buf, sizeof(T) * len);
 }
 
 }
