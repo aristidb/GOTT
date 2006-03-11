@@ -70,10 +70,19 @@ private:
     boost::function<void (unsigned)> callback;
     unsigned mask;
   };
-  fd_set read_fds, write_fds, except_fds;
+  struct fd_sets_t {
+    fd_sets_t() {
+      FD_ZERO(&read_fds);
+      FD_ZERO(&write_fds);
+      FD_ZERO(&except_fds);
+    }
+    fd_set read_fds, write_fds, except_fds;
+  } fd_sets;
   typedef std::map<int, handler> callback_map;
   std::set<int> wait_fds;
   callback_map callbacks;
+  selfpipe_message_manager message_mgr; 
+  signal_manager sig_mgr;
   bool running;
 
 public:

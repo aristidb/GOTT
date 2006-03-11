@@ -70,7 +70,7 @@ int main() {
   w2.on_fire().connect(boost::bind(&output, _1, 2));
 
   boost::scoped_ptr<main_loop> loop(
-#if 0
+#if 1
       new select_loop
 #else
       new epoll_loop

@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com )
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -44,15 +44,17 @@
 #include <boost/utility/in_place_factory.hpp>
 
 namespace gott{namespace events{
-select_loop::select_loop() : running(false) {
-  FD_ZERO(&read_fds);
-  FD_ZERO(&write_fds);
-  FD_ZERO(&except_fds);
+select_loop::select_loop() 
+    : message_mgr(this), sig_mgr(&message_mgr), running(false) {
 }
 
 void *select_loop::do_feature(gott::QID const &type) {
   GOTT_EVENTS_FEATURE(type,fd_manager);
   GOTT_EVENTS_FEATURE(type,timer_manager);
+  if (type == inprocess_message_manager::qid)
+    return &message_mgr;
+  if (type == signal_manager::qid)
+    return &sig_mgr;
   return 0;
 }
 
@@ -70,11 +72,11 @@ void select_loop::add_fd(int fd, unsigned mask,
   callbacks.insert(std::make_pair(fd, h));
 
   if (mask & fd_manager::read)
-    FD_SET(fd, &read_fds);
+    FD_SET(fd, &fd_sets.read_fds);
   if (mask & fd_manager::write)
-    FD_SET(fd, &write_fds);
+    FD_SET(fd, &fd_sets.write_fds);
   if (mask & fd_manager::exception)
-    FD_SET(fd, &except_fds);
+    FD_SET(fd, &fd_sets.except_fds);
 }
 
 void select_loop::remove_fd( int fd ) {
@@ -83,9 +85,9 @@ void select_loop::remove_fd( int fd ) {
     throw fd_manager::installation_error();
   wait_fds.erase(fd);
   callbacks.erase( it );
-  FD_CLR(fd,&read_fds);
-  FD_CLR(fd,&write_fds);
-  FD_CLR(fd,&except_fds);
+  FD_CLR(fd,&fd_sets.read_fds);
+  FD_CLR(fd,&fd_sets.write_fds);
+  FD_CLR(fd,&fd_sets.except_fds);
 }
 
 void select_loop::run(){
@@ -110,18 +112,21 @@ void select_loop::run(){
     if (!has_wait_timers() && wait_fds.empty())
       break;
     try {
-      num_fd = select_unix(n, &read_fds, &write_fds, &except_fds, t);
+      num_fd = select_unix(
+          n, &fd_sets.read_fds,
+          &fd_sets.write_fds, &fd_sets.except_fds,
+          t);
 
       for( callback_map::const_iterator it = callbacks.begin(), 
             e = callbacks.end(); 
          num_fd && it!=e;
          ++it)  {
         unsigned mask = 0;
-        if( FD_ISSET( it->first, &read_fds ) ) 
+        if( FD_ISSET( it->first, &fd_sets.read_fds ) ) 
           mask |= fd_manager::read;
-        if( FD_ISSET( it->first, &write_fds) )
+        if( FD_ISSET( it->first, &fd_sets.write_fds) )
           mask |= fd_manager::write;
-        if( FD_ISSET( it->first, &except_fds) ) 
+        if( FD_ISSET( it->first, &fd_sets.except_fds) ) 
           mask |= fd_manager::exception;
         if (mask) {
           --num_fd;
@@ -138,11 +143,11 @@ void select_loop::run(){
          it!=e;
          ++it)  {
       if( it->second.mask & fd_manager::write )
-        FD_SET( it->first, &write_fds );
+        FD_SET( it->first, &fd_sets.write_fds );
       if( it->second.mask & fd_manager::read )
-        FD_SET( it->first, &read_fds );
+        FD_SET( it->first, &fd_sets.read_fds );
       if( it->second.mask & fd_manager::exception )
-        FD_SET( it->first, &except_fds );
+        FD_SET( it->first, &fd_sets.except_fds );
     }
 
     n = callbacks.rbegin()->first + 1;
@@ -159,9 +164,9 @@ select_loop::~select_loop() {
   for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end();
       it!=e;
       ++it)  {
-    FD_CLR(it->first,&read_fds);
-    FD_CLR(it->first,&write_fds);
-    FD_CLR(it->first,&except_fds);
+    FD_CLR(it->first,&fd_sets.read_fds);
+    FD_CLR(it->first,&fd_sets.write_fds);
+    FD_CLR(it->first,&fd_sets.except_fds);
   }
 }
 
