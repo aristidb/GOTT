@@ -38,7 +38,6 @@
 #ifndef GOTT_BASE_EVENTS_FD_MANAGER_HPP
 #define GOTT_BASE_EVENTS_FD_MANAGER_HPP
 
-#include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/function.hpp>
@@ -56,7 +55,7 @@ class main_loop;
 class GOTT_EXPORT fd_manager {
 public:
   /// Constructor.
-  fd_manager();
+  GOTT_LOCAL fd_manager();
   /// Pure virtual destructor.
   virtual ~fd_manager() = 0;
 

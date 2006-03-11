@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is An Event Handling Class Library.
+ * The Original Code is An Event Handling Class Librar.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,14 +35,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_EVENTS_SIGNAL_MANAGER_HPP
-#define GOTT_BASE_EVENTS_SIGNAL_MANAGER_HPP
+#ifndef GOTT_EVENTS_INPROCESS_MESSAGE_MANAGER_HPP
+#define GOTT_EVENTS_INPROCESS_MESSAGE_MANAGER_HPP
 
-#include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>
-#include <sigc++/signal.h>
-#include <map>
+#include <gott/xany/xany.hpp>
 #include <boost/noncopyable.hpp>
+#include <sigc++/signal.h>
 
 namespace gott {
 namespace events {
@@ -50,50 +49,27 @@ namespace events {
 class main_loop;
 
 /**
- * Feature for main_loops able to deal with operating system signals.
+ * Feature for main_loops able to watch file descriptors (*NIX) or sockets 
+ * (*NIX + Win32).
  */
-class GOTT_EXPORT signal_manager : boost::noncopyable {
+class GOTT_EXPORT inprocess_message_manager : boost::noncopyable {
 public:
   /// Constructor.
-  signal_manager();
+  inprocess_message_manager();
   /// Pure virtual destructor.
-  virtual ~signal_manager() = 0;
+  virtual ~inprocess_message_manager() = 0;
 
   static QID const qid;
 
   /**
-   * In-program signal for signal notifications. Each signal should be 
-   * associated to a single main_loop or signal_manager - or a 
-   * std::runtime_error will be thrown.
+   * Send a message to the message_queue. Thread-safe.
    */
-  virtual sigc::signal1<void, int> &on_signal(int sig) = 0;
-
-public:
-  class GOTT_LOCAL proxy_t : boost::noncopyable {
-  public:
-    sigc::signal1<void, int> &on_signal(int sig) {
-      return db[sig];
-    }
-
-    GOTT_EXPORT void operator() (main_loop &) const;
-
-  private:
-    std::map<int, sigc::signal1<void, int> > db;
-  };
-
-  typedef boost::shared_ptr<proxy_t> proxy;
-  typedef proxy_t &proxy_ref;
-
-  GOTT_LOCAL static proxy_t *make_proxy() { return new proxy_t; }
-
-protected:
-  virtual void immediate_action(int sig) = 0;
-
-  static void register_signal(int sig, signal_manager *handler) GOTT_LOCAL;
-  static void unregister_all(signal_manager *handler) GOTT_LOCAL;
-  static signal_manager *find(int sig) GOTT_LOCAL;
-private:
-  static void signal_handler(int sig) GOTT_LOCAL;
+  virtual void send(gott::xany::Xany const &) = 0;
+  
+  /**
+   * Called whenever a message is sent.
+   */
+  virtual sigc::signal1<void, gott::xany::Xany const &> &on_receive() = 0;
 };
 
 }}

@@ -53,7 +53,7 @@ class main_loop;
 /**
  * Feature for main_loops able to deal with timer events.
  */
-class GOTT_EXPORT timer_manager {
+class GOTT_EXPORT timer_manager : boost::noncopyable {
 public:
   /// Constructor.
   timer_manager();

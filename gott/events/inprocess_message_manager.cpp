@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is An Event Handling Class Library.
+ * The Original Code is An Event Handling Class Librar.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,47 +35,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "sigselfpipe.hpp"
-#include <gott/syswrap/pipe_unix.hpp>
-#include <boost/bind.hpp>
-#include <signal.h>
-#include <gott/range_algo.hpp>
-#include <boost/optional.hpp>
-#include <boost/none.hpp>
-#include <exception>
+#include "inprocess_message_manager.hpp"
 
-using gott::events::signal_manager;
-using gott::events::sigselfpipe;
+using gott::events::inprocess_message_manager;
 
-typedef sigc::signal1<void, int> signl_t;
+gott::QID const inprocess_message_manager::qid(
+    "gott::events::inprocess_message_manager");
 
-sigselfpipe::sigselfpipe(fd_manager *fdm) {
-  pipe_unix(selfpipe);
-  fdm->add_fd(selfpipe[0], fd_manager::read, 
-      boost::bind(&sigselfpipe::notify_in, this), false);
-}
-
-sigselfpipe::~sigselfpipe() {
-  signal_manager::unregister_all(this);
-  close(selfpipe[0]);
-  close(selfpipe[1]);
-}
-
-signl_t &sigselfpipe::on_signal(int sig) {
-  std::map<int, signl_t>::iterator pos = handlers.find(sig);
-  if (pos == handlers.end()) {
-    signal_manager::register_signal(sig, this);
-    return handlers[sig];
-  }
-  return pos->second;
-}
-
-void sigselfpipe::immediate_action(int sig) {
-  write(selfpipe[1], &sig, sizeof(sig));
-}
-
-void sigselfpipe::notify_in() {
-  int sig;
-  read(selfpipe[0], &sig, sizeof(sig));
-  handlers[sig].emit(sig);
-}
+inprocess_message_manager::inprocess_message_manager() {}
+inprocess_message_manager::~inprocess_message_manager() {}
