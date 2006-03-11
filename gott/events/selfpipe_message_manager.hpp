@@ -59,7 +59,6 @@ public:
 private:
   int selfpipe[2];
   sigc::signal1<void, gott::xany::Xany const &> on_receive_;
-  gott::thread::message_queue<gott::xany::Xany> queue;  
 
   GOTT_LOCAL void notify_in();
 };

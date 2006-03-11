@@ -198,7 +198,8 @@ public:
   }
 
   /**
-   * Set to value stored in handle created with release().
+   * Set to value stored in handle created with release(). The handle will be
+   * invalid afterwards.
    */
   void recreate(void *p) {
     if (place)

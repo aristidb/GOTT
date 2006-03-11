@@ -55,12 +55,15 @@ selfpipe_message_manager::~selfpipe_message_manager() {
 }
 
 void selfpipe_message_manager::notify_in() {
-  char in[1];
-  read_unix(selfpipe[0], in);
-  on_receive_.emit(queue.pop());
+  void *data[1];
+  read_unix(selfpipe[0], data);
+  Xany value;
+  value.recreate(data[0]);
+  on_receive_.emit(value);
 }
 
-void selfpipe_message_manager::send(Xany const &v) {
-  queue.push(v);
-  write_unix(selfpipe[1], "");
+void selfpipe_message_manager::send(Xany const &value) {
+  Xany value_copy(value);
+  void *data[1] = { value_copy.release() };
+  write_unix(selfpipe[1], data);
 }
