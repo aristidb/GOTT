@@ -104,7 +104,8 @@ void select_loop::run(){
     if (has_timers()) {
       boost::posix_time::time_duration td = time_left();
       next_event.tv_sec = td.total_seconds();
-      next_event.tv_usec = td.fractional_seconds();
+      next_event.tv_usec = 
+        td.fractional_seconds() / (time_duration::ticks_per_second() / 1000000);
       t = &next_event;
     } else
       t = 0;
