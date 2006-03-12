@@ -42,6 +42,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/function.hpp>
+#include <boost/optional/optional.hpp>
+#include <boost/none.hpp>
 #include <deque>
 #include <algorithm>
 
@@ -107,6 +109,20 @@ public:
   Message pop() {
     boost::mutex::scoped_lock lock(monitor_lock);
     wait_for_data_u(lock);
+    Message result = pop_u();
+    slot_free_u();
+    return result;
+  }
+
+  /**
+   * Get and remove the first message of this queue if available.
+   * Does not block.
+   * \return The removed message if any.
+   */
+  ::boost::optional<Message> pop_nonblock() {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    if (empty_u())
+      return boost::none;
     Message result = pop_u();
     slot_free_u();
     return result;
