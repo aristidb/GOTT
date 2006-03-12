@@ -58,8 +58,13 @@
 namespace gott{namespace events{
 
 /**
- * Encapsulates a main loop that uses select to dispatch events.
- * Not copyable.
+ * A main_loop implementation that uses select to dispatch events.
+ *
+ * Features:
+ *  - gott::events::fd_manager
+ *  - gott::events::timer_manager
+ *  - gott::events::inprocess_message_manager
+ *  - gott::events::signal_manager
  */
 class GOTT_EXPORT select_loop 
     : public main_loop,

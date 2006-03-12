@@ -49,6 +49,15 @@
 namespace gott {
 namespace events {
 
+/**
+ * A main_loop implementation using on epoll(4) which is specific to Linux 2.6.
+ *
+ * Features:
+ *  - gott::events::fd_manager
+ *  - gott::events::timer_manager
+ *  - gott::events::inprocess_message_manager
+ *  - gott::events::signal_manager
+ */
 class GOTT_EXPORT epoll_loop
 : public main_loop,
   public fd_manager,
