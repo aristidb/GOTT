@@ -45,7 +45,7 @@
 using gott::events::signal_manager;
 using gott::xany::Xany;
 
-signal_manager::signal_manager(inprocess_message_manager *mm)
+signal_manager::signal_manager(sigsafe_message_manager *mm)
 : message_manager(mm) {
   message_manager->on_receive().connect(
       sigc::mem_fun(this, &signal_manager::receive_message));
@@ -105,7 +105,7 @@ namespace {
 
 void signal_manager::immediate_action(int sig) {
   signal_msg s = { sig };
-  message_manager->sig_send(Xany(s));
+  message_manager->send(Xany(s));
 }
 
 void signal_manager::receive_message(Xany const &m) {

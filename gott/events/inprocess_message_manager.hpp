@@ -67,15 +67,16 @@ public:
   virtual void send(gott::xany::Xany const &) = 0;
 
   /**
-   * Send a message to the main_loop from a signal handler.
-   */
-  virtual void sig_send(gott::xany::Xany const &) = 0;
-  
-  /**
    * Called whenever a message is sent.
    */
   virtual sigc::signal1<void, gott::xany::Xany const &> &on_receive() = 0;
 };
+
+/**
+ * An interface for implementations of inprocess_message_manager where
+ * send() is legally called from within a signal handler.
+ */
+class sigsafe_message_manager : public inprocess_message_manager {};
 
 }}
 

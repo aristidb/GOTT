@@ -48,12 +48,10 @@ namespace gott {
 namespace events {
 
 /**
- * A main_loop implementation based on gott::thread::message_queue. It has a
- * time-resolution of at least 50000 nanoseconds depending on the system.
+ * A main_loop implementation based on gott::thread::message_queue.
  *
  * Features:
  *  - gott::events::inprocess_message_manager
- *  - gott::events::signal_manager
  */
 class GOTT_EXPORT message_queue_loop 
 : public main_loop, public inprocess_message_manager {
@@ -77,10 +75,8 @@ private:
 
 private:
   bool running;
-  gott::thread::message_queue<gott::xany::Xany> queue, sig_queue;
+  gott::thread::message_queue<gott::xany::Xany> queue;
   sigc::signal1<void, gott::xany::Xany const &> on_receive_;
-
-  signal_manager sig_mgr;
 };
 
 }}

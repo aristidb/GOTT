@@ -39,30 +39,31 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <sys/time.h>
-#include <signal.h>
+#include <boost/thread/thread.hpp>
 #include <iostream>
+#include <unistd.h>
 
-void timer(gott::events::main_loop &) {
-  std::cout << boost::posix_time::microsec_clock::local_time() << std::endl;
+void timer(gott::xany::Xany const &x, gott::events::main_loop &m) {
+  if (x == gott::xany::Xany(0))
+    m.quit_local();
+  std::cout << x << ' ' << 
+    boost::posix_time::microsec_clock::local_time() << std::endl;
+}
+
+void pulse(gott::events::main_loop &m) {
+  for (int i = 10; i >= 0; --i) {
+    m.feature<gott::events::inprocess_message_manager>().send(
+        gott::xany::Xany(i));
+    sleep(1);
+  }
 }
 
 int main() {
   boost::scoped_ptr<gott::events::main_loop> m(
     new gott::events::message_queue_loop);
-  m->feature<gott::events::signal_manager>().on_signal(SIGALRM).connect(
-      boost::bind(&timer, boost::ref(*m)));
-  m->feature<gott::events::signal_manager>().on_signal(SIGINT).connect(
-      boost::bind(&gott::events::main_loop::quit_local, boost::ref(*m)));
-  itimerval timer;
-  timer.it_interval.tv_sec = 10;
-  timer.it_interval.tv_usec = 0;
-  timer.it_value.tv_sec = 10;
-  timer.it_value.tv_usec = 0;
-  
-  if (setitimer(ITIMER_REAL, &timer, 0) == -1)
-    std::cerr << "Problem!\n";
-  raise(SIGALRM);
+  m->feature<gott::events::inprocess_message_manager>().on_receive().connect(
+      boost::bind(&timer, _1, boost::ref(*m)));
+  boost::thread(boost::bind(&pulse, boost::ref(*m)));
   m->run();
   std::cout << "Done!" << std::endl;
 }

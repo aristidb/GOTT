@@ -49,7 +49,7 @@ namespace gott {
 namespace events {
 
 class main_loop;
-class inprocess_message_manager;
+class sigsafe_message_manager;
 
 /**
  * Feature for main_loops able to deal with operating system signals.
@@ -60,7 +60,7 @@ public:
    * Constructor.
    * \param message_manager Message manager to send signal information over. 
    */
-  signal_manager(inprocess_message_manager *message_manager);
+  signal_manager(sigsafe_message_manager *message_manager);
   /// Destructor.
   ~signal_manager();
 
@@ -101,7 +101,7 @@ private:
   void receive_message(gott::xany::Xany const &);
 
 private:
-  inprocess_message_manager *message_manager;
+  sigsafe_message_manager *message_manager;
   std::map<int, sigc::signal1<void, int> > handlers;
 };
 

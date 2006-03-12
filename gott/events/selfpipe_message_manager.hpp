@@ -44,7 +44,7 @@
 namespace gott {
 namespace events {
 
-class GOTT_EXPORT selfpipe_message_manager : public inprocess_message_manager {
+class GOTT_EXPORT selfpipe_message_manager : public sigsafe_message_manager {
 public:
   selfpipe_message_manager(fd_manager *fdm);
   ~selfpipe_message_manager();

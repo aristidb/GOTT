@@ -42,7 +42,7 @@ using gott::events::message_queue_loop;
 using gott::xany::Xany;
 
 message_queue_loop::message_queue_loop() 
-  : running(false), sig_mgr(this) {}
+  : running(false) {}
 message_queue_loop::~message_queue_loop() {}
 
 void message_queue_loop::quit_local() {
@@ -51,35 +51,15 @@ void message_queue_loop::quit_local() {
 
 void message_queue_loop::run() {
   running = true;
-  while (running) {
-    while (queue.empty() && sig_queue.empty()) {
-      struct timespec dur;
-      dur.tv_sec = 0;
-      dur.tv_nsec = 50000;
-      nanosleep(&dur, 0);
-    }
-    boost::optional<Xany> sigmsg = sig_queue.pop_nonblock();
-    if (sigmsg) {
-      on_receive_.emit(*sigmsg);
-      continue;
-    }
-    boost::optional<Xany> normalmsg = queue.pop_nonblock();
-    if (normalmsg)
-      on_receive_.emit(*normalmsg);
-  }
+  while (running)
+    on_receive_.emit(queue.pop());
 }
 
 void message_queue_loop::send(Xany const &val) {
   queue.push(val);
 }
 
-void message_queue_loop::sig_send(Xany const &val) {
-  sig_queue.push(val);
-}
-
 void *message_queue_loop::do_feature(gott::QID const &qid) {
   GOTT_EVENTS_FEATURE(qid,inprocess_message_manager);
-  if (qid == signal_manager::qid)
-    return &sig_mgr;
   return 0;
 }
