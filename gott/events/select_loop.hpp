@@ -68,14 +68,14 @@ namespace gott{namespace events{
  */
 class GOTT_EXPORT select_loop 
     : public main_loop,
-      public fd_manager, 
-      public standard_timer_manager {
+      private fd_manager, 
+      private standard_timer_manager {
 private:
   struct GOTT_LOCAL handler {
     boost::function<void (unsigned)> callback;
     unsigned mask;
   };
-  struct fd_sets_t {
+  struct GOTT_LOCAL fd_sets_t {
     fd_sets_t() {
       FD_ZERO(&read_fds);
       FD_ZERO(&write_fds);
@@ -94,10 +94,15 @@ public:
   select_loop();
   ~select_loop();
 
+private:
+  GOTT_LOCAL
   void add_fd(int, unsigned, boost::function<void (unsigned)> const &, 
       bool = true);
+
+  GOTT_LOCAL
   void remove_fd(int);
 
+public:
   void run();
   void quit_local();
 

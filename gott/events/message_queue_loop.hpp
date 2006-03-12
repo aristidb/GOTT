@@ -54,7 +54,7 @@ namespace events {
  *  - gott::events::inprocess_message_manager
  */
 class GOTT_EXPORT message_queue_loop 
-: public main_loop, public inprocess_message_manager {
+: public main_loop, private inprocess_message_manager {
 public:
   message_queue_loop();
   ~message_queue_loop();
@@ -62,8 +62,9 @@ public:
   void run();
   void quit_local();
 
+private:
+  GOTT_LOCAL
   void send(gott::xany::Xany const &);
-  void sig_send(gott::xany::Xany const &);
 
   GOTT_LOCAL
   sigc::signal1<void, gott::xany::Xany const &> &on_receive() {

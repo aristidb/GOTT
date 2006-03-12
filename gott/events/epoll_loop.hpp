@@ -60,8 +60,8 @@ namespace events {
  */
 class GOTT_EXPORT epoll_loop
 : public main_loop,
-  public fd_manager,
-  public standard_timer_manager {
+  private fd_manager,
+  private standard_timer_manager {
 public:
   epoll_loop();
   ~epoll_loop();
@@ -69,8 +69,12 @@ public:
   void run();
   void quit_local();
 
+private:
+  GOTT_LOCAL
   void add_fd(int fd, unsigned mask, boost::function<void (unsigned)> const &,
       bool wait = true);
+
+  GOTT_LOCAL
   void remove_fd(int fd);
 
 private:
