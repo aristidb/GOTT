@@ -65,6 +65,11 @@ public:
    * Send a message to the main_loop. Thread-safe.
    */
   virtual void send(gott::xany::Xany const &) = 0;
+
+  /**
+   * Send a message to the main_loop from a signal handler.
+   */
+  virtual void sig_send(gott::xany::Xany const &) = 0;
   
   /**
    * Called whenever a message is sent.

@@ -105,7 +105,7 @@ namespace {
 
 void signal_manager::immediate_action(int sig) {
   signal_msg s = { sig };
-  message_manager->send(Xany(s));
+  message_manager->sig_send(Xany(s));
 }
 
 void signal_manager::receive_message(Xany const &m) {

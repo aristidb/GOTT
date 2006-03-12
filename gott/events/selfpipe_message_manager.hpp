@@ -50,6 +50,8 @@ public:
   ~selfpipe_message_manager();
 
   void send(gott::xany::Xany const &);
+  void sig_send(gott::xany::Xany const &);
+
   GOTT_LOCAL
   sigc::signal1<void, gott::xany::Xany const &> &on_receive() {
     return on_receive_;

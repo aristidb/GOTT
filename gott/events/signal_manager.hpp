@@ -56,8 +56,11 @@ class inprocess_message_manager;
  */
 class GOTT_EXPORT signal_manager : boost::noncopyable, public sigc::trackable {
 public:
-  /// Constructor.
-  signal_manager(inprocess_message_manager *);
+  /**
+   * Constructor.
+   * \param message_manager Message manager to send signal information over. 
+   */
+  signal_manager(inprocess_message_manager *message_manager);
   /// Destructor.
   ~signal_manager();
 

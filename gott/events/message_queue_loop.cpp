@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "message_queue_loop.hpp"
+#include <time.h>
 
 using gott::events::message_queue_loop;
 using gott::xany::Xany;
@@ -51,13 +52,29 @@ void message_queue_loop::quit_local() {
 void message_queue_loop::run() {
   running = true;
   while (running) {
-    Xany val = queue.pop();
-    on_receive_.emit(val);
+    while (queue.empty() && sig_queue.empty()) {
+      struct timespec dur;
+      dur.tv_sec = 0;
+      dur.tv_nsec = 50000;
+      nanosleep(&dur, 0);
+    }
+    boost::optional<Xany> sigmsg = sig_queue.pop_nonblock();
+    if (sigmsg) {
+      on_receive_.emit(*sigmsg);
+      continue;
+    }
+    boost::optional<Xany> normalmsg = queue.pop_nonblock();
+    if (normalmsg)
+      on_receive_.emit(*normalmsg);
   }
 }
 
 void message_queue_loop::send(Xany const &val) {
   queue.push(val);
+}
+
+void message_queue_loop::sig_send(Xany const &val) {
+  sig_queue.push(val);
 }
 
 void *message_queue_loop::do_feature(gott::QID const &qid) {
