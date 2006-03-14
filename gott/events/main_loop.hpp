@@ -87,6 +87,7 @@ public:
     GOTT_LOCAL
     bad_feature() 
       : std::runtime_error("Requested main_loop feature not available") {}
+    ~bad_feature() throw();
     friend class main_loop;
   };
 

@@ -55,7 +55,7 @@ void message_queue_loop::run() {
     on_receive_.emit(queue.pop());
 }
 
-void message_queue_loop::send(Xany const &val) {
+void message_queue_loop::send(Xany const &val) throw() {
   queue.push(val);
 }
 

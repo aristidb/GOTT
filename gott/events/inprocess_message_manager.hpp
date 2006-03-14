@@ -64,7 +64,7 @@ public:
   /**
    * Send a message to the main_loop. Thread-safe.
    */
-  virtual void send(gott::xany::Xany const &) = 0;
+  virtual void send(gott::xany::Xany const &) throw() = 0;
 
   /**
    * Called whenever a message is sent.

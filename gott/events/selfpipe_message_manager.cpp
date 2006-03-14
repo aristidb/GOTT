@@ -62,7 +62,7 @@ void selfpipe_message_manager::notify_in() {
   on_receive_.emit(value);
 }
 
-void selfpipe_message_manager::send(Xany const &value) {
+void selfpipe_message_manager::send(Xany const &value) throw() {
   Xany value_copy(value);
   void *data[1] = { value_copy.release() };
   write_unix(selfpipe[1], data);

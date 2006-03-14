@@ -49,7 +49,7 @@ public:
   selfpipe_message_manager(fd_manager *fdm);
   ~selfpipe_message_manager();
 
-  void send(gott::xany::Xany const &);
+  void send(gott::xany::Xany const &) throw();
   void sig_send(gott::xany::Xany const &);
 
   GOTT_LOCAL

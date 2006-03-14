@@ -64,7 +64,7 @@ public:
 
 private:
   GOTT_LOCAL
-  void send(gott::xany::Xany const &);
+  void send(gott::xany::Xany const &) throw();
 
   GOTT_LOCAL
   sigc::signal1<void, gott::xany::Xany const &> &on_receive() {
