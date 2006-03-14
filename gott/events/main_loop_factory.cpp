@@ -54,3 +54,15 @@ bool main_loop_factory::try_add_feature(QID const &) {
   //TODO implement me
   return false;
 }
+
+/*
+ * I think I shall sketch the way this class works or at least how I imagine it
+ * to work.
+ * First there is a std::list of all main_loop implementations in order of 
+ * preference and their supported features (and stuff).
+ * For every requested feature all implementations that do not support it are
+ * removed from the list.
+ * Except: If there is only one element on the list left, say no.
+ *
+ * This might need better thinking but this information should be valuable.
+ */
