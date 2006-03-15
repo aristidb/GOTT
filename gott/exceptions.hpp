@@ -55,16 +55,19 @@ private:
 };
 
 class GOTT_EXPORT internal_error : public exception {
+public:
   explicit internal_error(gott::string const &desc) throw();
   ~internal_error() throw();
 };
 
 class GOTT_EXPORT user_error : public exception {
+public:
   explicit user_error(gott::string const &desc) throw();
   ~user_error() throw();
 };
 
 class GOTT_EXPORT system_error : public exception {
+public:
   explicit system_error(gott::string const &desc) throw();
   ~system_error() throw();
 };
