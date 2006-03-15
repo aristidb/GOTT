@@ -40,6 +40,7 @@
 
 #include <gott/visibility.hpp>
 #include <unistd.h>
+#include <limits.h>
 
 namespace gott {
 /**

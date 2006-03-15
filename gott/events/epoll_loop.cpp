@@ -39,7 +39,7 @@
 #include <gott/string/qid.hpp>
 #include <gott/syswrap/epoll_linux.hpp>
 #include <gott/syswrap/scoped_unix_file.hpp>
-#include <gott/syswrap/system_error.hpp>
+#include <gott/exceptions.hpp>
 #include <gott/syswrap/errno.hpp>
 #include <errno.h>
 #include <set>

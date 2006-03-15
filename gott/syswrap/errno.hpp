@@ -39,7 +39,7 @@
 #define GOTT_SYSWRAP_ERRNO_HPP
 
 #include <gott/visibility.hpp>
-#include "system_error.hpp"
+#include <gott/exceptions.hpp>
 
 namespace gott {
 

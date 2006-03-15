@@ -39,7 +39,7 @@
 #include "../watch.hpp"
 #include <gott/syswrap/read_write_unix.hpp>
 #include <gott/syswrap/inotify_linux.hpp>
-#include <gott/syswrap/system_error.hpp>
+#include <gott/exceptions.hpp>
 #include <algorithm>
 #include <unistd.h>
 

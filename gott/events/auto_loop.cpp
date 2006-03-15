@@ -37,7 +37,7 @@
 
 #include "auto_loop.hpp"
 #include "loop_requirement.hpp"
-#include <stdexcept>
+#include <gott/exceptions.hpp>
 
 using gott::events::auto_loop;
 using gott::events::main_loop;
@@ -73,7 +73,7 @@ auto_loop::thread_descriptor auto_loop::add(loop_requirement const &) {
 sigc::signal1<void, main_loop &> &
 auto_loop::before_run(thread_descriptor const &) {
   // TODO implement me
-  throw 0;
+  throw internal_error("gott::events::auto_loop is not functional");
 }
 
 bool auto_loop::try_feature(QID const &, loop_requirement const *) {

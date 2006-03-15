@@ -40,11 +40,11 @@
 
 #include "promote.hpp"
 #include <gott/string/string.hpp>
+#include <gott/exceptions.hpp>
 #include <typeinfo>
 #include <algorithm>
 #include <boost/type_traits.hpp>
 #include <cstddef>
-#include <stdexcept>
 #include <iosfwd>
 
 #include <gott/visibility.hpp>
@@ -249,7 +249,7 @@ template<class T>
 typename promote<T>::reference
 Xany_cast_ref(Xany &p) {
   if (p.empty() || p.type() != typeid(typename promote<T>::type))
-    throw std::bad_cast();
+    throw gott::user_error("Xany: incompatible type");
   return promote<T>::get_back(static_cast<typename
    Xany::template holder<typename promote<T>::type>*>(p.place)->value);
 }

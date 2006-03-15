@@ -36,11 +36,9 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "errno.hpp"
-
 #include <errno.h>
 #include <string.h>
-
-#include <string>
+#include <gott/string/string.hpp>
 
 using gott::errno_exception;
 
@@ -51,7 +49,7 @@ void gott::throw_errno_exception() {
 }
 
 namespace {
-  std::string desc(int n) {
+  gott::string desc(int n) {
     return strerror(n); // TODO threadsafe?
   }
 }
