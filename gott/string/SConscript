@@ -15,7 +15,7 @@
 #
 # The Initial Developer of the Original Code is
 # Aristid Breitkreuz (aribrei@arcor.de).
-# Portions created by the Initial Developer are Copyright (C) 2005
+# Portions created by the Initial Developer are Copyright (C) 2005-2006
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
@@ -39,10 +39,11 @@ import glob
 
 Import('env')
 
-env.SharedLibrary('string', glob.glob('*.cpp'))
-env = env.Copy()
-env.Append(LIBS = ['string'])
-
-Export('env')
+## Now in gott_fundamentals
+#env.SharedLibrary('string', glob.glob('*.cpp'))
+#env = env.Copy()
+#env.Append(LIBS = ['string'])
+#
+#Export('env')
 
 env.Program('string_test', glob.glob('test/*.cpp'))
