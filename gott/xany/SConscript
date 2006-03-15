@@ -35,10 +35,11 @@
 #
 # ***** END LICENSE BLOCK *****
 
-Import('env')
+## Now in gott_fundamentals
+#Import('env')
 
-env.SharedLibrary('xany', 'xany.cpp')
-env = env.Copy()
-env.Append(LIBS = ['xany'])
+#env.SharedLibrary('xany', 'xany.cpp')
+#env = env.Copy()
+#env.Append(LIBS = ['xany'])
 
-Export('env')
+#Export('env')
