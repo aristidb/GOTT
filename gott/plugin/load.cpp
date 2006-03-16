@@ -36,6 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "load.hpp"
+#include <gott/exceptions.hpp>
+#include <gott/string/string.hpp>
 
 using gott::string;
 using gott::plugin::plugin_base;
@@ -49,7 +51,7 @@ plugin_base *gott::plugin::load_plugin(
     system_configuration &/*sysc*/,
     plugin_configuration const &/*plgc*/) {
   //TODO implement me
-  throw 0;
+  throw internal_error("unimplemented");
 }
 
 void gott::plugin::unload_plugin(plugin_base *) {

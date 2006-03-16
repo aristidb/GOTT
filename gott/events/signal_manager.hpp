@@ -69,7 +69,7 @@ public:
   /**
    * In-program signal for signal notifications. Each signal should be 
    * associated to a single main_loop or signal_manager - or a 
-   * std::runtime_error will be thrown.
+   * user_error will be thrown.
    */
   sigc::signal1<void, int> &on_signal(int sig);
 

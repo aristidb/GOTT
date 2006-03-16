@@ -61,7 +61,7 @@ void *select_loop::do_feature(gott::QID const &type) {
 void select_loop::add_fd(int fd, unsigned mask, 
     boost::function<void (unsigned)> const &fun, bool wait) {
   if (callbacks.find(fd) != callbacks.end())
-    throw fd_manager::installation_error();
+    throw system_error("could not add fd");
 
   if (wait)
     wait_fds.insert(fd);
@@ -82,7 +82,7 @@ void select_loop::add_fd(int fd, unsigned mask,
 void select_loop::remove_fd( int fd ) {
   callback_map::iterator it = callbacks.find( fd );
   if (it == callbacks.end())
-    throw fd_manager::installation_error();
+    throw system_error("could not remove fd");
   wait_fds.erase(fd);
   callbacks.erase( it );
   FD_CLR(fd,&fd_sets.read_fds);

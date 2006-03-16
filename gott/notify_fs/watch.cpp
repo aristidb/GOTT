@@ -48,6 +48,6 @@ watch::watch(gott::string const &path, gott::notify_fs::ev_t mask)
 watch_implementation::~watch_implementation() {}
 
 watch_installation_failure::watch_installation_failure(gott::string const &file)
-: std::runtime_error("Failed to install watch for " + file) {}
+: system_error("Failed to install watch for " + file) {}
 
 watch_installation_failure::~watch_installation_failure() throw() {}

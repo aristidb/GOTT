@@ -1,7 +1,5 @@
 .
 tdl
-xany
-string
 plugin
 events
 configuration

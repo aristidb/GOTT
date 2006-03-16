@@ -41,5 +41,3 @@ using gott::events::main_loop;
 
 main_loop::main_loop() {}
 main_loop::~main_loop() {}
-
-main_loop::bad_feature::~bad_feature() throw() {}

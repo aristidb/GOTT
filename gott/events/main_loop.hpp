@@ -38,9 +38,9 @@
 #ifndef GOTT_BASE_EVENTS_MAIN_LOOP_HPP
 #define GOTT_BASE_EVENTS_MAIN_LOOP_HPP
 
-#include <stdexcept>
 #include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>
+#include <gott/exceptions.hpp>
 
 namespace gott {
 namespace events {
@@ -82,38 +82,29 @@ public:
         const_cast<main_loop *>(this)->feature_ptr<T>());
   }
 
-  /// Exception thrown if a requested feature is not available.
-  class GOTT_EXPORT bad_feature : std::runtime_error {
-    GOTT_LOCAL
-    bad_feature() 
-      : std::runtime_error("Requested main_loop feature not available") {}
-    ~bad_feature() throw();
-    friend class main_loop;
-  };
-
   /**
    * Get a concrete feature of the main loop.
    * \return A pointer to the feature.
-   * \throw main_loop::bad_feature if the feature is not available.
+   * \throw user_error If the feature is not available.
    */
   template<class T>
   GOTT_LOCAL T &feature() {
     T *p = feature_ptr<T>();
     if (!p)
-      throw bad_feature();
+      throw user_error("unsupported feature");
     return *p;
   }
 
   /**
    * Get a concrete feature of the main loop.
    * \return A pointer to the feature.
-   * \throw main_loop::bad_feature if the feature is not available.
+   * \throw user_error If the feature is not available.
    */
   template<class T>
   GOTT_LOCAL T const &feature() const {
     T const *p = feature_ptr<T>();
     if (!p)
-      throw bad_feature();
+      throw user_error("unsupported feature");
     return *p;
   }
 

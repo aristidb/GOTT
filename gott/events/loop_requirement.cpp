@@ -37,6 +37,7 @@
 
 #include "loop_requirement.hpp"
 #include "main_loop_factory.hpp"
+#include <gott/exceptions.hpp>
 #include <boost/variant.hpp>
 #include <boost/tuple/tuple.hpp>
 
@@ -77,9 +78,9 @@ bool loop_requirement::do_try(main_loop_factory &x) const {
       return comb.get<0>().do_try(x) && comb.get<1>().do_try(x);
     case combine_or:
       return comb.get<0>().do_try(x) || comb.get<1>().do_try(x);
-    default: throw 0;
+    default: throw internal_error("unimplemented");
     }
   } else if (p->data.type() == typeid(impl::feature)) {
     return x.try_add_feature(boost::get<impl::feature>(p->data).get<0>());
-  } else throw 0;
+  } else throw internal_error("unimplemented");
 }

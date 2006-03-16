@@ -38,7 +38,7 @@
 #include "signal_manager.hpp"
 #include "main_loop.hpp"
 #include "inprocess_message_manager.hpp"
-#include <stdexcept>
+#include <gott/exceptions.hpp>
 #include <signal.h>
 #include <map>
 
@@ -72,7 +72,7 @@ namespace {
 
 void signal_manager::register_signal(int sig, signal_manager *handler) {
   if (sys_handlers.find(sig) != sys_handlers.end())
-    throw std::runtime_error(
+    throw user_error(
         "cannot register more than one signal_manager per signal");
   sys_handlers[sig] = handler;
   signal(sig, signal_handler);

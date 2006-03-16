@@ -41,9 +41,6 @@
 #include "types.hpp"
 #include <gott/visibility.hpp>
 #include <gott/range.hpp>
-#ifndef NO_STDLIB
-#include <stdexcept>
-#endif
 
 namespace gott {
 class string;
@@ -147,16 +144,6 @@ public:
     return begin()[i];
   }
 
-#ifndef NO_STDLIB
-  /**
-   * Return the character at a certain position of the buffer.
-   */
-  utf32_t &at(std::size_t i) {
-    if (i > size())
-      throw std::out_of_range("string_buffer::at: index out of bounds");
-  }
-#endif
-  
   /**
    * Erase a range from the buffer.
    * \param r The range to erase.

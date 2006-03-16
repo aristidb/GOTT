@@ -73,8 +73,6 @@ public:
     any = read | write | exception
   };
 
-  class GOTT_EXPORT installation_error {}; // FIXME
-
   /**
    * Add a file descriptor to watch.
    * \param fd The file descriptor of the soon watched object.
@@ -85,7 +83,7 @@ public:
    *           of the events that occurred.
    * \param wait Specifies whether the main_loop::run shall wait for the
    *           descriptor to be removed.
-   * \throw installation_error If the descriptor is already registered or
+   * \throw system_error If the descriptor is already registered or
    *           something else happens.
    */
   virtual void add_fd(int fd, unsigned mask, 
@@ -99,7 +97,7 @@ public:
    *           Determines which events are caught for this descriptor.
    * \param cb Callback called whenever an event happens on this descriptor
    *           and it is in the @p mask.
-   * \throw installation_error If the descriptor is not yet registered or
+   * \throw system_error If the descriptor is not yet registered or
    *           something else happens.
    */ 
   virtual void change_fd(int fd, unsigned mask,
@@ -109,7 +107,7 @@ public:
   /**
    * Remove a file descriptor from the set of watched objects.
    * \param fd The file descriptor of the watched objects.
-   * \throw installation_error If the registered was not registered.
+   * \throw system_error If the registered was not registered.
    */
   virtual void remove_fd(int fd) = 0;
 

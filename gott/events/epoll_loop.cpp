@@ -119,21 +119,21 @@ void epoll_loop::add_fd(int fd, unsigned mask,
   try {
     epoll_ctl_linux(p->epoll_conn.access(), EPOLL_CTL_ADD, fd, &ev);
   } catch (system_error const &) {
-    throw fd_manager::installation_error();
+    throw system_error("could not add fd");
   }
 }
 
 void epoll_loop::remove_fd(int fd) {
   std::map<int, impl::fd_entry>::iterator it = p->fd_map.find(fd);
   if (it == p->fd_map.end())
-    throw fd_manager::installation_error();
+    throw system_error("could not remove fd");
   if (it->second.wait)
     p->wait_fds.erase(fd);
   p->fd_map.erase(it);
   try {
     epoll_ctl_linux(p->epoll_conn.access(), EPOLL_CTL_DEL, fd, 0);
   } catch (system_error const &) {
-    throw fd_manager::installation_error();
+    throw system_error("could not remove fd");
   }
 }
 

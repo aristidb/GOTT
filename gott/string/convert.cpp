@@ -38,6 +38,8 @@
 #include "convert.hpp"
 #include "iterator.hpp"
 #include <gott/range_algo.hpp>
+#include <gott/exceptions.hpp>
+#include <gott/string/string.hpp>
 
 using gott::utf32_t;
 using gott::utf8_t;
@@ -57,7 +59,7 @@ utf32_t gott::to_utf32_char(char const *mbc, char const *&end, encoding enc) {
     end = mbc + 4;
     return * (utf32_t *) mbc;
   default:
-    throw 0;
+    throw internal_error("unknown encoding");
   }
 }
 
@@ -93,7 +95,7 @@ void gott::write_utf32_to_enc(utf32_t ch, char *&out, encoding enc) {
     *out++ = char(ch);
     break;
   default:
-    throw 0;
+    throw internal_error("unknown encoding");
   }
 }
 
@@ -134,7 +136,7 @@ std::size_t gott::utf32_len(range_t<char const *> const &s, encoding enc) {
   case utf32be: case utf32le:
     return s.cast<wchar_t const *>().size();
   default:
-    throw 0;
+    throw internal_error("unknown encoding");
   }
 }
 
@@ -162,7 +164,7 @@ std::size_t gott::enc_len(utf32_t ch, encoding enc) {
   case iso8859_13: case iso8859_14: case iso8859_15: case iso8859_16:
     return 1;
   default:
-    throw 0;
+    throw internal_error("unknown_encoding");
   }
 }
 
