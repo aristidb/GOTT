@@ -42,6 +42,7 @@
 #include <gott/tdl/structure/structure.hpp>
 #include <utility>
 #include <boost/scoped_ptr.hpp>
+#include <boost/function.hpp>
 
 namespace tdl {
 namespace schema {
@@ -62,12 +63,10 @@ public:
   void seek_and_forget(id const &) GOTT_EXPORT;
   void forget(id const &) GOTT_EXPORT;
 
-  struct GOTT_EXPORT acceptor {
-    virtual void operator()(ev::token const &, source_position const &) = 0;
-    virtual ~acceptor() = 0;
-  };
+  typedef boost::function<void (ev::token const &, source_position const &)>
+    acceptor;
 
-  void replay(acceptor &);
+  void replay(acceptor const &);
   bool want_replay() const;
 
   template<class T>

@@ -48,6 +48,8 @@
 #include <gott/debug/assert.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
+#include <boost/ref.hpp>
 
 //#define VERBOSE
 
@@ -73,6 +75,7 @@ public:
   void handle_event(ev::event const &, bool token);
   bool try_play(ev::event const &, item &r);
   bool handle_item(ev::event const &, bool token);
+  void inject_item(ev::token const &, source_position const &);
 
   bool consume_event(bool token);
   bool pass_event(bool token);
@@ -229,16 +232,13 @@ void match::impl::handle_token(T const &e) {
 }
 
 void match::impl::replay_buffer() {
-  struct acc : positioning::acceptor {
-    match::impl &tt;
-    void operator() (ev::token const &t, source_position const &w) {
-      tt.overwrite_where = w;
-      tt.handle_event(t, true);
-      tt.overwrite_where.reset();
-    }
-    acc(match::impl &t) : tt(t) {}
-  } a(*this);
-  pos.replay(a);
+  pos.replay(boost::bind(&impl::inject_item, boost::ref(*this), _1, _2));
+}
+
+void match::impl::inject_item(ev::token const &t, source_position const &w) {
+  overwrite_where = w;
+  handle_event(t, true);
+  overwrite_where.reset();
 }
 
 void match::impl::handle_event(ev::event const &event, bool token) {
