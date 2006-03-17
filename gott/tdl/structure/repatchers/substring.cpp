@@ -37,17 +37,17 @@
 
 #include "substring.hpp"
 #include "../repatcher_by_name.hpp"
+#include <gott/exceptions.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <boost/optional.hpp>
 #include <boost/none.hpp>
-#include <stdexcept>
 
 using tdl::structure::repatch_substring;
 using tdl::structure::writable_structure;
 
 repatch_substring::repatch_substring(long l, long r) : left(l), right(r) {
   if (left < 0)
-    throw std::invalid_argument(
+    throw gott::user_error(
         "repatch_substring: substring must begin at non-negative position");
 }
 repatch_substring::~repatch_substring() {}

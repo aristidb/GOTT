@@ -38,7 +38,7 @@
 #ifndef GOTT_UTIL_TDL_EXCEPTIONS_HPP
 #define GOTT_UTIL_TDL_EXCEPTIONS_HPP
 
-#include <gott/visibility.hpp>
+#include <gott/exceptions.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <vector>
 
@@ -48,18 +48,9 @@ class string;
 
 namespace tdl {
 
-class GOTT_EXPORT tdl_exception : public std::exception {
+class GOTT_EXPORT tdl_exception : public gott::exception {
 public:
-  tdl_exception(gott::string const &msg) GOTT_LOCAL;
-  tdl_exception(tdl_exception const &) GOTT_LOCAL;
-  ~tdl_exception() throw();
-  char const *what() const throw();
-
-private:
-  class impl;
-  boost::scoped_ptr<impl> p;
-
-  tdl_exception() GOTT_LOCAL;
+  tdl_exception(gott::string const &msg);
 };
 
 class source_position;
