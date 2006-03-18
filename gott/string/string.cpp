@@ -104,6 +104,16 @@ std::size_t string::length() const {
   return p->length;
 }
 
+char *string::c_string_alloc() const {
+  char *result = new char[size() + 1];
+  utf8_range r = as_utf8();
+  char *out = result;
+  while (r.filled())
+    *out++ = *r.Begin++;
+  *out = '\0';
+  return result;
+}
+
 #ifndef NO_STDLIB
 std::ostream &gott::operator<<(std::ostream &stream, string const &s) {
   for (utf8_t const *it = s.as_utf8().begin(); it < s.as_utf8().end(); ++it)

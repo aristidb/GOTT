@@ -302,6 +302,12 @@ public:
     return as_utf8().size();
   }
 
+  /**
+   * Get a copy of the string with zero-termination in a freshly allocated
+   * buffer.
+   */
+  char *c_string_alloc() const;
+
 private:
   class representation;
   boost::shared_ptr<representation> p;
