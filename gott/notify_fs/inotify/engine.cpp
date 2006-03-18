@@ -103,43 +103,6 @@ inotify_engine::watch_alloc(string const &path, ev_t mask, watch &w) {
   return p;
 }
 
-#if 0 // reference
-int read_events (queue_t q, int fd)
-{
-	char buffer[16384];
-	size_t buffer_i;
-	struct inotify_event *pevent, *event;
-	ssize_t r;
-	size_t event_size;
-	int count = 0;
-
-	r = read (fd, buffer, 16384);
-
-	if (r <= 0) {
-		perror ("read(fd, buffer, 16384) = ");
-		return r;
-	}
-
-	buffer_i = 0;
-	printf("read = %d\n", r);
-
-	printf("sizeof inotify_event = %d\n", sizeof(struct inotify_event));
-	while (buffer_i < r) {
-		/* Parse events and queue them ! */
-		pevent = (struct inotify_event *)&buffer[buffer_i];
-		event_size = sizeof(struct inotify_event) + pevent->len;
-		printf("pevent->len = %d\n", pevent->len);
-		event = malloc(event_size);
-		memmove(event, pevent, event_size);
-		queue_enqueue(event, q);
-		buffer_i += event_size;
-		count++;
-	}
-
-	return count;
-}
-#endif
-
 void inotify_engine::notify() {
   std::cout << "New events:" << std::endl;
   char buffer[16384];

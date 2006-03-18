@@ -38,53 +38,6 @@
 #ifndef GOTT_UTIL_TDL_EXCEPTIONS_HPP
 #define GOTT_UTIL_TDL_EXCEPTIONS_HPP
 
-#if 0
-#include <gott/exceptions.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <vector>
-
-namespace tdl {
-
-class GOTT_EXPORT tdl_exception : public gott::exception {
-public:
-  tdl_exception(gott::string const &msg);
-};
-
-class source_position;
-
-struct GOTT_EXPORT mismatch : public tdl_exception {
-  GOTT_LOCAL
-  mismatch(source_position const &p, std::vector<gott::string> const &);
-  GOTT_LOCAL
-  mismatch(source_position const &p);
-  ~mismatch() throw();
-};
-
-namespace schema {
-
-struct GOTT_EXPORT unregistered_type : public tdl_exception {
-  unregistered_type(gott::string const &type) GOTT_LOCAL;
-  ~unregistered_type() throw();
-};
-
-struct GOTT_EXPORT dont_accept : public tdl_exception {
-  dont_accept(gott::string const &desc);
-  ~dont_accept() throw();
-};
-
-}
-
-namespace structure {
-
-struct GOTT_EXPORT failed_repatch : public tdl_exception {
-  failed_repatch(gott::string const &desc);
-  ~failed_repatch() throw();
-};
-
-}
-}
-#else
-
 #include <gott/exceptions.hpp>
 #include "source_position.hpp"
 #include <boost/scoped_ptr.hpp>
@@ -116,7 +69,5 @@ private:
 };
 
 }
-
-#endif
 
 #endif

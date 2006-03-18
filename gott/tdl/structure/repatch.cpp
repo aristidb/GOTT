@@ -50,11 +50,6 @@ using structure::repatcher_chain;
 repatcher::repatcher() {}
 repatcher::~repatcher() {}
 
-#if 0
-failed_repatch::failed_repatch(gott::string const &s) : tdl_exception(s) {}
-failed_repatch::~failed_repatch() throw() {}
-#endif
-
 simple_repatcher_context::~simple_repatcher_context() {}
 
 void simple_repatcher_context::begin(source_position const &w) {
