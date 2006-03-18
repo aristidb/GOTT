@@ -98,9 +98,8 @@ void object::test<1>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (tdl::mismatch const &m) {
-    ensure_equals("correct error", gott::string(m.what()),
-      "0:1 : mismatch in document(--doc--)>named(a)>follow>node after token ");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

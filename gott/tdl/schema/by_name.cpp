@@ -57,7 +57,7 @@ public:
   abstract_rule const &get(string const &name) {
     mapping::const_iterator it = items.find(name);
     if (it == items.end())
-      throw unregistered_type(name);
+      throw tdl_error("TDL Schema type-loader", "cannot load type " + name);
     return it->second;
   }
 };

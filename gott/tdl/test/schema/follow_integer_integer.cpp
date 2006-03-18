@@ -88,9 +88,8 @@ void object::test<2>(int) {
   try {
     run_test("d7");
     fail("just string");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()),
-      "1:1 : mismatch in document(doc)>follow(foll)>node(int1) at token d7");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -99,9 +98,8 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
-     "0:1 : mismatch in document(doc)>follow(foll)>node(int1) after token ");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -110,9 +108,8 @@ void object::test<4>(int) {
   try {
     run_test("-77 foo");
     fail("followed string");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
-     "1:5 : mismatch in document(doc)>follow(foll)>node(int2) at token foo");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -121,9 +118,8 @@ void object::test<5>(int) {
   try {
     run_test("4");
     fail("just one integer");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>follow(foll) after token 4");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -132,9 +128,8 @@ void object::test<6>(int) {
   try {
     run_test("4 99,y");
     fail("follows");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", std::string(mm.what()), 
-        "1:6 : mismatch in document(doc)>follow(foll) at token y");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

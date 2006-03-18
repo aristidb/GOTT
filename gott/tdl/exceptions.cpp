@@ -36,9 +36,66 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "exceptions.hpp"
-#include <gott/range_algo.hpp>
 #include <gott/string/string.hpp>
+#include <gott/thunk.hpp>
 
-using tdl::tdl_exception;
+using tdl::tdl_error;
+using gott::string;
 
-tdl_exception::tdl_exception(gott::string const &msg) : exception(msg) {}
+class tdl_error::impl {
+public:
+  string module;
+  string problem;
+  source_position where;
+
+  impl(string m, string p, source_position const &w)
+    : module(m), problem(p), where(w) {}
+};
+
+namespace {
+  gott::string make_string(string const &module, string const &problem) {
+    string arr[] = { module, ": ", problem };
+    return string(range(arr), string::concatenate);
+  }
+
+  gott::string make_string(string const &module, string const &problem,
+      tdl::source_position const &p) {
+    string arr[] = { 
+      module, ": ", problem,
+      (p.line > p.token_line || p.column > p.token_column + p.token.length() ?
+       " after " : " at "), 
+      p.file, 
+      p.file != string() ? ", " : string(), 
+      *gott::integer_to_string<gott::utf8_t>(p.token_line),
+      ":", *gott::integer_to_string<gott::utf8_t>(p.token_column + 1),
+      " (", p.token, ")"
+    };
+    return string(range(arr), string::concatenate);
+  }
+}
+
+tdl_error::tdl_error(string const &module, string const &problem)
+  : exception(make_string(module, problem)),
+    p(new impl(module, problem, source_position())) {}
+
+tdl_error::tdl_error(string const &module, string const &problem,
+    source_position const &where)
+  : exception(make_string(module, problem, where)),
+    p(new impl(module, problem, where)) {}
+
+tdl_error::tdl_error(tdl_error const &o)
+  : gott::exception(*this), p(new impl(*o.p)) {}
+
+tdl_error::~tdl_error() throw() {}
+
+string const &tdl_error::module() const {
+  return p->module;
+}
+
+string const &tdl_error::problem() const {
+  return p->problem;
+}
+
+tdl::source_position const &tdl_error::where() const {
+  return p->where;
+}

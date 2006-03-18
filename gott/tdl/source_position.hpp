@@ -62,6 +62,11 @@ public:
   gott::string token;
   unsigned token_line;
   unsigned token_column;
+
+  source_position token_position() const {
+    return source_position(file, token_line, token_column, token, token_line,
+        token_column);
+  }
 };
 
 inline std::ostream &operator<<(std::ostream &out, source_position const &obj) {

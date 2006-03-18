@@ -82,11 +82,8 @@ void object::test<1>(int c) {
       w << (77 + i) << '\n';
     run_test(w.str());
     fail("too few");
-  } catch (tdl::mismatch const &m) {
-    std::ostringstream err;
-    err << (c-1) << ":1 : mismatch in document>list>node(el) after token ";
-    if (c > 1) err << 76 + c;
-    ensure_equals("correct error", m.what(), err.str());
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -111,9 +108,8 @@ void object::test<10>(int c) {
       w << (77 + i) << '\n';
     run_test(w.str());
     fail("too few");
-  } catch (tdl::mismatch const &m) {
-    ensure_equals("correct error", m.what(),
-                  std::string("9:1 : mismatch in document at token 86"));
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -122,9 +118,8 @@ void object::test<16>(int) {
   try {
     run_test("1 2 3");
     fail("going down");
-  } catch (tdl::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()), 
-                  "1:1 : mismatch in document>list>node(el) after token 1");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -133,9 +128,8 @@ void object::test<17>(int) {
   try {
     run_test("lala");
     fail("string");
-  } catch (tdl::mismatch const &m) {
-    ensure_equals("correct error", std::string(m.what()), 
-                  "1:1 : mismatch in document>list>node(el) at token lala");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

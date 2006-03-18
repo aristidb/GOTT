@@ -106,9 +106,8 @@ void object::test<8>(int n) {
     }
     run_test(w.str());
     fail("too many");
-  } catch(tdl::mismatch const &m) {
-    ensure_equals("correct error", m.what(), 
-                  gott::string("1:15 : mismatch in document at token 7"));
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -117,9 +116,8 @@ void object::test<15>(int) {
   try {
     run_test("1 2 3");
     fail("going down");
-  } catch (tdl::mismatch const &m) {
-    ensure_equals("correct error", gott::string(m.what()),
-                  "1:1 : mismatch in document>ordered>list>node(el) after token 1");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

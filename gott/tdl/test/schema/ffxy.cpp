@@ -114,8 +114,8 @@ void object::test<10>(int n) {
   try {
     run("55 ", n - 10);
     fail("odd");
-  } catch (tdl::mismatch const &mm) {
-    return;
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

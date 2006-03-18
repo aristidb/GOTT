@@ -112,10 +112,8 @@ void object::test<4>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (tdl::mismatch const &m) {
-    ensure_equals("correct error", gott::string(m.what()),
-       "0:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
-       " after token ");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -124,10 +122,8 @@ void object::test<5>(int) {
   try {
     run_test("44");
     fail("should be greedy");
-  } catch (tdl::mismatch const &m) {
-    ensure_equals("correct error", gott::string(m.what()),
-        "1:1 : mismatch in document>ordered>list(s)>list(t)>node(ii)"
-        " after token 44");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

@@ -99,9 +99,8 @@ void object::test<4>(int) {
   try {
     run_test("a b");
     fail("following");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>list>node(el) after token a");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

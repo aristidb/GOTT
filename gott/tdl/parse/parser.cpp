@@ -306,7 +306,7 @@ string exec_parse::read_quoted(string::utf8_range &unread) {
     gott::utf8_t saved = *unread.Begin++;
     if (!unread.filled()) {
       if (saved != '"')
-        throw tdl::mismatch(ln.where);
+        throw tdl::tdl_error("TDL parser", "unclosed quote", ln.where);
       break;
     }
     double_dquote = *unread.Begin++ == L'"';
@@ -358,7 +358,7 @@ string exec_parse::read_paren(string::utf8_range &unread) {
     }
   }
   if (!balance)
-    throw tdl::mismatch(ln.where);
+    throw tdl::tdl_error("TDL parser", "unbalanced parentheses", ln.where);
   ln.end_token(result);
   return result;
 }

@@ -432,8 +432,8 @@ void object::test<20>(int) {
   std::istringstream data("\"");
   try {
     parse(data);
-  } catch (tdl::mismatch const &m) {
-    ensure_equals(m.what(), std::string("0:1 : mismatch after token "));
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL parser");
     return;
   }
   fail();
@@ -444,8 +444,8 @@ void object::test<21>(int) {
   std::istringstream data("x (");
   try {
     parse(data);
-  } catch (tdl::mismatch const &m) {
-    ensure_equals(m.what(), std::string("1:1 : mismatch after token x"));
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL parser");
     return;
   }
   fail();

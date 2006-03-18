@@ -42,7 +42,6 @@
 
 namespace structure = tdl::structure;
 using structure::repatcher;
-using structure::failed_repatch;
 using structure::writable_structure;
 using structure::simple_repatcher_context;
 using structure::repatch_nothing;
@@ -51,8 +50,10 @@ using structure::repatcher_chain;
 repatcher::repatcher() {}
 repatcher::~repatcher() {}
 
+#if 0
 failed_repatch::failed_repatch(gott::string const &s) : tdl_exception(s) {}
 failed_repatch::~failed_repatch() throw() {}
+#endif
 
 simple_repatcher_context::~simple_repatcher_context() {}
 

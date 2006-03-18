@@ -79,9 +79,8 @@ void object::test<2>(int) {
   try {
     run_test("d7");
     fail("just string");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND)>follow>node at token d7");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -90,9 +89,8 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-       "0:1 : mismatch in document(doc)>named(ND)>follow>node after token ");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -101,9 +99,8 @@ void object::test<4>(int) {
   try {
     run_test("ND,foo");
     fail("non-followed string");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:4 : mismatch in document(doc)>named(ND)>follow at token foo");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -112,9 +109,8 @@ void object::test<5>(int) {
   try {
     run_test("4");
     fail("just one integer");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND)>follow>node at token 4");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -123,9 +119,8 @@ void object::test<6>(int) {
   try {
     run_test("4 99,y");
     fail("nonsense");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND)>follow>node at token 4");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -134,9 +129,8 @@ void object::test<7>(int) {
   try {
     run_test("ND");
     fail("just label");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document(doc)>named(ND)>follow after token ND");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

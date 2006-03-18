@@ -270,7 +270,9 @@ bool match::impl::handle_item(ev::event const &event, bool token) {
 bool match::impl::try_play(ev::event const &event, item &current) {
   try {
     return event.play(current);
-  } catch (structure::failed_repatch &) {
+  } catch (tdl_error const &e) {
+    if (e.module() != "TDL Structure repatcher")
+      throw;
     return false;
   }
 }
@@ -315,7 +317,8 @@ void match::impl::fail_item() {
 }
 
 void match::impl::fail_all() {
-  throw mismatch(ref.where(), shadow_names);
+  throw tdl_error("TDL Schema matcher", "failed to match schema", 
+      ref.where().token_position());
 }
 
 void match::impl::real_parental_requirement() {

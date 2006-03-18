@@ -38,12 +38,20 @@
 #include "exceptions.hpp"
 #include <gott/string/string.hpp>
 #include <gott/range_algo.hpp>
+#include <string.h>
 
 using gott::string;
 
 gott::exception::exception(string const &desc) throw() 
   : data(desc.c_string_alloc()) {}
+
+gott::exception::exception(exception const &o)
+  : std::exception(), data(new char[std::strlen(o.data)]) {
+  std::strcpy(data, o.data);
+}
+
 gott::exception::~exception() throw() { delete [] data; }
+
 char const *gott::exception::what() const throw() { return data; }
 
 gott::internal_error::internal_error(string const &desc) throw()

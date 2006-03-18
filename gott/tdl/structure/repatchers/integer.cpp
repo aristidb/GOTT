@@ -60,10 +60,11 @@ repatch_integer::deferred_write(writable_structure &s) const {
         string input = gott::xany::Xany_cast<string>(x);
         long result;
         if (!is_integer(input, result))
-          throw failed_repatch("repatch_integer: could not match integer");
+          throw tdl_error("TDL Structure repatcher", "string is no integer");
         target.data(gott::xany::Xany(result));
       } else
-        throw failed_repatch("repatch_integer: could not match integer");
+        throw tdl_error("TDL Structure repatcher", 
+            "input cannot be converted to integer");
     }
 
     bool is_integer(string const &s, long &val) {
@@ -106,7 +107,8 @@ void repatch_integer::reg() {
     void data(gott::xany::Xany const &) { fail(); }
     void add_tag(string const &) { fail(); }
     void fail() {
-      throw std::invalid_argument("repatch_integer arguments");
+      throw tdl_error("TDL Structure repatcher loader",
+          "non-sensible arguments");
     }
     repatcher *result_alloc() const { return new repatch_integer(); }
     static repatcher_getter *alloc() { return new getter; }

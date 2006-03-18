@@ -1,3 +1,4 @@
+#if 0
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -50,3 +51,4 @@ dont_accept::dont_accept(string const &desc)
   : tdl_exception(pizza(desc)) {}
 
 dont_accept::~dont_accept() throw() {}
+#endif

@@ -89,9 +89,8 @@ void object::test<2>(int) {
   try {
     run_test("d7");
     fail("just string");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>node(foo) after token d7");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -100,9 +99,8 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "0:1 : mismatch in document>unordered>node(foo) after token ");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -111,9 +109,8 @@ void object::test<4>(int) {
   try {
     run_test("foo bar");
     fail("string following string");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>node after token foo");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -122,9 +119,8 @@ void object::test<5>(int) {
   try {
     run_test("foo");
     fail("just foo");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>node after token foo");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -132,9 +128,8 @@ template<> template<>
 void object::test<6>(int) {
   try {
     run_test("4,x,y");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:5 : mismatch in document>unordered>node(foo) at token y");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -143,9 +138,8 @@ void object::test<7>(int) {
   try {
     run_test("732 bar");
     fail("string following integer");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>node(foo) after token 732");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

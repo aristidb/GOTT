@@ -97,9 +97,8 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "0:1 : mismatch in document>unordered>node after token ");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -108,9 +107,8 @@ void object::test<4>(int) {
   try {
     run_test("list bar");
     fail("string following string");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>node after token list");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -119,9 +117,8 @@ void object::test<5>(int) {
   try {
     run_test("list,list");
     fail("two strings");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:6 : mismatch in document>unordered>node at token list");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -130,9 +127,8 @@ void object::test<6>(int) {
   try {
     run_test("4,x,y");
     fail("int then two strings");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:5 : mismatch in document>unordered>node at token y");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -141,9 +137,8 @@ void object::test<7>(int) {
   try {
     run_test("732 bar");
     fail("string following integer");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>unordered>node after token 732");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 

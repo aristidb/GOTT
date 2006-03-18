@@ -67,10 +67,11 @@ repatch_enumeration::deferred_write(writable_structure &s) const {
         string input = gott::xany::Xany_cast<string>(x);
         std::vector<string>::const_iterator it;
         if ((it = find(range(alternatives), input)) == alternatives.end())
-          throw failed_repatch(failure_message);
+          throw tdl_error("TDL Structure repatcher", "not in enumeration");
         target.data(gott::xany::Xany(long(it - alternatives.begin())));
       } else
-        throw failed_repatch(failure_message);
+        throw tdl_error("TDL Structure repatcher", 
+            "enumeration needs input string");
     }
   };
   return new context(s, alternatives);
@@ -95,7 +96,8 @@ void repatch_enumeration::reg() {
     }
     void add_tag(string const &) {}
     void fail() {
-      throw std::invalid_argument("repatch_enumeration arguments");
+      throw tdl_error("TDL Structure repatcher loader",
+          "non-sensible arguments");
     }
     repatcher *result_alloc() const {
       return new repatch_enumeration(all_strings);

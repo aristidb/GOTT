@@ -47,11 +47,12 @@ class string;
 class GOTT_EXPORT exception : public std::exception {
 public:
   explicit exception(gott::string const &desc) throw();
+  exception(exception const &);
   ~exception() throw();
   char const *what() const throw();
 
 private:
-  char const *data;
+  char *data;
 };
 
 class GOTT_EXPORT internal_error : public exception {

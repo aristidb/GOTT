@@ -47,8 +47,8 @@ using tdl::structure::writable_structure;
 
 repatch_substring::repatch_substring(long l, long r) : left(l), right(r) {
   if (left < 0)
-    throw gott::user_error(
-        "repatch_substring: substring must begin at non-negative position");
+    throw tdl_error("TDL Structure repatcher loader",
+        "substring must begin at non-negative position");
 }
 repatch_substring::~repatch_substring() {}
 
@@ -60,19 +60,21 @@ writable_structure *repatch_substring::deferred_write(
       : simple_repatcher_context(target), left(l), right(r) {}
     void data(gott::xany::Xany const &x) {
       if (!x.compatible<gott::string>())
-        throw failed_repatch("repatch_substring: need input string");
+        throw tdl_error("TDL Structure repatcher",
+            "substring needs input string");
       gott::string s = gott::xany::Xany_cast<gott::string>(x);
       long len = s.length();
       if (left > len || right > len || right < -len)
-        throw failed_repatch(
-            "repatch_substring: substring range out of bounds");
+        throw tdl_error("TDL Structure repatcher",
+            "substring range out of input bounds");
       gott::string::utf32_range in = s.as_utf32(), out;
       if (right > 0) 
         out = offset(simply(in.begin()), left, right);
       else
         out = offset(in, left, right);
       if (out.end() < out.begin())
-        throw failed_repatch("repatch_substring: invalid substring");
+        throw tdl_error("TDL Structure repatcher",
+            "substring range out of input bounds");
       target.data(gott::xany::Xany(gott::string(out)));
     }
   };
@@ -129,7 +131,8 @@ void repatch_substring::reg() {
       }
     }
     void fail() {
-      throw std::invalid_argument("repatch_substring arguments");
+      throw tdl_error("TDL Structure repatcher loader",
+          "non-sensible arguments");
     }
     repatcher *result_alloc() const {
       return new repatch_substring(left, right);

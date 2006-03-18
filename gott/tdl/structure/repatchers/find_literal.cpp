@@ -63,7 +63,8 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
 
     void data(gott::xany::Xany const &x) {
       if (!x.compatible<string>())
-        throw failed_repatch("repatch_find_literal: need input string");
+        throw tdl_error("TDL Structure repatcher", 
+            "find_literal needs string input");
       string s = gott::xany::Xany_cast<string>(x);
       bool fail = true;
       switch (loc) {
@@ -80,10 +81,9 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
         fail = !algo::contains(s.as_utf32(), literal.as_utf32());
         break;
       }
-      if (fail) {
-        throw failed_repatch("repatch_find_literal " + literal 
-            + ": condition not true");
-      }
+      if (fail)
+        throw tdl_error("TDL Structure repatcher", 
+            "find_literal condition not fulfilled");
       target.data(x);
     }
   };
@@ -117,7 +117,8 @@ void repatch_find_literal::reg() {
     }
     void add_tag(string const &) {}
     void fail() const {
-      throw std::invalid_argument("repatch_find_literal arguments");
+      throw tdl_error("TDL Structure repatcher loader",
+          "non-sensible arguments");
     }
     repatcher *result_alloc() const {
       if (!loc || !literal)

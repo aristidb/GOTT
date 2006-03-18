@@ -1,3 +1,4 @@
+#if 0
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -79,3 +80,4 @@ mismatch::mismatch(source_position const &p)
 : tdl_exception(build_string(p, std::vector<string>())) {}
 
 mismatch::~mismatch() throw() {}
+#endif

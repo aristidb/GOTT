@@ -96,9 +96,8 @@ void object::test<2>(int) {
   ind->begin(source_position());
   try {
     ind->data(Xany("(hallo"));
-  } catch (failed_repatch const &e) {
-    ensure_equals(std::string(e.what()), 
-        "repatch_find_literal ): condition not true");
+  } catch (tdl::tdl_error const &e) {
+    ensure_equals(e.module(), "TDL Structure repatcher");
     ensure_equals(o.str(), "");
   }
   ind->end();
@@ -188,7 +187,8 @@ void object::test<6>(int) {
     ind->begin(source_position());
       try {
         ind->data(Xany("foobar")); 
-      } catch (failed_repatch const &) {
+      } catch (tdl::tdl_error const &e) {
+        ensure_equals(e.module(), "TDL Structure repatcher");
         expected_failure = true;
       }
     ind->end();

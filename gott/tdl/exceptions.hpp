@@ -38,7 +38,7 @@
 #ifndef GOTT_UTIL_TDL_EXCEPTIONS_HPP
 #define GOTT_UTIL_TDL_EXCEPTIONS_HPP
 
-#if 1
+#if 0
 #include <gott/exceptions.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <vector>
@@ -86,10 +86,13 @@ struct GOTT_EXPORT failed_repatch : public tdl_exception {
 #else
 
 #include <gott/exceptions.hpp>
+#include "source_position.hpp"
+#include <boost/scoped_ptr.hpp>
 
 namespace tdl {
 
 class GOTT_EXPORT tdl_error : public gott::exception {
+public:
   tdl_error(
       gott::string const &module,
       gott::string const &problem);
@@ -99,13 +102,17 @@ class GOTT_EXPORT tdl_error : public gott::exception {
       gott::string const &problem,
       source_position const &where);
 
-  tdl_error(
-      gott::string const &module,
-      gott::string const &problem,
-      source_position const &where,
-      source_position const &contextual);
+  tdl_error(tdl_error const &);
 
   ~tdl_error() throw();
+
+  gott::string const &module() const;
+  gott::string const &problem() const;
+  source_position const &where() const;
+
+private:
+  class impl;
+  ::boost::scoped_ptr<impl> p;
 };
 
 }

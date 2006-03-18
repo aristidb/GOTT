@@ -85,9 +85,8 @@ void object::test<2>(int) {
   try {
     run_test("d7");
     fail("just string");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>ordered>node(i) after token d7");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -96,9 +95,8 @@ void object::test<3>(int) {
   try {
     run_test("");
     fail("empty");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "0:1 : mismatch in document>ordered>node after token ");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -107,9 +105,8 @@ void object::test<4>(int) {
   try {
     run_test("foo bar");
     fail("following");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>ordered>node(i) after token foo");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -118,9 +115,8 @@ void object::test<5>(int) {
   try {
     run_test("foo");
     fail("just string");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:1 : mismatch in document>ordered>node(i) after token foo");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -129,9 +125,8 @@ void object::test<6>(int) {
   try {
     run_test("x,4,y");
     fail("wrong order #1");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", 
-        gott::string(mm.what()), "1:5 : mismatch in document at token y");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
@@ -140,9 +135,8 @@ void object::test<7>(int) {
   try {
     run_test("4,x,y");
     fail("wrong order #2");
-  } catch (tdl::mismatch const &mm) {
-    ensure_equals("correct error", gott::string(mm.what()), 
-        "1:3 : mismatch in document>ordered>node(i) at token x");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
   }
 }
 
