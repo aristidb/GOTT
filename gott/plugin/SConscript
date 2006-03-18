@@ -39,7 +39,9 @@ import glob
 
 Import('env')
 
-env.SharedLibrary('plugin', glob.glob('*.cpp'))
+env2 = env.Copy()
+env2.Append(LIBS = 'dl')
+env2.SharedLibrary('plugin', glob.glob('*.cpp'))
 env = env.Copy()
 env.Append(LIBS = ['plugin'])
 
