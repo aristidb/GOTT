@@ -41,15 +41,8 @@
 
 using gott::string;
 
-static char const *get_buf(string const &desc) {
-  char *result = new char[desc.size() + 1];
-  gott::copy(desc.as_utf8(), result);
-  result[desc.size()] = 0;
-  return result;
-}
-
 gott::exception::exception(string const &desc) throw() 
-  : data(get_buf(desc)) {}
+  : data(desc.c_string_alloc()) {}
 gott::exception::~exception() throw() { delete [] data; }
 char const *gott::exception::what() const throw() { return data; }
 
