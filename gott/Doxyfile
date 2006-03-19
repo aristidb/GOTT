@@ -199,7 +199,8 @@ SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = 
 INCLUDE_FILE_PATTERNS  = 
 PREDEFINED             = GOTT_EXPORT= \
-                         GOTT_LOCAL=
+                         GOTT_LOCAL= \
+                         DOXYGEN_SHOULD_SKIP_THIS
 EXPAND_AS_DEFINED      = GOTT_EXPORT \
                          GOTT_LOCAL
 SKIP_FUNCTION_MACROS   = YES
