@@ -87,7 +87,8 @@ struct care_priority<no_priority> {
 /**
  * Thread-safe message queue.
  * 
- * \ref message_queue_prosa "In context."
+ * \ref message_queue_prosa "More information" in context as a structured 
+ * document."
  * 
  * \param Message The type of the messages.
  * \param Size The maximal size of the queue or 0 (default value) if unlimited.
@@ -655,74 +656,6 @@ message_filter_adapter<T, U>
 message_filter(T quit, U filter) {
   return message_filter_adapter<T, U>(quit, filter);
 }
-
-/**
-\page message_queue_prosa The message_queue class in context.
-
-\section intro Introduction
-It has been found that message passing is one of the safest primitives for
-organising code in more than one thread or process. The class
-gott::thread::message_queue provides a convenient C++ primitive for passing
-messages in process, that is between threads. Its size can be limited to prevent
-waste of memory, it can be opened/closed and it optionally supports priority
-handling.
-
-\section pcp Producer-consumer pattern
-\subsection pcp1on1 One producer, one consumer
-Imagine you have two threads. One thread (the producer) does nothing but wait
-for some resource and extract elements from it. The other thread (the consumer)
-shall do something with the elements. What do we need?
--# Some way to pass elements from the producer to the consumer.
--# Some way for the producer to tell the consumer that it has quit.
-As a further restriction, the program shall be portable across very different
-kinds of systems. 
-
-So lets define an example: The programm shall read small positive integers from
-a file and the program shall double them and print them out. Consumer and
-producer share a variable:
-\code
-gott::thread::message_queue<int> element_transfer;
-\endcode
-
-\attention
-There is no need for critical sections or semaphores or anything of the kind in
-order to use gott::thread::message_queue. It is safe to access it directly. You
-need to program carefully to prevent deadlocks though.
-
-Then, the producer looks something like this:
-\code
-std::ifstream infile("numbers.txt");
-int num;
-while (infile >> num) {
-  if (num < 0) break;
-  element_transfer.push(num);
-}
-element_transfer.push(-1);
-\endcode
-\note
-Negative numbers mark the end-of-sequence and can be compared with a special 
-"quit message".
-
-And the consumer:
-\code
-int num;
-while ((num = element_transfer.pop()) >= 0)
-  std::cout << (num * 2) << std::endl;
-\endcode
-\note 
-The consumer uses std::cout directly but as it is the only thread 
-to use it, that's safe.
-
-Alternatively, you can write the consumer like this:
-\code
-using namespace boost::lambda;
-element_transfer.wait_for_all(std::cout << _1 << '\n', _1 >= 0);
-\endcode
-\note
-There is a difference in behaviour: The first consumer flushes std::cout after
-every element, the second does not because std::endl can't be conveniently
-passed via Boost.Lambda - it IS possible though.
-*/
 
 }}
 
