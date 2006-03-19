@@ -89,6 +89,8 @@ struct care_priority<no_priority> {
  */
 template<class Message, unsigned Size = 0, class PriorityCompare = no_priority>
 class message_queue : boost::noncopyable {
+  typedef boost::mutex::scoped_lock scoped_lock;
+
   template<class T, class U, class R, R True>
   struct add_predicate {
     add_predicate(T f, U p) : func(f), pred(p) {}
@@ -124,7 +126,7 @@ public:
    * \param msg The message to add.
    */
   void push(Message const &msg) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     wait_for_opened_u(lock);
     wait_for_space_u(lock);
     push_u(msg);
@@ -137,7 +139,7 @@ public:
    * \return The removed message.
    */
   Message pop() {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     wait_for_data_u(lock);
     Message result = pop_u();
     slot_free_u();
@@ -150,7 +152,7 @@ public:
    * \return The removed message if any.
    */
   ::boost::optional<Message> pop_nonblock() {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     if (empty_u())
       return boost::none;
     Message result = pop_u();
@@ -163,7 +165,7 @@ public:
    * \return A constant reference to the message to glance at.
    */
   Message peek() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     wait_for_data_u(lock);
     return peek_u();
   }
@@ -174,7 +176,7 @@ public:
    */
   template<class T>
   bool pop_if(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
 
     wait_for_data_u(lock);
 
@@ -194,7 +196,7 @@ public:
    * Clear the message queue.
    */
   void drop() {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     queue.clear();
     many_free_u();
   }
@@ -206,13 +208,13 @@ public:
   //@{
   /// Check whether the queue is empty.
   bool empty() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     return empty_u();
   }
 
   /// Check whether the queue is full.
   bool full() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     return full_u();
   }
   //@}
@@ -226,7 +228,7 @@ public:
    * block until open() is called somewhere else.
    */
   void close() {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     closed_s = true;
     closed_u().notify_all();
   }
@@ -236,7 +238,7 @@ public:
    * queue will fail only if the queue is full.
    */
   void open() {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     closed_s = false;
     opened_u().notify_all();
   }
@@ -246,7 +248,7 @@ public:
    * \see open
    */
   void open_wait() {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     wait_for_closed_u(lock);
     closed_s = false;
     opened_u().notify_all();
@@ -256,7 +258,7 @@ public:
    * Check whether the queue is closed.
    */
   bool closed() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     return closed_s;
   }
   //@}
@@ -272,7 +274,7 @@ public:
    */
   template<class T>
   void wait_for_all(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
 
     for (;;) {
       wait_for_data_u(lock);
@@ -294,23 +296,17 @@ public:
    */
   template<class T>
   void wait_for_many(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
 
     wait_for_data_u(lock);
 
     while (!empty_u()) {
       Message m = pop_u();
+      slot_free_u();
       lock.unlock();
-      try {
-        func(m);
-      } catch (...) {
-        slot_free_u();
-        throw;
-      }
+      func(m);
       lock.lock();
     }
-
-    many_free_u();
   }
 
   /**
@@ -320,27 +316,18 @@ public:
    */
   template<class T>
   void wait_for_many_break(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
 
     wait_for_data_u(lock);
 
     while (!empty()) {
       Message m = pop_u();
+      slot_free_u();
       lock.unlock();
-      try {
-        if (!func(m))
-          break;
-      } catch (...) {
-        slot_free_u();
-        throw;
-      }
+      if (!func(m))
+        break;
       lock.lock();
     }
-
-    if (!lock.locked())
-      lock.lock();
-
-    many_free_u();
   }
 
   /**
@@ -418,7 +405,7 @@ public:
    */
   template<class T>
   bool filter(T func, bool strict_priority = false) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     wait_for_data_u(lock);
     return filter_u(func, strict_priority);
   }
@@ -437,7 +424,7 @@ public:
    */
   template<class T>
   void filter_all(T func, bool strict_priority = false) {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     wait_for_data_u(lock);
     while (filter_u(func, strict_priority))
       wait_for_new_data_u(lock);
@@ -501,7 +488,7 @@ public:
    * Waits until there is data available.
    */
   void wait_for_data() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     wait_for_data_u(lock);
   }
 
@@ -509,7 +496,7 @@ public:
    * Waits until there is space available.
    */
   void wait_for_space() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     wait_for_space_u(lock);
   }
 
@@ -517,32 +504,32 @@ public:
    * Waits until new data floats in.
    */
   void wait_for_new_data() const {
-    boost::mutex::scoped_lock lock(monitor_lock);
+    scoped_lock lock(monitor_lock);
     wait_for_new_data_u(lock);
   }
   //@}
 
 private:
-  void wait_for_data_u(boost::mutex::scoped_lock &lock) const {
+  void wait_for_data_u(scoped_lock &lock) const {
     while (empty_u())
       not_empty_u().wait(lock);
   }
 
-  void wait_for_space_u(boost::mutex::scoped_lock &lock) const {
+  void wait_for_space_u(scoped_lock &lock) const {
     while (full_u())
       not_full_u().wait(lock);
   }
 
-  void wait_for_new_data_u(boost::mutex::scoped_lock &lock) const {
+  void wait_for_new_data_u(scoped_lock &lock) const {
     new_data_u().wait(lock);
   }
 
-  void wait_for_opened_u(boost::mutex::scoped_lock &lock) const {
+  void wait_for_opened_u(scoped_lock &lock) const {
     while (closed_s)
       opened_u().wait(lock);
   }
 
-  void wait_for_closed_u(boost::mutex::scoped_lock &lock) const {
+  void wait_for_closed_u(scoped_lock &lock) const {
     while (!closed_s)
       closed_u().wait(lock);
   }
