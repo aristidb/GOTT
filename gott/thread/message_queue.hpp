@@ -108,7 +108,7 @@ public:
 
 public:
   /**
-   * \name Simple queue manipulation.
+   * \name Queue manipulation
    */
   //@{
   /**
@@ -160,10 +160,41 @@ public:
     wait_for_data_u(lock);
     return peek_u();
   }
+
+  /**
+   * Remove the first message if a callback returns true.
+   * \return Whether a message was removed.
+   */
+  template<class T>
+  bool pop_if(T func) {
+    boost::mutex::scoped_lock lock(monitor_lock);
+
+    wait_for_data_u(lock);
+
+    Message const &m = peek_u();
+    lock.unlock();
+    bool result = func(m);
+    lock.lock();
+
+    if (result) {
+      pop_u();
+      slot_free_u();
+    }
+    return result;
+  }
+
+  /**
+   * Clear the message queue.
+   */
+  void drop() {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    queue.clear();
+    many_free_u();
+  }
   //@}
 
   /**
-   * \name Simple queue status checks.
+   * \name Status checks
    */
   //@{
   /// Check whether the queue is empty.
@@ -180,13 +211,12 @@ public:
   //@}
 
   /**
-   * \name Opening / Closing facilities.
+   * \name Opening / Closing
    */
   //@{
   /**
    * Close the queue. After this attempt to push elements on it will
    * block until open() is called somewhere else.
-   * \see push(), open(), open_wait(), closed()
    */
   void close() {
     boost::mutex::scoped_lock lock(monitor_lock);
@@ -197,7 +227,6 @@ public:
   /**
    * Open the queue. This makes sure that any attempt to push elements on the
    * queue will fail only if the queue is full.
-   * \see push(), open_wait(), close(), closed()
    */
   void open() {
     boost::mutex::scoped_lock lock(monitor_lock);
@@ -207,7 +236,6 @@ public:
 
   /**
    * Open the queue but wait for it to be closed first.
-   * \see push(), open(), close(), closed()
    */
   void open_wait() {
     boost::mutex::scoped_lock lock(monitor_lock);
@@ -218,7 +246,6 @@ public:
 
   /**
    * Check whether the queue is closed.
-   * \see push(), open(), open_wait(), close()
    */
   bool closed() const {
     boost::mutex::scoped_lock lock(monitor_lock);
@@ -228,16 +255,7 @@ public:
 
 public:
   /**
-   * Clear the message queue.
-   */
-  void drop() {
-    boost::mutex::scoped_lock lock(monitor_lock);
-    queue.clear();
-    many_free_u();
-  }
-  
-  /**
-   * \name Waiting for multiple objects.
+   * \name Waiting for multiple objects
    */
   //@{
   /**
@@ -339,29 +357,6 @@ public:
   }
   //@}
 
-public:
-  /**
-   * Remove the first message if a callback returns true.
-   * \return Whether a message was removed.
-   */
-  template<class T>
-  bool pop_if(T func) {
-    boost::mutex::scoped_lock lock(monitor_lock);
-
-    wait_for_data_u(lock);
-
-    Message const &m = peek_u();
-    lock.unlock();
-    bool result = func(m);
-    lock.lock();
-
-    if (result) {
-      pop_u();
-      slot_free_u();
-    }
-    return result;
-  }
-
 private:
   template<class T>
   bool filter_u(T func, bool strict_priority) {
@@ -396,7 +391,7 @@ private:
 
 public:
   /**
-   * \name Filtering.
+   * \name Filtering
    */
   //@{
   /**
@@ -483,7 +478,7 @@ public:
 
 public:
   /**
-   * \name Waiting for events.
+   * \name Waiting for events
    */
   //@{
   /**
