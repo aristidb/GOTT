@@ -40,6 +40,7 @@
 
 #include <gott/visibility.hpp>
 #include "primitive_types.hpp"
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 
@@ -135,7 +136,7 @@ public: // implementation
   struct node;
 
 private:
-  node *head;
+  boost::scoped_ptr<node> head;
 };
 
 }}

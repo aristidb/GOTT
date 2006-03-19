@@ -63,9 +63,6 @@ path::node *new_clone(path::node const &n) {
 
 typedef boost::scoped_ptr<path::node> node_p;
 
-path::~path() { delete head; }
-path::path(path const &o) : head(o.head->clone()) {}
-
 namespace { 
 
 template<class T>
@@ -192,3 +189,12 @@ path &path::transform(transformations const &transf) {
   head = new ::transform(transf, head);
   return *this;
 }
+
+namespace {
+struct empty_path : concrete_node<empty_path> {
+};
+}
+
+path::path() : head(new empty_path) {}
+path::~path() {}
+path::path(path const &o) : head(o.head->clone()) {}

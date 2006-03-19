@@ -71,9 +71,8 @@ public:
   }
 
   ~representation() {
-    if (owned) {
+    if (owned)
       delete [] data;
-    }
   }
 
   std::size_t size;

@@ -55,7 +55,7 @@ std::wstring gott::to_wstring(string const &str, encoding enc) {
   range_t<char const *> precast_out = to_enc_alloc(str.as_utf8(), enc);
   range_t<wchar_t const *> out = precast_out.cast<wchar_t const *>();
   std::wstring result(out.begin(), out.end());
-  delete [] out.begin();
+  delete [] precast_out.begin();
   return result;
 }
 #endif
