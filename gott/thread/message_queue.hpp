@@ -94,7 +94,12 @@ public:
 
 public:
   /**
-   * Add a message to the end of this queue.
+   * \name Simple queue manipulation.
+   */
+  //@{
+  /**
+   * Add a message to the end of this queue. Blocks if the queue is full or 
+   * closed.
    * \param msg The message to add.
    */
   void push(Message const &msg) {
@@ -141,7 +146,12 @@ public:
     wait_for_data_u(lock);
     return peek_u();
   }
+  //@}
 
+  /**
+   * \name Simple queue status checks.
+   */
+  //@{
   /// Check whether the queue is empty.
   bool empty() const {
     boost::mutex::scoped_lock lock(monitor_lock);
@@ -153,10 +163,16 @@ public:
     boost::mutex::scoped_lock lock(monitor_lock);
     return full_u();
   }
+  //@}
 
   /**
+   * \name Opening / Closing facilities.
+   */
+  //@{
+  /**
    * Close the queue. After this attempt to push elements on it will
-   * block until open is called somewhere else.
+   * block until open() is called somewhere else.
+   * \see push(), open(), open_wait(), closed()
    */
   void close() {
     boost::mutex::scoped_lock lock(monitor_lock);
@@ -167,6 +183,7 @@ public:
   /**
    * Open the queue. This makes sure that any attempt to push elements on the
    * queue will fail only if the queue is full.
+   * \see push(), open_wait(), close(), closed()
    */
   void open() {
     boost::mutex::scoped_lock lock(monitor_lock);
@@ -176,7 +193,7 @@ public:
 
   /**
    * Open the queue but wait for it to be closed first.
-   * \see open
+   * \see push(), open(), close(), closed()
    */
   void open_wait() {
     boost::mutex::scoped_lock lock(monitor_lock);
@@ -187,11 +204,13 @@ public:
 
   /**
    * Check whether the queue is closed.
+   * \see push(), open(), open_wait(), close()
    */
   bool closed() const {
     boost::mutex::scoped_lock lock(monitor_lock);
     return closed_s;
   }
+  //@}
 
 public:
   /**
