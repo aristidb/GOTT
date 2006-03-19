@@ -88,7 +88,9 @@ template<class Message, unsigned Size = 0, class PriorityCompare = no_priority>
 class message_queue : boost::noncopyable {
 public:
   /// Constructor.
-  message_queue(PriorityCompare p = PriorityCompare()) : pcmp(p) {}
+  message_queue(bool opened = true, 
+      PriorityCompare p = PriorityCompare()) 
+    : pcmp(p), closed_s(!opened) {}
 
 public:
   /**
@@ -97,9 +99,11 @@ public:
    */
   void push(Message const &msg) {
     boost::mutex::scoped_lock lock(monitor_lock);
+    wait_for_opened_u(lock);
     wait_for_space_u(lock);
     push_u(msg);
     slot_filled_u();
+    new_data_u().notify_all();
   }
 
   /**
@@ -148,6 +152,45 @@ public:
   bool full() const {
     boost::mutex::scoped_lock lock(monitor_lock);
     return full_u();
+  }
+
+  /**
+   * Close the queue. After this attempt to push elements on it will
+   * block until open is called somewhere else.
+   */
+  void close() {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    closed_s = true;
+    closed_u().notify_all();
+  }
+
+  /**
+   * Open the queue. This makes sure that any attempt to push elements on the
+   * queue will fail only if the queue is full.
+   */
+  void open() {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    closed_s = false;
+    opened_u().notify_all();
+  }
+
+  /**
+   * Open the queue but wait for it to be closed first.
+   * \see open
+   */
+  void open_wait() {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    wait_for_closed_u(lock);
+    closed_s = false;
+    opened_u().notify_all();
+  }
+
+  /**
+   * Check whether the queue is closed.
+   */
+  bool closed() const {
+    boost::mutex::scoped_lock lock(monitor_lock);
+    return closed_s;
   }
 
 public:
@@ -440,6 +483,16 @@ private:
     new_data_u().wait(lock);
   }
 
+  void wait_for_opened_u(boost::mutex::scoped_lock &lock) const {
+    while (closed_s)
+      opened_u().wait(lock);
+  }
+
+  void wait_for_closed_u(boost::mutex::scoped_lock &lock) const {
+    while (!closed_s)
+      closed_u().wait(lock);
+  }
+
 private:
   void slot_free_u() {
     if (Size != 0)
@@ -460,7 +513,6 @@ private:
     queue.push_back(msg);
     if (care_priority<PriorityCompare>::value)
       std::push_heap(queue.begin(), queue.end(), pcmp);
-    new_data_u().notify_all();
   }
 
   Message pop_u() {
@@ -491,14 +543,17 @@ private:
 
 private:
   boost::condition &not_empty_u() const { return cond[0]; }
-  boost::condition &not_full_u() const { return cond[2]; }
+  boost::condition &not_full_u() const { return cond[4]; }
   boost::condition &new_data_u() const { return cond[1]; }
+  boost::condition &closed_u() const { return cond[2]; }
+  boost::condition &opened_u() const { return cond[3]; }
 
-  mutable boost::condition cond[Size == 0 ? 2 : 3];
+  mutable boost::condition cond[Size == 0 ? 4 : 5];
   
 private:
   std::deque<Message> queue;
   PriorityCompare const pcmp;
+  bool closed_s;
 };
 
 template<class QuitPred, class FilterPred>

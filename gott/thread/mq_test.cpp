@@ -58,12 +58,12 @@ typedef message_queue<int, 6> mq_t;
 typedef message_queue<int, 0, std::greater<int> > mq2_t;
 
 mq_t mq;
-mq2_t mq2;
+mq2_t mq2(false);
 
 typedef message_queue<string> string_queue;
 string_queue sq, sq_out;
 
-boost::barrier step2(2), step3(2);
+boost::barrier step2(2);
 
 string::size_type (string::*str_find)(string const &, string::size_type) const
     = &string::find;
@@ -90,13 +90,10 @@ void consumer() {
     mq.push(i);
   mq.push(0);
 
-
   for (int i = 0; i < 5; ++i)
     mq2.push(i);
   for (int i = 10; i >= 5; --i)
     mq2.push(i);
-
-  step3.wait();
 }
 
 string tag(string s, string f) {
@@ -130,9 +127,8 @@ int main() {
   mq.wait_for_all(cout << _1 << ' ', _1 < 9);
   cout << endl;
 
-  step3.wait();
-
   cout << "Priority:" << endl;
+  mq2.open();
   mq2.wait_for_all(cout << _1 << ' ', _1 < 10);
   cout << endl;
 
