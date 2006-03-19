@@ -110,7 +110,24 @@ void filter_consumer(string filter) {
     boost::thread::yield();
 }
 
+  struct helper_t {
+    int &value;
+    helper_t(int &value) : value(value) {}
+    bool operator() (int num) {
+      value = num;
+      return false;
+    }
+  };
+
 int main() {
+  {
+    int val;
+    helper_t helper(val);
+    mq.push(100);
+    mq.pop_if(helper);
+    std::cout << 'X' << val << std::endl;
+  }
+  
   boost::thread thrd(&consumer);
   
   for (int i = 80; i >= 0; --i)

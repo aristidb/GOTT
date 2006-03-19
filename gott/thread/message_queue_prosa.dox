@@ -69,7 +69,27 @@ mechanism is fine to quit one consumer, but if more than one consumer has to
 quit, we need different logics. We could simply send as many quit messages as
 there are consumers. We could use a guarded variable (volatile doesn't suffice)
 marking whether the producer has quit. Or we could simply not remove the quit
-message. Or even each consumer could repost a quit message.
+message. Or even each consumer could repost a quit message. The last two have
+the advantage of being scalable and the producer need not be changed. So this
+is how a consumer could look like:
+\code
+struct helper_t {
+  int &num;
+  helper_t(int &num) : num(num) {}
+  bool operator() (int value) const {
+    num = value;
+    return value >= 0;
+  }
+};
+int num;
+helper_t helper(num);
+while (element_transfer.pop_if(helper))
+  std::cout << (num * 2) << std::endl;
+\endcode
+\note
+All methods of gott::thread::message_queue taking functors as arguments take
+them by value.
 
-...
+\subsection pcp_n_1 Multiple producers, one consumer
+\subsection pcp_n_m Multiple producers, multiple consumers
 */
