@@ -136,7 +136,7 @@ public: // implementation
   struct node;
 
 private:
-  boost::scoped_ptr<node> head;
+  node *head;
 };
 
 }}
