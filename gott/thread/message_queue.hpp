@@ -50,7 +50,10 @@
 namespace gott {
 namespace thread {
 
-/// Return type of a filter callback.
+/**
+ * Return type of a filter callback.
+ * \relates message_queue
+ */
 enum message_filter_result { 
   /// The message is not accepted and should be ignored.
   message_out_filter, 
@@ -396,14 +399,13 @@ private:
 public:
   /**
    * \name Filtering
-   * \see message_filter()
    */
   //@{
   /**
    * Wait until there are messages available and then send them to a supplied
-   * callback, which returns a message_filter_result and remove only those for 
-   * which the callback returned message_in_filter or message_quit. If the 
-   * callback returned message_quit, return early.
+   * callback, which returns a #message_filter_result and remove only those for 
+   * which the callback returned #message_in_filter or #message_quit. If the 
+   * callback returned message_quit, return early. 
    * The callback must not access the message queue.
    * Returns immediately if there is data available but none gets through the
    * filter and none is classified as quit-message.
@@ -421,9 +423,11 @@ public:
   }
 
   /**
-   * Send all messages to a callback until it returns message_quit and remove 
-   * those messages for which the callback returned message_in_filter or
-   * message_quit.
+   * Send all messages to a callback until it returns #message_quit and remove 
+   * those messages for which the callback returned #message_in_filter or
+   * #message_quit.
+   * The return type of the callback must be convertible to 
+   * #message_filter_result.
    * The callback must not access the message queue.
    * \param func The filtering and receiving callback.
    * \param strict_priority Whether all elements should be passed in correct
@@ -440,10 +444,12 @@ public:
 
   /**
    * Wait until there are messages available and then send them to a supplied
-   * callback and remove them only if a predicate returns message_in_filter
-   * or message_quit. 
+   * callback and remove them only if a predicate returns #message_in_filter
+   * or #message_quit. 
+   * The return type of the predicate must be convertible to 
+   * #message_filter_result.
    * Returns if the messages are exhausted or the predicate returns 
-   * message_quit.
+   * #message_quit.
    * Neither the callback nor the predicate must access the message queue.
    * \param func The receiving callback.
    * \param pred The predicate.
@@ -451,6 +457,7 @@ public:
    *             priority order. This might be slow. This parameter has no 
    *             effect if PriorityCompare is no_priority.
    * \return Whether no filter returned quit.
+   * \see message_filter()
    */
   template<class T, class U>
   bool filter(T func, U pred, bool strict_priority = false) {
@@ -461,16 +468,19 @@ public:
   }
 
   /**
-   * Send all messages through a predicate until the same returns message_quit
-   * and if the predicate returns message_in_filter, remove them and send them 
-   * to a callback. The message for which the predicate returns message_quit 
+   * Send all messages through a predicate until the same returns #message_quit
+   * and if the predicate returns #message_in_filter, remove them and send them 
+   * to a callback. The message for which the predicate returns #message_quit 
    * is also removed. 
+   * The return type of the predicate must be convertible to 
+   * #message_filter_result.
    * Neither the callback nor the predicate must access the message queue.
    * \param func The receiving callback.
    * \param pred The predicate.
    * \param strict_priority Whether all elements should be passed in correct
    *             priority order. This might be slow. This parameter has no 
    *             effect if PriorityCompare is no_priority.
+   * \see message_filter
    */
   template<class T, class U>
   void filter_all(T func, U pred, bool strict_priority = false) {
@@ -599,12 +609,29 @@ private:
   bool closed_s;
 };
 
+/**
+ * Functor class for building a message filter predicate. Use message_filter()
+ * for more convenience.
+ */
 template<class QuitPred, class FilterPred>
 class message_filter_adapter {
 public:
-  message_filter_adapter(QuitPred q, FilterPred fi)
-  : quit(q), filter(fi) {}
+  /**
+   * Constructor.
+   * \param quit Should return true when its parameter is a quit-message.
+   * \param filter Should return true if the message passes through the filter.
+   */
+  message_filter_adapter(QuitPred quit, FilterPred filter)
+  : quit(quit), filter(filter) {}
 
+  /**
+   * Apply the functor to a message.
+   * \param m The message to check.
+   * \return 
+   *         - message_quit if the \p m is a quit-message.
+   *         - message_in_filter if the \p m passes through the filter.
+   *         - message_out_filter else.
+   */
   template<class Message>
   message_filter_result operator() (Message const &m) const {
     if (quit(m))
@@ -622,8 +649,9 @@ private:
 
 /**
  * Build a predicate for message_queue::filter and message_queue::filter_all
- * \param quit Should return true when its parameter is a quit-message.
+ * \param quit Should return true if its parameter is a quit-message.
  * \param filter Should return true if the message passes through the filter.
+ * \relates message_queue
  */
 template<class T, class U>
 message_filter_adapter<T, U> 
