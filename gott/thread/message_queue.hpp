@@ -222,7 +222,7 @@ public:
    */
   //@{
   /**
-   * Close the queue. After this attempt to push elements on it will
+   * Close the queue. After this attempts to push() elements on it will
    * block until open() is called somewhere else.
    */
   void close() {
@@ -232,7 +232,7 @@ public:
   }
 
   /**
-   * Open the queue. This makes sure that any attempt to push elements on the
+   * Open the queue. This makes sure that any attempt to push() elements on the
    * queue will fail only if the queue is full.
    */
   void open() {
@@ -243,6 +243,7 @@ public:
 
   /**
    * Open the queue but wait for it to be closed first.
+   * \see open
    */
   void open_wait() {
     boost::mutex::scoped_lock lock(monitor_lock);
