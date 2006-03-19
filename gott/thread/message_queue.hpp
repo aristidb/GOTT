@@ -257,7 +257,12 @@ public:
     while (!empty_u()) {
       Message m = pop_u();
       lock.unlock();
-      func(m);
+      try {
+        func(m);
+      } catch (...) {
+        slot_free_u();
+        throw;
+      }
       lock.lock();
     }
 
@@ -278,8 +283,13 @@ public:
     while (!empty()) {
       Message m = pop_u();
       lock.unlock();
-      if (!func(m))
-        break;
+      try {
+        if (!func(m))
+          break;
+      } catch (...) {
+        slot_free_u();
+        throw;
+      }
       lock.lock();
     }
 
