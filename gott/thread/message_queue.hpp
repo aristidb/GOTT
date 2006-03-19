@@ -101,10 +101,14 @@ class message_queue : boost::noncopyable {
   };
 
 public:
-  /// Constructor.
+  /** 
+   * Constructor.
+   * \param opened Whether the message_queue should initially be opened.
+   * \param compare An instance of your custom priority comparison functor.
+   */
   message_queue(bool opened = true, 
-      PriorityCompare p = PriorityCompare()) 
-    : pcmp(p), closed_s(!opened) {}
+      PriorityCompare compare = PriorityCompare()) 
+    : pcmp(compare), closed_s(!opened) {}
 
 public:
   /**
@@ -392,6 +396,7 @@ private:
 public:
   /**
    * \name Filtering
+   * \see message_filter()
    */
   //@{
   /**
