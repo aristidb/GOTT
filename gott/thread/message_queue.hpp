@@ -86,6 +86,20 @@ struct care_priority<no_priority> {
  */
 template<class Message, unsigned Size = 0, class PriorityCompare = no_priority>
 class message_queue : boost::noncopyable {
+  template<class T, class U, class R, R True>
+  struct add_predicate {
+    add_predicate(T f, U p) : func(f), pred(p) {}
+    T func;
+    U pred;
+    R operator() (Message const &m) const {
+      R result = pred(m);
+      if (result != True)
+        return result;
+      func(m);
+      return True;
+    }
+  };
+
 public:
   /// Constructor.
   message_queue(bool opened = true, 
@@ -223,6 +237,10 @@ public:
   }
   
   /**
+   * \name Waiting for multiple objects.
+   */
+  //@{
+  /**
    * Send messages to a callback until it returns false.
    * \param func The receiving callback.
    */
@@ -299,6 +317,28 @@ public:
     many_free_u();
   }
 
+  /**
+   * Send message to a callback until a predicate decides it should not.
+   * \param func The receiving callback.
+   * \param pred The predicate. Return false to make this function return.
+   */
+  template<class T, class U>
+  void wait_for_all(T func, U pred) {
+    wait_for_all(add_predicate<T, U, bool, true>(func, pred));
+  }
+
+  /**
+   * Wait until there are messages available and then send them to a supplied
+   * callback until a predicate returns false.
+   * \param func The receiving callback.
+   * \param pred The predicate.
+   */
+  template<class T, class U>
+  void wait_for_many_break(T func, U pred) {
+    wait_for_many_break(add_predicate<T, U, bool, true>(func, pred));
+  }
+  //@}
+
 public:
   /**
    * Remove the first message if a callback returns true.
@@ -356,6 +396,10 @@ private:
 
 public:
   /**
+   * \name Filtering.
+   */
+  //@{
+  /**
    * Wait until there are messages available and then send them to a supplied
    * callback, which returns a message_filter_result and remove only those for 
    * which the callback returned message_in_filter or message_quit. If the 
@@ -392,42 +436,6 @@ public:
     wait_for_data_u(lock);
     while (filter_u(func, strict_priority))
       wait_for_new_data_u(lock);
-  }
-
-  template<class T, class U, class R, R True>
-  struct add_predicate {
-    add_predicate(T f, U p) : func(f), pred(p) {}
-    T func;
-    U pred;
-    R operator() (Message const &m) const {
-      R result = pred(m);
-      if (result != True)
-        return result;
-      func(m);
-      return True;
-    }
-  };
-
-public:
-  /**
-   * Send message to a callback until a predicate decides it should not.
-   * \param func The receiving callback.
-   * \param pred The predicate. Return false to make this function return.
-   */
-  template<class T, class U>
-  void wait_for_all(T func, U pred) {
-    wait_for_all(add_predicate<T, U, bool, true>(func, pred));
-  }
-
-  /**
-   * Wait until there are messages available and then send them to a supplied
-   * callback until a predicate returns false.
-   * \param func The receiving callback.
-   * \param pred The predicate.
-   */
-  template<class T, class U>
-  void wait_for_many_break(T func, U pred) {
-    wait_for_many_break(add_predicate<T, U, bool, true>(func, pred));
   }
 
   /**
@@ -471,8 +479,13 @@ public:
           (func, pred),
         strict_priority);
   }
+  //@}
 
 public:
+  /**
+   * \name Waiting for events.
+   */
+  //@{
   /**
    * Waits until there is data available.
    */
@@ -496,6 +509,7 @@ public:
     boost::mutex::scoped_lock lock(monitor_lock);
     wait_for_new_data_u(lock);
   }
+  //@}
 
 private:
   void wait_for_data_u(boost::mutex::scoped_lock &lock) const {
@@ -606,6 +620,11 @@ private:
   FilterPred filter;
 };
 
+/**
+ * Build a predicate for message_queue::filter and message_queue::filter_all
+ * \param quit Should return true when its parameter is a quit-message.
+ * \param filter Should return true if the message passes through the filter.
+ */
 template<class T, class U>
 message_filter_adapter<T, U> 
 message_filter(T quit, U filter) {
