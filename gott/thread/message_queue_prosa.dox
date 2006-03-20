@@ -121,4 +121,38 @@ for (;;) {
 ??? Multiple consumers (nicest solution) ???
 
 \subsection pcp_n_m Multiple producers, multiple consumers
+
+\subsection pcp_mem Any number of producers, <b>no</b> consumers
+If there is no consumer for some reason but there are producers that happily
+add elements to the message queue, there is the risk of high amounts of memory
+to be wasted! But (who guessed it?) gott::thread::message_queue has mechanisms
+for dealing with this problem. The first ist to simply limit the size of the
+queue, like this (this might be also useful in order to reduce memory 
+consumption):
+\code
+gott::thread::message_queue<int, 50> sized_transfer;
+\endcode
+
+In some situations, you need to take care of the size because the program could
+dead-lock when the size is estimated to low.  If you can't do this, there is
+another solution: Just close the message queue! Shut its doors, that's possible.
+For example, the following code is a nice dead-lock:
+\code
+gott::thread::message_queue<int> q;
+q.push(4); // fine
+q.close();
+q.push(5); // will never return
+\endcode
+
+When there is no more consumer, just close the queue and the system's memory is
+safe. Of course, it can be opened again:
+\code
+q.open();
+assert(!q.closed());
+\endcode
+
+And it can even be constructed in closed state (opened is standard):
+\code
+gott::thread::message_queue<int> closed_q(false);
+\endcode
 */
