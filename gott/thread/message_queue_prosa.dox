@@ -122,7 +122,7 @@ for (;;) {
 
 \subsection pcp_n_m Multiple producers, multiple consumers
 
-\subsection pcp_mem Any number of producers, <b>no</b> consumers
+\subsection pcp_mem Any number of producers, NO consumers
 If there is no consumer for some reason but there are producers that happily
 add elements to the message queue, there is the risk of high amounts of memory
 to be wasted! But (who guessed it?) gott::thread::message_queue has mechanisms
