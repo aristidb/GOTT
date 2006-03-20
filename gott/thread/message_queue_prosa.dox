@@ -84,12 +84,41 @@ struct helper_t {
 int num;
 helper_t helper(num);
 while (element_transfer.pop_if(helper))
-  std::cout << (num * 2) << std::endl;
+  print_safely(num * 2);
 \endcode
 \note
 All methods of gott::thread::message_queue taking functors as arguments take
 them by value.
+\attention
+The above code uses a custom function print_safely to print a number on 
+std::cout because using it directly would <b>not</b> be thread-safe.
 
 \subsection pcp_n_1 Multiple producers, one consumer
+If there is more than one producer, a whole new problem arises: When to quit,
+actually? When a "main producer" quits? When all producers quit? Some other
+event?
+
+When the program shall quit on some other system event, the situation is easy:
+Get the event and push a quit message.
+
+When the program shall end as soon as a special "main producer" quits, the
+situation is easy for the consumers: they can behave as if there were only
+one producer and just quit as soon as they see a quit message - the quit message
+should not be removed though. Still, there are other producers that need to
+quit. As the quit message is never removed, it suffices to peek and check for
+a quit message before waiting on the resource. Something like this:
+\code
+int num;
+for (;;) {
+  boost::optional<int> possible_quit = element_transfer.peek_noblock();
+  if (possible_quit && *possible_quit < 0)
+    break;
+  if (infile >> num)
+    element_transfer.push(num);
+}
+\endcode
+
+??? Multiple consumers (nicest solution) ???
+
 \subsection pcp_n_m Multiple producers, multiple consumers
 */

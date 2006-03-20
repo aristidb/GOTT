@@ -161,7 +161,7 @@ public:
    * Does not block.
    * \return The removed message if any.
    */
-  ::boost::optional<Message> pop_nonblock() {
+  ::boost::optional<Message> pop_noblock() {
     scoped_lock lock(monitor_lock);
     if (empty_u())
       return boost::none;
@@ -172,11 +172,23 @@ public:
 
   /**
    * Get the first message of this queue but do not remove it.
-   * \return A constant reference to the message to glance at.
+   * \return The message to glance at.
    */
   Message peek() const {
     scoped_lock lock(monitor_lock);
     wait_for_data_u(lock);
+    return peek_u();
+  }
+
+  /**
+   * Get the first message of this queue if available but do not remove it.
+   * Does not block.
+   * \return The message to glance at.
+   */
+  Message peek_noblock() const {
+    scoped_lock lock(monitor_lock);
+    if (empty_u())
+      return boost::none;
     return peek_u();
   }
 
@@ -216,13 +228,19 @@ public:
    * \name Status checks
    */
   //@{
-  /// Check whether the queue is empty.
+  /**
+   * Check whether the queue is empty.
+   * \return Whether the queue is empty.
+   */
   bool empty() const {
     scoped_lock lock(monitor_lock);
     return empty_u();
   }
 
-  /// Check whether the queue is full.
+  /**
+   * Check whether the queue is full.
+   * \return Whether the queue is full.
+   */
   bool full() const {
     scoped_lock lock(monitor_lock);
     return full_u();
@@ -266,6 +284,7 @@ public:
 
   /**
    * Check whether the queue is closed.
+   * \return Whether the queue is closed.
    */
   bool closed() const {
     scoped_lock lock(monitor_lock);
