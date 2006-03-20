@@ -185,7 +185,7 @@ public:
    * Does not block.
    * \return The message to glance at.
    */
-  Message peek_noblock() const {
+  ::boost::optional<Message> peek_noblock() const {
     scoped_lock lock(monitor_lock);
     if (empty_u())
       return boost::none;
