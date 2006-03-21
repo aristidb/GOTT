@@ -6,4 +6,6 @@
 The properties library resides in the namespace gott::properties and is a
 collection of classes for abstracting the way data is stored behind a
 transparent interface. This is especially useful for API and ABI stability.
+Properties optionally support things like change notification and locking while
+maintaining their single interface.
 */

@@ -155,4 +155,23 @@ And it can even be constructed in closed state (opened is standard):
 \code
 gott::thread::message_queue<int> closed_q(false);
 \endcode
+
+\section prio Dealing with priorities
+By default, gott::thread::message_queue just deals with messages like a queue
+is supposed to: First come, first serve. If, for some reason, you want messages
+to be ordered, gott::thread::message_queue needs a functor to do so. The functor
+shall take two arguments and return a boolean value whether the left-hand-side
+argument's priority is lower than the right-hand-side argument's priority (true)
+or vice versa (false). So this example prints "1.5 1" (you <i>could</i> use 
+std::priority_queue for that, but hey we're talking message_queue):
+\code
+gott::thread::message_queue<double, 0, std::less<double> > ordered_double;
+ordered_double.push(1);
+ordered_double.push(1.5);
+std::cout << ordered_double.pop() << ' ';
+std::cout << ordered_double.pop() << std::endl;
+\endcode
+\note
+The 0 (zero) specifies that the queue has unlimited size, which is the default.
+Any other number would imply an enforced maximum size.
 */

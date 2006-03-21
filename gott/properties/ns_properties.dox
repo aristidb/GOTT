@@ -1,4 +1,5 @@
 /**
 \namespace gott::properties
-A full-fledged properties library.
+A full-fledged properties library. See a 
+\ref properties_prosa "textual introduction".
 */
