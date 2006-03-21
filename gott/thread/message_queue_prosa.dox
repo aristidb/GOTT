@@ -9,6 +9,13 @@ messages in process, that is between threads. Its size can be limited to prevent
 waste of memory, it can be opened/closed and it optionally supports priority
 handling.
 
+\note
+GOTT uses <a href="http://www.boost.org/doc/html/threads.html">
+Boost.Threads</a>.
+
+You can find much of the code below in runnable form in the gott/examples/
+directory.
+
 \section pcp Producer-consumer pattern
 \subsection pcp_1_1 One producer, one consumer
 Imagine you have two threads. One thread (the producer) does nothing but wait
@@ -20,8 +27,9 @@ As a further restriction, the program shall be portable across very different
 kinds of systems. 
 
 So lets define an example: The programm shall read small positive integers from
-a file and the program shall double them and print them out. Consumer and
-producer share a variable:
+a file and the program shall double them and print them out.
+
+Consumer and producer share a variable:
 \code
 gott::thread::message_queue<int> element_transfer;
 \endcode
