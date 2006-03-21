@@ -1,9 +1,3 @@
-/**
- * \example producer_consumer1.cpp
- * This is an example for the usage of gott::thread::message_queue borrowing
- * from the \ref message_queue_prosa "introductory text". It reads numbers from
- * the file numbers.txt, doubles them and prints them out.
- */
 #include <gott/thread/message_queue.hpp>
 #include <boost/thread/thread.hpp>
 #include <fstream>
