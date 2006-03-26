@@ -81,7 +81,8 @@ std::wostream &operator<<(std::wostream &o, copyable_structure const &s);
 
 /**
  * Print a (copyable) structure object to a (normal) stream.
- * @copydoc operator<<(std::wostream &, copyable_structure const &)
+ * \param o The stream to write to.
+ * \param s The structure to print.
  */
 GOTT_EXPORT
 std::ostream &operator<<(std::ostream &o, copyable_structure const &s);

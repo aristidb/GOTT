@@ -137,7 +137,7 @@ public:
 
   /**
    * Apply all transformations to a point and return the transformed point.
-   * \param p The untransformed point.
+   * \param x The untransformed point.
    * \return The transformed point.
    */
   GOTT_EXPORT point apply(point const &x);

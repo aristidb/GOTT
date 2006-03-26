@@ -48,10 +48,12 @@ template<class Type> class property;
 template<class Type> class read_property;
 template<class Type> class write_property;
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 template<class Type> struct annotated {
   typedef std::pair<Type *, void *> pointer;
   typedef std::pair<Type const *, void *> const_pointer;
 };
+#endif
 
 /**
  * A read-only reference to a property's value. Reference-counted.

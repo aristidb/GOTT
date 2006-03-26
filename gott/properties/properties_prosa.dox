@@ -7,5 +7,40 @@ The properties library resides in the namespace gott::properties and is a
 collection of classes for abstracting the way data is stored behind a
 transparent interface. This is especially useful for API and ABI stability.
 Properties optionally support things like change notification and locking while
-maintaining their single interface.
+maintaining their single interface. For example, say you have a window class
+(you know, the windows <i>inside</i> your computer screen) and your windows have
+a title. You could provide two methods, \c get_title() and \c set_title(), but
+this is rather... unaesthetic. We can do with less methods. With no single
+method, actually!
+\code
+gott::properties::property< gott::string > &title();
+// or
+gott::properties::property< gott::string > &title;
+\endcode
+\note
+It doesn't really matter which of the variants you choose. It's a matter of
+taste.
+
+Later, you can set the title easily:
+\code
+title.set("This is the new title.");
+\endcode
+
+\note
+gott::properties::property is an abstract base class. Initialize the reference
+with an instance of a class like gott::properties::concrete_property.
+
+\section storage Where to store the data?
+\subsection storage_integrated Integrated storage
+In many cases, you will want to just save the value of your new property in the
+object to which the property belongs. Often, it will suffice to save the value
+in the property implementation. Then, you will implement the property like this:
+\code
+class my_class {
+  my_class() : height_(4.0) {}
+  gott::properties::property<double> &height() { return height_; }
+private:
+  gott::properties::concrete_property<double> height_;
+};
+\endcode
 */

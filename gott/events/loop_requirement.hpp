@@ -102,7 +102,7 @@ inline loop_requirement operator||(
 
 /**
  * Requirement for a main_loop to have a certain feature.
- * \param T The required feature class.
+ * \arg \c T The required feature class.
  * \relates loop_requirement
  */
 template<class T>

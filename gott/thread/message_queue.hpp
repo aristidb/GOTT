@@ -88,14 +88,14 @@ struct care_priority<no_priority> {
  * Thread-safe message queue.
  * 
  * \ref message_queue_prosa "More information" in context as a structured 
- * document."
+ * document.
  * 
  * \param Message The type of the messages.
  * \param Size The maximal size of the queue or 0 (default value) if unlimited.
  * \param PriorityCompare The type of the priority comparer.
  *                        Should return x1.priority < x2.priority.
- *                        Pass #no_priority if you want the queue to behave 
- *                        plain FIFO (#no_priority is the default).
+ *                        Pass no_priority if you want the queue to behave 
+ *                        plain FIFO (no_priority is the default).
  */
 template<class Message, unsigned Size = 0, class PriorityCompare = no_priority>
 class message_queue : boost::noncopyable {
@@ -429,7 +429,7 @@ public:
    * \param func The filtering and receiving callback.
    * \param strict_priority Whether all elements should be passed in correct
    *             priority order. This might be slow. This parameter has no 
-   *             effect if PriorityCompare is #no_priority.
+   *             effect if PriorityCompare is no_priority.
    * \return Whether no filter returned quit.
    */
   template<class T>
@@ -449,7 +449,7 @@ public:
    * \param func The filtering and receiving callback.
    * \param strict_priority Whether all elements should be passed in correct
    *             priority order. This might be slow. This parameter has no 
-   *             effect if PriorityCompare is #no_priority.
+   *             effect if PriorityCompare is no_priority.
    */
   template<class T>
   void filter_all(T func, bool strict_priority = false) {
@@ -472,7 +472,7 @@ public:
    * \param pred The predicate.
    * \param strict_priority Whether all elements should be passed in correct
    *             priority order. This might be slow. This parameter has no 
-   *             effect if PriorityCompare is #no_priority.
+   *             effect if PriorityCompare is no_priority.
    * \return Whether no filter returned quit.
    * \see message_filter()
    */
@@ -496,7 +496,7 @@ public:
    * \param pred The predicate.
    * \param strict_priority Whether all elements should be passed in correct
    *             priority order. This might be slow. This parameter has no 
-   *             effect if PriorityCompare is #no_priority.
+   *             effect if PriorityCompare is no_priority.
    * \see message_filter
    */
   template<class T, class U>

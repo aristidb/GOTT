@@ -31,7 +31,7 @@ a file and the program shall double them and print them out.
 
 Consumer and producer share a variable:
 \code
-gott::thread::message_queue<int> element_transfer;
+gott::thread::message_queue< int > element_transfer;
 \endcode
 
 \attention
@@ -138,7 +138,7 @@ for dealing with this problem. The first ist to simply limit the size of the
 queue, like this (this might be also useful in order to reduce memory 
 consumption):
 \code
-gott::thread::message_queue<int, 50> sized_transfer;
+gott::thread::message_queue< int, 50 > sized_transfer;
 \endcode
 
 In some situations, you need to take care of the size because the program could
@@ -146,7 +146,7 @@ dead-lock when the size is estimated to low.  If you can't do this, there is
 another solution: Just close the message queue! Shut its doors, that's possible.
 For example, the following code is a nice dead-lock:
 \code
-gott::thread::message_queue<int> q;
+gott::thread::message_queue< int > q;
 q.push(4); // fine
 q.close();
 q.push(5); // will never return
@@ -161,7 +161,7 @@ assert(!q.closed());
 
 And it can even be constructed in closed state (opened is standard):
 \code
-gott::thread::message_queue<int> closed_q(false);
+gott::thread::message_queue< int > closed_q(false);
 \endcode
 
 \section prio Dealing with priorities
@@ -173,7 +173,7 @@ argument's priority is lower than the right-hand-side argument's priority (true)
 or vice versa (false). So this example prints "1.5 1" (you <i>could</i> use 
 std::priority_queue for that, but hey we're talking message_queue):
 \code
-gott::thread::message_queue<double, 0, std::less<double> > ordered_double;
+gott::thread::message_queue< double, 0, std::less< double > > ordered_double;
 ordered_double.push(1);
 ordered_double.push(1.5);
 std::cout << ordered_double.pop() << ' ';

@@ -46,6 +46,7 @@
 namespace gott {
 namespace properties {
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 template<class T, bool has_signal>
 struct property_chooser { // true
   typedef notifying_property<T> type;
@@ -55,11 +56,13 @@ template<class T>
 struct property_chooser<T, false> {
   typedef property<T> type;
 };
+#endif
 
 /**
  * Generic property type. Allows for nearly arbitrary properties via policies.
  * Policies can be specified as reference types so they are stored by referenc
- * in the property.
+ * in the property. Inherits from property<Type> or notifying_property<Type>,
+ * depending on Notification.
  * Default: No notifications, embedded storage (if concrete_property is on the
  *   stack, the value will be there, too), no locking.
  * 
@@ -74,9 +77,14 @@ template<
   class Storage = embedded_storage<Type>,
   class Lock = no_lock
 >
-class concrete_property 
+class concrete_property
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 : public
-    property_chooser<Type, policy<Notification>::class_type::has_signal>::type {
+    property_chooser<Type, policy<Notification>::class_type::has_signal>::type 
+#else
+: public notifying_property<Type>
+#endif
+{
 public:
   typedef typename policy<Storage>::class_type storage_policy;
   typedef typename policy<Lock>::class_type lock_policy;
