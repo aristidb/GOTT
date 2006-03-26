@@ -99,11 +99,14 @@ struct my_conversion {
 
 int main() {
   concrete_property<int> p;
-  p.set(4);
+  p.set(3);
+  p.apply_change_ref(++_1 - 7);
   translation_property<int, double> xx(p);
   *xx.read_write() += 1.7;
   p.apply_change(add<2>);
   *p.read_write() -= 2;
+
+  cout << p() << endl;
 
   { // DIRRTY - undefined behaviour
     read_write_reference<int> r = p.read_write();

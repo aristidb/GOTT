@@ -43,4 +43,79 @@ private:
   gott::properties::concrete_property<double> height_;
 };
 \endcode
+
+The class gott::properties::concrete_property uses policies to define itself. If
+you don't define any, the following policies are used:
+- gott::properties::no_notification, which means that you can <b>not</b> observe
+  whether the value of the property has changed.
+- <b>gott::properties::embedded_storage, which means that the value of the
+  property is saved in the concrete_property instance</b>
+- gott::properties::no_lock, which means that there is no locking of any
+  resource
+
+\subsection storage_external External storage
+You can store the value of the property anywhere you want, or maybe you can not
+choose. Again, you can use gott::properties::concrete_property. Just like this:
+\code
+gott::properties::concrete_property< 
+  gott::string,
+  gott::properties::no_notification,
+  gott::properties::external_storage< gott::string > >
+my_property(
+  gott::properties::external_storage< gott::string >(
+    &some_reading_function,
+    &some_writing_function
+  )
+);
+\endcode
+\note
+gott::properties::external_storage accepts getters and setters compatible with
+<a href="http://www.boost.org/doc/html/function.html">Boost.Function</a> by
+default. For some reasons you may want to use other functor types though, which
+is possible.
+
+\section access Accessing the property
+\subsection access_setget Using setters and getters
+
+The easiest way to access a property are the setters and getters. Well, you just
+set a property like this:
+\code
+my_property.set("value #1");
+my_property("value #2");
+\endcode
+
+And you get it like this:
+\code
+gott::string value = my_property.get();
+gott::string value2 = my_property();
+\endcode
+
+\subsection access_functors Using functors and functions
+Also, you can access the value of a property with functors. Examples shall show
+you how:
+\code
+using namespace boost::lambda;
+gott::properties::property< int > *p = new concrete_property< int >;
+
+p->apply_write(rand); // set the property to a random value
+p->apply_read(std::cout << _1 << '\n'); // print the current value (random)
+
+p->set(-7);
+p->apply_change(std::abs); // remove the sign of the value
+p->apply_change_ref(++_1 - 7); // increment the value
+std::cout << p->get() << std::endl; // prints 8
+
+delete p;
+\endcode
+While all of these examples could be easily expressed with setters and getters,
+you can always see them as an option and choose the most expressive. More
+importantly, gott::properties::property<>::apply_change() and
+gott::properties::property<>::apply_change_ref() are atomic operations, which
+means that all potential \ref locking "locking" will be in effect while the 
+functor is called.
+
+\section not Listening and observing
+\subsection not_raw The direct way
+\subsection not_helpers Combining and translating
+\section locking Locking
 */

@@ -238,6 +238,13 @@ public:
   }
 
   /**
+   * Set the value to another value.
+   * \param v The new value.
+   * \see set
+   */
+  void operator()(Type const &v) { set(v); }
+
+  /**
    * Set the value to the result of a function or functor.
    * \param func The function/functor to call.
    */
@@ -271,12 +278,13 @@ public:
   }
 
   /**
-   * Set the value to another value.
-   * \see set()
+   * Set the value to another value. Also, return the new value.
    */
   Type operator() (Type const &v) {
     return *read_write() = v;
   }
+
+  using read_property<Type>::operator();
 
   /**
    * Change the value by applying a function or functor on it and resetting it
@@ -287,6 +295,15 @@ public:
   void apply_change(F func) {
     read_write_reference<Type> x(read_write());
     *x = func(*x);
+  }
+
+  /**
+   * Change the value by applying a function or functor on a reference of it.
+   * \param func The function/functor to apply.
+   */
+  template<class F>
+  void apply_change_ref(F func) {
+    func(*read_write());
   }
 
   /// Destructor.
