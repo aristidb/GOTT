@@ -102,14 +102,14 @@ int main() {
   p.set(3);
   p.apply_change_ref(++_1 - 7);
   translation_property<int, double> xx(p);
-  *xx.read_write() += 1.7;
+  *xx.change() += 1.7;
   p.apply_change(add<2>);
-  *p.read_write() -= 2;
+  *p.change() -= 2;
 
   cout << p() << endl;
 
   { // DIRRTY - undefined behaviour
-    read_write_reference<int> r = p.read_write();
+    change_reference<int> r(p.change());
     p.set(10);
     *r -= 10;
   }
@@ -123,7 +123,7 @@ int main() {
   w.set(string("Hallo"));
   c.unblock();
   utf32_t const *add = (utf32_t const*)L" Welt!";
-  std::copy(add, add + 6, w.read_write()->append(6).begin());
+  std::copy(add, add + 6, w.change()->append(6).begin());
   cout << w.get() << endl;
 
   vobserve V;
@@ -146,7 +146,7 @@ int main() {
   
   stream_property streamed(external_storage<int>(read, write));
   for (;;) {
-    read_write_reference<int> r = streamed.read_write();
+    change_reference<int> r = streamed.change();
     *r *= 2;
     if (*r == 10)
       break;

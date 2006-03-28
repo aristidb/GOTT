@@ -31,7 +31,9 @@ gott::properties::property is an abstract base class. Initialize the reference
 with an instance of a class like gott::properties::concrete_property.
 
 \section storage Where to store the data?
+
 \subsection storage_integrated Integrated storage
+
 In many cases, you will want to just save the value of your new property in the
 object to which the property belongs. Often, it will suffice to save the value
 in the property implementation. Then, you will implement the property like this:
@@ -54,6 +56,7 @@ you don't define any, the following policies are used:
   resource
 
 \subsection storage_external External storage
+
 You can store the value of the property anywhere you want, or maybe you can not
 choose. Again, you can use gott::properties::concrete_property. Just like this:
 \code
@@ -75,6 +78,7 @@ default. For some reasons you may want to use other functor types though, which
 is possible.
 
 \section access Accessing the property
+
 \subsection access_setget Using setters and getters
 
 The easiest way to access a property are the setters and getters. Well, you just
@@ -91,13 +95,14 @@ gott::string value2 = my_property();
 \endcode
 
 \subsection access_functors Using functors and functions
+
 Also, you can access the value of a property with functors. Examples shall show
 you how:
 \code
 using namespace boost::lambda;
 gott::properties::property< int > *p = new concrete_property< int >;
 
-p->apply_write(rand); // set the property to a random value
+p->apply_write(std::rand); // set the property to a random value
 p->apply_read(std::cout << _1 << '\n'); // print the current value (random)
 
 p->set(-7);
@@ -114,8 +119,37 @@ gott::properties::property<>::apply_change_ref() are atomic operations, which
 means that all potential \ref locking "locking" will be in effect while the 
 functor is called.
 
+\subsection access_ref Using the references
+
+You can access the properties via special references. Using advanced C++
+features like destructors, those ensure that access on them happens
+transparently and, if possible, using the locking policy, atomically. It is
+similar in spirit to access via functors, only you can use it in more
+traditional inline style. It is advisable to use references over setters and
+getters especially if you are using objects.
+\code
+gott::properties::concrete_property< std::pair<int, int> > x =
+  std::make_pair(2, 3);
+x.change()->first = 7; // => 7, 3
+\endcode
+
+If you want to do a more complex transformation, but still atomic, you can do it
+like this:
+\code
+gott::properties::property<double> x;
+{
+  gott::properties::change_reference ref = x.change();
+  *ref = std::cos(*ref);
+}
+// x should be vaguely 0.0
+\endcode
+
 \section not Listening and observing
+
 \subsection not_raw The direct way
+
 \subsection not_helpers Combining and translating
+
 \section locking Locking
+
 */

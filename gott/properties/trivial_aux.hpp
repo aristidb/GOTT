@@ -45,7 +45,7 @@ namespace gott {
 namespace properties {
 
 struct no_lock {
-  typedef no_lock read_lock, write_lock, read_write_lock;
+  typedef no_lock read_lock, write_lock, change_lock;
 
   void *operator new(std::size_t) throw() { return 0; }
   void operator delete(void *) {}

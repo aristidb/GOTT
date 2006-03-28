@@ -39,6 +39,7 @@
 #define GOTT_UTIL_PROPERTIES_PROPERTY_HPP
 
 #include <utility>
+#include <algorithm>
 #include <sigc++/signal.h>
 
 namespace gott {
@@ -56,7 +57,7 @@ template<class Type> struct annotated {
 #endif
 
 /**
- * A read-only reference to a property's value. Reference-counted.
+ * A read-only reference to a property's value. Copying is destructive.
  */
 template<class Type>
 class read_reference {
@@ -70,30 +71,37 @@ public:
   }
     
   read_reference(read_property<Type> const &p)
-  : container(p), ptr(p.begin_read()), ref_count(new unsigned long(1)) {}
+  : container(&p), ptr(p.begin_read()) {}
 
   read_reference(read_reference const &o)
-    : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
-    { ++*ref_count; }
+  : container(o.container), ptr(o.ptr) {
+    o.container = 0;
+  }
 
   ~read_reference() {
-    if (--*ref_count == 0)
-      container.end_read(ptr);
+    destroy();
   }
 
   void operator=(read_reference const &o) {
-    ~read_reference();
-    new (this) read_reference(o);
+    destroy();
+    std::swap(container, o.container);
+    std::swap(ptr, o.ptr);
   }
 
 private:
-  read_property<Type> const &container;
-  typename annotated<Type>::const_pointer ptr;
-  unsigned long *ref_count;
+  void destroy() {
+    if (container) {
+      container->end_read(ptr);
+      container = 0;
+    }
+  }
+
+  mutable read_property<Type> const *container;
+  mutable typename annotated<Type>::const_pointer ptr;
 };
 
 /**
- * A write-only reference to a property's value. Reference-counted.
+ * A write-only reference to a property's value. Copying is destructive.
  */
 template<class Type>
 class write_reference {
@@ -107,33 +115,40 @@ public:
   }
   
   write_reference(write_property<Type> &p)
-  : container(p), ptr(p.begin_write()), ref_count(new unsigned long(1)) {}
+  : container(&p), ptr(p.begin_write()) {}
 
   write_reference(write_reference const &o)
-    : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
-    { ++*ref_count; }
+  : container(o.container), ptr(o.ptr) {
+    o.container = 0;
+  }
 
   ~write_reference() {
-    if (--*ref_count == 0)
-      container.end_write(ptr);
+    destroy();
   }
 
   void operator=(write_reference const &o) {
-    ~write_reference();
-    new (this) write_reference(o);
+    destroy();
+    std::swap(container, o.container);
+    std::swap(ptr, o.ptr);
   }
 
 private:
-  write_property<Type> &container;
-  typename annotated<Type>::pointer ptr;
-  unsigned long *ref_count;
+  void destroy() {
+    if (container) {
+      container->end_write(ptr);
+      container = 0;
+    }
+  }
+
+  mutable write_property<Type> *container;
+  mutable typename annotated<Type>::pointer ptr;
 };
 
 /**
- * A reference to a property's value. Reference-counted.
+ * A reference to a property's value. Copying is destructive.
  */
 template<class Type>
-class read_write_reference {
+class change_reference {
 public:
   Type *operator->() {
     return ptr.first;
@@ -143,27 +158,34 @@ public:
     return *ptr.first;
   }
     
-  read_write_reference(property<Type> &p)
-  : container(p), ptr(p.begin_read_write()), ref_count(new unsigned long(1)){}
+  change_reference(property<Type> &p)
+  : container(&p), ptr(p.begin_change()) {}
 
-  read_write_reference(read_write_reference const &o)
-  : container(o.container), ptr(o.ptr), ref_count(o.ref_count)
-  { ++*ref_count; }
-
-  void operator=(read_write_reference const &o) {
-    ~read_write_reference();
-    new (this) read_write_reference(o);
+  change_reference(change_reference const &o)
+  : container(o.container), ptr(o.ptr) {
+    o.container = 0;
   }
 
-  ~read_write_reference() {
-    if (--*ref_count == 0)
-      container.end_read_write(ptr);
+  void operator=(change_reference const &o) {
+    destroy();
+    std::swap(container, o.container);
+    std::swap(ptr, o.ptr);
+  }
+
+  ~change_reference() {
+    destroy();
   }
 
 private:
-  property<Type> &container;
-  typename annotated<Type>::pointer ptr;
-  unsigned long *ref_count;
+  void destroy() {
+    if (container) {
+      container->end_change(ptr);
+      container = 0;
+    }
+  }
+
+  mutable property<Type> *container;
+  mutable typename annotated<Type>::pointer ptr;
 };
 
 /**
@@ -271,9 +293,9 @@ class property : public read_property<Type>, public write_property<Type> {
 public:
   /**
    * Access the value for changing.
-   * \return A read_write_reference<Type> to the value.
+   * \return A change_reference<Type> to the value.
    */
-  read_write_reference<Type> read_write() {
+  change_reference<Type> change() {
     return *this; 
   }
 
@@ -281,7 +303,7 @@ public:
    * Set the value to another value. Also, return the new value.
    */
   Type operator() (Type const &v) {
-    return *read_write() = v;
+    return *change() = v;
   }
 
   using read_property<Type>::operator();
@@ -293,7 +315,7 @@ public:
    */
   template<class F> 
   void apply_change(F func) {
-    read_write_reference<Type> x(read_write());
+    change_reference<Type> x(change());
     *x = func(*x);
   }
 
@@ -303,16 +325,16 @@ public:
    */
   template<class F>
   void apply_change_ref(F func) {
-    func(*read_write());
+    func(*change());
   }
 
   /// Destructor.
   virtual ~property() {}
 
 private:
-  virtual typename annotated<Type>::pointer begin_read_write() = 0;
-  virtual void end_read_write(typename annotated<Type>::pointer) = 0;
-  friend class read_write_reference<Type>;
+  virtual typename annotated<Type>::pointer begin_change() = 0;
+  virtual void end_change(typename annotated<Type>::pointer) = 0;
+  friend class change_reference<Type>;
 };
 
 template<class T>

@@ -87,8 +87,8 @@ private:
     return translator.box(bound.write());
   }
 
-  annotated_pointer begin_read_write() {
-    return translator.box(bound.read_write());
+  annotated_pointer begin_change() {
+    return translator.box(bound.change());
   }
 
   void end_read(annotated_const_pointer p) const {
@@ -99,8 +99,8 @@ private:
     translator.template unbox<write_reference<OldType> >(p);
   }
   
-  void end_read_write(annotated_pointer p) {
-    translator.template unbox<read_write_reference<OldType> >(p);
+  void end_change(annotated_pointer p) {
+    translator.template unbox<change_reference<OldType> >(p);
   }
   
   property<OldType> &bound;
@@ -143,11 +143,11 @@ public:
 private:
   annotated_const_pointer begin_read() { return delegate.begin_read(); }
   annotated_pointer begin_write() { return delegate.begin_write(); }
-  annotated_pointer begin_read_write() { return delegate.begin_read_write(); }
+  annotated_pointer begin_change() { return delegate.begin_change(); }
 
   void end_read(annotated_const_pointer p) { delegate.end_read(p); }
   void end_write(annotated_pointer p) { delegate.end_write(p); }
-  void end_read_write(annotated_pointer p) { delegate.end_read_write(p); }
+  void end_change(annotated_pointer p) { delegate.end_change(p); }
 
   translation_property<OldType, NewType, Translation> delegate;
   sigc::signal0<void> on_change_signal;

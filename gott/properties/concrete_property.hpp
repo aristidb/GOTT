@@ -99,7 +99,7 @@ private:
   typedef typename policy<Lock>::storage lock_s;
   typedef typename lock_policy::read_lock read_lock;
   typedef typename lock_policy::write_lock write_lock;
-  typedef typename lock_policy::read_write_lock read_write_lock;
+  typedef typename lock_policy::change_lock change_lock;
 
   typedef typename property<Type>::annotated_pointer annotated_pointer;
   typedef typename property<Type>::annotated_const_pointer 
@@ -143,8 +143,8 @@ private:
     return annotated_pointer(storage.get_pointer_noread(),new write_lock(lock));
   }
 
-  annotated_pointer begin_read_write() {
-    return annotated_pointer(storage.get_pointer(), new read_write_lock(lock));
+  annotated_pointer begin_change() {
+    return annotated_pointer(storage.get_pointer(), new change_lock(lock));
   }
 
   void end_read(annotated_const_pointer p) const {
@@ -158,7 +158,7 @@ private:
     notifier.notify(this);
   }
   
-  void end_read_write(annotated_pointer p) {
+  void end_change(annotated_pointer p) {
     storage.finish_pointer(p.first);
     delete static_cast<write_lock *>(p.second);
     notifier.notify(this);
