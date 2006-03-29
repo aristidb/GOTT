@@ -141,14 +141,57 @@ gott::properties::property<double> x;
   gott::properties::change_reference ref = x.change();
   *ref = std::cos(*ref);
 }
-// x should be vaguely 0.0
+// x should be vaguely 1.0
 \endcode
+\attention
+Copying a reference to a property means destroying the original.
+
+As the name suggests, a change_reference is suitable for changing data. If you
+do not need to write any data or want to use const methods of the underlying
+object only, you can and should use gott::properties::property<>::read(). If you
+want to write fresh data only, you should use 
+gott::properties::property<>::write().
+\attention
+gott::properties::property<>::write() and gott::properties::write_reference
+should be used with caution when dealing with objects because the state of the
+object might either be freshly constructed or used, no guarantees.
 
 \section not Listening and observing
 
+When using a gott::properties::notifying_property, you can listen to the
+<a href="http://libsigc.sourceforge.net/">sigc++ 2.0</a> signal returned by
+gott::properties::notifying_property<>::on_change(), which is fired whenever
+the property was accessed for writing (whether the new value equals the old
+value or not).
+
+You need to declare your property like this:
+\code
+gott::properties::concrete_property<int, gott::properties::sigc_notification> p;
+\endcode
+
 \subsection not_raw The direct way
 
+... is explained completely by the <a href="http://libsigc.sourceforge.net/">
+sigc++ 2.0</a> documentation and this example:
+\code
+void on_change(gott::properties::property<int> &p) {
+  std::cout << p() << std::endl;
+}
+...
+p.on_change().connect(boost::bind(&on_change, boost::ref(p)));
+p.set(4); // prints 4
+*p.write() += 6; // prints 10
+\endcode
+
 \subsection not_helpers Combining and translating
+
+\subsubsection not_ver Verifiers
+
+\subsubsection not_li Liaisions
+
+\subsubsection not_tra Translations
+
+\subsection not_esoteric Esoteric paths
 
 \section locking Locking
 

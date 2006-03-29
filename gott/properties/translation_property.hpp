@@ -150,7 +150,7 @@ private:
   void end_change(annotated_pointer p) { delegate.end_change(p); }
 
   translation_property<OldType, NewType, Translation> delegate;
-  sigc::signal0<void> on_change_signal;
+  sigc::signal0<void> &on_change_signal;
 };
 
 }}
