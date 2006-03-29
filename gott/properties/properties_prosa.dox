@@ -164,9 +164,10 @@ gott::properties::notifying_property<>::on_change(), which is fired whenever
 the property was accessed for writing (whether the new value equals the old
 value or not).
 
-You need to declare your property like this:
+You need to declare your property like this, with the
+gott::properties::sigc_notification policy:
 \code
-gott::properties::concrete_property<int, gott::properties::sigc_notification> p;
+gott::properties::concrete_property< int, gott::properties::sigc_notification > p;
 \endcode
 
 \subsection not_raw The direct way
