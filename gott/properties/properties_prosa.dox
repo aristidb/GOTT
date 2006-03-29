@@ -172,7 +172,8 @@ gott::properties::concrete_property<int, gott::properties::sigc_notification> p;
 \subsection not_raw The direct way
 
 ... is explained completely by the <a href="http://libsigc.sourceforge.net/">
-sigc++ 2.0</a> documentation and this example:
+sigc++ 2.0</a> documentation, maybe the <a href="http://www.boost.org/">
+Boost</a> documentation and this example:
 \code
 void on_change(gott::properties::property<int> &p) {
   std::cout << p() << std::endl;
@@ -187,7 +188,7 @@ p.set(4); // prints 4
 
 \subsubsection not_ver Verifiers
 
-\subsubsection not_li Liaisions
+\subsubsection not_li Liaisons
 
 \subsubsection not_tra Translations
 
