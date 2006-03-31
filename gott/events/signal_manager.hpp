@@ -102,7 +102,8 @@ private:
 
 private:
   sigsafe_message_manager *message_manager;
-  std::map<int, sigc::signal1<void, int> > handlers;
+  typedef std::map<int, sigc::signal1<void, int> > handler_map_t;
+  handler_map_t handlers;
 };
 
 }}

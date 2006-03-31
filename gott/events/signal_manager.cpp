@@ -57,7 +57,7 @@ signal_manager::~signal_manager() {
 gott::QID const signal_manager::qid("gott::events::signal_manager");
 
 sigc::signal1<void, int> &signal_manager::on_signal(int sig) {
-  std::map<int, sigc::signal1<void, int> >::iterator pos = handlers.find(sig);
+  handler_map_t::iterator pos = handlers.find(sig);
   if (pos == handlers.end()) {
     register_signal(sig, this);
     return handlers[sig];
@@ -66,30 +66,34 @@ sigc::signal1<void, int> &signal_manager::on_signal(int sig) {
 }
 
 namespace {
-  typedef std::map<int, signal_manager *> handler_map;
-  handler_map sys_handlers;
+  typedef std::map<int, std::pair<signal_manager *, void (*)(int)> > 
+    sys_handler_map_t;
+  sys_handler_map_t sys_handlers;
 }
 
 void signal_manager::register_signal(int sig, signal_manager *handler) {
   if (sys_handlers.find(sig) != sys_handlers.end())
     throw user_error(
         "cannot register more than one signal_manager per signal");
-  sys_handlers[sig] = handler;
-  signal(sig, signal_handler);
+  sys_handlers[sig] =
+    std::make_pair(
+        handler,
+        signal(sig, signal_handler));
 }
 
 void signal_manager::unregister_all(signal_manager *handler) {
-  handler_map::iterator it = sys_handlers.begin();
+  sys_handler_map_t::iterator it = sys_handlers.begin();
   while (it != sys_handlers.end())
-    if (it->second == handler) {
-      handler_map::iterator del = it++;
+    if (it->second.first == handler) {
+      signal(it->first, it->second.second); // reinstall old handler
+      sys_handler_map_t::iterator del = it++;
       sys_handlers.erase(del);
     } else
       ++it;
 }
 
 signal_manager *signal_manager::find(int sig) {
-  return sys_handlers[sig];
+  return sys_handlers[sig].first;
 }
 
 void signal_manager::signal_handler(int sig) {
