@@ -1,7 +1,8 @@
 import glob
 
-Import('shrd')
-shrd.SharedLibrary('x11', glob.glob('*.cpp') )
+Import('env')
+env.SharedLibrary('x11', glob.glob('*.cpp') )
+env.Append(LIBS = ['x11'])
 
 SConscript(dirs = ['test'] )
 

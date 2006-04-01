@@ -1,7 +1,10 @@
 import glob
 
-Import('shrd')
+Import('env')
 
-shrd.SharedLibrary('base_ui', glob.glob('*.cpp'))
+env.SharedLibrary('base_ui', glob.glob('*.cpp'))
+env.Append(LIBS = ['base_ui'])
+Export('env')
 
-SConscript(dirs = ['directfb', 'x11', 'win32'] )
+#SConscript(dirs = ['directfb', 'x11', 'win32'] )
+SConscript(dirs = ['x11'])

@@ -106,6 +106,7 @@ dirs = [
 'graphics',
 'plugin',
 'properties',
+'ui',
 'examples'
 ]
 
