@@ -77,7 +77,7 @@ protected:
   } \
   boost::optional<function_entry_t> find_method_impl(gott::QID const &id) const;
 
-#define GOTT_PLUGIN_METHOD_REGISTRY_CONFINE(base) \
+#define GOTT_PLUGIN_METHOD_REGISTRY_EXTEND(base) \
   boost::optional<function_entry_t> find_method(gott::QID const &id) const { \
     boost::optional<function_entry_t> result = find_method_impl(id); \
     if (!result) result = this->base::find_method(id); \
@@ -179,41 +179,23 @@ plugin_method1_t<Ret, Arg1, Class> plugin_method(Ret (Class::*meth)(Arg1)) {
     gott::QID interface_id() const; \
     GOTT_PLUGIN_METHOD_REGISTRY_DECLARE;
 
+#define GOTT_PLUGIN_INTERFACE_EXTEND_BEGIN(name, base) \
+  class GOTT_EXPORT name : public base { \
+  public: \
+    ~name(); \
+    gott::QID interface_id() const; \
+    GOTT_PLUGIN_METHOD_REGISTRY_EXTEND(base);
+
 #define GOTT_PLUGIN_INTERFACE_DECLARE_END() \
   };
 
-#define GOTT_PLUGIN_INTERFACE_CONFINE(name, base) \
-  class GOTT_EXPORT name : public base { \
-    ~name(); \
-    gott::QID interface_id() const; \
-    GOTT_PLUGIN_METHOD_REGISTRY_CONFINE(base); \
-  }
-
-#define GOTT_PLUGIN_INTERFACE_BEGIN(name, id) \
+#define GOTT_PLUGIN_INTERFACE_IMPL_BEGIN(name, id) \
   name::~name() {} \
   gott::QID name::interface_id() const { return id; } \
   GOTT_PLUGIN_METHOD_REGISTRY_BEGIN(name)
 
-#define GOTT_PLUGIN_INTERFACE_END() \
+#define GOTT_PLUGIN_INTERFACE_IMPL_END() \
   GOTT_PLUGIN_METHOD_REGISTRY_END()
-
-template<class Interface, class Dispatcher>
-class remote_plugin : public Interface {
-public:
-  remote_plugin(Dispatcher d = Dispatcher())
-  : dispatcher(d) {}
-
-private:
-  Dispatcher dispatcher;
-
-  boost::optional<plugin_base::function_entry_t>
-  find_method(QID const &id) const {
-    boost::optional<plugin_base::function_entry_t> m =
-      this->Interface::find_method(id);
-    if (!m) return m;
-    return dispatcher.create_functor(*m);
-  }
-};
 
 typedef plugin_base *(*plugin_builder)(system_configuration &, 
                                        plugin_configuration const &);
