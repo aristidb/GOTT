@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2004-2005
+ * Portions created by the Initial Developer are Copyright (C) 2004-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -40,14 +40,14 @@
 
 #include <gott/visibility.hpp>
 #include <gott/xany/xany.hpp>
+#include <gott/string/qid.hpp>
 #include <boost/function.hpp>
 #include <boost/optional.hpp>
+#include <boost/none.hpp>
 #include <vector>
 #include <map>
 
 namespace gott {
-class QID;
-
 namespace plugin {
 
 class system_configuration;
@@ -85,7 +85,7 @@ protected:
   boost::optional<function_entry_t> find_method_impl(gott::QID const &id) const;
 
 #define GOTT_PLUGIN_METHOD_REGISTRY_BEGIN(type) \
-  boost::optional<plugin_base::function_entry_t> \
+  boost::optional<gott::plugin::plugin_base::function_entry_t> \
   type::find_method_impl(gott::QID const &id) const { \
     typedef std::map<gott::QID, function_entry_t> method_map_t; \
     static method_map_t method_handlers; \
@@ -103,12 +103,84 @@ protected:
       return boost::none; \
   }
 
-#define GOTT_PLUGIN_INTERFACE_DECLARE(name) \
+using namespace gott::xany;
+template<class Ret, class Class>
+class plugin_method0_t {
+public:
+  plugin_method0_t(Ret (Class::*meth)()) : method(meth) {}
+  Xany operator()(
+      plugin_base *obj, 
+      plugin_base::parameter_list_t const &) const {
+    return Xany((static_cast<Class *>(obj)->*method)());
+  }
+private:
+  Ret (Class::*method)();
+};
+
+template<class Class>
+class plugin_method0_t<void, Class> {
+public:
+  plugin_method0_t(void (Class::*meth)()) : method(meth) {}
+  Xany operator()(
+      plugin_base *obj,
+      plugin_base::parameter_list_t const &) const {
+    (static_cast<Class *>(obj)->*method)();
+    return Xany();
+  }
+private:
+  void (Class::*method)();
+};
+
+template<class Ret, class Class>
+plugin_method0_t<Ret, Class> plugin_method(Ret (Class::*meth)()) {
+  return meth;
+}
+
+template<class Ret, class Arg1, class Class>
+class plugin_method1_t {
+public:
+  plugin_method1_t(Ret (Class::*meth)(Arg1)) : method(meth) {}
+  Xany operator()(
+      plugin_base *obj,
+      plugin_base::parameter_list_t const &parameters) const {
+    return Xany((static_cast<Class *>(obj)->*method)(
+          Xany_cast<Arg1>(parameters[0])));
+  }
+private:
+  Ret (Class::*method)(Arg1);
+};
+
+template<class Arg1, class Class>
+class plugin_method1_t<void, Arg1, Class> {
+public:
+  plugin_method1_t(void (Class::*meth)(Arg1)) : method(meth) {}
+  Xany operator()(
+      plugin_base *obj,
+      plugin_base::parameter_list_t const &parameters) const {
+    (static_cast<Class *>(obj)->*method)(Xany_cast<Arg1>(parameters[0]));
+    return Xany();
+  }
+private:
+  void (Class::*method)(Arg1);
+};
+
+template<class Ret, class Arg1, class Class>
+plugin_method1_t<Ret, Arg1, Class> plugin_method(Ret (Class::*meth)(Arg1)) {
+  return meth;
+}
+
+#define GOTT_PLUGIN_METHOD(id, meth) \
+  GOTT_PLUGIN_METHOD_REGISTRY_ENTRY(id, gott::plugin::plugin_method(meth))
+
+#define GOTT_PLUGIN_INTERFACE_DECLARE_BEGIN(name) \
   class GOTT_EXPORT name : public gott::plugin::plugin_base { \
+  public: \
     ~name(); \
     gott::QID interface_id() const; \
-    GOTT_PLUGIN_METHOD_REGISTRY_DECLARE; \
-  }
+    GOTT_PLUGIN_METHOD_REGISTRY_DECLARE;
+
+#define GOTT_PLUGIN_INTERFACE_DECLARE_END() \
+  };
 
 #define GOTT_PLUGIN_INTERFACE_CONFINE(name, base) \
   class GOTT_EXPORT name : public base { \
@@ -124,7 +196,7 @@ protected:
 
 #define GOTT_PLUGIN_INTERFACE_END() \
   GOTT_PLUGIN_METHOD_REGISTRY_END()
- 
+
 template<class Interface, class Dispatcher>
 class remote_plugin : public Interface {
 public:

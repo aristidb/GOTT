@@ -37,3 +37,4 @@
 
 Import('env')
 env.Program('producer_consumer1', 'producer_consumer1.cpp')
+env.SharedLibrary('greeting', 'greeting_interface.cpp')
