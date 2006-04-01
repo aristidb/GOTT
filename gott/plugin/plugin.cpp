@@ -38,5 +38,14 @@
 #include "plugin.hpp"
 
 using gott::plugin::plugin_base;
+using gott::QID;
+using gott::xany::Xany;
 
 plugin_base::~plugin_base() {}
+
+Xany plugin_base::run_method(QID const &id, parameter_list_t const &parameters){
+  boost::optional<function_entry_t> meth = find_method(id);
+  if (!meth)
+    throw user_error("unknown method");
+  return (*meth)(this, parameters);
+}

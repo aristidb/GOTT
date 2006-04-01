@@ -40,7 +40,10 @@
 
 #include <gott/visibility.hpp>
 #include <gott/xany/xany.hpp>
+#include <boost/function.hpp>
+#include <boost/optional.hpp>
 #include <vector>
+#include <map>
 
 namespace gott {
 class QID;
@@ -56,34 +59,54 @@ public:
   typedef std::vector<gott::xany::Xany> parameter_list_t;
   virtual ~plugin_base() = 0;
   virtual void add(QID const &point, hook const &extension) = 0;
-  virtual void run_method(QID const &id, 
-      parameter_list_t const &parameters,
-      gott::xany::Xany &out) = 0;
+  virtual QID class_id() const = 0;
+  gott::xany::Xany run_method(QID const &id, 
+      parameter_list_t const &parameters);
+protected:
+  typedef
+    boost::function<gott::xany::Xany (plugin_base *, parameter_list_t const &)>
+    function_entry_t;
+  virtual boost::optional<function_entry_t> 
+    find_method(QID const &id) const = 0;
 };
 
-#define GOTT_PLUGIN_DECLARE_METHOD_REGISTRY(type) \
-  void run_method(gott::QID const &id, \
-      parameter_list_t const &parameters, \
-      gott::xany::Xany &out \
-      ); \
-  static const std::map<gott::QID const &, \
-    boost::function<void (type *, \
-        parameter_list_t const &, \
-        gott::xany::Xany &)> > handlers;
+#define GOTT_PLUGIN_DECLARE_METHOD_REGISTRY \
+  boost::optional<function_entry_t> find_method(gott::QID const &id) const
 
 #define GOTT_PLUGIN_METHOD_REGISTRY_BEGIN(type) \
-  void type::run_method(gott::QID const &id, \
-      parameter_list_t const &parameters, \
-      gott::xany::Xany &out) { \
-    if (handlers.empty()) {
+  boost::optional<plugin_base::function_entry_t> \
+  type::find_method(gott::QID const &id) const { \
+    typedef std::map<gott::QID, function_entry_t> method_map_t; \
+    static const method_map_t method_handlers; \
+    if (method_handlers.empty()) {
 
 #define GOTT_PLUGIN_METHOD_REGISTRY_ENTRY(id, fun) \
-      handlers[id] = fun;
+      method_handlers[id] = fun;
 
 #define GOTT_PLUGIN_METHOD_REGISTRY_END() \
     } \
-    handlers[id](this, parameters, out); \
+    method_map_t::const_iterator it = method_handlers.find(id); \
+    if (it != method_handlers.end()) \
+      return it->second; \
   }
+
+template<class Interface, class Dispatcher>
+class remote_plugin : public Interface {
+public:
+  remote_plugin(Dispatcher d = Dispatcher())
+  : dispatcher(d) {}
+
+private:
+  Dispatcher dispatcher;
+
+  boost::optional<plugin_base::function_entry_t>
+  find_method(QID const &id) const {
+    boost::optional<plugin_base::function_entry_t> m =
+      this->Interface::find_method(id);
+    if (!m) return m;
+    return dispatcher.create_functor(*m);
+  }
+};
 
 typedef plugin_base *(*plugin_builder)(system_configuration &, 
                                        plugin_configuration const &);
