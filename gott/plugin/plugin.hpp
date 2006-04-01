@@ -60,6 +60,7 @@ public:
   virtual ~plugin_base() = 0;
   virtual void add(QID const &point, hook const &extension) = 0;
   virtual QID class_id() const = 0;
+  virtual QID interface_id() const = 0;
   gott::xany::Xany run_method(QID const &id, 
       parameter_list_t const &parameters);
 protected:
@@ -70,12 +71,22 @@ protected:
     find_method(QID const &id) const = 0;
 };
 
-#define GOTT_PLUGIN_DECLARE_METHOD_REGISTRY \
-  boost::optional<function_entry_t> find_method(gott::QID const &id) const
+#define GOTT_PLUGIN_METHOD_REGISTRY_DECLARE \
+  boost::optional<function_entry_t> find_method(gott::QID const &id) const { \
+    return find_method_impl(id); \
+  } \
+  boost::optional<function_entry_t> find_method_impl(gott::QID const &id) const;
+
+#define GOTT_PLUGIN_METHOD_REGISTRY_CONFINE(base) \
+  boost::optional<function_entry_t> find_method(gott::QID const &id) const { \
+    boost::optional<function_entry_t> result = find_method_impl(id); \
+    if (!result) result = this->base::find_method(id); \
+  } \
+  boost::optional<function_entry_t> find_method_impl(gott::QID const &id) const;
 
 #define GOTT_PLUGIN_METHOD_REGISTRY_BEGIN(type) \
   boost::optional<plugin_base::function_entry_t> \
-  type::find_method(gott::QID const &id) const { \
+  type::find_method_impl(gott::QID const &id) const { \
     typedef std::map<gott::QID, function_entry_t> method_map_t; \
     static const method_map_t method_handlers; \
     if (method_handlers.empty()) {
@@ -88,8 +99,32 @@ protected:
     method_map_t::const_iterator it = method_handlers.find(id); \
     if (it != method_handlers.end()) \
       return it->second; \
+    else \
+      return boost::none; \
   }
 
+#define GOTT_PLUGIN_INTERFACE_DECLARE(name) \
+  class GOTT_EXPORT name : public gott::plugin::plugin_base { \
+    ~name(); \
+    gott::QID interface_id() const; \
+    GOTT_PLUGIN_METHOD_REGISTRY_DECLARE; \
+  }
+
+#define GOTT_PLUGIN_INTERFACE_CONFINE(name, base) \
+  class GOTT_EXPORT name : public base { \
+    ~name(); \
+    gott::QID interface_id() const; \
+    GOTT_PLUGIN_METHOD_REGISTRY_CONFINE(base); \
+  }
+
+#define GOTT_PLUGIN_INTERFACE_BEGIN(name, id) \
+  name::~name() {} \
+  gott::QID name::interface_id() const { return id; } \
+  GOTT_PLUGIN_METHOD_REGISTRY_BEGIN(name)
+
+#define GOTT_PLUGIN_INTERFACE_END() \
+  GOTT_PLUGIN_METHOD_REGISTRY_END()
+ 
 template<class Interface, class Dispatcher>
 class remote_plugin : public Interface {
 public:
