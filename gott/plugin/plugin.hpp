@@ -38,6 +38,7 @@
 #ifndef GOTT_BASE_PLUGIN_PLUGIN_HPP
 #define GOTT_BASE_PLUGIN_PLUGIN_HPP
 
+#if 1
 #include <gott/visibility.hpp>
 #include <gott/xany/xany.hpp>
 #include <gott/string/qid.hpp>
@@ -46,6 +47,7 @@
 #include <boost/none.hpp>
 #include <vector>
 #include <map>
+#endif
 
 namespace gott {
 namespace plugin {
@@ -81,6 +83,7 @@ protected:
   boost::optional<function_entry_t> find_method(gott::QID const &id) const { \
     boost::optional<function_entry_t> result = find_method_impl(id); \
     if (!result) result = this->base::find_method(id); \
+    return result;
   } \
   boost::optional<function_entry_t> find_method_impl(gott::QID const &id) const;
 
@@ -172,6 +175,9 @@ plugin_method1_t<Ret, Arg1, Class> plugin_method(Ret (Class::*meth)(Arg1)) {
 #define GOTT_PLUGIN_METHOD_ENTRY(id, meth) \
   GOTT_PLUGIN_METHOD_REGISTRY_ENTRY(id, gott::plugin::plugin_method(meth))
 
+#define GOTT_PLUGIN_METHOD_ENTRY2(name) \
+  GOTT_PLUGIN_METHOD_ENTRY(#name, &name)
+
 #define GOTT_PLUGIN_INTERFACE_DECLARE_BEGIN(name) \
   class GOTT_EXPORT name : public gott::plugin::plugin_base { \
   public: \
@@ -189,10 +195,13 @@ plugin_method1_t<Ret, Arg1, Class> plugin_method(Ret (Class::*meth)(Arg1)) {
 #define GOTT_PLUGIN_INTERFACE_DECLARE_END() \
   };
 
-#define GOTT_PLUGIN_INTERFACE_IMPL_BEGIN(name, id) \
-  name::~name() {} \
-  gott::QID name::interface_id() const { return id; } \
-  GOTT_PLUGIN_METHOD_REGISTRY_BEGIN(name)
+#define GOTT_PLUGIN_INTERFACE_IMPL_BEGIN(id, ns, name) \
+  ns::name::~name() {} \
+  gott::QID ns::name::interface_id() const { return id; } \
+  GOTT_PLUGIN_METHOD_REGISTRY_BEGIN(ns::name)
+
+#define GOTT_PLUGIN_INTERFACE_IMPL_BEGIN2(ns, name) \
+  GOTT_PLUGIN_INTERFACE_IMPL_BEGIN(#ns "::" #name, ns, name)
 
 #define GOTT_PLUGIN_INTERFACE_IMPL_END() \
   GOTT_PLUGIN_METHOD_REGISTRY_END()
