@@ -88,7 +88,7 @@ protected:
   boost::optional<plugin_base::function_entry_t> \
   type::find_method_impl(gott::QID const &id) const { \
     typedef std::map<gott::QID, function_entry_t> method_map_t; \
-    static const method_map_t method_handlers; \
+    static method_map_t method_handlers; \
     if (method_handlers.empty()) {
 
 #define GOTT_PLUGIN_METHOD_REGISTRY_ENTRY(id, fun) \
