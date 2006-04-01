@@ -5,7 +5,7 @@
 #include <iosfwd>
 
 GOTT_PLUGIN_INTERFACE_DECLARE_BEGIN(greeting_interface)
-  virtual void greet(std::ostream *);
+  virtual void greet(std::ostream *) = 0;
 GOTT_PLUGIN_INTERFACE_DECLARE_END()
 
 #endif

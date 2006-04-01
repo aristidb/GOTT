@@ -169,7 +169,7 @@ plugin_method1_t<Ret, Arg1, Class> plugin_method(Ret (Class::*meth)(Arg1)) {
   return meth;
 }
 
-#define GOTT_PLUGIN_METHOD(id, meth) \
+#define GOTT_PLUGIN_METHOD_ENTRY(id, meth) \
   GOTT_PLUGIN_METHOD_REGISTRY_ENTRY(id, gott::plugin::plugin_method(meth))
 
 #define GOTT_PLUGIN_INTERFACE_DECLARE_BEGIN(name) \
