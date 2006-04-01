@@ -73,7 +73,7 @@ public:
 
 #define GOTT_PLUGIN_METHOD_REGISTRY_BEGIN(type) \
   void type::run_method(gott::QID const &id, \
-      std::vector<gott::xany::Xany> const &parameters, \
+      parameter_list_t const &parameters, \
       gott::xany::Xany &out) { \
     if (handlers.empty()) {
 
@@ -84,7 +84,6 @@ public:
     } \
     handlers[id](this, parameters, out); \
   }
-    
 
 typedef plugin_base *(*plugin_builder)(system_configuration &, 
                                        plugin_configuration const &);
