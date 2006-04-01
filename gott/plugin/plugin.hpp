@@ -39,6 +39,8 @@
 #define GOTT_BASE_PLUGIN_PLUGIN_HPP
 
 #include <gott/visibility.hpp>
+#include <gott/xany/xany.hpp>
+#include <vector>
 
 namespace gott {
 class QID;
@@ -51,9 +53,38 @@ class hook;
 
 class GOTT_EXPORT plugin_base {
 public:
+  typedef std::vector<gott::xany::Xany> parameter_list_t;
   virtual ~plugin_base() = 0;
   virtual void add(QID const &point, hook const &extension) = 0;
+  virtual void run_method(QID const &id, 
+      parameter_list_t const &parameters,
+      gott::xany::Xany &out) = 0;
 };
+
+#define GOTT_PLUGIN_DECLARE_METHOD_REGISTRY(type) \
+  void run_method(gott::QID const &id, \
+      parameter_list_t const &parameters, \
+      gott::xany::Xany &out \
+      ); \
+  static const std::map<gott::QID const &, \
+    boost::function<void (type *, \
+        parameter_list_t const &, \
+        gott::xany::Xany &)> > handlers;
+
+#define GOTT_PLUGIN_METHOD_REGISTRY_BEGIN(type) \
+  void type::run_method(gott::QID const &id, \
+      std::vector<gott::xany::Xany> const &parameters, \
+      gott::xany::Xany &out) { \
+    if (handlers.empty()) {
+
+#define GOTT_PLUGIN_METHOD_REGISTRY_ENTRY(id, fun) \
+      handlers[id] = fun;
+
+#define GOTT_PLUGIN_METHOD_REGISTRY_END() \
+    } \
+    handlers[id](this, parameters, out); \
+  }
+    
 
 typedef plugin_base *(*plugin_builder)(system_configuration &, 
                                        plugin_configuration const &);
