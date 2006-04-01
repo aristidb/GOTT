@@ -83,7 +83,7 @@ protected:
   boost::optional<function_entry_t> find_method(gott::QID const &id) const { \
     boost::optional<function_entry_t> result = find_method_impl(id); \
     if (!result) result = this->base::find_method(id); \
-    return result;
+    return result; \
   } \
   boost::optional<function_entry_t> find_method_impl(gott::QID const &id) const;
 
