@@ -48,16 +48,6 @@ namespace gott {
  * \name Unix library loading routines
  * These functions wrap the dl routines of unix/posix. 
  * \todo{change the exception type thrown}
- * \code
- *   try{
- *     void * libm = gott::dlopen_unix( "libm.so", RTLD_NOW);
- *     int(*my_atan2)(double,double) = gott::function_cast<int(double,double)>(
- *       gott::dlsym_unix(libm, "atan2");
- *       );
- *   }
- *   catch(runtime_error const&e ){
- *   }
- * \endcode
  * \{
  */
 /**
@@ -73,6 +63,17 @@ GOTT_LOCAL inline FType* function_cast( void* handle )
 
 /**
  * Open a dynamic library. See dlopen(3) for reference,
+ * \code
+ *   try{
+ *     void * libm = gott::dlopen_unix( "libm.so", RTLD_NOW);
+ *     int(*my_atan2)(double,double) = gott::function_cast<int(double,double)>(
+ *       gott::dlsym_unix(libm, "atan2");
+ *       );
+ *   }
+ *   catch(runtime_error const&e ){
+ *   }
+ * \endcode
+
  * \param filename The name of the library to open
  * \param flag either RTLD_NOW or RTLD_LAZY
  * \return a handle of the dynamic library
