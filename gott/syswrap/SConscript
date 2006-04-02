@@ -40,6 +40,7 @@ Import('env')
 
 libobj = glob.glob('*.cpp')
 libobj.remove('test.cpp')
+env.Append(LIBS= ['dl'])
 env.SharedLibrary('syswrap', glob.glob('*.cpp'))
 env = env.Copy()
 env.Append(LIBS = ['syswrap'])

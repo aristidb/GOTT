@@ -39,17 +39,15 @@
 #include <boost/scoped_array.hpp>
 #include <gott/string/string.hpp>
 #include <gott/exceptions.hpp>
-#include <dlfcn.h>
+#include <gott/syswrap/dl_unix.hpp>
 
 using gott::plugin::module;
 
 module::module(gott::string const &path)
 : handle(
-    dlopen(
-      boost::scoped_array<char>(path.c_string_alloc()).get(),
-      RTLD_LAZY)) {
-  if (handle == 0)
-    throw system_error(dlerror());
+    dlopen_unix( boost::scoped_array<char>(path.c_string_alloc()).get() 
+    ,  RTLD_LAZY))
+{
 }
 
 module::~module() {
@@ -58,6 +56,6 @@ module::~module() {
 }
 
 void *module::entity(gott::string const &symbol) {
-  return dlsym(handle, 
-      boost::scoped_array<char>(symbol.c_string_alloc()).get());
+  return dlsym_unix(handle
+      , boost::scoped_array<char>(symbol.c_string_alloc()).get());
 }

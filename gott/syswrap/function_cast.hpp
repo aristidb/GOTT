@@ -34,62 +34,21 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
-
-#ifndef GOTT_SYSWRAP_LD_UNIX_HPP
-#define GOTT_SYSWRAP_LD_UNIX_HPP
-
-#include <gott/visibility.hpp>
-#include <gott/syswrap/function_cast.hpp>
-#include <dlfcn.h>
-
-namespace gott {
-
-
+#ifndef GOTT_SYSWRAP_FUNCTION_CAST_HPP
+#define GOTT_SYSWRAP_FUNCTION_CAST_HPP
+namespace gott{
 /**
- * \name Unix library loading routines
- * These functions wrap the dl routines of unix/posix. 
- * \{
- */
-
-/**
- * Open a dynamic library. See dlopen(3) for reference,
- * \code
- *   try{
- *     void * libm = gott::dlopen_unix( "libm.so", RTLD_NOW);
- *     double(*my_atan2)(double,double) = gott::function_cast<double(double,double)>(
- *       gott::dlsym_unix(libm, "atan2");
- *       );
- *   }
- *   catch(std::system_error const&e ){
- *   }
+ * Cast a symbol address to a function pointer. 
  * \endcode
-
- * \param filename The name of the library to open
- * \param flag either RTLD_NOW or RTLD_LAZY
- * \return a handle of the dynamic library
- * \throw gott::system_error
+ * \param handle the address of the symbol
+ * \param FType a 
+ * \return a function pointer
  */
-GOTT_EXPORT void* dlopen_unix( char const* filename, int flag );
-
-/**
- * Load a symbol from a dynamic library. See dlsym(3) for reference
- * \see gott::function_cast to do a clean cast. 
- * \param handle the handle of the dynamic library
- * \param symbol the name of the symbol 
- * \return the symbol address 
- * \throw gott::system_error
- */
-GOTT_EXPORT void *dlsym_unix(void *handle, char const* symbol);
-
-/**
- * Close a dynamic library. 
- * \param handle the handle of the previously loaded library 
- * \throw gott::system_error
- */
-GOTT_EXPORT void dlclose_unix(void *handle);
-
-/// \}
+template<typename FType>
+GOTT_LOCAL inline FType* function_cast( void* handle )
+{ return (FType*)(handle); }
 
 }
 
 #endif
+
