@@ -35,17 +35,16 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <stdexcept>
-#include "dl_unix.hpp"
-
-using std::runtime_error;
+#include <gott/exceptions.hpp>
+#include <gott/syswrap/dl_unix.hpp>
+#include <gott/string/string.hpp>
 
 void *gott::dlopen_unix( char const* filename, int flag )
 {
   dlerror();
   void *ret = dlopen(filename, flag);
-  if( ret == NULL ) 
-    throw runtime_error(dlerror());
+  if( ret == 0 ) 
+    throw system_error(gott::string(dlerror()));
   return ret;
 }
 
@@ -54,8 +53,8 @@ void *gott::dlsym_unix(void *handle, char const* symbol)
   dlerror();
   void *ret = dlsym(handle, symbol);
   char * er = dlerror();
-  if( er != NULL ) 
-    throw runtime_error(er);
+  if( er != 0 ) 
+    throw system_error(gott::string(er));
   return ret;
 }
 
@@ -63,6 +62,6 @@ void gott::dlclose_unix(void *handle)
 {
   int ret = dlclose( handle );
   if( ret != 0 )
-    throw runtime_error( dlerror() );
+    throw system_error( gott::string(dlerror()) );
 }
 
