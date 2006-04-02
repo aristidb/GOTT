@@ -66,7 +66,7 @@ GOTT_LOCAL inline FType* function_cast( void* handle )
  * \code
  *   try{
  *     void * libm = gott::dlopen_unix( "libm.so", RTLD_NOW);
- *     int(*my_atan2)(double,double) = gott::function_cast<int(double,double)>(
+ *     double(*my_atan2)(double,double) = gott::function_cast<double(double,double)>(
  *       gott::dlsym_unix(libm, "atan2");
  *       );
  *   }
