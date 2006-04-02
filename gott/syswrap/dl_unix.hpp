@@ -70,14 +70,14 @@ GOTT_LOCAL inline FType* function_cast( void* handle )
  *       gott::dlsym_unix(libm, "atan2");
  *       );
  *   }
- *   catch(runtime_error const&e ){
+ *   catch(std::runtime_error const&e ){
  *   }
  * \endcode
 
  * \param filename The name of the library to open
  * \param flag either RTLD_NOW or RTLD_LAZY
  * \return a handle of the dynamic library
- * \throw runtime_error
+ * \throw std::runtime_error
  */
 GOTT_EXPORT void* dlopen_unix( char const* filename, int flag );
 
@@ -87,14 +87,14 @@ GOTT_EXPORT void* dlopen_unix( char const* filename, int flag );
  * \param handle the handle of the dynamic library
  * \param symbol the name of the symbol 
  * \return the symbol address 
- * \throw runtime_error
+ * \throw std::runtime_error
  */
 GOTT_EXPORT void *dlsym_unix(void *handle, char const* symbol);
 
 /**
  * Close a dynamic library. 
  * \param handle the handle of the previously loaded library 
- * \throw runtime_error
+ * \throw std::runtime_error
  */
 GOTT_EXPORT void dlclose_unix(void *handle);
 
