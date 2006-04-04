@@ -52,7 +52,7 @@ module::module(gott::string const &path)
 
 module::~module() {
   if (handle)
-    dlclose(handle);
+    dlclose_unix(handle);
 }
 
 void *module::entity(gott::string const &symbol) {
