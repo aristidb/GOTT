@@ -52,7 +52,11 @@ module::module(gott::string const &path)
 
 module::~module() {
   if (handle)
-    dlclose_unix(handle);
+    try {
+      dlclose_unix(handle);
+    } catch (...) {
+      // TODO: log?
+    }
 }
 
 void *module::entity(gott::string const &symbol) {

@@ -54,13 +54,14 @@ namespace gott {
 /**
  * Open a dynamic library. See dlopen(3) for reference,
  * \code
- *   try{
- *     void * libm = gott::dlopen_unix( "libm.so", RTLD_NOW);
- *     double(*my_atan2)(double,double) = gott::function_cast<double(double,double)>(
- *       gott::dlsym_unix(libm, "atan2");
- *       );
- *   }
- *   catch(std::system_error const&e ){
+ *   try {
+ *     void *libm = gott::dlopen_unix("libm.so", RTLD_NOW);
+ *     double (*my_atan2)(double,double) = 
+ *       gott::function_cast<double (double,double)>(
+ *         gott::dlsym_unix(libm, "atan2"));
+ *     std::cout << my_atan2(2, 3) << std::endl;
+ *   } catch(gott::system_error const &e){
+ *     std::cerr << "sorry not to provide you with the arcus tangens of 2/3!\n";
  *   }
  * \endcode
 
