@@ -39,29 +39,26 @@
 #include <gott/syswrap/dl_unix.hpp>
 #include <gott/string/string.hpp>
 
-void *gott::dlopen_unix( char const* filename, int flag )
-{
+void *gott::dlopen_unix(char const* filename, int flag ) {
   dlerror();
   void *ret = dlopen(filename, flag);
-  if( ret == 0 ) 
+  if( ret == 0 )
     throw system_error(gott::string(dlerror()));
   return ret;
 }
 
-void *gott::dlsym_unix(void *handle, char const* symbol)
-{
+void *gott::dlsym_unix(void *handle, char const *symbol) {
   dlerror();
   void *ret = dlsym(handle, symbol);
-  char * er = dlerror();
-  if( er != 0 ) 
-    throw system_error(gott::string(er));
+  char *err = dlerror();
+  if (err != 0)
+    throw system_error(gott::string(err));
   return ret;
 }
 
-void gott::dlclose_unix(void *handle)
-{
+void gott::dlclose_unix(void *handle) {
   int ret = dlclose( handle );
-  if( ret != 0 )
-    throw system_error( gott::string(dlerror()) );
+  if (ret != 0)
+    throw system_error(gott::string(dlerror()));
 }
 
