@@ -41,6 +41,7 @@
 #include "types.hpp"
 #include <gott/visibility.hpp>
 #include <gott/range.hpp>
+#include <gott/range_algo.hpp>
 
 namespace gott {
 class string;
@@ -60,12 +61,10 @@ public:
   /**
    * Construct empty buffer.
    */
-  string_buffer() GOTT_EXPORT;
+  string_buffer() : begin_(0), end_(0), storage_end_(0) {}
 
   /// Copy-Constructor.
-  string_buffer(string_buffer const &b) : data(0) {
-    string_buffer empty;
-    this->swap(empty);
+  string_buffer(string_buffer const &b) : begin_(0), end_(0), storage_end_(0) {
     *this += b;
   }
 
@@ -73,9 +72,7 @@ public:
    * Construct buffer from string.
    * \param x The string to construct the buffer from.
    */
-  string_buffer(string const &x) : data(0) {
-    string_buffer empty;
-    this->swap(empty);
+  string_buffer(string const &x) : begin_(0), end_(0), storage_end_(0) {
     *this += x;
   }
   
@@ -83,51 +80,56 @@ public:
    * Construct buffer from string.
    * \param x The utf8 character range to construct the buffer from.
    */
-  string_buffer(range_t<utf32_t const *> const &x) : data(0) {
-    string_buffer empty;
-    this->swap(empty);
+  string_buffer(range_t<utf32_t const *> const &x) 
+  : begin_(0), end_(0), storage_end_(0) {
     insert(end(), x.begin(), x.end());
   }
 
   /// Destructor.
-  ~string_buffer() GOTT_EXPORT;
+  ~string_buffer() { if (begin_) delete [] begin_; }
 
   /**
    * Return an iterator pointing to the beginning of the represented string.
    */
   iterator begin() { 
-    return const_cast<iterator>(((string_buffer const *)this)->begin());
+    return begin_;
   }
 
   /**
    * Return an iterator pointing after the end of the represented string.
    */
   iterator end() {
-    return const_cast<iterator>(((string_buffer const *)this)->end());
+    return end_;
   }
   
   /**
    * Return an iterator pointing to the beginning of the represented string.
    */
-  const_iterator begin() const GOTT_EXPORT;
+  const_iterator begin() const {
+    return begin_;
+  }
 
   /**
    * Return an iterator pointing after the end of the represented string.
    */ 
-  const_iterator end() const GOTT_EXPORT;
+  const_iterator end() const {
+    return end_;
+  }
 
   /**
    * Return the size (and length) of the represented string.
    */
-  size_t size() const GOTT_EXPORT;
-  
+  size_t size() const {
+    return end_ - begin_;
+  }
+
   /**
    * Swap contents with another buffer.
    */
   void swap(string_buffer &o) {
-    representation *tmp = data;
-    data = o.data;
-    o.data = tmp;
+    std::swap(begin_, o.begin_);
+    std::swap(end_, o.end_);
+    std::swap(storage_end_, o.storage_end_);
   }
 
   /**
@@ -141,7 +143,14 @@ public:
    * Return the character at a certain position of the buffer.
    */
   utf32_t &operator[](std::size_t i) {
-    return begin()[i];
+    return begin_[i];
+  }
+
+  /**
+   * Return the character at a certain position of the buffer.
+   */
+  utf32_t operator[](std::size_t i) const {
+    return begin_[i];
   }
 
   /**
@@ -149,7 +158,15 @@ public:
    * \param r The range to erase.
    * \return Iterator pointing just after the erased range.
    */
-  iterator erase(range_t<iterator> const &r) GOTT_EXPORT;
+  iterator erase(range_t<iterator> const &r) {
+    iterator a = r.begin();
+    iterator b = r.end();
+
+    while (b != end_)
+      *a++ = *b++;
+    end_ = a;
+    return r.begin();
+  }
 
   iterator erase(iterator i1, iterator i2) {
     return erase(range(i1, i2));
@@ -161,7 +178,19 @@ public:
    * \param len The size of the inserted chunk.
    * \return The inserted chunk.
    */
-  range_t<iterator> insert(iterator pos, std::size_t len) GOTT_EXPORT;
+  range_t<iterator> insert(iterator pos, std::size_t len) {
+    if (len != 0) {
+      if (std::size_t(storage_end_ - end_) < len) {
+        std::size_t pp = pos - begin_;
+        ensure(len);
+        pos = begin_ + pp;
+      } else
+        end_ += len;
+      for (iterator it = end_ - 1; it >= pos + len; --it)
+        *it = *(it - len);
+    }
+    return range(pos, len);
+  }
 
   template<class I>
   void insert(iterator pos, I a, I b) {
@@ -187,20 +216,45 @@ public:
   /**
    * Append a string.
    */
-  void operator+=(string const &s) GOTT_EXPORT;
+  void operator+=(string const &s) {
+    gott::copy(s.as_utf32(), append(s.length()));
+  }
 
   /**
    * Append a string_buffer.
    */
-  void operator+=(string_buffer const &sb) GOTT_EXPORT;
+  void operator+=(string_buffer const &b) {
+    gott::copy(range(b), append(b.size()));
+  }
 
-  void operator+=(utf32_t ch) GOTT_LOCAL {
+  void operator+=(utf32_t ch) {
     *append(1).Begin = ch;
   }
 
 private:
-  class representation;
-  representation *data;
+  utf32_t *begin_;
+  utf32_t *end_;
+  utf32_t *storage_end_;
+
+  void ensure(std::size_t add_len) {
+    std::size_t old_len = end_ - begin_;
+    if (std::size_t(storage_end_ - end_) < add_len)
+      grow(old_len + add_len);
+    end_ = begin_ + old_len + add_len;
+  }
+
+  void grow(std::size_t length) {
+    std::size_t new_size = 1;
+    while (new_size < length) 
+      new_size <<= 1;
+    utf32_t *old = begin_;
+    begin_ = new utf32_t[new_size];
+    utf32_t *out = begin_;
+    for (utf32_t *pos = old; pos != end_; ++pos)
+      *out++ = *pos;
+    delete [] old;
+    storage_end_ = begin_ + new_size;
+  }
 };
 
 }

@@ -42,7 +42,7 @@
 #include "types.hpp"
 #include "stl.hpp"
 #include "convert.hpp"
-#include "buffer.hpp"
+//#include "buffer.hpp"
 #include <gott/visibility.hpp>
 #include <gott/range.hpp>
 #include <boost/shared_ptr.hpp>
@@ -205,9 +205,7 @@ public:
   /**
    * Construct from string_buffer.
    */
-  GOTT_LOCAL string(string_buffer const &b) {
-    set_up(to_utf8_alloc(range(b).cast<char const *>(), utf32), true);
-  }
+  string(string_buffer const &b);
 
   enum concat_tag { 
     concatenate  ///< Designates that many strings should be concatenated.
@@ -311,6 +309,8 @@ public:
 
 private:
   class representation;
+  //TODO: short string optimization
+  //like: variant<shared_ptr<representation>, char[16]> p;
   boost::shared_ptr<representation> p;
 
   void set_up(range_t<utf8_t const *> const &d, bool o);

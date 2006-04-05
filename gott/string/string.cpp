@@ -40,6 +40,7 @@
 #ifndef NO_STDLIB
 #include "stl.hpp"
 #endif
+#include "buffer.hpp"
 
 #include <gott/range.hpp>
 #include <gott/range_algo.hpp>
@@ -82,6 +83,9 @@ public:
 };
 
 string::string(string const &o) : p(o.p) {}
+string::string(string_buffer const &b)
+: p(new representation(
+      to_utf8_alloc(range(b).cast<char const *>(), utf32), true)) {}
 
 string::~string() {}
 
