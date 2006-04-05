@@ -63,9 +63,9 @@ public:
    * Return the character at the current position as UTF32.
    */
   utf32_t operator*() const {
-    utf8_t const mask6 = ~(~utf8_t() << 6);
-    utf8_t const mask5 = ~(~utf8_t() << 5);
-    utf8_t const mask4 = ~(~utf8_t() << 4);
+    uutf8_t const mask6 = ~(~uutf8_t() << 6);
+    uutf8_t const mask5 = ~(~uutf8_t() << 5);
+    uutf8_t const mask4 = ~(~uutf8_t() << 4);
     if (current[0] < 0xC0)
       return current[0];
     else if (current[0] < 0xE0)
@@ -164,15 +164,18 @@ public:
   /**
    * Construct from pointer to UTF8-formatted memory.
    */
-  utf8_iterator(utf8_t const *c = 0) : current(c) {}
+  utf8_iterator(utf8_t const *c = 0) 
+  : current(reinterpret_cast<uutf8_t const *>(c)) {}
 
   /**
    * Retrieve the current memory position.
    */
-  utf8_t const *ptr() const { return current; }
+  utf8_t const *ptr() const {
+    return reinterpret_cast<utf8_t const *>(current);
+  }
 
 private:
-  utf8_t const *current;
+  uutf8_t const *current;
 };
 
 /**

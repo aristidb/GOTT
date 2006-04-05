@@ -93,7 +93,7 @@ void object::test<3>(int) {
       stru::revocable_structure::pth p = w.point();
       w.data(Xany(8899.2));
       w.begin(source_position());
-        w.add_tag(L"--!");
+        w.add_tag("--!");
       w.revert(p);
       w.get_rid_of(p);
       w.data(Xany("77"));
@@ -111,7 +111,7 @@ void object::test<4>(int) {
     w.begin(source_position());
       w.data(Xany(8899.2));
       w.begin(source_position());
-        w.add_tag(L"--!");
+        w.add_tag("--!");
         w.data(Xany("77"));
       w.end();
     w.end();
@@ -128,7 +128,7 @@ void object::test<5>(int) {
     w.begin(source_position());
       w.data(Xany(8899.2));
       w.begin(source_position());
-        w.add_tag(L"--!");
+        w.add_tag("--!");
         w.data(Xany("77"));
       w.end();
     w.end();

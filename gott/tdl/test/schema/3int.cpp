@@ -75,9 +75,9 @@ template<> template<>
 void object::test<1>(int) {
   run_test("77\n102342\n9");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(77), L"el"));
-  c.push_back(S(Xany(102342), L"el"));
-  c.push_back(S(Xany(9), L"el"));
+  c.push_back(S(Xany(77), "el"));
+  c.push_back(S(Xany(102342), "el"));
+  c.push_back(S(Xany(9), "el"));
   M(c).write_to(xp);
   ensure_equals("three integers", tree, xp);
 }

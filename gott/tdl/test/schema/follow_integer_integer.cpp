@@ -77,9 +77,9 @@ template<> template<>
 void object::test<1>(int) {
   run_test("4\n 5");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(4), L"int1"));
-  c.push_back(S(Xany(5), L"int2"));
-  C(M(c, L"foll"), L"doc").write_to(xp);
+  c.push_back(S(Xany(4), "int1"));
+  c.push_back(S(Xany(5), "int2"));
+  C(M(c, "foll"), "doc").write_to(xp);
   ensure_equals("single follow_integer_integer entity", tree, xp);
 }
 

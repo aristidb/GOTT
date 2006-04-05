@@ -87,7 +87,7 @@ void object::test<1>(int t) {
 
   stru::cf::nd_list c;
   for (int i = 0; i < n; ++i) {
-    wchar_t ch[2] = {'0'+i,0};
+    char ch[2] = {'0'+i,0};
     c.push_back(S(Xany(ch), "el"));
   }
   C(M(c)).write_to(xp);

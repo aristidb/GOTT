@@ -146,7 +146,7 @@ bool match_follow_ordered::accept_empty(rule_attr_t const &,
 }
 
 gott::string match_follow_ordered::name() const {
-  return "follow";
+  return gott::string("follow");
 }
 
 match_follow_ordered::~match_follow_ordered() {

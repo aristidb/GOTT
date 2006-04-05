@@ -84,7 +84,7 @@ void object::test<1>(int) {
   run_test("4\nx");
   stru::cf::nd_list c;
   c.push_back(C(S(Xany(4), "int"), "list"));
-  c.push_back(S(Xany(L"x"), "string"));
+  c.push_back(S(Xany("x"), "string"));
   C(M(c, "ord")).write_to(xp);
   ensure_equals("single integer, then string", tree, xp);
 }
@@ -94,7 +94,7 @@ void object::test<2>(int) {
   run_test("d7");
   stru::cf::nd_list c;
   c.push_back(S(Xany(), "list"));
-  c.push_back(S(Xany(L"d7"), "string"));
+  c.push_back(S(Xany("d7"), "string"));
   C(M(c, "ord")).write_to(xp);
   ensure_equals("just string", tree, xp);
 }

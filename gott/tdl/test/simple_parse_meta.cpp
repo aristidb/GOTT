@@ -60,13 +60,13 @@ struct meta_basic {
     ev.push_back(pair<string,string>(cmd, param));
     return true;
   }
-  void expect(string const &cmd, string const &param = L"") {
+  void expect(string const &cmd, string const &param = string()) {
     xp.push_back(pair<string,string>(cmd, param));
   }
   void run_test() {
     istringstream x(data);
     final_position = parser.parse(x);
-    rest = x.str().c_str() + x.tellg();
+    rest = gott::string(x.str().c_str() + x.tellg(), gott::utf8);
   }
   meta_basic() { parser.set_default(boost::ref(*this)); }
 };
@@ -91,7 +91,7 @@ template<> template<>
 void object::test<1>(int) {
   data = "#?foobar qulux-dei zql";
   run_test();
-  expect(L"foobar", L"qulux-dei zql");
+  expect("foobar", "qulux-dei zql");
   ensure_equals("simple meta declaration", range(ev), range(xp));
   ensure_equals(final_position, 
       source_position("", 1, 0, "foobar qulux-dei zql", 1, 0));
@@ -104,7 +104,7 @@ void object::test<2>(int) {
   expect("real", "kluft");
   ensure_equals("multi-line declaration", range(ev), range(xp));
   ensure_equals("multi-line declaration rest", rest, 
-                string(L"   \n       \n\n#?delta_x yz"));
+                string("   \n       \n\n#?delta_x yz"));
   ensure_equals(final_position,
       source_position("", 9, 0, "real     kluft", 5, 0));
 }
@@ -116,7 +116,7 @@ void object::test<3>(int) {
   expect("a");
   expect("", "b");
   ensure_equals("multi-line #2", range(ev), range(xp));
-  ensure_equals("multi-line #2 rest", rest, string(L"#\n#?c"));
+  ensure_equals("multi-line #2 rest", rest, string("#\n#?c"));
   ensure_equals(final_position,
       source_position("", 2, 0, " b", 2, 0));
 }

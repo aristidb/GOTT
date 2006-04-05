@@ -73,7 +73,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test("4");
-  C(S(Xany(4), L"i")).write_to(xp);
+  C(S(Xany(4), "i")).write_to(xp);
   ensure_equals("single integer entity", tree, xp);
 }
 
@@ -120,7 +120,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   run_test("-777777");
-  C(S(Xany(-777777), L"i")).write_to(xp);
+  C(S(Xany(-777777), "i")).write_to(xp);
   ensure_equals("negative", tree, xp);
 }
 

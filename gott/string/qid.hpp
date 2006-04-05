@@ -45,7 +45,9 @@ namespace gott {
 class QID : public atom {
 public:
   template<class T>
-  QID(T const &x) : atom(x) {}
+  QID(T x) : atom(string(x)) {}
+  QID(char const *x) : atom(string(zero_terminated(x), string::literal)) {}
+  QID(atom const &x) : atom(x) {}
   ~QID() GOTT_EXPORT;
 };
 

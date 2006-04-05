@@ -81,5 +81,5 @@ bool match_any::accept_empty(rule_attr_t const &, std::vector<rule_t> const &cho
 }
 
 gott::string match_any::name() const {
-  return "any";
+  return gott::string("any");
 }

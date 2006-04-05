@@ -43,7 +43,7 @@ void *gott::dlopen_unix(char const* filename, int flag ) {
   dlerror();
   void *ret = dlopen(filename, flag);
   if( ret == 0 )
-    throw system_error(gott::string(dlerror()));
+    throw system_error(gott::string(dlerror(), gott::utf8));
   return ret;
 }
 
@@ -52,13 +52,13 @@ void *gott::dlsym_unix(void *handle, char const *symbol) {
   void *ret = dlsym(handle, symbol);
   char *err = dlerror();
   if (err != 0)
-    throw system_error(gott::string(err));
+    throw system_error(gott::string(err, gott::utf8));
   return ret;
 }
 
 void gott::dlclose_unix(void *handle) {
   int ret = dlclose( handle );
   if (ret != 0)
-    throw system_error(gott::string(dlerror()));
+    throw system_error(gott::string(dlerror(), gott::utf8));
 }
 

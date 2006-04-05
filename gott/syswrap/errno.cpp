@@ -50,7 +50,7 @@ void gott::throw_errno_exception() {
 
 namespace {
   gott::string desc(int n) {
-    return strerror(n); // TODO threadsafe?
+    return gott::string(strerror(n), gott::utf8); // TODO threadsafe?
   }
 }
 

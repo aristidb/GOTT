@@ -91,5 +91,5 @@ bool match_document::play(ev::child_succeed const &) {
 }
 
 gott::string match_document::name() const {
-  return "document";
+  return gott::string("document");
 }

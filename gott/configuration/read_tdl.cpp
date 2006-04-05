@@ -144,5 +144,5 @@ schema::item::expect match_config_tdl::expectation() const {
 }
 
 string match_config_tdl::name() const {
-  return "config";
+  return gott::string("config");
 }

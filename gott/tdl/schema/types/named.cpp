@@ -78,5 +78,5 @@ bool match_named::play(ev::child_succeed const &) {
 }
 
 gott::string match_named::name() const {
-  return "named";
+  return gott::string("named");
 }

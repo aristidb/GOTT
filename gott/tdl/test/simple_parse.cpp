@@ -55,7 +55,7 @@ struct spb : tdl::abstract_tdl_parser {
   void up() { ev.push_back(event(u, "")); }
   void node(string const &w) { ev.push_back(event(n, w)); }
   void comment(string const &w, bool nl) { 
-    ev.push_back(event(c, (nl ? "\n" : "") + w)); 
+    ev.push_back(event(c, (nl ? gott::string("\n") : gott::string()) + w)); 
   }
 
   void B() { xp.push_back(event(b, "")); }
@@ -64,7 +64,7 @@ struct spb : tdl::abstract_tdl_parser {
   void U() { xp.push_back(event(u, "")); }
   void N(string const &w) { xp.push_back(event(n, w)); }
   void C(string const &w, bool nl) { 
-    xp.push_back(event(c, (nl ? "\n" : "") + w)); 
+    xp.push_back(event(c, (nl ? gott::string("\n") : "") + w)); 
   }
 };
 

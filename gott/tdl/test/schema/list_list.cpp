@@ -91,8 +91,8 @@ void object::test<2>(int) {
   i.push_back(S(Xany(1), "ii"));
   i.push_back(S(Xany(2), "ii"));
   stru::cf::nd_list c;
-  c.push_back(C(M(i, L"t"), "s"));
-  c.push_back(S(Xany(L"a"), "xx"));
+  c.push_back(C(M(i, "t"), "s"));
+  c.push_back(S(Xany("a"), "xx"));
   C(M(c)).write_to(xp);
   ensure_equals("ints+string", tree, xp);
 }
@@ -102,7 +102,7 @@ void object::test<3>(int) {
   run_test("7000\n(4)");
   stru::cf::nd_list c;
   c.push_back(C(C(S(Xany(7000),"ii"),"t"),"s"));
-  c.push_back(S(Xany(L"(4)"), "xx"));
+  c.push_back(S(Xany("(4)"), "xx"));
   C(M(c)).write_to(xp);
   ensure_equals("int+string", tree, xp);
 }

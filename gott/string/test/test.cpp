@@ -26,17 +26,16 @@ int main() {
   string n(zero_terminated("Hallo, string-Welt!\n"), ascii);
   string x(n); // fast!
   cerr << (x == n) << ' ';
-  cerr << (x != L"muhkuh") << ' ';
-  cerr << (x == L"Hallo, string-Welt!\n") << '\n';
-  x = zero_terminated(L"xxxFoobar\n$");
+  cerr << (x != string(L"muhkuh", wide)) << ' ';
+  cerr << (x == string(L"Hallo, string-Welt!\n", wide)) << '\n';
+  x = string(zero_terminated(L"xxxFoobar\n$"), wide);
   x = offset(x.as_utf32(), 3, -1);
   n = x + n;
   print(n);
   print(x);
 
   static char const ae_euro_lit[] = "\xc3\xa4 hohodu \xe2\x82\xac\n";
-  string ae_euro(zero_terminated((utf8_t const *) ae_euro_lit), 
-                  string::utf8_literal);
+  string ae_euro(ae_euro_lit);
   string_buffer b(ae_euro);
   cerr << (b.size() == ae_euro.length()) << '\n';
   b[1] = utf32_t(L':');
@@ -52,6 +51,6 @@ int main() {
   print(string(b));
 
   atom A(offset(n.as_utf32(), x.length()));
-  atom B(string(zero_terminated("Hallo, string-Welt!\n").cast<utf8_t const *>(), string::utf8_literal));
+  atom B(string(zero_terminated("Hallo, string-Welt!\n").cast<utf8_t const *>(), string::literal));
   cerr << (A == B) << '\n';
 }

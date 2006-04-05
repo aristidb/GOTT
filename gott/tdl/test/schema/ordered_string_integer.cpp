@@ -74,8 +74,8 @@ template<> template<>
 void object::test<1>(int) {
   run_test("(hallo)\n-74545656");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(L"(hallo)")));
-  c.push_back(S(Xany(-74545656), L"i"));
+  c.push_back(S(Xany("(hallo)")));
+  c.push_back(S(Xany(-74545656), "i"));
   C(M(c)).write_to(xp);
   ensure_equals("single ordered_string_integer entity", tree, xp);
 }

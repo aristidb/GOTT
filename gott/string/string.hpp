@@ -79,42 +79,42 @@ public:
   /**
    * Construct from encoded string.
    */
-  GOTT_LOCAL string(range_t<char const *> in, encoding enc = utf8) {
+  GOTT_LOCAL string(range_t<char const *> in, encoding enc) {
     set_up(to_utf8_alloc(in, enc), true);
   }
 
   /**
    * Construct from encoded string.
    */
-  GOTT_LOCAL string(range_t<char *> in, encoding enc = utf8) {
+  GOTT_LOCAL string(range_t<char *> in, encoding enc) {
     set_up(to_utf8_alloc(in, enc), true);
   }
 
   /**
    * Construct from encoded c-string.
    */
-  GOTT_LOCAL string(char const *in, encoding enc = utf8) {
+  GOTT_LOCAL string(char const *in, encoding enc) {
     set_up(to_utf8_alloc(zero_terminated(in), enc), true);
   }
 
   /**
    * Construct from encoded wide string.
    */
-  GOTT_LOCAL string(range_t<wchar_t const *> in, encoding enc = wide) {
+  GOTT_LOCAL string(range_t<wchar_t const *> in, encoding enc) {
     set_up(to_utf8_alloc(in.cast<char const *>(), enc), true);
   }
 
   /**
    * Construct from encoded wide string.
    */
-  GOTT_LOCAL string(range_t<wchar_t *> in, encoding enc = wide) {
+  GOTT_LOCAL string(range_t<wchar_t *> in, encoding enc) {
     set_up(to_utf8_alloc(in.cast<char const *>(), enc), true);
   }
 
   /**
    * Construct from encoded wide c-string.
    */
-  GOTT_LOCAL string(wchar_t const *in, encoding enc = wide) {
+  GOTT_LOCAL string(wchar_t const *in, encoding enc) {
     set_up(to_utf8_alloc(zero_terminated(in).cast<char const *>(), enc), true);
   }
 
@@ -122,7 +122,7 @@ public:
   /**
    * Construct string from std::string.
    */
-  GOTT_LOCAL string(std::string const &s, encoding enc = utf8) {
+  GOTT_LOCAL string(std::string const &s, encoding enc) {
     set_up(to_utf8_alloc(range(&s[0], s.length()), enc), true);
   }
 
@@ -130,7 +130,7 @@ public:
   /**
    * Construct string from std::wstring.
    */
-  GOTT_LOCAL string(std::wstring const &s, encoding enc = wide) {
+  GOTT_LOCAL string(std::wstring const &s, encoding enc) {
     set_up(to_utf8_alloc(range(&s[0], s.length()).cast<char const *>(), enc), 
         true);
   }
@@ -156,10 +156,6 @@ public:
 #endif
 
 #ifndef GOTT_NO_THUNK
-  GOTT_LOCAL string(thunk_t<utf8_t> &thk) {
-    set_up(thk.consume_alloc(), true);
-  }
-
   GOTT_LOCAL string(thunk_t<char> &thk, encoding enc = utf8) {
     if (enc == utf8)
       set_up(thk.consume_alloc().cast<utf8_t const *>(), true);
@@ -184,7 +180,7 @@ public:
 #endif
   
   enum literal_tag { 
-    utf8_literal ///< Designates that a UTF8 string is a literal.
+    literal ///< Designates that a UTF8 string is a literal.
   };
 
   /**
@@ -199,6 +195,11 @@ public:
    */
   GOTT_LOCAL string(range_t<utf8_t *> in, literal_tag) {
     set_up(in, false);
+  }
+
+  template<int N>
+  GOTT_LOCAL string(utf8_t const (&in)[N]) {
+    set_up(range_t<utf8_t const *>(in, in + N - 1), false);
   }
 
   /**

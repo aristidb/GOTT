@@ -127,7 +127,7 @@ template<class Args>
 rule_attr_t rule_attr_with_named_params(Args const &args) {
   struct combine_strip {
     std::vector<gott::string> operator() (gott::string const &s) const { 
-      if (s != "")
+      if (s != gott::string())
         return std::vector<gott::string>(1, s); 
       else
         return std::vector<gott::string>();

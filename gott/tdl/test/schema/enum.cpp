@@ -60,7 +60,8 @@ struct schema_enumeration : tut::schema_basic {
     rule_one("document",
       rule("node", rule_attr_t(std::vector<string>(), true, Xany(),
              new repatch_enumeration(
-               list_of("first")("second")("third").operator vector<string>())))))
+               list_of(string("first"))(string("second"))(string("third")).
+                 operator vector<string>())))))
   {}
 };
 }

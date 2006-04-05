@@ -123,7 +123,7 @@ void object::test<14>(int t) {
 
   stru::cf::nd_list c;
   for (int i = 0; i < n; ++i)
-    c.push_back(S(Xany(i), L"el"));
+    c.push_back(S(Xany(i), "el"));
   M(c).write_to(xp);
 
   ensure_equals("enough", tree, xp);

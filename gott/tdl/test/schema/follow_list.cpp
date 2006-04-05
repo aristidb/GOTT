@@ -79,9 +79,9 @@ template<> template<>
 void object::test<1>(int) {
   run_test("4\n 5 x");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(4), L"i"));
-  c.push_back(S(Xany(5), L"i"));
-  c.push_back(S(Xany(L"x"), L"s"));
+  c.push_back(S(Xany(4), "i"));
+  c.push_back(S(Xany(5), "i"));
+  c.push_back(S(Xany("x"), "s"));
   C(M(c)).write_to(xp);
   ensure_equals("single follow_list entity", tree, xp);
 }
@@ -89,7 +89,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   run_test("d7");
-  C(C(S(Xany(L"d7"), L"s"))).write_to(xp);
+  C(C(S(Xany("d7"), "s"))).write_to(xp);
   ensure_equals("just string", tree, xp);
 }
 
@@ -107,8 +107,8 @@ template<> template<>
 void object::test<4>(int) {
   run_test("-77 foo");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(-77), L"i"));
-  c.push_back(S(Xany(L"foo"), L"s"));
+  c.push_back(S(Xany(-77), "i"));
+  c.push_back(S(Xany("foo"), "s"));
   C(M(c)).write_to(xp);
   ensure_equals("followed string", tree, xp);
 }

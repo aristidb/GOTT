@@ -147,7 +147,7 @@ bool exec_parse::read_line() {
   std::string line;
   if (!getline(stream, line))
     return false;
-  current_line = line;
+  current_line = gott::string(line, gott::utf8);
   return true;
 }
 
@@ -157,7 +157,7 @@ void exec_parse::normal(unsigned last) {
   try {
     do {
       if (read_line())
-        if (indent == 1 && current_line == L"***") // no space before, no behind
+        if (indent == 1 && current_line == "***") // no space before, no behind
           throw cancellor();
         else
           normal_line(current_line);
@@ -224,7 +224,7 @@ void exec_parse::normal_line(string const &s) {
     ln.start_token();
     if (unread.filled() && *unread.begin() == ',') {
       ln.new_char();
-      ln.end_token(L",");
+      ln.end_token(",");
       ++unread.Begin;
       to_down = false;
     } else
@@ -238,7 +238,7 @@ void exec_parse::normal_line(string const &s) {
 }
 
 bool exec_parse::empty_line() {
-  if (stream.peek() == L'#') {
+  if (stream.peek() == '#') {
     stream.get();
     read_line();
     parse.comment(current_line, true);
@@ -309,7 +309,7 @@ string exec_parse::read_quoted(string::utf8_range &unread) {
         throw tdl::tdl_error("TDL parser", "unclosed quote", ln.where);
       break;
     }
-    double_dquote = *unread.Begin++ == L'"';
+    double_dquote = *unread.Begin++ == '"';
   } while (double_dquote);
   unread.Begin -= 1 + !double_dquote; 
     // double_dquote still set if break was executed
@@ -321,7 +321,7 @@ string exec_parse::read_quoted(string::utf8_range &unread) {
   gott::string_buffer s = string(range(whole.begin(), unread.begin() - 1));
   static const string two_quote("\"\""), one_quote("\"");
   boost::algorithm::replace_all(s, two_quote.as_utf32(), one_quote.as_utf32());
- 
+
   return s;
 }
 

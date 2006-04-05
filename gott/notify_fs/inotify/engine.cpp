@@ -129,7 +129,7 @@ void inotify_engine::notify() {
       static_cast<inotify_watch *>(watches[pevent->wd])->context,
       ev_t(pevent->mask),
       pevent->cookie,
-      pevent->len ? pevent->name : ""
+      pevent->len ? gott::string(pevent->name, gott::utf8) : gott::string()
     };
     ev.context.on_fire().emit(ev);
   }

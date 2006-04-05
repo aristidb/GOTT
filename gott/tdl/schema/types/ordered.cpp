@@ -84,5 +84,5 @@ bool match_ordered::accept_empty(rule_attr_t const &,
 }
 
 gott::string match_ordered::name() const {
-  return "ordered";
+  return gott::string("ordered");
 }

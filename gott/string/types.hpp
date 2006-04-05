@@ -46,12 +46,14 @@ namespace gott {
 /**
  * The storage type of UTF8 characters.
  */
-typedef boost::uint8_t utf8_t;
+typedef char utf8_t;
+typedef boost::uint8_t uutf8_t;
 
 /**
  * The storage type of UTF32 characters.
  */
-typedef boost::uint32_t utf32_t;
+typedef boost::int32_t utf32_t;
+typedef boost::uint32_t uutf32_t;
 
 /**
  * ID for encodings.

@@ -39,10 +39,10 @@
 #define GOTT_UTIL_XANY_PROMOTE_HPP
 
 #include <boost/type_traits/is_enum.hpp>
+#include <gott/string/string.hpp>
 #include <string>
 
 namespace gott {
-class string;
 class string_buffer;
 
 namespace xany {
@@ -73,14 +73,21 @@ struct promote {
   static reference get_back(type &v) { return v; }
 };
 
-template<class Old, class New> 
+template<class Old, class New>
+struct standard_converter {
+  static Old back(New const &v) { return static_cast<Old>(v); }
+  static New forward(Old const &v) { return static_cast<New>(v); }
+  static void assign(New &dest, Old const &src) { dest = src; }
+};
+
+template<class Old, class New, class Conv = standard_converter<Old, New> > 
 struct standard_promote {
   typedef New type;
   class reference {
   public:
-    operator Old() const { return static_cast<Old>(ref_val); }
+    operator Old() const { return Conv::back(ref_val); }
     reference operator=(Old const &new_val) {
-      ref_val = new_val;
+      Conv::assign(ref_val, new_val);
       return *this;
     }
   private:
@@ -88,24 +95,15 @@ struct standard_promote {
     reference(New &v) : ref_val(v) {}
     friend struct standard_promote;
   };
-  static New get(Old const &v) { return New(v); }
+  static New get(Old const &v) { return Conv::forward(v); }
   static reference get_back(New &v) { return reference(v); }
 };
 
 #define GOTT_XANY_DECLARE_PROMOTER(Old, New) \
   template<> struct promote<Old, no_class> : standard_promote<Old, New> {}
 
-template<class ElementT, class New>
-struct array_promote {
-  typedef New type;
-
-  static New get(ElementT *v) { return New(v); }
-  static New get(ElementT const *v) { return New(v); }
-};
-
-#define GOTT_XANY_ARRAY_PROMOTER(OldE, New) \
-  template<int Size> \
-  struct promote<OldE [Size], no_class> : array_promote<OldE, New> {}
+#define GOTT_XANY_DECLARE_PROMOTER2(Old, New, Conv) \
+  template<> struct promote<Old, no_class> : standard_promote<Old, New, Conv> {}
 
 template<class T>
 struct promote<T, enum_class> : standard_promote<T, long> {};
@@ -119,14 +117,22 @@ GOTT_XANY_DECLARE_PROMOTER(unsigned int, unsigned long);
 
 GOTT_XANY_DECLARE_PROMOTER(float, double);
 
-GOTT_XANY_DECLARE_PROMOTER(char const *, string);
-GOTT_XANY_DECLARE_PROMOTER(char *, string);
-GOTT_XANY_DECLARE_PROMOTER(std::string, string);
+template<gott::encoding enc>
+struct enc_string_converter {
+  template<class Old>
+  static string forward(Old const &v) { return string(v, enc); }
+  template<class Old>
+  static void assign(string &dest, Old const &src) { dest = forward(src); }
+};
 
-GOTT_XANY_DECLARE_PROMOTER(wchar_t const *, string);
-GOTT_XANY_DECLARE_PROMOTER(wchar_t *, string);
+GOTT_XANY_DECLARE_PROMOTER2(char *, string, enc_string_converter<utf8>);
+GOTT_XANY_DECLARE_PROMOTER2(char const *, string, enc_string_converter<utf8>);
+GOTT_XANY_DECLARE_PROMOTER2(std::string, string, enc_string_converter<utf8>);
+
+GOTT_XANY_DECLARE_PROMOTER2(wchar_t *, string, enc_string_converter<wide>);
+GOTT_XANY_DECLARE_PROMOTER2(wchar_t const *, string,enc_string_converter<wide>);
 #ifdef HAVE_WIDE_STDLIB
-GOTT_XANY_DECLARE_PROMOTER(std::wstring, string);
+GOTT_XANY_DECLARE_PROMOTER2(std::wstring, string, enc_string_converter<wide>);
 #endif
 GOTT_XANY_DECLARE_PROMOTER(string_buffer, string);
 

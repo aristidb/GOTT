@@ -88,7 +88,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   run_test("d7");
-  C(C(S(Xany(L"d7")))).write_to(xp);
+  C(C(S(Xany("d7")))).write_to(xp);
   ensure_equals("single string", tree, xp);
 }
 

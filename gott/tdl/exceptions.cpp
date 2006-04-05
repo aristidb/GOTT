@@ -63,9 +63,9 @@ namespace {
     string arr[] = { 
       module, ": ", problem,
       (p.line > p.token_line || p.column > p.token_column + p.token.length() ?
-       " after " : " at "), 
+       string(" after ") : string(" at ")), 
       p.file, 
-      p.file != string() ? ", " : string(), 
+      p.file != string() ? string(", ") : string(), 
       *gott::integer_to_string<gott::utf8_t>(p.token_line),
       ":", *gott::integer_to_string<gott::utf8_t>(p.token_column + 1),
       " (", p.token, ")"

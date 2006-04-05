@@ -156,7 +156,7 @@ void object::test<4>(int) {
   c.push_back(S(Xany(7), "--other--"));
   c.push_back(S(Xany(-9), "--other--"));
   c.push_back(MD(Xany(0), nd_list(1, S(Xany(-1220), "sum-data")), "sum"));
-  c.push_back(MD(Xany(0), p, L"plugin"));
+  c.push_back(MD(Xany(0), p, "plugin"));
   C(MD(Xany(0), nd_list(1, M(c, "--unordered--")), "a"), "--doc--")
     .write_to(xp);
   ensure_equals("reordered #1", tree, xp);
