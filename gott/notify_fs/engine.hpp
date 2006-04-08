@@ -39,7 +39,7 @@
 #define GOTT_NOTIFY_FS_ENGINE_HPP
 
 #include "event.hpp"
-#include <sigc++/signal.h>
+#include <gott/plugin/plugin.hpp>
 
 namespace gott {
 namespace notify_fs {
@@ -47,13 +47,13 @@ namespace notify_fs {
 class watch;
 class watch_implementation;
 
-class GOTT_EXPORT engine {
-public:
-  virtual ~engine() = 0;
-  virtual watch_implementation *watch_alloc(string const &, ev_t, watch &) = 0;
-};
+GOTT_PLUGIN_INTERFACE_DECLARE_BEGIN(notification_engine)
+  virtual watch_implementation *watch_alloc(string const &, ev_t, watch *) = 0;
 
-GOTT_EXPORT extern engine *default_engine;
+  static notification_engine &get();
+GOTT_PLUGIN_INTERFACE_DECLARE_END()
+
+GOTT_EXPORT extern notification_engine *default_engine;
 
 }}
 

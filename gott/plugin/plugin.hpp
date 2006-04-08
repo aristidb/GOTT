@@ -38,7 +38,6 @@
 #ifndef GOTT_BASE_PLUGIN_PLUGIN_HPP
 #define GOTT_BASE_PLUGIN_PLUGIN_HPP
 
-#if 1
 #include <gott/visibility.hpp>
 #include <gott/xany/xany.hpp>
 #include <gott/string/qid.hpp>
@@ -47,7 +46,6 @@
 #include <boost/none.hpp>
 #include <vector>
 #include <map>
-#endif
 
 namespace gott {
 namespace plugin {
@@ -60,7 +58,7 @@ class GOTT_EXPORT plugin_base {
 public:
   typedef std::vector<gott::xany::Xany> parameter_list_t;
   virtual ~plugin_base() = 0;
-  virtual void add(QID const &point, hook const &extension) = 0;
+  virtual void add(QID const &point, hook const &extension);
   virtual QID class_id() const = 0;
   virtual QID interface_id() const = 0;
   gott::xany::Xany run_method(QID const &id, 
@@ -135,7 +133,8 @@ private:
 };
 
 template<class Ret, class Class>
-plugin_method0_t<Ret, Class> plugin_method(Ret (Class::*meth)()) {
+plugin_method0_t<Ret, Class>
+plugin_method(Ret (Class::*meth)()) {
   return meth;
 }
 
@@ -168,7 +167,84 @@ private:
 };
 
 template<class Ret, class Arg1, class Class>
-plugin_method1_t<Ret, Arg1, Class> plugin_method(Ret (Class::*meth)(Arg1)) {
+plugin_method1_t<Ret, Arg1, Class>
+plugin_method(Ret (Class::*meth)(Arg1)) {
+  return meth;
+}
+
+template<class Ret, class Arg1, class Arg2, class Class>
+class plugin_method2_t {
+public:
+  plugin_method2_t(Ret (Class::*meth)(Arg1, Arg2)) : method(meth) {}
+  Xany operator()(
+      plugin_base *obj,
+      plugin_base::parameter_list_t const &parameters) const {
+    return Xany((static_cast<Class *>(obj)->*method)(
+          Xany_cast<Arg1>(parameters[0]),
+          Xany_cast<Arg2>(parameters[1])));
+  }
+private:
+  Ret (Class::*method)(Arg1, Arg2);
+};
+
+template<class Arg1, class Arg2, class Class>
+class plugin_method2_t<void, Arg1, Arg2, Class> {
+public:
+  plugin_method2_t(void (Class::*meth)(Arg1, Arg2)) : method(meth) {}
+  Xany operator()(
+      plugin_base *obj,
+      plugin_base::parameter_list_t const &parameters) const {
+    (static_cast<Class *>(obj)->*method)(
+                                         Xany_cast<Arg1>(parameters[0]),
+                                         Xany_cast<Arg2>(parameters[1]));
+    return Xany();
+  }
+private:
+  void (Class::*method)(Arg1, Arg2);
+};
+
+template<class Ret, class Arg1, class Arg2, class Class>
+plugin_method2_t<Ret, Arg1, Arg2, Class> 
+plugin_method(Ret (Class::*meth)(Arg1, Arg2)) {
+  return meth;
+}
+
+template<class Ret, class Arg1, class Arg2, class Arg3, class Class>
+class plugin_method3_t {
+public:
+  plugin_method3_t(Ret (Class::*meth)(Arg1, Arg2, Arg3)) : method(meth) {}
+  Xany operator()(
+      plugin_base *obj,
+      plugin_base::parameter_list_t const &parameters) const {
+    return Xany((static_cast<Class *>(obj)->*method)(
+          Xany_cast<Arg1>(parameters[0]),
+          Xany_cast<Arg2>(parameters[1]),
+          Xany_cast<Arg3>(parameters[2])));
+  }
+private:
+  Ret (Class::*method)(Arg1, Arg2, Arg3);
+};
+
+template<class Arg1, class Arg2, class Arg3, class Class>
+class plugin_method3_t<void, Arg1, Arg2, Arg3, Class> {
+public:
+  plugin_method3_t(void (Class::*meth)(Arg1, Arg2, Arg3)) : method(meth) {}
+  Xany operator()(
+      plugin_base *obj,
+      plugin_base::parameter_list_t const &parameters) const {
+    (static_cast<Class *>(obj)->*method)(
+                                         Xany_cast<Arg1>(parameters[0]),
+                                         Xany_cast<Arg2>(parameters[1]),
+                                         Xany_cast<Arg3>(parameters[2]));
+    return Xany();
+  }
+private:
+  void (Class::*method)(Arg1, Arg2, Arg3);
+};
+
+template<class Ret, class Arg1, class Arg2, class Arg3, class Class>
+plugin_method3_t<Ret, Arg1, Arg2, Arg3, Class> 
+plugin_method(Ret (Class::*meth)(Arg1, Arg2, Arg3)) {
   return meth;
 }
 

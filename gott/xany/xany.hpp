@@ -260,7 +260,8 @@ Xany_cast_ref(Xany &p) {
  */
 template<class T>
 T Xany_cast(Xany const &p) {
-  return Xany_cast_ref<T>(const_cast<Xany &>(p));
+  return Xany_cast_ref<typename boost::remove_reference<T>::type>(
+      const_cast<Xany &>(p));
 }
 
 /**

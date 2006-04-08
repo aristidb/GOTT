@@ -96,8 +96,8 @@ struct inotify_watch : watch_implementation {
 }
 
 watch_implementation *
-inotify_engine::watch_alloc(string const &path, ev_t mask, watch &w) {
-  inotify_watch *p = new inotify_watch(this, path, mask, w);
+inotify_engine::watch_alloc(string const &path, ev_t mask, watch *w) {
+  inotify_watch *p = new inotify_watch(this, path, mask, *w);
   std::cout << "Add watch to " << &watches << " : " << p->wd << std::endl;
   watches[p->wd] = p;
   return p;
@@ -133,4 +133,8 @@ void inotify_engine::notify() {
     };
     ev.context.on_fire().emit(ev);
   }
+}
+
+gott::QID inotify_engine::class_id() const {
+  return "gott::notify_fs::inotify_engine";
 }

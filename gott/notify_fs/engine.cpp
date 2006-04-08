@@ -37,8 +37,14 @@
 
 #include "engine.hpp"
 
-using gott::notify_fs::engine;
+using namespace gott::notify_fs;
 
-engine::~engine() {}
+GOTT_PLUGIN_INTERFACE_IMPL_BEGIN2(gott::notify_fs, notification_engine)
+  GOTT_PLUGIN_METHOD_ENTRY2(gott::notify_fs::notification_engine::watch_alloc)
+GOTT_PLUGIN_INTERFACE_IMPL_END()
 
-engine *gott::notify_fs::default_engine = 0;
+notification_engine &notification_engine::get() {
+  return *default_engine;
+}
+
+notification_engine *gott::notify_fs::default_engine = 0;

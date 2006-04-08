@@ -102,9 +102,9 @@ dirs = [
 'tdl',
 'configuration',
 'events',
-'notify_fs',
 'graphics',
 'plugin',
+'notify_fs',
 'properties',
 #'ui',
 'examples'

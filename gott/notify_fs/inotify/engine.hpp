@@ -45,11 +45,15 @@
 namespace gott {
 namespace notify_fs {
 
-class GOTT_EXPORT inotify_engine : public engine {
+class GOTT_EXPORT inotify_engine : public notification_engine {
 public:
   inotify_engine();
   ~inotify_engine();
-  watch_implementation *watch_alloc(string const &, ev_t, watch &);
+  watch_implementation *watch_alloc(string const &, ev_t, watch *);
+
+public:
+  QID class_id() const;
+
 
 //private:
 public: //FIXME => private
