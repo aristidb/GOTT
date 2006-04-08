@@ -54,7 +54,10 @@ public:
   main_loop();
   /// Pure virtual destructor.
   virtual ~main_loop() = 0;
-  /// Run the main loop until there is nothing to do.
+  /**
+   * Run the main loop until there is nothing to do. Nothing to do means, there
+   * are no objects to wait for (explicitly).
+   */
   virtual void run() = 0;
   /// Quit the main loop from inside.
   virtual void quit_local() = 0;

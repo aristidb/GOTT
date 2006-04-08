@@ -83,7 +83,9 @@ public:
    *           and it is in the @p mask. Its parameter will be a combination
    *           of the events that occurred.
    * \param wait Specifies whether the main_loop::run shall wait for the
-   *           descriptor to be removed.
+   *           descriptor to be removed. If this is \c false, the main_loop
+   *           will quit when this is the only object that could provide events,
+   *           or if all other objects are specified "unwaited", too.
    * \throw system_error If the descriptor is already registered or
    *           something else happens.
    */
