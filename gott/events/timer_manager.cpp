@@ -67,11 +67,13 @@ public:
     scheduled_t;
   scheduled_t scheduled;
   unsigned waitfor;
+  pxtime::time_duration min_wait;
 
-  impl() : waitfor(0) {}
+  impl(pxtime::time_duration min_wait) : waitfor(0), min_wait(min_wait) {}
 };
 
-standard_timer_manager::standard_timer_manager() : p(new impl) {}
+standard_timer_manager::standard_timer_manager(pxtime::time_duration min_wait)
+  : p(new impl(min_wait)) {}
 standard_timer_manager::~standard_timer_manager() {}
 
 void standard_timer_manager::add_timer(deadline_timer const &tm) {
@@ -98,7 +100,7 @@ void standard_timer_manager::handle_pending_timers() {
   while (!scheduled.empty()) {
     deadline_timer const &current = scheduled.top();
 
-    if (now < current.timer)
+    if (current.timer - now >= p->min_wait)
       break;
 
     deadline_timer new_timer = current.handler();
@@ -112,7 +114,7 @@ void standard_timer_manager::handle_pending_timers() {
 boost::posix_time::time_duration standard_timer_manager::time_left() const {
   pxtime::ptime now = pxtime::microsec_clock::local_time();
   pxtime::time_duration ret = p->scheduled.top().timer - now;
-  if (ret < pxtime::seconds(0))
+  if (ret < p->min_wait)
     return pxtime::seconds(0);
   return ret;
 }

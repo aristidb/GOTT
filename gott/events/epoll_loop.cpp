@@ -81,7 +81,10 @@ public:
 
 
 epoll_loop::epoll_loop() 
-: p(new impl), message_mgr(this), sig_mgr(&message_mgr) {}
+: standard_timer_manager(boost::posix_time::milliseconds(1)),
+  p(new impl),
+  message_mgr(this),
+  sig_mgr(&message_mgr) {}
 
 epoll_loop::~epoll_loop() {}
 

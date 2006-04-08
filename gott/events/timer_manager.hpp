@@ -92,7 +92,7 @@ public:
 
 class standard_timer_manager : public timer_manager {
 public:
-  standard_timer_manager();
+  standard_timer_manager(boost::posix_time::time_duration min_wait);
   ~standard_timer_manager();
 
   void add_timer(deadline_timer const &);

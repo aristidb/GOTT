@@ -45,7 +45,10 @@
 
 namespace gott{namespace events{
 select_loop::select_loop() 
-    : message_mgr(this), sig_mgr(&message_mgr), running(false) {
+: standard_timer_manager(boost::posix_time::milliseconds(1)),
+  message_mgr(this),
+  sig_mgr(&message_mgr),
+  running(false) {
 }
 
 void *select_loop::do_feature(gott::QID const &type) {
