@@ -44,6 +44,7 @@
 #include <sigc++/signal.h>
 #include <map>
 #include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace gott {
 namespace events {

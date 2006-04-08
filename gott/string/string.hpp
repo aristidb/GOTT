@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -42,10 +42,10 @@
 #include "types.hpp"
 #include "stl.hpp"
 #include "convert.hpp"
-//#include "buffer.hpp"
+#include "immediate_string.hpp"
 #include <gott/visibility.hpp>
 #include <gott/range.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 
 #ifndef NO_GOTT_THUNK
 #include <gott/thunk.hpp>
@@ -308,13 +308,15 @@ public:
   char *c_string_alloc() const;
 
 private:
-  class representation;
-  //TODO: short string optimization
-  //like: variant<shared_ptr<representation>, char[16]> p;
-  boost::shared_ptr<representation> p;
+  class impl;
+  typedef boost::intrusive_ptr<impl> pimpl;
+  pimpl p;
 
   void set_up(range_t<utf8_t const *> const &d, bool o);
   void foreign(range_t<utf8_t const *> const &x);
+
+  friend void intrusive_ptr_add_ref(impl *) GOTT_EXPORT;
+  friend void intrusive_ptr_release(impl *) GOTT_EXPORT;
 };
 
 #ifndef NO_STDLIB

@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -52,26 +52,28 @@
 #include <string>
 #endif
 
+#include <boost/detail/atomic_count.hpp>
+
 using gott::string;
 using gott::range_t;
 
-class string::representation {
+class string::impl {
 public:
-  representation(range_t<utf8_t const *> d, bool o = true)
-  : size(d.size()), length(0), owned(o), data(d.begin()) {
+  impl(range_t<utf8_t const *> d, bool o = true)
+  : size(d.size()), length(0), owned(o), data(d.begin()), ref_count(0) {
   }
 
   enum foreign_tag { foreign_copy };
 
-  representation(range_t<utf8_t const *> const &x, foreign_tag)
+  impl(range_t<utf8_t const *> const &x, foreign_tag)
   : size(x.size()), length(0), owned(true),
-      data(new utf8_t[size]) {
+      data(new utf8_t[size]), ref_count(0) {
     utf8_t *out = const_cast<utf8_t *>(data);
     for (utf8_t const *it = x.begin(); it != x.end(); ++it)
       *out++ = *it;
   }
 
-  ~representation() {
+  ~impl() {
     if (owned)
       delete [] data;
   }
@@ -80,21 +82,31 @@ public:
   std::size_t length;
   bool owned;
   utf8_t const *data;
+  boost::detail::atomic_count ref_count;
 };
+
+void gott::intrusive_ptr_add_ref(string::impl *p) {
+  ++p->ref_count;
+}
+
+void gott::intrusive_ptr_release(string::impl *p) {
+  if (--p->ref_count == 0)
+    delete p;
+}
 
 string::string(string const &o) : p(o.p) {}
 string::string(string_buffer const &b)
-: p(new representation(
+: p(new impl(
       to_utf8_alloc(range(b).cast<char const *>(), utf32), true)) {}
 
 string::~string() {}
 
 void string::set_up(range_t<utf8_t const *> const &d, bool o) {
-  p.reset(new representation(d, o));
+  p = new impl(d, o);
 }
 
 void string::foreign(range_t<utf8_t const *> const &d) {
-  p.reset(new representation(d, representation::foreign_copy));
+  p = new impl(d, impl::foreign_copy);
 }
 
 range_t<gott::utf8_t const *> string::as_utf8() const {

@@ -18,11 +18,12 @@ void print(string const &n) {
   cerr << n;
 #else
   for (string::utf8_range r = n.as_utf8(); !r.empty(); ++r.begin())
-    std::cerr << *r.begin();
+    cerr << *r.begin();
 #endif
 }
 
 int main() {
+  cerr << "size:" << sizeof(string) << '\n';
   string n(zero_terminated("Hallo, string-Welt!\n"), ascii);
   string x(n); // fast!
   cerr << (x == n) << ' ';
