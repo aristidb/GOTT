@@ -183,7 +183,7 @@ deadline_timer move_window( window *win ) {
   reg->left = std::max( 0L, reg->left );
   reg->top = std::max( 0L, reg->top);
   std::cout <<"  to (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height <<  ")" << std::endl;
-  return deadline_timer( microsec_clock::local_time() + seconds(6), boost::bind( &move_window, win) );
+  return deadline_timer( microsec_clock::universal_time() + seconds(6), boost::bind( &move_window, win) );
 }
 
 deadline_timer resize_window( window *win ) {
@@ -192,7 +192,7 @@ deadline_timer resize_window( window *win ) {
   reg->width = 10 + rand()%180;
   reg->height= 10 + rand()%180;
   std::cout <<"  to (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height << ")" << std::endl;
-  return deadline_timer( microsec_clock::local_time() + seconds(10), boost::bind( &resize_window, win) );
+  return deadline_timer( microsec_clock::universal_time() + seconds(10), boost::bind( &resize_window, win) );
 }
 
 
@@ -204,8 +204,8 @@ int main(int, char **){
     window win( con, gott::rect( 30,30,123,230), gott::string("simple_x11.cpp title"), size_t(gott::ui::window_flags::Defaults) );
     win.on_draw().connect( &draw );
     loop.add_read_fd( con.get_descriptor(), boost::bind( &uicontext::process_read, &con ) );
-    loop.add_timer( deadline_timer( microsec_clock::local_time() + seconds(10), boost::bind( &resize_window, &win ) ) );
-    loop.add_timer( deadline_timer( microsec_clock::local_time() + seconds(7), boost::bind( &move_window, &win ) ) );
+    loop.add_timer( deadline_timer( microsec_clock::universal_time() + seconds(10), boost::bind( &resize_window, &win ) ) );
+    loop.add_timer( deadline_timer( microsec_clock::universal_time() + seconds(7), boost::bind( &move_window, &win ) ) );
     loop.on_signal(SIGINT).connect(boost::bind(&select_loop::quit, &loop));
     loop.run();
   }

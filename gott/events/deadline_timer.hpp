@@ -62,13 +62,13 @@ namespace gott{namespace events{
  *   using namespace boost::posix_time;
  *   deadline_timer do_something() {
  *      // do something 
- *      return deadline_timer( microsec_clock::local_time() + seconds(10), &do_something );
+ *      return deadline_timer( microsec_clock::universal_time() + seconds(10), &do_something );
  *   }
  *   ...
  *
  *   {
  *     select_loop loop;
- *     loop.add_timer( deadline_timer( microsec_clock::local_time() + seconds(10), &do_something ) );
+ *     loop.add_timer( deadline_timer( microsec_clock::universal_time() + seconds(10), &do_something ) );
  *     loop.run();
  *   }
  * \endcode
@@ -81,7 +81,7 @@ namespace gott{namespace events{
  *     if( ++exec == 20 )
  *       return deadline_timer::no_timer;
  *     else
- *       return deadline_timer( microsec_clock::local_time() + seconds(10), &do_something );
+ *       return deadline_timer( microsec_clock::universal_time() + seconds(10), &do_something );
  *   }
  * \endcode
  */
@@ -117,7 +117,7 @@ namespace detail {
     bool wait;
     deadline_timer operator() () const {
       delegate();
-      return deadline_timer(microsec_clock::local_time() + interval, 
+      return deadline_timer(microsec_clock::universal_time() + interval, 
           deadline_timer::handler_type(*this), wait);
     }
   };
@@ -136,7 +136,7 @@ inline deadline_timer periodic_timer(boost::posix_time::time_duration interval,
   using namespace boost::posix_time;
   detail::periodic_timeval_functor func = { delegate, interval, wait };
   return deadline_timer(
-      microsec_clock::local_time() + (start_now ? seconds(0) : interval),
+      microsec_clock::universal_time() + (start_now ? seconds(0) : interval),
       deadline_timer::handler_type(func), wait);
 }
 

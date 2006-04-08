@@ -95,7 +95,7 @@ bool standard_timer_manager::has_wait_timers() const {
 void standard_timer_manager::handle_pending_timers() {
   impl::scheduled_t &scheduled = p->scheduled;
 
-  pxtime::ptime now = pxtime::microsec_clock::local_time();
+  pxtime::ptime now = pxtime::microsec_clock::universal_time();
 
   while (!scheduled.empty()) {
     deadline_timer const &current = scheduled.top();
@@ -112,7 +112,7 @@ void standard_timer_manager::handle_pending_timers() {
 }
 
 boost::posix_time::time_duration standard_timer_manager::time_left() const {
-  pxtime::ptime now = pxtime::microsec_clock::local_time();
+  pxtime::ptime now = pxtime::microsec_clock::universal_time();
   pxtime::time_duration ret = p->scheduled.top().timer - now;
   if (ret < p->min_wait)
     return pxtime::seconds(0);

@@ -49,15 +49,8 @@ using boost::bind;
 
 deadline_timer timefunc() {
   std::cout << "beep!" << std::endl;
-  return deadline_timer(microsec_clock::local_time() + seconds(3), &timefunc);
-}
-
-void init_timer(main_loop &m) {
-  m.feature<timer_manager>().add_timer(
-      deadline_timer(
-        microsec_clock::local_time(),
-        &timefunc
-        ));
+  return deadline_timer(microsec_clock::universal_time() + seconds(3), 
+      &timefunc);
 }
 
 void init_sig(main_loop &m, auto_loop *pa) {
@@ -69,7 +62,7 @@ int main() {
   auto_loop loops;
   loops.feature<timer_manager>().add_timer(
       deadline_timer(
-        microsec_clock::local_time(),
+        microsec_clock::universal_time(),
         &timefunc
       ));
   loops.before_run(
