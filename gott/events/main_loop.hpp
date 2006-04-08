@@ -66,7 +66,10 @@ public:
    *   - a pointer to the feature
    */
   template<class T>
-  GOTT_LOCAL T *feature_ptr() { 
+  GOTT_LOCAL T *feature_ptr() {
+    T *outside = T::get_for(*this);
+    if (outside)
+      return outside;
     return static_cast<T *>(do_feature(T::qid));
   }
 

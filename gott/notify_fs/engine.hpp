@@ -49,11 +49,7 @@ class watch_implementation;
 
 GOTT_PLUGIN_INTERFACE_DECLARE_BEGIN(notification_engine)
   virtual watch_implementation *watch_alloc(string const &, ev_t, watch *) = 0;
-
-  static notification_engine &get();
 GOTT_PLUGIN_INTERFACE_DECLARE_END()
-
-GOTT_EXPORT extern notification_engine *default_engine;
 
 }}
 

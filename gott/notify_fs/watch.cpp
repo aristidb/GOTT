@@ -38,12 +38,10 @@
 #include "watch.hpp"
 #include "engine.hpp"
 
-using gott::notify_fs::watch;
-using gott::notify_fs::watch_implementation;
-using gott::notify_fs::watch_installation_failure;
+using namespace gott::notify_fs;
 
-watch::watch(gott::string const &path, gott::notify_fs::ev_t mask) 
-: p(notification_engine::get().watch_alloc(path, mask, this)) {}
+watch::watch(notification_engine &e, gott::string const &path, ev_t mask) 
+: p(e.watch_alloc(path, mask, this)) {}
 
 watch_implementation::~watch_implementation() {}
 

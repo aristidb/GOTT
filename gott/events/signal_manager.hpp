@@ -75,6 +75,9 @@ public:
   sigc::signal1<void, int> &on_signal(int sig);
 
 public:
+  static signal_manager *get_for(main_loop &) { return 0; }
+
+public:
   class GOTT_LOCAL proxy_t : boost::noncopyable {
   public:
     sigc::signal1<void, int> &on_signal(int sig) {

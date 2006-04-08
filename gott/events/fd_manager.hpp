@@ -132,6 +132,9 @@ public:
   typedef proxy_t &proxy_ref;
 
   GOTT_LOCAL static proxy_t *make_proxy() { return new proxy_t; }
+
+public:
+  static fd_manager *get_for(main_loop &) { return 0; }
 };
 
 }}

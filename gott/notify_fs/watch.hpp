@@ -48,11 +48,12 @@
 namespace gott {
 namespace notify_fs {
 
+class notification_engine;
 class watch_implementation;
 
 class watch : boost::noncopyable {
 public:
-  GOTT_EXPORT watch(gott::string const &path, ev_t mask);
+  GOTT_EXPORT watch(notification_engine &, gott::string const &path, ev_t mask);
   ~watch() {}
   sigc::signal1<void, event const &> on_fire() const {
     return fire;

@@ -70,6 +70,9 @@ public:
    * Called whenever a message is sent.
    */
   virtual sigc::signal1<void, gott::xany::Xany const &> &on_receive() = 0;
+
+public:
+  static inprocess_message_manager *get_for(main_loop &) { return 0; }
 };
 
 /**
