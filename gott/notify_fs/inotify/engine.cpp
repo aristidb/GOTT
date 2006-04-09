@@ -61,9 +61,8 @@ inotify_engine::~inotify_engine() {
 
 typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
 
-namespace {
-boost::int32_t get_watch(inotify_engine &eng, string const &path, 
-    ev_t mask) {
+boost::int32_t inotify_engine::get_watch(inotify_engine &eng, 
+    string const &path, ev_t mask) {
   char *c_path = new char[path.size() + 1];
   c_path[path.size()] = '\0';
   std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path);
@@ -78,13 +77,13 @@ boost::int32_t get_watch(inotify_engine &eng, string const &path,
   return result;
 }
 
-struct inotify_watch : watch_implementation {
+struct inotify_engine::inotify_watch : watch_implementation {
   inotify_engine &eng;
   boost::int32_t wd;
   watch &context;
 
   inotify_watch(inotify_engine *e, string const &path, ev_t mask, watch &w)
-  : eng(*e), wd(get_watch(eng, path, mask)), context(w) {}
+  : eng(*e), wd(inotify_engine::get_watch(eng, path, mask)), context(w) {}
 
   ~inotify_watch() {
     std::cout << "Remove watch from " << &eng.watches << " : " << wd 
@@ -93,7 +92,6 @@ struct inotify_watch : watch_implementation {
     gott::inotify_rm_watch_linux(eng.conn.access(), wd);
   }
 };
-}
 
 watch_implementation *
 inotify_engine::watch_alloc(string const &path, ev_t mask, watch *w) {

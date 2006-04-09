@@ -42,14 +42,20 @@
 #include <gott/plugin/plugin.hpp>
 
 namespace gott {
+namespace events { class main_loop; }
 namespace notify_fs {
 
 class watch;
 class watch_implementation;
 
-GOTT_PLUGIN_INTERFACE_DECLARE_BEGIN(notification_engine)
+class GOTT_EXPORT notification_engine {
+public:
+  virtual ~notification_engine();
   virtual watch_implementation *watch_alloc(string const &, ev_t, watch *) = 0;
-GOTT_PLUGIN_INTERFACE_DECLARE_END()
+  static notification_engine *get_for(gott::events::main_loop &);
+
+  static QID const qid;
+};
 
 }}
 

@@ -36,7 +36,30 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "engine.hpp"
+#include "inotify/engine.hpp"
+#include <gott/events/main_loop.hpp>
+#include <gott/events/fd_manager.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/construct.hpp>
 
-GOTT_PLUGIN_INTERFACE_IMPL_BEGIN2(gott::notify_fs, notification_engine)
-  GOTT_PLUGIN_METHOD_ENTRY2(gott::notify_fs::notification_engine::watch_alloc)
-GOTT_PLUGIN_INTERFACE_IMPL_END()
+using gott::notify_fs::notification_engine;
+using gott::events::main_loop;
+using gott::events::fd_manager;
+using namespace boost::lambda;
+
+gott::QID const notification_engine::qid(
+    "gott::notify_fs::notification_engine");
+
+notification_engine::~notification_engine() {}
+
+notification_engine *notification_engine::get_for(main_loop &m) {
+  void *&slot = m.feature_data(qid);
+  inotify_engine *eng = new inotify_engine;
+  slot = eng;
+  m.on_destroy().connect(bind(delete_ptr(), eng));
+  m.feature<fd_manager>().add_fd(
+      eng->conn.access(),
+      fd_manager::read,
+      bind(&inotify_engine::notify, eng));
+  return eng;
+}

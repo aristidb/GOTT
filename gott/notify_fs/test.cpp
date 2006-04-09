@@ -62,12 +62,6 @@ void blink() {
 }
 
 int main() {
-  static inotify_engine ee;
-  watch w(ee, "/tmp/testfile", all_events);
-  watch w2(ee, "/tmp", all_events);
-  w.on_fire().connect(boost::bind(&output, _1, 1));
-  w2.on_fire().connect(boost::bind(&output, _1, 2));
-
   boost::scoped_ptr<main_loop> loop(
 #if 0
       new select_loop
@@ -76,10 +70,12 @@ int main() {
 #endif
   );
 
-#if 1
-  loop->feature<fd_manager>().add_fd(
-    ee.conn.access(),fd_manager::read,boost::bind(&inotify_engine::notify,&ee));
-#endif
+  notification_engine &ee = loop->feature<notification_engine>();
+  watch w(ee, "/tmp/testfile", all_events);
+  watch w2(ee, "/tmp", all_events);
+  w.on_fire().connect(boost::bind(&output, _1, 1));
+  w2.on_fire().connect(boost::bind(&output, _1, 2));
+
   loop->feature<signal_manager>().on_signal(SIGINT).connect(
     boost::bind(&main_loop::quit_local, boost::ref(*loop)));
   loop->feature<timer_manager>().add_timer(
