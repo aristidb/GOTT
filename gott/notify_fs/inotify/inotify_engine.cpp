@@ -35,11 +35,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "engine.hpp"
+#include "inotify_engine.hpp"
 #include "../watch.hpp"
+#include <gott/events/main_loop.hpp>
+#include <gott/events/fd_manager.hpp>
 #include <gott/syswrap/read_write_unix.hpp>
 #include <gott/syswrap/inotify_linux.hpp>
 #include <gott/exceptions.hpp>
+#include <boost/lambda/bind.hpp>
 #include <algorithm>
 #include <unistd.h>
 
@@ -57,6 +60,14 @@ inotify_engine::inotify_engine() : conn(inotify_init_linux()) {
 
 inotify_engine::~inotify_engine() {
   std::cout << "Shut down Inotify." << std::endl;
+}
+
+void inotify_engine::integrate_into(gott::events::main_loop &m) {
+  using namespace boost::lambda;
+  m.feature<gott::events::fd_manager>().add_fd(
+      conn.access(),
+      gott::events::fd_manager::read,
+      bind(&inotify_engine::notify, this));
 }
 
 typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;

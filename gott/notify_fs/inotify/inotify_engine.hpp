@@ -38,7 +38,7 @@
 #ifndef GOTT_NOTIFY_FS_INOTIFY_ENGINE_HPP
 #define GOTT_NOTIFY_FS_INOTIFY_ENGINE_HPP
 
-#include "../engine.hpp"
+#include "../notification_engine.hpp"
 #include <gott/syswrap/scoped_unix_file.hpp>
 #include <map>
 
@@ -50,6 +50,7 @@ public:
   inotify_engine();
   ~inotify_engine();
   watch_implementation *watch_alloc(string const &, ev_t, watch *);
+  void integrate_into(gott::events::main_loop &);
 
 public:
   QID class_id() const;
@@ -59,7 +60,6 @@ private:
   void notify();
   std::map<boost::uint32_t, watch_implementation *> watches;
 
-  friend class notification_engine;
   static boost::int32_t get_watch(inotify_engine &eng, string const &path, 
     ev_t mask) GOTT_LOCAL;
   struct inotify_watch;

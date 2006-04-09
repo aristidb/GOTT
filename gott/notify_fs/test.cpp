@@ -36,18 +36,19 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "watch.hpp"
-#include "inotify/engine.hpp"
+#include "notification_engine.hpp"
 #include <gott/events/select_loop.hpp>
 #include <gott/events/epoll_loop.hpp>
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/signal_manager.hpp>
 #include <gott/events/timer_manager.hpp>
-#include <boost/bind.hpp>
+#include <boost/lambda/bind.hpp>
 #include <iostream>
 #include <signal.h>
 
 using namespace gott::notify_fs;
 using namespace gott::events;
+using namespace boost::lambda;
 
 void output(event const &ev, int context) {
   std::cout << context;
@@ -70,14 +71,13 @@ int main() {
 #endif
   );
 
-  notification_engine &ee = loop->feature<notification_engine>();
-  watch w(ee, "/tmp/testfile", all_events);
-  watch w2(ee, "/tmp", all_events);
-  w.on_fire().connect(boost::bind(&output, _1, 1));
-  w2.on_fire().connect(boost::bind(&output, _1, 2));
+  watch w(loop->feature<notification_engine>(), "/tmp/testfile", all_events);
+  watch w2(loop->feature<notification_engine>(), "/tmp", all_events);
+  w.on_fire().connect(bind(&output, _1, 1));
+  w2.on_fire().connect(bind(&output, _1, 2));
 
   loop->feature<signal_manager>().on_signal(SIGINT).connect(
-    boost::bind(&main_loop::quit_local, boost::ref(*loop)));
+    bind(&main_loop::quit_local, loop.get()));
   loop->feature<timer_manager>().add_timer(
     periodic_timer(boost::posix_time::seconds(3), &blink, true, true));
   loop->run();

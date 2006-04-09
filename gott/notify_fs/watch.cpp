@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "watch.hpp"
-#include "engine.hpp"
+#include "notification_engine.hpp"
 
 using namespace gott::notify_fs;
 
