@@ -73,6 +73,11 @@ public:
     T *outside = T::get_for(*this);
     if (outside)
       return outside;
+    return i_feature_ptr<T>();
+  }
+
+  template<class T>
+  GOTT_LOCAL T *i_feature_ptr() {
     return static_cast<T *>(do_feature(T::qid));
   }
 
