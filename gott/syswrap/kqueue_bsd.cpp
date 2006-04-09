@@ -20,6 +20,7 @@
  *
  * Contributor(s):
  *  Rüdiger Sonderfeld <kingruedi@c-plusplus.de>
+ *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -43,7 +44,7 @@ namespace gott {
   int kqueue_create_bsd() {
     int fd=kqueue();
     if(fd == -1)
-      throw errno_exception();
+      throw_errno_exception();
     return fd;
   }
 
@@ -53,7 +54,7 @@ namespace gott {
   {
     int n=kevent(kq, changelist, nchanges, eventlist, nevents, timeout);
     if(n == -1)
-      throw errno_exception();
+      throw_errno_exception();
     return fd;
   }
 }
