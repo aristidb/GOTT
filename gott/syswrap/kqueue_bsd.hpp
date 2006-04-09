@@ -39,14 +39,14 @@
 #define GOTT_SYSWRAP_KQUEUE_HPP
 
 #include <gott/visibility.hpp>
-#include <sys/types.h>
-#include <sys/event.h>
-#include <sys/time.h>
+
+struct kevent;
+struct timespec;
 
 namespace gott {
 
-GOTT_EXPORT int kqueue_create();
-GOTT_EXPORT int kqueue_event(int kq, const struct kevent *changelist,
+GOTT_EXPORT int kqueue_create_bsd();
+GOTT_EXPORT int kqueue_event_bsd(int kq, const struct kevent *changelist,
 			     int nchanges,
 			     struct kevent *eventlist, int nevents,
 			     const struct timespec *timeout);

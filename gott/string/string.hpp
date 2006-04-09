@@ -42,7 +42,6 @@
 #include "types.hpp"
 #include "stl.hpp"
 #include "convert.hpp"
-#include "immediate_string.hpp"
 #include <gott/visibility.hpp>
 #include <gott/range.hpp>
 #include <boost/intrusive_ptr.hpp>

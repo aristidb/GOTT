@@ -40,14 +40,14 @@
 
 namespace gott {
 
-  int kqueue_create() {
+  int kqueue_create_bsd() {
     int fd=kqueue();
     if(fd == -1)
       throw errno_exception();
     return fd;
   }
 
-  int kqueue_event(int kq, const struct kevent *changelist, int nchanges,
+  int kqueue_event_bsd(int kq, const struct kevent *changelist, int nchanges,
 		   struct kevent *eventlist, int nevents,
 		   const struct timespec *timeout)
   {
