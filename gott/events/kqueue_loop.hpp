@@ -50,7 +50,7 @@ namespace events {
 
 /**
  * A main_loop implementation using kqueue(2) which is specific to FreeBSD,
- *   MacOSX, NetBSD and propably more
+ *   MacOSX, NetBSD, OpenBSD and propably more
  *
  * Features:
  *  - gott::events::fd_manager

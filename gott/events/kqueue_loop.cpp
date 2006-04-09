@@ -45,18 +45,18 @@ namespace events {
   class kqueue_loop::impl {
   public:
     bool running;
-    scoped_unix_file fd;
-
-    std::vector<kevent> in_events;
+    scoped_unix_file queue;
 
     struct callback {
       unsigned mask;
       boost::function<void (unsigned)> call;
+      int fd;
+      bool wait;
     };
     std::vector<callback> callbacks;
 
     impl()
-      : running(false), fd(kqueue_create())
+      : running(false), queue(kqueue_create())
     {}
   };
 
@@ -81,25 +81,22 @@ namespace events {
 			   boost::function<void (unsigned)> const &cb,
 			   bool wait)
   {
-    if(mask & fd_manager::read) {
+    if(mask & fd_manager::read || mask & fd_manager::exception) {
       kevent n;
-      EV_SET(&n, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0,
-	     reinterpret_cast<void*>(wait));
-      p->in_events.push_back(n);
+      EV_SET(&n, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
+      kevent_event(p->queue, &n, 1, 0, 0, 0);
     }
     if(mask & fd_manager::write) {
       kevent n;
-      EV_SET(&n, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0,
-	     reinterpret_cast<void*>(wait));
-      p->in_events.push_back(n);
-    }
-    if(mask & fd_manager::exception) {
-      // ??
+      EV_SET(&n, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
+      kevent_event(p->queue, &n, 1, 0, 0, 0);
     }
 
     callback new_cb;
     new_cb.call = cb;
     new_cb.mask = mask;
+    new_cb.fd = fd;
+    new_cb.wait = wait;
     callbacks.push_back(new_cb);
   }
 
@@ -107,21 +104,29 @@ namespace events {
     struct find_fd {
       int fd;
       find_fd(int f) : fd(f) { }
-      bool operator()(kevent const &event) {
-	return event.ident == fd;
+      bool operator()(impl::callback const &cb) {
+	return cb.fd == fd;
       }
     };
   }
 
   void kqueue_loop::remove_fd(int fd) {
     find_fd fnd(fd);
-    std::vector<kevent>::iterator i=std::find(p->in_events.begin(),
-					      p->in_events.end(), fnd);
-    if(i == p->in_events.end())
+    std::vector<kevent>::iterator i=std::find(p->callbacks.begin(),
+					      p->callbacks.end(), fnd);
+    if(i == p->callbacks.end())
       throw system_error("could not remove fd");
 
-    i->flags = EV_DELETE;
-
+    if(mask & fd_manager::read || mask & fd_manager::exception) {
+      kevent n;
+      EV_SET(&n, fd, EVFILT_READ, EV_DELETE, 0, 0, 0);
+      kevent_event(p->queue, &n, 1, 0, 0, 0);
+    }
+    if(mask & fd_manager::write) {
+      kevent n;
+      EV_SET(&n, fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
+      kevent_event(p->queue, &n, 1, 0, 0, 0);
+    }
   }
 
   void kqueue_loop::quit_local() {
