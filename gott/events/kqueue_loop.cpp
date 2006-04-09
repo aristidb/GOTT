@@ -121,8 +121,7 @@ namespace events {
       throw system_error("could not remove fd");
 
     i->flags = EV_DELETE;
-    // deletes this i's kind of event or the kevent structure?
-    // if so what about removing i from in_events?
+
   }
 
   void kqueue_loop::quit_local() {
