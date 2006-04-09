@@ -42,6 +42,7 @@
 #include <gott/string/qid.hpp>
 #include <gott/exceptions.hpp>
 #include <sigc++/signal.h>
+#include <map>
 
 namespace gott {
 namespace events {
@@ -62,8 +63,6 @@ public:
   virtual void run() = 0;
   /// Quit the main loop from inside.
   virtual void quit_local() = 0;
-
-  sigc::signal0<void> &on_destroy() { return on_destroy_; }
 
   /**
    * Get a concrete feature of the main loop.
@@ -122,9 +121,17 @@ public:
     return *p;
   }
 
+public:
+  GOTT_LOCAL sigc::signal0<void> &on_destroy() { return on_destroy_; }
+
+  GOTT_LOCAL void *&feature_data(QID const &id) {
+    return feature_data_[id];
+  }
+
 protected:
   virtual void *do_feature(QID const &) = 0;
   sigc::signal0<void> on_destroy_;
+  std::map<QID, void *> feature_data_;
 };
 
 //TODO faster please
