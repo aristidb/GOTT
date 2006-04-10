@@ -37,11 +37,21 @@
 
 import os
 
-if not os.path.isfile('sys.py'):
-  print 'Please provide an sys.py file by symlinking it to a sys-<PLATFORM>.py file'
-  Exit(1)
+sysfile = 'sys.py'
+platform = ARGUMENTS.get('OS', str(Platform()))
 
-opts = Options(['sys.py', 'options.py'])
+if not os.path.isfile(sysfile):
+  sysfile = 'sys-' + platform + '.py'
+  if not os.path.isfile(sysfile):
+    print 'Please ensure that either sys.py or ' + sysfile + ' exists.'
+    print 'Alternatively, you can provide OS=<foo>, so that sys-<foo>.py exists.'
+    Exit(1)
+
+if not os.path.isfile('options.py'):
+  print 'Warning: You do not have a options.py file, using defaults or command-line values.'
+  print 'Type scons -Q -h for help with the options.'
+
+opts = Options([sysfile, 'options.py'])
 opts.Add(BoolOption('RELEASE', 'Release build', 1))
 opts.Add(EnumOption('OPTIMIZE', 'Optimization level', 'default', 
                     allowed_values=('default', 'none', 'some', 'full')))
