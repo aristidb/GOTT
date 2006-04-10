@@ -62,15 +62,13 @@ def CheckWarnings(context):
 	context.Result(result)
 	return result
 
-Import('optimize')
-
 def CheckOptimization(context):
 	context.Message('Checking if compiler supports gcc-style optimization levels... ')
 	lastCCFLAGS = context.env['CCFLAGS'][:]
 
-	if optimize == 'full':
+	if context.env['OPTIMIZE'] == 'full':
 		level = '-O3'
-	elif optimize == 'some':
+	elif context.env['OPTIMIZE'] == 'some':
 		level = '-O2'
 
 	context.env.Append(CCFLAGS = level)
@@ -99,12 +97,11 @@ tests =	{
 	'Debug': CheckDebug,
 }
 conf = Configure(env, custom_tests = tests)
-if optimize != 'none':
+if conf.env['OPTIMIZE'] != 'none':
 	conf.Optimization()
 conf.Warnings()
 conf.CompilerVisibility()
-Import('debug')
-if debug == 1:
+if not conf.env['RELEASE']:
 	conf.Debug()
 if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 	print 'Boost headers are not installed'

@@ -37,36 +37,13 @@
 
 import os
 
-cppdef = Split(ARGUMENTS.get('def', ''))
-cxx = Environment()['CXX']
-if os.environ.has_key('CXX'):
-	cxx = os.environ['CXX']
-cxx = ARGUMENTS.get('cxx', cxx)
-cflags = Split(ARGUMENTS.get('cflags', Environment()['CXXFLAGS']))
-release = int(ARGUMENTS.get('release', 1))
-if release:
-	debug = 0
-	optimize = 'full'
-	debug = -1
-else:
-	debug = 1
-	optimize = 'none'
-
-debug = int(ARGUMENTS.get('debug', debug))
-
-if debug == 1:
-	cppdef += ['DEBUG']
-elif debug == -1:
-	cppdef += ['NDEBUG']
-
-optimize = ARGUMENTS.get('optimize', optimize)
-
-caux = ARGUMENTS.get('aux')
-cflags += Split(caux)
-
-cflagsoverride = ARGUMENTS.get('cfoverride', 0)
-if cflagsoverride:
-	cflags = cflagsoverride
+opts = Options('options.py')
+opts.Add(BoolOption('RELEASE', 'Release build', 0))
+opts.Add(EnumOption('OPTIMIZE', 'Optimization level', 'default', 
+                    allowed_values=('default', 'none', 'some', 'full')))
+opts.Add(BoolOption('SYS_KQUEUE', 'Whether to use kqueue(4)', 0))
+opts.Add(BoolOption('SYS_INOTIFY', 'Whether to use inotify', 0))
+opts.Add(BoolOption('SYS_EPOLL', 'Whether to use epoll(4)', 0))
 
 libdirs_pre = open('libdirs.txt').readlines()
 
@@ -75,18 +52,24 @@ for x in libdirs_pre:
 	libdirs += ['#/' + x[0:-1]]
 
 env = Environment(
+  options = opts,
   ENV = os.environ, # FIXME: security hole?
-  CXX = cxx, 
-  CCFLAGS = cflags, 
   SHCCFLAGS = ['-DBUILDING_DLL'],
   CPPPATH=['#/..'], 
   LIBPATH=libdirs,
-  LINKFLAGS=['-Wl,--as-needed'],
-  CPPDEFINES=cppdef)
+  LINKFLAGS=['-Wl,--as-needed'])
+env.Help(opts.GenerateHelpText(env))
+
+if env['RELEASE']:
+  env.Append(CPPDEFINES = ['NDEBUG'])
+  if env['OPTIMIZE'] == 'default':
+    env['OPTIMIZE'] = 'full'
+else:
+  env.Append(CPPDEFINES = ['DEBUG'])
+  if env['OPTIMIZE'] == 'default':
+    env['OPTIMIZE'] = 'some'
 
 Export('env')
-Export('optimize')
-Export('debug')
 
 conf = SConscript('buildconf/SConscript')
 env = conf.Finish()

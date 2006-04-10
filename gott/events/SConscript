@@ -40,6 +40,12 @@ import glob
 Import('env')
 
 libobj = glob.glob('*.cpp')
+
+if env['SYS_KQUEUE'] == 0:
+  libobj.remove('kqueue_loop.cpp')
+if env['SYS_EPOLL'] == 0:
+  libobj.remove('epoll_loop.cpp')
+
 libobj.remove('auto_loop_test.cpp')
 libobj.remove('mq_loop_test.cpp')
 env.SharedLibrary('events', libobj)
