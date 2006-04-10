@@ -35,6 +35,18 @@
 #
 # ***** END LICENSE BLOCK *****
 
+def CheckLinkerAsNeeded(context):
+	context.Message('Checking if linker supports --as-needed flag... ')
+
+	lastLinkFlags = context.env['LINKFLAGS'][:]
+	context.env.Append(LINKFLAGS = '-Wl,--as-needed')
+
+	result = context.TryLink("int main() { }\n", '.cpp')
+	if not result:
+		context.env.Replace(LINKFLAGS = lastLinkFlags)
+	context.Result(result)
+	return result
+
 def CheckCompilerVisibility(context):
 	context.Message('Checking if compiler supports visibility attributes... ')
 	lastCPPDEF = context.env['CPPDEFINES'][:]
@@ -91,12 +103,14 @@ def CheckDebug(context):
 print 'Configuration...'
 Import('env')
 tests =	{
+        'LinkerAsNeeded': CheckLinkerAsNeeded,
 	'CompilerVisibility': CheckCompilerVisibility,
 	'Warnings': CheckWarnings,
 	'Optimization': CheckOptimization,
 	'Debug': CheckDebug,
 }
 conf = Configure(env, custom_tests = tests)
+conf.LinkerAsNeeded()
 if conf.env['OPTIMIZE'] != 'none':
 	conf.Optimization()
 conf.Warnings()

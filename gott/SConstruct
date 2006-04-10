@@ -86,8 +86,7 @@ env = Environment(
   ENV = os.environ, # FIXME: security hole?
   SHCCFLAGS = ['-DBUILDING_DLL'],
   CPPPATH=['#/..', '${BOOST_INCLUDE}'], 
-  LIBPATH=libdirs + ['${BOOST_LIB}'],
-  LINKFLAGS=['-Wl,--as-needed'])
+  LIBPATH=libdirs + ['${BOOST_LIB}'])
 env.Help(opts.GenerateHelpText(env))
 
 if env['RELEASE']:
