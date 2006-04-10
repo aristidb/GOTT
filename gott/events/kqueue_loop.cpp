@@ -38,7 +38,7 @@
 #include "kqueue_loop.hpp"
 #include <gott/syswrap/kqueue_bsd.hpp>
 #include <gott/syswrap/scoped_unix_file.hpp>
-#include <vector>
+#include <map>
 
 namespace gott {
 namespace events {
@@ -50,13 +50,14 @@ namespace events {
     struct callback {
       unsigned mask;
       boost::function<void (unsigned)> call;
-      int fd;
       bool wait;
     };
-    std::vector<callback> callbacks;
+    typedef std::map<int,callback> map_fd_cb;
+    map_fd_cb callbacks;
 
     impl()
-      : running(false), queue(kqueue_create())
+      : running(false),
+	queue(kqueue::create_bsd())
     {}
   };
 
@@ -84,49 +85,39 @@ namespace events {
     if(mask & fd_manager::read || mask & fd_manager::exception) {
       kevent n;
       EV_SET(&n, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
-      kevent_event(p->queue, &n, 1, 0, 0, 0);
+      kqueue::event_bsd(p->queue, &n, 1, 0, 0, 0);
     }
     if(mask & fd_manager::write) {
       kevent n;
       EV_SET(&n, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
-      kevent_event(p->queue, &n, 1, 0, 0, 0);
+      kqueue::event_bsd(p->queue, &n, 1, 0, 0, 0);
     }
 
     callback new_cb;
     new_cb.call = cb;
     new_cb.mask = mask;
-    new_cb.fd = fd;
     new_cb.wait = wait;
-    callbacks.push_back(new_cb);
-  }
-
-  namespace {
-    struct find_fd {
-      int fd;
-      find_fd(int f) : fd(f) { }
-      bool operator()(impl::callback const &cb) {
-	return cb.fd == fd;
-      }
-    };
+    callbacks[fd] = new_cb;
   }
 
   void kqueue_loop::remove_fd(int fd) {
-    find_fd fnd(fd);
-    std::vector<kevent>::iterator i=std::find(p->callbacks.begin(),
-					      p->callbacks.end(), fnd);
+    imp::map_fd_cb::iterator i=p->callbacks.find(fd);
     if(i == p->callbacks.end())
       throw system_error("could not remove fd");
 
-    if(mask & fd_manager::read || mask & fd_manager::exception) {
+    if(i->second.mask & fd_manager::read ||
+       i->second.mask & fd_manager::exception) {
       kevent n;
       EV_SET(&n, fd, EVFILT_READ, EV_DELETE, 0, 0, 0);
-      kevent_event(p->queue, &n, 1, 0, 0, 0);
+      kqueue::event_bsd(p->queue, &n, 1, 0, 0, 0);
     }
-    if(mask & fd_manager::write) {
+    if(i->second.mask & fd_manager::write) {
       kevent n;
       EV_SET(&n, fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
-      kevent_event(p->queue, &n, 1, 0, 0, 0);
+      kqueue::event_bsd(p->queue, &n, 1, 0, 0, 0);
     }
+
+    p->callbacks.erase(i);
   }
 
   void kqueue_loop::quit_local() {
@@ -135,8 +126,38 @@ namespace events {
 
   void kqueue_loop::run() {
     p->running = true;
+    enum { EVENTS_N=64; }
+    kevent events[EVENTS_N];
     while(p->running) {
-      
+      timespec tm;
+      bool has_timers_mem = has_timers();
+      if (has_timers_mem) {
+	handle_pending_timers();
+	tm.tv_sec = 0;
+	tm.tv_nsec = int(std::min(time_left().total_nanoseconds(), 
+				  boost::int64_t(INT_MAX)));
+      } 
+    
+      if (!has_wait_timers() && p->wait_fds.empty())
+	break;
+
+      int n=kqueue::event_bsd(p->queue, 0, 0, events, EVENTS_N,
+			      has_timers_mem ? &tm : 0x0);
+      for(int i=0; i<n; ++i) {
+	impl::map_fd_cb::iterator j=p->callbacks.find(events[i].fd);
+	if(j == p->callbacks.end())
+	  continue; //is this an error?
+	if(events[i].filter & EVFILT_READ) {
+	  if(!(j->second.mask & fd_manager::read))
+	    break; //do we really have to check this and should it be an error?
+	  j->second.call(fd_manager::read);
+	}
+	else if(events[i].filter & EVFILT_WRITE) {
+	  if(!(j->second.mask & fd_manager::read))
+	    break; //do we really have to check this and should it be an error?
+	  j->second.call(fd_manager::read);
+	}
+      }
     }
   }
 }}

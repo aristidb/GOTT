@@ -40,15 +40,15 @@
 #include "errno.hpp"
 
 namespace gott {
-
-  int kqueue_create_bsd() {
+namespace kqueue {
+  int create_bsd() {
     int fd=kqueue();
     if(fd == -1)
       throw_errno_exception();
     return fd;
   }
 
-  int kqueue_event_bsd(int kq, const struct kevent *changelist, int nchanges,
+  int event_bsd(int kq, const struct kevent *changelist, int nchanges,
 		   struct kevent *eventlist, int nevents,
 		   const struct timespec *timeout)
   {
@@ -57,4 +57,4 @@ namespace gott {
       throw_errno_exception();
     return fd;
   }
-}
+}}
