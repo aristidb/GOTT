@@ -64,7 +64,7 @@ opts = Options([sysfile, 'options.py'])
 opts.Add(BoolOption('RELEASE', 'Release build', 1))
 opts.Add(EnumOption('OPTIMIZE', 'Optimization level', 'default', 
                     allowed_values=('default', 'none', 'some', 'full')))
-opts.Add(BoolOption('SYS_KQUEUE', 'Whether to use kqueue(4)', 0))
+opts.Add(BoolOption('SYS_KQUEUE', 'Whether to use kqueue(2)', 0))
 opts.Add(BoolOption('SYS_INOTIFY', 'Whether to use inotify', 0))
 opts.Add(BoolOption('SYS_EPOLL', 'Whether to use epoll(4)', 0))
 
