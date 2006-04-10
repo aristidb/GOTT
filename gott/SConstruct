@@ -37,8 +37,12 @@
 
 import os
 
-opts = Options('options.py')
-opts.Add(BoolOption('RELEASE', 'Release build', 0))
+if not os.path.isfile('sys.py'):
+  print 'Please provide an sys.py file by symlinking it to a sys-<PLATFORM>.py file'
+  Exit(1)
+
+opts = Options(['sys.py', 'options.py'])
+opts.Add(BoolOption('RELEASE', 'Release build', 1))
 opts.Add(EnumOption('OPTIMIZE', 'Optimization level', 'default', 
                     allowed_values=('default', 'none', 'some', 'full')))
 opts.Add(BoolOption('SYS_KQUEUE', 'Whether to use kqueue(4)', 0))
