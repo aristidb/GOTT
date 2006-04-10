@@ -69,7 +69,7 @@ opts.Add(PathOption('BOOST_INCLUDE', 'Include directory of boost', '/usr/include
 opts.Add(PathOption('BOOST_LIB', 'Library directory of boost', '/usr/lib'))
 opts.Add('BOOST_LIBSUFFIX', 'Library suffix of boost', '')
 
-opts.Add(BoolOption('SYS_KQUEUE', 'Whether to use kqueue(4)', 0))
+opts.Add(BoolOption('SYS_KQUEUE', 'Whether to use kqueue(2)', 0))
 opts.Add(BoolOption('SYS_INOTIFY', 'Whether to use inotify', 0))
 opts.Add(BoolOption('SYS_EPOLL', 'Whether to use epoll(4)', 0))
 
