@@ -42,6 +42,8 @@ platform = ARGUMENTS.get('OS', str(Platform()))
 platform2 = sys.platform
 
 sysfiles = ['sys.py', 'sys-' + platform2 + '.py', 'sys-' + platform + '.py']
+if platform == platform2:
+  del sysfiles[2]
 sysfile = 'none'
 
 for i in sysfiles:
