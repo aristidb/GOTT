@@ -48,6 +48,7 @@
 #include <boost/utility/in_place_factory.hpp>
 #include <boost/cstdint.hpp>
 #include <climits>
+#include <cmath>
 
 using gott::events::epoll_loop;
 
@@ -146,8 +147,10 @@ void epoll_loop::run() {
     int timeout = -1;
     if (has_timers()) {
       handle_pending_timers();
-      timeout = int(std::min(time_left().total_milliseconds(), 
-            boost::int64_t(INT_MAX)));
+      typedef boost::int64_t i64;
+      timeout = int(std::min(
+            i64(std::floor(time_left().total_microseconds() / 1000.0 + 0.5)),
+            i64(INT_MAX)));
     } 
     
     if (!has_wait_timers() && p->wait_fds.empty())
