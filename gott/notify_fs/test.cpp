@@ -42,7 +42,10 @@
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/signal_manager.hpp>
 #include <gott/events/timer_manager.hpp>
+#include <boost/ref.hpp>
 #include <boost/lambda/bind.hpp>
+#include <boost/optional/optional.hpp>
+#include <boost/utility/in_place_factory.hpp>
 #include <iostream>
 #include <signal.h>
 
@@ -71,9 +74,14 @@ int main() {
 #endif
   );
 
-  watch w(loop->feature<notification_engine>(), "/tmp/testfile", all_events);
+  boost::optional<watch> w;
+  try {
+    w = boost::in_place(boost::ref(loop->feature<notification_engine>()), "/tmp/testfile", all_events);
+    w->on_fire().connect(bind(&output, _1, 1));
+  } catch (watch_installation_failure&) {
+    std::cerr << "/tmp/testfile does not exist\n";
+  }
   watch w2(loop->feature<notification_engine>(), "/tmp", all_events);
-  w.on_fire().connect(bind(&output, _1, 1));
   w2.on_fire().connect(bind(&output, _1, 2));
 
   loop->feature<signal_manager>().on_signal(SIGINT).connect(
