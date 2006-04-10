@@ -64,6 +64,11 @@ opts = Options([sysfile, 'options.py'])
 opts.Add(BoolOption('RELEASE', 'Release build', 1))
 opts.Add(EnumOption('OPTIMIZE', 'Optimization level', 'default', 
                     allowed_values=('default', 'none', 'some', 'full')))
+
+opts.Add(PathOption('BOOST_INCLUDE', 'Include directory of boost', '/usr/include'))
+opts.Add(PathOption('BOOST_LIB', 'Library directory of boost', '/usr/lib'))
+opts.Add('BOOST_LIBSUFFIX', 'Library suffix of boost', '')
+
 opts.Add(BoolOption('SYS_KQUEUE', 'Whether to use kqueue(4)', 0))
 opts.Add(BoolOption('SYS_INOTIFY', 'Whether to use inotify', 0))
 opts.Add(BoolOption('SYS_EPOLL', 'Whether to use epoll(4)', 0))
@@ -78,8 +83,8 @@ env = Environment(
   options = opts,
   ENV = os.environ, # FIXME: security hole?
   SHCCFLAGS = ['-DBUILDING_DLL'],
-  CPPPATH=['#/..'], 
-  LIBPATH=libdirs,
+  CPPPATH=['#/..', '${BOOST_INCLUDE}'], 
+  LIBPATH=libdirs + ['${BOOST_LIB}'],
   LINKFLAGS=['-Wl,--as-needed'])
 env.Help(opts.GenerateHelpText(env))
 
