@@ -39,22 +39,26 @@
 #include "kqueue_bsd.hpp"
 #include "errno.hpp"
 
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
+
 namespace gott {
 namespace kqueue {
   int create_bsd() {
-    int fd=kqueue();
+    int fd = ::kqueue();
     if(fd == -1)
       throw_errno_exception();
     return fd;
   }
 
-  int event_bsd(int kq, const struct kevent *changelist, int nchanges,
-		   struct kevent *eventlist, int nevents,
-		   const struct timespec *timeout)
+  int event_bsd(int kq, const kevent *changelist, int nchanges,
+		   kevent *eventlist, int nevents,
+		   const timespec *timeout)
   {
-    int n=kevent(kq, changelist, nchanges, eventlist, nevents, timeout);
+    int n = ::kevent(kq, changelist, nchanges, eventlist, nevents, timeout);
     if(n == -1)
       throw_errno_exception();
-    return fd;
+    return n;
   }
 }}
