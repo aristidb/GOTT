@@ -171,9 +171,9 @@ namespace events {
           j->second.call(fd_manager::read);
         }
         else if(events[i].filter & EVFILT_WRITE) {
-          if(!(j->second.mask & fd_manager::read))
+          if(!(j->second.mask & fd_manager::write))
             continue; //do we really have to check this and should it be an error?
-          j->second.call(fd_manager::read);
+          j->second.call(fd_manager::write);
       	}
       }
     }
