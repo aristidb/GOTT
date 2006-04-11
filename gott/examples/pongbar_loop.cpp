@@ -7,7 +7,6 @@
 #include <boost/lambda/if.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <iostream>
-#include <signal.h>
 
 using namespace gott::events;
 using namespace boost::lambda;

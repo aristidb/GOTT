@@ -60,6 +60,10 @@ quit_manager *quit_manager::get_for(main_loop &loop) {
 void quit_manager::enable_master() {
   ref_loop.feature<signal_manager>().on_signal(SIGINT).connect(
       bind(&quit_manager::quit_event, this));
+  ref_loop.feature<signal_manager>().on_signal(SIGTERM).connect(
+      bind(&quit_manager::quit_event, this));
+  ref_loop.feature<signal_manager>().on_signal(SIGPIPE).connect(
+      bind(&quit_manager::quit_event, this));
 }
 
 void quit_manager::quit_event() {
