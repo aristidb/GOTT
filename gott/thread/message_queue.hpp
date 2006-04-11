@@ -157,6 +157,20 @@ public:
   }
 
   /**
+   * Get and remove the first message of this queue if the queue is not closed.
+   * \return The removed message if any.
+   */
+  ::boost::optional<Message> pop_open() {
+    scoped_lock lock(monitor_lock);
+    if (closed_s && empty_u())
+      return boost::none;
+    wait_for_data_u(lock);
+    Message result = pop_u();
+    slot_free_u();
+    return result;
+  }
+  
+  /**
    * Get and remove the first message of this queue if available.
    * Does not block.
    * \return The removed message if any.
@@ -319,6 +333,26 @@ public:
   }
 
   /**
+   * Send messages to a callback until the queue is closed.
+   * \param func The receiving callback.
+   */
+  template<class T>
+  void wait_while_open(T func) {
+    scoped_lock lock(monitor_lock);
+
+    while (!closed_s) {
+      wait_for_data_u(lock);
+
+      Message m = pop_u();
+      slot_free_u();
+
+      lock.unlock();
+      func(m);
+      lock.lock();
+    }
+  }
+
+  /**
    * Wait until there are messages available and then send them all at once
    * to a supplied callback.
    * \param func The receiving callback.
@@ -327,6 +361,8 @@ public:
   void wait_for_many(T func) {
     scoped_lock lock(monitor_lock);
 
+    if (closed_s)
+      return;
     wait_for_data_u(lock);
 
     while (!empty_u()) {
@@ -347,6 +383,8 @@ public:
   void wait_for_many_break(T func) {
     scoped_lock lock(monitor_lock);
 
+    if (closed_s)
+      return;
     wait_for_data_u(lock);
 
     while (!empty()) {
