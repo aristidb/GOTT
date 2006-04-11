@@ -39,12 +39,13 @@
 #include <gott/tdl/source_position.hpp>
 #include <vector>
 #include <stack>
-#include <boost/bind.hpp>
+#include <boost/lambda/bind.hpp>
 #include <gott/range_algo.hpp>
 
 using gott::string;
 using gott::xany::Xany;
 using tdl::structure::container;
+using namespace boost::lambda;
 
 class container::impl {
 public:
@@ -113,7 +114,7 @@ void container::data(Xany const &data) {
 
 void container::copy_to(writable_structure &w) const {
   using namespace gott;
-  for_each(range(p->root.children), boost::bind(&impl::node::write, _1, &w));
+  for_each(range(p->root.children), bind(&impl::node::write, _1, &w));
 }
 
 bool container::operator==(container const &x) const {
@@ -127,8 +128,8 @@ void container::impl::node::write(writable_structure *w) const {
   using namespace gott;
   w->begin(where);
   w->data(data);
-  for_each(range(tags), boost::bind(&writable_structure::add_tag, w, _1));
-  for_each(range(children), boost::bind(&node::write, _1, w));
+  for_each(range(tags), bind(&writable_structure::add_tag, w, _1));
+  for_each(range(children), bind(&node::write, _1, w));
   w->end();
 }
 
