@@ -1,7 +1,7 @@
 #include <gott/events/select_loop.hpp>
 #include <gott/events/main_loop.hpp>
 #include <gott/events/timer_manager.hpp>
-#include <gott/events/signal_manager.hpp>
+#include <gott/events/quit_manager.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/if.hpp>
@@ -36,8 +36,7 @@ int main() {
          var(i) += var(dx),
          if_then((var(i) == 0 || var(i) == width - 2), var(dx) = -var(dx))
         )));
-  loop->feature<signal_manager>().on_signal(SIGINT).connect(
-      bind(&main_loop::quit_local, loop.get()));
+  loop->feature<quit_manager>().enable_master();
   loop->run();
   std::cout << std::endl;
 }

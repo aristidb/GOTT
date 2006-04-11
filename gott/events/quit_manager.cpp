@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Filesystem Notification Library.
+ * The Original Code is An Event Handling Class Library.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,57 +35,33 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "watch.hpp"
-#include "notification_engine.hpp"
-#include <gott/events/select_loop.hpp>
-#include <gott/events/epoll_loop.hpp>
-#include <gott/events/fd_manager.hpp>
-#include <gott/events/quit_manager.hpp>
-#include <gott/events/timer_manager.hpp>
-#include <boost/ref.hpp>
+#include "quit_manager.hpp"
+#include "signal_manager.hpp"
 #include <boost/lambda/bind.hpp>
-#include <boost/optional/optional.hpp>
-#include <boost/utility/in_place_factory.hpp>
-#include <iostream>
 #include <signal.h>
 
-using namespace gott::notify_fs;
-using namespace gott::events;
 using namespace boost::lambda;
+using namespace gott::events;
 
-void output(event const &ev, int context) {
-  std::cout << context;
-  std::cout << "ev" << std::hex << ev.flags;
-  std::cout << " cookie" << ev.cookie;
-  std::cout << " name " << ev.name;
-  std::cout << std::endl;
+gott::QID const quit_manager::qid("gott::events::quit_manager");
+
+quit_manager::quit_manager(main_loop &loop) : ref_loop(loop) {}
+quit_manager::~quit_manager() {}
+
+quit_manager *quit_manager::get_for(main_loop &loop) {
+  void *&slot = loop.feature_data(qid);
+  if (slot)
+    return static_cast<quit_manager *>(slot);
+  quit_manager *man = new quit_manager(loop);
+  slot = man;
+  return man;
 }
 
-void blink() {
-  std::cout << boost::posix_time::microsec_clock::local_time() << " blink" << std::endl;
+void quit_manager::enable_master() {
+  ref_loop.feature<signal_manager>().on_signal(SIGINT).connect(
+      bind(&quit_manager::quit_event, this));
 }
 
-int main() {
-  boost::scoped_ptr<main_loop> loop(
-#if 0
-      new select_loop
-#else
-      new epoll_loop
-#endif
-  );
-
-  boost::optional<watch> w;
-  try {
-    w = boost::in_place(boost::ref(loop->feature<notification_engine>()), "/tmp/testfile", all_events);
-    w->on_fire().connect(bind(&output, _1, 1));
-  } catch (watch_installation_failure&) {
-    std::cerr << "/tmp/testfile does not exist\n";
-  }
-  watch w2(loop->feature<notification_engine>(), "/tmp", all_events);
-  w2.on_fire().connect(bind(&output, _1, 2));
-
-  loop->feature<quit_manager>().enable_master();
-  loop->feature<timer_manager>().add_timer(
-    periodic_timer(boost::posix_time::seconds(3), &blink, true, true));
-  loop->run();
+void quit_manager::quit_event() {
+  ref_loop.quit_local();
 }
