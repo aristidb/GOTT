@@ -100,6 +100,12 @@ def CheckDebug(context):
 	context.Result(result)
 	return result
 
+def CheckPkgConfigPkg(context, name):
+	context.Message('Checking for %s... ' % name)
+	result = context.TryAction('pkg-config --exists \'%s\'' % name)[0]
+	context.Result(result)
+	return result
+
 print 'Configuration...'
 Import('env')
 tests =	{
@@ -108,6 +114,7 @@ tests =	{
 	'Warnings': CheckWarnings,
 	'Optimization': CheckOptimization,
 	'Debug': CheckDebug,
+	'PkgConfigPkg': CheckPkgConfigPkg
 }
 conf = Configure(env, custom_tests = tests)
 conf.LinkerAsNeeded()
@@ -133,6 +140,10 @@ if not conf.CheckLib(boost_date_time_lib, language = 'c++'):
 
 if conf.CheckCHeader('unistd.h', '<>'):
 	conf.env.Append(CPPDEFINES = 'HAS_UNISTD_H')
+
+if not conf.PkgConfigPkg('sigc++-2.0'):
+	print "sigc++-2.0 not found. If you have installed sigc++-2.0 check pkg-config setup."
+	Exit(1)
 
 conf.env.ParseConfig('pkg-config --cflags sigc++-2.0')
 conf.env.ParseConfig('pkg-config --libs sigc++-2.0')
