@@ -75,6 +75,9 @@ public:
   /// Copy contents to another structure.
   GOTT_EXPORT void copy_to(writable_structure &w) const;
 
+  /// Swap contents with another container.
+  GOTT_EXPORT void swap(container &x);
+
 private:
   void begin(source_position const &);
   void end();

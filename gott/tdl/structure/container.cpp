@@ -83,14 +83,15 @@ container::container(container const &x)
 container::~container() {}
 
 void container::operator=(container const &x) {
-  if (this == &x)
-    return;
-  clear();
-  x.copy_to(*this);
+  container(x).swap(*this);
 }
 
 void container::clear() {
   p.reset(new impl);
+}
+
+void container::swap(container &x) {
+  p.swap(x.p);
 }
 
 void container::begin(source_position const &w) {
