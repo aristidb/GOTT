@@ -64,26 +64,24 @@ namespace events {
 
     impl()
       : running(false),
-	queue(kqueue::create_bsd())
+      queue(kqueue::create_bsd())
     {}
   };
 
   kqueue_loop::kqueue_loop()
     : standard_timer_manager(
-#ifdef BOOST_DATE_TIME_HAS_NANOSEC
+#ifdef BOOST_DATE_TIME_HAS_NANOSEC // TODO: is this low wait reasonable?
 			     boost::posix_time::nanoseconds(1)
 #else
-			     // ... ??!?
-			     boost::posix_time::time_duration(0, 0, 0,
-	     boost::posix_time::time_duration::ticks_per_second()/1000000000)
+           boost::posix_time::microseconds(1)
 #endif
 			     ),
       p(new impl),
       message_mgr(this),
       sig_mgr(&message_mgr)
-  { }
+  {}
 
-  kqueue_loop::~kqueue_loop() { }
+  kqueue_loop::~kqueue_loop() {}
 
   void *kqueue_loop::do_feature(gott::QID const &qid) {
     GOTT_EVENTS_FEATURE(qid, fd_manager);
@@ -152,31 +150,31 @@ namespace events {
       timespec tm;
       bool has_timers_mem = has_timers();
       if (has_timers_mem) {
-	handle_pending_timers();
-	tm.tv_sec = 0;
-	tm.tv_nsec = int(std::min(time_left().total_nanoseconds(), 
-				  boost::int64_t(INT_MAX)));
+        handle_pending_timers();
+      	tm.tv_sec = 0;
+      	tm.tv_nsec = int(std::min(time_left().total_nanoseconds(), 
+        boost::int64_t(INT_MAX)));
       } 
     
       if (!has_wait_timers() && p->wait_fds.empty())
-	break;
+        break;
 
       int n=kqueue::event_bsd(p->queue.access(), 0, 0, events, EVENTS_N,
 			      has_timers_mem ? &tm : 0x0);
       for(int i=0; i<n; ++i) {
-	impl::map_fd_cb::iterator j=p->callbacks.find(events[i].ident);
-	if(j == p->callbacks.end())
-	  continue; //is this an error?
-	if(events[i].filter & EVFILT_READ) {
-	  if(!(j->second.mask & fd_manager::read))
-	    continue; //do we really have to check this and should it be an error?
-	  j->second.call(fd_manager::read);
-	}
-	else if(events[i].filter & EVFILT_WRITE) {
-	  if(!(j->second.mask & fd_manager::read))
-	    continue; //do we really have to check this and should it be an error?
-	  j->second.call(fd_manager::read);
-	}
+        impl::map_fd_cb::iterator j=p->callbacks.find(events[i].ident);
+        if(j == p->callbacks.end())
+      	  continue; //is this an error?
+        if(events[i].filter & EVFILT_READ) {
+          if(!(j->second.mask & fd_manager::read))
+            continue; //do we really have to check this and should it be an error?
+          j->second.call(fd_manager::read);
+        }
+        else if(events[i].filter & EVFILT_WRITE) {
+          if(!(j->second.mask & fd_manager::read))
+            continue; //do we really have to check this and should it be an error?
+          j->second.call(fd_manager::read);
+      	}
       }
     }
   }

@@ -111,7 +111,7 @@ def CheckBoostDateTimeCanNanosec(context):
 	result = context.TryCompile(
 		"#include <boost/date_time/posix_time/posix_time_types.hpp>\nint main() { boost::posix_time::nanoseconds n(1); }", '.cpp')
 	if result:
-		context.env.Append(CCFLAGS = ['-DBOOST_DATE_TIME_HAS_NANOSEC'])
+		context.env.Append(CPPDEFINES = ['BOOST_DATE_TIME_HAS_NANOSEC'])
 	context.Result(result)
 	return result
 
