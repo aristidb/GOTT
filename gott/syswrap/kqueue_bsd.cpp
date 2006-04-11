@@ -52,9 +52,9 @@ namespace kqueue {
     return fd;
   }
 
-  int event_bsd(int kq, const kevent *changelist, int nchanges,
-		   kevent *eventlist, int nevents,
-		   const timespec *timeout)
+  int event_bsd(int kq, const struct kevent *changelist, int nchanges,
+		   struct kevent *eventlist, int nevents,
+		   const struct timespec *timeout)
   {
     int n = ::kevent(kq, changelist, nchanges, eventlist, nevents, timeout);
     if(n == -1)

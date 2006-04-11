@@ -47,9 +47,9 @@ struct timespec;
 namespace gott {
 namespace kqueue {
 GOTT_EXPORT int create_bsd();
-GOTT_EXPORT int event_bsd(int kq, kevent const *changelist, int nchanges,
-			  kevent *eventlist, int nevents,
-			  timespec const *timeout);
+GOTT_EXPORT int event_bsd(int kq, struct kevent const *changelist, int nchanges,
+			  struct kevent *eventlist, int nevents,
+			  struct timespec const *timeout);
 }}
 
 #endif

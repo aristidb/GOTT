@@ -106,6 +106,15 @@ def CheckPkgConfigPkg(context, name):
 	context.Result(result)
 	return result
 
+def CheckBoostDateTimeCanNanosec(context):
+	context.Message('Checking if Boost date_time supports nanosecons... ')
+	result = context.TryCompile(
+		"#include <boost/date_time/posix_time/posix_time_types.hpp>\nint main() { boost::posix_time::nanoseconds n(1); }", '.cpp')
+	if result:
+		context.env.Append(CCFLAGS = ['-DBOOST_DATE_TIME_HAS_NANOSEC'])
+	context.Result(result)
+	return result
+
 print 'Configuration...'
 Import('env')
 tests =	{
@@ -114,7 +123,8 @@ tests =	{
 	'Warnings': CheckWarnings,
 	'Optimization': CheckOptimization,
 	'Debug': CheckDebug,
-	'PkgConfigPkg': CheckPkgConfigPkg
+	'PkgConfigPkg': CheckPkgConfigPkg,
+	'BoostDateTimeCanNanosec': CheckBoostDateTimeCanNanosec
 }
 conf = Configure(env, custom_tests = tests)
 conf.LinkerAsNeeded()
@@ -137,6 +147,7 @@ boost_date_time_lib = 'boost_date_time' + conf.env['BOOST_LIBSUFFIX']
 if not conf.CheckLib(boost_date_time_lib, language = 'c++'):
   print 'Boost date_time library is not installed:', boost_date_time_lib
   Exit(1)
+conf.BoostDateTimeCanNanosec()
 
 if conf.CheckCHeader('unistd.h', '<>'):
 	conf.env.Append(CPPDEFINES = 'HAS_UNISTD_H')

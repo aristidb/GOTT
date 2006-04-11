@@ -38,7 +38,13 @@
 #include "kqueue_loop.hpp"
 #include <gott/syswrap/kqueue_bsd.hpp>
 #include <gott/syswrap/scoped_unix_file.hpp>
+#include <set>
 #include <map>
+
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
+
 
 namespace gott {
 namespace events {
@@ -50,10 +56,11 @@ namespace events {
     struct callback {
       unsigned mask;
       boost::function<void (unsigned)> call;
-      bool wait;
     };
     typedef std::map<int,callback> map_fd_cb;
     map_fd_cb callbacks;
+
+    std::set<int> wait_fds;
 
     impl()
       : running(false),
@@ -62,11 +69,21 @@ namespace events {
   };
 
   kqueue_loop::kqueue_loop()
-    : standard_timer_manager(boost::posix_time::nanoseconds(1)),
+    : standard_timer_manager(
+#ifdef BOOST_DATE_TIME_HAS_NANOSEC
+			     boost::posix_time::nanoseconds(1)
+#else
+			     // ... ??!?
+			     boost::posix_time::time_duration(0, 0, 0,
+	     boost::posix_time::time_duration::ticks_per_second()/1000000000)
+#endif
+			     ),
       p(new impl),
       message_mgr(this),
       sig_mgr(&message_mgr)
   { }
+
+  kqueue_loop::~kqueue_loop() { }
 
   void *kqueue_loop::do_feature(gott::QID const &qid) {
     GOTT_EVENTS_FEATURE(qid, fd_manager);
@@ -83,41 +100,44 @@ namespace events {
 			   bool wait)
   {
     if(mask & fd_manager::read || mask & fd_manager::exception) {
-      kevent n;
+      struct kevent n;
       EV_SET(&n, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
-      kqueue::event_bsd(p->queue, &n, 1, 0, 0, 0);
+      kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
     if(mask & fd_manager::write) {
-      kevent n;
+      struct kevent n;
       EV_SET(&n, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
-      kqueue::event_bsd(p->queue, &n, 1, 0, 0, 0);
+      kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
 
-    callback new_cb;
+    if(wait)
+      p->wait_fds.insert(fd);
+
+    impl::callback new_cb;
     new_cb.call = cb;
     new_cb.mask = mask;
-    new_cb.wait = wait;
-    callbacks[fd] = new_cb;
+    p->callbacks[fd] = new_cb;
   }
 
   void kqueue_loop::remove_fd(int fd) {
-    imp::map_fd_cb::iterator i=p->callbacks.find(fd);
+    impl::map_fd_cb::iterator i=p->callbacks.find(fd);
     if(i == p->callbacks.end())
       throw system_error("could not remove fd");
 
     if(i->second.mask & fd_manager::read ||
        i->second.mask & fd_manager::exception) {
-      kevent n;
+      struct kevent n;
       EV_SET(&n, fd, EVFILT_READ, EV_DELETE, 0, 0, 0);
-      kqueue::event_bsd(p->queue, &n, 1, 0, 0, 0);
+      kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
     if(i->second.mask & fd_manager::write) {
-      kevent n;
+      struct kevent n;
       EV_SET(&n, fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
-      kqueue::event_bsd(p->queue, &n, 1, 0, 0, 0);
+      kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
 
     p->callbacks.erase(i);
+    p->wait_fds.erase(fd);
   }
 
   void kqueue_loop::quit_local() {
@@ -126,8 +146,8 @@ namespace events {
 
   void kqueue_loop::run() {
     p->running = true;
-    enum { EVENTS_N=64; }
-    kevent events[EVENTS_N];
+    enum { EVENTS_N=64 };
+    struct kevent events[EVENTS_N];
     while(p->running) {
       timespec tm;
       bool has_timers_mem = has_timers();
@@ -141,20 +161,20 @@ namespace events {
       if (!has_wait_timers() && p->wait_fds.empty())
 	break;
 
-      int n=kqueue::event_bsd(p->queue, 0, 0, events, EVENTS_N,
+      int n=kqueue::event_bsd(p->queue.access(), 0, 0, events, EVENTS_N,
 			      has_timers_mem ? &tm : 0x0);
       for(int i=0; i<n; ++i) {
-	impl::map_fd_cb::iterator j=p->callbacks.find(events[i].fd);
+	impl::map_fd_cb::iterator j=p->callbacks.find(events[i].ident);
 	if(j == p->callbacks.end())
 	  continue; //is this an error?
 	if(events[i].filter & EVFILT_READ) {
 	  if(!(j->second.mask & fd_manager::read))
-	    break; //do we really have to check this and should it be an error?
+	    continue; //do we really have to check this and should it be an error?
 	  j->second.call(fd_manager::read);
 	}
 	else if(events[i].filter & EVFILT_WRITE) {
 	  if(!(j->second.mask & fd_manager::read))
-	    break; //do we really have to check this and should it be an error?
+	    continue; //do we really have to check this and should it be an error?
 	  j->second.call(fd_manager::read);
 	}
       }
