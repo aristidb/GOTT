@@ -43,6 +43,8 @@ using std::basic_ostream;
 using gott::xany::Xany;
 using tdl::structure::direct_print;
 
+template class direct_print<char>;
+
 template<class C>
 class direct_print<C>::impl {
 public:
