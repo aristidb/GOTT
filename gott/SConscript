@@ -42,6 +42,7 @@ env.Program('thunk_test', 'thunk.cpp')
 libobj = glob.glob('string/*.cpp')
 libobj += ['exceptions.cpp', 'xany/xany.cpp']
 env.SharedLibrary('gott_fundamentals', libobj)
-env.Append(LIBS = ['gott_fundamentals'])
 
+env = env.Copy()
+env.Append(LIBS = ['gott_fundamentals'])
 Export('env')
