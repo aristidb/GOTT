@@ -164,7 +164,14 @@ void epoll_loop::run() {
         std::map<int, impl::fd_entry>::iterator it = p->fd_map.find(fd);
         if (it != p->fd_map.end()) {
           impl::fd_entry &e = it->second;
-          e.callback(e.mask);
+          unsigned mask = 0;
+          if (event[i].events & (EPOLLIN | EPOLLPRI))
+            mask |= fd_manager::read;
+          if (event[i].events & EPOLLOUT)
+            mask |= fd_manager::write;
+          if (event[i].events & (EPOLLERR | EPOLLHUP))
+            mask |= fd_manager::exception;
+          e.callback(mask);
         }
       }
     } catch (errno_exception const &e) {
