@@ -52,6 +52,51 @@ timer_manager::timer_manager() {}
 timer_manager::~timer_manager() {}
 gott::QID const timer_manager::qid("gott::events::timer_manager");
 
+void timer_manager::add_deadline_timer(
+      pxtime::ptime const &time_point,
+      boost::function<void (timer_manager &)> const &callback,
+      bool wait) {
+  add_timer(deadline_timer(time_point, callback, wait));
+}
+
+void timer_manager::add_monotonic_timer(
+    pxtime::time_duration const &time_point,
+    boost::function<void (timer_manager &)> const &callback,
+    bool wait) {
+  add_timer(monotonic_timer(time_point, callback, wait));
+}
+
+void timer_manager::add_relative_timer(
+    pxtime::time_duration const &interval,
+    boost::function<void (timer_manager &)> const &callback,
+    bool wait) {
+  add_monotonic_timer(monotonic_clock() + interval, callback, wait);
+}
+
+namespace {
+static void do_periodic_timer(
+    pxtime::time_duration const &interval,
+    boost::function<void ()> const &callback,
+    bool wait,
+    timer_manager &man) {
+  callback();
+  man.add_relative_timer(
+      interval,
+      boost::bind(&do_periodic_timer, interval, callback, wait, _1),
+      wait);
+}
+}
+
+void timer_manager::add_periodic_timer(
+    pxtime::time_duration const &interval,
+    boost::function<void ()> const &callback,
+    bool wait) {
+  add_relative_timer(
+      interval, 
+      boost::bind(&do_periodic_timer, interval, callback, wait, _1),
+      wait);
+}
+
 class standard_timer_manager::impl {
 public:
   typedef 
@@ -82,55 +127,16 @@ standard_timer_manager::standard_timer_manager(
   : p(new impl(min_wait)) {}
 standard_timer_manager::~standard_timer_manager() {}
 
-void standard_timer_manager::add_deadline_timer(
-      pxtime::ptime const &time_point,
-      boost::function<void (timer_manager &)> const &callback,
-      bool wait) {
-  deadline_timer tm(time_point, callback, wait);
+void standard_timer_manager::add_timer(deadline_timer const &tm) {
   if (tm.must_wait())
     ++p->waitfor;
-  p->scheduled_deadline.push(tm);  
+  p->scheduled_deadline.push(tm);
 }
 
-void standard_timer_manager::add_monotonic_timer(
-    pxtime::time_duration const &time_point,
-    boost::function<void (timer_manager &)> const &callback,
-    bool wait) {
-  monotonic_timer tm(time_point, callback, wait);
+void standard_timer_manager::add_timer(monotonic_timer const &) {
   if (tm.must_wait())
     ++p->waitfor;
   p->scheduled_monotonic.push(tm);
-}
-
-void standard_timer_manager::add_relative_timer(
-    pxtime::time_duration const &interval,
-    boost::function<void (timer_manager &)> const &callback,
-    bool wait) {
-  add_monotonic_timer(monotonic_clock() + interval, callback, wait);
-}
-
-namespace {
-static void do_periodic_timer(
-    pxtime::time_duration const &interval,
-    boost::function<void ()> const &callback,
-    bool wait,
-    timer_manager &man) {
-  callback();
-  man.add_relative_timer(
-      interval,
-      boost::bind(&do_periodic_timer, interval, callback, wait, _1),
-      wait);
-}
-}
-
-void standard_timer_manager::add_periodic_timer(
-    pxtime::time_duration const &interval,
-    boost::function<void ()> const &callback,
-    bool wait) {
-  add_relative_timer(
-      interval, 
-      boost::bind(&do_periodic_timer, interval, callback, wait, _1),
-      wait);
 }
 
 bool standard_timer_manager::has_timers() const {

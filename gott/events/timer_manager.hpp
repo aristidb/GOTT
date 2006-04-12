@@ -50,6 +50,7 @@ namespace gott {
 namespace events {
 
 class main_loop;
+class deadline_timer;
 class monotonic_timer;
 
 /**
@@ -65,28 +66,33 @@ public:
   static QID const qid;
 
   /// Add a deadline timer.
-  virtual void add_deadline_timer(
+  void add_deadline_timer(
       boost::posix_time::ptime const &time_point,
       boost::function<void (timer_manager &)> const &callback,
-      bool wait = true) = 0;
+      bool wait = true) ;
+
+  /// Add a deadline_timer.
+  virtual void add_timer(deadline_timer const &) = 0;
 
   /// Add a monotonic timer.
-  virtual void add_monotonic_timer(
+  void add_monotonic_timer(
       boost::posix_time::time_duration const &time_point,
       boost::function<void (timer_manager &)> const &callback,
-      bool wait = true) = 0;
+      bool wait = true);
+
+  virtual void add_timer(monotonic_timer const &) = 0;
 
   /// Add a relative timer.
-  virtual void add_relative_timer(
+  void add_relative_timer(
       boost::posix_time::time_duration const &interval,
       boost::function<void (timer_manager &)> const &callback,
-      bool wait = true) = 0;
+      bool wait = true);
   
   /// Add a periodic timer.
-  virtual void add_periodic_timer(
+  void add_periodic_timer(
       boost::posix_time::time_duration const &interval,
       boost::function<void ()> const &callback,
-      bool wait = true) = 0;
+      bool wait = true);
 
   /// Check if there are timers to be scheduled sometime.
   virtual bool has_timers() const = 0;
@@ -100,25 +106,8 @@ public:
   standard_timer_manager(boost::posix_time::time_duration const &min_wait);
   ~standard_timer_manager();
 
-  void add_deadline_timer(
-      boost::posix_time::ptime const &time_point,
-      boost::function<void (timer_manager &)> const &callback,
-      bool wait = true);
-
-  void add_monotonic_timer(
-      boost::posix_time::time_duration const &time_point,
-      boost::function<void (timer_manager &)> const &callback,
-      bool wait = true);
-
-  void add_relative_timer(
-      boost::posix_time::time_duration const &interval,
-      boost::function<void (timer_manager &)> const &callback,
-      bool wait = true);
-
-  void add_periodic_timer(
-      boost::posix_time::time_duration const &interval,
-      boost::function<void ()> const &callback,
-      bool wait = true);
+  void add_timer(deadline_timer const &);
+  void add_timer(monotonic_timer const &);
 
   bool has_timers() const;
   bool has_wait_timers() const;
