@@ -149,6 +149,8 @@ if not conf.CheckLib(boost_date_time_lib, language = 'c++'):
   Exit(1)
 conf.BoostDateTimeCanNanosec()
 
+conf.CheckLib('rt')
+
 if conf.CheckCHeader('unistd.h', '<>'):
 	conf.env.Append(CPPDEFINES = 'HAS_UNISTD_H')
 
