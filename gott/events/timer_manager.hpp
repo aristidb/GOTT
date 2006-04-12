@@ -123,13 +123,14 @@ public:
   /**
    * Add a periodic timer.
    * \param interval The amount of time between wakes.
-   * \param callback The callback to call whenever the timer is woken.
-   * \param wait Whether the main_loop should wait for the timer (that is, 
-   *             forever) before quitting.
+   * \param callback The callback to call whenever the timer is woken. Return
+   *                 false when the timer should end.
+   * \param wait Whether the main_loop should wait for the timer to end (by
+   *             returning false) before quitting.
    */
   void add_periodic_timer(
       boost::posix_time::time_duration const &interval,
-      boost::function<void ()> const &callback,
+      boost::function<bool ()> const &callback,
       bool wait = true);
 
 public:

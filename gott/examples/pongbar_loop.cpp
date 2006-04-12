@@ -4,10 +4,11 @@
 #include <gott/events/quit_manager.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <iostream>
+#include <ctime>
 
 using namespace gott::events;
 
-const int width = 80;
+const int width = 60;
 
 void draw_bar(int pos) {
   std::cout << "\r|";
@@ -16,20 +17,29 @@ void draw_bar(int pos) {
       std::cout << '*';
     else
       std::cout << ' ';
-  std::cout << "|\r" << std::flush;
+  std::cout << '|';// << std::flush;
 }
 
 class bar_drawer {
   int pos;
   int dx;
+  std::clock_t last;
 public:
-  bar_drawer() : pos(0), dx(1) {}
+  bar_drawer() : pos(0), dx(1), last(std::clock()) {}
 
-  void operator() () {
+  bool operator() () {
     draw_bar(pos);
     if (pos + dx == -1 || pos + dx == width - 1)
       dx = -dx;
     pos += dx;
+    
+    std::clock_t next = clock();
+    std::cout << ' ';
+    std::cout.width(6);
+    std::cout << (next - last) << std::flush;
+    last = next;
+
+    return true;
   }
 };
 

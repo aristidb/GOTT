@@ -49,8 +49,7 @@ namespace events {
 class main_loop;
 
 /**
- * Feature for main_loops able to watch file descriptors (*NIX) or sockets 
- * (*NIX + Win32).
+ * Feature for sending messages to main_loops from other threads.
  */
 class GOTT_EXPORT inprocess_message_manager : boost::noncopyable {
 public:

@@ -76,20 +76,20 @@ void timer_manager::add_relative_timer(
 namespace {
 static void do_periodic_timer(
     pxtime::time_duration const &interval,
-    boost::function<void ()> const &callback,
+    boost::function<bool ()> const &callback,
     bool wait,
     timer_manager &man) {
-  callback();
-  man.add_relative_timer(
-      interval,
-      boost::bind(&do_periodic_timer, interval, callback, wait, _1),
-      wait);
+  if (callback())
+    man.add_relative_timer(
+        interval,
+        boost::bind(&do_periodic_timer, interval, callback, wait, _1),
+        wait);
 }
 }
 
 void timer_manager::add_periodic_timer(
     pxtime::time_duration const &interval,
-    boost::function<void ()> const &callback,
+    boost::function<bool ()> const &callback,
     bool wait) {
   add_relative_timer(
       interval, 

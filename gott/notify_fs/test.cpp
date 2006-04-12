@@ -62,9 +62,10 @@ void output(event const &ev, int context) {
   std::cout << std::endl;
 }
 
-void blink() {
+bool blink() {
   std::cout << boost::posix_time::microsec_clock::local_time();
   std::cout << " blink" << std::endl;
+  return true;
 }
 
 int main() {
