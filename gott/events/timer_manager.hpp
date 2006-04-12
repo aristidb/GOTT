@@ -38,17 +38,19 @@
 #ifndef GOTT_BASE_EVENTS_TIMER_MANAGER_HPP
 #define GOTT_BASE_EVENTS_TIMER_MANAGER_HPP
 
-#include "deadline_timer.hpp"
 #include <gott/string/qid.hpp>
+#include <gott/syswrap/clocks.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/function.hpp>
 #include <vector>
 
 namespace gott {
 namespace events {
 
 class main_loop;
+class monotonic_timer;
 
 /**
  * Feature for main_loops able to deal with timer events.
@@ -61,30 +63,33 @@ public:
   virtual ~timer_manager() = 0;
   
   static QID const qid;
+
+  /// Add a deadline timer.
+  virtual void add_deadline_timer(
+      boost::posix_time::ptime const &time_point,
+      boost::function<void (timer_manager &)> const &callback,
+      bool wait = true) = 0;
+
+  /// Add a monotonic timer.
+  virtual void add_monotonic_timer(
+      boost::posix_time::time_duration const &time_point,
+      boost::function<void (timer_manager &)> const &callback,
+      bool wait = true) = 0;
+
+  /// Add a relative timer.
+  virtual void add_relative_timer(
+      boost::posix_time::time_duration const &interval,
+      boost::function<void (timer_manager &)> const &callback,
+      bool wait = true) = 0;
   
-  /// Add a deadline_timer.
-  virtual void add_timer(deadline_timer const &) = 0;
+  /// Add a periodic timer.
+  virtual void add_periodic_timer(
+      boost::posix_time::time_duration const &interval,
+      boost::function<void ()> const &callback,
+      bool wait = true) = 0;
 
   /// Check if there are timers to be scheduled sometime.
   virtual bool has_timers() const = 0;
-
-public:
-  class proxy_t : boost::noncopyable {
-  public:
-    void add_timer(deadline_timer const &t) {
-      req.push_back(t);
-    }
-
-    GOTT_EXPORT void operator() (main_loop &m) const;
-
-  private:
-    std::vector<deadline_timer> req;
-  };
-
-  typedef boost::shared_ptr<proxy_t> proxy;
-  typedef proxy_t &proxy_ref;
-
-  GOTT_LOCAL static proxy_t *make_proxy() { return new proxy_t; }
 
 public:
   static timer_manager *get_for(main_loop &) { return 0; }
@@ -92,10 +97,29 @@ public:
 
 class standard_timer_manager : public timer_manager {
 public:
-  standard_timer_manager(boost::posix_time::time_duration min_wait);
+  standard_timer_manager(boost::posix_time::time_duration const &min_wait);
   ~standard_timer_manager();
 
-  void add_timer(deadline_timer const &);
+  void add_deadline_timer(
+      boost::posix_time::ptime const &time_point,
+      boost::function<void (timer_manager &)> const &callback,
+      bool wait = true);
+
+  void add_monotonic_timer(
+      boost::posix_time::time_duration const &time_point,
+      boost::function<void (timer_manager &)> const &callback,
+      bool wait = true);
+
+  void add_relative_timer(
+      boost::posix_time::time_duration const &interval,
+      boost::function<void (timer_manager &)> const &callback,
+      bool wait = true);
+
+  void add_periodic_timer(
+      boost::posix_time::time_duration const &interval,
+      boost::function<void ()> const &callback,
+      bool wait = true);
+
   bool has_timers() const;
   bool has_wait_timers() const;
 

@@ -40,8 +40,7 @@
 #include <unistd.h>
 
 using namespace boost::posix_time;
-
-time_duration monotonic_clock() {
+time_duration gott::monotonic_clock() {
 #if defined(_POSIX_MONOTONIC_CLOCK) && _POSIX_MONOTONIC_CLOCK>=0
   struct timespec tp;
   clock_gettime(CLOCK_MONOTONIC, &tp);

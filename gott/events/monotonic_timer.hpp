@@ -14,12 +14,11 @@
  * The Original Code is An Event Handling Class Library.
  *
  * The Initial Developer of the Original Code is
- * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Aristid Breitkreuz (aribrei@arcor.de).
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *  Andreas Pokorny (andreas.pokorny@gmail.com)
  *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -36,37 +35,36 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_EVENTS_DEADLINE_TIMER_HPP_INCLUDED
-#define GOTT_BASE_EVENTS_DEADLINE_TIMER_HPP_INCLUDED
+#ifndef GOTT_EVENTS_MONOTONIC_TIMER_HPP
+#define GOTT_EVENTS_MONOTONIC_TIMER_HPP
 
 #include "basic_timer.hpp"
+#include <gott/syswrap/clocks.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace gott { namespace events {
 
-class deadline_timer : public basic_timer {
+class monotonic_timer : public basic_timer {
 public:
-  deadline_timer(
-      boost::posix_time::ptime const &time_point,
+  monotonic_timer(
+      boost::posix_time::time_duration const &time_point,
       callback_type const &callback,
       bool wait)
     : basic_timer(callback, wait), time_point(time_point) {}
 
-  bool operator>(deadline_timer const &o) const {
+  bool operator>(monotonic_timer const &o) const {
     return time_point > o.time_point;
   }
 
   boost::posix_time::time_duration time_left(
-      boost::posix_time::ptime now =
-        boost::posix_time::microsec_clock::local_time()) const {
+      boost::posix_time::time_duration now = monotonic_clock()) const {
     return time_point - now;
   }
 
 private:
-  boost::posix_time::ptime time_point;
+  boost::posix_time::time_duration time_point;
 };
 
 }}
 
 #endif
-

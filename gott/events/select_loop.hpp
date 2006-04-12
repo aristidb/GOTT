@@ -48,7 +48,6 @@
 #include <boost/function.hpp>
 #include <boost/optional/optional.hpp>
 #include <gott/visibility.hpp>
-#include "deadline_timer.hpp"
 #include "main_loop.hpp"
 #include "fd_manager.hpp"
 #include "timer_manager.hpp"
