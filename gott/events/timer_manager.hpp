@@ -65,37 +65,72 @@ public:
   
   static QID const qid;
 
-  /// Add a deadline timer.
+  /**
+   * Add a deadline timer (UTC based).
+   * \param time_point The time when the timer should wake, in UTC.
+   * \param callback The callback to call when the timer is woken. Gets this
+   *                 object as parameter if it wants to add new timers.
+   * \param wait Whether the main_loop should wait for the timer to be removed
+   *             before quitting.
+   */
   void add_deadline_timer(
       boost::posix_time::ptime const &time_point,
       boost::function<void (timer_manager &)> const &callback,
       bool wait = true) ;
 
-  /// Add a deadline_timer.
-  virtual void add_timer(deadline_timer const &) = 0;
+  /**
+   * Add a deadline_timer (UTC based).
+   * \param tm The timer to add.
+   */
+  virtual void add_timer(deadline_timer const &tm) = 0;
 
-  /// Add a monotonic timer.
+  /**
+   * Add a monotonic timer. The clock behind this timer should not do any jump
+   * backwards if the system supports it.
+   * \param time_point The time when the timer should wake in monotonic time.
+   * \param callback The callback to call when the timer is woken. Gets this
+   *                 object as parameter if it wants to add new timers.
+   * \param wait Whether the main_loop should wait for the timer to be removed
+   *             before quitting.
+   * \see gott::monotonic_clock()
+   */
   void add_monotonic_timer(
       boost::posix_time::time_duration const &time_point,
       boost::function<void (timer_manager &)> const &callback,
       bool wait = true);
 
-  virtual void add_timer(monotonic_timer const &) = 0;
+  /**
+   * Add a monotonic_timer. The clock behind this timer should not do any jump
+   * backwards if the system supports it.
+   * \param tm The timer to add.
+   * \see gott::monotonic_clock()
+   */
+  virtual void add_timer(monotonic_timer const &tm) = 0;
 
-  /// Add a relative timer.
+  /**
+   * Add a relative timer.
+   * \param interval The amount of time from now when the timer should wake.
+   * \param callback The callback to call when the timer is woken. Gets this
+   *                 object as parameter if it wants to add new timers.
+   * \param wait Whether the main_loop should wait for the timer to be removed
+   *             before quitting.
+   */
   void add_relative_timer(
       boost::posix_time::time_duration const &interval,
       boost::function<void (timer_manager &)> const &callback,
       bool wait = true);
   
-  /// Add a periodic timer.
+  /**
+   * Add a periodic timer.
+   * \param interval The amount of time between wakes.
+   * \param callback The callback to call whenever the timer is woken.
+   * \param wait Whether the main_loop should wait for the timer (that is, 
+   *             forever) before quitting.
+   */
   void add_periodic_timer(
       boost::posix_time::time_duration const &interval,
       boost::function<void ()> const &callback,
       bool wait = true);
-
-  /// Check if there are timers to be scheduled sometime.
-  virtual bool has_timers() const = 0;
 
 public:
   static timer_manager *get_for(main_loop &) { return 0; }

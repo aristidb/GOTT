@@ -133,7 +133,7 @@ void standard_timer_manager::add_timer(deadline_timer const &tm) {
   p->scheduled_deadline.push(tm);
 }
 
-void standard_timer_manager::add_timer(monotonic_timer const &) {
+void standard_timer_manager::add_timer(monotonic_timer const &tm) {
   if (tm.must_wait())
     ++p->waitfor;
   p->scheduled_monotonic.push(tm);
