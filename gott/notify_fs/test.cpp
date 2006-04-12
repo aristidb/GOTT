@@ -46,6 +46,7 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/utility/in_place_factory.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <iostream>
 #include <signal.h>
 
@@ -62,7 +63,8 @@ void output(event const &ev, int context) {
 }
 
 void blink() {
-  std::cout << boost::posix_time::microsec_clock::local_time() << " blink" << std::endl;
+  std::cout << boost::posix_time::microsec_clock::local_time();
+  std::cout << " blink" << std::endl;
 }
 
 int main() {
@@ -76,7 +78,8 @@ int main() {
 
   boost::optional<watch> w;
   try {
-    w = boost::in_place(boost::ref(loop->feature<notification_engine>()), "/tmp/testfile", all_events);
+    w = boost::in_place(boost::ref(loop->feature<notification_engine>()),
+          "/tmp/testfile", all_events);
     w->on_fire().connect(bind(&output, _1, 1));
   } catch (watch_installation_failure&) {
     std::cerr << "/tmp/testfile does not exist\n";
@@ -85,7 +88,9 @@ int main() {
   w2.on_fire().connect(bind(&output, _1, 2));
 
   loop->feature<quit_manager>().enable_master();
-  loop->feature<timer_manager>().add_timer(
-    periodic_timer(boost::posix_time::seconds(3), &blink, true, true));
+  loop->feature<timer_manager>().add_periodic_timer(
+      boost::posix_time::seconds(3),
+      &blink,
+      true);
   loop->run();
 }

@@ -43,6 +43,7 @@
 
 namespace gott {
 
+GOTT_EXPORT
 boost::posix_time::time_duration monotonic_clock();
 
 }

@@ -14,12 +14,11 @@
  * The Original Code is An Event Handling Class Library.
  *
  * The Initial Developer of the Original Code is
- * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Aristid Breitkreuz (aribrei@arcor.de).
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *  Andreas Pokorny (andreas.pokorny@gmail.com)
  *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -36,37 +35,37 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_EVENTS_DEADLINE_TIMER_HPP_INCLUDED
-#define GOTT_BASE_EVENTS_DEADLINE_TIMER_HPP_INCLUDED
+#ifndef GOTT_EVENTS_BASIC_TIMER_HPP
+#define GOTT_EVENTS_BASIC_TIMER_HPP
 
-#include "basic_timer.hpp"
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/function.hpp>
 
 namespace gott { namespace events {
 
-class deadline_timer : public basic_timer {
+class timer_manager;
+
+class basic_timer {
 public:
-  deadline_timer(
-      boost::posix_time::ptime const &time_point,
-      callback_type const &callback,
-      bool wait)
-    : basic_timer(callback, wait), time_point(time_point) {}
+  typedef boost::function<void (timer_manager &)> callback_type;
 
-  bool operator>(deadline_timer const &o) const {
-    return time_point > o.time_point;
+  ~basic_timer() {}
+
+  bool must_wait() const {
+    return wait_;
   }
 
-  boost::posix_time::time_duration time_left(
-      boost::posix_time::ptime now =
-        boost::posix_time::microsec_clock::local_time()) const {
-    return time_point - now;
+  void emit(timer_manager &man) {
+    callback(man);
   }
+
+protected:
+  basic_timer(callback_type const &cb, bool wait) : wait_(wait), callback(cb) {}
 
 private:
-  boost::posix_time::ptime time_point;
+  bool wait_;
+  callback_type callback;
 };
 
 }}
 
 #endif
-

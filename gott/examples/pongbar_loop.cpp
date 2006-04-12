@@ -35,9 +35,10 @@ public:
 
 int main() {
   boost::scoped_ptr<main_loop> loop(new select_loop);
-  loop->feature<timer_manager>().add_timer(periodic_timer(
+  loop->feature<timer_manager>().add_periodic_timer(
         boost::posix_time::milliseconds(80),
-        bar_drawer()));
+        bar_drawer(),
+        true);
   loop->feature<quit_manager>().enable_master();
   loop->run();
   std::cout << std::endl;

@@ -37,25 +37,20 @@
 
 #include "timer_manager.hpp"
 #include "main_loop.hpp"
+#include "deadline_timer.hpp"
+#include "monotonic_timer.hpp"
 #include <gott/range_algo.hpp>
 #include <queue>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/lambda/bind.hpp>
+#include <boost/bind.hpp>
 
 namespace pxtime = boost::posix_time;
 using gott::events::timer_manager;
 using gott::events::standard_timer_manager;
 
-using namespace boost::lambda;
-
 timer_manager::timer_manager() {}
 timer_manager::~timer_manager() {}
 gott::QID const timer_manager::qid("gott::events::timer_manager");
-
-void timer_manager::proxy_t::operator() (main_loop &m) const {
-  timer_manager &t = m.feature<timer_manager>();
-  for_each(range(req), bind(&timer_manager::add_timer, &t, _1));
-}
 
 class standard_timer_manager::impl {
 public:
@@ -64,28 +59,82 @@ public:
       deadline_timer, 
       std::vector<deadline_timer>,
       std::greater<deadline_timer> >
-    scheduled_t;
-  scheduled_t scheduled;
+    scheduled_deadline_t;
+  scheduled_deadline_t scheduled_deadline;
+
+  typedef
+    std::priority_queue<
+      monotonic_timer,
+      std::vector<monotonic_timer>,
+      std::greater<monotonic_timer> >
+    scheduled_monotonic_t;
+  scheduled_monotonic_t scheduled_monotonic;
+  
   unsigned waitfor;
+
   pxtime::time_duration min_wait;
 
   impl(pxtime::time_duration min_wait) : waitfor(0), min_wait(min_wait) {}
 };
 
-standard_timer_manager::standard_timer_manager(pxtime::time_duration min_wait)
+standard_timer_manager::standard_timer_manager(
+    pxtime::time_duration const &min_wait)
   : p(new impl(min_wait)) {}
 standard_timer_manager::~standard_timer_manager() {}
 
-void standard_timer_manager::add_timer(deadline_timer const &tm) {
-  if (tm.timer.is_not_a_date_time())
-    return;
-  if (tm.wait)
+void standard_timer_manager::add_deadline_timer(
+      pxtime::ptime const &time_point,
+      boost::function<void (timer_manager &)> const &callback,
+      bool wait) {
+  deadline_timer tm(time_point, callback, wait);
+  if (tm.must_wait())
     ++p->waitfor;
-  p->scheduled.push(tm);
+  p->scheduled_deadline.push(tm);  
+}
+
+void standard_timer_manager::add_monotonic_timer(
+    pxtime::time_duration const &time_point,
+    boost::function<void (timer_manager &)> const &callback,
+    bool wait) {
+  monotonic_timer tm(time_point, callback, wait);
+  if (tm.must_wait())
+    ++p->waitfor;
+  p->scheduled_monotonic.push(tm);
+}
+
+void standard_timer_manager::add_relative_timer(
+    pxtime::time_duration const &interval,
+    boost::function<void (timer_manager &)> const &callback,
+    bool wait) {
+  add_monotonic_timer(monotonic_clock() + interval, callback, wait);
+}
+
+namespace {
+static void do_periodic_timer(
+    pxtime::time_duration const &interval,
+    boost::function<void ()> const &callback,
+    bool wait,
+    timer_manager &man) {
+  callback();
+  man.add_relative_timer(
+      interval,
+      boost::bind(&do_periodic_timer, interval, callback, wait, _1),
+      wait);
+}
+}
+
+void standard_timer_manager::add_periodic_timer(
+    pxtime::time_duration const &interval,
+    boost::function<void ()> const &callback,
+    bool wait) {
+  add_relative_timer(
+      interval, 
+      boost::bind(&do_periodic_timer, interval, callback, wait, _1),
+      wait);
 }
 
 bool standard_timer_manager::has_timers() const {
-  return !p->scheduled.empty();
+  return !p->scheduled_deadline.empty() || !p->scheduled_monotonic.empty();
 }
 
 bool standard_timer_manager::has_wait_timers() const {
@@ -93,28 +142,47 @@ bool standard_timer_manager::has_wait_timers() const {
 }
 
 void standard_timer_manager::handle_pending_timers() {
-  impl::scheduled_t &scheduled = p->scheduled;
+  { // handle deadline_timers
+    impl::scheduled_deadline_t &scheduled_deadline = p->scheduled_deadline;
 
-  pxtime::ptime now = pxtime::microsec_clock::universal_time();
+    pxtime::ptime now = pxtime::microsec_clock::universal_time();
 
-  while (!scheduled.empty()) {
-    deadline_timer const &current = scheduled.top();
+    while (!scheduled_deadline.empty()) {
+      deadline_timer current = scheduled_deadline.top();
 
-    if (current.timer - now >= p->min_wait)
-      break;
+      if (current.time_left(now) >= p->min_wait)
+        break;
 
-    deadline_timer new_timer = current.handler();
-    if (current.wait)
-      --p->waitfor;
-    scheduled.pop();
-    add_timer(new_timer);
+      if (current.must_wait())
+        --p->waitfor;
+      scheduled_deadline.pop();
+      current.emit(*this);
+    }
+  }
+  { // handle monotonic_timers
+    pxtime::time_duration now = monotonic_clock();
+
+    while (!p->scheduled_monotonic.empty()) {
+      monotonic_timer current = p->scheduled_monotonic.top();
+
+      if (current.time_left(now) >= p->min_wait)
+        break;
+
+      if (current.must_wait())
+        --p->waitfor;
+      p->scheduled_monotonic.pop();
+      current.emit(*this);
+    }
   }
 }
 
 boost::posix_time::time_duration standard_timer_manager::time_left() const {
-  pxtime::ptime now = pxtime::microsec_clock::universal_time();
-  pxtime::time_duration ret = p->scheduled.top().timer - now;
+  pxtime::time_duration ret = pxtime::seconds(0);
+  if (!p->scheduled_deadline.empty())
+    ret = p->scheduled_deadline.top().time_left();
+  if (!p->scheduled_monotonic.empty())
+    ret = std::min(ret, p->scheduled_monotonic.top().time_left());
   if (ret < p->min_wait)
-    return pxtime::seconds(0);
+    ret = pxtime::seconds(0);
   return ret;
 }
