@@ -39,42 +39,37 @@
 #include <ostream>
 #include <gott/string/string.hpp>
 
-using std::basic_ostream;
 using gott::xany::Xany;
 using tdl::structure::direct_print;
 
-template class direct_print<char>;
-
-template<class C>
-class direct_print<C>::impl {
+class direct_print::impl {
 public:
-  impl(basic_ostream<C> &o, unsigned s)
+  impl(std::ostream &o, unsigned s)
   : out(o), level(-s), step(s), line_ended(true), tag_printed(false) {}
   
-  basic_ostream<C> &out;
+  std::ostream &out;
   unsigned level;
   unsigned const step;
   bool line_ended, tag_printed;    
 };
 
-template<class C>
-direct_print<C>::direct_print(basic_ostream<C> &o, unsigned s) 
+direct_print::direct_print(std::ostream &o, unsigned s) 
 : p(new impl(o, s)) {}
 
-template<class C> direct_print<C>::~direct_print() {}
+direct_print::~direct_print() {}
 
-template<class C> void direct_print<C>::begin(source_position const &) {
+void direct_print::begin(source_position const &) {
   p->level += p->step;
   if (!p->line_ended)
     p->out << '\n';
   p->line_ended = true;
 }
 
-template<class C> void direct_print<C>::end() {
+void direct_print::end() {
   p->level -= p->step;
 }
 
-template<class C> void direct_print<C>::data(Xany const &x) {
+void direct_print::data(Xany const &x) {
   for (unsigned i = 0; i < p->level; ++i)
     p->out << ' ';
   if (x.empty())
@@ -85,7 +80,7 @@ template<class C> void direct_print<C>::data(Xany const &x) {
   p->line_ended = false;
 }
 
-template<class C> void direct_print<C>::add_tag(gott::string const &s) {
+void direct_print::add_tag(gott::string const &s) {
   if (p->tag_printed)
     p->out << ", ";
   else
@@ -94,18 +89,9 @@ template<class C> void direct_print<C>::add_tag(gott::string const &s) {
   p->tag_printed = true;
 }
 
-std::ostream &tdl::structure::operator<<(std::ostream &o,
-    copyable_structure const &s) {
-  direct_print<char> p(o);
+std::ostream &
+tdl::structure::operator<<(std::ostream &o, copyable_structure const &s) {
+  direct_print p(o);
   s.copy_to(p);
   return o;
 }
-
-#ifdef HAVE_WIDE_STDLIB
-std::wostream &tdl::structure::operator<<(std::wostream &o,
-    copyable_structure const &s) {
-  direct_print<wchar_t> p(o);
-  s.copy_to(p);
-  return o;
-}
-#endif

@@ -40,6 +40,7 @@
 
 #include "structure.hpp"
 #include <boost/scoped_ptr.hpp>
+#include <iosfwd>
 
 namespace tdl {
 namespace structure {
@@ -48,7 +49,6 @@ namespace structure {
  * A structure writer callback directly writing to a stream. Does not support
  * backtracking, of course.
  */
-template<class Ch>
 class direct_print : public writable_structure {
 public:
   /**
@@ -56,7 +56,7 @@ public:
    * \param out The stream to write to.
    * \param step The indentation width.
    */
-  GOTT_EXPORT direct_print(std::basic_ostream<Ch> &out, unsigned step = 4);
+  GOTT_EXPORT direct_print(std::ostream &out, unsigned step = 4);
   GOTT_EXPORT ~direct_print();
 
 private:
@@ -68,16 +68,6 @@ private:
   class impl;
   boost::scoped_ptr<impl> p;
 };
-
-#ifdef HAVE_WIDE_STDLIB
-/**
- * Print a (copyable) structure object to a (wide) stream.
- * \param o The stream to write to.
- * \param s The structure to print.
- */
-GOTT_EXPORT
-std::wostream &operator<<(std::wostream &o, copyable_structure const &s);
-#endif
 
 /**
  * Print a (copyable) structure object to a (normal) stream.

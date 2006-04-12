@@ -78,7 +78,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   std::ostringstream o;
-  direct_print<char> out(o);
+  direct_print out(o);
   scoped_ptr<repatcher> re(strip_paren());
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin(source_position());
@@ -90,7 +90,7 @@ void object::test<1>(int) {
 template<> template<>
 void object::test<2>(int) {
   std::ostringstream o;
-  direct_print<char> out(o);
+  direct_print out(o);
   scoped_ptr<repatcher> re(strip_paren());
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin(source_position());
@@ -109,7 +109,7 @@ void object::test<3>(int) {
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
-  direct_print<char> out(stream);
+  direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
 
   ind->begin(source_position());
@@ -128,7 +128,7 @@ void object::test<4>(int) {
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
-  direct_print<char> out(stream);
+  direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
 
   ind->begin(source_position());
@@ -157,7 +157,7 @@ void object::test<5>(int) {
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
-  direct_print<char> out(stream);
+  direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin(source_position());
     ind->data(Xany("123456789"));
@@ -175,7 +175,7 @@ void object::test<6>(int) {
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
-  direct_print<char> out(stream);
+  direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin(source_position()); 
   ind->begin(source_position()); ind->data(Xany("barfoo")); ind->end();
@@ -221,7 +221,7 @@ void object::test<7>(int) {
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
-  direct_print<char> out(stream);
+  direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
   ind->begin(source_position());
     ind->data(Xany("x077"));

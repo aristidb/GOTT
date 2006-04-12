@@ -135,7 +135,7 @@ void object::test<5>(int) {
   w.end();
 
   std::ostringstream strm;
-  stru::direct_print<char> o(strm);
+  stru::direct_print o(strm);
   p1.copy_to(o);
   ensure_equals("stringified tree", strm.str(),
       "-\n    8899.2\n        77 : --!");
