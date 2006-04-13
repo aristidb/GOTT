@@ -44,7 +44,6 @@
 #include <sigc++/signal.h>
 #include <map>
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace gott {
 namespace events {
@@ -76,24 +75,6 @@ public:
 
 public:
   static signal_manager *get_for(main_loop &) { return 0; }
-
-public:
-  class GOTT_LOCAL proxy_t : boost::noncopyable {
-  public:
-    sigc::signal1<void, int> &on_signal(int sig) {
-      return db[sig];
-    }
-
-    GOTT_EXPORT void operator() (main_loop &) const;
-
-  private:
-    std::map<int, sigc::signal1<void, int> > db;
-  };
-
-  typedef boost::shared_ptr<proxy_t> proxy;
-  typedef proxy_t &proxy_ref;
-
-  GOTT_LOCAL static proxy_t *make_proxy() { return new proxy_t; }
 
 private:
   static void register_signal(int sig, signal_manager *handler) GOTT_LOCAL;

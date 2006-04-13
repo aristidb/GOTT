@@ -118,10 +118,3 @@ void signal_manager::receive_message(Xany const &m) {
     handlers[sig].emit(sig);
   }
 }
-
-void signal_manager::proxy_t::operator() (main_loop &m) const {
-  signal_manager &s = m.feature<signal_manager>();
-  for (std::map<int, sigc::signal1<void, int> >::const_iterator it = db.begin();
-      it != db.end(); ++it)
-    s.on_signal(it->first).connect(it->second);
-}
