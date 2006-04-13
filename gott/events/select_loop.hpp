@@ -86,7 +86,7 @@ private:
   std::set<int> wait_fds;
   callback_map callbacks;
   selfpipe_message_manager message_mgr; 
-  signal_manager sig_mgr;
+  standard_signal_manager sig_mgr;
   bool running;
   sigc::signal0<void> on_idle_;
 

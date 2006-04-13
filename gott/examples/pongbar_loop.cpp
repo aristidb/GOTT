@@ -140,5 +140,5 @@ int main() {
   loop->on_idle().connect(bind(&bar_drawer::redraw, &d));
   loop->feature<quit_manager>().enable_master();
   loop->run();
-  std::cout << std::endl;
+  std::cout << "\nDone!" << std::endl;
 }

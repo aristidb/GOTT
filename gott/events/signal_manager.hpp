@@ -51,35 +51,50 @@ namespace events {
 class main_loop;
 class sigsafe_message_manager;
 
-/**
- * Feature for main_loops able to deal with operating system signals.
- */
-class GOTT_EXPORT signal_manager : boost::noncopyable, public sigc::trackable {
+class GOTT_EXPORT signal_manager {
 public:
-  /**
-   * Constructor.
-   * \param message_manager Message manager to send signal information over. 
-   */
-  signal_manager(sigsafe_message_manager *message_manager);
-  /// Destructor.
-  ~signal_manager();
-
   static QID const qid;
+
+  /// Constructor.
+  signal_manager();
+
+  /// Pure-virtual destructor.
+  virtual ~signal_manager() = 0;
 
   /**
    * In-program signal for signal notifications. Each signal should be 
    * associated to a single main_loop or signal_manager - or a 
    * user_error will be thrown.
    */
-  sigc::signal1<void, int> &on_signal(int sig);
+  virtual sigc::signal1<void, int> &on_signal(int sig) = 0;
 
 public:
   static signal_manager *get_for(main_loop &) { return 0; }
+};
+
+/**
+ * Feature for main_loops able to deal with operating system signals.
+ */
+class standard_signal_manager :
+  public signal_manager,
+  boost::noncopyable,
+  public sigc::trackable {
+public:
+  /**
+   * Constructor.
+   * \param message_manager Message manager to send signal information over. 
+   */
+  standard_signal_manager(sigsafe_message_manager *message_manager);
+  /// Destructor.
+  ~standard_signal_manager();
+
+  sigc::signal1<void, int> &on_signal(int sig);
 
 private:
-  static void register_signal(int sig, signal_manager *handler) GOTT_LOCAL;
-  static void unregister_all(signal_manager *handler) GOTT_LOCAL;
-  static signal_manager *find(int sig) GOTT_LOCAL;
+  static void register_signal(
+      int sig, standard_signal_manager *handler) GOTT_LOCAL;
+  static void unregister_all(standard_signal_manager *handler) GOTT_LOCAL;
+  static standard_signal_manager *find(int sig) GOTT_LOCAL;
   static void signal_handler(int sig) GOTT_LOCAL;
 
   void immediate_action(int sig);

@@ -42,21 +42,26 @@
 #include <signal.h>
 #include <map>
 
-using gott::events::signal_manager;
+using namespace gott::events;
 using gott::xany::Xany;
 
-signal_manager::signal_manager(sigsafe_message_manager *mm)
+gott::QID const signal_manager::qid(
+    "gott::events::signal_manager");
+
+signal_manager::signal_manager() {}
+signal_manager::~signal_manager() {}
+
+standard_signal_manager::standard_signal_manager(sigsafe_message_manager *mm)
 : message_manager(mm) {
   message_manager->on_receive().connect(
-      sigc::mem_fun(this, &signal_manager::receive_message));
+      sigc::mem_fun(this, &standard_signal_manager::receive_message));
 }
-signal_manager::~signal_manager() {
+
+standard_signal_manager::~standard_signal_manager() {
   unregister_all(this);
 }
 
-gott::QID const signal_manager::qid("gott::events::signal_manager");
-
-sigc::signal1<void, int> &signal_manager::on_signal(int sig) {
+sigc::signal1<void, int> &standard_signal_manager::on_signal(int sig) {
   handler_map_t::iterator pos = handlers.find(sig);
   if (pos == handlers.end()) {
     register_signal(sig, this);
@@ -66,22 +71,23 @@ sigc::signal1<void, int> &signal_manager::on_signal(int sig) {
 }
 
 namespace {
-  typedef std::map<int, std::pair<signal_manager *, void (*)(int)> > 
+  typedef std::map<int, std::pair<standard_signal_manager *, void (*)(int)> > 
     sys_handler_map_t;
   sys_handler_map_t sys_handlers;
 }
 
-void signal_manager::register_signal(int sig, signal_manager *handler) {
+void standard_signal_manager::register_signal(
+    int sig, standard_signal_manager *handler) {
   if (sys_handlers.find(sig) != sys_handlers.end())
     throw user_error(
-        "cannot register more than one signal_manager per signal");
+        "cannot register more than one standard_signal_manager per signal");
   sys_handlers[sig] =
     std::make_pair(
         handler,
         signal(sig, signal_handler));
 }
 
-void signal_manager::unregister_all(signal_manager *handler) {
+void standard_signal_manager::unregister_all(standard_signal_manager *handler) {
   sys_handler_map_t::iterator it = sys_handlers.begin();
   while (it != sys_handlers.end())
     if (it->second.first == handler) {
@@ -92,11 +98,11 @@ void signal_manager::unregister_all(signal_manager *handler) {
       ++it;
 }
 
-signal_manager *signal_manager::find(int sig) {
+standard_signal_manager *standard_signal_manager::find(int sig) {
   return sys_handlers[sig].first;
 }
 
-void signal_manager::signal_handler(int sig) {
+void standard_signal_manager::signal_handler(int sig) {
   find(sig)->immediate_action(sig);
 }
 
@@ -107,12 +113,12 @@ namespace {
   };
 }
 
-void signal_manager::immediate_action(int sig) {
+void standard_signal_manager::immediate_action(int sig) {
   signal_msg s = { sig };
   message_manager->send(Xany(s));
 }
 
-void signal_manager::receive_message(Xany const &m) {
+void standard_signal_manager::receive_message(Xany const &m) {
   if (m.compatible<signal_msg>()) {
     int sig = xany::Xany_cast<signal_msg>(m).sig;
     handlers[sig].emit(sig);

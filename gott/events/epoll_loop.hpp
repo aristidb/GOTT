@@ -85,7 +85,7 @@ private:
   class impl;
   boost::scoped_ptr<impl> p;
   selfpipe_message_manager message_mgr;
-  signal_manager sig_mgr;
+  standard_signal_manager sig_mgr;
 };
 
 }}
