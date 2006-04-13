@@ -77,14 +77,16 @@ void timer_manager::add_relative_timer(
 
 namespace {
 static void do_periodic_timer(
+    pxtime::time_duration const &last,
     pxtime::time_duration const &interval,
     boost::function<bool ()> const &callback,
     bool wait,
     timer_manager &man) {
   if (callback())
-    man.add_relative_timer(
-        interval,
-        boost::bind(&do_periodic_timer, interval, callback, wait, _1),
+    man.add_monotonic_timer(
+        last + interval,
+        boost::bind(&do_periodic_timer,
+          last + interval, interval, callback, wait, _1),
         wait);
 }
 }
@@ -93,9 +95,11 @@ void timer_manager::add_periodic_timer(
     pxtime::time_duration const &interval,
     boost::function<bool ()> const &callback,
     bool wait) {
-  add_relative_timer(
-      interval, 
-      boost::bind(&do_periodic_timer, interval, callback, wait, _1),
+  pxtime::time_duration now = monotonic_clock();
+  add_monotonic_timer(
+      now + interval, 
+      boost::bind(&do_periodic_timer,
+        now + interval, interval, callback, wait, _1),
       wait);
 }
 
