@@ -78,6 +78,8 @@ public:
     boost::function<void ()> read, write, exception;
   };
   std::map<int, entry> file_descriptors;
+
+  sigc::signal0<void> on_idle;
 };
 
 
@@ -90,6 +92,10 @@ epoll_loop::~epoll_loop() {}
 
 void epoll_loop::quit_local() {
   p->running = false;
+}
+
+sigc::signal0<void> &epoll_loop::on_idle() {
+  return p->on_idle;
 }
 
 void *epoll_loop::do_feature(gott::QID const &qid) {
@@ -152,6 +158,8 @@ void epoll_loop::run() {
       if (!has_timers())
         timeout = -1;
     }
+
+    p->on_idle.emit();
     
     if (!has_wait_timers() && p->wait_fds.empty())
       break;

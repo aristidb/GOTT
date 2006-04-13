@@ -25,16 +25,25 @@ class bar_drawer {
 public:
   void add(bar *b) {
     bars.push_back(b);
+    invalidate();
+  }
+
+  void invalidate() {
+    valid = false;
   }
 
   void redraw() {
-    std::cout << '\r';
-    std::for_each(bars.begin(), bars.end(), bind(&bar::draw, _1));
-    std::cout << std::flush;
+    if (!valid) {
+      std::cout << '\r';
+      std::for_each(bars.begin(), bars.end(), bind(&bar::draw, _1));
+      std::cout << std::flush;
+      valid = true;
+    }
   }
 
 private:
   std::vector<bar *> bars;
+  bool valid;
 };
 
 class pong_bar : public bar {
@@ -46,12 +55,12 @@ public:
 
   void pong_step() {
     advance();
-    drawer.redraw();
+    drawer.invalidate();
   }
 
   void hop() {
     pos = (std::rand() % (width - 2));
-    drawer.redraw();
+    drawer.invalidate();
   }
 
   void toggle_token() {
@@ -59,7 +68,7 @@ public:
       token = '.';
     else
       token = '*';
-    drawer.redraw();
+    drawer.invalidate();
   }
 
   void draw() {
@@ -128,6 +137,7 @@ int main() {
   tm.add_periodic_timer(
       milliseconds(300),
       (bind(&pong_bar::hop, &b3), true));
+  loop->on_idle().connect(bind(&bar_drawer::redraw, &d));
   loop->feature<quit_manager>().enable_master();
   loop->run();
   std::cout << std::endl;

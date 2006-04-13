@@ -88,6 +88,7 @@ private:
   selfpipe_message_manager message_mgr; 
   signal_manager sig_mgr;
   bool running;
+  sigc::signal0<void> on_idle_;
 
 public:
   select_loop();
@@ -104,6 +105,8 @@ private:
 public:
   void run();
   void quit_local();
+
+  sigc::signal0<void> &on_idle() { return on_idle_; }
 
 private:
   GOTT_LOCAL void *do_feature(gott::QID const &);

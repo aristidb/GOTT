@@ -61,6 +61,7 @@ public:
 
   void run();
   void quit_local();
+  sigc::signal0<void> &on_idle() { return on_idle_; }
 
 private:
   GOTT_LOCAL
@@ -78,6 +79,7 @@ private:
   bool running;
   gott::thread::message_queue<gott::xany::Xany> queue;
   sigc::signal1<void, gott::xany::Xany const &> on_receive_;
+  sigc::signal0<void> on_idle_;
 };
 
 }}

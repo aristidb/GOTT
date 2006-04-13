@@ -113,6 +113,8 @@ void select_loop::run(){
     } else
       t = 0;
     
+    on_idle().emit();
+
     if (!has_wait_timers() && wait_fds.empty())
       break;
     try {

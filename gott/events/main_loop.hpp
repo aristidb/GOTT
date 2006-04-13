@@ -64,6 +64,8 @@ public:
   /// Quit the main loop from inside.
   virtual void quit_local() = 0;
 
+  virtual sigc::signal0<void> &on_idle() = 0;
+
   /**
    * Get a concrete feature of the main loop.
    * \return

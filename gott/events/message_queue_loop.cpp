@@ -51,8 +51,10 @@ void message_queue_loop::quit_local() {
 
 void message_queue_loop::run() {
   running = true;
-  while (running)
+  while (running) {
     on_receive_.emit(queue.pop());
+    on_idle_.emit();
+  }
 }
 
 void message_queue_loop::send(Xany const &val) throw() {
