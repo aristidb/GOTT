@@ -69,14 +69,7 @@ namespace events {
   };
 
   kqueue_loop::kqueue_loop()
-    : standard_timer_manager(
-#ifdef BOOST_DATE_TIME_HAS_NANOSEC // TODO: is this low wait reasonable?
-			     boost::posix_time::nanoseconds(1)
-#else
-           boost::posix_time::microseconds(1)
-#endif
-			     ),
-      p(new impl),
+    : p(new impl),
       message_mgr(this),
       sig_mgr(&message_mgr)
   {}

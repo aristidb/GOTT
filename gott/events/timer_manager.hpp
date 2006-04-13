@@ -115,7 +115,7 @@ public:
    * \param wait Whether the main_loop should wait for the timer to be removed
    *             before quitting.
    */
-  void add_relative_timer(
+  virtual void add_relative_timer(
       boost::posix_time::time_duration const &interval,
       boost::function<void (timer_manager &)> const &callback,
       bool wait = true);
@@ -139,18 +139,33 @@ public:
 
 class standard_timer_manager : public timer_manager {
 public:
-  standard_timer_manager(boost::posix_time::time_duration const &min_wait);
+  standard_timer_manager();
   ~standard_timer_manager();
 
   void add_timer(deadline_timer const &);
   void add_timer(monotonic_timer const &);
 
+  void add_relative_timer(
+      boost::posix_time::time_duration const &interval,
+      boost::function<void (timer_manager &)> const &callback,
+      bool wait = true);
+
   bool has_timers() const;
   bool has_wait_timers() const;
 
 public:
-  void handle_pending_timers();
-  boost::posix_time::time_duration time_left() const;
+  void handle_pending_timers() {
+    do_time_action(true, 0);
+  }
+  
+  boost::posix_time::time_duration time_left(bool handle = false) {
+    boost::posix_time::time_duration result;
+    do_time_action(handle, &result);
+    return result;
+  }
+
+private:
+  void do_time_action(bool handle, boost::posix_time::time_duration *left);
 
 private:
   class impl;

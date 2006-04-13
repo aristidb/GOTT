@@ -82,8 +82,7 @@ public:
 
 
 epoll_loop::epoll_loop() 
-: standard_timer_manager(boost::posix_time::milliseconds(1)),
-  p(new impl),
+: p(new impl),
   message_mgr(this),
   sig_mgr(&message_mgr) {}
 
@@ -146,12 +145,13 @@ void epoll_loop::run() {
   while (p->running) {
     int timeout = -1;
     if (has_timers()) {
-      handle_pending_timers();
       typedef boost::int64_t i64;
       timeout = int(std::min(
-            i64(std::floor(time_left().total_microseconds() / 1000.0 + 0.5)),
-            i64(INT_MAX)));
-    } 
+          i64(std::floor(time_left(true).total_microseconds() / 1000.0 + 0.5)),
+          i64(INT_MAX)));
+      if (!has_timers())
+        timeout = -1;
+    }
     
     if (!has_wait_timers() && p->wait_fds.empty())
       break;

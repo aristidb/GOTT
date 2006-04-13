@@ -43,10 +43,11 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/utility/in_place_factory.hpp>
 
+#include <iostream>
+
 namespace gott{namespace events{
 select_loop::select_loop() 
-: standard_timer_manager(boost::posix_time::milliseconds(1)),
-  message_mgr(this),
+: message_mgr(this),
   sig_mgr(&message_mgr),
   running(false) {
 }
@@ -102,10 +103,9 @@ void select_loop::run(){
 
   int num_fd;
   while(running) {
-    handle_pending_timers();
+    boost::posix_time::time_duration td = time_left(true);
 
     if (has_timers()) {
-      boost::posix_time::time_duration td = time_left();
       next_event.tv_sec = td.total_seconds();
       next_event.tv_usec = 
         td.fractional_seconds() / (time_duration::ticks_per_second() / 1000000);
@@ -126,12 +126,18 @@ void select_loop::run(){
          num_fd && it!=e;
          ++it)  {
         unsigned mask = 0;
-        if( FD_ISSET( it->first, &fd_sets.read_fds ) ) 
+        if( FD_ISSET( it->first, &fd_sets.read_fds ) ) {
           mask |= fd_manager::read;
-        if( FD_ISSET( it->first, &fd_sets.write_fds) )
+          FD_CLR( it->first, &fd_sets.read_fds );
+        } 
+        if( FD_ISSET( it->first, &fd_sets.write_fds) ) {
           mask |= fd_manager::write;
-        if( FD_ISSET( it->first, &fd_sets.except_fds) ) 
+          FD_CLR( it->first, &fd_sets.write_fds );
+        }
+        if( FD_ISSET( it->first, &fd_sets.except_fds) ) {
           mask |= fd_manager::exception;
+          FD_CLR( it->first, &fd_sets.except_fds );
+        }
         if (mask) {
           --num_fd;
           it->second.callback(mask);

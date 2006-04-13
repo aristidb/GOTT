@@ -43,6 +43,8 @@
 #include <queue>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/bind.hpp>
+#include <boost/optional.hpp>
+#include <boost/none.hpp>
 
 namespace pxtime = boost::posix_time;
 using gott::events::timer_manager;
@@ -117,14 +119,13 @@ public:
   
   unsigned waitfor;
 
-  pxtime::time_duration min_wait;
+  boost::optional<pxtime::time_duration> saved_monotonic_time;
 
-  impl(pxtime::time_duration min_wait) : waitfor(0), min_wait(min_wait) {}
+  impl() : waitfor(0) {}
 };
 
-standard_timer_manager::standard_timer_manager(
-    pxtime::time_duration const &min_wait)
-  : p(new impl(min_wait)) {}
+standard_timer_manager::standard_timer_manager()
+  : p(new impl()) {}
 standard_timer_manager::~standard_timer_manager() {}
 
 void standard_timer_manager::add_timer(deadline_timer const &tm) {
@@ -139,6 +140,15 @@ void standard_timer_manager::add_timer(monotonic_timer const &tm) {
   p->scheduled_monotonic.push(tm);
 }
 
+void standard_timer_manager::add_relative_timer(
+    pxtime::time_duration const &interval,
+    boost::function<void (timer_manager &)> const &callback,
+    bool wait) {
+  pxtime::time_duration now = 
+    p->saved_monotonic_time ? *p->saved_monotonic_time : monotonic_clock();
+  add_monotonic_timer(now + interval, callback, wait);
+}
+
 bool standard_timer_manager::has_timers() const {
   return !p->scheduled_deadline.empty() || !p->scheduled_monotonic.empty();
 }
@@ -147,48 +157,76 @@ bool standard_timer_manager::has_wait_timers() const {
   return p->waitfor > 0;
 }
 
-void standard_timer_manager::handle_pending_timers() {
-  { // handle deadline_timers
-    impl::scheduled_deadline_t &scheduled_deadline = p->scheduled_deadline;
-
-    pxtime::ptime now = pxtime::microsec_clock::universal_time();
-
-    while (!scheduled_deadline.empty()) {
-      deadline_timer current = scheduled_deadline.top();
-
-      if (current.time_left(now) >= p->min_wait)
-        break;
-
-      if (current.must_wait())
-        --p->waitfor;
-      scheduled_deadline.pop();
-      current.emit(*this);
-    }
-  }
-  { // handle monotonic_timers
-    pxtime::time_duration now = monotonic_clock();
-
-    while (!p->scheduled_monotonic.empty()) {
-      monotonic_timer current = p->scheduled_monotonic.top();
-
-      if (current.time_left(now) >= p->min_wait)
-        break;
-
-      if (current.must_wait())
-        --p->waitfor;
-      p->scheduled_monotonic.pop();
-      current.emit(*this);
-    }
-  }
-}
-
-boost::posix_time::time_duration standard_timer_manager::time_left() const {
-  pxtime::time_duration ret = pxtime::seconds(0);
+void standard_timer_manager::do_time_action(
+    bool handle, pxtime::time_duration *left) {
+  // Get current time
+  pxtime::ptime now_deadline;
   if (!p->scheduled_deadline.empty())
-    ret = p->scheduled_deadline.top().time_left();
-  if (!p->scheduled_monotonic.empty())
-    ret = std::min(ret, p->scheduled_monotonic.top().time_left());
-  if (ret < p->min_wait)
-    ret = pxtime::seconds(0);
-  return ret;
+    now_deadline = pxtime::microsec_clock::universal_time();
+  pxtime::time_duration now_monotonic;
+  if (!p->scheduled_monotonic.empty()) {
+    now_monotonic = monotonic_clock();
+    p->saved_monotonic_time = now_monotonic;
+  }
+
+  unsigned long no_handled = 0;
+  // Handle timers
+  if (handle) {
+    { // handle deadline_timers
+      while (!p->scheduled_deadline.empty()) {
+        deadline_timer current = p->scheduled_deadline.top();
+
+        if (current.time_left(now_deadline) > pxtime::seconds(0))
+          break;
+
+        if (current.must_wait())
+          --p->waitfor;
+        p->scheduled_deadline.pop();
+        current.emit(*this);
+        ++no_handled;
+      }
+    }
+    { // handle monotonic_timers
+      while (!p->scheduled_monotonic.empty()) {
+        monotonic_timer current = p->scheduled_monotonic.top();
+
+        if (current.time_left(now_monotonic) > pxtime::seconds(0))
+          break;
+
+        if (current.must_wait())
+          --p->waitfor;
+        p->scheduled_monotonic.pop();
+        current.emit(*this);
+        ++no_handled;
+      }
+    }
+  }
+
+  if (no_handled > 0) {
+    if (!p->scheduled_deadline.empty())
+      now_deadline = pxtime::microsec_clock::universal_time();
+    if (!p->scheduled_monotonic.empty()) {
+      now_monotonic = monotonic_clock();
+      p->saved_monotonic_time = now_monotonic;
+    }
+  }
+
+  // Get time left
+  if (left) {
+    bool has_deadline = !p->scheduled_deadline.empty();
+    bool has_monotonic = !p->scheduled_monotonic.empty();
+    if (has_deadline && has_monotonic)
+      *left = std::min(
+          p->scheduled_deadline.top().time_left(now_deadline),
+          p->scheduled_monotonic.top().time_left(now_monotonic));
+    else if (has_deadline)
+      *left = p->scheduled_deadline.top().time_left(now_deadline);
+    else if (!p->scheduled_monotonic.empty())
+      *left = p->scheduled_monotonic.top().time_left(now_monotonic);
+    else
+      *left = pxtime::time_duration(pxtime::pos_infin);
+    *left = std::max(*left, pxtime::time_duration(0,0,0,0));
+  }
+  
+  p->saved_monotonic_time = boost::none;
 }
