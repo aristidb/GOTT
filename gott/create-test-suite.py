@@ -1,24 +1,42 @@
 #!/usr/bin/env python
 
-scons = '../contrib/scons/scons.py'
+scons = '../scons/scons.py'
 nm = 'nm'
 cxxfilt = 'c++filt'
 
-def compile_tests(file):
+def compile(file):
     os.system(scons + ' ' + file)
 
-def find_tests(file):
-    os.system(nm + ' ' + file)
+def auto_tests_list(file):
+    compile(file);
+    pipe = os.popen(nm + ' -j ' + file + ' | ' + cxxfilt)
+    import re
+    regex = re.compile('.*test[a-zA-Z0-9]*()$') #!!!!!!!
+    funcs = []
+    for func in pipe:
+	if regex.match(func):
+	    funcs.append(func)
+    return funcs
 
-def read_manual_test_list(file):
+def manual_tests_list(file):
+    try:
+	return open(file.replace('.cpp', '.tests'), 'r').readlines()
+    except IOError:
+	print 'WARNING: No manual test file found'
+    return []
 
 def create_suite(file, options):
     test_funcs = []
     if options.auto:
-	compile_tests(file)
-	test_funcs.append(find_tests(file))
+	test_funcs.append(auto_tests_list(file))
     if options.manual:
-	test_funcs.append(read_manual_test_list(file))
+	test_funcs.append(manual_tests_list(file))
+
+    # TODO check if file already exists
+    fh = open(file.replace('.cpp', '-suite.cpp'), 'w')
+    
+#    for func in test_funcs:
+	
 
 import optparse
 
@@ -33,8 +51,9 @@ parser.add_option('--no-auto', action='store_false', dest='auto',
                   help='No automatic test-suite creation')
 parser.add_option('--no-manual', action='store_false', dest='manual',
 		  help='No manual test-suite creation', default=True)
-parser.add_option('--no-update', action='store_false', dest='update',
-		  help='Do not call update-tests.py', default=True)
+parser.add_option('-t', '--create-test-runner', action='store_true',
+		  dest='update', help='Do not call create-test-runner.py',
+		  default=False)
 
 (options, args) = parser.parse_args()
 
