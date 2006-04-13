@@ -56,6 +56,7 @@ public:
   main_loop();
   /// Pure virtual destructor.
   virtual ~main_loop() = 0;
+
   /**
    * Run the main loop until there is nothing to do. Nothing to do means, there
    * are no objects to wait for (explicitly).
@@ -64,6 +65,12 @@ public:
   /// Quit the main loop from inside.
   virtual void quit_local() = 0;
 
+  /**
+   * The idle signal.
+   * The idle signal is emitted (at least) whenever the main_loop is about to
+   * block. Also, this signal is guaranteed to be emitted after <b>all</b>
+   * timers have been handled.
+   */
   virtual sigc::signal0<void> &on_idle() = 0;
 
   /**
@@ -80,6 +87,12 @@ public:
     return i_feature_ptr<T>();
   }
 
+  /**
+   * Get a concrete integrated feature of the main loop.
+   * \return
+   *   - 0 if the feature is not available
+   *   - a pointer to the feature
+   */
   template<class T>
   GOTT_LOCAL T *i_feature_ptr() {
     return static_cast<T *>(do_feature(T::qid));
