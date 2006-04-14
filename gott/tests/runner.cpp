@@ -7,6 +7,8 @@
 #include <cppunit/TestRunner.h>
 #include <cppunit/TextTestProgressListener.h>
 
+#include <cppunit/TestPath.h>
+
 #include <vector>
 #include <string>
 #include <boost/program_options.hpp>
@@ -22,7 +24,6 @@ void test(std::string const &path,
     std::cout << "Running: "  <<  (path == "" ? "*" : path) << '\n';
     runner.run(controller, path);
     out.write();
-    // should we quit runner if a test failes?
   }
   catch(std::invalid_argument &e)  { // Test path not resolved
     std::cerr << '\n' <<  "ERROR: " << e.what() << '\n';
@@ -83,14 +84,20 @@ int main(int argc, char **argv) {
     out.reset(new CppUnit::TextOutputter(&result, std::cerr));
 
   if(vm.count("test-path")) {
+    int ret = 0;
     string_vector vec=vm["test-path"].as<string_vector>();
     for(string_vector::iterator i=vec.begin();
 	i != vec.end();
 	++i)
-      test(*i, controller, runner, *out.get());
+      {
+	test(*i, controller, runner, *out.get());
+	if(!result.wasSuccessful())
+	  ret = 1;
+      }
+    return ret;
   }
   else
     test("", controller, runner, *out.get());
  
-  return result.wasSuccessful() ? 0 : 1; //TODO result only knows about the last test!
+  return result.wasSuccessful() ? 0 : 1;
 }
