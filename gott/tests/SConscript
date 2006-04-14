@@ -1,0 +1,24 @@
+
+Import('env')
+
+import dircache
+import glob
+import os
+import stat
+
+def ScanDir(path):
+    codefiles = glob.glob(path + '/*.cpp')
+    files = dircache.listdir(path)
+    for file in files:
+	mode = os.stat(path+'/'+file)[stat.ST_MODE]
+	if stat.S_ISDIR(mode):
+	    codefiles += ScanDir(file)
+    return codefiles
+
+codefiles = ScanDir('.')
+
+test_env = env.Copy()
+
+test_env.Append(LINKFLAGS = '-lcppunit -lboost_program_options')
+
+env.Program('unit_test', codefiles)
