@@ -43,3 +43,7 @@ SConscript(dirs=['sigcmp'])
 SConscript(dirs=['tut'])
 
 SConscript(dirs=['x11'])
+
+SConscript(dirs=['kqueue'])
+
+SConscript(dirs=['cppunit'])
