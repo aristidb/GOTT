@@ -39,9 +39,9 @@
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
-
+ 
 using namespace boost::posix_time;
-
+ 
 static time_duration fallback_monotonic_clock() { // TODO: FIXME, make monotonic
   // TODO: emit some warning
   struct timeval tp;
@@ -50,7 +50,7 @@ static time_duration fallback_monotonic_clock() { // TODO: FIXME, make monotonic
       tp.tv_sec,
       tp.tv_usec / (1000000 / time_duration::ticks_per_second()));
 }
-
+ 
 time_duration gott::monotonic_clock() {
 #if defined(_POSIX_TIMERS) && _POSIX_TIMERS>0
   struct timespec tp;
@@ -60,7 +60,7 @@ time_duration gott::monotonic_clock() {
       tp.tv_sec,
       tp.tv_nsec / (1000000000 / time_duration::ticks_per_second()));
 #else
-  return time_duration(0, 0, 0, 0);
-  //#error "No monotonic_clock support for your system"
+  #warning "Monotonic clocks are not supported on your system."
+  return fallback_monotonic_clock();
 #endif
 }
