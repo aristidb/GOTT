@@ -49,6 +49,6 @@ time_duration gott::monotonic_clock() {
       tp.tv_nsec / (1000000000 / time_duration::ticks_per_second()));
 #else
   return time_duration(0, 0, 0, 0);
-  #error "No monotonic_clock support for your system"
+  //#error "No monotonic_clock support for your system"
 #endif
 }
