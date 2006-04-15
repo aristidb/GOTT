@@ -107,7 +107,7 @@ def CheckPkgConfigPkg(context, name):
 	return result
 
 def CheckBoostDateTimeCanNanosec(context):
-	context.Message('Checking if Boost date_time supports nanosecons... ')
+	context.Message('Checking if Boost date_time supports nanoseconds... ')
 	result = context.TryCompile(
 		"#include <boost/date_time/posix_time/posix_time_types.hpp>\nint main() { boost::posix_time::nanoseconds n(1); }", '.cpp')
 	if result:

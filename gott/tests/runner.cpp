@@ -133,8 +133,7 @@ int main(int argc, char **argv) {
       }
     return ret;
   }
-  else
-    test("", controller, runner, *out.get());
- 
+
+  test("", controller, runner, *out.get());
   return result.wasSuccessful() ? 0 : 1;
 }

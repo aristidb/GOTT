@@ -119,7 +119,8 @@ dirs = [
 'notify_fs',
 'properties',
 #'ui',
-'examples'
+'examples',
+'tests'
 ]
 
 for x in dirs:
