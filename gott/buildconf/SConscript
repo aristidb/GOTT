@@ -147,6 +147,14 @@ boost_date_time_lib = 'boost_date_time' + conf.env['BOOST_LIBSUFFIX']
 if not conf.CheckLib(boost_date_time_lib, language = 'c++'):
   print 'Boost date_time library is not installed:', boost_date_time_lib
   Exit(1)
+
+boost_popt_lib = 'boost_program_options' + conf.env['BOOST_LIBSUFFIX']
+if not conf.CheckLib(boost_popt_lib, language = 'c++'):
+  print 'Boost date_time library is not installed:', boost_date_time_lib
+  Exit(1)
+
+conf.CheckLib('cppunit', language = 'c++')
+
 conf.BoostDateTimeCanNanosec()
 
 conf.CheckLib('rt')

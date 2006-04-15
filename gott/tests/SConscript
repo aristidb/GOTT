@@ -54,8 +54,5 @@ def ScanDir(path):
 codefiles = ScanDir('.')
 
 #if codefiles == []:
-test_env = env.Copy()
 
-test_env.Append(LINKFLAGS = '-lcppunit -lboost_program_options')
-
-test_env.Program('unit_test', codefiles)
+env.Program('unit_test', codefiles)
