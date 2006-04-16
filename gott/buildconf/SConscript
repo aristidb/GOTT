@@ -35,6 +35,12 @@
 #
 # ***** END LICENSE BLOCK *****
 
+def AddSysOpts(env):
+	dict = env.Dictionary()
+	for k, v in dict.iteritems():
+		if k[:4] == 'SYS_' and v == 1:
+			env.Append(CPPDEFINES = ['BUILD_' + k[4:]])
+
 def CheckLinkerAsNeeded(context):
 	context.Message('Checking if linker supports --as-needed flag... ')
 
@@ -126,7 +132,10 @@ tests =	{
 	'PkgConfigPkg': CheckPkgConfigPkg,
 	'BoostDateTimeCanNanosec': CheckBoostDateTimeCanNanosec
 }
+
 conf = Configure(env, custom_tests = tests)
+AddSysOpts(conf.env)
+
 conf.LinkerAsNeeded()
 if conf.env['OPTIMIZE'] != 'none':
 	conf.Optimization()
