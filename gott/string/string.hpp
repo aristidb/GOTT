@@ -45,6 +45,7 @@
 #include <gott/visibility.hpp>
 #include <gott/range.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/mpl/bool.hpp>
 
 #ifndef NO_GOTT_THUNK
 #include <gott/thunk.hpp>
@@ -67,6 +68,9 @@ class GOTT_EXPORT string {
 public:
   typedef range_t<utf8_t const *> utf8_range;
   typedef range_t<utf8_iterator> utf32_range;
+
+  typedef boost::mpl::true_ equality_comparable;
+  typedef boost::mpl::true_ printable;
 
   /**
    * Construct empty string

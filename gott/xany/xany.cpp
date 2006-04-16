@@ -36,7 +36,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "xany.hpp"
-#include "operations.hpp"
 
 using namespace std;
 using namespace gott::xany;
@@ -56,6 +55,16 @@ bool gott::xany::operator!=(Xany const &lhs, Xany const &rhs) {
   return !(lhs == rhs);
 }
 
+std::ostream &gott::xany::operator<<(std::ostream &s, Xany const &v) {
+  if (!v.empty()) {
+    printable const &printer = 
+      dynamic_cast<printable const &>(v.get_operations());
+    printer.print(s, v);
+  }
+  return s;
+}
+
 printable::~printable() {}
 
 equality_comparable::~equality_comparable() {}
+

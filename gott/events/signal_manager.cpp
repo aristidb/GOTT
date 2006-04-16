@@ -108,8 +108,9 @@ void standard_signal_manager::signal_handler(int sig) {
 
 namespace {
   struct signal_msg { 
-    int sig; 
-    bool operator==(signal_msg const &o) const { return sig == o.sig; };
+    int sig;
+    typedef boost::mpl::false_ equality_comparable;
+    typedef boost::mpl::false_ printable;
   };
 }
 

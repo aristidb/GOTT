@@ -42,8 +42,79 @@
 #include "operations_base.hpp"
 #include <ostream>
 #include <gott/string/string.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/mpl/vector/vector0.hpp>
+#include <boost/mpl/push_back.hpp>
+#include <boost/mpl/empty.hpp>
+#include <boost/mpl/inherit.hpp>
+#include <boost/mpl/inherit_linearly.hpp>
 
 namespace gott { namespace xany {
+
+struct equality_comparable_tag {};
+struct printable_tag {};
+
+template<class EqualityComparable, class Printable>
+struct op_traits_ctor {
+  typedef 
+    boost::mpl::vector0<> set0;
+  typedef
+    typename boost::mpl::if_<
+      EqualityComparable,
+      typename boost::mpl::push_back<set0, equality_comparable_tag>::type,
+      set0
+    >::type set1;
+  typedef
+    typename boost::mpl::if_<
+      Printable,
+      typename boost::mpl::push_back<set1, printable_tag>::type,
+      set1
+    >::type set2;
+  typedef set2 type;
+};
+
+template<class T>
+struct op_traits {
+  typedef
+    typename op_traits_ctor<
+      typename T::equality_comparable,
+      typename T::printable
+    >::type type;
+};
+
+template<>
+struct op_traits<void> {
+  typedef op_traits_ctor<boost::mpl::false_, boost::mpl::false_>::type type;
+};
+
+template<>
+struct op_traits<long> {
+  typedef op_traits_ctor<boost::mpl::true_, boost::mpl::true_>::type type;
+};
+
+template<>
+struct op_traits<double> {
+  typedef op_traits_ctor<boost::mpl::true_, boost::mpl::true_>::type type;
+};
+
+template<class T, class Tag>
+struct get_op;
+
+template<class T> 
+struct operations :
+  boost::mpl::inherit2<
+    typename boost::mpl::inherit_linearly<
+      typename op_traits<T>::type,
+      boost::mpl::inherit<boost::mpl::_1, get_op<T, boost::mpl::_2> >
+    >::type,
+    typename boost::mpl::if_<
+      typename boost::mpl::empty<typename op_traits<T>::type>::type,
+      operations_base,
+      boost::mpl::empty_base
+    >::type
+  >::type
+{};
 
 /**
  * Any equality-comparable Xany-compatible type has this interface in its
@@ -60,11 +131,8 @@ template<class T> struct equality_comparer : equality_comparable {
   }
 };
 
-/**
- * The default operations implementation.
- */
-template<class T> 
-struct operations : equality_comparer<T> {};
+template<class T>
+struct get_op<T, equality_comparable_tag> : equality_comparer<T> {};
 
 /**
  * Checks whether two typeless objects are equal.
@@ -101,29 +169,16 @@ template<class T> struct printer : printable {
 #endif
 };
 
+template<class T>
+struct get_op<T, printable_tag> : printer<T> {};
+
 /**
  * Print a typeless object to a stream.
  * \param s The stream to write to.
  * \param v The object to print.
  * \return A reference to s.
  */
-template<class Ch, class ChT>
-std::basic_ostream<Ch, ChT> &
-operator<<(std::basic_ostream<Ch, ChT> &s, Xany const &v) {
-  if (!v.empty()) {
-    printable const &printer = 
-      dynamic_cast<printable const &>(v.get_operations());
-    printer.print(s, v);
-  }
-  return s;
-}
-
-#define GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(T) \
-  template<> struct operations<T> : equality_comparer<T>, printer<T> {}
-
-GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(long);
-GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(double);
-GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(string);
+GOTT_EXPORT std::ostream &operator<<(std::ostream &s, Xany const &v);
 
 }}
 
