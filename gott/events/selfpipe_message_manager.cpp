@@ -68,6 +68,3 @@ void selfpipe_message_manager::send(Xany const &value) throw() {
   write_unix(selfpipe[1], data);
 }
 
-void selfpipe_message_manager::sig_send(Xany const &value) {
-  send(value);
-}
