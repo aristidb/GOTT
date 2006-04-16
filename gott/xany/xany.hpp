@@ -39,41 +39,15 @@
 #define GOTT_XANY_XANY_HPP
 
 #include "promote.hpp"
-#include <gott/string/string.hpp>
+#include "operations_base.hpp"
 #include <gott/exceptions.hpp>
 #include <typeinfo>
-#include <algorithm>
 #include <boost/type_traits.hpp>
 #include <cstddef>
-#include <iosfwd>
-
 #include <gott/visibility.hpp>
-
-#include <iostream>
 
 namespace gott {
 namespace xany {
-
-/**
- * Dummy basetype for "typeless operations".
- *
- * Example usage:
- * @code
- * Xany v(4);
- * std::cout << v;
- * @endcode
- * Which is behind the scenes:
- * @code
- * dynamic_cast<printable&>(v.get_operations()).print(std::cout, v);
- * @endcode
- */
-struct operations_base {
-  GOTT_EXPORT virtual ~operations_base() = 0;
-};
-
-template<class T> struct operations;
-
-template<> struct operations<void> : operations_base {};
 
 template<class T> struct GOTT_EXPORT spelled_t {};
 
@@ -175,14 +149,12 @@ public:
    */
   template<class T>
   bool compatible() const {
-    if (!place)
-      return false;
 #ifdef BUG_FIXED_GCC_TEMPLATE_TYPEINFO
     std::type_info const &desire = spell<typename promote<T>::type>();
-    std::type_info const &actual = place->spelled_type();
+    std::type_info const &actual = spelled_type();
 #else
     std::type_info const &desire = typeid(typename promote<T>::type);
-    std::type_info const &actual = place->type();
+    std::type_info const &actual = type();
 #endif
     return desire == actual;
   }
@@ -248,7 +220,7 @@ private:
 template<class T>
 typename promote<T>::reference
 Xany_cast_ref(Xany &p) {
-  if (p.empty() || p.type() != typeid(typename promote<T>::type))
+  if (!p.compatible<T>())
     throw gott::user_error("Xany: incompatible type");
   return promote<T>::get_back(static_cast<typename
    Xany::template holder<typename promote<T>::type>*>(p.place)->value);
@@ -264,86 +236,8 @@ T Xany_cast(Xany const &p) {
       const_cast<Xany &>(p));
 }
 
-/**
- * Any equality-comparable Xany-compatible type has this interface in its
- * operations.
- */
-struct GOTT_EXPORT equality_comparable : virtual operations_base {
-  virtual bool equals(Xany const &, Xany const &) const = 0;
-  virtual ~equality_comparable() = 0;
-};
-
-template<class T> struct equality_comparer : equality_comparable {
-  bool equals(Xany const &a, Xany const &b) const {
-    return Xany_cast<T>(a) == Xany_cast<T>(b);
-  }
-};
-
-/**
- * The default operations implementation.
- */
-template<class T> 
-struct operations : equality_comparer<T> {};
-
-/**
- * Checks whether two typeless objects are equal.
- */
-GOTT_EXPORT bool operator==(Xany const &lhs, Xany const &rhs);
-
-/**
- * Checks whether two typeless objects differ.
- */
-GOTT_EXPORT bool operator!=(Xany const &lhs, Xany const &rhs);
-
-/**
- * Any printable Xany-compatible type has this interface in its operations.
- */
-struct GOTT_EXPORT printable : virtual operations_base {
-  virtual void print(std::ostream &, Xany const &) const = 0;
-
-#ifdef HAVE_WIDE_STDLIB
-  virtual void print(std::wostream &, Xany const &) const = 0;
-#endif
-
-  virtual ~printable() = 0;
-};
-
-template<class T> struct printer : printable {
-  void print(std::ostream &s, Xany const &v) const {
-    s << Xany_cast<T>(v);
-  }
-
-#ifdef HAVE_WIDE_STDLIB
-  void print(std::wostream &s, Xany const &v) const {
-    s << Xany_cast<T>(v);
-  }
-#endif
-};
-
-/**
- * Print a typeless object to a stream.
- * \param s The stream to write to.
- * \param v The object to print.
- * \return A reference to s.
- */
-template<class Ch, class ChT>
-std::basic_ostream<Ch, ChT> &
-operator<<(std::basic_ostream<Ch, ChT> &s, Xany const &v) {
-  if (!v.empty()) {
-    printable const &printer = 
-      dynamic_cast<printable const &>(v.get_operations());
-    printer.print(s, v);
-  }
-  return s;
-}
-
-#define GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(T) \
-  template<> struct operations<T> : equality_comparer<T>, printer<T> {}
-
-GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(long);
-GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(double);
-GOTT_XANY_DECLARE_EQUALITY_COMPARABLE_AND_PRINTABLE(string);
-
 }}
+
+#include "operations.hpp" // depends on Xany
 
 #endif

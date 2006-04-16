@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,27 +35,32 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "xany.hpp"
-#include "operations.hpp"
+#ifndef GOTT_XANY_OPERATIONS_BASE_HPP
+#define GOTT_XANY_OPERATIONS_BASE_HPP
 
-using namespace std;
-using namespace gott::xany;
+namespace gott { namespace xany {
 
-operations_base::~operations_base() {}
+/**
+ * Dummy basetype for "typeless operations".
+ *
+ * Example usage:
+ * @code
+ * Xany v(4);
+ * std::cout << v;
+ * @endcode
+ * Which is behind the scenes:
+ * @code
+ * dynamic_cast<printable&>(v.get_operations()).print(std::cout, v);
+ * @endcode
+ */
+struct operations_base {
+  GOTT_EXPORT virtual ~operations_base() = 0;
+};
 
-bool gott::xany::operator==(Xany const &lhs, Xany const &rhs) {
-  if (lhs.empty() || rhs.empty())
-    return lhs.empty() && rhs.empty();
-  if (lhs.type() != rhs.type())
-    return false;
-  return dynamic_cast<equality_comparable const &>(lhs.get_operations())
-          .equals(lhs, rhs);
-}
+template<class T> struct operations;
 
-bool gott::xany::operator!=(Xany const &lhs, Xany const &rhs) {
-  return !(lhs == rhs);
-}
+template<> struct operations<void> : operations_base {};
 
-printable::~printable() {}
+}}
 
-equality_comparable::~equality_comparable() {}
+#endif
