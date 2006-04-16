@@ -38,6 +38,8 @@
 #ifndef GOTT_XANY_OPERATIONS_BASE_HPP
 #define GOTT_XANY_OPERATIONS_BASE_HPP
 
+#include <gott/visibility.hpp>
+
 namespace gott { namespace xany {
 
 /**
