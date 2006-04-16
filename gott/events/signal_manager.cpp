@@ -39,6 +39,7 @@
 #include "main_loop.hpp"
 #include "inprocess_message_manager.hpp"
 #include <gott/exceptions.hpp>
+#include <gott/xany/tagged_base.hpp>
 #include <signal.h>
 #include <map>
 
@@ -107,21 +108,18 @@ void standard_signal_manager::signal_handler(int sig) {
 }
 
 namespace {
-  struct signal_msg { 
-    int sig;
-    typedef boost::mpl::false_ equality_comparable;
-    typedef boost::mpl::false_ printable;
+  struct signal_msg : gott::xany::tagged_base<int> { 
+    signal_msg(int x) : gott::xany::tagged_base<int>(x) {}
   };
 }
 
 void standard_signal_manager::immediate_action(int sig) {
-  signal_msg s = { sig };
-  message_manager->send(Xany(s));
+  message_manager->send(Xany(signal_msg(sig)));
 }
 
 void standard_signal_manager::receive_message(Xany const &m) {
   if (m.compatible<signal_msg>()) {
-    int sig = xany::Xany_cast<signal_msg>(m).sig;
+    int sig = xany::Xany_cast<signal_msg>(m).get();
     handlers[sig].emit(sig);
   }
 }

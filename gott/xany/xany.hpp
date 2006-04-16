@@ -38,23 +38,15 @@
 #ifndef GOTT_XANY_XANY_HPP
 #define GOTT_XANY_XANY_HPP
 
+#include "spell.hpp"
 #include "promote.hpp"
 #include "operations_base.hpp"
 #include <gott/exceptions.hpp>
-#include <typeinfo>
 #include <boost/type_traits.hpp>
 #include <cstddef>
 #include <gott/visibility.hpp>
 
-namespace gott {
-namespace xany {
-
-template<class T> struct GOTT_EXPORT spelled_t {};
-
-template<class T>
-inline std::type_info const &spell() {
-  return typeid(spelled_t<T>);
-}
+namespace gott { namespace xany {
 
 /**
  * Typeless objects.
@@ -188,7 +180,8 @@ private:
     virtual operations_base &get_operations() const = 0;
   };
 
-  template<class T> struct holder : public placeholder {
+  template<class T>
+  struct holder : public placeholder {
     holder(T const &v) : value(v) {}
     std::type_info const &type() const { 
       return typeid(T); 
