@@ -53,6 +53,7 @@ namespace events {
     bool running;
     scoped_unix_file queue;
 
+    // fd_manager
     struct callback {
       unsigned mask;
       boost::function<void (unsigned)> call;
@@ -62,16 +63,19 @@ namespace events {
 
     std::set<int> wait_fds;
 
+    // signal_manager
+    typedef std::map<int, sigc::signal1<void, int> > map_sig_hnd;
+    map_sig_hnd signals;
+
     impl()
       : running(false),
-      queue(kqueue::create_bsd())
+	queue(kqueue::create_bsd())
     {}
   };
 
   kqueue_loop::kqueue_loop()
     : p(new impl),
-      message_mgr(this),
-      sig_mgr(&message_mgr)
+      message_mgr(this)
   {}
 
   kqueue_loop::~kqueue_loop() {}
@@ -79,11 +83,21 @@ namespace events {
   void *kqueue_loop::do_feature(gott::QID const &qid) {
     GOTT_EVENTS_FEATURE(qid, fd_manager);
     GOTT_EVENTS_FEATURE(qid, timer_manager);
+    GOTT_EVENTS_FEATURE(qid, signal_manager);
     if (qid == inprocess_message_manager::qid)
       return &message_mgr;
-    if (qid == signal_manager::qid)
-      return &sig_mgr;
     return 0;
+  }
+
+  sigc::signal1<void, int> &kqueue_loop::on_signal(int sig) {
+    impl::map_sig_hnd::iterator i = p->signals.find(sig);
+    if(i == p->signals.end()) {
+      struct kevent n;
+      EV_SET(&n, sig, EVFILT_SIGNAL, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
+      kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
+      return p->signals[sig];
+    }
+    return i->second;
   }
 
   void kqueue_loop::add_fd(int fd, unsigned mask, 
@@ -138,7 +152,7 @@ namespace events {
   void kqueue_loop::run() {
     p->running = true;
     enum { EVENTS_N=64 };
-    struct kevent events[EVENTS_N];
+    struct kevent event_list[EVENTS_N];
     while(p->running) {
       timespec tm;
       bool has_timers_mem = has_timers();
@@ -152,22 +166,32 @@ namespace events {
       if (!has_wait_timers() && p->wait_fds.empty())
         break;
 
-      int n=kqueue::event_bsd(p->queue.access(), 0, 0, events, EVENTS_N,
+      int n=kqueue::event_bsd(p->queue.access(), 0, 0, event_list, EVENTS_N,
 			      has_timers_mem ? &tm : 0x0);
-      for(int i=0; i<n; ++i) {
-        impl::map_fd_cb::iterator j=p->callbacks.find(events[i].ident);
-        if(j == p->callbacks.end())
-      	  continue; //is this an error?
-        if(events[i].filter & EVFILT_READ) {
-          if(!(j->second.mask & fd_manager::read))
-            continue; //do we really have to check this and should it be an error?
-          j->second.call(fd_manager::read);
-        }
-        else if(events[i].filter & EVFILT_WRITE) {
-          if(!(j->second.mask & fd_manager::write))
-            continue; //do we really have to check this and should it be an error?
-          j->second.call(fd_manager::write);
-      	}
+      for(int i=0; i<n; ++i) {        
+	if(event_list[i].filter & EVFILT_SIGNAL) {
+	  impl::map_sig_hnd::iterator j = p->signals.find(event_list[i].ident);
+	  if(j == p->signals.end())
+	    continue; //is this an error?
+	  i->second(event_list[i].ident);
+	}
+        else {
+	  impl::map_fd_cb::iterator j=p->callbacks.find(event_list[i].ident);
+	  if(j == p->callbacks.end())
+	    continue; //is this an error?
+	  if(event_list[i].filter & EVFILT_READ) {
+//do we really have to check this and should it be an error?
+	    if(!(j->second.mask & fd_manager::read))
+	      continue;
+	    j->second.call(fd_manager::read);
+	  }
+	  else if(event_list[i].filter & EVFILT_WRITE) {
+//do we really have to check this and should it be an error?
+	    if(!(j->second.mask & fd_manager::write))
+	      continue;
+	    j->second.call(fd_manager::write);
+	  }
+	}
       }
     }
   }

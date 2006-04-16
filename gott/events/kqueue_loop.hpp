@@ -61,12 +61,8 @@ namespace events {
 class GOTT_EXPORT kqueue_loop
   : public main_loop,
     private fd_manager,
-    private standard_timer_manager
-
-  /*
-    KQueue could also replace signal_manager!
-   */
-
+    private standard_timer_manager,
+    private signal_manager
 {
  public:
   kqueue_loop();
@@ -82,12 +78,13 @@ class GOTT_EXPORT kqueue_loop
 
   GOTT_LOCAL void remove_fd(int fd);
 
+  GOTT_LOCAL sigc::signal1<void, int> &on_signal(int sig);
+
   void *do_feature(QID const &);
 
   class impl;
   boost::scoped_ptr<impl> p;
   selfpipe_message_manager message_mgr;
-  standard_signal_manager sig_mgr;
 };
 
 }}
