@@ -14,8 +14,12 @@
 #include <gott/syswrap/read_write_unix.hpp>
 
 #include <gott/events/select_loop.hpp>
+#ifdef BUILD_KQUEUE
 #include <gott/events/kqueue_loop.hpp>
+#endif
+#ifdef BUILD_EPOLL
 #include <gott/events/epoll_loop.hpp>
+#endif
 
 using namespace gott;
 using namespace gott::events;
@@ -67,7 +71,7 @@ public:
 
   void test_kqueue_loop() {
 #ifdef BUILD_KQUEUE
-    reader(new kqueue_loop);
+    //reader(new kqueue_loop);
 #endif
   }
 };
