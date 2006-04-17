@@ -53,14 +53,18 @@ public:
     ssize_t n = read_unix(pipes[0], buffer);
     TS_ASSERT_LESS_THAN(0, n);
     TS_ASSERT(gott::string("Hallo Welt!") == buffer);
-    if (reads == 2)
-      ml->feature<fd_manager>().remove_fd(pipes[0]);
-    else
+    switch (reads) {
+    case 2:
       write_unix(pipes[1], "Hallo Welt!");
+      break;
+    case 3:
+      ml->feature<fd_manager>().remove_fd(pipes[0]);
+      break;
+    }
   }
 
   void write_thread() {
-    write_unix(pipes[1], "Hallo Welt!");
+    write_unix(pipes[1], "Hallo Welt!\0Hallo Welt!");
   }
 #endif
 
@@ -76,7 +80,7 @@ public:
 
     loop->run();
 
-    TS_ASSERT_EQUALS(reads, 2);
+    TS_ASSERT_EQUALS(reads, 3);
 
     thrd.join();
 #endif
