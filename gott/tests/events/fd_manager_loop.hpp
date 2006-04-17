@@ -26,19 +26,41 @@ using namespace gott::events;
 
 class fd_manager_loop_test : public CxxTest::TestSuite
 {
+  int pipes[2];
+  int reads;
+
 public:
+  void setUp() {
+    reads = 0;
 #ifdef HAS_UNISTD_H
-  static void read_event(main_loop *ml, int fd, unsigned mask) {
-    TS_ASSERT(mask == fd_manager::read);
-    char buffer[12];
-    ssize_t n = read_unix(fd, buffer);
-    TS_ASSERT(n > 0);
-    TS_ASSERT(gott::string("Hallo Welt!") == gott::string(buffer));
-    ml->quit_local();
+    pipe_unix(pipes);
+#endif
   }
 
-  static void write_thread(int fd) {
-    write_unix(fd, "Hallo Welt!");
+  void tearDown() {
+#ifdef HAS_UNISTD_H
+    close(pipes[0]);
+    close(pipes[1]);
+    pipes[0] = pipes[1] = -1;
+#endif
+  }
+
+#ifdef HAS_UNISTD_H
+  void read_event(main_loop *ml, unsigned mask) {
+    ++reads;
+    TS_ASSERT_EQUALS(mask, unsigned(fd_manager::read));
+    char buffer[12];
+    ssize_t n = read_unix(pipes[0], buffer);
+    TS_ASSERT_LESS_THAN(0, n);
+    TS_ASSERT(gott::string("Hallo Welt!") == buffer);
+    if (reads == 2)
+      ml->feature<fd_manager>().remove_fd(pipes[0]);
+    else
+      write_unix(pipes[1], "Hallo Welt!");
+  }
+
+  void write_thread() {
+    write_unix(pipes[1], "Hallo Welt!");
   }
 #endif
 
@@ -46,16 +68,15 @@ public:
 #ifdef HAS_UNISTD_H
     boost::scoped_ptr<main_loop> loop(ploop);
 
-    int pipes[2];
-    pipe_unix(pipes);
-
-    boost::thread thrd(boost::bind(fd_manager_loop_test::write_thread,
-        			   pipes[1]));
-
     loop->feature<fd_manager>().add_fd
       (pipes[0], fd_manager::read, boost::bind
-       (fd_manager_loop_test::read_event, loop.get(), pipes[0], _1));
+       (&fd_manager_loop_test::read_event, this, loop.get(), _1));
+
+    boost::thread thrd(boost::bind(&fd_manager_loop_test::write_thread, this));
+
     loop->run();
+
+    TS_ASSERT_EQUALS(reads, 2);
 
     thrd.join();
 #endif
