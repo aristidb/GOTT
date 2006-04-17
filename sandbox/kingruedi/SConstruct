@@ -32,18 +32,20 @@ env = Environment(
 
 Export('env')
 
-SConscript(dirs=['agg'])
+#SConscript(dirs=['agg'])
 
-SConscript(dirs=['bfd'])
+#SConscript(dirs=['bfd'])
 
-SConscript(dirs=['cairo'])
+#SConscript(dirs=['cairo'])
 
-SConscript(dirs=['sigcmp'])
+#SConscript(dirs=['sigcmp'])
 
-SConscript(dirs=['tut'])
+#SConscript(dirs=['tut'])
 
-SConscript(dirs=['x11'])
+#SConscript(dirs=['x11'])
 
 SConscript(dirs=['kqueue'])
 
-SConscript(dirs=['cppunit'])
+#SConscript(dirs=['cppunit'])
+
+SConscript(dirs=['cxxtest'])

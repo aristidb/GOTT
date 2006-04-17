@@ -70,10 +70,11 @@ void test(std::string const &path,
 typedef std::vector<std::string> string_vector;
 
 int main(int argc, char **argv) {
+  std::string format;
   po::options_description desc("options");
   desc.add_options()
     ("help", "display help messsage")
-    ("output", po::value<std::string>(),
+    ("output", po::value<std::string>(&format)->default_value("text"),
      "specify output type (text, xml, compiler)");
 
   po::options_description hidden("Hidden options");
@@ -111,7 +112,7 @@ int main(int argc, char **argv) {
   boost::scoped_ptr<CppUnit::Outputter> out;
 
   if(vm.count("output")) {
-    std::string format=vm["output"].as<std::string>();
+    //    std::string format; vm["output"].as<int>();
     if(format == "xml")
       out.reset(new CppUnit::XmlOutputter(&result, std::cerr, "utf-8"));
     else if(format == "compiler")
