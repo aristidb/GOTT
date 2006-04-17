@@ -43,13 +43,15 @@
 using gott::events::selfpipe_message_manager;
 using gott::xany::Xany;
 
-selfpipe_message_manager::selfpipe_message_manager(fd_manager *fdm) {
+selfpipe_message_manager::selfpipe_message_manager(fd_manager *fdm)
+: fdm(fdm) {
   pipe_unix(selfpipe);
   fdm->add_fd(selfpipe[0], fd_manager::read, 
       boost::bind(&selfpipe_message_manager::notify_in, this), false);
 }
 
 selfpipe_message_manager::~selfpipe_message_manager() {
+  fdm->remove_fd(selfpipe[0]);
   close(selfpipe[0]);
   close(selfpipe[1]);
 }

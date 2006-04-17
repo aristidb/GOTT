@@ -56,6 +56,8 @@
 #include <string>
 #endif
 
+#include <cstring>
+
 namespace gott {
 
 class string_buffer;
@@ -119,6 +121,26 @@ public:
    */
   GOTT_LOCAL string(wchar_t const *in, encoding enc) {
     set_up(to_utf8_alloc(zero_terminated(in).cast<char const *>(), enc), true);
+  }
+
+  /**
+   * Construct from iterator range.
+   */
+  template<class I>
+  GOTT_LOCAL string(range_t<I> in, encoding enc) {
+    std::size_t len = in.size() * sizeof(*in.begin());
+    range_t<char *> buf = range(new char[len], len), bufw = buf;
+    while (in.filled()) {
+      std::memcpy(bufw.begin(), &*in.begin(), sizeof(*in.begin()));
+      bufw.begin() += sizeof(*in.begin());
+      ++in.begin();
+    }
+    if (enc == utf8)
+      set_up(buf, true);
+    else {
+      set_up(to_utf8_alloc(buf, enc), true);
+      delete [] buf.begin();
+    }
   }
 
 #ifndef NO_STDLIB
@@ -234,7 +256,7 @@ public:
   /**
    * Construct from character range.
    */
-  GOTT_LOCAL string(range_t<utf8_iterator> const &r) {
+  GOTT_LOCAL string(range_t<utf8_iterator> const &r, encoding = utf32) {
     foreign(r.call<utf8_t const *>(&utf8_iterator::ptr));
   }
 
@@ -270,14 +292,6 @@ public:
    */
   GOTT_LOCAL void operator=(string other) {
     other.swap(*this);
-  }
-
-  /**
-   * Assign from iterator range.
-   */
-  template<class I>
-  void assign(I a, I b) {
-    operator=(string(range(a, b)));
   }
 
   /**

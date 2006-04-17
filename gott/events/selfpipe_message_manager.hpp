@@ -57,6 +57,7 @@ public:
   }
 
 private:
+  fd_manager *fdm;
   int selfpipe[2];
   sigc::signal1<void, gott::xany::Xany const &> on_receive_;
 

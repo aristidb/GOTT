@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is An Event Handling Class Library.
+ * The Original Code is A String and Text Storage Library.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2006
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,36 +35,44 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "message_queue_loop.hpp"
-#include <time.h>
+#ifndef GOTT_STRING_UTF8_WRAPPER_HPP
+#define GOTT_STRING_ENC_WRAPPER_HPP
 
-using gott::events::message_queue_loop;
-using gott::xany::Xany;
+#include "string.hpp"
+#include "iterator.hpp"
 
-message_queue_loop::message_queue_loop() 
-  : running(false) {}
+namespace gott {
 
-message_queue_loop::~message_queue_loop() {
-  on_destroy().emit();
-}
+class utf32_wrapper {
+public:
+  typedef utf8_iterator const_iterator;
 
-void message_queue_loop::quit_local() {
-  running = false;
-}
+  utf32_wrapper() {}
 
-void message_queue_loop::run() {
-  running = true;
-  while (running) {
-    on_receive_.emit(queue.pop());
-    on_idle_.emit();
+  utf32_wrapper(string const &str) : rep(str) {}
+
+  template<class I>
+  utf32_wrapper(I a, I b) : rep(range(a, b), utf32) {}
+
+  template<class I>
+  void assign(I a, I b) {
+    rep = string(range(a, b), utf32);
   }
+
+  const_iterator begin() const {
+    return rep.as_utf32().begin();
+  }
+
+  const_iterator end() const {
+    return rep.as_utf32().end();
+  }
+
+  string const &get() const { return rep; }
+  
+private:
+  string rep;
+};
+
 }
 
-void message_queue_loop::send(Xany const &val) throw() {
-  queue.push(val);
-}
-
-void *message_queue_loop::do_feature(gott::QID const &qid) {
-  GOTT_EVENTS_FEATURE(qid,inprocess_message_manager);
-  return 0;
-}
+#endif

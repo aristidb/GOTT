@@ -40,4 +40,4 @@
 using gott::events::main_loop;
 
 main_loop::main_loop() {}
-main_loop::~main_loop() { on_destroy_.emit(); }
+main_loop::~main_loop() {}

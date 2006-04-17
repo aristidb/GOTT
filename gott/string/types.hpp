@@ -77,6 +77,17 @@ enum encoding {
   NO_ENCODING
 };
 
+inline unsigned enc_char_size(encoding enc) {
+  switch (enc) {
+  case utf16le: case utf16be:
+    return 2;
+  case utf32le: case utf32be:
+    return 4;
+  default:
+    return 1;
+  }
+}
+
 }
 
 #endif

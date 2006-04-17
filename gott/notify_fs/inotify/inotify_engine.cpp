@@ -54,17 +54,20 @@ using gott::notify_fs::watch_implementation;
 using gott::notify_fs::ev_t;
 using gott::notify_fs::watch;
 
-inotify_engine::inotify_engine() : conn(inotify_init_linux()) {
+inotify_engine::inotify_engine() : fdm(0), conn(inotify_init_linux()) {
   std::cout << "Inotify up and running..." << std::endl;
 }
 
 inotify_engine::~inotify_engine() {
+  if (fdm)
+    fdm->remove_fd(conn.access());
   std::cout << "Shut down Inotify." << std::endl;
 }
 
 void inotify_engine::integrate_into(gott::events::main_loop &m) {
   using namespace boost::lambda;
-  m.feature<gott::events::fd_manager>().add_fd(
+  fdm = m.feature_ptr<gott::events::fd_manager>();
+  fdm->add_fd(
       conn.access(),
       gott::events::fd_manager::read,
       bind(&inotify_engine::notify, this));
