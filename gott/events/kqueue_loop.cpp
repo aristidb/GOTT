@@ -173,7 +173,7 @@ namespace events {
           impl::map_sig_hnd::iterator j = p->signals.find(event_list[i].ident);
           if(j == p->signals.end())
             continue; //is this an error?
-          i->second(event_list[i].ident);
+          j->second(event_list[i].ident);
         }
         else {
           impl::map_fd_cb::iterator j=p->callbacks.find(event_list[i].ident);
