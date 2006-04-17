@@ -162,8 +162,6 @@ if not conf.CheckLib(boost_popt_lib, language = 'c++'):
   print 'Boost date_time library is not installed:', boost_date_time_lib
   Exit(1)
 
-conf.CheckLib('cppunit', language = 'c++')
-
 conf.BoostDateTimeCanNanosec()
 
 conf.CheckLib('rt')

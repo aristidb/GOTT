@@ -27,6 +27,7 @@ using namespace gott::events;
 class fd_manager_loop_test : public CxxTest::TestSuite
 {
 public:
+#ifdef HAS_UNISTD_H
   static void read_event(main_loop *ml, int fd, unsigned mask) {
     TS_ASSERT(mask == fd_manager::read);
     char buffer[12];
@@ -39,8 +40,9 @@ public:
   static void write_thread(int fd) {
     write_unix(fd, "Hallo Welt!");
   }
+#endif
 
-  void reader(main_loop *ploop) {
+  void meta_reader(main_loop *ploop) {
 #ifdef HAS_UNISTD_H
     boost::scoped_ptr<main_loop> loop(ploop);
 
@@ -59,19 +61,21 @@ public:
 #endif
   }
 
-  void test_select_loop_read() {
-    reader(new select_loop);
-  }
-
-  void test_epoll_loop() {
-#ifdef BUILD_EPOLL
-    reader(new epoll_loop);
+  void test_read__select_loop() {
+#ifdef HAS_UNISTD_H
+    meta_reader(new select_loop);
 #endif
   }
 
-  void test_kqueue_loop() {
+  void test_read__epoll_loop() {
+#ifdef BUILD_EPOLL
+    meta_reader(new epoll_loop);
+#endif
+  }
+
+  void test_read__kqueue_loop() {
 #ifdef BUILD_KQUEUE
-    //reader(new kqueue_loop);
+    meta_reader(new kqueue_loop);
 #endif
   }
 };
