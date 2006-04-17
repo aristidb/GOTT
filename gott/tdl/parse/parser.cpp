@@ -245,7 +245,7 @@ bool exec_parse::empty_line() {
     return true;
   }
   
-  if (stream.peek() == L'\n') {
+  if (stream.peek() == '\n') {
     stream.get();
     return true;
   }
