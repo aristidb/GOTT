@@ -1,21 +1,8 @@
 Import('env')
 
-import os
-try :
-    print 'Using `cxxtestgen.py` to create test runner'
-    n = os.spawnvp(os.P_WAIT, 'python',
-		   ['python', '../../../ext/cxxtest/cxxtestgen.py',
-		    '--error-printer', '-o', 'test.cpp', 'test0.hpp',
-		    'test0.hpp'])
-    if n != 0:
-	print 'Error while running `cxxtestgen.py`'
-	os.exit(1)
-except OSError, inst:
-    print "Error Failed to run 'cxxtestgen.py': "
-    print inst
-    os.exit(1)
-
 cxxtest_env = env.Copy()
-cxxtest_env.Append(CPPPATH = '../../../ext/cxxtest')
+cxxtest_env.Command('test.cpp', ['test0.hpp', 'test1.hpp'],
+		    'python ../../ext/cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCE')
+cxxtest_env.Append(CPPPATH = ['../../../ext/cxxtest', '..'])
 cxxtest_env.Program('test.cpp')
 
