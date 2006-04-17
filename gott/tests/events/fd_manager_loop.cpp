@@ -52,7 +52,7 @@ public:
     pipe_unix(pipes);
 
     boost::thread thrd(boost::bind(fd_manager_loop_test::write_thread,
-				   pipes[1]));
+        			   pipes[1]));
 
     boost::scoped_ptr<main_loop> loop(new select_loop);
     loop->feature<fd_manager>().add_fd

@@ -73,8 +73,8 @@ class GOTT_EXPORT kqueue_loop
 
  private:
   GOTT_LOCAL void add_fd(int fd, unsigned mask,
-			 boost::function<void (unsigned)> const &cb,
-			 bool wait = true);
+        		 boost::function<void (unsigned)> const &cb,
+        		 bool wait = true);
 
   GOTT_LOCAL void remove_fd(int fd);
 

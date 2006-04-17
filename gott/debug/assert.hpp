@@ -50,10 +50,10 @@ namespace gott {
 namespace x__assert {
 template<class T, class U>
 void fail(int line, char const *file, char const *function, char const *lhs,
-	  char const *rhs, char const *message, T const &lhs_v,
-	  U const &rhs_v) {
+          char const *rhs, char const *message, T const &lhs_v,
+          U const &rhs_v) {
   std::cerr << "Assertion failed in " << function << '@' << file << ':'
-	    << line << "\nMessage: " << message << '\n';
+            << line << "\nMessage: " << message << '\n';
   if (lhs)
     std::cout << lhs << ": " << lhs_v << '\n';
   if (rhs)

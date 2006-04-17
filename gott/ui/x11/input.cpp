@@ -168,33 +168,33 @@ key_table::key_table()
 
 key_code key_table::translate_key( KeySym const& sym ) const
 {
-	if ( !sym )
-		return NoKey;
+        if ( !sym )
+        	return NoKey;
 
-	switch ( sym>>8 )
-	{
-		case 0x00:	// Latin 1
-		case 0x01:	// Latin 2
-		case 0x02:	// Latin 3
-		case 0x03:	// Latin 4
-		case 0x04:	// Katakana
-		case 0x05:	// Arabic
-		case 0x06:	// Cyrillic
-		case 0x07:	// Greek
-		case 0x08:	// Technical
-		case 0x0A:	// Publishing
-		case 0x0C:	// Hebrew
-		case 0x0D:	// Thai
-			return key_code( t[1][sym & 0xFF] );
-		
-		case 0xFF:
-			return key_code( t[0][sym & 0xFF] );
+        switch ( sym>>8 )
+        {
+        	case 0x00:	// Latin 1
+        	case 0x01:	// Latin 2
+        	case 0x02:	// Latin 3
+        	case 0x03:	// Latin 4
+        	case 0x04:	// Katakana
+        	case 0x05:	// Arabic
+        	case 0x06:	// Cyrillic
+        	case 0x07:	// Greek
+        	case 0x08:	// Technical
+        	case 0x0A:	// Publishing
+        	case 0x0C:	// Hebrew
+        	case 0x0D:	// Thai
+        		return key_code( t[1][sym & 0xFF] );
+        	
+        	case 0xFF:
+        		return key_code( t[0][sym & 0xFF] );
 
-		default:
-			break;
-	}
-	
-	return NoKey;
+        	default:
+        		break;
+        }
+        
+        return NoKey;
 }
 
 }}}}

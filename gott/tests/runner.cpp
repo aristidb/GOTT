@@ -53,9 +53,9 @@
 namespace po = boost::program_options;
 
 void test(std::string const &path,
-	  CppUnit::TestResult &controller,
-	  CppUnit::TestRunner &runner,
-	  CppUnit::Outputter &out)
+          CppUnit::TestResult &controller,
+          CppUnit::TestRunner &runner,
+          CppUnit::Outputter &out)
 {
   try {
     std::cout << "Running: "  <<  (path == "" ? "*" : path) << '\n';
@@ -88,12 +88,12 @@ int main(int argc, char **argv) {
 
   po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).options(cmdopts).
-	    positional(p).run(), vm);
+            positional(p).run(), vm);
   po::notify(vm);    
 
   if (vm.count("help")) {
     std::cerr << "usage: " << *argv << " [options] tests*\n"
-	      << desc << '\n';
+              << desc << '\n';
     return 1;
   }
 
@@ -124,12 +124,12 @@ int main(int argc, char **argv) {
     int ret = 0;
     string_vector vec=vm["test-path"].as<string_vector>();
     for(string_vector::iterator i=vec.begin();
-	i != vec.end();
-	++i)
+        i != vec.end();
+        ++i)
       {
-	test(*i, controller, runner, *out.get());
-	if(!result.wasSuccessful())
-	  ret = 1;
+        test(*i, controller, runner, *out.get());
+        if(!result.wasSuccessful())
+          ret = 1;
       }
     return ret;
   }

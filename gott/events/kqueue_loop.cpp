@@ -69,7 +69,7 @@ namespace events {
 
     impl()
       : running(false),
-	queue(kqueue::create_bsd())
+        queue(kqueue::create_bsd())
     {}
   };
 
@@ -101,8 +101,8 @@ namespace events {
   }
 
   void kqueue_loop::add_fd(int fd, unsigned mask, 
-			   boost::function<void (unsigned)> const &cb,
-			   bool wait)
+        		   boost::function<void (unsigned)> const &cb,
+        		   bool wait)
   {
     if(mask & fd_manager::read || mask & fd_manager::exception) {
       struct kevent n;
@@ -167,31 +167,31 @@ namespace events {
         break;
 
       int n=kqueue::event_bsd(p->queue.access(), 0, 0, event_list, EVENTS_N,
-			      has_timers_mem ? &tm : 0x0);
+        		      has_timers_mem ? &tm : 0x0);
       for(int i=0; i<n; ++i) {        
-	if(event_list[i].filter & EVFILT_SIGNAL) {
-	  impl::map_sig_hnd::iterator j = p->signals.find(event_list[i].ident);
-	  if(j == p->signals.end())
-	    continue; //is this an error?
-	  i->second(event_list[i].ident);
-	}
+        if(event_list[i].filter & EVFILT_SIGNAL) {
+          impl::map_sig_hnd::iterator j = p->signals.find(event_list[i].ident);
+          if(j == p->signals.end())
+            continue; //is this an error?
+          i->second(event_list[i].ident);
+        }
         else {
-	  impl::map_fd_cb::iterator j=p->callbacks.find(event_list[i].ident);
-	  if(j == p->callbacks.end())
-	    continue; //is this an error?
-	  if(event_list[i].filter & EVFILT_READ) {
+          impl::map_fd_cb::iterator j=p->callbacks.find(event_list[i].ident);
+          if(j == p->callbacks.end())
+            continue; //is this an error?
+          if(event_list[i].filter & EVFILT_READ) {
 //do we really have to check this and should it be an error?
-	    if(!(j->second.mask & fd_manager::read))
-	      continue;
-	    j->second.call(fd_manager::read);
-	  }
-	  else if(event_list[i].filter & EVFILT_WRITE) {
+            if(!(j->second.mask & fd_manager::read))
+              continue;
+            j->second.call(fd_manager::read);
+          }
+          else if(event_list[i].filter & EVFILT_WRITE) {
 //do we really have to check this and should it be an error?
-	    if(!(j->second.mask & fd_manager::write))
-	      continue;
-	    j->second.call(fd_manager::write);
-	  }
-	}
+            if(!(j->second.mask & fd_manager::write))
+              continue;
+            j->second.call(fd_manager::write);
+          }
+        }
       }
     }
   }

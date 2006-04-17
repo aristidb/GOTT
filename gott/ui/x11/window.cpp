@@ -179,9 +179,9 @@ window::window( uicontext& app, rect const& position, string const& title, std::
   title_.set(title);
 
   // Wait for Map events? 
-	
-	// flag this window as open
-	flags |= window_flags::Open;
+        
+        // flag this window as open
+        flags |= window_flags::Open;
   
   region_.set(position);
 
