@@ -95,11 +95,21 @@ public:
   virtual invalidation child_changed(object const *child) const = 0;
 
   /**
-   * Provide the size of the object.
-   * \param transf The transformations to apply before calculating the size.
+   * Provide the size and position of the object.
+   * \param transf The transformations to apply before calculating the extents.
    * \return The rectangular extents of the object.
    */
   virtual rect extents(transformations const &transf) const = 0;
+
+  /**
+   * Provide the size and position of a child of the object.
+   * \param child The child of the object whose extents must be calculated.
+   * \param transf The transformations to apply before calculation the extents.
+   * \return The rectangular extents of the child.
+   */
+  virtual rect child_extents(
+      object const *child,
+      transformations const &transf) const = 0;
 
   /// Destructor.
   virtual ~object() = 0;
