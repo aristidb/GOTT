@@ -64,6 +64,7 @@ public:
   }
 
   void write_thread() {
+    sleep(1);
     write_unix(pipes[1], "Hallo Welt!\0Hallo Welt!");
   }
 #endif
