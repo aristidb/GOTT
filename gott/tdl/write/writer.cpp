@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "writer.hpp"
+#include <gott/string/utf32_wrapper.hpp>
 #include <boost/tokenizer.hpp>
 #include <ostream>
 
@@ -160,14 +161,14 @@ private:
       boost::tokenizer<
         separator_t,
         gott::utf8_iterator,
-        string
+        gott::utf32_wrapper
       >
       tokenizer_t;
 
     gott::utf32_t const sep_data[] 
       = { gott::to_utf32_char("\n", gott::ascii), 0 };
     separator_t sep(sep_data);
-    tokenizer_t tokens(s.as_utf32(), sep);
+    tokenizer_t tokens(s, sep);
     for (tokenizer_t::iterator it = tokens.begin(); it != tokens.end(); ++it) {
       prepare_line();
       out << *it;
