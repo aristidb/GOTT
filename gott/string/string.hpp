@@ -121,6 +121,32 @@ public:
     set_up(to_utf8_alloc(zero_terminated(in).cast<char const *>(), enc), true);
   }
 
+  /**
+   * Construct from iterator range.
+   */
+  template<class I>
+  GOTT_LOCAL string(range_t<I> in, encoding enc) {
+    std::size_t len = in.size() * enc_char_size(enc);
+    range_t<char *> buf = range(new char[len], len);
+    switch (enc_char_size(enc)) {
+    case 1:
+      gott::copy(in, buf);
+      break;
+    case 2:
+      gott::copy(in, buf.cast<boost::int16_t *>());
+      break;
+    case 4:
+      gott::copy(in, buf.cast<boost::int32_t *>());
+      break;
+    }
+    if (enc == utf8)
+      set_up(buf, true);
+    else {
+      set_up(to_utf8_alloc(buf, enc), true);
+      delete [] buf.begin();
+    }
+  }
+
 #ifndef NO_STDLIB
   /**
    * Construct string from std::string.
@@ -270,14 +296,6 @@ public:
    */
   GOTT_LOCAL void operator=(string other) {
     other.swap(*this);
-  }
-
-  /**
-   * Assign from iterator range.
-   */
-  template<class I>
-  void assign(I a, I b) {
-    operator=(string(range(a, b)));
   }
 
   /**

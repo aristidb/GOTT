@@ -35,57 +35,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_UTIL_NSTRING_TYPES_HPP
-#define GOTT_UTIL_NSTRING_TYPES_HPP
+#ifndef GOTT_STRING_UTF8_WRAPPER_HPP
+#define GOTT_STRING_ENC_WRAPPER_HPP
 
-#include <boost/cstdint.hpp>
-#include <cstddef>
+#include "string.hpp"
 
 namespace gott {
 
-/**
- * The storage type of UTF8 characters.
- */
-typedef char utf8_t;
-typedef boost::uint8_t uutf8_t;
+class utf8_wrapper {
+public:
+  utf8_wrapper() {}
+  utf8_wrapper(string const &s) : rep(s) {}
 
-/**
- * The storage type of UTF32 characters.
- */
-typedef boost::int32_t utf32_t;
-typedef boost::uint32_t uutf32_t;
+  template<class I>
+  utf8_wrapper(I a, I b) : rep(range(a, b), utf8) {}
 
-/**
- * ID for encodings.
- */
-enum encoding {
-  // Full Unicode
-  utf8,
-  utf16be, utf16le,
-  utf32be, utf32le,
-  utf7,
-  c99,java,
-  // Proprietary (TODO)
-  utf16 = utf16le,
-  utf32 = utf32le,
-  wide = utf32,
-  // European
-  ascii,
-  iso8859_1, iso8859_2, iso8859_3, iso8859_4, iso8859_5, iso8859_6, iso8859_7,
-  iso8859_8, iso8859_9, iso8859_10, iso8859_11, iso8859_12, iso8859_13, 
-  iso8859_14, iso8859_15, iso8859_16,
-  NO_ENCODING
-};
-
-inline unsigned enc_char_size(encoding enc) {
-  switch (enc) {
-  case utf16le: case utf16be:
-    return 2;
-  case utf32le: case utf32be:
-    return 4;
-  default:
-    return 1;
+  template<class I>
+  void assign(I a, I b) {
+    rep = string(range(a, b), utf8);
   }
+
+  string const &get() const { return rep; }
+  
+private:
+  string rep;
 }
 
 }
