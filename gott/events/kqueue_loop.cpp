@@ -67,6 +67,9 @@ namespace events {
     typedef std::map<int, sigc::signal1<void, int> > map_sig_hnd;
     map_sig_hnd signals;
 
+    // main_loop
+    sigc::signal0<void, sigc::nil> on_idle;
+
     impl()
       : running(false),
         queue(kqueue::create_bsd())
@@ -147,6 +150,10 @@ namespace events {
     p->wait_fds.erase(fd);
   }
 
+  sigc::signal0<void, sigc::nil> &kqueue_loop::on_idle() {
+    return p->on_idle;
+  }
+
   void kqueue_loop::quit_local() {
     p->running = false;
   }
@@ -163,7 +170,9 @@ namespace events {
       	tm.tv_sec = 0;
       	tm.tv_nsec = int(std::min(time_left().total_nanoseconds(), 
         boost::int64_t(INT_MAX)));
-      } 
+      }
+
+      p->on_idle.emit();
     
       if (!has_wait_timers() && p->wait_fds.empty())
         break;

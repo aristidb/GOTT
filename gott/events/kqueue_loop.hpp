@@ -70,6 +70,7 @@ class GOTT_EXPORT kqueue_loop
 
   void run();
   void quit_local();
+  sigc::signal0<void, sigc::nil>& on_idle();
 
  private:
   GOTT_LOCAL void add_fd(int fd, unsigned mask,
@@ -79,7 +80,7 @@ class GOTT_EXPORT kqueue_loop
   GOTT_LOCAL void remove_fd(int fd);
 
   GOTT_LOCAL sigc::signal1<void, int> &on_signal(int sig);
-
+  
   void *do_feature(QID const &);
 
   class impl;

@@ -43,7 +43,7 @@ import os
 import stat
 
 def ScanDir(path):
-    codefiles = glob.glob(path + '/*.cpp')
+    codefiles = glob.glob(path + '/*.hpp')
     files = dircache.listdir(path)
     for file in files:
 	mode = os.stat(path+'/'+file)[stat.ST_MODE]
@@ -53,6 +53,12 @@ def ScanDir(path):
 
 codefiles = ScanDir('.')
 
-#if codefiles == []:
+## FIXME: call string (relative path, call to python)
+env.Command('unit_test.cpp', codefiles,
+'python ../ext/cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCE')
+## FIXME: clone env?
+env.Append(CPPPATH = ['../../ext/cxxtest', '..'])
+env.Program('unit_test.cpp')
 
-env.Program('unit_test', codefiles)
+## Should Scons run unit_test?
+
