@@ -56,6 +56,8 @@
 #include <string>
 #endif
 
+#include <cstring>
+
 namespace gott {
 
 class string_buffer;
@@ -126,18 +128,12 @@ public:
    */
   template<class I>
   GOTT_LOCAL string(range_t<I> in, encoding enc) {
-    std::size_t len = in.size() * enc_char_size(enc);
-    range_t<char *> buf = range(new char[len], len);
-    switch (enc_char_size(enc)) {
-    case 1:
-      gott::copy(in, buf);
-      break;
-    case 2:
-      gott::copy(in, buf.cast<boost::int16_t *>());
-      break;
-    case 4:
-      gott::copy(in, buf.cast<boost::int32_t *>());
-      break;
+    std::size_t len = in.size() * sizeof(*in.begin());
+    range_t<char *> buf = range(new char[len], len), bufw = buf;
+    while (in.filled()) {
+      std::memcpy(bufw.begin(), &*in.begin(), sizeof(*in.begin()));
+      bufw.begin() += sizeof(*in.begin());
+      ++in.begin();
     }
     if (enc == utf8)
       set_up(buf, true);
@@ -260,7 +256,7 @@ public:
   /**
    * Construct from character range.
    */
-  GOTT_LOCAL string(range_t<utf8_iterator> const &r) {
+  GOTT_LOCAL string(range_t<utf8_iterator> const &r, encoding = utf32) {
     foreign(r.call<utf8_t const *>(&utf8_iterator::ptr));
   }
 

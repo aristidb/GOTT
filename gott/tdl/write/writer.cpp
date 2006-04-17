@@ -168,10 +168,10 @@ private:
     gott::utf32_t const sep_data[] 
       = { gott::to_utf32_char("\n", gott::ascii), 0 };
     separator_t sep(sep_data);
-    tokenizer_t tokens(s, sep);
+    tokenizer_t tokens(gott::utf32_wrapper(s), sep);
     for (tokenizer_t::iterator it = tokens.begin(); it != tokens.end(); ++it) {
       prepare_line();
-      out << *it;
+      out << it->get();
       fresh_line = false;
     }
   }

@@ -48,13 +48,11 @@ public:
   typedef utf8_iterator const_iterator;
 
   utf32_wrapper() {}
-  utf32_wrapper(string const &s) : rep(s) {}
+
+  utf32_wrapper(string const &str) : rep(str) {}
 
   template<class I>
   utf32_wrapper(I a, I b) : rep(range(a, b), utf32) {}
-
-  utf32_wrapper(const_iterator a, const_iterator b) 
-    : rep(range(a, b).call(&const_iterator::ptr), string::foreign) {}
 
   template<class I>
   void assign(I a, I b) {
@@ -73,7 +71,7 @@ public:
   
 private:
   string rep;
-}
+};
 
 }
 
