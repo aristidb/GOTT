@@ -54,11 +54,11 @@ def ScanDir(path):
 codefiles = ScanDir('.')
 
 ## FIXME: call string (relative path, call to python)
-env.Command('unit_test.cpp', codefiles,
+test_env = env.Copy()
+test_env.Command('unit_test.cpp', codefiles,
 'python ../ext/cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCE')
-## FIXME: clone env?
-env.Append(CPPPATH = ['../../ext/cxxtest', '..'])
-env.Program('unit_test.cpp')
+test_env.Append(CPPPATH = ['../../ext/cxxtest', '..'])
+test_env.Program('unit_test.cpp')
 
 ## Should Scons run unit_test?
 
