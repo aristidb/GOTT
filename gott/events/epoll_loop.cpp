@@ -88,7 +88,9 @@ epoll_loop::epoll_loop()
   message_mgr(this),
   sig_mgr(&message_mgr) {}
 
-epoll_loop::~epoll_loop() {}
+epoll_loop::~epoll_loop() {
+  on_destroy().emit();
+}
 
 void epoll_loop::quit_local() {
   p->running = false;

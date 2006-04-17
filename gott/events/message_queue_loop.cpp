@@ -43,7 +43,10 @@ using gott::xany::Xany;
 
 message_queue_loop::message_queue_loop() 
   : running(false) {}
-message_queue_loop::~message_queue_loop() {}
+
+message_queue_loop::~message_queue_loop() {
+  on_destroy().emit();
+}
 
 void message_queue_loop::quit_local() {
   running = false;

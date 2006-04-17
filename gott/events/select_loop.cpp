@@ -173,6 +173,7 @@ void select_loop::quit_local() {
 }
 
 select_loop::~select_loop() {
+  on_destroy().emit();
   for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end();
       it!=e;
       ++it)  {

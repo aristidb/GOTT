@@ -39,6 +39,7 @@
 #define GOTT_NOTIFY_FS_INOTIFY_ENGINE_HPP
 
 #include "../notification_engine.hpp"
+#include <gott/events/fd_manager.hpp>
 #include <gott/syswrap/scoped_unix_file.hpp>
 #include <map>
 
@@ -56,6 +57,7 @@ public:
   QID class_id() const;
 
 private:
+  gott::events::fd_manager *fdm;
   scoped_unix_file conn;
   void notify();
   std::map<boost::uint32_t, watch_implementation *> watches;

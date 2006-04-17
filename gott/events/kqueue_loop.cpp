@@ -78,7 +78,9 @@ namespace events {
       message_mgr(this)
   {}
 
-  kqueue_loop::~kqueue_loop() {}
+  kqueue_loop::~kqueue_loop() {
+    on_destroy().emit();
+  }
 
   void *kqueue_loop::do_feature(gott::QID const &qid) {
     GOTT_EVENTS_FEATURE(qid, fd_manager);
