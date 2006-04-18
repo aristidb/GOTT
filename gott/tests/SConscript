@@ -56,7 +56,7 @@ codefiles = ScanDir('.')
 ## FIXME: call string (relative path, call to python)
 test_env = env.Copy()
 test_env.Command('unit_test.cpp', codefiles,
-'python ../ext/cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCE')
+'python ../ext/cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCES')
 test_env.Append(CPPPATH = ['../../ext/cxxtest', '..'])
 test_env.Program('unit_test.cpp')
 
