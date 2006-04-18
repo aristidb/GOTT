@@ -72,6 +72,11 @@ class GOTT_EXPORT kqueue_loop
   void quit_local();
   sigc::signal0<void, sigc::nil>& on_idle();
 
+  // Interface for notify_fs
+  void watch_fd(int fd, unsigned mask,
+		boost::function<void (unsigned)> const &cb);
+  void unwatch_fd(int fd);
+
  private:
   GOTT_LOCAL void add_fd(int fd, unsigned mask,
         		 boost::function<void (unsigned)> const &cb,

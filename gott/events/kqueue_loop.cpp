@@ -41,10 +41,11 @@
 #include <set>
 #include <map>
 
+#include <gott/notify_fs/event.hpp>
+
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
-
 
 namespace gott {
 namespace events {
@@ -66,6 +67,9 @@ namespace events {
     // signal_manager
     typedef std::map<int, sigc::signal1<void, int> > map_sig_hnd;
     map_sig_hnd signals;
+
+    // notify fs
+    map_fd_cb notify_fs;
 
     // main_loop
     sigc::signal0<void, sigc::nil> on_idle;
@@ -150,6 +154,50 @@ namespace events {
     p->wait_fds.erase(fd);
   }
 
+  namespace {
+    GOTT_LOCAL u_int ev_t2kqueue(unsigned mask) {
+      u_int fflags = 0;
+      if(mask & notify_fs::file_delete)
+	fflags |= NOTE_DELETE;
+      if(mask & notify_fs::file_moved_from ||
+	 mask & notify_fs::file_moved_to)
+	fflags |= NOTE_RENAME;
+      if(mask & notify_fs::file_modify)
+	fflags |= NOTE_WRITE;
+      if(mask & notify_fs::file_attrib)
+	fflags |= NOTE_ATTRIB;
+      return fflags;
+    }
+  }
+
+  void kqueue_loop::watch_fd(int fd, unsigned mask,
+			     boost::function<void (unsigned)> const &cb)
+  {
+    struct kevent e;
+    EV_SET(&e, fd, EVFILT_VNODE, EV_ADD | EV_ENABLE |
+	   (mask & notify_fs::flag_oneshot ? EV_ONESHOT : 0),
+	   ev_t2kqueue(mask), 0, 0);
+
+    impl::callback cb_;
+    cb_.mask = mask;
+    cb_.call = cb;
+    p->notify_fs[fd] = cb_;
+
+    kqueue::event_bsd(p->queue.access(), &e, 1, 0, 0, 0);
+  }
+
+  void kqueue_loop::unwatch_fd(int fd) {
+    impl::map_fd_cb::iterator i = p->notify_fs.find(fd);
+    if(i == p->notify_fs.end())
+      return;
+
+    struct kevent e;
+    EV_SET(&e, fd, EVFILT_VNODE, EV_DELETE, ev_t2kqueue(i->second.mask), 0, 0);
+    kqueue::event_bsd(p->queue.access(), &e, 1, 0, 0, 0);
+
+    p->notify_fs.erase(i);
+  }
+
   sigc::signal0<void, sigc::nil> &kqueue_loop::on_idle() {
     return p->on_idle;
   }
@@ -185,6 +233,12 @@ namespace events {
           if(j != p->signals.end())
 	    j->second(event_list[i].ident);
         }
+	else if(event_list[i].filter == EVFILT_VNODE) {
+	  impl::map_fd_cb::iterator j=p->notify_fs.find(event_list[i].ident);
+	  if(j == p->notify_fs.end())
+	    continue;
+	  j->second.call(event_list[i].fflags); //TODO fflags 2 ev_t
+	}
 	else {
 	  impl::map_fd_cb::iterator j=p->callbacks.find(event_list[i].ident);
 	  if(j == p->callbacks.end())
