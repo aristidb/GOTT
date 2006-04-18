@@ -54,7 +54,12 @@ notification_engine *notification_engine::get_for(main_loop &m) {
   void *&slot = m.feature_data(qid);
   if (slot)
     return static_cast<notification_engine *>(slot);
-  notification_engine *eng = new inotify_engine;
+  notification_engine *eng = 0;
+#ifdef BUILD_INOTIFY
+  eng = new inotify_engine;
+#else
+  #warning "You have no notify_fs!"
+#endif
   slot = eng;
   m.on_destroy().connect(bind(delete_ptr(), eng));
   eng->integrate_into(m);
