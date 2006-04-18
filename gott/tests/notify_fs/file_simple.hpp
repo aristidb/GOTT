@@ -84,6 +84,18 @@ public:
     meta_test(gott::notify_fs::file_close, &close_file);
   }
 
+  //void test_access() {
+  //  meta_test(gott::notify_fs::file_access, &access_file);
+  //}
+
+  void test_write() {
+    meta_test(gott::notify_fs::file_modify, &write_to_file);
+  }
+
+  //void test_metadata() {
+  //  meta_test(gott::notify_fs::file_attrib, &stat_file);
+  //}
+
 private:
   void meta_test(gott::notify_fs::ev_t event, void (*fun)()) {
     using namespace boost::lambda;
@@ -113,6 +125,21 @@ private:
 
   static void close_file() {
     ::close(open(testfile, O_RDONLY));
+  }
+
+  static void access_file() {
+    ::access(testfile, F_OK);
+  }
+
+  static void write_to_file() {
+    int fd = ::open(testfile, O_WRONLY);
+    ::write(fd, "-", 1);
+    ::close(fd);
+  }
+
+  static void stat_file() {
+    struct stat buf;
+    ::stat(testfile, &buf);
   }
 
   static void helper_thread(void (*call)()) {

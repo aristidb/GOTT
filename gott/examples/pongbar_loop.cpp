@@ -1,4 +1,5 @@
-#include <gott/events/select_loop.hpp>
+#include <gott/events/main_loop_factory.hpp>
+#include <gott/events/loop_requirement.hpp>
 #include <gott/events/main_loop.hpp>
 #include <gott/events/timer_manager.hpp>
 #include <gott/events/quit_manager.hpp>
@@ -120,7 +121,12 @@ int main() {
   space_bar s2(2, d);
   pong_bar b3(26, d);
   d.redraw();
-  boost::scoped_ptr<main_loop> loop(new select_loop);
+
+  
+  main_loop_factory loop_gen;
+  loop_gen.try_add(feature<timer_manager>() && feature<quit_manager>());
+  boost::scoped_ptr<main_loop> loop(loop_gen.get_alloc());
+  
   timer_manager &tm = loop->feature<timer_manager>();
   tm.add_periodic_timer(
       milliseconds(80),
@@ -137,8 +143,10 @@ int main() {
   tm.add_periodic_timer(
       milliseconds(300),
       (bind(&pong_bar::hop, &b3), true));
+
   loop->on_idle().connect(bind(&bar_drawer::redraw, &d));
   loop->feature<quit_manager>().enable_master();
+
   loop->run();
   std::cout << "\nDone!" << std::endl;
 }
