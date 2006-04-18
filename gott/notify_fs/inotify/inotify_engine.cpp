@@ -64,6 +64,10 @@ inotify_engine::~inotify_engine() {
   std::cout << "Shut down Inotify." << std::endl;
 }
 
+bool inotify_engine::support_event(ev_t ev) const {
+  return true;
+}
+
 void inotify_engine::integrate_into(gott::events::main_loop &m) {
   using namespace boost::lambda;
   fdm = m.feature_ptr<gott::events::fd_manager>();
@@ -147,6 +151,3 @@ void inotify_engine::notify() {
   }
 }
 
-gott::QID inotify_engine::class_id() const {
-  return "gott::notify_fs::inotify_engine";
-}

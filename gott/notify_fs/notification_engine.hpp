@@ -51,12 +51,16 @@ class watch_implementation;
 class GOTT_EXPORT notification_engine {
 public:
   virtual ~notification_engine();
-  virtual watch_implementation *watch_alloc(string const &, ev_t, watch *) = 0;
-  virtual void integrate_into(gott::events::main_loop &) = 0;
+  virtual bool support_event(ev_t event) const = 0;
 
+public:
   static notification_engine *get_for(gott::events::main_loop &);
-
   static QID const qid;
+
+private:
+  virtual void integrate_into(gott::events::main_loop &) = 0;
+  virtual watch_implementation *watch_alloc(string const &, ev_t, watch *) = 0;
+  friend class watch;
 };
 
 }}

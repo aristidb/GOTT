@@ -38,10 +38,10 @@
 import glob
 Import('env')
 
-if env['SYS_INOTIFY'] == 1:
+if env['SYS_INOTIFY'] == 1: #FIXME (delete this line)
   env.SharedLibrary('notify_inotify', glob.glob('inotify/*.cpp'))
   env = env.Copy()
-  env.Append(LIBS = ['notify_inotify'])
+  env.Append(LIBS = ['notify_inotify']) #FIXME
 
   libobj = glob.glob('*.cpp')
   libobj.remove('test.cpp')

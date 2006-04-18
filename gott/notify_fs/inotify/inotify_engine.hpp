@@ -46,15 +46,16 @@
 namespace gott {
 namespace notify_fs {
 
-class GOTT_EXPORT inotify_engine : public notification_engine {
+class inotify_engine : public notification_engine {
 public:
-  inotify_engine();
-  ~inotify_engine();
+  inotify_engine() GOTT_EXPORT;
+  ~inotify_engine() GOTT_EXPORT;
+ 
+private:
+  bool support_event(ev_t ev) const;
+
   watch_implementation *watch_alloc(string const &, ev_t, watch *);
   void integrate_into(gott::events::main_loop &);
-
-public:
-  QID class_id() const;
 
 private:
   gott::events::fd_manager *fdm;
@@ -63,7 +64,7 @@ private:
   std::map<boost::uint32_t, watch_implementation *> watches;
 
   static boost::int32_t get_watch(inotify_engine &eng, string const &path, 
-    ev_t mask) GOTT_LOCAL;
+    ev_t mask);
   struct inotify_watch;
 };
 
