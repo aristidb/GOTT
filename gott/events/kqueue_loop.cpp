@@ -98,7 +98,7 @@ namespace events {
     impl::map_sig_hnd::iterator i = p->signals.find(sig);
     if(i == p->signals.end()) {
       struct kevent n;
-      EV_SET(&n, sig, EVFILT_SIGNAL, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
+      EV_SET(&n, sig, EVFILT_SIGNAL, EV_ADD | EV_ENABLE /*| EV_ONESHOT*/, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
       return p->signals[sig];
     }
@@ -111,12 +111,12 @@ namespace events {
   {
     if(mask & fd_manager::read || mask & fd_manager::exception) {
       struct kevent n;
-      EV_SET(&n, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
+      EV_SET(&n, fd, EVFILT_READ, EV_ADD | EV_ENABLE /*| EV_ONESHOT*/, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
     if(mask & fd_manager::write) {
       struct kevent n;
-      EV_SET(&n, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, 0);
+      EV_SET(&n, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE /*| EV_ONESHOT*/, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
 
@@ -180,29 +180,25 @@ namespace events {
       int n=kqueue::event_bsd(p->queue.access(), 0, 0, event_list, EVENTS_N,
         		      has_timers_mem ? &tm : 0x0);
       for(int i=0; i<n; ++i) {        
-        if(event_list[i].filter & EVFILT_SIGNAL) {
+        if(event_list[i].filter == EVFILT_SIGNAL) {
           impl::map_sig_hnd::iterator j = p->signals.find(event_list[i].ident);
-          if(j == p->signals.end())
-            continue; //is this an error?
-          j->second(event_list[i].ident);
+          if(j != p->signals.end())
+	    j->second(event_list[i].ident);
         }
-        else {
-          impl::map_fd_cb::iterator j=p->callbacks.find(event_list[i].ident);
-          if(j == p->callbacks.end())
-            continue; //is this an error?
-          if(event_list[i].filter & EVFILT_READ) {
-//do we really have to check this and should it be an error?
-            if(!(j->second.mask & fd_manager::read))
-              continue;
-            j->second.call(fd_manager::read);
-          }
-          else if(event_list[i].filter & EVFILT_WRITE) {
-//do we really have to check this and should it be an error?
-            if(!(j->second.mask & fd_manager::write))
-              continue;
-            j->second.call(fd_manager::write);
-          }
-        }
+	else {
+	  impl::map_fd_cb::iterator j=p->callbacks.find(event_list[i].ident);
+	  if(j == p->callbacks.end())
+	    continue;
+	  if(event_list[i].filter == EVFILT_READ) {
+	     assert(j->second.mask & fd_manager::read ||
+		    j->second.mask & fd_manager::exception);
+	    j->second.call(fd_manager::read);
+	  }
+	  else if(event_list[i].filter == EVFILT_WRITE) {
+	    assert(j->second.mask & fd_manager::write);
+	    j->second.call(fd_manager::write);
+	  }
+	}
       }
     }
   }
