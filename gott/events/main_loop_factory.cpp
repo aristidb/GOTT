@@ -40,10 +40,18 @@
 #include "main_loop.hpp"
 #include <gott/string/qid.hpp>
 
+#include "epoll_loop.hpp"
+#include "kqueue_loop.hpp"
+#include "select_loop.hpp"
+
 using gott::events::main_loop_factory;
 using gott::events::main_loop;
 
-main_loop_factory::main_loop_factory() {}
+class main_loop_factory::impl {
+public:
+};
+
+main_loop_factory::main_loop_factory() : p(new impl) {}
 main_loop_factory::~main_loop_factory() {}
 
 bool main_loop_factory::try_add(loop_requirement const &req) {
@@ -51,8 +59,17 @@ bool main_loop_factory::try_add(loop_requirement const &req) {
 }
 
 bool main_loop_factory::try_add_feature(QID const &) {
-  //TODO implement me
-  return false;
+  return true; // FIXME
+}
+
+main_loop *main_loop_factory::get_alloc() const {
+#if defined(BUILD_EPOLL)
+  return new epoll_loop;
+#elif defined(BUILD_KQUEUE)
+  return new kqueue_loop;
+#else
+  return new select_loop;
+#endif
 }
 
 /*

@@ -39,7 +39,8 @@
 #include <cxxtest/TestSuite.h>
 
 #include <gott/events/main_loop.hpp>
-#include <gott/events/select_loop.hpp> //FIXME
+#include <gott/events/main_loop_factory.hpp>
+#include <gott/events/loop_requirement.hpp>
 #include <gott/notify_fs/notification_engine.hpp>
 #include <gott/notify_fs/watch.hpp>
 
@@ -59,7 +60,9 @@ class notify_fs_file_simple_test : public CxxTest::TestSuite
 
 public:
   void setUp() {
-    loop = new gott::events::select_loop;
+    gott::events::main_loop_factory fact;
+    fact.try_add(gott::events::feature<gott::notify_fs::notification_engine>());
+    loop = fact.get_alloc();
     ::creat(testfile, 00777);
   }
 

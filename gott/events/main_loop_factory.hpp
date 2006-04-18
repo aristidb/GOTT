@@ -40,6 +40,7 @@
 
 #include <gott/visibility.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott { class QID;
 namespace events {
@@ -55,6 +56,10 @@ public:
 
 public: // internal
   bool try_add_feature(QID const &);
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}
