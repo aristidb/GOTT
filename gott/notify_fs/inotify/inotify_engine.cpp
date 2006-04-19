@@ -54,7 +54,7 @@ using gott::notify_fs::watch_implementation;
 using gott::notify_fs::ev_t;
 using gott::notify_fs::watch;
 
-inotify_engine::inotify_engine() : fdm(0), conn(inotify_init_linux()) {
+inotify_engine::inotify_engine() : loop(0), fdm(0), conn(inotify_init_linux()) {
   std::cout << "Inotify up and running..." << std::endl;
 }
 
@@ -64,17 +64,19 @@ inotify_engine::~inotify_engine() {
   std::cout << "Shut down Inotify." << std::endl;
 }
 
-bool inotify_engine::support_event(ev_t ev) const {
+bool inotify_engine::support_event(ev_t) const {
   return true;
 }
 
 void inotify_engine::integrate_into(gott::events::main_loop &m) {
   using namespace boost::lambda;
+  loop = &m;
   fdm = m.feature_ptr<gott::events::fd_manager>();
   fdm->add_fd(
       conn.access(),
       gott::events::fd_manager::read,
-      bind(&inotify_engine::notify, this));
+      bind(&inotify_engine::notify, this),
+      false);
 }
 
 typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
@@ -99,21 +101,35 @@ struct inotify_engine::inotify_watch : watch_implementation {
   inotify_engine &eng;
   boost::int32_t wd;
   watch &context;
+  bool wait;
 
-  inotify_watch(inotify_engine *e, string const &path, ev_t mask, watch &w)
-  : eng(*e), wd(inotify_engine::get_watch(eng, path, mask)), context(w) {}
+  inotify_watch(
+      inotify_engine *e,
+      string const &path,
+      ev_t mask,
+      watch &w,
+      bool wait)
+  : eng(*e),
+    wd(inotify_engine::get_watch(eng, path, mask)),
+    context(w),
+    wait(wait) {
+    if (wait)
+      eng.loop->add_waitable();
+  }
 
   ~inotify_watch() {
     std::cout << "Remove watch from " << &eng.watches << " : " << wd 
       << std::endl;
+    if (wait)
+      eng.loop->remove_waitable();
     eng.watches.erase(wd);
     gott::inotify_rm_watch_linux(eng.conn.access(), wd);
   }
 };
 
 watch_implementation *
-inotify_engine::watch_alloc(string const &path, ev_t mask, watch *w) {
-  inotify_watch *p = new inotify_watch(this, path, mask, *w);
+inotify_engine::watch_alloc(string const &path, ev_t mask, watch *w, bool wait){
+  inotify_watch *p = new inotify_watch(this, path, mask, *w, wait);
   std::cout << "Add watch to " << &watches << " : " << p->wd << std::endl;
   watches[p->wd] = p;
   return p;

@@ -54,10 +54,11 @@ public:
 private:
   bool support_event(ev_t ev) const;
 
-  watch_implementation *watch_alloc(string const &, ev_t, watch *);
+  watch_implementation *watch_alloc(string const &, ev_t, watch *, bool);
   void integrate_into(gott::events::main_loop &);
 
 private:
+  gott::events::main_loop *loop;
   gott::events::fd_manager *fdm;
   scoped_unix_file conn;
   void notify();

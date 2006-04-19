@@ -59,7 +59,8 @@ public:
 
 private:
   virtual void integrate_into(gott::events::main_loop &) = 0;
-  virtual watch_implementation *watch_alloc(string const &, ev_t, watch *) = 0;
+  virtual watch_implementation *watch_alloc(
+      string const &, ev_t, watch *, bool wait) = 0;
   friend class watch;
 };
 

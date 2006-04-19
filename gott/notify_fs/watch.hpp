@@ -53,8 +53,21 @@ class watch_implementation;
 
 class watch : boost::noncopyable {
 public:
-  GOTT_EXPORT watch(notification_engine &, gott::string const &path, ev_t mask);
-  ~watch() {}
+  GOTT_EXPORT watch();
+  GOTT_EXPORT watch(
+      notification_engine &engine,
+      gott::string const &path,
+      ev_t mask,
+      bool wait = true);
+  GOTT_EXPORT ~watch();
+
+  GOTT_EXPORT void open(
+      notification_engine &engine,
+      gott::string const &path,
+      ev_t mask,
+      bool wait = true);
+  GOTT_EXPORT void close();
+
   sigc::signal1<void, event const &> on_fire() const {
     return fire;
   }

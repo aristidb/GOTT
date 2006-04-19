@@ -39,9 +39,23 @@
 #include "notification_engine.hpp"
 
 using namespace gott::notify_fs;
+using gott::string;
 
-watch::watch(notification_engine &e, gott::string const &path, ev_t mask) 
-: p(e.watch_alloc(path, mask, this)) {}
+watch::watch() : p() {}
+watch::watch(notification_engine &e, string const &path, ev_t mask, bool wait) 
+: p(e.watch_alloc(path, mask, this, wait)) {}
+watch::~watch() {}
+
+void watch::open(notification_engine &e,
+    string const &path,
+    ev_t mask,
+    bool wait) {
+  p.reset(e.watch_alloc(path, mask, this, wait));
+}
+
+void watch::close() {
+  p.reset();
+}
 
 watch_implementation::~watch_implementation() {}
 
