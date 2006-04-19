@@ -41,12 +41,12 @@
 #include <gott/events/fd_manager.hpp>
 #include <gott/syswrap/read_write_unix.hpp>
 #include <gott/syswrap/inotify_linux.hpp>
+#include <gott/syswrap/scoped_unix_file.hpp>
 #include <gott/exceptions.hpp>
 #include <boost/lambda/bind.hpp>
+#include <boost/scoped_array.hpp>
 #include <algorithm>
 #include <unistd.h>
-
-#include <iostream>
 
 using gott::string;
 using gott::notify_fs::inotify_engine;
@@ -54,14 +54,20 @@ using gott::notify_fs::watch_implementation;
 using gott::notify_fs::ev_t;
 using gott::notify_fs::watch;
 
-inotify_engine::inotify_engine() : loop(0), fdm(0), conn(inotify_init_linux()) {
-  std::cout << "Inotify up and running..." << std::endl;
-}
+class inotify_engine::impl {
+public:
+  impl() : loop(0), fdm(0), conn(inotify_init_linux()) {}
+  gott::events::main_loop *loop;
+  gott::events::fd_manager *fdm;
+  scoped_unix_file conn;
+  std::map<boost::uint32_t, watch_implementation *> watches;
+};
+
+inotify_engine::inotify_engine() : p(new impl) {}
 
 inotify_engine::~inotify_engine() {
-  if (fdm)
-    fdm->remove_fd(conn.access());
-  std::cout << "Shut down Inotify." << std::endl;
+  if (p->fdm)
+    p->fdm->remove_fd(p->conn.access());
 }
 
 bool inotify_engine::support_event(ev_t) const {
@@ -70,10 +76,10 @@ bool inotify_engine::support_event(ev_t) const {
 
 void inotify_engine::integrate_into(gott::events::main_loop &m) {
   using namespace boost::lambda;
-  loop = &m;
-  fdm = m.feature_ptr<gott::events::fd_manager>();
-  fdm->add_fd(
-      conn.access(),
+  p->loop = &m;
+  p->fdm = m.feature_ptr<gott::events::fd_manager>();
+  p->fdm->add_fd(
+      p->conn.access(),
       gott::events::fd_manager::read,
       bind(&inotify_engine::notify, this),
       false);
@@ -81,19 +87,20 @@ void inotify_engine::integrate_into(gott::events::main_loop &m) {
 
 typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
 
-boost::int32_t inotify_engine::get_watch(inotify_engine &eng, 
-    string const &path, ev_t mask) {
-  char *c_path = new char[path.size() + 1];
-  c_path[path.size()] = '\0';
-  std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path);
+boost::int32_t inotify_engine::get_watch(
+    inotify_engine &eng, 
+    string const &path,
+    ev_t mask) {
+  boost::scoped_array<char> c_path(new char[path.size() + 1]);
+  c_path.get()[path.size()] = '\0';
+  std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path.get());
   boost::uint32_t result;
   try {
-    result = gott::inotify_add_watch_linux(eng.conn.access(), c_path, mask);
+    result = 
+      gott::inotify_add_watch_linux(eng.p->conn.access(), c_path.get(), mask);
   } catch (gott::system_error const &) {
-    delete [] c_path;
     throw gott::notify_fs::watch_installation_failure(path);
   }
-  delete [] c_path;
   return result;
 }
 
@@ -114,51 +121,45 @@ struct inotify_engine::inotify_watch : watch_implementation {
     context(w),
     wait(wait) {
     if (wait)
-      eng.loop->add_waitable();
+      eng.p->loop->add_waitable();
   }
 
   ~inotify_watch() {
-    std::cout << "Remove watch from " << &eng.watches << " : " << wd 
-      << std::endl;
     if (wait)
-      eng.loop->remove_waitable();
-    eng.watches.erase(wd);
-    gott::inotify_rm_watch_linux(eng.conn.access(), wd);
+      eng.p->loop->remove_waitable();
+    eng.p->watches.erase(wd);
+    gott::inotify_rm_watch_linux(eng.p->conn.access(), wd);
   }
 };
 
 watch_implementation *
 inotify_engine::watch_alloc(string const &path, ev_t mask, watch *w, bool wait){
-  inotify_watch *p = new inotify_watch(this, path, mask, *w, wait);
-  std::cout << "Add watch to " << &watches << " : " << p->wd << std::endl;
-  watches[p->wd] = p;
-  return p;
+  inotify_watch *pp = new inotify_watch(this, path, mask, *w, wait);
+  p->watches[pp->wd] = pp;
+  return pp;
 }
 
 void inotify_engine::notify() {
-  std::cout << "New events:" << std::endl;
   char buffer[16384];
-  size_t r = read_unix(conn.access(), buffer, sizeof(buffer));
+  size_t r = read_unix(p->conn.access(), buffer, sizeof(buffer));
   for (size_t i = 0; i < size_t(r);) {
     inotify_event *pevent = reinterpret_cast<inotify_event *>(buffer + i);
     if (i + sizeof(inotify_event) >= sizeof(buffer) 
         || i + sizeof(inotify_event) + pevent->len >= sizeof(buffer)) {
-      std::cout << "inotify: moveback" << std::endl;
       size_t rest = sizeof(buffer) - i;
       memmove(pevent, buffer, rest);
       i = 0;
-      r = read_unix(conn.access(), buffer + rest, sizeof(buffer) - rest) + rest;
+      r = read_unix(p->conn.access(), buffer + rest, sizeof(buffer) - rest)
+        + rest;
       continue;
     }
     i += sizeof(inotify_event) + pevent->len;
     if (pevent->mask & IN_Q_OVERFLOW)
       return;
-    if (pevent->wd == -1) {
-      std::cout << "inotify: Common event " << pevent->mask << std::endl;
+    if (pevent->wd == -1)
       continue;
-    }
     event ev = {
-      static_cast<inotify_watch *>(watches[pevent->wd])->context,
+      static_cast<inotify_watch *>(p->watches[pevent->wd])->context,
       ev_t(pevent->mask),
       pevent->cookie,
       pevent->len ? gott::string(pevent->name, gott::utf8) : gott::string()

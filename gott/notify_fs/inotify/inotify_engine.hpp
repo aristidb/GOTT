@@ -39,9 +39,7 @@
 #define GOTT_NOTIFY_FS_INOTIFY_ENGINE_HPP
 
 #include "../notification_engine.hpp"
-#include <gott/events/fd_manager.hpp>
-#include <gott/syswrap/scoped_unix_file.hpp>
-#include <map>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace notify_fs {
@@ -58,11 +56,9 @@ private:
   void integrate_into(gott::events::main_loop &);
 
 private:
-  gott::events::main_loop *loop;
-  gott::events::fd_manager *fdm;
-  scoped_unix_file conn;
+  class impl;
+  boost::scoped_ptr<impl> p;
   void notify();
-  std::map<boost::uint32_t, watch_implementation *> watches;
 
   static boost::int32_t get_watch(inotify_engine &eng, string const &path, 
     ev_t mask);
