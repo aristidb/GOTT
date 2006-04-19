@@ -24,6 +24,8 @@ public:
 
 class bar_drawer {
 public:
+  bar_drawer() : valid(true) {}
+
   void add(bar *b) {
     bars.push_back(b);
     invalidate();
@@ -121,7 +123,6 @@ int main() {
   space_bar s2(2, d);
   pong_bar b3(26, d);
   d.redraw();
-
   
   main_loop_factory loop_gen;
   loop_gen.try_add(feature<timer_manager>() && feature<quit_manager>());
