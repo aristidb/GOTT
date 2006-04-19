@@ -37,12 +37,12 @@
 
 #include "watch.hpp"
 #include "notification_engine.hpp"
-#include <gott/events/select_loop.hpp>
-#include <gott/events/epoll_loop.hpp>
+#include <gott/events/main_loop_factory.hpp>
+#include <gott/events/loop_requirement.hpp>
+#include <gott/events/main_loop.hpp>
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/quit_manager.hpp>
 #include <gott/events/timer_manager.hpp>
-#include <boost/ref.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/utility/in_place_factory.hpp>
@@ -69,19 +69,15 @@ bool blink() {
 }
 
 int main() {
-  boost::scoped_ptr<main_loop> loop(
-#ifdef BUILD_EPOLL
-      new epoll_loop
-#else
-      new select_loop
-#endif
-  );
+  main_loop_factory gen;
+  gen.try_add(feature<notification_engine>() && feature<timer_manager>() &&
+        feature<quit_manager>());
+  boost::scoped_ptr<main_loop> loop(gen.get_alloc());
 
-  boost::optional<watch> w;
+  watch w;
   try {
-    w = boost::in_place(boost::ref(loop->feature<notification_engine>()),
-          "/tmp/testfile", all_events);
-    w->on_fire().connect(bind(&output, _1, 1));
+    w.open(loop->feature<notification_engine>(), "/tmp/testfile", all_events);
+    w.on_fire().connect(bind(&output, _1, 1));
   } catch (watch_installation_failure&) {
     std::cerr << "/tmp/testfile does not exist\n";
   }
