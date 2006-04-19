@@ -56,11 +56,13 @@ class epoll_loop::impl {
 public:
   impl() 
     : running(false),
-    epoll_conn(epoll_create_linux(1024))
+    epoll_conn(epoll_create_linux(1024)),
+    wait(0)
   {}
 
   bool running;
   scoped_unix_file epoll_conn;
+  int wait;
 
   struct fd_entry {
     unsigned mask;
@@ -84,7 +86,8 @@ public:
 
 
 epoll_loop::epoll_loop() 
-: p(new impl),
+: standard_timer_manager(this),
+  p(new impl),
   message_mgr(this),
   sig_mgr(&message_mgr) {}
 
@@ -110,12 +113,20 @@ void *epoll_loop::do_feature(gott::QID const &qid) {
   return 0;
 }
 
+void epoll_loop::add_waitable() {
+  ++p->wait;
+}
+
+void epoll_loop::remove_waitable() {
+  --p->wait;
+}
+
 void epoll_loop::add_fd(int fd, unsigned mask, 
     boost::function<void (unsigned)> const &cb, bool wait) {
   p->fd_map.insert(std::make_pair(fd, impl::fd_entry(mask, cb, wait)));
 
-  if (wait)
-    p->wait_fds.insert(fd);
+  if (wait) 
+    add_waitable();
 
   epoll_event ev;
   ev.events = 0;
@@ -139,7 +150,7 @@ void epoll_loop::remove_fd(int fd) {
   if (it == p->fd_map.end())
     throw system_error("could not remove fd");
   if (it->second.wait)
-    p->wait_fds.erase(fd);
+    remove_waitable();
   p->fd_map.erase(it);
   try {
     epoll_ctl_linux(p->epoll_conn.access(), EPOLL_CTL_DEL, fd, 0);
@@ -150,7 +161,7 @@ void epoll_loop::remove_fd(int fd) {
 
 void epoll_loop::run() {
   p->running = true;
-  while (p->running) {
+  while (p->running && p->wait > 0) {
     int timeout = -1;
     if (has_timers()) {
       typedef boost::int64_t i64;
@@ -163,7 +174,7 @@ void epoll_loop::run() {
 
     p->on_idle.emit();
     
-    if (!has_wait_timers() && p->wait_fds.empty())
+    if (!p->running || p->wait <= 0)
       break;
     
     epoll_event event[64];

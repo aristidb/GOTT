@@ -74,6 +74,16 @@ public:
   virtual sigc::signal0<void> &on_idle() = 0;
 
   /**
+   * Add an object to the list of objects the main_loop should wait for.
+   */
+  virtual void add_waitable() = 0;
+
+  /**
+   * Remove an object from the list of objects the main_loop should wait for.
+   */
+  virtual void remove_waitable() = 0;
+
+  /**
    * Get a concrete feature of the main loop.
    * \return
    *   - 0 if the feature is not available

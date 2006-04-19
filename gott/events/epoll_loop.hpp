@@ -70,6 +70,9 @@ public:
   void quit_local();
   sigc::signal0<void> &on_idle();
 
+  void add_waitable();
+  void remove_waitable();
+
 private:
   GOTT_LOCAL
   void add_fd(int fd, unsigned mask, boost::function<void (unsigned)> const &,
@@ -79,7 +82,7 @@ private:
   void remove_fd(int fd);
 
 private:
-  void *do_feature(QID const &);
+  GOTT_LOCAL void *do_feature(QID const &);
 
 private:
   class impl;

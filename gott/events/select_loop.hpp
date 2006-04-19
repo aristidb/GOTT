@@ -89,6 +89,7 @@ private:
   standard_signal_manager sig_mgr;
   bool running;
   sigc::signal0<void> on_idle_;
+  int wait;
 
 public:
   select_loop();
@@ -105,6 +106,9 @@ private:
 public:
   void run();
   void quit_local();
+
+  void add_waitable();
+  void remove_waitable();
 
   sigc::signal0<void> &on_idle() { return on_idle_; }
 

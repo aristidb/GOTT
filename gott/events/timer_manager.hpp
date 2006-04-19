@@ -139,7 +139,7 @@ public:
 
 class standard_timer_manager : public timer_manager {
 public:
-  standard_timer_manager();
+  standard_timer_manager(main_loop *);
   ~standard_timer_manager();
 
   void add_timer(deadline_timer const &);
@@ -151,7 +151,6 @@ public:
       bool wait = true);
 
   bool has_timers() const;
-  bool has_wait_timers() const;
 
 public:
   void handle_pending_timers() {

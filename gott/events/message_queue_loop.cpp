@@ -42,10 +42,18 @@ using gott::events::message_queue_loop;
 using gott::xany::Xany;
 
 message_queue_loop::message_queue_loop() 
-  : running(false) {}
+  : running(false), wait(0) {}
 
 message_queue_loop::~message_queue_loop() {
   on_destroy().emit();
+}
+
+void message_queue_loop::add_waitable() {
+  ++wait;
+}
+
+void message_queue_loop::remove_waitable() {
+  --wait;
 }
 
 void message_queue_loop::quit_local() {
@@ -54,7 +62,7 @@ void message_queue_loop::quit_local() {
 
 void message_queue_loop::run() {
   running = true;
-  while (running) {
+  while (running && wait > 0) {
     on_receive_.emit(queue.pop());
     on_idle_.emit();
   }

@@ -47,9 +47,11 @@
 
 namespace gott{namespace events{
 select_loop::select_loop() 
-: message_mgr(this),
+: standard_timer_manager(this),
+  message_mgr(this),
   sig_mgr(&message_mgr),
-  running(false) {
+  running(false),
+  wait(0) {
 }
 
 void *select_loop::do_feature(gott::QID const &type) {
@@ -62,13 +64,23 @@ void *select_loop::do_feature(gott::QID const &type) {
   return 0;
 }
 
+void select_loop::add_waitable() {
+  ++wait;
+}
+
+void select_loop::remove_waitable() {
+  --wait;
+}
+
 void select_loop::add_fd(int fd, unsigned mask, 
     boost::function<void (unsigned)> const &fun, bool wait) {
   if (callbacks.find(fd) != callbacks.end())
     throw system_error("could not add fd");
 
-  if (wait)
+  if (wait) {
+    add_waitable();
     wait_fds.insert(fd);
+  }
 
   handler h;
   h.callback = fun;
@@ -87,7 +99,8 @@ void select_loop::remove_fd( int fd ) {
   callback_map::iterator it = callbacks.find( fd );
   if (it == callbacks.end())
     throw system_error("could not remove fd");
-  wait_fds.erase(fd);
+  if (wait_fds.count(fd) > 0)
+    remove_waitable();
   callbacks.erase( it );
   FD_CLR(fd,&fd_sets.read_fds);
   FD_CLR(fd,&fd_sets.write_fds);
@@ -102,7 +115,7 @@ void select_loop::run(){
   timeval next_event, *t; 
 
   int num_fd;
-  while(running) {
+  while(running && wait > 0) {
     boost::posix_time::time_duration td = time_left(true);
 
     if (has_timers()) {
@@ -115,8 +128,9 @@ void select_loop::run(){
     
     on_idle().emit();
 
-    if (!has_wait_timers() && wait_fds.empty())
+    if (!running || wait <= 0)
       break;
+
     try {
       num_fd = select_unix(
           n, &fd_sets.read_fds,

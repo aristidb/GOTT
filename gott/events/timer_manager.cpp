@@ -121,26 +121,26 @@ public:
     scheduled_monotonic_t;
   scheduled_monotonic_t scheduled_monotonic;
   
-  unsigned waitfor;
-
   boost::optional<pxtime::time_duration> saved_monotonic_time;
 
-  impl() : waitfor(0) {}
+  main_loop *loop;
+
+  impl(main_loop *loop) : loop(loop) {}
 };
 
-standard_timer_manager::standard_timer_manager()
-  : p(new impl()) {}
+standard_timer_manager::standard_timer_manager(main_loop *loop)
+  : p(new impl(loop)) {}
 standard_timer_manager::~standard_timer_manager() {}
 
 void standard_timer_manager::add_timer(deadline_timer const &tm) {
   if (tm.must_wait())
-    ++p->waitfor;
+    p->loop->add_waitable();
   p->scheduled_deadline.push(tm);
 }
 
 void standard_timer_manager::add_timer(monotonic_timer const &tm) {
   if (tm.must_wait())
-    ++p->waitfor;
+    p->loop->add_waitable();
   p->scheduled_monotonic.push(tm);
 }
 
@@ -155,10 +155,6 @@ void standard_timer_manager::add_relative_timer(
 
 bool standard_timer_manager::has_timers() const {
   return !p->scheduled_deadline.empty() || !p->scheduled_monotonic.empty();
-}
-
-bool standard_timer_manager::has_wait_timers() const {
-  return p->waitfor > 0;
 }
 
 void standard_timer_manager::do_time_action(
@@ -184,7 +180,7 @@ void standard_timer_manager::do_time_action(
           break;
 
         if (current.must_wait())
-          --p->waitfor;
+          p->loop->remove_waitable();
         p->scheduled_deadline.pop();
         current.emit(*this);
         ++no_handled;
@@ -198,7 +194,7 @@ void standard_timer_manager::do_time_action(
           break;
 
         if (current.must_wait())
-          --p->waitfor;
+          p->loop->remove_waitable();
         p->scheduled_monotonic.pop();
         current.emit(*this);
         ++no_handled;

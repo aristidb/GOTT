@@ -64,6 +64,7 @@ bool main_loop_factory::try_add_feature(QID const &) {
 
 main_loop *main_loop_factory::get_alloc() const {
 #if defined(BUILD_EPOLL)
+  //return new select_loop;
   return new epoll_loop;
 #elif defined(BUILD_KQUEUE)
   return new kqueue_loop;

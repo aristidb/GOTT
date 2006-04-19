@@ -63,6 +63,9 @@ public:
   void quit_local();
   sigc::signal0<void> &on_idle() { return on_idle_; }
 
+  void add_waitable();
+  void remove_waitable();
+
 private:
   GOTT_LOCAL
   void send(gott::xany::Xany const &) throw();
@@ -80,6 +83,7 @@ private:
   gott::thread::message_queue<gott::xany::Xany> queue;
   sigc::signal1<void, gott::xany::Xany const &> on_receive_;
   sigc::signal0<void> on_idle_;
+  int wait;
 };
 
 }}

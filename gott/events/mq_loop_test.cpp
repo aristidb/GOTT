@@ -61,6 +61,7 @@ void pulse(gott::events::main_loop &m) {
 int main() {
   boost::scoped_ptr<gott::events::main_loop> m(
     new gott::events::message_queue_loop);
+  m->add_waitable();
   m->feature<gott::events::inprocess_message_manager>().on_receive().connect(
       boost::bind(&timer, _1, boost::ref(*m)));
   boost::thread(boost::bind(&pulse, boost::ref(*m)));
