@@ -45,11 +45,11 @@
 #include "../structure/repatch.hpp"
 #include <gott/range_algo.hpp>
 #include <gott/string/stl.hpp>
-#include <gott/debug/assert.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
+#include <cassert>
 
 //#define VERBOSE
 
@@ -149,9 +149,8 @@ void match::add(rule_t const &f) {
   p->parse[current].structure = struc;
 
   item *the_item = f.get(*this);
-  GOTT_ASSERT_2(the_item,(item*)0,std::not_equal_to<item*>(),"Acquired rule_t");
-  GOTT_ASSERT_2(the_item->attributes(), f.attributes(), 
-      std::equal_to<rule_attr_t>(), "Rule attributes");
+  assert(the_item != 0);
+  assert(the_item->attributes() == f.attributes());
 
   p->parse[current].the_item.reset(the_item);
 }

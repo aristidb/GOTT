@@ -37,7 +37,7 @@
 
 #include "list.hpp"
 #include "../rule_attr.hpp"
-#include <gott/debug/assert.hpp>
+#include <cassert>
 
 namespace schema = tdl::schema;
 namespace ev = tdl::schema::ev;
@@ -47,7 +47,7 @@ using schema::match_list;
 
 match_list::match_list(rule_attr_t const &a, std::vector<rule_t> const &r, match &m)
 : item(a, m), sub(r[0]), cfg(r[0].attributes().outer()), cancelled(false) {
-  GOTT_ASSERT_2(r.size(), 1, std::equal_to<int>(), "1 child");
+  assert(r.size() == 1);
   last = m.pos().current();
   if (accept_more(expectation()))
     matcher().add(sub);

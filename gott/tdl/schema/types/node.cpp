@@ -37,7 +37,7 @@
 
 #include "node.hpp"
 #include "../event.hpp"
-#include <gott/debug/assert.hpp>
+#include <cassert>
 
 namespace schema = tdl::schema;
 namespace ev = tdl::schema::ev;
@@ -47,7 +47,7 @@ using schema::match_node;
 match_node::match_node(rule_attr_t const &a, std::vector<rule_t> const &r, 
     match &m)
 : happy_once(a, m) {
-  GOTT_ASSERT_2(r.size(), 0, std::equal_to<int>(), "no children");
+  assert(r.empty());
 }
 
 bool match_node::play(ev::node const &n) {

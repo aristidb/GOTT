@@ -39,8 +39,8 @@
 #include "../event.hpp"
 #include <gott/string/string.hpp>
 #include <gott/tdl/structure/repatchers/enumeration.hpp>
-#include <gott/debug/assert.hpp>
 #include <boost/assign/list_of.hpp>
+#include <cassert>
 
 using std::vector;
 using gott::string;
@@ -66,7 +66,7 @@ match_named::match_named(rule_attr_t const &a, vector<rule_t> const &s,match &m)
         (rule("node", rule_attr_t(rule_attr_t::simple, false, 
           new structure::repatch_enumeration(std::vector<string>(1, tag)))))
         (s[0]))) {
-  GOTT_ASSERT_2(s.size(), 1, std::equal_to<int>(), "one parameter");
+  assert(s.size() == 1);
   matcher().add(rewritten);
 }
 

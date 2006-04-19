@@ -42,7 +42,6 @@
 #include <vector>
 #include <set>
 #include <cstddef>
-#include <gott/debug/assert.hpp>
 
 using std::size_t;
 namespace schema = tdl::schema;
@@ -172,8 +171,7 @@ void positioning::replay(acceptor const &acc) {
       if (p->replay)
         break;
 
-      GOTT_ASSERT_2(p->consumed, p->unconsumed, std::equal_to<long>(),
-                    "Gotta consume token");
+      assert(p->consumed == p->unconsumed);
     }
     p->in_replay = false;
   } else
@@ -185,13 +183,15 @@ bool positioning::want_replay() const {
 }
 
 #ifdef DEBUG
+#include <iostream>
+
 void positioning::debug_dump() const {
-  std::wcerr << L"[";
-  std::wcerr << L'U' << p->unconsumed << L',';
-  std::wcerr << L'C' << p->consumed << L',';
-  std::wcerr << L'S' << p->seeked << L',';
-  std::wcerr << L'R' << p->replay << L',';
-  std::wcerr << L'I' << p->in_replay;
-  std::wcerr << L"]";
+  std::cerr << "[";
+  std::cerr << 'U' << p->unconsumed << ',';
+  std::cerr << 'C' << p->consumed << ',';
+  std::cerr << 'S' << p->seeked << ',';
+  std::cerr << 'R' << p->replay << ',';
+  std::cerr << 'I' << p->in_replay;
+  std::cerr << "]";
 }
 #endif

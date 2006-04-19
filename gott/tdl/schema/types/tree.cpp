@@ -37,7 +37,7 @@
 
 #include "tree.hpp"
 #include "../event.hpp"
-#include <gott/debug/assert.hpp>
+#include <cassert>
 
 using tdl::schema::match_tree;
 using tdl::schema::item;
@@ -45,7 +45,7 @@ namespace ev = tdl::schema::ev;
 
 match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match &m)
 : item(a, m), level(0), fresh_level(true) {
-  GOTT_ASSERT_2(c.size(), 0, std::equal_to<int>(), "no children");
+  assert(c.empty());
 }
 
 gott::string match_tree::name() const {
