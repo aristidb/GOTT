@@ -70,7 +70,7 @@ bool blink() {
 
 int main() {
   boost::scoped_ptr<main_loop> loop(
-#if BUILD_EPOLL
+#ifdef BUILD_EPOLL
       new epoll_loop
 #else
       new select_loop
