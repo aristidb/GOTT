@@ -40,6 +40,7 @@
 
 #include "inprocess_message_manager.hpp"
 #include "fd_manager.hpp"
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace events {
@@ -51,15 +52,11 @@ public:
 
   void send(gott::xany::Xany const &) throw();
 
-  GOTT_LOCAL
-  sigc::signal1<void, gott::xany::Xany const &> &on_receive() {
-    return on_receive_;
-  }
+  sigc::signal1<void, gott::xany::Xany const &> &on_receive();
 
 private:
-  fd_manager *fdm;
-  int selfpipe[2];
-  sigc::signal1<void, gott::xany::Xany const &> on_receive_;
+  class impl;
+  boost::scoped_ptr<impl> p;
 
   GOTT_LOCAL void notify_in();
 };

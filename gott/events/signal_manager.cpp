@@ -52,9 +52,18 @@ gott::QID const signal_manager::qid(
 signal_manager::signal_manager() {}
 signal_manager::~signal_manager() {}
 
+class standard_signal_manager::impl {
+public:
+  impl(sigsafe_message_manager *mm) : message_manager(mm) {}
+
+  sigsafe_message_manager *message_manager;
+  typedef std::map<int, sigc::signal1<void, int> > handler_map_t;
+  handler_map_t handlers;
+};
+
 standard_signal_manager::standard_signal_manager(sigsafe_message_manager *mm)
-: message_manager(mm) {
-  message_manager->on_receive().connect(
+: p(new impl(mm)) {
+  p->message_manager->on_receive().connect(
       sigc::mem_fun(this, &standard_signal_manager::receive_message));
 }
 
@@ -63,10 +72,10 @@ standard_signal_manager::~standard_signal_manager() {
 }
 
 sigc::signal1<void, int> &standard_signal_manager::on_signal(int sig) {
-  handler_map_t::iterator pos = handlers.find(sig);
-  if (pos == handlers.end()) {
+  impl::handler_map_t::iterator pos = p->handlers.find(sig);
+  if (pos == p->handlers.end()) {
     register_signal(sig, this);
-    return handlers[sig];
+    return p->handlers[sig];
   }
   return pos->second;
 }
@@ -74,7 +83,7 @@ sigc::signal1<void, int> &standard_signal_manager::on_signal(int sig) {
 namespace {
   typedef std::map<int, std::pair<standard_signal_manager *, void (*)(int)> > 
     sys_handler_map_t;
-  sys_handler_map_t sys_handlers;
+  static sys_handler_map_t sys_handlers;
 }
 
 void standard_signal_manager::register_signal(
@@ -92,7 +101,7 @@ void standard_signal_manager::unregister_all(standard_signal_manager *handler) {
   sys_handler_map_t::iterator it = sys_handlers.begin();
   while (it != sys_handlers.end())
     if (it->second.first == handler) {
-      signal(it->first, it->second.second); // reinstall old handler
+      ::signal(it->first, it->second.second); // reinstall old handler
       sys_handler_map_t::iterator del = it++;
       sys_handlers.erase(del);
     } else
@@ -114,12 +123,12 @@ namespace {
 }
 
 void standard_signal_manager::immediate_action(int sig) {
-  message_manager->send(Xany(signal_msg(sig)));
+  p->message_manager->send(Xany(signal_msg(sig)));
 }
 
 void standard_signal_manager::receive_message(Xany const &m) {
   if (m.compatible<signal_msg>()) {
     int sig = xany::Xany_cast<signal_msg>(m).get();
-    handlers[sig].emit(sig);
+    p->handlers[sig].emit(sig);
   }
 }

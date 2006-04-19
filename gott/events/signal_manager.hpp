@@ -40,12 +40,11 @@
 
 #include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>
-#include <gott/xany/xany.hpp>
 #include <sigc++/signal.h>
-#include <map>
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 
-namespace gott {
+namespace gott { namespace xany { class Xany; }
 namespace events {
 
 class main_loop;
@@ -101,9 +100,8 @@ private:
   void receive_message(gott::xany::Xany const &);
 
 private:
-  sigsafe_message_manager *message_manager;
-  typedef std::map<int, sigc::signal1<void, int> > handler_map_t;
-  handler_map_t handlers;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}

@@ -40,9 +40,7 @@
 
 #include "main_loop.hpp"
 #include "inprocess_message_manager.hpp"
-#include "signal_manager.hpp"
-#include <gott/thread/message_queue.hpp>
-#include <setjmp.h>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace events {
@@ -61,7 +59,7 @@ public:
 
   void run();
   void quit_local();
-  sigc::signal0<void> &on_idle() { return on_idle_; }
+  sigc::signal0<void> &on_idle();
 
   void add_waitable();
   void remove_waitable();
@@ -71,19 +69,14 @@ private:
   void send(gott::xany::Xany const &) throw();
 
   GOTT_LOCAL
-  sigc::signal1<void, gott::xany::Xany const &> &on_receive() {
-    return on_receive_;
-  }
+  sigc::signal1<void, gott::xany::Xany const &> &on_receive();
 
 private:
   void *do_feature(QID const &);
 
 private:
-  bool running;
-  gott::thread::message_queue<gott::xany::Xany> queue;
-  sigc::signal1<void, gott::xany::Xany const &> on_receive_;
-  sigc::signal0<void> on_idle_;
-  int wait;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}

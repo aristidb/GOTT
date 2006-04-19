@@ -36,6 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "epoll_loop.hpp"
+#include "selfpipe_message_manager.hpp"
+#include "signal_manager.hpp"
 #include <gott/string/qid.hpp>
 #include <gott/syswrap/epoll_linux.hpp>
 #include <gott/syswrap/scoped_unix_file.hpp>
@@ -57,8 +59,7 @@ public:
   impl() 
     : running(false),
     epoll_conn(epoll_create_linux(1024)),
-    wait(0)
-  {}
+    wait(0) {}
 
   bool running;
   scoped_unix_file epoll_conn;
@@ -82,14 +83,22 @@ public:
   std::map<int, entry> file_descriptors;
 
   sigc::signal0<void> on_idle;
+
+  boost::optional<selfpipe_message_manager> message_mgr;
+  boost::optional<standard_signal_manager> sig_mgr;
+
+  void init_mgr(fd_manager *fdm) {
+    if (!message_mgr)
+      message_mgr = boost::in_place(fdm);
+    if (!sig_mgr)
+      sig_mgr = boost::in_place(message_mgr.get_ptr());
+  }
 };
 
 
 epoll_loop::epoll_loop() 
 : standard_timer_manager(this),
-  p(new impl),
-  message_mgr(this),
-  sig_mgr(&message_mgr) {}
+  p(new impl()) {}
 
 epoll_loop::~epoll_loop() {
   on_destroy().emit();
@@ -106,10 +115,14 @@ sigc::signal0<void> &epoll_loop::on_idle() {
 void *epoll_loop::do_feature(gott::QID const &qid) {
   GOTT_EVENTS_FEATURE(qid, fd_manager);
   GOTT_EVENTS_FEATURE(qid, timer_manager);
-  if (qid == inprocess_message_manager::qid)
-    return &message_mgr;
-  if (qid == signal_manager::qid)
-    return &sig_mgr;
+  if (qid == inprocess_message_manager::qid) {
+    p->init_mgr(this);
+    return p->message_mgr.get_ptr();
+  }
+  if (qid == signal_manager::qid) {
+    p->init_mgr(this);
+    return p->sig_mgr.get_ptr();
+  }
   return 0;
 }
 

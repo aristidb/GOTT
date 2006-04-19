@@ -41,8 +41,6 @@
 #include "main_loop.hpp"
 #include "fd_manager.hpp"
 #include "timer_manager.hpp"
-#include "selfpipe_message_manager.hpp"
-#include "signal_manager.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -87,8 +85,6 @@ private:
 private:
   class impl;
   boost::scoped_ptr<impl> p;
-  selfpipe_message_manager message_mgr;
-  standard_signal_manager sig_mgr;
 };
 
 }}

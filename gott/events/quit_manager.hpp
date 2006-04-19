@@ -38,10 +38,13 @@
 #ifndef GOTT_EVENTS_QUIT_MANAGER_HPP
 #define GOTT_EVENTS_QUIT_MANAGER_HPP
 
-#include "main_loop.hpp"
+#include <gott/visibility.hpp>
+#include <gott/string/qid.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott { namespace events {
+class main_loop;
 
 class quit_manager : boost::noncopyable {
 public:
@@ -56,7 +59,9 @@ public:
 
 private:
   void quit_event();
-  main_loop &ref_loop;
+
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}

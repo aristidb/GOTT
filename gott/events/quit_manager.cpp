@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "quit_manager.hpp"
+#include "main_loop.hpp"
 #include "signal_manager.hpp"
 #include <boost/lambda/bind.hpp>
 #include <signal.h>
@@ -45,7 +46,13 @@ using namespace gott::events;
 
 gott::QID const quit_manager::qid("gott::events::quit_manager");
 
-quit_manager::quit_manager(main_loop &loop) : ref_loop(loop) {}
+class quit_manager::impl {
+public:
+  impl(main_loop &loop) : loop(loop) {}
+  main_loop &loop;
+};
+
+quit_manager::quit_manager(main_loop &loop) : p(new impl(loop)) {}
 quit_manager::~quit_manager() {}
 
 quit_manager *quit_manager::get_for(main_loop &loop) {
@@ -58,14 +65,14 @@ quit_manager *quit_manager::get_for(main_loop &loop) {
 }
 
 void quit_manager::enable_master() {
-  ref_loop.feature<signal_manager>().on_signal(SIGINT).connect(
+  p->loop.feature<signal_manager>().on_signal(SIGINT).connect(
       bind(&quit_manager::quit_event, this));
-  ref_loop.feature<signal_manager>().on_signal(SIGTERM).connect(
+  p->loop.feature<signal_manager>().on_signal(SIGTERM).connect(
       bind(&quit_manager::quit_event, this));
-  ref_loop.feature<signal_manager>().on_signal(SIGPIPE).connect(
+  p->loop.feature<signal_manager>().on_signal(SIGPIPE).connect(
       bind(&quit_manager::quit_event, this));
 }
 
 void quit_manager::quit_event() {
-  ref_loop.quit_local();
+  p->loop.quit_local();
 }

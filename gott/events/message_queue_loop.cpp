@@ -36,40 +36,60 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "message_queue_loop.hpp"
+#include <gott/thread/message_queue.hpp>
+#include <gott/xany/xany.hpp>
 #include <time.h>
 
 using gott::events::message_queue_loop;
 using gott::xany::Xany;
 
-message_queue_loop::message_queue_loop() 
-  : running(false), wait(0) {}
+class message_queue_loop::impl {
+public:
+  impl() : running(false), wait(0) {}
+
+  bool running;
+  gott::thread::message_queue<gott::xany::Xany> queue;
+  sigc::signal1<void, gott::xany::Xany const &> on_receive_;
+  sigc::signal0<void> on_idle_;
+  int wait;
+};
+
+message_queue_loop::message_queue_loop() : p(new impl) {}
 
 message_queue_loop::~message_queue_loop() {
   on_destroy().emit();
 }
 
+sigc::signal0<void> &message_queue_loop::on_idle() {
+  return p->on_idle_;
+}
+
+sigc::signal1<void, gott::xany::Xany const &> &message_queue_loop::on_receive(){
+  return p->on_receive_;
+}
+
 void message_queue_loop::add_waitable() {
-  ++wait;
+  ++p->wait;
 }
 
 void message_queue_loop::remove_waitable() {
-  --wait;
+  --p->wait;
 }
 
 void message_queue_loop::quit_local() {
-  running = false;
+  p->running = false;
 }
 
 void message_queue_loop::run() {
-  running = true;
-  while (running && wait > 0) {
-    on_receive_.emit(queue.pop());
-    on_idle_.emit();
+  p->running = true;
+  while (p->running && p->wait > 0) {
+    p->on_receive_.emit(p->queue.pop());
+    p->on_idle_.emit();
   }
 }
 
 void message_queue_loop::send(Xany const &val) throw() {
-  queue.push(val);
+  p->queue.push(val);
 }
 
 void *message_queue_loop::do_feature(gott::QID const &qid) {

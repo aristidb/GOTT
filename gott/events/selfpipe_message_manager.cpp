@@ -43,30 +43,42 @@
 using gott::events::selfpipe_message_manager;
 using gott::xany::Xany;
 
+class selfpipe_message_manager::impl {
+public:
+  impl(fd_manager *fdm) : fdm(fdm) {}
+  fd_manager *fdm;
+  int selfpipe[2];
+  sigc::signal1<void, Xany const &> on_receive_;
+};
+
 selfpipe_message_manager::selfpipe_message_manager(fd_manager *fdm)
-: fdm(fdm) {
-  pipe_unix(selfpipe);
-  fdm->add_fd(selfpipe[0], fd_manager::read, 
+: p(new impl(fdm)) {
+  pipe_unix(p->selfpipe);
+  fdm->add_fd(p->selfpipe[0], fd_manager::read, 
       boost::bind(&selfpipe_message_manager::notify_in, this), false);
 }
 
 selfpipe_message_manager::~selfpipe_message_manager() {
-  fdm->remove_fd(selfpipe[0]);
-  close(selfpipe[0]);
-  close(selfpipe[1]);
+  p->fdm->remove_fd(p->selfpipe[0]);
+  close(p->selfpipe[0]);
+  close(p->selfpipe[1]);
+}
+
+sigc::signal1<void, Xany const &> &selfpipe_message_manager::on_receive() {
+  return p->on_receive_;
 }
 
 void selfpipe_message_manager::notify_in() {
   void *data[1];
-  read_unix(selfpipe[0], data);
+  read_unix(p->selfpipe[0], data);
   Xany value;
   value.recreate(data[0]);
-  on_receive_.emit(value);
+  p->on_receive_.emit(value);
 }
 
 void selfpipe_message_manager::send(Xany const &value) throw() {
   Xany value_copy(value);
   void *data[1] = { value_copy.release() };
-  write_unix(selfpipe[1], data);
+  write_unix(p->selfpipe[1], data);
 }
 

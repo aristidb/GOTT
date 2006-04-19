@@ -42,7 +42,7 @@
 #include <gott/string/qid.hpp>
 #include <gott/exceptions.hpp>
 #include <sigc++/signal.h>
-#include <map>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 namespace events {
@@ -147,16 +147,15 @@ public:
   }
 
 public:
-  GOTT_LOCAL sigc::signal0<void> &on_destroy() { return on_destroy_; }
-
-  GOTT_LOCAL void *&feature_data(QID const &id) {
-    return feature_data_[id];
-  }
+  sigc::signal0<void> &on_destroy();
+  void *&feature_data(QID const &id);
 
 protected:
   virtual void *do_feature(QID const &) = 0;
-  sigc::signal0<void> on_destroy_;
-  std::map<QID, void *> feature_data_;
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 //TODO faster please
