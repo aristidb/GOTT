@@ -80,7 +80,8 @@ bool match_unordered::play(ev::child_fail const &) {
   bool happy = pos->slot.expectation() != need;
   if (++pos == children.end())
     if (happy) {
-      children = list_t();
+      children.erase(pos);
+      pos = --children.end();
       return true;
     } else {
       all_happy = false;
