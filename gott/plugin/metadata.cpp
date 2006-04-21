@@ -42,10 +42,7 @@
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
-#include <gott/tdl/structure/container.hpp>//FIXME
-#include <gott/tdl/structure/print.hpp>//FIXME
 #include <boost/assign/list_of.hpp>
-#include <iostream>//FIXME
 
 using gott::plugin::plugin_metadata;
 using std::istream;
