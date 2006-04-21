@@ -77,6 +77,9 @@ class GOTT_EXPORT kqueue_loop
 		boost::function<void (unsigned)> const &cb);
   void unwatch_fd(int fd);
 
+  void add_waitable();
+  void remove_waitable();
+
  private:
   GOTT_LOCAL void add_fd(int fd, unsigned mask,
         		 boost::function<void (unsigned)> const &cb,

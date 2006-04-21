@@ -56,13 +56,19 @@ namespace events {
 
     // fd_manager
     struct callback {
+      callback(unsigned mask_, boost::function<void (unsigned)> const &c,
+	       bool wait_)
+	: mask(mask_), call(c), wait(wait_)
+      { }
+
       unsigned mask;
       boost::function<void (unsigned)> call;
+      bool wait;
     };
     typedef std::map<int,callback> map_fd_cb;
-    map_fd_cb callbacks;
+    map_fd_cb fd_callbacks;
 
-    std::set<int> wait_fds;
+    unsigned wait;
 
     // signal_manager
     typedef std::map<int, sigc::signal1<void, int> > map_sig_hnd;
@@ -81,7 +87,8 @@ namespace events {
   };
 
   kqueue_loop::kqueue_loop()
-    : p(new impl),
+    : standard_timer_manager(this),
+      p(new impl),
       message_mgr(this)
   {}
 
@@ -109,6 +116,15 @@ namespace events {
     return i->second;
   }
 
+  void kqueue_loop::add_waitable() {
+    ++p->wait;
+  }
+
+  void kqueue_loop::remove_waitable() {
+    assert(p->wait > 0);
+    --p->wait;
+  }
+
   void kqueue_loop::add_fd(int fd, unsigned mask, 
         		   boost::function<void (unsigned)> const &cb,
         		   bool wait)
@@ -125,17 +141,14 @@ namespace events {
     }
 
     if(wait)
-      p->wait_fds.insert(fd);
+      add_waitable();
 
-    impl::callback new_cb;
-    new_cb.call = cb;
-    new_cb.mask = mask;
-    p->callbacks[fd] = new_cb;
+    p->fd_callbacks.insert(std::make_pair(fd, impl::callback(mask, cb, wait)));
   }
 
   void kqueue_loop::remove_fd(int fd) {
-    impl::map_fd_cb::iterator i=p->callbacks.find(fd);
-    if(i == p->callbacks.end())
+    impl::map_fd_cb::iterator i=p->fd_callbacks.find(fd);
+    if(i == p->fd_callbacks.end())
       throw system_error("could not remove fd");
 
     if(i->second.mask & fd_manager::read ||
@@ -150,8 +163,10 @@ namespace events {
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
 
-    p->callbacks.erase(i);
-    p->wait_fds.erase(fd);
+    if(i->second.wait)
+      remove_waitable();
+
+    p->fd_callbacks.erase(i);
   }
 
   namespace {
@@ -178,10 +193,7 @@ namespace events {
 	   (mask & notify_fs::flag_oneshot ? EV_ONESHOT : 0),
 	   ev_t2kqueue(mask), 0, 0);
 
-    impl::callback cb_;
-    cb_.mask = mask;
-    cb_.call = cb;
-    p->notify_fs[fd] = cb_;
+    p->notify_fs.insert(std::make_pair(fd, impl::callback(mask, cb, false)));
 
     kqueue::event_bsd(p->queue.access(), &e, 1, 0, 0, 0);
   }
@@ -210,7 +222,7 @@ namespace events {
     p->running = true;
     enum { EVENTS_N=64 };
     struct kevent event_list[EVENTS_N];
-    while(p->running) {
+    while(p->running && p->wait > 0) {
       timespec tm;
       bool has_timers_mem = has_timers();
       if (has_timers_mem) {
@@ -222,8 +234,8 @@ namespace events {
 
       p->on_idle.emit();
     
-      if (!has_wait_timers() && p->wait_fds.empty())
-        break;
+      if (!p->running || p->wait <= 0)
+	break;
 
       int n=kqueue::event_bsd(p->queue.access(), 0, 0, event_list, EVENTS_N,
         		      has_timers_mem ? &tm : 0x0);
@@ -240,8 +252,8 @@ namespace events {
 	  j->second.call(event_list[i].fflags); //TODO fflags 2 ev_t
 	}
 	else {
-	  impl::map_fd_cb::iterator j=p->callbacks.find(event_list[i].ident);
-	  if(j == p->callbacks.end())
+	  impl::map_fd_cb::iterator j=p->fd_callbacks.find(event_list[i].ident);
+	  if(j == p->fd_callbacks.end())
 	    continue;
 	  if(event_list[i].filter == EVFILT_READ) {
 	     assert(j->second.mask & fd_manager::read ||
