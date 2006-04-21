@@ -46,19 +46,17 @@ namespace notify_fs {
 
 class inotify_engine : public notification_engine {
 public:
-  inotify_engine() GOTT_EXPORT;
+  inotify_engine(gott::events::main_loop &) GOTT_EXPORT;
   ~inotify_engine() GOTT_EXPORT;
  
 private:
   bool support_event(ev_t ev) const;
 
   watch_implementation *watch_alloc(string const &, ev_t, watch *, bool);
-  void integrate_into(gott::events::main_loop &);
 
 private:
   class impl;
   boost::scoped_ptr<impl> p;
-  void notify();
 
   static boost::int32_t get_watch(inotify_engine &eng, string const &path, 
     ev_t mask);

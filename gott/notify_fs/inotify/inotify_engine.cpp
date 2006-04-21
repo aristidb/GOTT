@@ -53,36 +53,39 @@ using gott::notify_fs::inotify_engine;
 using gott::notify_fs::watch_implementation;
 using gott::notify_fs::ev_t;
 using gott::notify_fs::watch;
+using gott::events::main_loop;
 
 class inotify_engine::impl {
 public:
-  impl() : loop(0), fdm(0), conn(inotify_init_linux()) {}
-  gott::events::main_loop *loop;
+  impl(main_loop &r_loop) 
+    : loop(&r_loop),
+      fdm(&loop->feature<gott::events::fd_manager>()),
+      conn(inotify_init_linux()) {
+    using namespace boost::lambda;
+    fdm->add_fd(
+        conn.access(),
+        gott::events::fd_manager::read,
+        bind(&inotify_engine::impl::notify, this),
+        false);
+  }
+  
+  ~impl() {
+    fdm->remove_fd(conn.access());
+  }
+  
+  main_loop *loop;
   gott::events::fd_manager *fdm;
   scoped_unix_file conn;
   std::map<boost::uint32_t, watch_implementation *> watches;
+
+  void notify();
 };
 
-inotify_engine::inotify_engine() : p(new impl) {}
-
-inotify_engine::~inotify_engine() {
-  if (p->fdm)
-    p->fdm->remove_fd(p->conn.access());
-}
+inotify_engine::inotify_engine(main_loop &loop) : p(new impl(loop)) {}
+inotify_engine::~inotify_engine() {}
 
 bool inotify_engine::support_event(ev_t) const {
   return true;
-}
-
-void inotify_engine::integrate_into(gott::events::main_loop &m) {
-  using namespace boost::lambda;
-  p->loop = &m;
-  p->fdm = m.feature_ptr<gott::events::fd_manager>();
-  p->fdm->add_fd(
-      p->conn.access(),
-      gott::events::fd_manager::read,
-      bind(&inotify_engine::notify, this),
-      false);
 }
 
 typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
@@ -139,9 +142,9 @@ inotify_engine::watch_alloc(string const &path, ev_t mask, watch *w, bool wait){
   return pp;
 }
 
-void inotify_engine::notify() {
+void inotify_engine::impl::notify() {
   char buffer[16384];
-  size_t r = read_unix(p->conn.access(), buffer, sizeof(buffer));
+  size_t r = read_unix(conn.access(), buffer, sizeof(buffer));
   for (size_t i = 0; i < size_t(r);) {
     inotify_event *pevent = reinterpret_cast<inotify_event *>(buffer + i);
     if (i + sizeof(inotify_event) >= sizeof(buffer) 
@@ -149,7 +152,7 @@ void inotify_engine::notify() {
       size_t rest = sizeof(buffer) - i;
       memmove(pevent, buffer, rest);
       i = 0;
-      r = read_unix(p->conn.access(), buffer + rest, sizeof(buffer) - rest)
+      r = read_unix(conn.access(), buffer + rest, sizeof(buffer) - rest)
         + rest;
       continue;
     }
@@ -159,7 +162,7 @@ void inotify_engine::notify() {
     if (pevent->wd == -1)
       continue;
     event ev = {
-      static_cast<inotify_watch *>(p->watches[pevent->wd])->context,
+      static_cast<inotify_watch *>(watches[pevent->wd])->context,
       ev_t(pevent->mask),
       pevent->cookie,
       pevent->len ? gott::string(pevent->name, gott::utf8) : gott::string()
