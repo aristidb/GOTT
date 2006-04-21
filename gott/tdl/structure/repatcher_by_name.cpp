@@ -37,6 +37,7 @@
 
 #include "repatcher_by_name.hpp"
 #include "repatch.hpp"
+#include <gott/tdl/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -86,6 +87,7 @@ repatcher_getter *repatcher_by_name_t::chain_alloc() const {
         pos = inner1; break;
       case inner1:
         where.reset(ref.get_alloc(what));
+        what = string();
         inner2_level = 0;
         pos = inner2; break;
       case inner2:
@@ -106,6 +108,10 @@ repatcher_getter *repatcher_by_name_t::chain_alloc() const {
         }
         break;
       case inner1:
+        if (what != string()) {
+          begin(source_position());
+          end();
+        }
         pos = outer; break;
       case outer:
         fail();
@@ -126,7 +132,8 @@ repatcher_getter *repatcher_by_name_t::chain_alloc() const {
         where->add_tag(s);
     }
     void fail() {
-      throw std::invalid_argument("chain_alloc: invalid input");
+      throw tdl_error("TDL Structure repatcher loader",
+          "non-sensible arguments");
     }
     repatcher *result_alloc() const {
       return result;

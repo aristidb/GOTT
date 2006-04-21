@@ -169,7 +169,7 @@ void object::test<5>(int) {
 template<> template<>
 void object::test<6>(int) {
   scoped_ptr<repatcher_getter> re_g(
-      repatcher_by_name().get_alloc("find_literal"));
+      repatcher_by_name().get_alloc("find-literal"));
   re_g->begin(source_position()); re_g->data(Xany("foo")); re_g->end();
   re_g->begin(source_position()); re_g->data(Xany(repatch_find_literal::type::end)); re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());

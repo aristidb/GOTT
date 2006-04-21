@@ -70,7 +70,7 @@ namespace tut {
 template<> template<>
 void object::test<1>(int) {
   run_test("ND\n zz");
-  C(MD(Xany(0), nd_list(1, S(Xany("zz"), "S")), "ND"), "doc").write_to(xp);
+  C(MD(Xany(), nd_list(1, S(Xany("zz"), "S")), "ND"), "doc").write_to(xp);
   ensure_equals("single follow_integer_integer entity", tree, xp);
 }
 

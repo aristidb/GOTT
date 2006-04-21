@@ -35,26 +35,22 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "integer.hpp"
-#include "enumeration.hpp"
-#include "substring.hpp"
-#include "find_literal.hpp"
-#include "throw_away.hpp"
-#include "../repatcher_by_name.hpp"
+#ifndef GOTT_TDL_STRUCTURE_REPATCHERS_THROW_AWAY_HPP
+#define GOTT_TDL_STRUCTURE_REPATCHERS_THROW_AWAY_HPP
+
 #include "../repatch.hpp"
 
-namespace {
-struct builtin_repatchers {
-  builtin_repatchers();
-} auto_reg;
-}
+namespace tdl { namespace structure {
 
-using namespace tdl::structure;
+class GOTT_EXPORT repatch_throw_away 
+  : public concrete_repatcher<repatch_throw_away> {
+public:
+  repatch_throw_away();
+  ~repatch_throw_away();
+  writable_structure *deferred_write(writable_structure &) const;
+  static void reg();
+};
 
-builtin_repatchers::builtin_repatchers() {
-  repatch_integer::reg();
-  repatch_enumeration::reg();
-  repatch_substring::reg();
-  repatch_find_literal::reg();
-  repatch_throw_away::reg();
-}
+}}
+
+#endif

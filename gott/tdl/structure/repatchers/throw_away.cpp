@@ -35,26 +35,42 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "integer.hpp"
-#include "enumeration.hpp"
-#include "substring.hpp"
-#include "find_literal.hpp"
 #include "throw_away.hpp"
 #include "../repatcher_by_name.hpp"
-#include "../repatch.hpp"
+#include <gott/tdl/exceptions.hpp>
 
-namespace {
-struct builtin_repatchers {
-  builtin_repatchers();
-} auto_reg;
+using gott::string;
+namespace structure = tdl::structure;
+using structure::repatch_throw_away;
+using structure::writable_structure;
+
+repatch_throw_away::repatch_throw_away() {}
+repatch_throw_away::~repatch_throw_away() {}
+
+writable_structure *
+repatch_throw_away::deferred_write(writable_structure &) const {
+  struct context : writable_structure {
+    void data(gott::xany::Xany const &) {}
+    void add_tag(gott::string const &) {}
+    void begin(tdl::source_position const &) {}
+    void end() {}
+  };
+  return new context;
 }
 
-using namespace tdl::structure;
-
-builtin_repatchers::builtin_repatchers() {
-  repatch_integer::reg();
-  repatch_enumeration::reg();
-  repatch_substring::reg();
-  repatch_find_literal::reg();
-  repatch_throw_away::reg();
+void repatch_throw_away::reg() {
+  struct getter : public repatcher_getter {
+    getter() {}
+    void begin(source_position const &) { fail(); }
+    void end() { fail(); }
+    void data(gott::xany::Xany const &) { fail(); }
+    void add_tag(string const &) { fail(); }
+    void fail() {
+      throw tdl_error("TDL Structure repatcher loader",
+          "non-sensible arguments");
+    }
+    repatcher *result_alloc() const { return new repatch_throw_away(); }
+    static repatcher_getter *alloc() { return new getter; }
+  };
+  repatcher_by_name().add("throw-away", &getter::alloc);
 }

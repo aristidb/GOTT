@@ -38,8 +38,10 @@
 #include "named.hpp"
 #include "../event.hpp"
 #include <gott/string/string.hpp>
-#include <gott/tdl/structure/repatchers/enumeration.hpp>
+#include <gott/tdl/structure/repatch.hpp>
+#include <gott/tdl/structure/repatcher_by_name.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <cassert>
 
 using std::vector;
@@ -58,13 +60,38 @@ rule_attr_t match_named::attributes(string const &s, bool cc) {
   return rule_attr_t(vector<string>(1, s), cc, Xany(s));
 }
 
+static string get_id(rule_attr_t const &a) {
+  if (a.user().empty() && a.tags().empty())
+    return string("-");
+  if (a.user().empty())
+    return a.tags()[0];
+  return Xany_cast<string>(a.user());
+}
+
+static tdl::structure::repatcher *get_repatcher(string const &tag) {
+  boost::scoped_ptr<tdl::structure::repatcher_getter> getter(
+      tdl::structure::repatcher_by_name().chain_alloc());
+  tdl::structure::writable_structure &param = *getter;
+  tdl::source_position w_;
+  param.begin(w_);
+    param.data(Xany("enumeration"));
+    param.begin(w_);
+      param.begin(w_); param.data(Xany(tag)); param.end();
+    param.end();
+  param.end();
+  param.begin(w_);
+    param.data(Xany("throw-away"));
+  param.end();
+  return getter->result_alloc();
+}
+
 match_named::match_named(rule_attr_t const &a, vector<rule_t> const &s,match &m)
 : happy_once(a, m), 
-  tag(Xany_cast<string>(a.user())),
+  tag(get_id(a)),
   rewritten(
       rule("follow", rule_attr_t(rule_attr_t::simple, false), list_of 
         (rule("node", rule_attr_t(rule_attr_t::simple, false, 
-          new structure::repatch_enumeration(std::vector<string>(1, tag)))))
+          get_repatcher(tag))))
         (s[0]))) {
   assert(s.size() == 1);
   matcher().add(rewritten);

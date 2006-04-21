@@ -127,5 +127,5 @@ void repatch_find_literal::reg() {
     }
     static repatcher_getter *alloc() { return new getter; }
   };
-  repatcher_by_name().add("find_literal", &getter::alloc);
+  repatcher_by_name().add("find-literal", &getter::alloc);
 }
