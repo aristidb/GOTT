@@ -42,6 +42,7 @@
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
+#include <gott/tdl/structure/container.hpp>//FIXME
 #include <gott/tdl/structure/print.hpp>//FIXME
 #include <boost/assign/list_of.hpp>
 #include <iostream>//FIXME
@@ -49,26 +50,46 @@
 using gott::plugin::plugin_metadata;
 using std::istream;
 
-istream &gott::plugin::operator>>(istream &stream, plugin_metadata &) {
+istream &gott::plugin::operator>>(istream &stream, plugin_metadata &out_value) {
   using namespace tdl::structure;
   using namespace tdl::schema;
   using namespace boost::assign;
   using gott::xany::Xany;
 
-  direct_print out(std::cout);
+  struct accepter : writable_structure {
+    accepter(plugin_metadata &ref) : ref(ref) {}
+
+    plugin_metadata &ref;
+
+    string tag;
+    Xany data_;
+
+    void begin(tdl::source_position const &) {}
+    void end() {
+      using gott::xany::Xany_cast;
+      if (tag == "interface")
+        ref.interfaces.push_back(Xany_cast<string>(data_));
+      else if (tag == "plugin-id")
+        ref.plugin_id = Xany_cast<string>(data_);
+      tag = string();
+    }
+
+    void add_tag(string const &t) { tag = t; }
+    void data(Xany const &x) { data_ = x; }
+  };
+
+  accepter out(out_value);
   revocable_adapter adapter(out);
   match matcher(adapter);
   matcher.add(
-      rule_one("document",
-        rule("unordered", rule_attr(),
+      rule_one("document", rule_attr(coat = false),
+        rule("unordered", rule_attr(coat = false),
           list_of
           (rule_one("named",
-                    rule_attr(tag = "plugin-id", user = Xany("plugin-id")),
+                    rule_attr(tag = "plugin-id"),
                     rule("node")))
           (rule_one("named",
-                    rule_attr(
-                      tag = "interface", user = Xany("interface"),
-                      outer = list()),
+                    rule_attr(tag = "interface", outer = list()),
                     rule("node"))))));
   matcher.parse(stream);
   return stream;
