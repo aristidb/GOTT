@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2004-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,29 +35,23 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_PLUGIN_PLUGIN_HPP
-#define GOTT_BASE_PLUGIN_PLUGIN_HPP
+#ifndef GOTT_PLUGIN_METADATA_HPP
+#define GOTT_PLUGIN_METADATA_HPP
 
-#include <gott/visibility.hpp>
+#include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
+#include <vector>
+#include <iosfwd>
 
-namespace gott {
-namespace plugin {
+namespace gott { namespace plugin {
 
-class system_configuration;
-class plugin_configuration;
-class hook;
-struct plugin_metadata;
-
-class GOTT_EXPORT plugin_base {
-public:
-  virtual ~plugin_base() = 0;
-  virtual plugin_metadata const &metadata() const = 0;
-  virtual void add_hook(QID const &point, hook const &extension);
+struct plugin_metadata {
+  QID plugin_id;
+  std::vector<QID> interfaces;
 };
 
-typedef plugin_base *(*plugin_builder)(system_configuration &, 
-                                       plugin_configuration const &);
+GOTT_EXPORT
+std::istream &operator>>(std::istream &stream, plugin_metadata &out);
 
 }}
 

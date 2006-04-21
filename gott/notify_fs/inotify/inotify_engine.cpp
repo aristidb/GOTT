@@ -46,6 +46,7 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/scoped_array.hpp>
 #include <algorithm>
+#include <map>
 #include <unistd.h>
 
 using gott::string;

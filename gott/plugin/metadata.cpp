@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2004-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,30 +35,41 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_PLUGIN_PLUGIN_HPP
-#define GOTT_BASE_PLUGIN_PLUGIN_HPP
+#include "metadata.hpp"
+#include <gott/tdl/schema/match.hpp>
+#include <gott/tdl/schema/rule.hpp>
+#include <gott/tdl/schema/by_name.hpp>
+#include <gott/tdl/schema/rule_attr.hpp>
+#include <gott/tdl/schema/slot.hpp>
+#include <gott/tdl/structure/revocable_adapter.hpp>
+#include <gott/tdl/structure/print.hpp>//FIXME
+#include <boost/assign/list_of.hpp>
+#include <iostream>//FIXME
 
-#include <gott/visibility.hpp>
-#include <gott/string/qid.hpp>
+using gott::plugin::plugin_metadata;
+using std::istream;
 
-namespace gott {
-namespace plugin {
+istream &gott::plugin::operator>>(istream &stream, plugin_metadata &) {
+  using namespace tdl::structure;
+  using namespace tdl::schema;
+  using namespace boost::assign;
+  using gott::xany::Xany;
 
-class system_configuration;
-class plugin_configuration;
-class hook;
-struct plugin_metadata;
-
-class GOTT_EXPORT plugin_base {
-public:
-  virtual ~plugin_base() = 0;
-  virtual plugin_metadata const &metadata() const = 0;
-  virtual void add_hook(QID const &point, hook const &extension);
-};
-
-typedef plugin_base *(*plugin_builder)(system_configuration &, 
-                                       plugin_configuration const &);
-
-}}
-
-#endif
+  direct_print out(std::cout);
+  revocable_adapter adapter(out);
+  match matcher(adapter);
+  matcher.add(
+      rule_one("document",
+        rule("unordered", rule_attr(),
+          list_of
+          (rule_one("named",
+                    rule_attr(tag = "plugin-id", user = Xany("plugin-id")),
+                    rule("node")))
+          (rule_one("named",
+                    rule_attr(
+                      tag = "interface", user = Xany("interface"),
+                      outer = list()),
+                    rule("node"))))));
+  matcher.parse(stream);
+  return stream;
+}

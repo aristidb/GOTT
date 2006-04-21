@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -38,8 +38,22 @@
 #ifndef GOTT_BASE_PLUGIN_HOOK_HPP
 #define GOTT_BASE_PLUGIN_HOOK_HPP
 
+#include "plugin.hpp"
+
 namespace gott {
 namespace plugin {
+
+class hook {
+public:
+  template<class T>
+  hook(T *p) : p(p) {}
+
+  template<class T>
+  T *get() const { return static_cast<T *>(p); }
+
+private:
+  void *p;
+};
 
 }}
 

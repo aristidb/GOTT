@@ -49,6 +49,8 @@ namespace gott {
  */
 class atom : public string {
 public:
+  atom() {}
+
   /// Copy-Constructor (fast).
   GOTT_EXPORT atom(atom const &);
 
