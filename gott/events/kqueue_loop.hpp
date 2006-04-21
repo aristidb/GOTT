@@ -68,17 +68,20 @@ class GOTT_EXPORT kqueue_loop
   kqueue_loop();
   ~kqueue_loop();
 
-  void run();
-  void quit_local();
-  sigc::signal0<void, sigc::nil>& on_idle();
+ private:
+  GOTT_LOCAL void run();
+  GOTT_LOCAL void quit_local();
+  GOTT_LOCAL sigc::signal0<void, sigc::nil>& on_idle();
 
+ public:
   // Interface for notify_fs
   void watch_fd(int fd, unsigned mask,
 		boost::function<void (unsigned)> const &cb);
   void unwatch_fd(int fd);
 
-  void add_waitable();
-  void remove_waitable();
+ private:
+  GOTT_LOCAL void add_waitable();
+  GOTT_LOCAL void remove_waitable();
 
  private:
   GOTT_LOCAL void add_fd(int fd, unsigned mask,
@@ -89,7 +92,7 @@ class GOTT_EXPORT kqueue_loop
 
   GOTT_LOCAL sigc::signal1<void, int> &on_signal(int sig);
   
-  void *do_feature(QID const &);
+  GOTT_LOCAL void *do_feature(QID const &);
 
   class impl;
   boost::scoped_ptr<impl> p;

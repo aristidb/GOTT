@@ -64,12 +64,13 @@ public:
   epoll_loop();
   ~epoll_loop();
 
-  void run();
-  void quit_local();
-  sigc::signal0<void> &on_idle();
+private:
+  GOTT_LOCAL void run();
+  GOTT_LOCAL void quit_local();
+  GOTT_LOCAL sigc::signal0<void> &on_idle();
 
-  void add_waitable();
-  void remove_waitable();
+  GOTT_LOCAL void add_waitable();
+  GOTT_LOCAL void remove_waitable();
 
 private:
   GOTT_LOCAL

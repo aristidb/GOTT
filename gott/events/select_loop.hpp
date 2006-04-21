@@ -103,14 +103,14 @@ private:
   GOTT_LOCAL
   void remove_fd(int);
 
-public:
-  void run();
-  void quit_local();
+private:
+  GOTT_LOCAL void run();
+  GOTT_LOCAL void quit_local();
 
-  void add_waitable();
-  void remove_waitable();
+  GOTT_LOCAL void add_waitable();
+  GOTT_LOCAL void remove_waitable();
 
-  sigc::signal0<void> &on_idle() { return on_idle_; }
+  GOTT_LOCAL sigc::signal0<void> &on_idle() { return on_idle_; }
 
 private:
   GOTT_LOCAL void *do_feature(gott::QID const &);
