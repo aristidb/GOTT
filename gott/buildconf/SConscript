@@ -140,7 +140,8 @@ conf.LinkerAsNeeded()
 if conf.env['OPTIMIZE'] != 'none':
 	conf.Optimization()
 conf.Warnings()
-conf.CompilerVisibility()
+if conf.env['HIDE_SYMBOLS']:
+	conf.CompilerVisibility()
 if not conf.env['RELEASE']:
 	conf.Debug()
 if not conf.CheckCXXHeader('boost/config.hpp', '<>'):

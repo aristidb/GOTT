@@ -66,6 +66,7 @@ opts = Options([sysfile, 'options.py'])
 opts.Add(BoolOption('RELEASE', 'Release build', 1))
 opts.Add(EnumOption('OPTIMIZE', 'Optimization level', 'default', 
                     allowed_values=('default', 'none', 'some', 'full')))
+opts.Add(BoolOption('HIDE_SYMBOLS', 'Hide unused symbols', 1))
 
 opts.Add(PathOption('BOOST_INCLUDE', 'Include directory of boost', '/usr/include'))
 opts.Add(PathOption('BOOST_LIB', 'Library directory of boost', '/usr/lib'))
