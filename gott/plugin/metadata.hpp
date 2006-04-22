@@ -40,16 +40,47 @@
 
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
+#include <boost/function.hpp>
 #include <vector>
 #include <iosfwd>
 
 namespace gott { namespace plugin {
 
+/**
+ * A plugin's metadata.
+ */
 struct plugin_metadata {
   QID plugin_id;
   std::vector<QID> interfaces;
 };
 
+/**
+ * Send all plugins' metadata to a callback.
+ * \param function The function to send the plugins' metadata to.
+ */
+GOTT_EXPORT
+void enumerate_plugin_metadata(
+    boost::function<void (plugin_metadata const &)> const &function);
+
+/**
+ * Add a plugin or rather its' metadata to the relevant (in-memory) database.
+ * This function does not record the plugin persistently.
+ * \param metadata The new metadata.
+ */
+GOTT_EXPORT
+void add_plugin_metadata(plugin_metadata const &metadata);
+
+/**
+ * Add a list of some plugins' metadata read from a stream.
+ * \param stream The stream to empty.
+ */
+GOTT_EXPORT
+void extract_plugin_metadata(std::istream &stream);
+
+/**
+ * Read a plugin's metadata from a stream.
+ * \param stream The stream to read from.
+ */
 GOTT_EXPORT
 std::istream &operator>>(std::istream &stream, plugin_metadata &out);
 

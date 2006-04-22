@@ -41,7 +41,7 @@ Import('env')
 
 libobj = glob.glob('*.cpp')
 libobj.remove('test.cpp')
-env.SharedLibrary('plugin', glob.glob('*.cpp'))
+env.SharedLibrary('plugin', libobj)
 env = env.Copy()
 env.Append(LIBS = ['plugin'])
 env.Program('test.cpp')

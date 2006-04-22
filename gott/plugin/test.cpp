@@ -6,12 +6,16 @@
 using namespace std;
 using namespace boost::lambda;
 
-int main() {
-  gott::plugin::plugin_metadata x;
-  cin >> x;
-
-  cout << x.plugin_id << std::endl;
-  cout << "Interfaces:\n";
-  for_each(x.interfaces.begin(), x.interfaces.end(), cout << _1 << ' ');
+void dump(gott::plugin::plugin_metadata const &x) {
+  cout << x.plugin_id;
+  if (!x.interfaces.empty()) {
+    cout << " with interfaces: ";
+    for_each(x.interfaces.begin(), x.interfaces.end(), cout << _1 << ' ');
+  }
   cout << endl;
+}
+
+int main() {
+  gott::plugin::extract_plugin_metadata(cin);
+  gott::plugin::enumerate_plugin_metadata(&dump);
 }
