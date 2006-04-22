@@ -106,7 +106,7 @@ private:
 
   template<class Functor, class Predicate, class Result, Result Success>
   struct add_predicate {
-    add_predicate(Functor functor, Pred predicate) 
+    add_predicate(Functor functor, Predicate predicate) 
       : functor(functor), predicate(predicate) {}
     Functor functor;
     Predicate predicate;
@@ -115,7 +115,7 @@ private:
       if (result != Success)
         return result;
       functor(m);
-      return True;
+      return Success;
     }
   };
 
