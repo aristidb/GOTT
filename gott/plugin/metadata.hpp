@@ -62,6 +62,9 @@ struct plugin_metadata {
   module_type_t module_type;
 
   gott::string file_path;
+
+  plugin_metadata()
+  : module_type(dynamic_native) {}
 };
 
 /**
