@@ -68,19 +68,21 @@ enum message_filter_result {
  * about priorities and behave plain FIFO.
  */
 struct no_priority {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   template<class T>
-  bool operator()(T,T) { return false; } ///< @internal
+  bool operator()(T,T) { return false; } // unused
+#endif
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 template<class T>
 struct care_priority {
-  enum { value = 1 };
+  enum { value = true };
 };
 
 template<>
 struct care_priority<no_priority> {
-  enum { value = 0 };
+  enum { value = false };
 };
 #endif
 
@@ -99,18 +101,20 @@ struct care_priority<no_priority> {
  */
 template<class Message, unsigned Size = 0, class PriorityCompare = no_priority>
 class message_queue : boost::noncopyable {
+private:
   typedef boost::mutex::scoped_lock scoped_lock;
 
-  template<class T, class U, class R, R True>
+  template<class Functor, class Predicate, class Result, Result Success>
   struct add_predicate {
-    add_predicate(T f, U p) : func(f), pred(p) {}
-    T func;
-    U pred;
-    R operator() (Message const &m) const {
-      R result = pred(m);
-      if (result != True)
+    add_predicate(Functor functor, Pred predicate) 
+      : functor(functor), predicate(predicate) {}
+    Functor functor;
+    Predicate predicate;
+    Result operator() (Message const &m) const {
+      Result result = predicate(m);
+      if (result != Success)
         return result;
-      func(m);
+      functor(m);
       return True;
     }
   };
