@@ -78,6 +78,11 @@ istream &gott::plugin::operator>>(istream &stream, plugin_metadata &out_value) {
   accepter out(out_value);
   revocable_adapter adapter(out);
   match matcher(adapter);
+  /*
+  unordered
+    named (plugin-id), node
+    :list named (interface), node
+   */
   matcher.add(
       rule_one("document", rule_attr(coat = false),
         rule("unordered", rule_attr(coat = false),
