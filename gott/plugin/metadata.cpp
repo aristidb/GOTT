@@ -47,6 +47,7 @@
 #include <gott/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/thread.hpp>
 #include <map>
 
 using namespace tdl::schema;
@@ -57,13 +58,16 @@ using namespace gott;
 using std::istream;
 using std::ostream;
 
-typedef std::map<QID, plugin_metadata> plugin_metadata_map_t;
-static plugin_metadata_map_t plugin_metadata_database;
-
-typedef std::multimap<QID, QID> plugin_metadata_by_interface_t;
-static plugin_metadata_by_interface_t plugin_metadata_by_interface;
-
 namespace {
+  static boost::recursive_mutex metadata_biglock;
+  #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
+
+  typedef std::map<QID, plugin_metadata> plugin_metadata_map_t;
+  static plugin_metadata_map_t plugin_metadata_database;
+
+  typedef std::multimap<QID, QID> plugin_metadata_by_interface_t;
+  static plugin_metadata_by_interface_t plugin_metadata_by_interface;
+
   /*
   ordered
     named (plugin-id), node
@@ -113,8 +117,17 @@ namespace {
   };
 }
 
+void gott::plugin::load_standard_metadata() {
+  BIGLOCK;
+  static bool loaded;
+  if (!loaded) {
+    loaded = true;
+  }
+}
+
 void gott::plugin::enumerate_plugin_metadata(
     boost::function<void (plugin_metadata const &)> const &function) {
+  BIGLOCK;
   for (plugin_metadata_map_t::iterator it = plugin_metadata_database.begin();
       it != plugin_metadata_database.end();
       ++it)
@@ -124,6 +137,7 @@ void gott::plugin::enumerate_plugin_metadata(
 void gott::plugin::enumerate_plugin_metadata_with_interface(
     QID const &id,
     boost::function<void (plugin_metadata const &)> const &function) {
+  BIGLOCK;
   std::pair<
     plugin_metadata_by_interface_t::iterator,
     plugin_metadata_by_interface_t::iterator
@@ -135,6 +149,7 @@ void gott::plugin::enumerate_plugin_metadata_with_interface(
 }
 
 plugin_metadata const &gott::plugin::find_plugin_metadata(QID const &id) {
+  BIGLOCK;
   plugin_metadata_map_t::iterator it = plugin_metadata_database.find(id);
   if (it == plugin_metadata_database.end())
     throw user_error("requested plugin metadata entry not found");
@@ -142,6 +157,7 @@ plugin_metadata const &gott::plugin::find_plugin_metadata(QID const &id) {
 }
 
 void gott::plugin::add_plugin_metadata(plugin_metadata const &metadata) {
+  BIGLOCK;
   plugin_metadata_database[metadata.plugin_id] = metadata;
   for (plugin_metadata::interface_list_t::const_iterator it = 
         metadata.interfaces.begin();

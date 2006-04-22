@@ -46,6 +46,9 @@
 
 namespace gott { namespace plugin {
 
+GOTT_EXPORT
+void load_standard_metadata();
+
 /**
  * A plugin's metadata.
  */
@@ -62,7 +65,7 @@ struct plugin_metadata {
 };
 
 /**
- * Send all plugins' metadata to a callback.
+ * Send all plugins' metadata to a callback. Thread-safe.
  * \param function The function to send the plugins' metadata to.
  */
 GOTT_EXPORT
@@ -71,6 +74,7 @@ void enumerate_plugin_metadata(
 
 /**
  * Send all plugins' metadata with a certain interface to a callback.
+ * Thread-safe.
  */
 GOTT_EXPORT
 void enumerate_plugin_metadata_with_interface(
@@ -78,7 +82,7 @@ void enumerate_plugin_metadata_with_interface(
     boost::function<void (plugin_metadata const &)> const &function);
 
 /**
- * Find metadata for a specific plugin.
+ * Find metadata for a specific plugin. Thread-safe.
  * \param plugin_id The id of the plugin to search.
  */
 GOTT_EXPORT
@@ -86,14 +90,14 @@ plugin_metadata const &find_plugin_metadata(QID const &plugin_id);
 
 /**
  * Add a plugin or rather its' metadata to the relevant (in-memory) database.
- * This function does not record the plugin persistently.
+ * This function does not record the plugin persistently. Thread-safe.
  * \param metadata The new metadata.
  */
 GOTT_EXPORT
 void add_plugin_metadata(plugin_metadata const &metadata);
 
 /**
- * Add a list of some plugins' metadata read from a stream.
+ * Add a list of some plugins' metadata read from a stream. Thread-safe.
  * \param stream The stream to empty.
  */
 GOTT_EXPORT
