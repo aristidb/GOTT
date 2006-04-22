@@ -49,6 +49,7 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/thread.hpp>
 #include <map>
+#include <fstream>
 
 using namespace tdl::schema;
 using namespace tdl::structure;
@@ -121,6 +122,8 @@ void gott::plugin::load_standard_metadata() {
   BIGLOCK;
   static bool loaded;
   if (!loaded) {
+    std::ifstream in_std("plugin_registry.tdl");
+    extract_plugin_metadata(in_std);
     loaded = true;
   }
 }
