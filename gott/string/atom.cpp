@@ -56,3 +56,6 @@ bool gott::operator==(atom const &a, atom const &b) {
   return a.as_utf8().begin() == b.as_utf8().begin(); // same memory
 }
 
+bool gott::operator<(atom const &a, atom const &b) {
+  return a.as_utf8().begin() < b.as_utf8().begin();
+}

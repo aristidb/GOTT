@@ -75,6 +75,11 @@ inline bool operator!=(atom const &a, atom const &b) {
   return !(a == b);
 }
 
+/**
+ * Compare two atoms (fast). Does not return lexicographical order.
+ */
+GOTT_EXPORT bool operator<(atom const &, atom const &);
+
 }
 
 #endif
