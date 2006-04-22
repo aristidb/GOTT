@@ -51,7 +51,14 @@ namespace gott { namespace plugin {
  */
 struct plugin_metadata {
   QID plugin_id;
-  std::vector<QID> interfaces;
+
+  typedef std::vector<QID> interface_list_t;
+  interface_list_t interfaces;
+
+  enum module_type_t { dynamic_native };
+  module_type_t module_type;
+
+  gott::string file_path;
 };
 
 /**
@@ -61,6 +68,21 @@ struct plugin_metadata {
 GOTT_EXPORT
 void enumerate_plugin_metadata(
     boost::function<void (plugin_metadata const &)> const &function);
+
+/**
+ * Send all plugins' metadata with a certain interface to a callback.
+ */
+GOTT_EXPORT
+void enumerate_plugin_metadata_with_interface(
+    QID const &interface_id,
+    boost::function<void (plugin_metadata const &)> const &function);
+
+/**
+ * Find metadata for a specific plugin.
+ * \param plugin_id The id of the plugin to search.
+ */
+GOTT_EXPORT
+plugin_metadata const &find_plugin_metadata(QID const &plugin_id);
 
 /**
  * Add a plugin or rather its' metadata to the relevant (in-memory) database.
@@ -80,9 +102,18 @@ void extract_plugin_metadata(std::istream &stream);
 /**
  * Read a plugin's metadata from a stream.
  * \param stream The stream to read from.
+ * \param out The metadata object to fill.
  */
 GOTT_EXPORT
 std::istream &operator>>(std::istream &stream, plugin_metadata &out);
+
+/**
+ * Write a plugin's metadata to a stream.
+ * \param stream The stream to write to.
+ * \param in The metadata object to write.
+ */
+GOTT_EXPORT
+std::ostream &operator<<(std::ostream &stream, plugin_metadata const &in);
 
 }}
 

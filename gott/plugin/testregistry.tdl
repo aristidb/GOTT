@@ -1,0 +1,15 @@
+plugin-id foo
+has-interface bar
+file-path /tmp/foo.so
+module-type dynamic-native
+
+plugin-id fox
+has-interface boo
+module-type dynamic-native
+file-path ~/fox-77.so
+
+plugin-id moo
+module-type dynamic-native
+has-interface bar
+file-path /dev/null
+has-interface boo

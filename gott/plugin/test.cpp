@@ -1,21 +1,20 @@
 #include "metadata.hpp"
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <boost/lambda/lambda.hpp>
 
 using namespace std;
 using namespace boost::lambda;
-
-void dump(gott::plugin::plugin_metadata const &x) {
-  cout << x.plugin_id;
-  if (!x.interfaces.empty()) {
-    cout << " with interfaces: ";
-    for_each(x.interfaces.begin(), x.interfaces.end(), cout << _1 << ' ');
-  }
-  cout << endl;
-}
+using namespace gott::plugin;
 
 int main() {
-  gott::plugin::extract_plugin_metadata(cin);
-  gott::plugin::enumerate_plugin_metadata(&dump);
+  ifstream f("testregistry.tdl");
+  if (!f) f.open("plugin/testregistry.tdl");
+  extract_plugin_metadata(f);
+  enumerate_plugin_metadata(cout << _1 << "\n\n");
+  cout << endl;
+  enumerate_plugin_metadata_with_interface("bar", cout << _1 << "\n\n");
+  cout << endl;
+  enumerate_plugin_metadata_with_interface("boo", cout << _1 << "\n\n");
 }

@@ -42,35 +42,50 @@
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
+#include <gott/tdl/structure/repatchers/enumeration.hpp>
+#include <gott/tdl/write/writer.hpp>
+#include <gott/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <boost/assign/list_of.hpp>
-#include <boost/optional/optional.hpp>
-#include <boost/none.hpp>
-#include <boost/utility/in_place_factory.hpp>
-#include <list>
-
-using gott::plugin::plugin_metadata;
-using std::istream;
+#include <map>
 
 using namespace tdl::schema;
 using namespace tdl::structure;
 using namespace gott::xany;
-using gott::string;
+using namespace gott::plugin;
+using namespace gott;
+using std::istream;
+using std::ostream;
 
-static std::list<plugin_metadata> plugin_metadata_database;
+typedef std::map<QID, plugin_metadata> plugin_metadata_map_t;
+static plugin_metadata_map_t plugin_metadata_database;
+
+typedef std::multimap<QID, QID> plugin_metadata_by_interface_t;
+static plugin_metadata_by_interface_t plugin_metadata_by_interface;
 
 namespace {
   /*
   ordered
     named (plugin-id), node
-    :list named (interface), node
+    unordered
+      :list named (has-interface), node
+      named (module-type), enumeration $ dynamic-native
+      named (file-path), node
    */
   static rule_t metadata_schema = 
     rule("ordered", rule_attr(coat = false, outer = optional()),
         boost::assign::list_of
-        (rule_one("named", rule_attr(tag = "plugin-id"), rule("node"))) 
-        (rule_one("named", rule_attr(tag = "interface", outer = list()),
-                  rule("node"))));
+        (rule_one("named", rule_attr(tag = "plugin-id"), rule("node")))
+        (rule("unordered", rule_attr(coat = false),
+          boost::assign::list_of
+          (rule_one("named", rule_attr(tag = "has-interface", outer = list()),
+                    rule("node")))
+          (rule_one("named", rule_attr(tag = "module-type"),
+                    rule("node",
+                      rule_attr(tdl::schema::repatcher = 
+                        new repatch_enumeration(
+                          std::vector<string>(1, "dynamic-native"))))))
+          (rule_one("named", rule_attr(tag = "file-path"), rule("node"))))));
 
   struct accepter : writable_structure {
     accepter(plugin_metadata &ref) : ref(ref) {}
@@ -82,10 +97,14 @@ namespace {
 
     void begin(tdl::source_position const &) {}
     void end() {
-      if (tag == "interface")
+      if (tag == "has-interface")
         ref.interfaces.push_back(Xany_cast<string>(data_));
       else if (tag == "plugin-id")
         ref.plugin_id = Xany_cast<string>(data_);
+      else if (tag == "module-type")
+        ref.module_type = Xany_cast<plugin_metadata::module_type_t>(data_);
+      else if (tag == "file-path")
+        ref.file_path = Xany_cast<string>(data_);
       tag = string();
     }
 
@@ -96,44 +115,69 @@ namespace {
 
 void gott::plugin::enumerate_plugin_metadata(
     boost::function<void (plugin_metadata const &)> const &function) {
-  for_each(range(plugin_metadata_database), function);
+  for (plugin_metadata_map_t::iterator it = plugin_metadata_database.begin();
+      it != plugin_metadata_database.end();
+      ++it)
+    function(it->second);
+}
+
+void gott::plugin::enumerate_plugin_metadata_with_interface(
+    QID const &id,
+    boost::function<void (plugin_metadata const &)> const &function) {
+  std::pair<
+    plugin_metadata_by_interface_t::iterator,
+    plugin_metadata_by_interface_t::iterator
+  > r = plugin_metadata_by_interface.equal_range(id);
+  while (r.first != r.second) {
+    function(find_plugin_metadata(r.first->second));
+    ++r.first;
+  }
+}
+
+plugin_metadata const &gott::plugin::find_plugin_metadata(QID const &id) {
+  plugin_metadata_map_t::iterator it = plugin_metadata_database.find(id);
+  if (it == plugin_metadata_database.end())
+    throw user_error("requested plugin metadata entry not found");
+  return it->second;
 }
 
 void gott::plugin::add_plugin_metadata(plugin_metadata const &metadata) {
-  plugin_metadata_database.push_back(metadata);
+  plugin_metadata_database[metadata.plugin_id] = metadata;
+  for (plugin_metadata::interface_list_t::const_iterator it = 
+        metadata.interfaces.begin();
+      it != metadata.interfaces.end();
+      ++it)
+    plugin_metadata_by_interface.insert(
+      plugin_metadata_by_interface_t::value_type(
+        *it,
+        metadata.plugin_id));
 }
 
 void gott::plugin::extract_plugin_metadata(istream &stream) {
   struct multi_accepter : writable_structure {
-    multi_accepter() : level(0) {}
+    multi_accepter() : level(0), inner(current) {}
 
-    boost::optional<accepter> inner;
     unsigned level;
+    plugin_metadata current;
+    accepter inner;
 
     void begin(tdl::source_position const &w) {
       if (level == 0) {
-        plugin_metadata_database.push_back(plugin_metadata());
-        inner = boost::in_place(boost::ref(plugin_metadata_database.back()));
+        current = plugin_metadata();
       } else
-        inner->begin(w);
+        inner.begin(w);
       ++level;
     }
-
     void end() {
       --level;
-      if (level == 0)
-        inner = boost::none;
-      else
-        inner->end();
+      if (level == 0) {
+        add_plugin_metadata(current);
+      } else
+        inner.end();
     }
 
-    void data(Xany const &x) {
-      if (inner) inner->data(x);
-    }
-
-    void add_tag(string const &s) {
-      if (inner) inner->add_tag(s);
-    }
+    void data(Xany const &x) { inner.data(x); }
+    void add_tag(string const &s) { inner.add_tag(s); }
   };
   multi_accepter out;
   revocable_adapter adapter(out);
@@ -145,11 +189,52 @@ void gott::plugin::extract_plugin_metadata(istream &stream) {
 }
 
 istream &gott::plugin::operator>>(istream &stream, plugin_metadata &out_value) {
+  out_value.interfaces.clear();
   accepter out(out_value);
   revocable_adapter adapter(out);
   match(
       rule_one("document", rule_attr(coat = false), metadata_schema),
       adapter)
     .parse(stream);
+  return stream;
+}
+
+ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
+  tdl::tdl_writer w(stream, 2);
+  w.down();
+  {
+    w.node("plugin-id"); 
+    w.down();
+      w.node(val.plugin_id);
+    w.up();
+  }
+  {
+    w.node("module-type");
+    w.down();
+      switch (val.module_type) {
+      case plugin_metadata::dynamic_native:
+        w.node("dynamic-native");
+        break;
+      };
+    w.up();
+  }
+  {
+    w.node("file-path");
+    w.down();
+      w.node(val.file_path);
+    w.up();
+  }
+  {
+    for (plugin_metadata::interface_list_t::const_iterator it =
+          val.interfaces.begin();
+        it != val.interfaces.end();
+        ++it) {
+      w.node("has-interface");
+      w.down();
+        w.node(*it);
+      w.up();
+    }
+  }
+  w.up();
   return stream;
 }
