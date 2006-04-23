@@ -76,19 +76,21 @@ struct plugin_metadata {
 
 /**
  * Send all plugins' metadata records that fullfill some (or none) requirements
- * to a callback. Thread-safe.
- * \param function The function to send the plugins' metadata to.
+ * to a callback. Thread-safe. If you omit the _p at the end, you can use
+ * named parameters (you must prepend tags:: to the parameter's name).
+ * \param callback The function to send the plugins' metadata to.
  * \param plugin_id Requires the record to have the given plugin_id if set.
  * \param interface_id Requires the record to indicate support for the given
  *                 interface if set.
  */
 GOTT_EXPORT
 void enumerate_plugin_metadata_p(
-    boost::function<void (plugin_metadata const &)> const &function,
+    boost::function<void (plugin_metadata const &)> const &callback,
     boost::optional<QID const &> const &plugin_id,
     boost::optional<QID const &> const &interface_id,
     bool cancel_early);
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace tags {
   BOOST_PARAMETER_KEYWORD(detail, callback)
   BOOST_PARAMETER_KEYWORD(detail, plugin_id)
@@ -152,6 +154,7 @@ find_plugin_metadata_with_named_params(ArgPack const &args) {
       true);
   return cb.result;
 }
+#endif
 
 /**
  * Add a plugin or rather its' metadata to the relevant (in-memory) database.
