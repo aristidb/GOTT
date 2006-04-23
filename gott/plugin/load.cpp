@@ -36,7 +36,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "load.hpp"
-#include "metadata.hpp"
 #include <gott/exceptions.hpp>
 #include <gott/string/string.hpp>
 
@@ -47,11 +46,9 @@ using gott::plugin::system_configuration;
 using gott::plugin::plugin_configuration;
 
 plugin_base *gott::plugin::load_plugin(
-    QID const &/*name*/,
-    string const &/*version*/,
+    plugin_metadata const &/*which*/,
     system_configuration &/*sysc*/,
     plugin_configuration const &/*plgc*/) {
-  load_standard_metadata();
   //TODO implement me
   throw internal_error("unimplemented");
 }

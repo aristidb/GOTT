@@ -45,10 +45,11 @@ class string;
 
 namespace plugin {
 
+class plugin_metadata;
+
 GOTT_EXPORT
 plugin_base *load_plugin(
-    QID const &name, 
-    string const &version,
+    plugin_metadata const &which, 
     system_configuration &sysc,
     plugin_configuration const &plgc);
 
@@ -59,13 +60,12 @@ template<class ConcretePlugin>
 class plugin_handle {
 public:
   plugin_handle(
-      QID const &name, 
-      string const &version,
+      plugin_metadata const &which,
       system_configuration &sysc, 
       plugin_configuration const &plgc)
   : p(
       dynamic_cast<ConcretePlugin *>(
-        load_plugin(name, version, sysc, plgc)))
+        load_plugin(which, sysc, plgc)))
   {}
   ~plugin_handle() { unload_plugin(p); }
 
