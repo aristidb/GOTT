@@ -46,6 +46,7 @@
 #include <boost/parameter/keyword.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
+#include <boost/parameter/binding.hpp>
 #include <vector>
 #include <iosfwd>
 
@@ -92,11 +93,22 @@ namespace tags {
   BOOST_PARAMETER_KEYWORD(detail, interface)
 }
 
+namespace detail {
+template<class T>
+QID get_opt_qid(T const &x) {
+  return x;
+}
+
+inline boost::none_t get_opt_qid(boost::none_t) {
+  return boost::none;
+}
+}
+
 template<class ArgPack>
 void enumerate_plugin_metadata_with_named_params(ArgPack const &args) {
   enumerate_plugin_metadata_p(args[tags::callback],
-      args[tags::plugin_id | boost::none],
-      args[tags::interface | boost::none]);
+      detail::get_opt_qid(args[tags::plugin_id | boost::none]),
+      detail::get_opt_qid(args[tags::interface | boost::none]));
 }
 
 typedef boost::parameter::parameters<

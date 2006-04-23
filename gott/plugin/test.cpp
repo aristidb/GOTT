@@ -15,8 +15,8 @@ int main() {
   enumerate_plugin_metadata(cout << _1 << "\n\n");
   cout << endl;
   enumerate_plugin_metadata(cout << _1 << "\n\n",
-      tags::interface = gott::QID("bar"));
+      tags::interface = "bar");
   cout << endl;
   enumerate_plugin_metadata(cout << _1 << "\n\n",
-      tags::interface = gott::QID("boo"));
+      tags::interface = "boo");
 }
