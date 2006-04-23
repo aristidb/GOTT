@@ -14,7 +14,9 @@ int main() {
   extract_plugin_metadata(f);
   enumerate_plugin_metadata(cout << _1 << "\n\n");
   cout << endl;
-  enumerate_plugin_metadata_with_interface("bar", cout << _1 << "\n\n");
+  enumerate_plugin_metadata(cout << _1 << "\n\n",
+      tags::interface = gott::QID("bar"));
   cout << endl;
-  enumerate_plugin_metadata_with_interface("boo", cout << _1 << "\n\n");
+  enumerate_plugin_metadata(cout << _1 << "\n\n",
+      tags::interface = gott::QID("boo"));
 }

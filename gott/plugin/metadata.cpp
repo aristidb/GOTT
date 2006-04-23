@@ -63,11 +63,8 @@ namespace {
   static boost::recursive_mutex metadata_biglock;
   #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
 
-  typedef std::map<QID, plugin_metadata> plugin_metadata_map_t;
-  static plugin_metadata_map_t plugin_metadata_database;
-
-  typedef std::multimap<QID, QID> plugin_metadata_by_interface_t;
-  static plugin_metadata_by_interface_t plugin_metadata_by_interface;
+  typedef std::vector<plugin_metadata> plugin_metadata_list_t;
+  plugin_metadata_list_t known_plugin_metadata;
 
   /*
   ordered
@@ -128,48 +125,26 @@ void gott::plugin::load_standard_metadata() {
   }
 }
 
-void gott::plugin::enumerate_plugin_metadata(
-    boost::function<void (plugin_metadata const &)> const &function) {
+void gott::plugin::enumerate_plugin_metadata_p(
+    boost::function<void (plugin_metadata const &)> const &function,
+    boost::optional<QID const &> const &plugin_id,
+    boost::optional<QID const &> const &interface_id) {
   BIGLOCK;
-  for (plugin_metadata_map_t::iterator it = plugin_metadata_database.begin();
-      it != plugin_metadata_database.end();
-      ++it)
-    function(it->second);
-}
-
-void gott::plugin::enumerate_plugin_metadata_with_interface(
-    QID const &id,
-    boost::function<void (plugin_metadata const &)> const &function) {
-  BIGLOCK;
-  std::pair<
-    plugin_metadata_by_interface_t::iterator,
-    plugin_metadata_by_interface_t::iterator
-  > r = plugin_metadata_by_interface.equal_range(id);
-  while (r.first != r.second) {
-    function(find_plugin_metadata(r.first->second));
-    ++r.first;
+  for (plugin_metadata_list_t::iterator it = known_plugin_metadata.begin();
+      it != known_plugin_metadata.end();
+      ++it) {
+    if (plugin_id && it->plugin_id != *plugin_id)
+      continue;
+    if (interface_id && 
+        find(range(it->interfaces), *interface_id) == it->interfaces.end())
+      continue;
+    function(*it);
   }
-}
-
-plugin_metadata const &gott::plugin::find_plugin_metadata(QID const &id) {
-  BIGLOCK;
-  plugin_metadata_map_t::iterator it = plugin_metadata_database.find(id);
-  if (it == plugin_metadata_database.end())
-    throw user_error("requested plugin metadata entry not found");
-  return it->second;
 }
 
 void gott::plugin::add_plugin_metadata(plugin_metadata const &metadata) {
   BIGLOCK;
-  plugin_metadata_database[metadata.plugin_id] = metadata;
-  for (plugin_metadata::interface_list_t::const_iterator it = 
-        metadata.interfaces.begin();
-      it != metadata.interfaces.end();
-      ++it)
-    plugin_metadata_by_interface.insert(
-      plugin_metadata_by_interface_t::value_type(
-        *it,
-        metadata.plugin_id));
+  known_plugin_metadata.push_back(metadata);
 }
 
 void gott::plugin::extract_plugin_metadata(istream &stream) {

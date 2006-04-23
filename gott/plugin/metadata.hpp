@@ -41,6 +41,11 @@
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/function.hpp>
+#include <boost/optional/optional.hpp>
+#include <boost/none.hpp>
+#include <boost/parameter/keyword.hpp>
+#include <boost/parameter/parameters.hpp>
+#include <boost/parameter/macros.hpp>
 #include <vector>
 #include <iosfwd>
 
@@ -68,28 +73,39 @@ struct plugin_metadata {
 };
 
 /**
- * Send all plugins' metadata to a callback. Thread-safe.
+ * Send all plugins' metadata records that fullfill some (or none) requirements
+ * to a callback. Thread-safe.
  * \param function The function to send the plugins' metadata to.
+ * \param plugin_id Requires the record to have the given plugin_id if set.
+ * \param interface_id Requires the record to indicate support for the given
+ *                 interface if set.
  */
 GOTT_EXPORT
-void enumerate_plugin_metadata(
-    boost::function<void (plugin_metadata const &)> const &function);
+void enumerate_plugin_metadata_p(
+    boost::function<void (plugin_metadata const &)> const &function,
+    boost::optional<QID const &> const &plugin_id,
+    boost::optional<QID const &> const &interface_id);
 
-/**
- * Send all plugins' metadata with a certain interface to a callback.
- * Thread-safe.
- */
-GOTT_EXPORT
-void enumerate_plugin_metadata_with_interface(
-    QID const &interface_id,
-    boost::function<void (plugin_metadata const &)> const &function);
+namespace tags {
+  BOOST_PARAMETER_KEYWORD(detail, callback)
+  BOOST_PARAMETER_KEYWORD(detail, plugin_id)
+  BOOST_PARAMETER_KEYWORD(detail, interface)
+}
 
-/**
- * Find metadata for a specific plugin. Thread-safe.
- * \param plugin_id The id of the plugin to search.
- */
-GOTT_EXPORT
-plugin_metadata const &find_plugin_metadata(QID const &plugin_id);
+template<class ArgPack>
+void enumerate_plugin_metadata_with_named_params(ArgPack const &args) {
+  enumerate_plugin_metadata_p(args[tags::callback],
+      args[tags::plugin_id | boost::none],
+      args[tags::interface | boost::none]);
+}
+
+typedef boost::parameter::parameters<
+  tags::detail::callback,
+  tags::detail::plugin_id,
+  tags::detail::interface
+> epm_params;
+
+BOOST_PARAMETER_FUN(void, enumerate_plugin_metadata, 1, 3, epm_params);
 
 /**
  * Add a plugin or rather its' metadata to the relevant (in-memory) database.
