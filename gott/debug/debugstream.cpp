@@ -25,7 +25,7 @@
 namespace gott {
 namespace util {
 namespace debug {
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef IN_DOXY
   //::std::basic_ostream<utf32_t> debugstream(std::wcerr.rdbuf());
 #endif
 }}}

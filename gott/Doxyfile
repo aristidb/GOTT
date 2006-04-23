@@ -200,7 +200,7 @@ INCLUDE_PATH           =
 INCLUDE_FILE_PATTERNS  = 
 PREDEFINED             = GOTT_EXPORT= \
                          GOTT_LOCAL= \
-                         DOXYGEN_SHOULD_SKIP_THIS
+                         IN_DOXY
 EXPAND_AS_DEFINED      = GOTT_EXPORT \
                          GOTT_LOCAL
 SKIP_FUNCTION_MACROS   = YES

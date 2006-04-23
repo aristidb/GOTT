@@ -76,21 +76,22 @@ struct plugin_metadata {
 
 /**
  * Send all plugins' metadata records that fullfill some (or none) requirements
- * to a callback. Thread-safe. If you omit the _p at the end, you can use
- * named parameters (you must prepend tags:: to the parameter's name).
+ * to a callback. Thread-safe.
  * \param callback The function to send the plugins' metadata to.
- * \param plugin_id Requires the record to have the given plugin_id if set.
- * \param interface_id Requires the record to indicate support for the given
+ * \param plugin_id Requires the record to have the given plugin-id if set.
+ * \param interface Requires the record to indicate support for the given
  *                 interface if set.
+ * \param cancel_early Cancel after the first record was found.
+ * \see enumerate_plugin_metadata
  */
 GOTT_EXPORT
 void enumerate_plugin_metadata_p(
     boost::function<void (plugin_metadata const &)> const &callback,
     boost::optional<QID const &> const &plugin_id,
-    boost::optional<QID const &> const &interface_id,
+    boost::optional<QID const &> const &interface,
     bool cancel_early);
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef IN_DOXY
 namespace tags {
   BOOST_PARAMETER_KEYWORD(detail, callback)
   BOOST_PARAMETER_KEYWORD(detail, plugin_id)
@@ -154,6 +155,37 @@ find_plugin_metadata_with_named_params(ArgPack const &args) {
       true);
   return cb.result;
 }
+#else
+/**
+ * Send all plugins' metadata records that fullfill some (or none) requirements
+ * to a callback. Supports named parameters.
+ * \param tags::callback The function to send the plugins' metadata to.
+ * \param tags::plugin_id Requires the record to have the given plugin-id
+ *                       (optional).
+ * \param tags::interface Requires the record to indicate support for the given
+ *                       interface (optional).
+ * \param tags::cancel_early Cancel after the first record was found.
+ */
+void enumerate_plugin_metadata(
+    boost::function<void (plugin_metadata const &)> const &tags::callback,
+    QID const &tags::plugin_id,
+    QID const &tags::interface,
+    bool tags::cancel_early = false
+    );
+
+/**
+ * Find a plugin's metadata that fulfills some requirements and return it if any
+ * was found.
+ * \param tags::plugin_id Requires the record to have the given plugin-id
+ *                        (optional).
+ * \param tags::interface Requires the record to indicate support for the given
+ *                        interface (optional).
+ */
+boost::optional<plugin_metadata const &>
+find_plugin_metadata(
+    QID const &tags::plugin_id,
+    QID const &tags::interface
+    );
 #endif
 
 /**

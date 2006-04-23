@@ -46,7 +46,7 @@
 namespace gott {
 namespace properties {
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef IN_DOXY
 template<class T, bool has_signal>
 struct property_chooser { // true
   typedef notifying_property<T> type;
@@ -78,7 +78,7 @@ template<
   class Lock = no_lock
 >
 class concrete_property
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef IN_DOXY
 : public
     property_chooser<Type, policy<Notification>::class_type::has_signal>::type 
 #else

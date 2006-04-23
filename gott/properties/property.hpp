@@ -49,7 +49,7 @@ template<class Type> class property;
 template<class Type> class read_property;
 template<class Type> class write_property;
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef IN_DOXY
 template<class Type> struct annotated {
   typedef std::pair<Type *, void *> pointer;
   typedef std::pair<Type const *, void *> const_pointer;

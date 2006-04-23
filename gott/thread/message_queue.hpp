@@ -68,13 +68,13 @@ enum message_filter_result {
  * about priorities and behave plain FIFO.
  */
 struct no_priority {
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef IN_DOXY
   template<class T>
   bool operator()(T,T) { return false; } // unused
 #endif
 };
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef IN_DOXY
 template<class T>
 struct care_priority {
   enum { value = true };
