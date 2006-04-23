@@ -43,6 +43,7 @@
 #include <boost/function.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/none.hpp>
+#include <boost/ref.hpp>
 #include <boost/parameter/keyword.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
@@ -85,39 +86,72 @@ GOTT_EXPORT
 void enumerate_plugin_metadata_p(
     boost::function<void (plugin_metadata const &)> const &function,
     boost::optional<QID const &> const &plugin_id,
-    boost::optional<QID const &> const &interface_id);
+    boost::optional<QID const &> const &interface_id,
+    bool cancel_early);
 
 namespace tags {
   BOOST_PARAMETER_KEYWORD(detail, callback)
   BOOST_PARAMETER_KEYWORD(detail, plugin_id)
   BOOST_PARAMETER_KEYWORD(detail, interface)
+  BOOST_PARAMETER_KEYWORD(detail, cancel_early)
 }
+
+typedef boost::parameter::parameters<
+  tags::detail::callback,
+  tags::detail::plugin_id,
+  tags::detail::interface,
+  tags::detail::cancel_early
+> epm_params;
+
+BOOST_PARAMETER_FUN(void, enumerate_plugin_metadata, 1, 4, epm_params);
 
 namespace detail {
-template<class T>
-QID get_opt_qid(T const &x) {
-  return x;
-}
+  template<class T>
+  QID get_opt_qid(T const &x) {
+    return x;
+  }
 
-inline boost::none_t get_opt_qid(boost::none_t) {
-  return boost::none;
-}
+  inline boost::none_t get_opt_qid(boost::none_t) {
+    return boost::none;
+  }
 }
 
 template<class ArgPack>
 void enumerate_plugin_metadata_with_named_params(ArgPack const &args) {
   enumerate_plugin_metadata_p(args[tags::callback],
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
-      detail::get_opt_qid(args[tags::interface | boost::none]));
+      detail::get_opt_qid(args[tags::interface | boost::none]),
+      args[tags::cancel_early | false]);
 }
 
 typedef boost::parameter::parameters<
-  tags::detail::callback,
   tags::detail::plugin_id,
   tags::detail::interface
-> epm_params;
+> fpm_params;
 
-BOOST_PARAMETER_FUN(void, enumerate_plugin_metadata, 1, 3, epm_params);
+BOOST_PARAMETER_FUN(inline boost::optional<plugin_metadata const &>,
+    find_plugin_metadata, 0, 2, fpm_params);
+
+namespace detail {
+  struct find_functor {
+    find_functor() {}
+    boost::optional<plugin_metadata const &> result;
+    void operator() (plugin_metadata const &x) {
+      result = x;
+    }
+  };
+}
+
+template<class ArgPack>
+boost::optional<plugin_metadata const &>
+find_plugin_metadata_with_named_params(ArgPack const &args) {
+  detail::find_functor cb;
+  enumerate_plugin_metadata_p(boost::ref(cb),
+      detail::get_opt_qid(args[tags::plugin_id | boost::none]),
+      detail::get_opt_qid(args[tags::interface | boost::none]),
+      true);
+  return cb.result;
+}
 
 /**
  * Add a plugin or rather its' metadata to the relevant (in-memory) database.

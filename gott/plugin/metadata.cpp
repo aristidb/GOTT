@@ -128,7 +128,8 @@ void gott::plugin::load_standard_metadata() {
 void gott::plugin::enumerate_plugin_metadata_p(
     boost::function<void (plugin_metadata const &)> const &function,
     boost::optional<QID const &> const &plugin_id,
-    boost::optional<QID const &> const &interface_id) {
+    boost::optional<QID const &> const &interface_id,
+    bool cancel_early) {
   BIGLOCK;
   for (plugin_metadata_list_t::iterator it = known_plugin_metadata.begin();
       it != known_plugin_metadata.end();
@@ -139,6 +140,8 @@ void gott::plugin::enumerate_plugin_metadata_p(
         find(range(it->interfaces), *interface_id) == it->interfaces.end())
       continue;
     function(*it);
+    if (cancel_early)
+      break;
   }
 }
 
