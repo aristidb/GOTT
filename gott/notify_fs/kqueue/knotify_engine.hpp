@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is An Event Handling Class Library.
+ * The Original Code is A Filesystem Notification Library.
  *
  * The Initial Developer of the Original Code is
  * Rüdiger Sonderfeld <kingruedi@c-plusplus.de>.
- * Portions created by the Initial Developer are Copyright (C) 2006
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,71 +35,31 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_EVENTS_KQUEUE_LOOP_HPP
-#define GOTT_EVENTS_KQUEUE_LOOP_HPP
+#ifndef GOTT_NOTIFY_FS_KQUEUE_KNOTIFY_ENGINE_HPP
+#define GOTT_NOTIFY_FS_KQUEUE_KNOTIFY_ENGINE_HPP
 
-#include "main_loop.hpp"
-#include "fd_manager.hpp"
-#include "timer_manager.hpp"
-#include "selfpipe_message_manager.hpp"
-#include "signal_manager.hpp"
-#include <boost/scoped_ptr.hpp>
+#include <gott/notify_fs/notification_engine.hpp>
+
+namespace gott { namespace events { class kqueue_loop; }}
 
 namespace gott {
-namespace events {
+namespace notify_fs {
+  class knotify_engine
+    : public notification_engine
+  {
+  public:
+    knotify_engine(gott::events::main_loop &m) GOTT_EXPORT;
+    ~knotify_engine() GOTT_EXPORT;
 
-/**
- * A main_loop implementation using kqueue(2) which is specific to FreeBSD,
- *   MacOSX, NetBSD, OpenBSD and propably more
- *
- * Features:
- *  - gott::events::fd_manager
- *  - gott::events::timer_manager
- *  - gott::events::inprocess_message_manager
- *  - gott::events::signal_manager
- */
-class GOTT_EXPORT kqueue_loop
-  : public main_loop,
-    private fd_manager,
-    private standard_timer_manager,
-    private signal_manager
-{
- public:
-  kqueue_loop();
-  ~kqueue_loop();
+  private:
+    bool support_event(ev_t event) const;
+    watch_implementation *watch_alloc(string const&, ev_t, watch*, bool);
 
- private:
-  GOTT_LOCAL void run();
-  GOTT_LOCAL void quit_local();
-  GOTT_LOCAL sigc::signal0<void, sigc::nil>& on_idle();
+  private:
+    events::kqueue_loop *kq;
 
- public:
-  // Interface for notify_fs
-  void watch_fd(int fd, unsigned mask,
-		boost::function<void (unsigned)> const &cb,
-		bool wait);
-  void unwatch_fd(int fd);
-
- private:
-  GOTT_LOCAL void add_waitable();
-  GOTT_LOCAL void remove_waitable();
-
- private:
-  GOTT_LOCAL void add_fd(int fd, unsigned mask,
-        		 boost::function<void (unsigned)> const &cb,
-        		 bool wait = true);
-
-  GOTT_LOCAL void remove_fd(int fd);
-
-  GOTT_LOCAL sigc::signal1<void, int> &on_signal(int sig);
-  
-  GOTT_LOCAL void *do_feature(QID const &);
-
-  class impl;
-  boost::scoped_ptr<impl> p;
-  selfpipe_message_manager message_mgr;
-};
-
+    struct kqueue_watch;
+  };
 }}
 
 #endif

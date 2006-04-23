@@ -186,14 +186,17 @@ namespace events {
   }
 
   void kqueue_loop::watch_fd(int fd, unsigned mask,
-			     boost::function<void (unsigned)> const &cb)
+			     boost::function<void (unsigned)> const &cb,
+			     bool wait)
   {
     struct kevent e;
     EV_SET(&e, fd, EVFILT_VNODE, EV_ADD | EV_ENABLE |
 	   (mask & notify_fs::flag_oneshot ? EV_ONESHOT : 0),
 	   ev_t2kqueue(mask), 0, 0);
 
-    p->notify_fs.insert(std::make_pair(fd, impl::callback(mask, cb, false)));
+    p->notify_fs.insert(std::make_pair(fd, impl::callback(mask, cb, wait)));
+    if(wait)
+      add_waitable();
 
     kqueue::event_bsd(p->queue.access(), &e, 1, 0, 0, 0);
   }
@@ -207,6 +210,8 @@ namespace events {
     EV_SET(&e, fd, EVFILT_VNODE, EV_DELETE, ev_t2kqueue(i->second.mask), 0, 0);
     kqueue::event_bsd(p->queue.access(), &e, 1, 0, 0, 0);
 
+    if(i->second.wait)
+      remove_waitable();
     p->notify_fs.erase(i);
   }
 
