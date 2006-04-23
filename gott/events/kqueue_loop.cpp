@@ -174,13 +174,18 @@ namespace events {
       u_int fflags = 0;
       if(mask & notify_fs::file_delete)
 	fflags |= NOTE_DELETE;
-      if(mask & notify_fs::file_moved_from ||
-	 mask & notify_fs::file_moved_to)
+      if(mask & notify_fs::file_move)
 	fflags |= NOTE_RENAME;
       if(mask & notify_fs::file_modify)
 	fflags |= NOTE_WRITE;
       if(mask & notify_fs::file_attrib)
 	fflags |= NOTE_ATTRIB;
+      if(mask & notify_fs::file_access_revoke)
+	fflags |= NOTE_REVOKE;
+      if(mask & notify_fs::file_link)
+	fflags |= NOTE_LINK;
+      if(mask & notify_fs::file_extend)
+	fflags |= NOTE_EXTEND;
       return fflags;
     }
   }
@@ -223,6 +228,27 @@ namespace events {
     p->running = false;
   }
 
+  namespace {
+    GOTT_LOCAL unsigned kqueue2ev_t(u_int mask) {
+      unsigned ev_t_ = 0;
+      if(mask & NOTE_DELETE)
+	ev_t_ |= notify_fs::file_delete;
+      if(mask & NOTE_RENAME)
+	ev_t_ |= notify_fs::file_move;
+      if(mask & NOTE_WRITE)
+	ev_t_ |= notify_fs::file_modify;
+      if(mask & NOTE_ATTRIB)
+	ev_t_ |= notify_fs::file_attrib;
+      if(mask & NOTE_REVOKE)
+	ev_t_ |= notify_fs::file_access_revoke;
+      if(mask & NOTE_LINK)
+	ev_t_ |= notify_fs::file_link;
+      if(mask & NOTE_EXTEND)
+	ev_t_ |= notify_fs::file_extend;
+      return ev_t_;
+    }
+  }
+
   void kqueue_loop::run() {
     p->running = true;
     enum { EVENTS_N=64 };
@@ -254,7 +280,7 @@ namespace events {
 	  impl::map_fd_cb::iterator j=p->notify_fs.find(event_list[i].ident);
 	  if(j == p->notify_fs.end())
 	    continue;
-	  j->second.call(event_list[i].fflags); //TODO fflags 2 ev_t
+	  j->second.call(kqueue2ev_t(event_list[i].fflags));
 	}
 	else {
 	  impl::map_fd_cb::iterator j=p->fd_callbacks.find(event_list[i].ident);

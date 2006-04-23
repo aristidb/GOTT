@@ -20,6 +20,7 @@
  *
  * Contributor(s):
  *  Aristid Breitkreuz (aribrei@arcor.de)
+ *  Rüdiger Sonderfeld <kingruedi@c-plusplus.de>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -86,6 +87,12 @@ enum ev_t {
   flag_directory = 0x40000000,
   /// Event is sent only once.
   flag_oneshot = 0x80000000,
+  /// Access to the file was revoked
+  file_access_revoke = 0x20000000, //in some way similar to extra_unmount!
+  /// The link count on the file changed.
+  file_link = 0x80000,
+  /// The file referenced by the descriptor was extended.
+  file_extend = 0x40000,
   all_events = file_access | file_modify | file_attrib | file_close_write 
     | file_close_nowrite | file_open | file_moved_from | file_moved_to
     | subfile_delete | subfile_create | file_delete
