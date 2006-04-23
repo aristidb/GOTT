@@ -43,14 +43,12 @@ if env['SYS_INOTIFY'] == 1:
   env = env.Copy()
   
   env.Append(LIBS = ['notify_inotify']) #FIXME
-elif env['SYS_KQUEUE'] == 1:
-  env.SharedLibrary('notify_kqueue', glob.glob('kqueue/*.cpp'))
-  env = env.Copy()
-
-  env.Append(LIBS = ['notify_kqueue'])
 
 libobj = glob.glob('*.cpp')
 libobj.remove('test.cpp')
+if env['SYS_KQUEUE'] == 1:
+  libobj += glob.glob('kqueue/*.cpp')
+
 env.SharedLibrary('notify_fs', libobj)
 
 env = env.Copy()
