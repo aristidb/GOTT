@@ -37,6 +37,7 @@
 
 #include "notification_engine.hpp"
 #include "inotify/inotify_engine.hpp"
+#include "kqueue/knotify_engine.hpp"
 #include <gott/events/main_loop.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/construct.hpp>
@@ -57,6 +58,8 @@ notification_engine *notification_engine::get_for(main_loop &m) {
   notification_engine *eng = 0;
 #ifdef BUILD_INOTIFY
   eng = new inotify_engine(m);
+#elif BUILD_KQUEUE
+  eng = new knotify_engine(m);
 #else
   #warning "You have no notify_fs!"
 #endif
