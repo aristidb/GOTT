@@ -104,10 +104,12 @@ namespace {
         ref.interfaces.push_back(Xany_cast<string>(data_));
       else if (tag == "plugin-id")
         ref.plugin_id = Xany_cast<string>(data_);
+#if 0
       else if (tag == "module-type")
         ref.module_type = Xany_cast<plugin_metadata::module_type_t>(data_);
       else if (tag == "file-path")
         ref.file_path = Xany_cast<string>(data_);
+#endif
       else if (tag == "symbol")
         ref.symbol = Xany_cast<string>(data_);
       tag = string();
@@ -208,6 +210,7 @@ ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
       w.node(val.plugin_id);
     w.up();
   }
+#if 0
   {
     w.node("module-type");
     w.down();
@@ -224,6 +227,7 @@ ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
       w.node(val.file_path);
     w.up();
   }
+#endif
   {
     w.node("symbol");
     w.down();

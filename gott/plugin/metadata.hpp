@@ -56,21 +56,11 @@ namespace gott { namespace plugin {
 GOTT_EXPORT
 void load_standard_metadata();
 
-/**
- * A plugin's metadata.
- */
-struct plugin_metadata {
+struct module_metadata {
   /**
-   * The plugin's unique ID.
+   * The module's unique identifier.
    */
-  QID plugin_id;
-
-  typedef std::vector<QID> interface_list_t;
-
-  /**
-   * The list of interfaces that the plugin supports.
-   */
-  interface_list_t interfaces;
+  QID module_id;
 
   /**
    * The types a module might have.
@@ -87,14 +77,38 @@ struct plugin_metadata {
    */
   string file_path;
 
+  module_metadata() : module_type(dynamic_native) {}
+};
+
+/**
+ * A plugin's metadata.
+ */
+struct plugin_metadata {
+  /**
+   * The plugin's unique identifier.
+   */
+  QID plugin_id;
+
+  typedef std::vector<QID> interface_list_t;
+
+  /**
+   * The list of interfaces that the plugin supports.
+   */
+  interface_list_t interfaces;
+
+  /**
+   * The module the plugin resides in.
+   */
+  QID enclosing_module;
+
   /**
    * The entry smbol of the plugin.
    */
   string symbol;
+};
 
-  /// Default-Constructor.
-  plugin_metadata()
-  : module_type(dynamic_native) {}
+struct interface_metadata {
+  QID interface_id;
 };
 
 /**
