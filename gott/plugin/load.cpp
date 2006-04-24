@@ -47,7 +47,6 @@ using gott::plugin::plugin_configuration;
 
 plugin_base *gott::plugin::load_plugin(
     plugin_metadata const &/*which*/,
-    system_configuration &/*sysc*/,
     plugin_configuration const &/*plgc*/) {
   //TODO implement me
   throw internal_error("unimplemented");

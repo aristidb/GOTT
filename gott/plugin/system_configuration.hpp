@@ -38,8 +38,27 @@
 #ifndef GOTT_BASE_PLUGIN_SYSTEM_CONFIGURATION_HPP
 #define GOTT_BASE_PLUGIN_SYSTEM_CONFIGURATION_HPP
 
+#include <gott/visibility.hpp>
+#include <boost/noncopyable.hpp>
+
 namespace gott {
 namespace plugin {
+
+class system_configuration : boost::noncopyable {
+public:
+  /**
+   * Replace the current system_configuration object with another. Thread-safe.
+   */
+  static system_configuration &reset(system_configuration &newconf) GOTT_EXPORT;
+
+  /**
+   * Return a reference to the global system_configuration object. Thread-safe.
+   */
+  static system_configuration &get() GOTT_EXPORT;
+
+private:
+  system_configuration();
+};
 
 }}
 

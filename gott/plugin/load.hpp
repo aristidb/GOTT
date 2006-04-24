@@ -50,7 +50,6 @@ class plugin_metadata;
 GOTT_EXPORT
 plugin_base *load_plugin(
     plugin_metadata const &which, 
-    system_configuration &sysc,
     plugin_configuration const &plgc);
 
 GOTT_EXPORT
@@ -61,11 +60,10 @@ class plugin_handle {
 public:
   plugin_handle(
       plugin_metadata const &which,
-      system_configuration &sysc, 
       plugin_configuration const &plgc)
   : p(
       dynamic_cast<ConcretePlugin *>(
-        load_plugin(which, sysc, plgc)))
+        load_plugin(which, plgc)))
   {}
   ~plugin_handle() { unload_plugin(p); }
 
