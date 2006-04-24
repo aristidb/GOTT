@@ -1,9 +1,11 @@
 plugin-id foo
+symbol xyz
 has-interface bar
 file-path /tmp/foo.so
 module-type dynamic-native
 
 plugin-id fox
+symbol xy
 has-interface boo
 module-type dynamic-native
 file-path ~/fox-77.so
@@ -13,3 +15,4 @@ module-type dynamic-native
 has-interface bar
 file-path /dev/null
 has-interface boo
+symbol p

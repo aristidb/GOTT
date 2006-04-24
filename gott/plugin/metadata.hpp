@@ -60,16 +60,39 @@ void load_standard_metadata();
  * A plugin's metadata.
  */
 struct plugin_metadata {
+  /**
+   * The plugin's unique ID.
+   */
   QID plugin_id;
 
   typedef std::vector<QID> interface_list_t;
+
+  /**
+   * The list of interfaces that the plugin supports.
+   */
   interface_list_t interfaces;
 
+  /**
+   * The types a module might have.
+   */
   enum module_type_t { dynamic_native };
+
+  /**
+   * The type of the module.
+   */
   module_type_t module_type;
 
-  gott::string file_path;
+  /**
+   * The file where the plugin resides.
+   */
+  string file_path;
 
+  /**
+   * The entry smbol of the plugin.
+   */
+  string symbol;
+
+  /// Default-Constructor.
   plugin_metadata()
   : module_type(dynamic_native) {}
 };

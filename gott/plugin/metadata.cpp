@@ -87,7 +87,8 @@ namespace {
                       rule_attr(tdl::schema::repatcher = 
                         new repatch_enumeration(
                           std::vector<string>(1, "dynamic-native"))))))
-          (rule_one("named", rule_attr(tag = "file-path"), rule("node"))))));
+          (rule_one("named", rule_attr(tag = "file-path"), rule("node")))
+          (rule_one("named", rule_attr(tag = "symbol"), rule("node"))))));
 
   struct accepter : writable_structure {
     accepter(plugin_metadata &ref) : ref(ref) {}
@@ -107,6 +108,8 @@ namespace {
         ref.module_type = Xany_cast<plugin_metadata::module_type_t>(data_);
       else if (tag == "file-path")
         ref.file_path = Xany_cast<string>(data_);
+      else if (tag == "symbol")
+        ref.symbol = Xany_cast<string>(data_);
       tag = string();
     }
 
@@ -219,6 +222,12 @@ ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
     w.node("file-path");
     w.down();
       w.node(val.file_path);
+    w.up();
+  }
+  {
+    w.node("symbol");
+    w.down();
+      w.node(val.symbol);
     w.up();
   }
   {
