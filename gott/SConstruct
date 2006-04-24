@@ -64,7 +64,8 @@ if not os.path.isfile('options.py'):
 
 opts = Options([sysfile, 'options.py'])
 opts.Add(BoolOption('RELEASE', 'Release build', 1))
-opts.Add(EnumOption('OPTIMIZE', 'Optimization level', 'default', 
+opts.Add(BoolOption('DEBUG', 'Improve debugging (overrides HIDE_SYMBOLS)', 0))
+opts.Add(EnumOption('OPTIMIZATION', 'Optimization level', 'default', 
                     allowed_values=('default', 'none', 'some', 'full')))
 opts.Add(BoolOption('HIDE_SYMBOLS', 'Hide unused symbols', 1))
 
@@ -91,14 +92,17 @@ env = Environment(
   LIBPATH=libdirs + ['${BOOST_LIB}'])
 env.Help(opts.GenerateHelpText(env))
 
-if env['RELEASE']:
+if env['RELEASE'] == 1:
   env.Append(CPPDEFINES = ['NDEBUG'])
-  if env['OPTIMIZE'] == 'default':
-    env['OPTIMIZE'] = 'full'
 else:
   env.Append(CPPDEFINES = ['DEBUG'])
-  if env['OPTIMIZE'] == 'default':
-    env['OPTIMIZE'] = 'some'
+
+if env['DEBUG'] == 1:
+  if env['OPTIMIZATION'] == 'default':
+    env['OPTIMIZATION'] = 'none'
+else:
+  if env['OPTIMIZATION'] == 'default':
+    env['OPTIMIZATION'] = 'full'
 
 Export('env')
 

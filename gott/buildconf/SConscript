@@ -82,13 +82,13 @@ def CheckWarnings(context):
 	return result
 
 def CheckOptimization(context):
-	context.Message('Checking if compiler supports gcc-style optimization levels... ')
+	context.Message('Checking if compiler supports gcc-style optimization levels (if necessary)... ')
 	lastCCFLAGS = context.env['CCFLAGS'][:]
 
-	if context.env['OPTIMIZE'] == 'full':
-		level = '-O3'
-	elif context.env['OPTIMIZE'] == 'some':
-		level = '-O2'
+	if context.env['OPTIMIZATION'] == 'full':
+		level = ['-O3']
+	elif context.env['OPTIMIZATION'] == 'some':
+		level = ['-O2']
 
 	context.env.Append(CCFLAGS = level)
 	result = context.TryLink("#ifdef __OPTIMIZE__\nint main() {}\n#endif\n", '.cpp')
@@ -138,12 +138,12 @@ conf = Configure(env, custom_tests = tests)
 AddSysOpts(conf.env)
 
 conf.LinkerAsNeeded()
-if conf.env['OPTIMIZE'] != 'none':
+if conf.env['OPTIMIZATION'] != 'none':
 	conf.Optimization()
 conf.Warnings()
-if conf.env['HIDE_SYMBOLS']:
+if conf.env['HIDE_SYMBOLS'] and conf.env['DEBUG'] == 0:
 	conf.CompilerVisibility()
-if not conf.env['RELEASE']:
+if conf.env['DEBUG']:
 	conf.Debug()
 if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 	print 'Boost headers are not installed'
