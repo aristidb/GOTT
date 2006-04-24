@@ -114,6 +114,10 @@ namespace detail {
     return x;
   }
 
+  inline QID const &get_opt_qid(QID const &x) {
+    return x;
+  }
+
   inline boost::none_t get_opt_qid(boost::none_t) {
     return boost::none;
   }
