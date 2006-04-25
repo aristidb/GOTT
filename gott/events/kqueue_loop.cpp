@@ -82,7 +82,8 @@ namespace events {
 
     impl()
       : running(false),
-        queue(kqueue::create_bsd())
+        queue(kqueue::create_bsd()),
+	wait(0)
     {}
   };
 
@@ -109,7 +110,7 @@ namespace events {
     impl::map_sig_hnd::iterator i = p->signals.find(sig);
     if(i == p->signals.end()) {
       struct kevent n;
-      EV_SET(&n, sig, EVFILT_SIGNAL, EV_ADD | EV_ENABLE /*| EV_ONESHOT*/, 0, 0, 0);
+      EV_SET(&n, sig, EVFILT_SIGNAL, EV_ADD | EV_ENABLE, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
       return p->signals[sig];
     }
@@ -131,12 +132,12 @@ namespace events {
   {
     if(mask & fd_manager::read || mask & fd_manager::exception) {
       struct kevent n;
-      EV_SET(&n, fd, EVFILT_READ, EV_ADD | EV_ENABLE /*| EV_ONESHOT*/, 0, 0, 0);
+      EV_SET(&n, fd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
     if(mask & fd_manager::write) {
       struct kevent n;
-      EV_SET(&n, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE /*| EV_ONESHOT*/, 0, 0, 0);
+      EV_SET(&n, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
 

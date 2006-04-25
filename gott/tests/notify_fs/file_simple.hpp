@@ -99,6 +99,9 @@ public:
 private:
   void meta_test(gott::notify_fs::ev_t event, void (*fun)()) {
     using namespace boost::lambda;
+    if(!loop->feature<gott::notify_fs::notification_engine>().support_event
+       (event))
+      return;
     int encountered = 0;
     gott::notify_fs::watch w(
         loop->feature<gott::notify_fs::notification_engine>(),

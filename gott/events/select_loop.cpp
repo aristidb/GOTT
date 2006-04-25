@@ -137,15 +137,21 @@ void select_loop::run(){
           &fd_sets.write_fds, &fd_sets.except_fds,
           t);
 
+      // this holds the callbacks to call and the parameter
+      // (see lower for explaination)
+      typedef std::vector<std::pair<unsigned,
+	boost::function<void (unsigned)> > > call_t;
+      call_t call;
+
       for( callback_map::const_iterator it = callbacks.begin(), 
-            e = callbacks.end(); 
-         num_fd && it!=e;
-         ++it)  {
+	     e = callbacks.end();
+	   num_fd && it!=callbacks.end();
+	   ++it) {
         unsigned mask = 0;
         if( FD_ISSET( it->first, &fd_sets.read_fds ) ) {
           mask |= fd_manager::read;
           FD_CLR( it->first, &fd_sets.read_fds );
-        } 
+        }
         if( FD_ISSET( it->first, &fd_sets.write_fds) ) {
           mask |= fd_manager::write;
           FD_CLR( it->first, &fd_sets.write_fds );
@@ -156,16 +162,25 @@ void select_loop::run(){
         }
         if (mask) {
           --num_fd;
-          it->second.callback(mask);
+          call.push_back(make_pair(mask, it->second.callback));
         }
       }
+
+      // Calling the callbacks is sepperated from iterating through the map
+      // because a callback can invalidate map iterators by calling remove_fd
+      // - This was a nasty bug to find!
+      for(call_t::const_iterator it=call.begin(),
+	    e=call.end();
+	  it != e;
+	  ++it)
+	it->second(it->first);
     } catch (errno_exception const &e) {
       if (e.number() != EINTR)
         throw;
     }
 
     for( callback_map::const_iterator it = callbacks.begin(), 
-           e = callbacks.end(); 
+	   e = callbacks.end();
          it!=e;
          ++it)  {
       if( it->second.mask & fd_manager::write )
