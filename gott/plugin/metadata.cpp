@@ -37,6 +37,7 @@
 
 #include "metadata.hpp"
 #include "plugin_metadata.hpp"
+#include "module_metadata.hpp"
 #include <boost/thread/mutex.hpp>
 #include <fstream>
 
@@ -46,8 +47,14 @@ void gott::plugin::load_standard_metadata() {
 
   static bool loaded;
   if (!loaded) {
-    std::ifstream in_std("plugin_registry.tdl");
-    extract_plugin_metadata(in_std);
+    {
+      std::ifstream in("plugin_registry.tdl");
+      extract_plugin_metadata(in);
+    }
+    {
+      std::ifstream in("module_registry.tdl");
+      extract_module_metadata(in);
+    }
     loaded = true;
   }
 }
