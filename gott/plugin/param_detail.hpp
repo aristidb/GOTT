@@ -35,15 +35,47 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_METADATA_HPP
-#define GOTT_PLUGIN_METADATA_HPP
+#ifndef GOTT_PLUGIN_TAGS_HPP
+#define GOTT_PLUGIN_TAGS_HPP
 
-#include <gott/visibility.hpp>
+#include <boost/parameter/keyword.hpp>
+#include <boost/none.hpp>
+#include <boost/optional/optional.hpp>
+#include <gott/string/qid.hpp>
 
-namespace gott { namespace plugin {
+namespace gott { namespace plugin { 
+  
+namespace tags {
+  BOOST_PARAMETER_KEYWORD(detail, callback)
+  BOOST_PARAMETER_KEYWORD(detail, plugin_id)
+  BOOST_PARAMETER_KEYWORD(detail, module_id)
+  BOOST_PARAMETER_KEYWORD(detail, interface)
+  BOOST_PARAMETER_KEYWORD(detail, cancel_early)
+}
 
-GOTT_EXPORT
-void load_standard_metadata();
+namespace detail {
+  template<class T>
+  QID get_opt_qid(T const &x) {
+    return x;
+  }
+
+  inline QID const &get_opt_qid(QID const &x) {
+    return x;
+  }
+
+  inline boost::none_t get_opt_qid(boost::none_t) {
+    return boost::none;
+  }
+  
+  template<class T>
+  struct find_functor {
+    find_functor() {}
+    boost::optional<T const &> result;
+    void operator() (T const &x) {
+      result = x;
+    }
+  };
+}
 
 }}
 

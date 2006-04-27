@@ -1,4 +1,4 @@
-#include "metadata.hpp"
+#include "plugin_metadata.hpp"
 #include <iostream>
 #include <fstream>
 #include <algorithm>

@@ -35,16 +35,4 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_METADATA_HPP
-#define GOTT_PLUGIN_METADATA_HPP
-
-#include <gott/visibility.hpp>
-
-namespace gott { namespace plugin {
-
-GOTT_EXPORT
-void load_standard_metadata();
-
-}}
-
-#endif
+#include "module_metadata.hpp"
