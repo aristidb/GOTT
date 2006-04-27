@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,48 +35,17 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_PLUGIN_LOAD_HPP
-#define GOTT_BASE_PLUGIN_LOAD_HPP
-
+#include "plugin_handle.hpp"
+#include "plugin_metadata.hpp"
+#include "module_metadata.hpp"
 #include "plugin.hpp"
 
-namespace gott {
-class string;
+using namespace gott::plugin;
 
-namespace plugin {
+plugin_handle_base::plugin_handle_base(plugin_metadata const &which)
+: mod(which.enclosing_module_metadata()),
+  p(mod.load_plugin(which)) {}
 
-class plugin_metadata;
-
-GOTT_EXPORT
-plugin_base *load_plugin(
-    plugin_metadata const &which, 
-    plugin_configuration const &plgc);
-
-GOTT_EXPORT
-void unload_plugin(plugin_base *plugin);
-
-template<class ConcretePlugin>
-class plugin_handle {
-public:
-  plugin_handle(
-      plugin_metadata const &which,
-      plugin_configuration const &plgc)
-  : p(
-      dynamic_cast<ConcretePlugin *>(
-        load_plugin(which, plgc)))
-  {}
-  ~plugin_handle() { unload_plugin(p); }
-
-  ConcretePlugin &operator*() { return *p; }
-  ConcretePlugin const &operator*() const { return *p; }
-  ConcretePlugin *operator->() { return p; }
-  ConcretePlugin const *operator->() const { return p; }
-  ConcretePlugin *get() { return p; }
-  ConcretePlugin const *get() const { return p; }
-private:
-  ConcretePlugin *p;
-};
-
-}}
-
-#endif
+plugin_handle_base::~plugin_handle_base() {
+  delete p;
+}

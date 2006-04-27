@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,23 +35,47 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "load.hpp"
-#include <gott/exceptions.hpp>
-#include <gott/string/string.hpp>
+#ifndef GOTT_BASE_PLUGIN_PLUGIN_HANDLE_HPP
+#define GOTT_BASE_PLUGIN_PLUGIN_HANDLE_HPP
 
-using gott::string;
-using gott::plugin::plugin_base;
-using gott::QID;
-using gott::plugin::system_configuration;
-using gott::plugin::plugin_configuration;
+#include "plugin.hpp"
+#include "module.hpp"
 
-plugin_base *gott::plugin::load_plugin(
-    plugin_metadata const &/*which*/,
-    plugin_configuration const &/*plgc*/) {
-  //TODO implement me
-  throw internal_error("unimplemented");
-}
+namespace gott {
+class string;
 
-void gott::plugin::unload_plugin(plugin_base *) {
-  //TODO implement me
-}
+namespace plugin {
+
+class plugin_handle_base {
+public:
+  plugin_handle_base(plugin_metadata const &which) GOTT_EXPORT;
+  ~plugin_handle_base() GOTT_EXPORT;
+
+  plugin_base *get_base() { return p; }
+
+private:
+  module mod;
+  plugin_base *p;
+};    
+
+template<class ConcretePlugin>
+class plugin_handle : public plugin_handle_base {
+public:
+  plugin_handle(plugin_metadata const &which)
+  : plugin_handle_base(which),
+    p(dynamic_cast<ConcretePlugin *>(get_base())) {}
+  ~plugin_handle() {}
+
+  ConcretePlugin &operator*() { return *p; }
+  ConcretePlugin const &operator*() const { return *p; }
+  ConcretePlugin *operator->() { return p; }
+  ConcretePlugin const *operator->() const { return p; }
+  ConcretePlugin *get() { return p; }
+  ConcretePlugin const *get() const { return p; }
+private:
+  ConcretePlugin *p;
+};
+
+}}
+
+#endif

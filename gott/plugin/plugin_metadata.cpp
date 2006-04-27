@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "plugin_metadata.hpp"
+#include "module_metadata.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>
@@ -55,6 +56,14 @@ using namespace gott::plugin;
 using namespace gott;
 using std::istream;
 using std::ostream;
+
+module_metadata const &plugin_metadata::enclosing_module_metadata() const {
+  boost::optional<module_metadata const &> res =
+    find_module_metadata(enclosing_module);
+  if (!res)
+    throw system_error("module not found");
+  return *res;
+}
 
 namespace {
   static boost::recursive_mutex metadata_biglock;

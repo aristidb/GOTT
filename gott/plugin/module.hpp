@@ -44,13 +44,18 @@ namespace gott {
 class string;
 
 namespace plugin {
+class plugin_base;
+struct module_metadata;
+struct plugin_metadata;
 
 class module {
 public:
-  GOTT_EXPORT module(gott::string const &path);
+  GOTT_EXPORT module(module_metadata const &which);
   GOTT_EXPORT ~module();
 
   GOTT_EXPORT void *entity(gott::string const &symbol);
+
+  GOTT_EXPORT plugin_base *load_plugin(plugin_metadata const &which);
 
 private:
   void *handle;

@@ -51,6 +51,8 @@
 
 namespace gott { namespace plugin {
 
+struct module_metadata;
+
 /**
  * A plugin's metadata.
  */
@@ -71,6 +73,8 @@ struct plugin_metadata {
    * The module the plugin resides in.
    */
   QID enclosing_module;
+
+  module_metadata const &enclosing_module_metadata() const GOTT_EXPORT;
 
   /**
    * The entry smbol of the plugin.

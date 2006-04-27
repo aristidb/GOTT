@@ -36,17 +36,22 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "module.hpp"
+#include "plugin.hpp"
+#include "module_metadata.hpp"
+#include "plugin_metadata.hpp"
 #include <boost/scoped_array.hpp>
 #include <gott/string/string.hpp>
 #include <gott/exceptions.hpp>
 #include <gott/syswrap/dl_unix.hpp>
+#include <gott/syswrap/function_cast.hpp>
 
 using gott::plugin::module;
 
-module::module(gott::string const &path)
+module::module(module_metadata const &which)
 : handle(
-    dlopen_unix( boost::scoped_array<char>(path.c_string_alloc()).get() 
-    ,  RTLD_LAZY))
+    dlopen_unix(
+      boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
+      RTLD_LAZY))
 {
 }
 
@@ -60,6 +65,12 @@ module::~module() {
 }
 
 void *module::entity(gott::string const &symbol) {
-  return dlsym_unix(handle
-      , boost::scoped_array<char>(symbol.c_string_alloc()).get());
+  return dlsym_unix(handle,
+      boost::scoped_array<char>(symbol.c_string_alloc()).get());
+}
+
+gott::plugin::plugin_base *module::load_plugin(plugin_metadata const &which) {
+  typedef plugin_base *(fun_t)();
+  fun_t *fun = function_cast<fun_t>(entity(which.symbol));
+  fun();
 }
