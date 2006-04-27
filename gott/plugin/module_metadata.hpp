@@ -45,6 +45,7 @@
 #include <boost/optional/optional.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
+#include <iosfwd>
 
 namespace gott { namespace plugin {
 
@@ -124,6 +125,16 @@ boost::optional<module_metadata const &>
 find_module_metadata(
     QID const &tags::module_id);
 #endif
+
+GOTT_EXPORT void add_module_metadata(module_metadata const &);
+
+GOTT_EXPORT void extract_module_metadata(std::istream &stream);
+
+GOTT_EXPORT
+std::istream &operator>>(std::istream &stream, module_metadata &out);
+
+GOTT_EXPORT
+std::ostream &operator<<(std::ostream &stream, module_metadata const &in);
 
 }}
 

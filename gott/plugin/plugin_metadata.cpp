@@ -42,13 +42,11 @@
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
-#include <gott/tdl/structure/repatchers/enumeration.hpp>
 #include <gott/tdl/write/writer.hpp>
 #include <gott/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/thread.hpp>
-#include <map>
 
 using namespace tdl::schema;
 using namespace tdl::structure;
@@ -63,18 +61,18 @@ namespace {
   #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
 
   typedef std::vector<plugin_metadata> plugin_metadata_list_t;
-  plugin_metadata_list_t known_plugin_metadata;
+  static plugin_metadata_list_t known_plugin_metadata;
 
   /*
   ordered
     named (plugin-id), node
     unordered
       :list named (has-interface), node
-      named (module-type), enumeration $ dynamic-native
-      named (file-path), node
+      named (enclosing-module), node
+      named (symbol), node
    */
   static rule_t metadata_schema = 
-    rule("ordered", rule_attr(coat = false, outer = optional()),
+    rule("ordered", rule_attr(coat = false),
         boost::assign::list_of
         (rule_one("named", rule_attr(tag = "plugin-id"), rule("node")))
         (rule("unordered", rule_attr(coat = false),
@@ -171,7 +169,7 @@ void gott::plugin::extract_plugin_metadata(istream &stream) {
 }
 
 istream &gott::plugin::operator>>(istream &stream, plugin_metadata &out_value) {
-  out_value.interfaces.clear();
+  out_value = plugin_metadata();
   accepter out(out_value);
   revocable_adapter adapter(out);
   match(
