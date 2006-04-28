@@ -41,7 +41,6 @@
 #include "plugin_metadata.hpp"
 #include "plugin_builder.hpp"
 #include "plugin_configuration.hpp"
-#include "system_configuration.hpp"
 #include <boost/scoped_array.hpp>
 #include <gott/string/string.hpp>
 #include <gott/exceptions.hpp>
@@ -81,5 +80,5 @@ plugin_base *module::load_plugin(
     plugin_metadata const &which,
     plugin_configuration const &conf) {
   plugin_builder *fun = function_cast<plugin_builder>(entity(which.symbol));
-  return fun(system_configuration::get(), conf);
+  return fun(conf);
 }

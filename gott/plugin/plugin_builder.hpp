@@ -43,15 +43,12 @@
 namespace gott { namespace plugin {
 
 class plugin_base;
-class system_configuration;
 class plugin_configuration;
 
-typedef plugin_base *(plugin_builder)(system_configuration &, 
-                                       plugin_configuration const &);
+typedef plugin_base *(plugin_builder)(plugin_configuration const &);
 
 #define GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(symbol, type) \
   extern "C" GOTT_EXPORT gott::plugin::plugin_base * symbol( \
-      gott::plugin::system_configuration &, \
       gott::plugin::plugin_configuration const &) { \
     return new type; \
   }
