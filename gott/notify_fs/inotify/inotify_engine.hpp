@@ -46,8 +46,8 @@ namespace notify_fs {
 
 class inotify_engine : public notification_engine {
 public:
-  inotify_engine(gott::events::main_loop &) GOTT_EXPORT;
-  ~inotify_engine() GOTT_EXPORT;
+  inotify_engine(gott::events::main_loop &);
+  ~inotify_engine();
  
 private:
   bool support_event(ev_t ev) const;

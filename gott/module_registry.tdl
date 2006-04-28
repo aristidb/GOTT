@@ -1,0 +1,3 @@
+module-id gott::notify_fs::inotify
+file-path libnotify_inotify.so
+module-type dynamic-native

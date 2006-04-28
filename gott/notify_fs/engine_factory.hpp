@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Plugin / Loadable Module Engine.
+ * The Original Code is A Filesystem Notification Library.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
@@ -35,26 +35,24 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "metadata.hpp"
-#include "plugin_metadata.hpp"
-#include "module_metadata.hpp"
-#include <boost/thread/once.hpp>
-#include <fstream>
+#ifndef GOTT_NOTIFY_FS_ENGINE_FACTORY_HPP
+#define GOTT_NOTIFY_FS_ENGINE_FACTORY_HPP
 
-static boost::once_flag once = BOOST_ONCE_INIT;
+#include <gott/plugin/plugin.hpp>
 
-static void do_load() {
-  using namespace gott::plugin;
-  {
-    std::ifstream in("plugin_registry.tdl");
-    extract_plugin_metadata(in);
-  }
-  {
-    std::ifstream in("module_registry.tdl");
-    extract_module_metadata(in);
-  }
-}
+namespace gott { 
 
-void gott::plugin::load_standard_metadata() {
-  boost::call_once(&do_load, once);
-}
+namespace events { class main_loop; }
+
+namespace notify_fs {
+
+class notification_engine;
+
+class GOTT_EXPORT engine_factory : public plugin::plugin_base {
+public:
+  virtual notification_engine *alloc(events::main_loop &m) const = 0;
+};
+
+}}
+
+#endif

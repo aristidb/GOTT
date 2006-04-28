@@ -47,12 +47,10 @@ namespace plugin {
 class system_configuration;
 class plugin_configuration;
 class hook;
-struct plugin_metadata;
 
 class GOTT_EXPORT plugin_base {
 public:
   virtual ~plugin_base() = 0;
-  virtual plugin_metadata const &metadata() const = 0;
   virtual void add_hook(QID const &point, hook const &extension);
 };
 

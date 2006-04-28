@@ -72,5 +72,5 @@ void *module::entity(gott::string const &symbol) {
 gott::plugin::plugin_base *module::load_plugin(plugin_metadata const &which) {
   typedef plugin_base *(fun_t)();
   fun_t *fun = function_cast<fun_t>(entity(which.symbol));
-  fun();
+  return fun();
 }

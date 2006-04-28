@@ -35,26 +35,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "metadata.hpp"
-#include "plugin_metadata.hpp"
-#include "module_metadata.hpp"
-#include <boost/thread/once.hpp>
-#include <fstream>
+#ifndef GOTT_PLUGIN_HPP
+#define GOTT_PLUGIN_HPP
 
-static boost::once_flag once = BOOST_ONCE_INIT;
+#include <gott/plugin/plugin.hpp>
+#include <gott/plugin/plugin_handle.hpp>
+#include <gott/plugin/metadata.hpp>
+#include <gott/plugin/plugin_metadata.hpp>
+#include <gott/plugin/module_metadata.hpp>
 
-static void do_load() {
-  using namespace gott::plugin;
-  {
-    std::ifstream in("plugin_registry.tdl");
-    extract_plugin_metadata(in);
-  }
-  {
-    std::ifstream in("module_registry.tdl");
-    extract_module_metadata(in);
-  }
-}
-
-void gott::plugin::load_standard_metadata() {
-  boost::call_once(&do_load, once);
-}
+#endif

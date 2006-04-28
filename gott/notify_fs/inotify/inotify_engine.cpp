@@ -37,6 +37,7 @@
 
 #include "inotify_engine.hpp"
 #include "../watch.hpp"
+#include "../engine_factory.hpp"
 #include <gott/events/main_loop.hpp>
 #include <gott/events/fd_manager.hpp>
 #include <gott/syswrap/read_write_unix.hpp>
@@ -50,11 +51,20 @@
 #include <unistd.h>
 
 using gott::string;
-using gott::notify_fs::inotify_engine;
-using gott::notify_fs::watch_implementation;
-using gott::notify_fs::ev_t;
-using gott::notify_fs::watch;
+using namespace gott::notify_fs;
 using gott::events::main_loop;
+
+namespace {
+struct inotify_factory : engine_factory {
+  notification_engine *alloc(main_loop &loop) const {
+    return new inotify_engine(loop);
+  }
+};
+}
+
+GOTT_EXPORT 
+extern "C"
+inotify_factory *inotify_plugin() { return new inotify_factory; }
 
 class inotify_engine::impl {
 public:

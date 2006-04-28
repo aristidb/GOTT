@@ -1,0 +1,4 @@
+plugin-id gott::notify_fs::inotify_factory
+has-interface gott::notify_fs::engine_factory
+enclosing-module gott::notify_fs::inotify
+symbol inotify_plugin

@@ -37,11 +37,14 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "notification_engine.hpp"
-#include "inotify/inotify_engine.hpp"
-#include "kqueue/knotify_engine.hpp"
+#include "engine_factory.hpp"
+#include <gott/plugin.hpp>
 #include <gott/events/main_loop.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/construct.hpp>
+#include <boost/thread/once.hpp>
+#include <boost/optional.hpp>
+#include <boost/utility/in_place_factory.hpp>
 
 using gott::notify_fs::notification_engine;
 using gott::events::main_loop;
@@ -52,18 +55,29 @@ gott::QID const notification_engine::qid(
 
 notification_engine::~notification_engine() {}
 
+static boost::once_flag once = BOOST_ONCE_INIT;
+static boost::optional<
+  gott::plugin::plugin_handle<gott::notify_fs::engine_factory> > handle;
+
+static void init_handle() {
+  using namespace gott::plugin;
+  load_standard_metadata();
+  boost::optional<plugin_metadata const &> which =
+    find_plugin_metadata(tags::interface = "gott::notify_fs::engine_factory");
+  if (!which)
+    throw gott::system_error(
+        "no file system event notification engine available");
+  handle = boost::in_place(*which);
+}
+
 notification_engine *notification_engine::get_for(main_loop &m) {
   void *&slot = m.feature_data(qid);
   if (slot)
     return static_cast<notification_engine *>(slot);
-  notification_engine *eng = 0;
-#ifdef BUILD_INOTIFY
-  eng = new inotify_engine(m);
-#elif BUILD_KQUEUE
-  eng = new knotify_engine(m);
-#else
-  #warning "You have no notify_fs!"
-#endif
+
+  boost::call_once(init_handle, once);
+  notification_engine *eng = handle.get()->alloc(m);
+  
   slot = eng;
   m.on_destroy().connect(bind(delete_ptr(), eng));
   return eng;
