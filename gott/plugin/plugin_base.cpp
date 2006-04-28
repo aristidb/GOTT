@@ -35,7 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "plugin.hpp"
+#include "plugin_base.hpp"
 #include <gott/exceptions.hpp>
 
 using gott::plugin::plugin_base;

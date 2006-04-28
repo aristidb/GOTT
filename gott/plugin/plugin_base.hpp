@@ -35,8 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_PLUGIN_PLUGIN_HPP
-#define GOTT_BASE_PLUGIN_PLUGIN_HPP
+#ifndef GOTT_BASE_PLUGIN_PLUGIN_BASE_HPP
+#define GOTT_BASE_PLUGIN_PLUGIN_BASE_HPP
 
 #include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>

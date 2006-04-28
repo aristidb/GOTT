@@ -39,7 +39,7 @@
 #define GOTT_NOTIFY_FS_ENGINE_HPP
 
 #include "event.hpp"
-#include <gott/plugin/plugin.hpp>
+#include <gott/plugin/plugin_base.hpp>
 
 namespace gott {
 namespace events { class main_loop; }

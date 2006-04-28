@@ -38,7 +38,7 @@
 #ifndef GOTT_BASE_PLUGIN_HOOK_HPP
 #define GOTT_BASE_PLUGIN_HOOK_HPP
 
-#include "plugin.hpp"
+#include "plugin_base.hpp"
 
 namespace gott {
 namespace plugin {

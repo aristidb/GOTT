@@ -38,7 +38,7 @@
 #include "plugin_handle.hpp"
 #include "plugin_metadata.hpp"
 #include "module_metadata.hpp"
-#include "plugin.hpp"
+#include "plugin_base.hpp"
 
 using namespace gott::plugin;
 

@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "module.hpp"
-#include "plugin.hpp"
+#include "plugin_base.hpp"
 #include "module_metadata.hpp"
 #include "plugin_metadata.hpp"
 #include <boost/scoped_array.hpp>

@@ -38,7 +38,7 @@
 #ifndef GOTT_PLUGIN_HPP
 #define GOTT_PLUGIN_HPP
 
-#include <gott/plugin/plugin.hpp>
+#include <gott/plugin/plugin_base.hpp>
 #include <gott/plugin/plugin_handle.hpp>
 #include <gott/plugin/metadata.hpp>
 #include <gott/plugin/plugin_metadata.hpp>
