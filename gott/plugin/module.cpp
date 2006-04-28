@@ -39,6 +39,9 @@
 #include "plugin_base.hpp"
 #include "module_metadata.hpp"
 #include "plugin_metadata.hpp"
+#include "plugin_builder.hpp"
+#include "plugin_configuration.hpp"
+#include "system_configuration.hpp"
 #include <boost/scoped_array.hpp>
 #include <gott/string/string.hpp>
 #include <gott/exceptions.hpp>
@@ -46,6 +49,7 @@
 #include <gott/syswrap/function_cast.hpp>
 
 using gott::plugin::module;
+using gott::plugin::plugin_base;
 
 module::module(module_metadata const &which)
 : handle(
@@ -69,8 +73,13 @@ void *module::entity(gott::string const &symbol) {
       boost::scoped_array<char>(symbol.c_string_alloc()).get());
 }
 
-gott::plugin::plugin_base *module::load_plugin(plugin_metadata const &which) {
-  typedef plugin_base *(fun_t)();
-  fun_t *fun = function_cast<fun_t>(entity(which.symbol));
-  return fun();
+plugin_base *module::load_plugin(plugin_metadata const &which) {
+  return load_plugin(which, plugin_configuration(which));
+}
+
+plugin_base *module::load_plugin(
+    plugin_metadata const &which,
+    plugin_configuration const &conf) {
+  plugin_builder *fun = function_cast<plugin_builder>(entity(which.symbol));
+  return fun(system_configuration::get(), conf);
 }

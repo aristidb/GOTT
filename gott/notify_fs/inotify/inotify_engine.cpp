@@ -44,6 +44,7 @@
 #include <gott/syswrap/inotify_linux.hpp>
 #include <gott/syswrap/scoped_unix_file.hpp>
 #include <gott/exceptions.hpp>
+#include <gott/plugin/plugin_builder.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/scoped_array.hpp>
 #include <algorithm>
@@ -103,9 +104,7 @@ struct inotify_factory : engine_factory {
 };
 }
 
-extern "C"
-GOTT_EXPORT 
-inotify_factory *inotify_plugin() { return new inotify_factory; }
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(inotify_plugin, inotify_factory)
 
 typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
 

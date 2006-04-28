@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "plugin_configuration.hpp"
-#include <gott/string/qid.hpp>
+#include "plugin_metadata.hpp"
 #include <boost/variant.hpp>
 #include <gott/xany/xany.hpp>
 #include <map>
@@ -49,9 +49,9 @@ using boost::variant;
 
 class plugin_configuration::impl {
 public:
-  impl(QID const &plugin) : plugin(plugin) {}
+  impl(plugin_metadata const &plugin) : plugin(plugin) {}
 
-  QID plugin;
+  plugin_metadata plugin;
   
   typedef variant<Xany, hook const *> entry;
   typedef std::map<QID, entry> mapping;
@@ -59,7 +59,7 @@ public:
   mapping parameters;
 };
 
-plugin_configuration::plugin_configuration(QID const &plugin) 
+plugin_configuration::plugin_configuration(plugin_metadata const &plugin) 
   : p(new impl(plugin)) {}
 
 plugin_configuration::~plugin_configuration() {}

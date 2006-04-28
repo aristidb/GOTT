@@ -45,6 +45,7 @@ class string;
 
 namespace plugin {
 class plugin_base;
+class plugin_configuration;
 struct module_metadata;
 struct plugin_metadata;
 
@@ -56,6 +57,9 @@ public:
   GOTT_EXPORT void *entity(gott::string const &symbol);
 
   GOTT_EXPORT plugin_base *load_plugin(plugin_metadata const &which);
+  GOTT_EXPORT plugin_base *load_plugin(
+      plugin_metadata const &which,
+      plugin_configuration const &conf);
 
 private:
   void *handle;

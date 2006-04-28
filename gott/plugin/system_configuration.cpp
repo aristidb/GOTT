@@ -36,3 +36,18 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "system_configuration.hpp"
+#include <gott/exceptions.hpp>
+
+using gott::plugin::system_configuration;
+
+//TODO,FIXME
+
+static system_configuration *global;
+
+system_configuration &system_configuration::get() {
+  return *global;
+}
+
+system_configuration &system_configuration::set(system_configuration &) {
+  return *global;
+}

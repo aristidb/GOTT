@@ -40,7 +40,6 @@
 
 #include <gott/visibility.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace gott {
 class QID;
@@ -48,11 +47,13 @@ namespace xany { class Xany; }
 
 namespace plugin {
 
+class plugin_metadata;
 class hook;
 
-class plugin_configuration : boost::noncopyable {
+class plugin_configuration {
 public:
-  plugin_configuration(QID const &plugin) GOTT_EXPORT;
+  plugin_configuration(plugin_metadata const &) GOTT_EXPORT;
+  plugin_configuration(plugin_configuration const &) GOTT_EXPORT;
   ~plugin_configuration() GOTT_EXPORT;
 
   void add_param(QID const &, xany::Xany const &) GOTT_EXPORT;
@@ -60,9 +61,6 @@ public:
 
   void add_hook(QID const &, hook const &) GOTT_EXPORT;
   hook const &find_hook(QID const &) const GOTT_EXPORT;
-
-  void save() GOTT_EXPORT;
-  void reload() GOTT_EXPORT;
 
 private:
   class impl;

@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2004-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,24 +35,26 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_PLUGIN_PLUGIN_BASE_HPP
-#define GOTT_BASE_PLUGIN_PLUGIN_BASE_HPP
+#ifndef GOTT_BASE_PLUGIN_PLUGIN_BUILDER_HPP
+#define GOTT_BASE_PLUGIN_PLUGIN_BUILDER_HPP
 
 #include <gott/visibility.hpp>
-#include <gott/string/qid.hpp>
 
-namespace gott {
-namespace plugin {
+namespace gott { namespace plugin {
 
+class plugin_base;
 class system_configuration;
 class plugin_configuration;
-class hook;
 
-class GOTT_EXPORT plugin_base {
-public:
-  virtual ~plugin_base() = 0;
-  virtual void add_hook(QID const &point, hook const &extension);
-};
+typedef plugin_base *(plugin_builder)(system_configuration &, 
+                                       plugin_configuration const &);
+
+#define GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(symbol, type) \
+  extern "C" GOTT_EXPORT gott::plugin::plugin_base * symbol( \
+      gott::plugin::system_configuration &, \
+      gott::plugin::plugin_configuration const &) { \
+    return new type; \
+  }
 
 }}
 

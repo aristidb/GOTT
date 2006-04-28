@@ -48,8 +48,9 @@ class system_configuration : boost::noncopyable {
 public:
   /**
    * Replace the current system_configuration object with another. Thread-safe.
+   * Must not be called after a call to get().
    */
-  static system_configuration &reset(system_configuration &newconf) GOTT_EXPORT;
+  static system_configuration &set(system_configuration &newconf) GOTT_EXPORT;
 
   /**
    * Return a reference to the global system_configuration object. Thread-safe.
