@@ -103,8 +103,8 @@ struct inotify_factory : engine_factory {
 };
 }
 
-GOTT_EXPORT 
 extern "C"
+GOTT_EXPORT 
 inotify_factory *inotify_plugin() { return new inotify_factory; }
 
 typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
