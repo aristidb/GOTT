@@ -35,7 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "inotify_engine.hpp"
+#include "../notification_engine.hpp"
 #include "../watch.hpp"
 #include "../engine_factory.hpp"
 #include <gott/events/main_loop.hpp>
@@ -54,6 +54,47 @@ using gott::string;
 using namespace gott::notify_fs;
 using gott::events::main_loop;
 
+namespace gott {
+namespace notify_fs {
+
+class inotify_engine : public notification_engine {
+public:
+  inotify_engine(main_loop &r_loop) 
+    : loop(&r_loop),
+      fdm(&loop->feature<gott::events::fd_manager>()),
+      conn(inotify_init_linux()) {
+    using namespace boost::lambda;
+    fdm->add_fd(
+        conn.access(),
+        gott::events::fd_manager::read,
+        bind(&inotify_engine:: notify, this),
+        false);    
+  }
+
+  ~inotify_engine() {
+    fdm->remove_fd(conn.access());
+  }
+ 
+private:
+  bool support_event(ev_t) const { return true; }
+
+  watch_implementation *watch_alloc(string const &, ev_t, watch *, bool);
+
+private:
+  main_loop *loop;
+  gott::events::fd_manager *fdm;
+  scoped_unix_file conn;
+  std::map<boost::uint32_t, watch_implementation *> watches;
+
+  void notify();
+
+  static boost::int32_t get_watch(inotify_engine &eng, string const &path, 
+    ev_t mask);
+  struct inotify_watch;
+};
+
+}}
+
 namespace {
 struct inotify_factory : engine_factory {
   notification_engine *alloc(main_loop &loop) const {
@@ -65,39 +106,6 @@ struct inotify_factory : engine_factory {
 GOTT_EXPORT 
 extern "C"
 inotify_factory *inotify_plugin() { return new inotify_factory; }
-
-class inotify_engine::impl {
-public:
-  impl(main_loop &r_loop) 
-    : loop(&r_loop),
-      fdm(&loop->feature<gott::events::fd_manager>()),
-      conn(inotify_init_linux()) {
-    using namespace boost::lambda;
-    fdm->add_fd(
-        conn.access(),
-        gott::events::fd_manager::read,
-        bind(&inotify_engine::impl::notify, this),
-        false);
-  }
-  
-  ~impl() {
-    fdm->remove_fd(conn.access());
-  }
-  
-  main_loop *loop;
-  gott::events::fd_manager *fdm;
-  scoped_unix_file conn;
-  std::map<boost::uint32_t, watch_implementation *> watches;
-
-  void notify();
-};
-
-inotify_engine::inotify_engine(main_loop &loop) : p(new impl(loop)) {}
-inotify_engine::~inotify_engine() {}
-
-bool inotify_engine::support_event(ev_t) const {
-  return true;
-}
 
 typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
 
@@ -111,7 +119,7 @@ boost::int32_t inotify_engine::get_watch(
   boost::uint32_t result;
   try {
     result = 
-      gott::inotify_add_watch_linux(eng.p->conn.access(), c_path.get(), mask);
+      gott::inotify_add_watch_linux(eng.conn.access(), c_path.get(), mask);
   } catch (gott::system_error const &) {
     throw gott::notify_fs::watch_installation_failure(path);
   }
@@ -135,25 +143,25 @@ struct inotify_engine::inotify_watch : watch_implementation {
     context(w),
     wait(wait) {
     if (wait)
-      eng.p->loop->add_waitable();
+      eng.loop->add_waitable();
   }
 
   ~inotify_watch() {
     if (wait)
-      eng.p->loop->remove_waitable();
-    eng.p->watches.erase(wd);
-    gott::inotify_rm_watch_linux(eng.p->conn.access(), wd);
+      eng.loop->remove_waitable();
+    eng.watches.erase(wd);
+    gott::inotify_rm_watch_linux(eng.conn.access(), wd);
   }
 };
 
 watch_implementation *
 inotify_engine::watch_alloc(string const &path, ev_t mask, watch *w, bool wait){
   inotify_watch *pp = new inotify_watch(this, path, mask, *w, wait);
-  p->watches[pp->wd] = pp;
+  watches[pp->wd] = pp;
   return pp;
 }
 
-void inotify_engine::impl::notify() {
+void inotify_engine::notify() {
   char buffer[16384];
   size_t r = read_unix(conn.access(), buffer, sizeof(buffer));
   for (size_t i = 0; i < size_t(r);) {
