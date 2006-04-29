@@ -51,6 +51,8 @@ using namespace tdl::schema;
 using namespace boost::assign;
 
 int main() {
+  std::istream::sync_with_stdio(false);
+
   std::cerr 
     <<
     "Simple config test: TDL configuration\n"

@@ -54,6 +54,7 @@
 #ifndef NO_STDLIB
 #include <iosfwd>
 #include <string>
+#include <gott/range_algo.hpp>
 #endif
 
 #include <cstring>
@@ -248,8 +249,12 @@ public:
     set_up(range(current, size), true);
     for (I it = r.Begin; it != r.End; ++it) {
       utf8_range r = it->as_utf8();
+#ifndef NO_STDLIB
+      current = copy(r, current);
+#else
       while (!r.empty())
         *current++ = *r.Begin++;
+#endif
     }
   }
 
