@@ -112,17 +112,12 @@ boost::int32_t inotify_engine::get_watch(
     inotify_engine &eng, 
     string const &path,
     ev_t mask) {
-  boost::scoped_array<char> c_path(new char[path.size() + 1]);
-  c_path.get()[path.size()] = '\0';
-  std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path.get());
-  boost::uint32_t result;
+  boost::scoped_array<char> c_path(path.c_string_alloc());
   try {
-    result = 
-      gott::inotify_add_watch_linux(eng.conn.access(), c_path.get(), mask);
+    return gott::inotify_add_watch_linux(eng.conn.access(), c_path.get(), mask);
   } catch (gott::system_error const &) {
     throw gott::notify_fs::watch_installation_failure(path);
   }
-  return result;
 }
 
 struct inotify_engine::inotify_watch : watch_implementation {
