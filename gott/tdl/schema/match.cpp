@@ -123,7 +123,6 @@ public:
 
   typedef std::vector<entry> Stack;
   Stack parse;
-  std::vector<string> shadow_names;
 
   ::boost::optional<source_position> overwrite_where;
 };
@@ -214,11 +213,6 @@ shared_ptr<writable_structure> match::impl::direct_structure_non_base() {
 
 template<class T>
 void match::impl::handle_token(T const &e) {
-  shadow_names.clear();
-  gott::range_t<Stack::iterator> in = gott::range(parse);
-  while (!in.empty())
-    shadow_names.push_back(in.Begin++->the_item->long_name());
-
   if (miss) {    
     real_parental_requirement();
     miss.reset();

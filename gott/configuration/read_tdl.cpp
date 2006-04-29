@@ -45,7 +45,6 @@
 #include <boost/algorithm/string.hpp>
 #include <gott/range.hpp>
 #include <map>
-#include <iostream>//FIXME
 
 using gott::string;
 namespace config = gott::config;
@@ -115,8 +114,6 @@ bool match_config_tdl::play(ev::down const &) {
     current_id = current_id + "::";
   }
 
-  std::cout << "down => " << current_id << std::endl;
-
   return true;
 }
 
@@ -124,19 +121,14 @@ bool match_config_tdl::play(ev::up const &) {
   if (!may_leave)
     return false;
 
-  std::cout << "up => ";
-  if (next_child == children.end()) {
-    std::cout << '$' << current_id << std::endl;
+  if (next_child == children.end())
     return false;
-  }
 
   dirty = false;
   peer = false;
 
   current_id = offset(current_id.as_utf8(), 0, -add_len.back());
   add_len.pop_back();
-  
-  std::cout << current_id << std::endl;
   
   return true;
 }
@@ -154,8 +146,6 @@ bool match_config_tdl::play(ev::node const &n) {
   else
     current_id = current_id + n.get_data();
 
-  std::cout << "node => " << current_id << std::endl;
-
   next_child = children.find(current_id);
 
   return true;
@@ -165,7 +155,6 @@ bool match_config_tdl::play(ev::child_succeed const &) {
   dirty = true;
   peer = true;
   may_leave = true;
-  std::cout << "child_succeed => " << current_id << std::endl;
   return true;
 }
 
