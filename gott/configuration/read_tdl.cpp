@@ -36,26 +36,63 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "read_tdl.hpp"
+#include <gott/tdl/schema/item.hpp>
+#include <gott/tdl/schema/rule.hpp>
+#include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/by_name.hpp>
 #include <gott/tdl/schema/event.hpp>
 #include <gott/tdl/schema/match.hpp>
 #include <boost/algorithm/string.hpp>
 #include <gott/range.hpp>
-
-#include <iostream>
+#include <map>
+#include <iostream>//FIXME
 
 using gott::string;
 namespace config = gott::config;
 namespace schema = tdl::schema;
 namespace ev = schema::ev;
-using config::match_config_tdl;
 
 namespace {
-struct config_type {
-  config_type() {
-    schema::by_name().add<match_config_tdl>("config");
-  }
-} auto_reg;
+
+/**
+ * Matcher for a single config item.
+ * Matches one TDL item (which may configure more than one item).
+ * Tag is key and key is tag. 
+ */
+class match_config_tdl : public tdl::schema::item {
+public:
+  match_config_tdl(tdl::schema::rule_attr_t const &, 
+      std::vector<tdl::schema::rule_t> const &, 
+      tdl::schema::match &);
+
+  static bool accept_empty(
+      tdl::schema::rule_attr_t const &, 
+      std::vector<tdl::schema::rule_t> const &)
+  { return true; }
+
+private:
+  bool play(tdl::schema::ev::down const &);
+  bool play(tdl::schema::ev::up const &);
+  bool play(tdl::schema::ev::node const &);
+  bool play(tdl::schema::ev::child_succeed const &);
+
+  expect expectation() const;
+
+  string name() const;
+
+  typedef std::map<string, tdl::schema::rule_t> children_t;
+  children_t children;
+  string current_id;
+  std::vector<int> add_len;
+  children_t::const_iterator next_child;
+  bool dirty, peer, may_leave;
+};
+
+}
+
+void *gott::config::detail::init_config() {
+  schema::by_name().add<match_config_tdl>("config");
+  return 0;
 }
 
 match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra, 

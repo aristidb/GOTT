@@ -38,47 +38,17 @@
 #ifndef GOTT_BASE_CONFIG_READ_TDL_HPP
 #define GOTT_BASE_CONFIG_READ_TDL_HPP
 
-#include <gott/tdl/schema/item.hpp>
-#include <gott/tdl/schema/rule.hpp>
-#include <gott/tdl/schema/rule_attr.hpp>
-#include <map>
+#include <gott/visibility.hpp>
 
-namespace gott {
-namespace config {
+namespace gott { namespace config {
 
-/**
- * Matcher for a single config item.
- * Matches one TDL item (which may configure more than one item).
- * Tag is key and key is tag. 
- */
-class match_config_tdl : public tdl::schema::item {
-public:
-  match_config_tdl(tdl::schema::rule_attr_t const &, 
-      std::vector<tdl::schema::rule_t> const &, 
-      tdl::schema::match &);
+namespace detail { 
+GOTT_EXPORT void *init_config();
 
-  static bool accept_empty(
-      tdl::schema::rule_attr_t const &, 
-      std::vector<tdl::schema::rule_t> const &)
-  { return true; }
-
-private:
-  bool play(tdl::schema::ev::down const &);
-  bool play(tdl::schema::ev::up const &);
-  bool play(tdl::schema::ev::node const &);
-  bool play(tdl::schema::ev::child_succeed const &);
-
-  expect expectation() const;
-
-  string name() const;
-
-  typedef std::map<string, tdl::schema::rule_t> children_t;
-  children_t children;
-  string current_id;
-  std::vector<int> add_len;
-  children_t::const_iterator next_child;
-  bool dirty, peer, may_leave;
-};
+namespace {
+void *init_x = init_config();
+}
+}
 
 }}
 

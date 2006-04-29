@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include <gott/configuration/read_tdl.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
 #include <gott/tdl/schema/match.hpp>
