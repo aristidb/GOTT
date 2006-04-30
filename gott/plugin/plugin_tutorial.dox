@@ -154,10 +154,10 @@ int main() {
 \endcode
 
 When you run this, the output should be:
-<verbatim>
+\verbatim
 Hello world!
 Hello world!
-</verbatim>
+\endverbatim
 
 But we wanted more action, or at least something more interesting. We shall fix
 that:
@@ -185,18 +185,18 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(random, the_second_plugin)
 Add this to the same shared library as the first plugin (you may add it to a
 separate, too). Then, add the following to plugin_registry.tdl:
 
-<verbatim>
+\verbatim
 plugin-id my::random::plugin
 enclosing-module my::hello::container
 has-interface my::simple_action
 symbol the_second_plugin
-</verbatim>
+\endverbatim
 
 Now, run and be astonished by something like this:
-<verbatim>
+\verbatim
 Hello world!
 Hello world!
 746455
 375483
-</verbatim>
+\endverbatim
  */
