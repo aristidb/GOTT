@@ -43,6 +43,7 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/construct.hpp>
 #include <boost/thread/once.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/optional.hpp>
 #include <boost/utility/in_place_factory.hpp>
 
@@ -55,9 +56,12 @@ gott::QID const notification_engine::qid(
 
 notification_engine::~notification_engine() {}
 
-static boost::once_flag once = BOOST_ONCE_INIT;
-static boost::optional<
+namespace {
+boost::once_flag once = BOOST_ONCE_INIT;
+boost::optional<
   gott::plugin::plugin_handle<gott::notify_fs::engine_factory> > handle;
+boost::mutex plugin_mutex;
+}
 
 static void init_handle() {
   using namespace gott::plugin;
@@ -76,7 +80,12 @@ notification_engine *notification_engine::get_for(main_loop &m) {
     return static_cast<notification_engine *>(slot);
 
   boost::call_once(init_handle, once);
-  notification_engine *eng = handle.get()->alloc(m);
+
+  notification_engine *eng;
+  {
+  boost::mutex::scoped_lock lock(plugin_mutex);
+  eng = handle.get()->alloc(m);
+  }
   
   slot = eng;
   m.on_destroy().connect(bind(delete_ptr(), eng));
