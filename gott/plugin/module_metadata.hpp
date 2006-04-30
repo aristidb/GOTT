@@ -78,7 +78,8 @@ void enumerate_module_metadata_p(
     boost::function<void (module_metadata const &)> const &callback,
     boost::optional<QID const &> const &module_id,
     bool cancel_early,
-    bool load_standard_metadata
+    bool load_standard_metadata,
+    bool validate
     );
 
 #ifndef IN_DOXY
@@ -86,10 +87,11 @@ typedef boost::parameter::parameters<
     tags::detail::callback,
     tags::detail::module_id,
     tags::detail::cancel_early,
-    tags::detail::load_standard_metadata
+    tags::detail::load_standard_metadata,
+    tags::detail::validate
   > emm_params;
 
-BOOST_PARAMETER_FUN(void, enumerate_module_metadata, 1, 4, emm_params);
+BOOST_PARAMETER_FUN(void, enumerate_module_metadata, 1, 5, emm_params);
 
 template<class ArgPack>
 void enumerate_module_metadata_with_named_params(ArgPack const &args) {
@@ -97,17 +99,19 @@ void enumerate_module_metadata_with_named_params(ArgPack const &args) {
       args[tags::callback],
       detail::get_opt_qid(args[tags::module_id | boost::none]),
       args[tags::cancel_early | false],
-      args[tags::load_standard_metadata | true]);
+      args[tags::load_standard_metadata | true],
+      args[tags::validate | true]);
 }
 
 typedef boost::parameter::parameters<
     tags::detail::module_id,
-    tags::detail::load_standard_metadata
+    tags::detail::load_standard_metadata,
+    tags::detail::validate
   > fmm_params;
 
 BOOST_PARAMETER_FUN(
     inline boost::optional<module_metadata const &>, find_module_metadata,
-    0, 2, fmm_params);
+    0, 3, fmm_params);
 
 template<class ArgPack>
 boost::optional<module_metadata const &>
@@ -117,21 +121,28 @@ find_module_metadata_with_named_params(ArgPack const &args) {
       boost::ref(cb),
       detail::get_opt_qid(args[tags::module_id | boost::none]),
       true,
-      args[tags::load_standard_metadata | true]);
+      args[tags::load_standard_metadata | true],
+      args[tags::validate | true]);
   return cb.result;
 }
 #else//=>IN_DOXY
 void enumerate_module_metadata(
     boost::function<void (module_metadata const &)> const &tags::callback,
     QID const &tags::module_id,
-    bool tags::cancel_early = false);
+    bool tags::cancel_early = false,
+    bool tags::load_standard_metadata = true,
+    bool tags::validate = true);
 
 boost::optional<module_metadata const &>
 find_module_metadata(
-    QID const &tags::module_id);
+    QID const &tags::module_id,
+    bool tags::load_standard_metadata = true,
+    bool tags::validate = true);
 #endif
 
 GOTT_EXPORT void add_module_metadata(module_metadata const &);
+
+GOTT_EXPORT void clear_module_metadata();
 
 GOTT_EXPORT void extract_module_metadata(std::istream &stream);
 

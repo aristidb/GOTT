@@ -74,7 +74,8 @@ struct plugin_metadata {
    */
   QID enclosing_module;
 
-  module_metadata const &enclosing_module_metadata() const GOTT_EXPORT;
+  module_metadata const &enclosing_module_metadata(
+      bool load_standard_metadata = true) const GOTT_EXPORT;
 
   /**
    * The entry smbol of the plugin.
@@ -103,7 +104,8 @@ void enumerate_plugin_metadata_p(
     boost::optional<QID const &> const &plugin_id,
     boost::optional<QID const &> const &interface,
     bool cancel_early,
-    bool load_standard_metadata);
+    bool load_standard_metadata,
+    bool validate);
 
 #ifndef IN_DOXY
 typedef boost::parameter::parameters<
@@ -111,10 +113,11 @@ typedef boost::parameter::parameters<
   tags::detail::plugin_id,
   tags::detail::interface,
   tags::detail::cancel_early,
-  tags::detail::load_standard_metadata
+  tags::detail::load_standard_metadata,
+  tags::detail::validate
 > epm_params;
 
-BOOST_PARAMETER_FUN(void, enumerate_plugin_metadata, 1, 5, epm_params);
+BOOST_PARAMETER_FUN(void, enumerate_plugin_metadata, 1, 6, epm_params);
 
 template<class ArgPack>
 void enumerate_plugin_metadata_with_named_params(ArgPack const &args) {
@@ -122,17 +125,19 @@ void enumerate_plugin_metadata_with_named_params(ArgPack const &args) {
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
       detail::get_opt_qid(args[tags::interface | boost::none]),
       args[tags::cancel_early | false],
-      args[tags::load_standard_metadata | true]);
+      args[tags::load_standard_metadata | true],
+      args[tags::validate | true]);
 }
 
 typedef boost::parameter::parameters<
   tags::detail::plugin_id,
   tags::detail::interface,
-  tags::detail::load_standard_metadata
+  tags::detail::load_standard_metadata,
+  tags::detail::validate
 > fpm_params;
 
 BOOST_PARAMETER_FUN(inline boost::optional<plugin_metadata const &>,
-    find_plugin_metadata, 0, 3, fpm_params);
+    find_plugin_metadata, 0, 4, fpm_params);
 
 template<class ArgPack>
 boost::optional<plugin_metadata const &>
@@ -142,7 +147,8 @@ find_plugin_metadata_with_named_params(ArgPack const &args) {
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
       detail::get_opt_qid(args[tags::interface | boost::none]),
       true,
-      args[tags::load_standard_metadata | true]);
+      args[tags::load_standard_metadata | true],
+      args[tags::validate | true]);
   return cb.result;
 }
 #else//=>IN_DOXY
@@ -160,7 +166,9 @@ void enumerate_plugin_metadata(
     boost::function<void (plugin_metadata const &)> const &tags::callback,
     QID const &tags::plugin_id,
     QID const &tags::interface,
-    bool tags::cancel_early = false
+    bool tags::cancel_early = false,
+    bool tags::load_standard_metadata = true,
+    bool tags::validate = true
     );
 
 /**
@@ -174,7 +182,9 @@ void enumerate_plugin_metadata(
 boost::optional<plugin_metadata const &>
 find_plugin_metadata(
     QID const &tags::plugin_id,
-    QID const &tags::interface
+    QID const &tags::interface,
+    bool tags::load_standard_metadata = true,
+    bool tags::validate = true
     );
 #endif
 
@@ -185,6 +195,12 @@ find_plugin_metadata(
  */
 GOTT_EXPORT
 void add_plugin_metadata(plugin_metadata const &metadata);
+
+/**
+ * Clear the plugin metadata database.
+ */
+GOTT_EXPORT
+void clear_plugin_metadata();
 
 /**
  * Add a list of some plugins' metadata read from a stream. Thread-safe.

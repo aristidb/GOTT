@@ -35,44 +35,19 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "metadata.hpp"
+#include "validate.hpp"
 #include "plugin_metadata.hpp"
 #include "module_metadata.hpp"
-#include <boost/thread/once.hpp>
-#include <fstream>
 
-namespace {
-boost::once_flag once_standard = BOOST_ONCE_INIT;
-boost::once_flag once_core = BOOST_ONCE_INIT;
+using gott::plugin::plugin_metadata;
+using gott::plugin::module_metadata;
 
-void noop() {}
-
-void do_load_standard() {
-  boost::call_once(&noop, once_core); // simulate loading provisory metadata
-  { // get rid of any provisory metadata
-    gott::plugin::clear_plugin_metadata();
-    gott::plugin::clear_module_metadata();
-  }
-  using namespace gott::plugin;
-  {
-    std::ifstream in("plugin_registry.tdl");
-    extract_plugin_metadata(in);
-  }
-  {
-    std::ifstream in("module_registry.tdl");
-    extract_module_metadata(in);
-  }
+bool gott::plugin::validate_metadata(plugin_metadata const &which) {
+  if (!validate_metadata(which.enclosing_module_metadata()))
+    return false;
+  return true;
 }
 
-void do_load_core() {
-  //nothing yet, TDL builtin types to be inserted here(!)
-}
-}
-
-void gott::plugin::load_standard_metadata() {
-  boost::call_once(&do_load_standard, once_standard);
-}
-
-void gott::plugin::load_core_metadata() {
-  boost::call_once(&do_load_core, once_core);
+bool gott::plugin::validate_metadata(module_metadata const &which) {
+  return true;
 }

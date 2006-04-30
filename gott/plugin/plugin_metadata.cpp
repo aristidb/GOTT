@@ -38,6 +38,7 @@
 #include "plugin_metadata.hpp"
 #include "module_metadata.hpp"
 #include "metadata.hpp"
+#include "validate.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>
@@ -58,9 +59,12 @@ using namespace gott;
 using std::istream;
 using std::ostream;
 
-module_metadata const &plugin_metadata::enclosing_module_metadata() const {
+module_metadata const &plugin_metadata::enclosing_module_metadata(
+    bool do_load_standard_metadata) const {
   boost::optional<module_metadata const &> res =
-    find_module_metadata(enclosing_module);
+    find_module_metadata(
+        enclosing_module,
+        tags::load_standard_metadata = do_load_standard_metadata);
   if (!res)
     throw system_error("module not found");
   return *res;
@@ -123,7 +127,8 @@ void gott::plugin::enumerate_plugin_metadata_p(
     boost::optional<QID const &> const &plugin_id,
     boost::optional<QID const &> const &interface_id,
     bool cancel_early,
-    bool do_load_standard_metadata) {
+    bool do_load_standard_metadata,
+    bool validate) {
   if (do_load_standard_metadata)
     load_standard_metadata();
   BIGLOCK;
@@ -135,6 +140,8 @@ void gott::plugin::enumerate_plugin_metadata_p(
     if (interface_id && 
         find(range(it->interfaces), *interface_id) == it->interfaces.end())
       continue;
+    if (validate && !validate_metadata(*it))
+      continue;
     function(*it);
     if (cancel_early)
       break;
@@ -144,6 +151,11 @@ void gott::plugin::enumerate_plugin_metadata_p(
 void gott::plugin::add_plugin_metadata(plugin_metadata const &metadata) {
   BIGLOCK;
   known_plugin_metadata.push_back(metadata);
+}
+
+void gott::plugin::clear_plugin_metadata() {
+  BIGLOCK;
+  plugin_metadata_list_t().swap(known_plugin_metadata);
 }
 
 void gott::plugin::extract_plugin_metadata(istream &stream) {

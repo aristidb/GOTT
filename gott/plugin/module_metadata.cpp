@@ -37,6 +37,7 @@
 
 #include "module_metadata.hpp"
 #include "metadata.hpp"
+#include "validate.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>
@@ -111,7 +112,8 @@ void gott::plugin::enumerate_module_metadata_p(
     boost::function<void (module_metadata const &)> const &callback,
     boost::optional<QID const &> const &module_id,
     bool cancel_early,
-    bool do_load_standard_metadata) {
+    bool do_load_standard_metadata,
+    bool validate) {
   if (do_load_standard_metadata)
     load_standard_metadata();
   BIGLOCK;
@@ -119,6 +121,8 @@ void gott::plugin::enumerate_module_metadata_p(
       it != known_module_metadata.end();
       ++it) {
     if (module_id && it->module_id != *module_id)
+      continue;
+    if (validate && !validate_metadata(*it))
       continue;
     callback(*it);
     if (cancel_early)
@@ -129,6 +133,11 @@ void gott::plugin::enumerate_module_metadata_p(
 void gott::plugin::add_module_metadata(module_metadata const &metadata) {
   BIGLOCK;
   known_module_metadata.push_back(metadata);
+}
+
+void gott::plugin::clear_module_metadata() {
+  BIGLOCK;
+  module_metadata_list_t().swap(known_module_metadata);
 }
 
 void gott::plugin::extract_module_metadata(istream &stream) {
