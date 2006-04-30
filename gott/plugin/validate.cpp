@@ -38,6 +38,8 @@
 #include "validate.hpp"
 #include "plugin_metadata.hpp"
 #include "module_metadata.hpp"
+#include <boost/filesystem/operations.hpp>
+#include <gott/string/stl.hpp>
 
 using gott::plugin::plugin_metadata;
 using gott::plugin::module_metadata;
@@ -49,5 +51,7 @@ bool gott::plugin::validate_metadata(plugin_metadata const &which) {
 }
 
 bool gott::plugin::validate_metadata(module_metadata const &which) {
+  if (!boost::filesystem::exists(to_string(which.file_path)))
+    return false;
   return true;
 }
