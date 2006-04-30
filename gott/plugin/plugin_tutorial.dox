@@ -80,6 +80,7 @@ library above:
 using namespace gott::plugin;
 
 int main() {
+  // Find the first plugin which supports the interface and load it.
   plugin_handle<my::simple_action> handle(
     find_plugin_metadata(tags::interface = "my::simple_action"));
   handle->do_it();
@@ -122,5 +123,80 @@ enclosing-module my::hello::container
 symbol the_plugin
 \endverbatim
 
-Hope you can figure it out.
+Hope you can figure it out. You should see something like this on your screen:
+<verbatim>
+Hello world!
+</verbatim>
+
+\subsection more_action But I want more action!
+
+OK, we'll do that. You want more action? I'll give you more action<b>s</b>!
+First, we change the application like this:
+\code
+#include "simple_application.hpp"
+#include <gott/plugin.hpp>
+
+using namespace gott::plugin;
+
+namespace {
+void run_action(plugin_metadata const &which) {
+  plugin_handle<my::simple_action> handle(which);
+  handle->do_it();
+  handle->do_it();
+}
+}
+
+int main() {
+  enumerate_plugin_metadata(
+    tags::interface = "my::simple_action",
+    tags::callback = &run_action);
+}
+\endcode
+
+When you run this, the output should be:
+<verbatim>
+Hello world!
+Hello world!
+</verbatim>
+
+But we wanted more action, or at least something more interesting. We shall fix
+that:
+\code
+#include "simple_action.hpp"
+#include <gott/plugin.hpp>
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+namespace {
+class random : public my::simple_action {
+  random() {
+    std::srand(std::time(0));
+  }
+
+  void do_it() {
+    std::cout << std::rand() << std::endl;
+  }
+};
+}
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(random, the_second_plugin)
+\endcode
+Add this to the same shared library as the first plugin (you may add it to a
+separate, too). Then, add the following to plugin_registry.tdl:
+
+<verbatim>
+plugin-id my::random::plugin
+enclosing-module my::hello::container
+has-interface my::simple_action
+symbol the_second_plugin
+</verbatim>
+
+Now, run and be astonished by something like this:
+<verbatim>
+Hello world!
+Hello world!
+746455
+375483
+</verbatim>
  */
