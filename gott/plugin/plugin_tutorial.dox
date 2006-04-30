@@ -38,5 +38,89 @@
 /**
 \page plugin_tutorial A tutorial for GOTT plugins.
 
-Sorry, must eat.
+\section intro Introduction
+
+Plugins are a wonderful method for creating dynamic, extensible applications.
+GOTT plugins strive for maximum flexibility and usability. You need basically
+two things for a functional plugin: a dynamic library (also called shared object
+or library under some circumstances) and accompanying metadata.
+
+\section quickstart Quick start / Hello world
+
+Let's do a "Hello world" with GOTT plugins. First we need an interface:
+\code
+// simple_action.hpp
+#ifndef SIMPLE_ACTION_HPP
+#define SIMPLE_ACTION_HPP
+#include <gott/plugin/plugin_base.hpp>
+
+namespace my {
+//interface-id: my::simple_action (just a QID)
+class GOTT_EXPORT simple_action : public gott::plugin::plugin_base {
+public:
+  virtual void do_it() = 0;
+  virtual ~simple_action();
+};
+}
+#endif
+
+// simple_action.cpp
+#include "simple_action.hpp"
+
+my::simple_action::~simple_action() {} // for vtable/typeinfo
+\endcode
+We <b>have to</b> put this interface into a shared library.
+
+Then, let's create a simple application that links to the generated shared
+library above:
+\code
+#include "simple_application.hpp"
+#include <gott/plugin.hpp>
+
+using namespace gott::plugin;
+
+int main() {
+  plugin_handle<my::simple_action> handle(
+    find_plugin_metadata(tags::interface = "my::simple_action"));
+  handle->do_it();
+}
+\endcode
+
+Now we have an application that can use plugins but no plugin by itself. We 
+shall define this one now:
+\code
+// my_plugin.cpp
+#include "simple_application.hpp"
+#include <gott/plugin.hpp>
+#include <iostream>
+
+namespace {
+class hello : public my::simple_action {
+public:
+  void do_it() {
+    std::cout << "Hello world!" << std::endl;
+  }
+};
+}
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(hello, the_plugin)
+\endcode
+Put this into a shared library of its own, suppose it is saved to
+/home/max/hello.so, then we need to add the following metadata to
+module_metadata.tdl:
+\verbatim
+module-id my::hello::container
+module-type dynamic-native # it's a shared library
+file-path /home/max/hello.so
+\endverbatim
+
+And we need to add the following lines to plugin_metadata.tdl:
+\verbatim
+plugin-id my::hello::plugin
+has-interface my::simple_action
+enclosing-module my::hello::container
+symbol the_plugin
+\endverbatim
+
+Hope you can figure it out.
  */
