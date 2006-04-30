@@ -39,6 +39,8 @@
 #define GOTT_PLUGIN_MODULE_HPP
 
 #include <gott/visibility.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace gott {
 class string;
@@ -49,7 +51,7 @@ class plugin_configuration;
 struct module_metadata;
 struct plugin_metadata;
 
-class module {
+class module : boost::noncopyable {
 public:
   GOTT_EXPORT module(module_metadata const &which);
   GOTT_EXPORT ~module();
@@ -62,7 +64,8 @@ public:
       plugin_configuration const &conf);
 
 private:
-  void *handle;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}

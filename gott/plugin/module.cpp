@@ -50,26 +50,36 @@
 using gott::plugin::module;
 using gott::plugin::plugin_base;
 
-module::module(module_metadata const &which)
-: handle(
-    dlopen_unix(
-      boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
-      RTLD_LAZY))
-{
-}
+class module::impl {
+private:
+  void *handle;
+public:
+  impl(module_metadata const &which)
+  : handle(
+      dlopen_unix(
+        boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
+        RTLD_LAZY)) {}
 
-module::~module() {
-  if (handle)
-    try {
-      dlclose_unix(handle);
-    } catch (...) {
-      // TODO: log?
-    }
-}
+  ~impl() {
+    if (handle)
+      try {
+        dlclose_unix(handle);
+      } catch (...) {
+        // TODO: log?
+      }
+  }
+
+  void *entity(gott::string const &symbol) {
+    return dlsym_unix(handle,
+        boost::scoped_array<char>(symbol.c_string_alloc()).get());
+  }
+};
+
+module::module(module_metadata const &which) : p(new impl(which)) {}
+module::~module() {}
 
 void *module::entity(gott::string const &symbol) {
-  return dlsym_unix(handle,
-      boost::scoped_array<char>(symbol.c_string_alloc()).get());
+  return p->entity(symbol);
 }
 
 plugin_base *module::load_plugin(plugin_metadata const &which) {
