@@ -41,9 +41,12 @@
 #include <boost/thread/once.hpp>
 #include <fstream>
 
-static boost::once_flag once = BOOST_ONCE_INIT;
+namespace {
+boost::once_flag once_standard = BOOST_ONCE_INIT;
+boost::once_flag once_core = BOOST_ONCE_INIT;
 
-static void do_load() {
+void do_load_standard() {
+  gott::plugin::load_core_metadata();
   using namespace gott::plugin;
   {
     std::ifstream in("plugin_registry.tdl");
@@ -55,6 +58,17 @@ static void do_load() {
   }
 }
 
+void do_load_core() {
+  //nothing yet, TDL builtin types to be inserted here(!)
+}
+}
+
 void gott::plugin::load_standard_metadata() {
-  boost::call_once(&do_load, once);
+  boost::call_once(&do_load_standard, once_standard);
+}
+
+
+
+void gott::plugin::load_core_metadata() {
+  boost::call_once(&do_load_core, once_core);
 }

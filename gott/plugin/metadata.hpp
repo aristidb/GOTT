@@ -43,6 +43,9 @@
 namespace gott { namespace plugin {
 
 GOTT_EXPORT
+void load_core_metadata();
+
+GOTT_EXPORT
 void load_standard_metadata();
 
 }}
