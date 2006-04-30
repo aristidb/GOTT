@@ -51,6 +51,7 @@ namespace tags {
   BOOST_PARAMETER_KEYWORD(detail, module_id)
   BOOST_PARAMETER_KEYWORD(detail, interface)
   BOOST_PARAMETER_KEYWORD(detail, cancel_early)
+  BOOST_PARAMETER_KEYWORD(detail, load_standard_metadata)
 }
 
 namespace detail {

@@ -37,6 +37,7 @@
 
 #include "plugin_metadata.hpp"
 #include "module_metadata.hpp"
+#include "metadata.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>
@@ -121,7 +122,10 @@ void gott::plugin::enumerate_plugin_metadata_p(
     boost::function<void (plugin_metadata const &)> const &function,
     boost::optional<QID const &> const &plugin_id,
     boost::optional<QID const &> const &interface_id,
-    bool cancel_early) {
+    bool cancel_early,
+    bool do_load_standard_metadata) {
+  if (do_load_standard_metadata)
+    load_standard_metadata();
   BIGLOCK;
   for (plugin_metadata_list_t::iterator it = known_plugin_metadata.begin();
       it != known_plugin_metadata.end();

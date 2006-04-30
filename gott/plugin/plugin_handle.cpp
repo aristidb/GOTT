@@ -39,12 +39,27 @@
 #include "plugin_metadata.hpp"
 #include "module_metadata.hpp"
 #include "plugin_base.hpp"
+#include <gott/exceptions.hpp>
 
 using namespace gott::plugin;
 
 plugin_handle_base::plugin_handle_base(plugin_metadata const &which)
 : mod(which.enclosing_module_metadata()),
   p(mod.load_plugin(which)) {}
+
+namespace {
+plugin_metadata const &unwrap(
+    boost::optional<plugin_metadata const &> const &which) {
+  if (!which)
+    throw gott::system_error("plugin not found");
+  return which.get();
+}
+}
+
+plugin_handle_base::plugin_handle_base(
+    boost::optional<plugin_metadata const &> const &which)
+: mod(unwrap(which).enclosing_module_metadata()),
+  p(mod.load_plugin(unwrap(which))) {}
 
 plugin_handle_base::~plugin_handle_base() {
   delete p;

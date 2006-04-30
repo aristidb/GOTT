@@ -40,6 +40,7 @@
 
 #include "plugin_base.hpp"
 #include "module.hpp"
+#include <boost/optional/optional_fwd.hpp>
 
 namespace gott {
 class string;
@@ -49,6 +50,8 @@ namespace plugin {
 class plugin_handle_base {
 public:
   plugin_handle_base(plugin_metadata const &which) GOTT_EXPORT;
+  GOTT_EXPORT
+  plugin_handle_base(boost::optional<plugin_metadata const &> const &which);
   ~plugin_handle_base() GOTT_EXPORT;
 
   plugin_base *get_base() { return p; }
@@ -64,6 +67,10 @@ public:
   plugin_handle(plugin_metadata const &which)
   : plugin_handle_base(which),
     p(dynamic_cast<ConcretePlugin *>(get_base())) {}
+  plugin_handle(boost::optional<plugin_metadata const &> const &which)
+  : plugin_handle_base(which),
+    p(dynamic_cast<ConcretePlugin *>(get_base())) {}
+
   ~plugin_handle() {}
 
   ConcretePlugin &operator*() { return *p; }

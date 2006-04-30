@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "module_metadata.hpp"
+#include "metadata.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>
@@ -109,7 +110,10 @@ namespace {
 void gott::plugin::enumerate_module_metadata_p(
     boost::function<void (module_metadata const &)> const &callback,
     boost::optional<QID const &> const &module_id,
-    bool cancel_early) {
+    bool cancel_early,
+    bool do_load_standard_metadata) {
+  if (do_load_standard_metadata)
+    load_standard_metadata();
   BIGLOCK;
   for (module_metadata_list_t::iterator it = known_module_metadata.begin();
       it != known_module_metadata.end();

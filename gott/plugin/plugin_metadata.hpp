@@ -94,6 +94,7 @@ struct interface_metadata {
  * \param interface Requires the record to indicate support for the given
  *                 interface if set.
  * \param cancel_early Cancel after the first record was found.
+ * \param load_standard_metadata Call load_standard_metadata() first.
  * \see enumerate_plugin_metadata
  */
 GOTT_EXPORT
@@ -101,33 +102,37 @@ void enumerate_plugin_metadata_p(
     boost::function<void (plugin_metadata const &)> const &callback,
     boost::optional<QID const &> const &plugin_id,
     boost::optional<QID const &> const &interface,
-    bool cancel_early);
+    bool cancel_early,
+    bool load_standard_metadata);
 
 #ifndef IN_DOXY
 typedef boost::parameter::parameters<
   tags::detail::callback,
   tags::detail::plugin_id,
   tags::detail::interface,
-  tags::detail::cancel_early
+  tags::detail::cancel_early,
+  tags::detail::load_standard_metadata
 > epm_params;
 
-BOOST_PARAMETER_FUN(void, enumerate_plugin_metadata, 1, 4, epm_params);
+BOOST_PARAMETER_FUN(void, enumerate_plugin_metadata, 1, 5, epm_params);
 
 template<class ArgPack>
 void enumerate_plugin_metadata_with_named_params(ArgPack const &args) {
   enumerate_plugin_metadata_p(args[tags::callback],
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
       detail::get_opt_qid(args[tags::interface | boost::none]),
-      args[tags::cancel_early | false]);
+      args[tags::cancel_early | false],
+      args[tags::load_standard_metadata | true]);
 }
 
 typedef boost::parameter::parameters<
   tags::detail::plugin_id,
-  tags::detail::interface
+  tags::detail::interface,
+  tags::detail::load_standard_metadata
 > fpm_params;
 
 BOOST_PARAMETER_FUN(inline boost::optional<plugin_metadata const &>,
-    find_plugin_metadata, 0, 2, fpm_params);
+    find_plugin_metadata, 0, 3, fpm_params);
 
 template<class ArgPack>
 boost::optional<plugin_metadata const &>
@@ -136,7 +141,8 @@ find_plugin_metadata_with_named_params(ArgPack const &args) {
   enumerate_plugin_metadata_p(boost::ref(cb),
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
       detail::get_opt_qid(args[tags::interface | boost::none]),
-      true);
+      true,
+      args[tags::load_standard_metadata | true]);
   return cb.result;
 }
 #else//=>IN_DOXY

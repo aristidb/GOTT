@@ -77,33 +77,37 @@ GOTT_EXPORT
 void enumerate_module_metadata_p(
     boost::function<void (module_metadata const &)> const &callback,
     boost::optional<QID const &> const &module_id,
-    bool cancel_early
+    bool cancel_early,
+    bool load_standard_metadata
     );
 
 #ifndef IN_DOXY
 typedef boost::parameter::parameters<
     tags::detail::callback,
     tags::detail::module_id,
-    tags::detail::cancel_early
+    tags::detail::cancel_early,
+    tags::detail::load_standard_metadata
   > emm_params;
 
-BOOST_PARAMETER_FUN(void, enumerate_module_metadata, 1, 3, emm_params);
+BOOST_PARAMETER_FUN(void, enumerate_module_metadata, 1, 4, emm_params);
 
 template<class ArgPack>
 void enumerate_module_metadata_with_named_params(ArgPack const &args) {
   enumerate_module_metadata_p(
       args[tags::callback],
       detail::get_opt_qid(args[tags::module_id | boost::none]),
-      args[tags::cancel_early | false]);
+      args[tags::cancel_early | false],
+      args[tags::load_standard_metadata | true]);
 }
 
 typedef boost::parameter::parameters<
-    tags::detail::module_id
+    tags::detail::module_id,
+    tags::detail::load_standard_metadata
   > fmm_params;
 
 BOOST_PARAMETER_FUN(
     inline boost::optional<module_metadata const &>, find_module_metadata,
-    0, 1, fmm_params);
+    0, 2, fmm_params);
 
 template<class ArgPack>
 boost::optional<module_metadata const &>
@@ -112,7 +116,8 @@ find_module_metadata_with_named_params(ArgPack const &args) {
   enumerate_module_metadata_p(
       boost::ref(cb),
       detail::get_opt_qid(args[tags::module_id | boost::none]),
-      true);
+      true,
+      args[tags::load_standard_metadata | true]);
   return cb.result;
 }
 #else//=>IN_DOXY

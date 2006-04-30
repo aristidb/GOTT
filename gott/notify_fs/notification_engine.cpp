@@ -57,29 +57,16 @@ gott::QID const notification_engine::qid(
 notification_engine::~notification_engine() {}
 
 namespace {
-boost::once_flag once = BOOST_ONCE_INIT;
-boost::optional<
-  gott::plugin::plugin_handle<gott::notify_fs::engine_factory> > handle;
+gott::plugin::plugin_handle<gott::notify_fs::engine_factory> handle(
+    gott::plugin::find_plugin_metadata(
+      gott::plugin::tags::interface = "gott::notify_fs::engine_factory"));
 boost::mutex plugin_mutex;
-}
-
-static void init_handle() {
-  using namespace gott::plugin;
-  load_standard_metadata();
-  boost::optional<plugin_metadata const &> which =
-    find_plugin_metadata(tags::interface = "gott::notify_fs::engine_factory");
-  if (!which)
-    throw gott::system_error(
-        "no file system event notification engine available");
-  handle = boost::in_place(*which);
 }
 
 notification_engine *notification_engine::get_for(main_loop &m) {
   void *&slot = m.feature_data(qid);
   if (slot)
     return static_cast<notification_engine *>(slot);
-
-  boost::call_once(init_handle, once);
 
   notification_engine *eng;
   {
