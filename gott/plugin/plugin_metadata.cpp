@@ -64,6 +64,7 @@ module_metadata const &plugin_metadata::enclosing_module_metadata(
   boost::optional<module_metadata const &> res =
     find_module_metadata(
         enclosing_module,
+        tags::validate = false,
         tags::load_standard_metadata = do_load_standard_metadata);
   if (!res)
     throw system_error("module not found");
