@@ -71,6 +71,12 @@ module_metadata const &plugin_metadata::enclosing_module_metadata(
   return *res;
 }
 
+bool plugin_metadata::is_valid() const {
+  if (!validation)
+    validation = detail::validate_metadata(*this);
+  return *validation;
+}
+
 namespace {
   static boost::recursive_mutex metadata_biglock;
   #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
@@ -141,7 +147,7 @@ void gott::plugin::enumerate_plugin_metadata_p(
     if (interface_id && 
         find(range(it->interfaces), *interface_id) == it->interfaces.end())
       continue;
-    if (validate && !validate_metadata(*it))
+    if (validate && !it->is_valid())
       continue;
     function(*it);
     if (cancel_early)

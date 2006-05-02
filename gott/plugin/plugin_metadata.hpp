@@ -81,6 +81,11 @@ struct plugin_metadata {
    * The entry smbol of the plugin.
    */
   string symbol;
+
+  bool is_valid() const;
+
+private:
+  mutable boost::optional<bool> validation;
 };
 
 struct interface_metadata {

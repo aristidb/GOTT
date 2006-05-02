@@ -43,8 +43,12 @@ namespace gott { namespace plugin {
 struct plugin_metadata;
 struct module_metadata;
 
+namespace detail {
+
 bool validate_metadata(plugin_metadata const &);
 bool validate_metadata(module_metadata const &);
+
+}
 
 }}
 

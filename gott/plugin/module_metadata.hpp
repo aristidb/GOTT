@@ -71,6 +71,11 @@ struct module_metadata {
   string file_path;
 
   module_metadata() : module_type(dynamic_native) {}
+
+  bool is_valid() const;
+
+private:
+  mutable boost::optional<bool> validation;
 };
 
 GOTT_EXPORT

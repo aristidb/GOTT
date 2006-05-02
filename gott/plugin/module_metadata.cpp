@@ -58,6 +58,12 @@ using namespace gott;
 using std::istream;
 using std::ostream;
 
+bool module_metadata::is_valid() const {
+  if (!validation)
+    validation = detail::validate_metadata(*this);
+  return *validation;
+}
+
 namespace {
   static boost::recursive_mutex metadata_biglock;
   #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
@@ -122,7 +128,7 @@ void gott::plugin::enumerate_module_metadata_p(
       ++it) {
     if (module_id && it->module_id != *module_id)
       continue;
-    if (validate && !validate_metadata(*it))
+    if (validate && !it->is_valid())
       continue;
     callback(*it);
     if (cancel_early)
