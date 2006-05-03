@@ -45,7 +45,7 @@ operations_base::~operations_base() {}
 bool gott::xany::operator==(Xany const &lhs, Xany const &rhs) {
   if (lhs.empty() || rhs.empty())
     return lhs.empty() && rhs.empty();
-  if (lhs.type() != rhs.type())
+  if (!lhs.type_equals(rhs))
     return false;
   return dynamic_cast<equality_comparable const &>(lhs.get_operations())
           .equals(lhs, rhs);

@@ -136,6 +136,14 @@ public:
     return place ? place->spelled_type() : spell<void>();
   }
 
+  bool type_equals(Xany const &o) const {
+#ifdef BUG_FIXED_GCC_TEMPLATE_TYPEINFO
+    return spelled_type() == o.spelled_type();
+#else
+    return type() == o.type();
+#endif
+  }
+
   /**
    * Checks for type compatibilty.
    */
