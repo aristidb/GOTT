@@ -67,6 +67,7 @@ bool module_metadata::is_valid() const {
 }
 
 boost::shared_ptr<module> module_metadata::get_instance() const {
+  //FIXME,TODO: this is not thread-safe
   if (!instance.expired())
     return instance.lock();
   boost::shared_ptr<module> result(new module(*this));
