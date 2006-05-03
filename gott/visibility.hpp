@@ -46,7 +46,7 @@
   #endif
   #define GOTT_LOCAL
 #else
-  #ifdef HAVE_VISIBILITY
+  #ifdef HAS_VISIBILITY
     #define GOTT_EXPORT __attribute__ ((visibility("default")))
     #define GOTT_LOCAL __attribute__ ((visibility("hidden")))
   #else
