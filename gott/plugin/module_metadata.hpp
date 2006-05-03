@@ -45,6 +45,8 @@
 #include <boost/optional/optional.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
+#include <boost/weak_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <iosfwd>
 
 namespace gott { namespace plugin {
@@ -72,9 +74,13 @@ struct module_metadata {
 
   module_metadata() : module_type(dynamic_native) {}
 
-  bool is_valid() const;
+  bool is_valid() const GOTT_EXPORT;
+
+  boost::shared_ptr<class module> get_instance() const GOTT_EXPORT;
 
 private:
+  mutable boost::weak_ptr<class module> instance;
+
   mutable boost::optional<bool> validation;
 };
 

@@ -38,6 +38,7 @@
 #include "module_metadata.hpp"
 #include "metadata.hpp"
 #include "validate.hpp"
+#include "module.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>
@@ -46,6 +47,7 @@
 #include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/tdl/structure/repatchers/enumeration.hpp>
 #include <gott/tdl/write/writer.hpp>
+#include <gott/exceptions.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/thread.hpp>
 #include <vector>
@@ -62,6 +64,14 @@ bool module_metadata::is_valid() const {
   if (!validation)
     validation = detail::validate_metadata(*this);
   return *validation;
+}
+
+boost::shared_ptr<module> module_metadata::get_instance() const {
+  if (!instance.expired())
+    return instance.lock();
+  boost::shared_ptr<module> result(new module(*this));
+  instance = result;
+  return result;
 }
 
 namespace {

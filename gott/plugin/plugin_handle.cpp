@@ -46,12 +46,12 @@ using namespace gott::plugin;
 class plugin_handle_base::impl {
 public:
   impl(plugin_metadata const &which)
-    : mod(which.enclosing_module_metadata()),
-      p(mod.load_plugin(which)) {}
+    : mod(which.enclosing_module_metadata().get_instance()),
+      p(mod->load_plugin(which)) {}
 
   ~impl() { delete p; }
 
-  module mod;
+  boost::shared_ptr<module> mod;
   plugin_base *p;
 };
 
