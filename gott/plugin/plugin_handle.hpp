@@ -41,6 +41,7 @@
 #include "plugin_base.hpp"
 #include "module.hpp"
 #include <boost/optional/optional_fwd.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace gott {
 class string;
@@ -54,11 +55,11 @@ public:
   plugin_handle_base(boost::optional<plugin_metadata const &> const &which);
   ~plugin_handle_base() GOTT_EXPORT;
 
-  plugin_base *get_base() { return p; }
+  plugin_base *get_base() const GOTT_EXPORT;
 
 private:
-  module mod;
-  plugin_base *p;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };    
 
 template<class ConcretePlugin>

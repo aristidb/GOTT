@@ -43,9 +43,20 @@
 
 using namespace gott::plugin;
 
+class plugin_handle_base::impl {
+public:
+  impl(plugin_metadata const &which)
+    : mod(which.enclosing_module_metadata()),
+      p(mod.load_plugin(which)) {}
+
+  ~impl() { delete p; }
+
+  module mod;
+  plugin_base *p;
+};
+
 plugin_handle_base::plugin_handle_base(plugin_metadata const &which)
-: mod(which.enclosing_module_metadata()),
-  p(mod.load_plugin(which)) {}
+: p(new impl(which)) {}
 
 namespace {
 plugin_metadata const &unwrap(
@@ -58,9 +69,10 @@ plugin_metadata const &unwrap(
 
 plugin_handle_base::plugin_handle_base(
     boost::optional<plugin_metadata const &> const &which)
-: mod(unwrap(which).enclosing_module_metadata()),
-  p(mod.load_plugin(unwrap(which))) {}
+: p(new impl(unwrap(which))) {}
 
-plugin_handle_base::~plugin_handle_base() {
-  delete p;
+plugin_handle_base::~plugin_handle_base() {}
+
+plugin_base *plugin_handle_base::get_base() const {
+  return p->p;
 }
