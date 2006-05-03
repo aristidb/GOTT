@@ -63,6 +63,8 @@ public:
       return dlopen_unix(
           boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
           RTLD_LAZY | RTLD_LOCAL);
+    default:
+      throw 0;
     }
   }
 

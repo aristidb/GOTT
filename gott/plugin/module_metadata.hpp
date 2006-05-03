@@ -45,7 +45,7 @@
 #include <boost/optional/optional.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
-#include <boost/weak_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <iosfwd>
 
@@ -72,16 +72,18 @@ struct module_metadata {
    */
   string file_path;
 
-  module_metadata() : module_type(dynamic_native) {}
+  module_metadata() GOTT_EXPORT;
+  ~module_metadata() GOTT_EXPORT;
+  module_metadata(module_metadata const &o) GOTT_EXPORT;
+  void operator=(module_metadata const &o) GOTT_EXPORT;
 
   bool is_valid() const GOTT_EXPORT;
 
   boost::shared_ptr<class module> get_instance() const GOTT_EXPORT;
 
 private:
-  mutable boost::weak_ptr<class module> instance;
-
-  mutable boost::optional<bool> validation;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 GOTT_EXPORT

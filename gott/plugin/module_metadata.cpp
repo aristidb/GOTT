@@ -50,6 +50,7 @@
 #include <gott/exceptions.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/thread.hpp>
+#include <boost/weak_ptr.hpp>
 #include <vector>
 
 using namespace tdl::schema;
@@ -60,18 +61,45 @@ using namespace gott;
 using std::istream;
 using std::ostream;
 
+class module_metadata::impl {
+public:
+  boost::weak_ptr<module> instance;
+  boost::optional<bool> validation;
+  boost::mutex mutex;
+};
+
+module_metadata::module_metadata() 
+  : module_type(dynamic_native),
+    p(new impl) {}
+
+module_metadata::module_metadata(module_metadata const &o) 
+  : module_id(o.module_id),
+    module_type(o.module_type),
+    file_path(o.file_path),
+    p(new impl) {}
+
+void module_metadata::operator=(module_metadata const &o) {
+  module_id = o.module_id;
+  module_type = o.module_type;
+  file_path = o.file_path;
+  p.reset(new impl);
+}
+
+module_metadata::~module_metadata() {}
+
 bool module_metadata::is_valid() const {
-  if (!validation)
-    validation = detail::validate_metadata(*this);
-  return *validation;
+  boost::mutex::scoped_lock lock(p->mutex);
+  if (!p->validation)
+    p->validation = detail::validate_metadata(*this);
+  return *p->validation;
 }
 
 boost::shared_ptr<module> module_metadata::get_instance() const {
-  //FIXME,TODO: this is not thread-safe
-  if (!instance.expired())
-    return instance.lock();
+  boost::mutex::scoped_lock lock(p->mutex);
+  if (!p->instance.expired())
+    return p->instance.lock();
   boost::shared_ptr<module> result(new module(*this));
-  instance = result;
+  p->instance = result;
   return result;
 }
 
