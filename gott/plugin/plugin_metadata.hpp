@@ -46,6 +46,7 @@
 #include <boost/ref.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <iosfwd>
 
@@ -84,8 +85,14 @@ struct plugin_metadata {
 
   bool is_valid() const;
 
+  plugin_metadata();
+  ~plugin_metadata();
+  plugin_metadata(plugin_metadata const &);
+  void operator=(plugin_metadata const &);
+
 private:
-  mutable boost::optional<bool> validation;
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 struct interface_metadata {
@@ -198,13 +205,11 @@ find_plugin_metadata(
  * This function does not record the plugin persistently. Thread-safe.
  * \param metadata The new metadata.
  */
-GOTT_EXPORT
 void add_plugin_metadata(plugin_metadata const &metadata);
 
 /**
  * Clear the plugin metadata database.
  */
-GOTT_EXPORT
 void clear_plugin_metadata();
 
 /**
@@ -219,7 +224,6 @@ void extract_plugin_metadata(std::istream &stream);
  * \param stream The stream to read from.
  * \param out The metadata object to fill.
  */
-GOTT_EXPORT
 std::istream &operator>>(std::istream &stream, plugin_metadata &out);
 
 /**

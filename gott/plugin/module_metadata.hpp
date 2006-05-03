@@ -51,6 +51,9 @@
 
 namespace gott { namespace plugin {
 
+/**
+ *
+ */
 struct module_metadata {
   /**
    * The module's unique identifier.
@@ -72,13 +75,19 @@ struct module_metadata {
    */
   string file_path;
 
-  module_metadata() GOTT_EXPORT;
-  ~module_metadata() GOTT_EXPORT;
-  module_metadata(module_metadata const &o) GOTT_EXPORT;
-  void operator=(module_metadata const &o) GOTT_EXPORT;
+  module_metadata();
+  ~module_metadata();
+  module_metadata(module_metadata const &o);
+  void operator=(module_metadata const &o);
 
+  /**
+   * Check whether the metadata is valid. Thread-safe.
+   */
   bool is_valid() const GOTT_EXPORT;
 
+  /**
+   * Get a module instance for this metadata. Thread-safe.
+   */
   boost::shared_ptr<class module> get_instance() const GOTT_EXPORT;
 
 private:
@@ -153,13 +162,13 @@ find_module_metadata(
     bool tags::validate = true);
 #endif
 
-GOTT_EXPORT void add_module_metadata(module_metadata const &);
+void add_module_metadata(module_metadata const &);
 
-GOTT_EXPORT void clear_module_metadata();
-
-GOTT_EXPORT void extract_module_metadata(std::istream &stream);
+void clear_module_metadata();
 
 GOTT_EXPORT
+void extract_module_metadata(std::istream &stream);
+
 std::istream &operator>>(std::istream &stream, module_metadata &out);
 
 GOTT_EXPORT

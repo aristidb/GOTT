@@ -59,6 +59,29 @@ using namespace gott;
 using std::istream;
 using std::ostream;
 
+class plugin_metadata::impl {
+public:
+  boost::optional<bool> validation;
+  boost::mutex mutex;
+};
+
+plugin_metadata::plugin_metadata() : p(new impl) {}
+plugin_metadata::~plugin_metadata() {}
+plugin_metadata::plugin_metadata(plugin_metadata const &o)
+  : plugin_id(o.plugin_id),
+    interfaces(o.interfaces),
+    enclosing_module(o.enclosing_module),
+    symbol(o.symbol),
+    p(new impl) {}
+
+void plugin_metadata::operator=(plugin_metadata const &o) {
+  plugin_id = o.plugin_id;
+  interfaces = o.interfaces;
+  enclosing_module = o.enclosing_module;
+  symbol = o.symbol;
+  p.reset(new impl);
+}
+
 module_metadata const &plugin_metadata::enclosing_module_metadata(
     bool do_load_standard_metadata) const {
   boost::optional<module_metadata const &> res =
@@ -72,9 +95,10 @@ module_metadata const &plugin_metadata::enclosing_module_metadata(
 }
 
 bool plugin_metadata::is_valid() const {
-  if (!validation)
-    validation = detail::validate_metadata(*this);
-  return *validation;
+  boost::mutex::scoped_lock lock(p->mutex);
+  if (!p->validation)
+    p->validation = detail::validate_metadata(*this);
+  return *p->validation;
 }
 
 namespace {
