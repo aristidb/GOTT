@@ -55,13 +55,21 @@ private:
   void *handle;
 public:
   impl(module_metadata const &which)
-  : handle(
-      dlopen_unix(
-        boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
-        RTLD_LAZY)) {}
+  : handle(get_handle(which)) {}
+
+  static void *get_handle(module_metadata const &which) {
+    switch (which.module_type) {
+    case module_metadata::dynamic_native:
+      return dlopen_unix(
+          boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
+          RTLD_LAZY | RTLD_LOCAL);
+    case module_metadata::core:
+      return RTLD_DEFAULT;
+    }
+  }
 
   ~impl() {
-    if (handle)
+    if (handle && handle != RTLD_DEFAULT)
       try {
         dlclose_unix(handle);
       } catch (...) {
