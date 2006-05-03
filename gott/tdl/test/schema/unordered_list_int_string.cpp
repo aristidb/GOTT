@@ -56,12 +56,12 @@ namespace {
 struct schema_unordered_list_integer_string : tut::schema_basic {
   schema_unordered_list_integer_string()
   : tut::schema_basic(
-      rule_one("document",
-        rule("unordered", RA(), boost::assign::list_of
-          (rule("node",
+      rule_one("tdl::schema::document",
+        rule("tdl::schema::unordered", RA(), boost::assign::list_of
+          (rule("tdl::schema::node",
             RA(std::vector<string>(),true,Xany(),new stru::repatch_integer(),
                slotcfg(), slotcfg(slotcfg::list))))
-          (rule("node"))))) {}
+          (rule("tdl::schema::node"))))) {}
 };
 }
 

@@ -53,10 +53,10 @@ namespace {
 struct schema_ordered_string_integer : tut::schema_basic {
   schema_ordered_string_integer()
  : tut::schema_basic(
-      rule_one("document",
-        rule("ordered", RA(), boost::assign::list_of
-         (rule("node", RA()))
-         (rule("node", RA("i", true, new stru::repatch_integer())))))) {}
+      rule_one("tdl::schema::document",
+        rule("tdl::schema::ordered", RA(), boost::assign::list_of
+         (rule("tdl::schema::node", RA()))
+         (rule("tdl::schema::node", RA("i", true, new stru::repatch_integer())))))) {}
 };
 }
 

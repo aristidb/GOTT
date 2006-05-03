@@ -51,8 +51,8 @@ namespace {
 struct schema_literal : tut::schema_basic {
   schema_literal() 
   : tut::schema_basic(
-      rule_one("document",
-        rule("node", 
+      rule_one("tdl::schema::document",
+        rule("tdl::schema::node", 
           rule_attr_t("foobar", true, 
             new stru::repatch_enumeration(std::vector<string>(1, "foobar"))))))
   {}

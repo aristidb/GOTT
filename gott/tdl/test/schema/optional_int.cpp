@@ -56,9 +56,9 @@ namespace {
 struct schema_optional_int : tut::schema_basic {
   schema_optional_int() 
   : tut::schema_basic(
-      rule_one("document",
-         rule_one("list",
-           rule("node",
+      rule_one("tdl::schema::document",
+         rule_one("tdl::schema::list",
+           rule("tdl::schema::node",
              RA(std::vector<string>(1, "el"), true, Xany(), 
                 new stru::repatch_integer(), 
                 slotcfg(), slotcfg(slotcfg::optional)))))) {}

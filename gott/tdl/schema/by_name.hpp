@@ -59,7 +59,7 @@ class by_name_t {
 
 public:
   /**
-   * Add a type to the database.
+   * Add a type to the database. Thread-safe.
    * \param name The name to find the type with.
    * \param type The type.
    */
@@ -73,7 +73,7 @@ public:
   }
 
   /**
-   * Get a type from the database.
+   * Get a type from the database. Thread-safe.
    * \param name The type's name.
    * \param att The attributes to supply to the type.
    * \param children The children to supply to the type.

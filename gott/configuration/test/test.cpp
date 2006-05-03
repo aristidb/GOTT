@@ -63,15 +63,15 @@ int main() {
     ;
   
   rule_t conf = 
-    rule_one("document",
-      rule("list", rule_attr(tag = "container"),
-        list_of(rule("config", rule_attr(outer = list(), tag = "element"),
+    rule_one("tdl::schema::document",
+      rule("tdl::schema::list", rule_attr(tag = "container"),
+        list_of(rule("gott::tdl_config", rule_attr(outer = list(), tag = "element"),
           list_of
-          (rule("node", rule_attr(tag = "conf::int", 
+          (rule("tdl::schema::node", rule_attr(tag = "conf::int", 
               repatcher = new structure::repatch_integer())))
-          (rule("node", rule_attr(tag = "conf::string")))
-          (rule("list", rule_attr(tag = "get::more::stuff"),
-            list_of(rule("node", rule_attr(outer = list())))))))));
+          (rule("tdl::schema::node", rule_attr(tag = "conf::string")))
+          (rule("tdl::schema::list", rule_attr(tag = "get::more::stuff"),
+            list_of(rule("tdl::schema::node", rule_attr(outer = list())))))))));
 
   structure::container out;
   structure::revocable_adapter r(out);

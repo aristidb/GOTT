@@ -53,7 +53,7 @@ namespace {
 struct schema_epsilon : tut::schema_basic {
   schema_epsilon()
   : tut::schema_basic(
-      rule_one("document", rule("node", 
+      rule_one("tdl::schema::document", rule("tdl::schema::node", 
            rule_attr(schema::outer = schema::exactly(0)))))
   {}
 };

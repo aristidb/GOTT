@@ -57,18 +57,18 @@ namespace {
 struct schema_ffxy : tut::schema_basic {
   schema_ffxy() 
   : tut::schema_basic(
-      rule_one("document",
-        rule_one("ordered",
-          rule_one("follow",
-            rule("ordered", RA(), list_of
-              (rule_one("follow", RA("o"),
-                rule("follow", 
+      rule_one("tdl::schema::document",
+        rule_one("tdl::schema::ordered",
+          rule_one("tdl::schema::follow",
+            rule("tdl::schema::ordered", RA(), list_of
+              (rule_one("tdl::schema::follow", RA("o"),
+                rule("tdl::schema::follow", 
                   RA(std::vector<string>(1, "xy"), true, Xany(), 0,
                      slotcfg(), slotcfg(slotcfg::list)),
                   list_of
-                    (rule("node", RA("int1", true, new I())))
-                    (rule("node", RA("int2", true, new I()))))))
-              (rule("node"))))))) {}
+                    (rule("tdl::schema::node", RA("int1", true, new I())))
+                    (rule("tdl::schema::node", RA("int2", true, new I()))))))
+              (rule("tdl::schema::node"))))))) {}
 
   void run(string prefix, int n) {
     string test_data = prefix;

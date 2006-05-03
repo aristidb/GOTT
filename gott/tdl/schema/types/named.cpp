@@ -89,8 +89,8 @@ match_named::match_named(rule_attr_t const &a, vector<rule_t> const &s,match &m)
 : happy_once(a, m), 
   tag(get_id(a)),
   rewritten(
-      rule("follow", rule_attr_t(rule_attr_t::simple, false), list_of 
-        (rule("node", rule_attr_t(rule_attr_t::simple, false, 
+      rule("tdl::schema::follow", rule_attr_t(rule_attr_t::simple, false), list_of 
+        (rule("tdl::schema::node", rule_attr_t(rule_attr_t::simple, false, 
           get_repatcher(tag))))
         (s[0]))) {
   assert(s.size() == 1);
@@ -105,5 +105,5 @@ bool match_named::play(ev::child_succeed const &) {
 }
 
 gott::string match_named::name() const {
-  return gott::string("named");
+  return gott::string("tdl::schema::named");
 }

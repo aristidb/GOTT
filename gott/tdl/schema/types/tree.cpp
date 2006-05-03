@@ -49,7 +49,7 @@ match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match
 }
 
 gott::string match_tree::name() const {
-  return gott::string("tree");
+  return gott::string("tdl::schema::tree");
 }
 
 item::expect match_tree::expectation() const {

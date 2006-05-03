@@ -51,8 +51,8 @@ schema::rule_t match_document::deflatten(std::vector<rule_t> const &children) {
     if (children[0].attributes().outer() == one())
       return children[0];
     else
-      return rule("list", rule_attr(coat = false), children);
-  return rule("ordered", rule_attr(coat = false), children);
+      return rule("tdl::schema::list", rule_attr(coat = false), children);
+  return rule("tdl::schema::ordered", rule_attr(coat = false), children);
 }
 
 bool match_document::play(ev::begin_parse const &) {
@@ -91,5 +91,5 @@ bool match_document::play(ev::child_succeed const &) {
 }
 
 gott::string match_document::name() const {
-  return gott::string("document");
+  return gott::string("tdl::schema::document");
 }

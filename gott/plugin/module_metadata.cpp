@@ -118,14 +118,16 @@ namespace {
       named (module-type), enumeration $ dynamic-native
    */
   static rule_t metadata_schema = 
-    rule("ordered", rule_attr(coat = false),
+    rule("tdl::schema::ordered", rule_attr(coat = false),
         boost::assign::list_of
-        (rule_one("named", rule_attr(tag = "module-id"), rule("node")))
-        (rule("unordered", rule_attr(coat = false),
+        (rule_one("tdl::schema::named", rule_attr(tag = "module-id"),
+                  rule("tdl::schema::node")))
+        (rule("tdl::schema::unordered", rule_attr(coat = false),
           boost::assign::list_of
-          (rule_one("named", rule_attr(tag = "file-path"), rule("node")))
-          (rule_one("named", rule_attr(tag = "module-type"),
-                    rule("node", rule_attr(
+          (rule_one("tdl::schema::named", rule_attr(tag = "file-path"),
+                    rule("tdl::schema::node")))
+          (rule_one("tdl::schema::named", rule_attr(tag = "module-type"),
+                    rule("tdl::schema::node", rule_attr(
                       tdl::schema::repatcher = new repatch_enumeration(
                         boost::assign::list_of
                         (string("dynamic-native"))
@@ -216,8 +218,8 @@ void gott::plugin::extract_module_metadata(istream &stream) {
   multi_accepter out;
   revocable_adapter adapter(out);
   match(
-      rule_one("document", rule_attr(coat = false),
-        rule_one("ordered", rule_attr(outer = list()),
+      rule_one("tdl::schema::document", rule_attr(coat = false),
+        rule_one("tdl::schema::ordered", rule_attr(outer = list()),
           metadata_schema)),
       adapter).parse(stream);
 }
@@ -227,7 +229,7 @@ istream &gott::plugin::operator>>(istream &stream, module_metadata &out_value) {
   accepter out(out_value);
   revocable_adapter adapter(out);
   match(
-      rule_one("document", rule_attr(coat = false), metadata_schema),
+      rule_one("tdl::schema::document", rule_attr(coat = false), metadata_schema),
       adapter)
     .parse(stream);
   return stream;

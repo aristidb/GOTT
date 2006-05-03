@@ -55,12 +55,12 @@ struct builtin_types {
 
 using namespace tdl::schema;
 
-#define REG(t) by_name().add<match_##t>(#t)
+#define REG(t) by_name().add<match_##t>("tdl::schema::" #t)
 
 builtin_types::builtin_types() {
   REG(any);
   REG(document);
-  by_name().add<match_follow_ordered>("follow");
+  by_name().add<match_follow_ordered>("tdl::schema::follow");
   REG(list);
   REG(named);
   REG(ordered);

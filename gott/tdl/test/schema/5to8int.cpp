@@ -56,7 +56,7 @@ namespace {
 struct schema_5to8int : tut::schema_basic {
   schema_5to8int()
   : tut::schema_basic(
-      rule_one("document", rule("node",
+      rule_one("tdl::schema::document", rule("tdl::schema::node",
              RA(std::vector<string>(1, "el"), true, Xany(), 
                 new stru::repatch_integer(), 
                 slotcfg(), slotcfg(slotcfg::range, 5, 8)))))

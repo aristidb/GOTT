@@ -57,25 +57,25 @@ struct schema_multi_footype : tut::schema_basic {
   rule_t multi, footype;
 
   schema_multi_footype() 
-  : tut::schema_basic(rule_one("document", RA("--doc--"), 
+  : tut::schema_basic(rule_one("tdl::schema::document", RA("--doc--"), 
         rule_t(&footype))) {
-    footype = rule_one("named", schema::match_named::attributes("a"),
+    footype = rule_one("tdl::schema::named", schema::match_named::attributes("a"),
         rule_t(&multi));
 
     multi =
-      rule("unordered", RA("--unordered--"), list_of
-        (rule_one("named", schema::match_named::attributes("plugin"), 
-          rule_one("list", RA(RA::simple, false),
-            rule("node", 
+      rule("tdl::schema::unordered", RA("--unordered--"), list_of
+        (rule_one("tdl::schema::named", schema::match_named::attributes("plugin"), 
+          rule_one("tdl::schema::list", RA(RA::simple, false),
+            rule("tdl::schema::node", 
               RA(std::vector<string>(1, "plugin-data"), true, Xany(), 0,
                 slotcfg(), slotcfg(slotcfg::list))))))
-        (rule_one("named", schema::match_named::attributes("sum"),
-          rule_one("list", RA(RA::simple, false),
-            rule("node", 
+        (rule_one("tdl::schema::named", schema::match_named::attributes("sum"),
+          rule_one("tdl::schema::list", RA(RA::simple, false),
+            rule("tdl::schema::node", 
               RA(std::vector<string>(1, "sum-data"), true, Xany(),
                  new stru::repatch_integer(),
                  slotcfg(), slotcfg(slotcfg::some))))))
-        (rule("node", 
+        (rule("tdl::schema::node", 
           RA(std::vector<string>(1, "--other--"), true, Xany(), 
              new stru::repatch_integer(),
              slotcfg(), slotcfg(slotcfg::some)))));

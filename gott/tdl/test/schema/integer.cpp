@@ -53,8 +53,8 @@ namespace {
 struct schema_integer : tut::schema_basic {
   schema_integer() 
   : tut::schema_basic(
-      rule_one("document", 
-        rule("node", rule_attr(tag = "i", repatcher = 
+      rule_one("tdl::schema::document", 
+        rule("tdl::schema::node", rule_attr(tag = "i", repatcher = 
             new stru::repatch_integer()))))
   {}
 };

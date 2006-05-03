@@ -54,9 +54,9 @@ namespace {
 struct schema_some_string : tut::schema_basic {
   schema_some_string()
   : tut::schema_basic(
-      rule_one("document", RA(),
-        rule_one("list", RA(),
-          rule("node", 
+      rule_one("tdl::schema::document", RA(),
+        rule_one("tdl::schema::list", RA(),
+          rule("tdl::schema::node", 
             RA(std::vector<string>(1, "el"), true, Xany(), 0, 
                slotcfg(), slotcfg(slotcfg::some)))))) {}
 };

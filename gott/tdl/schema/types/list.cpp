@@ -97,7 +97,7 @@ item::expect match_list::expectation() const {
 }
 
 gott::string match_list::name() const {
-  return gott::string("list");
+  return gott::string("tdl::schema::list");
 }
 
 bool match_list::accept_empty(rule_attr_t const &, std::vector<rule_t> const &c) {

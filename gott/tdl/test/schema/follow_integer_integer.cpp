@@ -56,10 +56,10 @@ namespace {
 struct schema_follow_integer_integer : tut::schema_basic {
   schema_follow_integer_integer() 
   : tut::schema_basic(
-      rule_one("document", RA("doc"),
-        rule("follow", RA("foll"), list_of
-          (rule("node", RA("int1", true, new I())))
-          (rule("node", RA("int2", true, new I())))))) {}
+      rule_one("tdl::schema::document", RA("doc"),
+        rule("tdl::schema::follow", RA("foll"), list_of
+          (rule("tdl::schema::node", RA("int1", true, new I())))
+          (rule("tdl::schema::node", RA("int2", true, new I())))))) {}
 };
 }
 

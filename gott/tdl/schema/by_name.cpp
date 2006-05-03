@@ -38,6 +38,7 @@
 #include "by_name.hpp"
 #include "../exceptions.hpp"
 #include <gott/string/string.hpp>
+#include <boost/thread/mutex.hpp>
 #include <map>
 
 namespace schema = tdl::schema;
@@ -53,6 +54,7 @@ class by_name_t::impl {
 public:
   typedef std::map<string, abstract_rule> mapping; 
   mapping items;
+  boost::mutex mutex;
 
   abstract_rule const &get(string const &name) {
     mapping::const_iterator it = items.find(name);
@@ -69,10 +71,12 @@ by_name_t::~by_name_t() {
 }
 
 void by_name_t::add(string const &name, abstract_rule const &type) {
+  boost::mutex::scoped_lock lock(p->mutex);
   p->items.insert(impl::mapping::value_type(name, type));
 }
 
 schema::rule_t by_name_t::get(string const &n, rule_attr_t const &a, 
                               std::vector<rule_t> const &c) const {
+  boost::mutex::scoped_lock lock(p->mutex);
   return rule_t(p->get(n), a, c);
 }

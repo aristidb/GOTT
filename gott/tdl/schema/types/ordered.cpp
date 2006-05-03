@@ -59,7 +59,7 @@ std::vector<schema::rule_t> match_ordered::deflatten(
     if (in[i].attributes().outer() == one())
       out[i] = in[i];
     else
-      out[i] = rule_one("list", rule_attr(coat = false), in[i]);
+      out[i] = rule_one("tdl::schema::list", rule_attr(coat = false), in[i]);
   }
   return out;
 }
@@ -84,5 +84,5 @@ bool match_ordered::accept_empty(rule_attr_t const &,
 }
 
 gott::string match_ordered::name() const {
-  return gott::string("ordered");
+  return gott::string("tdl::schema::ordered");
 }

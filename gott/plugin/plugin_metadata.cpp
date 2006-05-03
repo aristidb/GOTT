@@ -117,15 +117,19 @@ namespace {
       named (symbol), node
    */
   static rule_t metadata_schema = 
-    rule("ordered", rule_attr(coat = false),
+    rule("tdl::schema::ordered", rule_attr(coat = false),
         boost::assign::list_of
-        (rule_one("named", rule_attr(tag = "plugin-id"), rule("node")))
-        (rule("unordered", rule_attr(coat = false),
+        (rule_one("tdl::schema::named", rule_attr(tag = "plugin-id"),
+                  rule("tdl::schema::node")))
+        (rule("tdl::schema::unordered", rule_attr(coat = false),
           boost::assign::list_of
-          (rule_one("named", rule_attr(tag = "has-interface", outer = list()),
-                    rule("node")))
-          (rule_one("named", rule_attr(tag = "enclosing-module"), rule("node")))
-          (rule_one("named", rule_attr(tag = "symbol"), rule("node"))))));
+          (rule_one("tdl::schema::named",
+                    rule_attr(tag = "has-interface", outer = list()),
+                    rule("tdl::schema::node")))
+          (rule_one("tdl::schema::named", rule_attr(tag = "enclosing-module"),
+                    rule("tdl::schema::node")))
+          (rule_one("tdl::schema::named", rule_attr(tag = "symbol"),
+                    rule("tdl::schema::node"))))));
 
   struct accepter : writable_structure {
     accepter(plugin_metadata &ref) : ref(ref) {}
@@ -218,8 +222,8 @@ void gott::plugin::extract_plugin_metadata(istream &stream) {
   multi_accepter out;
   revocable_adapter adapter(out);
   match(
-      rule_one("document", rule_attr(coat = false),
-        rule_one("ordered", rule_attr(outer = list()),
+      rule_one("tdl::schema::document", rule_attr(coat = false),
+        rule_one("tdl::schema::ordered", rule_attr(outer = list()),
           metadata_schema)),
       adapter).parse(stream);
 }
@@ -229,7 +233,7 @@ istream &gott::plugin::operator>>(istream &stream, plugin_metadata &out_value) {
   accepter out(out_value);
   revocable_adapter adapter(out);
   match(
-      rule_one("document", rule_attr(coat = false), metadata_schema),
+      rule_one("tdl::schema::document", rule_attr(coat = false), metadata_schema),
       adapter)
     .parse(stream);
   return stream;

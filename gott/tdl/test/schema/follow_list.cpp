@@ -55,13 +55,13 @@ namespace {
 struct schema_follow_list : tut::schema_basic {
   schema_follow_list() 
   : tut::schema_basic(
-      rule_one("document",
-        rule("follow", RA(), boost::assign::list_of
-          (rule("node", 
+      rule_one("tdl::schema::document",
+        rule("tdl::schema::follow", RA(), boost::assign::list_of
+          (rule("tdl::schema::node", 
             RA(std::vector<string>(1,"i"),true,Xany(),
               new stru::repatch_integer(),
                slotcfg(), slotcfg(slotcfg::list))))
-          (rule("node", RA("s")))))) {}
+          (rule("tdl::schema::node", RA("s")))))) {}
 };
 }
 

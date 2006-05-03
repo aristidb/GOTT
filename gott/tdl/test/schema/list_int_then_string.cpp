@@ -58,14 +58,14 @@ namespace {
 struct schema_list_int_then_string : tut::schema_basic {
   schema_list_int_then_string() 
   : tut::schema_basic(
-      rule_one("document", RA(),
-        rule("ordered", RA("ord"), list_of
-          (rule_one("list", RA("list"),
-            rule("node", 
+      rule_one("tdl::schema::document", RA(),
+        rule("tdl::schema::ordered", RA("ord"), list_of
+          (rule_one("tdl::schema::list", RA("tdl::schema::list"),
+            rule("tdl::schema::node", 
               RA(std::vector<gott::string>(1, "int"), true, Xany(),
                 new stru::repatch_integer(),
                 slotcfg(), slotcfg(slotcfg::list)))))
-          (rule("node", RA("string")))))) {}
+          (rule("tdl::schema::node", RA("string")))))) {}
 };
 }
 
@@ -83,7 +83,7 @@ template<> template<>
 void object::test<1>(int) {
   run_test("4\nx");
   stru::cf::nd_list c;
-  c.push_back(C(S(Xany(4), "int"), "list"));
+  c.push_back(C(S(Xany(4), "int"), "tdl::schema::list"));
   c.push_back(S(Xany("x"), "string"));
   C(M(c, "ord")).write_to(xp);
   ensure_equals("single integer, then string", tree, xp);
@@ -93,7 +93,7 @@ template<> template<>
 void object::test<2>(int) {
   run_test("d7");
   stru::cf::nd_list c;
-  c.push_back(S(Xany(), "list"));
+  c.push_back(S(Xany(), "tdl::schema::list"));
   c.push_back(S(Xany("d7"), "string"));
   C(M(c, "ord")).write_to(xp);
   ensure_equals("just string", tree, xp);
@@ -146,7 +146,7 @@ void object::test<7>(int) {
   for (int i = 4; i <= 7; ++i)
     ll.push_back(S(Xany(i), "int"));
   stru::cf::nd_list c;
-  c.push_back(M(ll, "list"));
+  c.push_back(M(ll, "tdl::schema::list"));
   c.push_back(S(Xany("(zzz doink)"), "string"));
   C(M(c, "ord")).write_to(xp);
   ensure_equals("many thingies", tree, xp);

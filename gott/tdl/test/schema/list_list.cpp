@@ -50,17 +50,17 @@ namespace {
 struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() 
   : tut::schema_basic(
-    rule_one("document",
-      rule("ordered", rule_attr_t(), boost::assign::list_of
-        (rule_one("list", rule_attr_t("s"),
-          rule_one("list", 
+    rule_one("tdl::schema::document",
+      rule("tdl::schema::ordered", rule_attr_t(), boost::assign::list_of
+        (rule_one("tdl::schema::list", rule_attr_t("s"),
+          rule_one("tdl::schema::list", 
             rule_attr_t(std::vector<string>(1, "t"), true, Xany(), 0,
               slotcfg(), slotcfg(slotcfg::list)),
-            rule("node",
+            rule("tdl::schema::node",
               rule_attr_t(std::vector<string>(1, "ii"), true, Xany(), 
                 new stru::repatch_integer(),
                 slotcfg(), slotcfg(slotcfg::list))))))
-        (rule("node", rule_attr_t("xx")))))) {}
+        (rule("tdl::schema::node", rule_attr_t("xx")))))) {}
 };
 }
 

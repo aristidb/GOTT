@@ -60,5 +60,5 @@ bool match_node::play(ev::node const &n) {
 }
 
 gott::string match_node::name() const {
-  return gott::string("node");
+  return gott::string("tdl::schema::node");
 }

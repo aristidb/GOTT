@@ -90,7 +90,7 @@ private:
 }
 
 void *gott::config::detail::init_config() {
-  schema::by_name().add<match_config_tdl>("config");
+  schema::by_name().add<match_config_tdl>("gott::tdl_config");
   return 0;
 }
 
@@ -170,5 +170,5 @@ schema::item::expect match_config_tdl::expectation() const {
 }
 
 string match_config_tdl::name() const {
-  return gott::string("config");
+  return gott::string("gott::tdl_config");
 }
