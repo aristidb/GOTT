@@ -90,7 +90,7 @@ namespace {
                       tdl::schema::repatcher = new repatch_enumeration(
                         boost::assign::list_of
                         (string("dynamic-native"))
-                        (string("core")).operator std::vector<string>()))))))));
+                        .operator std::vector<string>()))))))));
 
   struct accepter : writable_structure {
     accepter(module_metadata &ref) : ref(ref) {}
@@ -215,9 +215,6 @@ ostream &gott::plugin::operator<<(ostream &stream, module_metadata const &val) {
       switch (val.module_type) {
       case module_metadata::dynamic_native:
         w.node("dynamic-native");
-        break;
-      case module_metadata::core:
-        w.node("core");
         break;
       }
     w.up();

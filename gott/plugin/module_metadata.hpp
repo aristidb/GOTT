@@ -58,7 +58,7 @@ struct module_metadata {
   /**
    * The types a module might have.
    */
-  enum module_type_t { dynamic_native, core };
+  enum module_type_t { dynamic_native };
 
   /**
    * The type of the module.

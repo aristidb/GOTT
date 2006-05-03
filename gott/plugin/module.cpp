@@ -63,13 +63,11 @@ public:
       return dlopen_unix(
           boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
           RTLD_LAZY | RTLD_LOCAL);
-    case module_metadata::core:
-      return RTLD_DEFAULT;
     }
   }
 
   ~impl() {
-    if (handle && handle != RTLD_DEFAULT)
+    if (handle)
       try {
         dlclose_unix(handle);
       } catch (...) {
