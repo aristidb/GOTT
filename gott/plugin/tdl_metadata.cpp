@@ -105,6 +105,7 @@ namespace {
   };
 }
 
+extern "C"
 void gott::plugin::extract_plugin_metadata(istream &stream) {
   struct multi_accepter : writable_structure {
     multi_accepter() : level(0), inner(current) {}
@@ -138,18 +139,6 @@ void gott::plugin::extract_plugin_metadata(istream &stream) {
         rule_one("tdl::schema::ordered", rule_attr(outer = list()),
           plugin_schema)),
       adapter).parse(stream);
-}
-
-istream &gott::plugin::operator>>(istream &stream, plugin_metadata &out_value) {
-  out_value = plugin_metadata();
-  plugin_accepter out(out_value);
-  revocable_adapter adapter(out);
-  match(
-      rule_one("tdl::schema::document", rule_attr(coat = false), 
-        plugin_schema),
-      adapter)
-    .parse(stream);
-  return stream;
 }
 
 ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
@@ -236,7 +225,7 @@ namespace {
   };
 }
 
-
+extern "C"
 void gott::plugin::extract_module_metadata(istream &stream) {
   struct multi_accepter : writable_structure {
     multi_accepter() : level(0), inner(current) {}
@@ -270,18 +259,6 @@ void gott::plugin::extract_module_metadata(istream &stream) {
         rule_one("tdl::schema::ordered", rule_attr(outer = list()),
           module_schema)),
       adapter).parse(stream);
-}
-
-istream &gott::plugin::operator>>(istream &stream, module_metadata &out_value) {
-  out_value = module_metadata();
-  module_accepter out(out_value);
-  revocable_adapter adapter(out);
-  match(
-      rule_one("tdl::schema::document", rule_attr(coat = false),
-        module_schema),
-      adapter)
-    .parse(stream);
-  return stream;
 }
 
 ostream &gott::plugin::operator<<(ostream &stream, module_metadata const &val) {

@@ -38,6 +38,8 @@
 #include "metadata.hpp"
 #include "plugin_metadata.hpp"
 #include "module_metadata.hpp"
+#include <gott/syswrap/dl_unix.hpp>
+#include <gott/syswrap/function_cast.hpp>
 #include <boost/thread/once.hpp>
 #include <fstream>
 
@@ -55,14 +57,21 @@ void do_load_standard() {
     clear_plugin_metadata();
     clear_module_metadata();
   }
+  void *handle = gott::dlopen_unix("libplugin_tdl.so", RTLD_LAZY);
+  typedef void (fun_t)(std::istream &);
+  fun_t *do_extract_plugin_metadata = gott::function_cast<fun_t>(
+      gott::dlsym_unix(handle, "extract_plugin_metadata"));
+  fun_t *do_extract_module_metadata = gott::function_cast<fun_t>(
+      gott::dlsym_unix(handle, "extract_module_metadata"));
   {
     std::ifstream in("plugin_registry.tdl");
-    extract_plugin_metadata(in);
+    do_extract_plugin_metadata(in);
   }
   {
     std::ifstream in("module_registry.tdl");
-    extract_module_metadata(in);
+    do_extract_module_metadata(in);
   }
+  gott::dlclose_unix(handle);
 }
 
 void do_load_core() {

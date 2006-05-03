@@ -85,10 +85,10 @@ struct plugin_metadata {
 
   bool is_valid() const;
 
-  plugin_metadata();
-  ~plugin_metadata();
-  plugin_metadata(plugin_metadata const &);
-  void operator=(plugin_metadata const &);
+  plugin_metadata() GOTT_EXPORT;
+  ~plugin_metadata() GOTT_EXPORT;
+  plugin_metadata(plugin_metadata const &) GOTT_EXPORT;
+  void operator=(plugin_metadata const &) GOTT_EXPORT;
 
 private:
   class impl;
@@ -205,6 +205,7 @@ find_plugin_metadata(
  * This function does not record the plugin persistently. Thread-safe.
  * \param metadata The new metadata.
  */
+GOTT_EXPORT
 void add_plugin_metadata(plugin_metadata const &metadata);
 
 /**
@@ -216,15 +217,9 @@ void clear_plugin_metadata();
  * Add a list of some plugins' metadata read from a stream. Thread-safe.
  * \param stream The stream to empty.
  */
+extern "C"
 GOTT_EXPORT
 void extract_plugin_metadata(std::istream &stream);
-
-/**
- * Read a plugin's metadata from a stream.
- * \param stream The stream to read from.
- * \param out The metadata object to fill.
- */
-std::istream &operator>>(std::istream &stream, plugin_metadata &out);
 
 /**
  * Write a plugin's metadata to a stream.

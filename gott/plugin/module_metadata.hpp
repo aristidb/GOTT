@@ -75,10 +75,10 @@ struct module_metadata {
    */
   string file_path;
 
-  module_metadata();
-  ~module_metadata();
-  module_metadata(module_metadata const &o);
-  void operator=(module_metadata const &o);
+  module_metadata() GOTT_EXPORT;
+  ~module_metadata() GOTT_EXPORT;
+  module_metadata(module_metadata const &o) GOTT_EXPORT;
+  void operator=(module_metadata const &o) GOTT_EXPORT;
 
   /**
    * Check whether the metadata is valid. Thread-safe.
@@ -162,14 +162,14 @@ find_module_metadata(
     bool tags::validate = true);
 #endif
 
+GOTT_EXPORT
 void add_module_metadata(module_metadata const &);
 
 void clear_module_metadata();
 
+extern "C"
 GOTT_EXPORT
 void extract_module_metadata(std::istream &stream);
-
-std::istream &operator>>(std::istream &stream, module_metadata &out);
 
 GOTT_EXPORT
 std::ostream &operator<<(std::ostream &stream, module_metadata const &in);
