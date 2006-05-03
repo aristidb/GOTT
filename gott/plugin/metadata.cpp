@@ -41,6 +41,8 @@
 #include <boost/thread/once.hpp>
 #include <fstream>
 
+using namespace gott::plugin;
+
 namespace {
 boost::once_flag once_standard = BOOST_ONCE_INIT;
 boost::once_flag once_core = BOOST_ONCE_INIT;
@@ -50,10 +52,9 @@ void noop() {}
 void do_load_standard() {
   boost::call_once(&noop, once_core); // simulate loading provisory metadata
   { // get rid of any provisory metadata
-    gott::plugin::clear_plugin_metadata();
-    gott::plugin::clear_module_metadata();
+    clear_plugin_metadata();
+    clear_module_metadata();
   }
-  using namespace gott::plugin;
   {
     std::ifstream in("plugin_registry.tdl");
     extract_plugin_metadata(in);
@@ -65,7 +66,34 @@ void do_load_standard() {
 }
 
 void do_load_core() {
-  //nothing yet, TDL builtin types to be inserted here(!)
+  // Load metadata for TDL, necessary for reading in the metadata.
+  // Yes, this is what they call "boot-strapping".
+  {
+    module_metadata builtins;
+    builtins.module_id = "tdl::builtins";
+    builtins.file_path = "tdl/libtdl.so";
+    builtins.module_type = module_metadata::dynamic_native;
+    add_module_metadata(builtins);
+  }
+  struct schema_type_adder {
+    void operator()(gott::string const &s) {
+      plugin_metadata schema_type;
+      schema_type.plugin_id = "tdl::schema::" + s;
+      schema_type.interfaces.push_back("tdl::schema::type");
+      schema_type.enclosing_module = "tdl::builtins";
+      schema_type.symbol = "plugin_schema_" + s;
+      add_plugin_metadata(schema_type);
+    }
+  } add_schema_type;
+  add_schema_type("any");
+  add_schema_type("document");
+  add_schema_type("follow");
+  add_schema_type("list");
+  add_schema_type("named");
+  add_schema_type("ordered");
+  add_schema_type("unordered");
+  add_schema_type("tree");
+  add_schema_type("node");
 }
 }
 
