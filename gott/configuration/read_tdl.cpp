@@ -35,7 +35,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "read_tdl.hpp"
 #include <gott/tdl/schema/item.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/rule_attr.hpp>
@@ -47,7 +46,6 @@
 #include <map>
 
 using gott::string;
-namespace config = gott::config;
 namespace schema = tdl::schema;
 namespace ev = schema::ev;
 
@@ -87,11 +85,6 @@ private:
   bool dirty, peer, may_leave;
 };
 
-}
-
-void *gott::config::detail::init_config() {
-  schema::by_name().add<match_config_tdl>("gott::tdl_config");
-  return 0;
 }
 
 match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra, 

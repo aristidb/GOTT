@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2004-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,36 +35,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "../by_name.hpp"
-#include "any.hpp"
-#include "document.hpp"
-#include "follow_ordered.hpp"
-#include "list.hpp"
-#include "named.hpp"
-#include "ordered.hpp"
-#include "node.hpp"
-#include "unordered.hpp"
-#include "tree.hpp"
-#include <gott/string/string.hpp>
+#include "type.hpp"
 
-namespace {
-struct builtin_types {
-  builtin_types();
-} auto_reg;
-}
-
-using namespace tdl::schema;
-
-#define REG(t) by_name().add<match_##t>("tdl::schema::" #t)
-
-builtin_types::builtin_types() {
-  REG(any);
-  REG(document);
-  by_name().add<match_follow_ordered>("tdl::schema::follow");
-  REG(list);
-  REG(named);
-  REG(ordered);
-  REG(node);
-  REG(unordered);
-  REG(tree);
-}
+tdl::schema::type::~type() {}

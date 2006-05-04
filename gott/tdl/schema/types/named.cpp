@@ -37,6 +37,8 @@
 
 #include "named.hpp"
 #include "../event.hpp"
+#include "../type.hpp"
+#include <gott/plugin/plugin_builder.hpp>
 #include <gott/string/string.hpp>
 #include <gott/tdl/structure/repatch.hpp>
 #include <gott/tdl/structure/repatcher_by_name.hpp>
@@ -55,6 +57,10 @@ using schema::item;
 using schema::rule_attr_t;
 using schema::match_named;
 using namespace boost::assign;
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_schema_named,
+    schema::concrete_type<match_named>)
 
 rule_attr_t match_named::attributes(string const &s, bool cc) {
   return rule_attr_t(vector<string>(1, s), cc, Xany(s));

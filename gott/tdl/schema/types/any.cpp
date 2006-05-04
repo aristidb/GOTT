@@ -36,11 +36,17 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "any.hpp"
+#include "../type.hpp"
+#include <gott/plugin/plugin_builder.hpp>
 
 namespace schema = tdl::schema;
 namespace ev = schema::ev;
 using schema::match_any;
 using schema::item;
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_schema_any,
+    schema::concrete_type<match_any>)
 
 match_any::match_any(rule_attr_t const &a, std::vector<rule_t> const &vv, match &m) 
 : happy_once(a, m), v(vv), pos(v.begin()) {

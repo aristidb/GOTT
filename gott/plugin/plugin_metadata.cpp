@@ -94,7 +94,8 @@ namespace {
 
   typedef std::vector<plugin_metadata> plugin_metadata_list_t;
   static plugin_metadata_list_t known_plugin_metadata;
-
+  static bool enabled = true;
+  static plugin_metadata_list_t core_plugin_metadata;
 }
 
 void gott::plugin::enumerate_plugin_metadata_p(
@@ -107,9 +108,13 @@ void gott::plugin::enumerate_plugin_metadata_p(
   if (do_load_standard_metadata)
     load_standard_metadata();
   BIGLOCK;
-  for (plugin_metadata_list_t::iterator it = known_plugin_metadata.begin();
-      it != known_plugin_metadata.end();
-      ++it) {
+  plugin_metadata_list_t::iterator begin = known_plugin_metadata.begin();
+  plugin_metadata_list_t::iterator end = known_plugin_metadata.end();
+  if (!enabled || begin == end) {
+    begin = core_plugin_metadata.begin();
+    end = core_plugin_metadata.end();
+  }
+  for (plugin_metadata_list_t::iterator it = begin; it != end; ++it) {
     if (plugin_id && it->plugin_id != *plugin_id)
       continue;
     if (interface_id && 
@@ -123,9 +128,14 @@ void gott::plugin::enumerate_plugin_metadata_p(
   }
 }
 
-void gott::plugin::add_plugin_metadata(plugin_metadata const &metadata) {
+void gott::plugin::add_plugin_metadata(
+    plugin_metadata const &metadata,
+    bool core) {
   BIGLOCK;
-  known_plugin_metadata.push_back(metadata);
+  if (core)
+    core_plugin_metadata.push_back(metadata);
+  else
+    known_plugin_metadata.push_back(metadata);
 }
 
 void gott::plugin::clear_plugin_metadata() {
@@ -133,4 +143,12 @@ void gott::plugin::clear_plugin_metadata() {
   plugin_metadata_list_t().swap(known_plugin_metadata);
 }
 
+void gott::plugin::disable_plugin_metadata() {
+  BIGLOCK;
+  enabled = false;
+}
 
+void gott::plugin::enable_plugin_metadata() {
+  BIGLOCK;
+  enabled = true;
+}

@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A General Purpose Configuration Library.
+ * The Original Code is A C++ Library for Dealing with the TDL Language.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,20 +35,26 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_CONFIG_READ_TDL_HPP
-#define GOTT_BASE_CONFIG_READ_TDL_HPP
+#ifndef GOTT_TDL_SCHEMA_TYPE_HPP
+#define GOTT_TDL_SCHEMA_TYPE_HPP
 
-#include <gott/visibility.hpp>
+#include "rule.hpp"
+#include <gott/plugin/plugin_base.hpp>
 
-namespace gott { namespace config {
+namespace tdl { namespace schema {
 
-namespace detail { 
-GOTT_EXPORT void *init_config();
+class GOTT_EXPORT type : public gott::plugin::plugin_base {
+public:
+  virtual abstract_rule get_abstract() const = 0;
+  virtual ~type() = 0;
+};
 
-namespace {
-void *init_x = init_config();
-}
-}
+template<class T>
+class concrete_type : public type {
+  abstract_rule get_abstract() const {
+    return abstract_rule(&construct_item<T>, &T::accept_empty);
+  }
+};
 
 }}
 

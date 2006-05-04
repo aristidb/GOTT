@@ -37,6 +37,8 @@
 
 #include "list.hpp"
 #include "../rule_attr.hpp"
+#include "../type.hpp"
+#include <gott/plugin/plugin_builder.hpp>
 #include <cassert>
 
 namespace schema = tdl::schema;
@@ -44,6 +46,10 @@ namespace ev = tdl::schema::ev;
 using schema::item;
 using schema::slotcfg;
 using schema::match_list;
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_schema_list,
+    schema::concrete_type<match_list>)
 
 match_list::match_list(rule_attr_t const &a, std::vector<rule_t> const &r, match &m)
 : item(a, m), sub(r[0]), cfg(r[0].attributes().outer()), cancelled(false) {

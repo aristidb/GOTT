@@ -163,9 +163,12 @@ find_module_metadata(
 #endif
 
 GOTT_EXPORT
-void add_module_metadata(module_metadata const &);
+void add_module_metadata(module_metadata const &metadata, bool core = false);
 
 void clear_module_metadata();
+
+void disable_module_metadata();
+void enable_module_metadata();
 
 extern "C"
 GOTT_EXPORT

@@ -206,12 +206,15 @@ find_plugin_metadata(
  * \param metadata The new metadata.
  */
 GOTT_EXPORT
-void add_plugin_metadata(plugin_metadata const &metadata);
+void add_plugin_metadata(plugin_metadata const &metadata, bool core = false);
 
 /**
  * Clear the plugin metadata database.
  */
 void clear_plugin_metadata();
+
+void disable_plugin_metadata();
+void enable_plugin_metadata();
 
 /**
  * Add a list of some plugins' metadata read from a stream. Thread-safe.

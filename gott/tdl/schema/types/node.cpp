@@ -37,12 +37,18 @@
 
 #include "node.hpp"
 #include "../event.hpp"
+#include "../type.hpp"
+#include <gott/plugin/plugin_builder.hpp>
 #include <cassert>
 
 namespace schema = tdl::schema;
 namespace ev = tdl::schema::ev;
 using schema::item;
 using schema::match_node;
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_schema_node,
+    schema::concrete_type<match_node>)
 
 match_node::match_node(rule_attr_t const &a, std::vector<rule_t> const &r, 
     match &m)

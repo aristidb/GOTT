@@ -126,5 +126,5 @@ bool rule_t::accept_empty() const {
 }
 
 rule_t sh::rule(string const &id, rule_attr_t const &a,vector<rule_t> const &c){
-  return by_name().get(id, a, c);
+  return get_by_name(id, a, c);
 }

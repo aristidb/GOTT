@@ -38,9 +38,8 @@
 #ifndef GOTT_UTIL_TDL_SCHEMA_BY_NAME_HPP
 #define GOTT_UTIL_TDL_SCHEMA_BY_NAME_HPP
 
-#include <boost/scoped_ptr.hpp>
 #include <gott/visibility.hpp>
-#include <gott/tdl/schema/rule.hpp>
+#include <vector>
 
 namespace gott {
 class string;
@@ -49,46 +48,11 @@ class string;
 namespace tdl {
 namespace schema {
 
-/**
- * Manages all named (native) schema types.
- */
-class by_name_t {
-  by_name_t();
-  ~by_name_t();
-  friend by_name_t &by_name();
+class rule_t;
+class rule_attr_t;
 
-public:
-  /**
-   * Add a type to the database. Thread-safe.
-   * \param name The name to find the type with.
-   * \param type The type.
-   */
-  GOTT_EXPORT void add(gott::string const &name, abstract_rule const &type);
-
-  template<class T>
-  void add(gott::string const &name) {
-    item_constructor type_con = &construct_item<T>;
-    item_check accept_empty = &T::accept_empty;
-    add(name, abstract_rule(type_con, accept_empty));
-  }
-
-  /**
-   * Get a type from the database. Thread-safe.
-   * \param name The type's name.
-   * \param att The attributes to supply to the type.
-   * \param children The children to supply to the type.
-   * \return A rule_t for the wanted type.
-   */
-  GOTT_EXPORT 
-  rule_t get(gott::string const &name, rule_attr_t const &att, 
-             std::vector<rule_t> const &children) const;
-
-private:
-  class impl;
-  boost::scoped_ptr<impl> p;
-};
-
-GOTT_EXPORT by_name_t &by_name();
+rule_t get_by_name(gott::string const &name, rule_attr_t const &att,
+    std::vector<rule_t> const &children);
 
 }}
 

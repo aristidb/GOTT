@@ -95,6 +95,8 @@ namespace {
 
   typedef std::vector<module_metadata> module_metadata_list_t;
   static module_metadata_list_t known_module_metadata;
+  static bool enabled = true;
+  static module_metadata_list_t core_module_metadata;
 }
 
 void gott::plugin::enumerate_module_metadata_p(
@@ -106,9 +108,13 @@ void gott::plugin::enumerate_module_metadata_p(
   if (do_load_standard_metadata)
     load_standard_metadata();
   BIGLOCK;
-  for (module_metadata_list_t::iterator it = known_module_metadata.begin();
-      it != known_module_metadata.end();
-      ++it) {
+  module_metadata_list_t::iterator begin = known_module_metadata.begin();
+  module_metadata_list_t::iterator end = known_module_metadata.end();
+  if (!enabled || begin == end) {
+    begin = core_module_metadata.begin();
+    end = core_module_metadata.end();
+  }
+  for (module_metadata_list_t::iterator it = begin; it != end; ++it) {
     if (module_id && it->module_id != *module_id)
       continue;
     if (validate && !it->is_valid())
@@ -119,9 +125,14 @@ void gott::plugin::enumerate_module_metadata_p(
   }
 }
 
-void gott::plugin::add_module_metadata(module_metadata const &metadata) {
+void gott::plugin::add_module_metadata(
+    module_metadata const &metadata,
+    bool core) {
   BIGLOCK;
-  known_module_metadata.push_back(metadata);
+  if (core)
+    core_module_metadata.push_back(metadata);
+  else
+    known_module_metadata.push_back(metadata);
 }
 
 void gott::plugin::clear_module_metadata() {
@@ -129,3 +140,12 @@ void gott::plugin::clear_module_metadata() {
   module_metadata_list_t().swap(known_module_metadata);
 }
 
+void gott::plugin::disable_module_metadata() {
+  BIGLOCK;
+  enabled = false;
+}
+
+void gott::plugin::enable_module_metadata() {
+  BIGLOCK;
+  enabled = true;
+}

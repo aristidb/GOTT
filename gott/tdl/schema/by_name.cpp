@@ -36,47 +36,21 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "by_name.hpp"
-#include "../exceptions.hpp"
+#include "rule.hpp"
+#include "type.hpp"
 #include <gott/string/string.hpp>
-#include <boost/thread/mutex.hpp>
-#include <map>
+#include <gott/plugin.hpp>
 
-namespace schema = tdl::schema;
-using schema::by_name_t;
+using namespace tdl::schema;
+using namespace gott::plugin;
 using gott::string;
+using std::vector;
 
-by_name_t &schema::by_name() {
-  static by_name_t m;
-  return m;
-}
-
-class by_name_t::impl {
-public:
-  typedef std::map<string, abstract_rule> mapping; 
-  mapping items;
-  boost::mutex mutex;
-
-  abstract_rule const &get(string const &name) {
-    mapping::const_iterator it = items.find(name);
-    if (it == items.end())
-      throw tdl_error("TDL Schema type-loader", "cannot load type " + name);
-    return it->second;
-  }
-};
-
-by_name_t::by_name_t() : p(new impl) {
-}
-
-by_name_t::~by_name_t() {
-}
-
-void by_name_t::add(string const &name, abstract_rule const &type) {
-  boost::mutex::scoped_lock lock(p->mutex);
-  p->items.insert(impl::mapping::value_type(name, type));
-}
-
-schema::rule_t by_name_t::get(string const &n, rule_attr_t const &a, 
-                              std::vector<rule_t> const &c) const {
-  boost::mutex::scoped_lock lock(p->mutex);
-  return rule_t(p->get(n), a, c);
+rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
+    vector<rule_t> const &c) {
+  load_core_metadata();
+  plugin_handle<type> handle(find_plugin_metadata(
+        tags::plugin_id = s,
+        tags::interface = "tdl::schema::type"));
+  return schema::rule_t(handle->get_abstract(), a, c);
 }

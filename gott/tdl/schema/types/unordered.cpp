@@ -38,12 +38,18 @@
 #include "unordered.hpp"
 #include <gott/range_algo.hpp>
 #include "../rule_attr.hpp"
+#include "../type.hpp"
+#include <gott/plugin/plugin_builder.hpp>
 
 namespace schema = tdl::schema;
 namespace ev = tdl::schema::ev;
 using schema::item;
 using schema::match_unordered;
 using std::vector;
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_schema_unordered,
+    schema::concrete_type<match_unordered>)
 
 match_unordered::match_unordered(rule_attr_t const &a, vector<rule_t> const &r,
     match &m) 

@@ -37,11 +37,17 @@
 
 #include "tree.hpp"
 #include "../event.hpp"
+#include "../type.hpp"
+#include <gott/plugin/plugin_builder.hpp>
 #include <cassert>
 
 using tdl::schema::match_tree;
 using tdl::schema::item;
 namespace ev = tdl::schema::ev;
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_schema_tree,
+    tdl::schema::concrete_type<match_tree>)
 
 match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match &m)
 : item(a, m), level(0), fresh_level(true) {

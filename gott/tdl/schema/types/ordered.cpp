@@ -37,11 +37,17 @@
 
 #include "ordered.hpp"
 #include "../rule.hpp"
+#include "../type.hpp"
+#include <gott/plugin/plugin_builder.hpp>
 
 namespace schema = tdl::schema;
 namespace ev = tdl::schema::ev;
 using schema::item;
 using schema::match_ordered;
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_schema_ordered,
+    schema::concrete_type<match_ordered>)
 
 match_ordered::match_ordered(rule_attr_t const &a, std::vector<rule_t> const&r,
                              match  &m)

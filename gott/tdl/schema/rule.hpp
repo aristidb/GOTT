@@ -98,12 +98,6 @@ private:
   boost::shared_ptr<impl const> p;
 };
 
-template<class T>
-rule_t rule(rule_attr_t const &a, 
-    std::vector<rule_t> const &c = std::vector<rule_t>()) {
-  return rule_t(abstract_rule(&construct_item<T>, &T::accept_any), a, c);
-}
-
 rule_t rule(gott::string const &name, rule_attr_t const &a = rule_attr_t(), 
     std::vector<rule_t> const &c = std::vector<rule_t>()) GOTT_EXPORT;
 

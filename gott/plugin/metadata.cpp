@@ -52,25 +52,27 @@ boost::once_flag once_core = BOOST_ONCE_INIT;
 void noop() {}
 
 void do_load_standard() {
-  boost::call_once(&noop, once_core); // simulate loading provisory metadata
-  { // get rid of any provisory metadata
-    clear_plugin_metadata();
-    clear_module_metadata();
-  }
   void *handle = gott::dlopen_unix("libplugin_tdl.so", RTLD_LAZY);
   typedef void (fun_t)(std::istream &);
   fun_t *do_extract_plugin_metadata = gott::function_cast<fun_t>(
       gott::dlsym_unix(handle, "extract_plugin_metadata"));
   fun_t *do_extract_module_metadata = gott::function_cast<fun_t>(
       gott::dlsym_unix(handle, "extract_module_metadata"));
+
+  disable_plugin_metadata();
   {
     std::ifstream in("plugin_registry.tdl");
     do_extract_plugin_metadata(in);
   }
+  enable_plugin_metadata();
+
+  disable_module_metadata();
   {
     std::ifstream in("module_registry.tdl");
     do_extract_module_metadata(in);
   }
+  enable_module_metadata();
+
   gott::dlclose_unix(handle);
 }
 
@@ -82,7 +84,7 @@ void do_load_core() {
     builtins.module_id = "tdl::builtins";
     builtins.file_path = "tdl/libtdl.so";
     builtins.module_type = module_metadata::dynamic_native;
-    add_module_metadata(builtins);
+    add_module_metadata(builtins, true);
   }
   struct schema_type_adder {
     void operator()(gott::string const &s) {
@@ -91,7 +93,7 @@ void do_load_core() {
       schema_type.interfaces.push_back("tdl::schema::type");
       schema_type.enclosing_module = "tdl::builtins";
       schema_type.symbol = "plugin_schema_" + s;
-      add_plugin_metadata(schema_type);
+      add_plugin_metadata(schema_type, true);
     }
   } add_schema_type;
   add_schema_type("any");
@@ -107,6 +109,10 @@ void do_load_core() {
 }
 
 void gott::plugin::load_standard_metadata() {
+  static bool first = true; // protect against recursion
+  if (!first)
+    return;
+  first = false;
   boost::call_once(&do_load_standard, once_standard);
 }
 
