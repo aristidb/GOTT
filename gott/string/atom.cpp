@@ -45,7 +45,7 @@ static string *atomize(string const &n) {
   static std::map<string, string *> table;
   std::map<string, string *>::iterator it = table.find(n);
   if (it == table.end()) {
-    string *x = new string(n);
+    string *x = new string(n.as_utf8(), gott::utf8);
     table.insert(std::map<string, string *>::value_type(*x, x));
     return x;
   }
