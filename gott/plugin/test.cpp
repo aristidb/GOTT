@@ -50,7 +50,7 @@ int main() {
     cout << "There is no plugin to support interface boo?!\n";
   else
     cout << "First plugin to support interface boo: "
-      << x.get().plugin_id << ".\n";
+      << x.get().plugin_id.get_string() << ".\n";
 
   enumerate_module_metadata(cout << _1 << "\n\n",
       tags::validate = false, tags::load_standard_metadata = false);

@@ -147,13 +147,13 @@ ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
   {
     w.node("plugin-id"); 
     w.down();
-      w.node(val.plugin_id);
+      w.node(val.plugin_id.get_string());
     w.up();
   }
   {
     w.node("enclosing-module");
     w.down();
-      w.node(val.enclosing_module);
+      w.node(val.enclosing_module.get_string());
     w.up();
   }
   {
@@ -169,7 +169,7 @@ ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
         ++it) {
       w.node("has-interface");
       w.down();
-        w.node(*it);
+        w.node(it->get_string());
       w.up();
     }
   }
@@ -267,7 +267,7 @@ ostream &gott::plugin::operator<<(ostream &stream, module_metadata const &val) {
   {
     w.node("module-id"); 
     w.down();
-      w.node(val.module_id);
+      w.node(val.module_id.get_string());
     w.up();
   }
   {

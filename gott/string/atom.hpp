@@ -58,9 +58,7 @@ public:
   /// Destructor.
   ~atom() {}
 
-  string const &get() const { return *rep; }
-
-  operator string() const { return get(); }
+  string const &get_string() const { return *rep; }
 
   bool operator==(atom const &o) const {
     return rep == o.rep;
@@ -73,6 +71,10 @@ public:
     return rep < o.rep;
   }
 
+  bool operator<=(atom const &o) const {
+    return rep <= o.rep;
+  }
+
 private:
   string *rep;
 };
@@ -83,6 +85,14 @@ private:
  */
 inline bool operator!=(atom const &a, atom const &b) {
   return !(a == b);
+}
+
+inline bool operator>(atom const &a, atom const &b) {
+  return !(a <= b);
+}
+
+inline bool operator>=(atom const &a, atom const &b) {
+  return !(a < b);
 }
 
 }
