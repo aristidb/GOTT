@@ -47,25 +47,35 @@ namespace gott {
  * Atoms are strings with fast comparison and fast hashing but slow constructor
  * and medium-slow copying.
  */
-class atom : public string {
+class atom {
 public:
-  atom() {}
-
   /// Copy-Constructor (fast).
-  GOTT_EXPORT atom(atom const &);
+  atom(atom const &o) : rep(o.rep) {}
 
   /// Constructor (slow).
-  GOTT_EXPORT atom(string const &);
+  GOTT_EXPORT atom(string const & = string(""));
 
   /// Destructor.
-  GOTT_EXPORT ~atom();
-};
+  ~atom() {}
 
-/**
- * Compare two atoms for equality (fast).
- * \relates atom
- */
-GOTT_EXPORT bool operator==(atom const &, atom const &);
+  string const &get() const { return *rep; }
+
+  operator string() const { return get(); }
+
+  bool operator==(atom const &o) const {
+    return rep == o.rep;
+  }
+
+  /**
+   * Compare two atoms (fast). Does not return lexicographical order.
+   */
+  bool operator<(atom const &o) const {
+    return rep < o.rep;
+  }
+
+private:
+  string *rep;
+};
 
 /**
  * Compare two atoms for inequality (fast).
@@ -74,11 +84,6 @@ GOTT_EXPORT bool operator==(atom const &, atom const &);
 inline bool operator!=(atom const &a, atom const &b) {
   return !(a == b);
 }
-
-/**
- * Compare two atoms (fast). Does not return lexicographical order.
- */
-GOTT_EXPORT bool operator<(atom const &, atom const &);
 
 }
 

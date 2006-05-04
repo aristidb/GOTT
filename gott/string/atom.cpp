@@ -36,26 +36,21 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "atom.hpp"
-#include <set>
+#include <map>
 
 using gott::atom;
 using gott::string;
 
-static string atomize(string const &n) {
-  static std::set<string> table;
-  return *table.insert(n).first;
+static string *atomize(string const &n) {
+  static std::map<string, string *> table;
+  std::map<string, string *>::iterator it = table.find(n);
+  if (it == table.end()) {
+    string *x = new string(n);
+    table.insert(std::map<string, string *>::value_type(*x, x));
+    return x;
+  }
+  return it->second;
 }
 
-atom::atom(string const &n) : string(atomize(n)) {}
+atom::atom(string const &n) : rep(atomize(n)) {}
 
-atom::atom(atom const &o) : string(o) {}
-
-atom::~atom() {}
-
-bool gott::operator==(atom const &a, atom const &b) {
-  return a.as_utf8().begin() == b.as_utf8().begin(); // same memory
-}
-
-bool gott::operator<(atom const &a, atom const &b) {
-  return a.as_utf8().begin() < b.as_utf8().begin();
-}
