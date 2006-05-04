@@ -9,3 +9,7 @@ module-type dynamic-native
 module-id tdl::builtins
 file-path tdl/libtdl.so
 module-type dynamic-native
+
+module-id gott::configuration
+file-path configuration/libconfig.so
+module-type dynamic-native

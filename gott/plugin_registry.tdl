@@ -55,4 +55,7 @@ has-interface tdl::schema::type
 enclosing-module tdl::builtins
 symbol plugin_schema_tree
 
-
+plugin-id gott::config::tdl_element
+has-interface tdl::schema::type
+enclosing-module gott::configuration
+symbol plugin_tdl

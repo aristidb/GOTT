@@ -41,6 +41,8 @@
 #include <gott/tdl/schema/by_name.hpp>
 #include <gott/tdl/schema/event.hpp>
 #include <gott/tdl/schema/match.hpp>
+#include <gott/tdl/schema/type.hpp>
+#include <gott/plugin/plugin_builder.hpp>
 #include <boost/algorithm/string.hpp>
 #include <gott/range.hpp>
 #include <map>
@@ -86,6 +88,8 @@ private:
 };
 
 }
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin_tdl, schema::concrete_type<match_config_tdl>)
 
 match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra, 
     std::vector<schema::rule_t> const &o_children, 

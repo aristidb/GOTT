@@ -39,18 +39,42 @@
 #include "rule.hpp"
 #include "type.hpp"
 #include <gott/string/string.hpp>
+#include <gott/string/atom.hpp>
 #include <gott/plugin.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
+#include <map>
 
 using namespace tdl::schema;
 using namespace gott::plugin;
 using gott::string;
 using std::vector;
 
+namespace {
+  typedef std::map<gott::atom, boost::shared_ptr<plugin_handle<type> > > map_t;
+  map_t all_handles;
+  boost::mutex mutex;
+}
+
 rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
     vector<rule_t> const &c) {
   load_core_metadata();
-  plugin_handle<type> handle(find_plugin_metadata(
+  load_standard_metadata();
+
+  boost::mutex::scoped_lock lock(mutex);
+
+  if (all_handles.count(s) == 0) {
+    boost::shared_ptr<plugin_handle<type> > handle(new plugin_handle<type>(
+      find_plugin_metadata(
         tags::plugin_id = s,
-        tags::interface = "tdl::schema::type"));
-  return schema::rule_t(handle->get_abstract(), a, c);
+        tags::interface = "tdl::schema::type",
+        tags::load_standard_metadata = false)));
+
+    all_handles.insert(map_t::value_type(s, handle));
+  }
+
+  type &type = *all_handles.find(s)->second->get();
+  abstract_rule abstract = type.get_abstract();
+
+  return rule_t(abstract, a, c);
 }
