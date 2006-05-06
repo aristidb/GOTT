@@ -52,6 +52,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <time.h>
 
 static char const testfile[] = "/tmp/testfile";
 
@@ -100,6 +101,11 @@ public:
   //void test_metadata() {
   //  meta_test(gott::notify_fs::file_attrib, &stat_file);
   //}
+  
+  void test_manywrite() {
+    for (int i = 0; i < 1000000; ++i)
+      test_write();
+  }
 
 private:
   void meta_test(gott::notify_fs::ev_t event, void (*fun)()) {
@@ -116,7 +122,7 @@ private:
           &notify_fs_file_simple_test::on_event,
           this,
           var(encountered)));
-    boost::thread thrd(bind(&helper_thread, fun));
+    boost::thread thrd(fun);
     loop->run();
     TS_ASSERT_EQUALS(encountered, 1);
     thrd.join();
@@ -148,10 +154,5 @@ private:
   static void stat_file() {
     struct stat buf;
     ::stat(testfile, &buf);
-  }
-
-  static void helper_thread(void (*call)()) {
-    sleep(1); // make sure the loop is running
-    call();
   }
 };
