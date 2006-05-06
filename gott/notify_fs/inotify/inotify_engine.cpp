@@ -174,12 +174,18 @@ void inotify_engine::notify() {
       return;
     if (pevent->wd == -1)
       continue;
-    event ev = {
-      static_cast<inotify_watch *>(watches[pevent->wd])->context,
-      ev_t(pevent->mask),
-      pevent->cookie,
-      pevent->len ? gott::string(pevent->name, gott::utf8) : gott::string()
-    };
+    
+    inotify_watch *mywatch = static_cast<inotify_watch *>(watches[pevent->wd]);
+    if (!mywatch)
+      continue;
+    watch &context = mywatch->context;
+    ev_t mask = ev_t(pevent->mask);
+    cookie_t cookie = pevent->cookie;
+    gott::string name;
+    if (pevent->len > 0)
+      name = gott::string(pevent->name, gott::utf8);
+    
+    event ev = { context, mask, cookie, name };
     ev.context.on_fire().emit(ev);
   }
 }
