@@ -36,7 +36,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "common.hpp"
-#include <gott/tdl/schema/types/named.hpp>
 
 namespace schema = tdl::schema;
 namespace stru = tdl::structure;
@@ -44,16 +43,16 @@ using gott::xany::Xany;
 
 using namespace stru::cf;
 
-typedef schema::rule_attr_t RA;
+using schema::rule_attr;
 using schema::rule_t;
 
 namespace {
 struct schema_named_string : tut::schema_basic {
   schema_named_string() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document", RA("doc"),
-        rule_one("tdl::schema::named", schema::match_named::attributes("ND"),
-          rule("tdl::schema::node", RA("S"))))) {}
+      rule_one("tdl::schema::document", rule_attr(schema:: tag = "doc"),
+        rule_one("tdl::schema::named", rule_attr(schema::tag = "ND"),
+          rule("tdl::schema::node", rule_attr(schema::tag = "S"))))) {}
 };
 }
 

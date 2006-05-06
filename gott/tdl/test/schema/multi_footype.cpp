@@ -37,7 +37,6 @@
 
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
-#include <gott/tdl/schema/types/named.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
 #include <boost/assign/list_of.hpp>
 
@@ -59,17 +58,17 @@ struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() 
   : tut::schema_basic(rule_one("tdl::schema::document", RA("--doc--"), 
         rule_t(&footype))) {
-    footype = rule_one("tdl::schema::named", schema::match_named::attributes("a"),
+    footype = rule_one("tdl::schema::named", schema::rule_attr(schema::tag = "a"),
         rule_t(&multi));
 
     multi =
       rule("tdl::schema::unordered", RA("--unordered--"), list_of
-        (rule_one("tdl::schema::named", schema::match_named::attributes("plugin"), 
+        (rule_one("tdl::schema::named", schema::rule_attr(schema::tag = "plugin"), 
           rule_one("tdl::schema::list", RA(RA::simple, false),
             rule("tdl::schema::node", 
               RA(std::vector<string>(1, "plugin-data"), true, Xany(), 0,
                 slotcfg(), slotcfg(slotcfg::list))))))
-        (rule_one("tdl::schema::named", schema::match_named::attributes("sum"),
+        (rule_one("tdl::schema::named", schema::rule_attr(schema::tag = "sum"),
           rule_one("tdl::schema::list", RA(RA::simple, false),
             rule("tdl::schema::node", 
               RA(std::vector<string>(1, "sum-data"), true, Xany(),
