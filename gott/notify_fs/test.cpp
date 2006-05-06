@@ -43,6 +43,7 @@
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/quit_manager.hpp>
 #include <gott/events/timer_manager.hpp>
+#include <gott/plugin.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/utility/in_place_factory.hpp>
@@ -72,7 +73,7 @@ int main() {
   main_loop_factory gen;
   gen.try_add(feature<notification_engine>() && feature<timer_manager>() &&
         feature<quit_manager>());
-  boost::scoped_ptr<main_loop> loop(gen.get_alloc());
+  gott::plugin::plugin_handle<main_loop> loop(gen.get());
 
   watch w;
   try {
@@ -90,4 +91,5 @@ int main() {
       &blink,
       true);
   loop->run();
+  std::cout << "Done!\n";
 }
