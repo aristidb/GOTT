@@ -1,0 +1,8 @@
+Import('env')
+
+env.SharedLibrary('select_loop', 'select_loop.cpp')
+if env['SYS_EPOLL']:
+	env.SharedLibrary('epoll_loop', 'epoll_loop.cpp')
+if env['SYS_KQUEUE']:
+	env.SharedLibrary('kqueue_loop', 'kqueue_loop.cpp')
+env.SharedLibrary('message_queue_loop', 'message_queue_loop.cpp')
