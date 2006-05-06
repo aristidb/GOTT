@@ -39,10 +39,8 @@
 #include "loop_requirement.hpp"
 #include "main_loop.hpp"
 #include <gott/string/qid.hpp>
-
-#include "epoll_loop.hpp"
-#include "kqueue_loop.hpp"
-#include "select_loop.hpp"
+#include <gott/plugin.hpp>
+#include <gott/exceptions.hpp>
 
 using gott::events::main_loop_factory;
 using gott::events::main_loop;
@@ -62,15 +60,13 @@ bool main_loop_factory::try_add_feature(QID const &) {
   return true; // FIXME
 }
 
-main_loop *main_loop_factory::get_alloc() const {
-#if defined(BUILD_EPOLL)
-  //return new select_loop;
-  return new epoll_loop;
-#elif defined(BUILD_KQUEUE)
-  return new kqueue_loop;
-#else
-  return new select_loop;
-#endif
+gott::plugin::plugin_metadata const &main_loop_factory::get() const {
+  using namespace gott::plugin;
+  boost::optional<plugin_metadata const &> result =
+    find_plugin_metadata(tags::interface = "gott::events::main_loop");
+  if (!result)
+    throw system_error("could not find appropriate main loop");
+  return *result;
 }
 
 /*

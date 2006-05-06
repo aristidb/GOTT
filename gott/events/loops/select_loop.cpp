@@ -39,11 +39,12 @@
 #include "select_loop.hpp"
 #include <gott/syswrap/select_unix.hpp>
 #include <gott/syswrap/errno.hpp>
+#include <gott/plugin/plugin_builder.hpp>
 #include <errno.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/utility/in_place_factory.hpp>
 
-#include <iostream>
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin, gott::events::select_loop)
 
 namespace gott{namespace events{
 select_loop::select_loop() 

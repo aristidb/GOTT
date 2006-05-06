@@ -42,7 +42,11 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace gott { class QID;
+namespace gott { 
+
+class QID;
+namespace plugin { struct plugin_metadata; }
+
 namespace events {
 class loop_requirement;
 class main_loop;
@@ -52,7 +56,7 @@ public:
   GOTT_EXPORT main_loop_factory();
   GOTT_EXPORT ~main_loop_factory();
   GOTT_EXPORT bool try_add(loop_requirement const &);
-  GOTT_EXPORT main_loop *get_alloc() const;
+  GOTT_EXPORT plugin::plugin_metadata const &get() const;
 
 public: // internal
   bool try_add_feature(QID const &);

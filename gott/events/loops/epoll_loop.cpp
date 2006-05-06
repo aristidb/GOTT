@@ -36,13 +36,14 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "epoll_loop.hpp"
-#include "selfpipe_message_manager.hpp"
-#include "signal_manager.hpp"
+#include "../selfpipe_message_manager.hpp"
+#include "../signal_manager.hpp"
 #include <gott/string/qid.hpp>
 #include <gott/syswrap/epoll_linux.hpp>
 #include <gott/syswrap/scoped_unix_file.hpp>
 #include <gott/exceptions.hpp>
 #include <gott/syswrap/errno.hpp>
+#include <gott/plugin/plugin_builder.hpp>
 #include <errno.h>
 #include <set>
 #include <map>
@@ -53,6 +54,8 @@
 #include <cmath>
 
 using gott::events::epoll_loop;
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin, epoll_loop)
 
 class epoll_loop::impl {
 public:

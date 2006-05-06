@@ -56,4 +56,3 @@ sigc::signal0<void> &main_loop::on_destroy() {
 void *&main_loop::feature_data(gott::QID const &id) {
   return p->feature_data[id];
 }
-

@@ -52,13 +52,11 @@
 #include <gott/syswrap/pipe_unix.hpp>
 #include <gott/syswrap/read_write_unix.hpp>
 
-#include <gott/events/select_loop.hpp>
-#ifdef BUILD_KQUEUE
-#include <gott/events/kqueue_loop.hpp>
-#endif
-#ifdef BUILD_EPOLL
-#include <gott/events/epoll_loop.hpp>
-#endif
+#include <gott/plugin.hpp>
+#include <gott/events/main_loop.hpp>
+#include <gott/events/fd_manager.hpp>
+
+#include <boost/utility/in_place_factory.hpp>
 
 using namespace gott;
 using namespace gott::events;
@@ -69,6 +67,7 @@ class fd_manager_loop_test : public CxxTest::TestSuite
 {
   int pipes[2];
   int reads;
+  boost::optional<gott::plugin::plugin_handle<main_loop> > ploop;
 
 public:
   void setUp() {
@@ -80,6 +79,7 @@ public:
 
   void tearDown() {
 #ifdef HAS_UNISTD_H
+    ploop = boost::none;
     close(pipes[0]);
     close(pipes[1]);
     pipes[0] = pipes[1] = -1;
@@ -115,14 +115,15 @@ public:
 #endif
 
   void meta_reader(
-      main_loop *ploop,
       int presleep_time,
       int no_initial,
       std::set<int> repeaters,
       int cancel,
       int quit = -1) {
 #ifdef HAS_UNISTD_H
-    boost::scoped_ptr<main_loop> loop(ploop);
+    TS_ASSERT(ploop);
+
+    main_loop *loop = ploop->get();
 
     loop->feature<fd_manager>().add_fd(
         pipes[0],
@@ -130,7 +131,7 @@ public:
         boost::bind(
           &fd_manager_loop_test::read_event,
           this,
-          loop.get(),
+          loop,
           repeaters,
           cancel,
           quit,
@@ -153,75 +154,82 @@ public:
 #endif
   }
 
+  void create_loop(QID const &which) {
+    TS_ASSERT_THROWS_NOTHING(
+        ploop = boost::in_place(gott::plugin::find_plugin_metadata(
+            gott::plugin::tags::plugin_id = which)));
+  }
+
   void test_read1_select_loop() {
 #ifdef HAS_UNISTD_H
-    meta_reader(new select_loop, 1, 2, boost::assign::list_of(2), 3);
+    create_loop("gott::events::select_loop");
+    meta_reader(1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read1_epoll_loop() {
 #ifdef BUILD_EPOLL
-    meta_reader(new epoll_loop, 1, 2, boost::assign::list_of(2), 3);
+    meta_reader(1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read1_kqueue_loop() {
 #ifdef BUILD_KQUEUE
-    meta_reader(new kqueue_loop, 1, 2, boost::assign::list_of(2), 3);
+    meta_reader(1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read2_select_loop() {
 #ifdef HAS_UNISTD_H
-    meta_reader(new select_loop, -1, 2, boost::assign::list_of(2), 3);
+    meta_reader(-1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read2_epoll_loop() {
 #ifdef BUILD_EPOLL
-    meta_reader(new epoll_loop, -1, 2, boost::assign::list_of(2), 3);
+    meta_reader(-1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read2_kqueue_loop() {
 #ifdef BUILD_KQUEUE
-    meta_reader(new kqueue_loop, -1, 2, boost::assign::list_of(2), 3);
+    meta_reader(-1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read3_select_loop() {
 #ifdef HAS_UNISTD_H
-    meta_reader(new select_loop, 0, 2, boost::assign::list_of(2), -1, 3);
+    meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
 #endif
   }
 
   void test_read3_epoll_loop() {
 #ifdef BUILD_EPOLL
-    meta_reader(new epoll_loop, 0, 2, boost::assign::list_of(2), -1, 3);
+    meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
 #endif
   }
 
   void test_read3_kqueue_loop() {
 #ifdef BUILD_KQUEUE
-    meta_reader(new kqueue_loop, 0, 2, boost::assign::list_of(2), -1, 3);
+    meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
 #endif
   }
 
   void test_read4_select_loop() {
 #ifdef HAS_UNISTD_H
-    meta_reader(new select_loop, 0, 3, boost::assign::list_of(2)(3), 5);
+    meta_reader(0, 3, boost::assign::list_of(2)(3), 5);
 #endif
   }
 
   void test_read4_epoll_loop() {
 #ifdef BUILD_EPOLL
-    meta_reader(new epoll_loop, -1, 3, boost::assign::list_of(2)(3), 5);
+    meta_reader(-1, 3, boost::assign::list_of(2)(3), 5);
 #endif
   }
 
   void test_read4_kqueue_loop() {
 #ifdef BUILD_KQUEUE
-    meta_reader(new kqueue_loop, -1, 3, boost::assign::list_of(2)(3), 5);
+    meta_reader(-1, 3, boost::assign::list_of(2)(3), 5);
 #endif
   }
 };

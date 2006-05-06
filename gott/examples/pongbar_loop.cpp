@@ -3,6 +3,7 @@
 #include <gott/events/main_loop.hpp>
 #include <gott/events/timer_manager.hpp>
 #include <gott/events/quit_manager.hpp>
+#include <gott/plugin.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -126,7 +127,8 @@ int main() {
   
   main_loop_factory loop_gen;
   loop_gen.try_add(feature<timer_manager>() && feature<quit_manager>());
-  boost::scoped_ptr<main_loop> loop(loop_gen.get_alloc());
+
+  gott::plugin::plugin_handle<main_loop> loop(loop_gen.get());
   
   timer_manager &tm = loop->feature<timer_manager>();
   tm.add_periodic_timer(

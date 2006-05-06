@@ -14,12 +14,11 @@
  * The Original Code is An Event Handling Class Library.
  *
  * The Initial Developer of the Original Code is
- * Andreas Pokorny (andreas.pokorny@gmail.com )
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Aristid Breitkreuz (aribrei@arcor.de).
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *  Andreas Pokorny (andreas.pokorny@gmail.com)
  *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -36,87 +35,51 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_EVENTS_SELECT_LOOP_HPP_INCLUDED
-#define GOTT_BASE_EVENTS_SELECT_LOOP_HPP_INCLUDED
+#ifndef GOTT_EVENTS_MESSAGE_QUEUE_LOOP_HPP
+#define GOTT_EVENTS_MESSAGE_QUEUE_LOOP_HPP
 
-#include <map> 
-#include <algorithm>
-#include <queue>
-#include <set>
-#include <sys/select.h> 
-#include <boost/noncopyable.hpp>
-#include <boost/function.hpp>
-#include <boost/optional/optional.hpp>
-#include <gott/visibility.hpp>
-#include "main_loop.hpp"
-#include "fd_manager.hpp"
-#include "timer_manager.hpp"
-#include "selfpipe_message_manager.hpp"
-#include "signal_manager.hpp"
+#include "../main_loop.hpp"
+#include "../inprocess_message_manager.hpp"
+#include <boost/scoped_ptr.hpp>
 
-namespace gott{namespace events{
+namespace gott {
+namespace events {
 
 /**
- * A main_loop implementation that uses select to dispatch events.
+ * A main_loop implementation based on gott::thread::message_queue.
  *
  * Features:
- *  - gott::events::fd_manager
- *  - gott::events::timer_manager
  *  - gott::events::inprocess_message_manager
- *  - gott::events::signal_manager
  */
-class GOTT_EXPORT select_loop 
-    : public main_loop,
-      private fd_manager, 
-      private standard_timer_manager {
-private:
-  struct GOTT_LOCAL handler {
-    boost::function<void (unsigned)> callback;
-    unsigned mask;
-  };
-  struct GOTT_LOCAL fd_sets_t {
-    fd_sets_t() {
-      FD_ZERO(&read_fds);
-      FD_ZERO(&write_fds);
-      FD_ZERO(&except_fds);
-    }
-    fd_set read_fds, write_fds, except_fds;
-  } fd_sets;
-  typedef std::map<int, handler> callback_map;
-  std::set<int> wait_fds;
-  callback_map callbacks;
-  selfpipe_message_manager message_mgr; 
-  standard_signal_manager sig_mgr;
-  bool running;
-  sigc::signal0<void> on_idle_;
-  int wait;
-
+class message_queue_loop 
+: public main_loop, private inprocess_message_manager {
 public:
-  select_loop();
-  ~select_loop();
-
-private:
-  GOTT_LOCAL
-  void add_fd(int, unsigned, boost::function<void (unsigned)> const &, 
-      bool = true);
-
-  GOTT_LOCAL
-  void remove_fd(int);
+  message_queue_loop();
+  ~message_queue_loop();
 
 private:
   GOTT_LOCAL void run();
   GOTT_LOCAL void quit_local();
+  GOTT_LOCAL sigc::signal0<void> &on_idle();
 
   GOTT_LOCAL void add_waitable();
   GOTT_LOCAL void remove_waitable();
 
-  GOTT_LOCAL sigc::signal0<void> &on_idle() { return on_idle_; }
+private:
+  GOTT_LOCAL
+  void send(gott::xany::Xany const &) throw();
+
+  GOTT_LOCAL
+  sigc::signal1<void, gott::xany::Xany const &> &on_receive();
 
 private:
-  GOTT_LOCAL void *do_feature(gott::QID const &);
+  GOTT_LOCAL void *do_feature(QID const &);
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}
 
 #endif
-

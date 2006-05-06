@@ -38,9 +38,9 @@
 #ifndef GOTT_EVENTS_EPOLL_LOOP_HPP
 #define GOTT_EVENTS_EPOLL_LOOP_HPP
 
-#include "main_loop.hpp"
-#include "fd_manager.hpp"
-#include "timer_manager.hpp"
+#include "../main_loop.hpp"
+#include "../fd_manager.hpp"
+#include "../timer_manager.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -56,7 +56,7 @@ namespace events {
  *  - gott::events::inprocess_message_manager
  *  - gott::events::signal_manager
  */
-class GOTT_EXPORT epoll_loop
+class epoll_loop
 : public main_loop,
   private fd_manager,
   private standard_timer_manager {

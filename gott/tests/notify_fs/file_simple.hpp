@@ -43,6 +43,7 @@
 #include <gott/events/loop_requirement.hpp>
 #include <gott/notify_fs/notification_engine.hpp>
 #include <gott/notify_fs/watch.hpp>
+#include <gott/plugin.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/lambda/bind.hpp>
@@ -56,19 +57,23 @@ static char const testfile[] = "/tmp/testfile";
 
 class notify_fs_file_simple_test : public CxxTest::TestSuite
 {
-  gott::events::main_loop *loop;
+  gott::plugin::plugin_handle<gott::events::main_loop> loop;
 
 public:
-  void setUp() {
+  static gott::plugin::plugin_metadata const &which_main_loop() {
     gott::events::main_loop_factory fact;
     fact.try_add(gott::events::feature<gott::notify_fs::notification_engine>());
-    loop = fact.get_alloc();
+    return fact.get();
+  }
+
+  notify_fs_file_simple_test() : loop(which_main_loop()) {}
+
+  void setUp() {
     ::creat(testfile, 00777);
   }
 
   void tearDown() {
     ::unlink(testfile);
-    delete loop;
   }
 
   void test_acquire() {

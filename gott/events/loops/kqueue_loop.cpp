@@ -20,6 +20,7 @@
  *
  * Contributor(s):
  *  Rüdiger Sonderfeld <kingruedi@c-plusplus.de>
+ *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -43,9 +44,13 @@
 
 #include <gott/notify_fs/event.hpp>
 
+#include <gott/plugin/plugin_builder.hpp>
+
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin, gott::events::kqueue_loop)
 
 namespace gott {
 namespace events {

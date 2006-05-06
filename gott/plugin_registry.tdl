@@ -59,3 +59,19 @@ plugin-id gott::config::tdl_element
 has-interface tdl::schema::type
 enclosing-module gott::configuration
 symbol plugin_tdl
+
+# main_loop
+plugin-id gott::events::kqueue_loop
+has-interface gott::events::main_loop
+enclosing-module gott::events::kqueue_loop
+symbol plugin
+
+plugin-id gott::events::epoll_loop
+has-interface gott::events::main_loop
+enclosing-module gott::events::epoll_loop
+symbol plugin
+
+plugin-id gott::events::select_loop
+has-interface gott::events::main_loop
+enclosing-module gott::events::select_loop
+symbol plugin

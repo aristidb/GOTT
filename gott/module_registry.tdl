@@ -13,3 +13,15 @@ module-type dynamic-native
 module-id gott::configuration
 file-path configuration/libconfig.so
 module-type dynamic-native
+
+module-id gott::events::kqueue_loop
+file-path events/loops/libkqueue_loop.so
+module-type dynamic-native
+
+module-id gott::events::epoll_loop
+file-path events/loops/libepoll_loop.so
+module-type dynamic-native
+
+module-id gott::events::select_loop
+file-path events/loops/libselect_loop.so
+module-type dynamic-native

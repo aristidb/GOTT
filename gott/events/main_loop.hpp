@@ -41,6 +41,7 @@
 #include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>
 #include <gott/exceptions.hpp>
+#include <gott/plugin/plugin_base.hpp>
 #include <sigc++/signal.h>
 #include <boost/scoped_ptr.hpp>
 
@@ -50,7 +51,7 @@ namespace events {
 /**
  * Basic main loop interface class. For a single thread only.
  */
-class GOTT_EXPORT main_loop {
+class GOTT_EXPORT main_loop : public gott::plugin::plugin_base {
 public:
   /// Constructor.
   main_loop();
