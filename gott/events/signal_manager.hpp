@@ -74,7 +74,7 @@ public:
 /**
  * Feature for main_loops able to deal with operating system signals.
  */
-class standard_signal_manager :
+class GOTT_EXPORT standard_signal_manager :
   public signal_manager,
   boost::noncopyable,
   public sigc::trackable {

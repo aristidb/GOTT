@@ -161,11 +161,12 @@ private:
   struct periodic_helper;
 };
 
-class standard_timer_manager : public timer_manager {
+class GOTT_EXPORT standard_timer_manager : public timer_manager {
 public:
   standard_timer_manager(main_loop *);
   ~standard_timer_manager();
 
+private:
   void add_timer(deadline_timer const &);
   void add_timer(monotonic_timer const &);
 
@@ -174,14 +175,15 @@ public:
       boost::function<void (timer_manager &)> const &callback,
       bool wait = true);
 
+public:
   bool has_timers() const;
 
 public:
-  void handle_pending_timers() {
+  void handle_pending_timers() GOTT_LOCAL {
     do_time_action(true, 0);
   }
   
-  boost::posix_time::time_duration time_left(bool handle = false) {
+  boost::posix_time::time_duration time_left(bool handle = false) GOTT_LOCAL {
     boost::posix_time::time_duration result;
     do_time_action(handle, &result);
     return result;

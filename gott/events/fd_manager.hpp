@@ -56,7 +56,7 @@ class main_loop;
 class GOTT_EXPORT fd_manager {
 public:
   /// Constructor.
-  GOTT_LOCAL fd_manager();
+  fd_manager();
   /// Pure virtual destructor.
   virtual ~fd_manager() = 0;
 
