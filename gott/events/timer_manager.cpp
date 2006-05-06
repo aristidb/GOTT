@@ -45,6 +45,7 @@
 #include <boost/bind.hpp>
 #include <boost/optional.hpp>
 #include <boost/none.hpp>
+#include <boost/ref.hpp>
 
 namespace pxtime = boost::posix_time;
 using gott::events::timer_manager;
@@ -72,35 +73,61 @@ void timer_manager::add_relative_timer(
     pxtime::time_duration const &interval,
     boost::function<void (timer_manager &)> const &callback,
     bool wait) {
-  add_monotonic_timer(monotonic_clock() + interval, callback, wait);
+  add_monotonic_timer(monotonic_now() + interval, callback, wait);
 }
 
 namespace {
-static void do_periodic_timer(
-    pxtime::time_duration const &last,
-    pxtime::time_duration const &interval,
-    boost::function<bool ()> const &callback,
-    bool wait,
-    timer_manager &man) {
-  if (callback())
-    man.add_monotonic_timer(
-        last + interval,
-        boost::bind(&do_periodic_timer,
-          last + interval, interval, callback, wait, _1),
-        wait);
-}
+struct remove_overdraw_helper {
+  remove_overdraw_helper(boost::function<bool ()> const &callback)
+    : callback(callback) {}
+
+  boost::function<bool ()> callback;
+
+  bool operator()(unsigned overdraw) const {
+    for (unsigned i = 0; i < overdraw + 1; ++i)
+      if (!callback())
+        return false;
+    return true;
+  }
+};
 }
 
 void timer_manager::add_periodic_timer(
     pxtime::time_duration const &interval,
     boost::function<bool ()> const &callback,
     bool wait) {
-  pxtime::time_duration now = monotonic_clock();
-  add_monotonic_timer(
-      now + interval, 
-      boost::bind(&do_periodic_timer,
-        now + interval, interval, callback, wait, _1),
-      wait);
+  add_periodic_timer_overdraw(interval, remove_overdraw_helper(callback), wait);
+}
+
+struct timer_manager::periodic_helper {
+  pxtime::time_duration when;
+  pxtime::time_duration interval;
+  boost::function<bool (unsigned)> callback;
+  bool wait;
+  void operator()(timer_manager &man) {
+    unsigned overdraw = (man.monotonic_now() - when).ticks() / interval.ticks();
+    if (callback(overdraw)) {
+      when += interval * (1 + overdraw);
+      man.add_monotonic_timer(when, *this, wait);
+    }
+  }
+};
+
+void timer_manager::add_periodic_timer_overdraw(
+    pxtime::time_duration const &interval,
+    boost::function<bool (unsigned)> const &callback,
+    bool wait) {
+  pxtime::time_duration next = monotonic_now() + interval;
+  periodic_helper helper = { next, interval, callback, wait };
+  add_monotonic_timer(next, helper, wait);
+};
+
+pxtime::time_duration timer_manager::monotonic_now() const {
+  return monotonic_clock();
+}
+
+pxtime::ptime timer_manager::utc_now() const {
+  return pxtime::microsec_clock::universal_time();
 }
 
 class standard_timer_manager::impl {
@@ -122,6 +149,7 @@ public:
   scheduled_monotonic_t scheduled_monotonic;
   
   boost::optional<pxtime::time_duration> saved_monotonic_time;
+  boost::optional<pxtime::ptime> saved_utc_time;
 
   main_loop *loop;
 
@@ -144,15 +172,6 @@ void standard_timer_manager::add_timer(monotonic_timer const &tm) {
   p->scheduled_monotonic.push(tm);
 }
 
-void standard_timer_manager::add_relative_timer(
-    pxtime::time_duration const &interval,
-    boost::function<void (timer_manager &)> const &callback,
-    bool wait) {
-  pxtime::time_duration now = 
-    p->saved_monotonic_time ? *p->saved_monotonic_time : monotonic_clock();
-  add_monotonic_timer(now + interval, callback, wait);
-}
-
 bool standard_timer_manager::has_timers() const {
   return !p->scheduled_deadline.empty() || !p->scheduled_monotonic.empty();
 }
@@ -161,8 +180,10 @@ void standard_timer_manager::do_time_action(
     bool handle, pxtime::time_duration *left) {
   // Get current time
   pxtime::ptime now_deadline;
-  if (!p->scheduled_deadline.empty())
+  if (!p->scheduled_deadline.empty()) {
     now_deadline = pxtime::microsec_clock::universal_time();
+    p->saved_utc_time = now_deadline;
+  }
   pxtime::time_duration now_monotonic;
   if (!p->scheduled_monotonic.empty()) {
     now_monotonic = monotonic_clock();
@@ -203,8 +224,10 @@ void standard_timer_manager::do_time_action(
   }
 
   if (no_handled > 0) {
-    if (!p->scheduled_deadline.empty())
+    if (!p->scheduled_deadline.empty()) {
       now_deadline = pxtime::microsec_clock::universal_time();
+      p->saved_utc_time = now_deadline;
+    }
     if (!p->scheduled_monotonic.empty()) {
       now_monotonic = monotonic_clock();
       p->saved_monotonic_time = now_monotonic;
@@ -229,4 +252,13 @@ void standard_timer_manager::do_time_action(
   }
   
   p->saved_monotonic_time = boost::none;
+  p->saved_utc_time = boost::none;
+}
+
+pxtime::time_duration standard_timer_manager::monotonic_now() const {
+  return p->saved_monotonic_time ? *p->saved_monotonic_time : timer_manager::monotonic_now();
+}
+
+pxtime::ptime standard_timer_manager::utc_now() const {
+  return p->saved_utc_time ? *p->saved_utc_time : timer_manager::utc_now();
 }

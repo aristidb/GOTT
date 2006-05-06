@@ -115,26 +115,50 @@ public:
    * \param wait Whether the main_loop should wait for the timer to be removed
    *             before quitting.
    */
-  virtual void add_relative_timer(
+  void add_relative_timer(
       boost::posix_time::time_duration const &interval,
       boost::function<void (timer_manager &)> const &callback,
       bool wait = true);
   
   /**
    * Add a periodic timer.
-   * \param interval The amount of time between wakes.
+   * \param interval The minimum and avaerage amount of time between wakes.
    * \param callback The callback to call whenever the timer is woken. Return
-   *                 false when the timer should end.
+   *            false when the timer should end.
    * \param wait Whether the main_loop should wait for the timer to end (by
-   *             returning false) before quitting.
+   *            returning false) before quitting.
    */
   void add_periodic_timer(
       boost::posix_time::time_duration const &interval,
       boost::function<bool ()> const &callback,
       bool wait = true);
 
+  /**
+   * Add a periodic timer that instead of being called multiple times at once,
+   * gives an overdraw counter to the callback. This has the advantage of 
+   * wasting less resources than add_periodic_timer(). The overdraw counter
+   * specifies the number of times the timer should have been woken but has not
+   * been, so it is always 0 if the timer is never late.
+   * \param interval The minimum amount of time between wakes.
+   * \param callback The callback to call whenever the timer is woken. Return
+   *            false when the timer should end.
+   * \param wait Whether the main_loop should wait for the timer to end (by
+   *            return false) before quitting.
+   */
+  void add_periodic_timer_overdraw(
+      boost::posix_time::time_duration const &interval,
+      boost::function<bool (unsigned overdraw)> const &callback,
+      bool wait = true);
+
+protected:
+  virtual boost::posix_time::time_duration monotonic_now() const;
+  virtual boost::posix_time::ptime utc_now() const;
+
 public:
-  static timer_manager *get_for(main_loop &) { return 0; }
+  static timer_manager *get_for(main_loop &) GOTT_LOCAL { return 0; }
+
+private:
+  struct periodic_helper;
 };
 
 class standard_timer_manager : public timer_manager {
@@ -165,6 +189,10 @@ public:
 
 private:
   void do_time_action(bool handle, boost::posix_time::time_duration *left);
+
+private:
+  boost::posix_time::time_duration monotonic_now() const;
+  boost::posix_time::ptime utc_now() const;
 
 private:
   class impl;
