@@ -159,76 +159,91 @@ public:
         ploop = boost::in_place(gott::plugin::find_plugin_metadata(
             gott::plugin::tags::plugin_id = which)));
   }
+  
+  void select_loop() { create_loop("gott::events::select_loop"); }
+  void epoll_loop() { create_loop("gott::events::epoll_loop"); }
+  void kqueue_loop() { create_loop("gott::events::kqueue_loop"); }
 
   void test_read1_select_loop() {
 #ifdef HAS_UNISTD_H
-    create_loop("gott::events::select_loop");
+    select_loop();
     meta_reader(1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read1_epoll_loop() {
 #ifdef BUILD_EPOLL
+    epoll_loop();
     meta_reader(1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read1_kqueue_loop() {
 #ifdef BUILD_KQUEUE
+    kqueue_loop();
     meta_reader(1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read2_select_loop() {
 #ifdef HAS_UNISTD_H
+    select_loop();
     meta_reader(-1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read2_epoll_loop() {
 #ifdef BUILD_EPOLL
+    epoll_loop();
     meta_reader(-1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read2_kqueue_loop() {
 #ifdef BUILD_KQUEUE
+    kqueue_loop();
     meta_reader(-1, 2, boost::assign::list_of(2), 3);
 #endif
   }
 
   void test_read3_select_loop() {
 #ifdef HAS_UNISTD_H
+    select_loop();
     meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
 #endif
   }
 
   void test_read3_epoll_loop() {
 #ifdef BUILD_EPOLL
+    epoll_loop();
     meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
 #endif
   }
 
   void test_read3_kqueue_loop() {
 #ifdef BUILD_KQUEUE
+    kqueue_loop();
     meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
 #endif
   }
 
   void test_read4_select_loop() {
 #ifdef HAS_UNISTD_H
+    select_loop();
     meta_reader(0, 3, boost::assign::list_of(2)(3), 5);
 #endif
   }
 
   void test_read4_epoll_loop() {
 #ifdef BUILD_EPOLL
+    epoll_loop();
     meta_reader(-1, 3, boost::assign::list_of(2)(3), 5);
 #endif
   }
 
   void test_read4_kqueue_loop() {
 #ifdef BUILD_KQUEUE
+    kqueue_loop();
     meta_reader(-1, 3, boost::assign::list_of(2)(3), 5);
 #endif
   }
