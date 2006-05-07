@@ -56,7 +56,7 @@ namespace ev {
 /**
  * Interface event for TDL tokens and schema notifications.
  */
-class event {
+class GOTT_EXPORT event {
 public:
   /**
    * Notify a item of this event.
@@ -87,11 +87,11 @@ inline std::ostream &operator<<(std::ostream &s, event const &e) {
 }
 
 /// The base class for token events.
-class token : public event {
+class GOTT_EXPORT token : public event {
 };
 
 /// The event class for the simple::parser::begin_parse token.
-class begin_parse : public token {
+class GOTT_EXPORT begin_parse : public token {
 public:
   bool play(item &r) const;
   void print(std::ostream &s) const;
@@ -99,7 +99,7 @@ public:
 };
 
 /// The event class for the simple::parser::down token.
-class down : public token {
+class GOTT_EXPORT down : public token {
 public:
   bool play(item &r) const;
   void print(std::ostream &s) const;
@@ -107,7 +107,7 @@ public:
 };
 
 /// The event class for the simple::parser::node token.
-class node : public token {
+class GOTT_EXPORT node : public token {
   gott::string data;
 public:
   node(gott::string const &);
@@ -122,7 +122,7 @@ public:
 };
 
 /// The event class for the simple::parser::up token.
-class up : public token {
+class GOTT_EXPORT up : public token {
 public:
   bool play(item &r) const;
   void print(std::ostream &s) const;
@@ -130,7 +130,7 @@ public:
 };
 
 /// The event class for the simple::parser::end_parse token.
-class end_parse : public token {
+class GOTT_EXPORT end_parse : public token {
 public:
   bool play(item &r) const;
   void print(std::ostream &s) const;
@@ -142,11 +142,11 @@ typedef boost::variant<begin_parse, down, node, up, end_parse> token_t;
 token const &get(token_t const &);
 
 /// The base class for notification events.
-class notification : public event {
+class GOTT_EXPORT notification : public event {
 };
 
 /// The event class for a succeeded child.
-class child_succeed : public notification {
+class GOTT_EXPORT child_succeed : public notification {
 public:
   bool play(item &r) const;
   void print(std::ostream &s) const;
@@ -154,7 +154,7 @@ public:
 };
 
 /// The event class for a failed child.
-class child_fail : public notification {
+class GOTT_EXPORT child_fail : public notification {
 public:
   bool play(item &r) const;
   void print(std::ostream &s) const;
