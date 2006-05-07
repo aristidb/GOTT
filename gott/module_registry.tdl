@@ -15,7 +15,7 @@ file-path tdl/libtdl_builtins.so
 depend-on tdl::library
 module-type dynamic-native
 
-module-id gott::plugin::tdl
+module-id gott::plugin::tdl_metadata
 file-path plugin/libplugin_tdl.so
 depend-on tdl::library
 module-type dynamic-native
