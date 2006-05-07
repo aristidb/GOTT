@@ -48,6 +48,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <iosfwd>
+#include <vector>
 
 namespace gott { namespace plugin {
 
@@ -74,6 +75,9 @@ struct module_metadata {
    * The file where the plugin resides.
    */
   string file_path;
+
+  typedef std::vector<QID> module_list_t;
+  module_list_t dependencies;
 
   module_metadata() GOTT_EXPORT;
   ~module_metadata() GOTT_EXPORT;

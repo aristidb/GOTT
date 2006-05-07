@@ -62,12 +62,14 @@ module_metadata::module_metadata(module_metadata const &o)
   : module_id(o.module_id),
     module_type(o.module_type),
     file_path(o.file_path),
+    dependencies(o.dependencies),
     p(new impl) {}
 
 void module_metadata::operator=(module_metadata const &o) {
   module_id = o.module_id;
   module_type = o.module_type;
   file_path = o.file_path;
+  dependencies = o.dependencies;
   p.reset(new impl);
 }
 

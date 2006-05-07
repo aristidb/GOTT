@@ -46,16 +46,30 @@
 #include <gott/exceptions.hpp>
 #include <gott/syswrap/dl_unix.hpp>
 #include <gott/syswrap/function_cast.hpp>
+#include <boost/shared_ptr.hpp>
 
 using gott::plugin::module;
 using gott::plugin::plugin_base;
 
 class module::impl {
 private:
+  std::vector<boost::shared_ptr<module> > dependencies;
   void *handle;
+  
 public:
   impl(module_metadata const &which)
-  : handle(get_handle(which)) {}
+  : handle(0) {
+    module_metadata::module_list_t::const_iterator it 
+      = which.dependencies.begin();
+    for (; it != which.dependencies.end(); ++it) {
+      boost::optional<module_metadata const &> dep 
+        = find_module_metadata(tags::module_id = *it);
+      if (!dep)
+        throw system_error("could not find dependency " + it->get_string());
+      dependencies.push_back(dep.get().get_instance());
+    }
+    handle = get_handle(which);
+  }
 
   static void *get_handle(module_metadata const &which) {
     switch (which.module_type) {

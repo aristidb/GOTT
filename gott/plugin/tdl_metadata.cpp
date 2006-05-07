@@ -199,7 +199,10 @@ namespace {
                       tdl::schema::repatcher = new repatch_enumeration(
                         boost::assign::list_of
                         (string("dynamic-native"))
-                        .operator std::vector<string>()))))))));
+                        .operator std::vector<string>())))))
+          (rule_one("tdl::schema::named",
+                    rule_attr(tag = "depend-on", outer = list()),
+                    rule("tdl::schema::node"))))));
 
   struct module_accepter : writable_structure {
     module_accepter(module_metadata &ref) : ref(ref) {}
@@ -217,6 +220,8 @@ namespace {
         ref.file_path = Xany_cast<string>(data_);
       else if (tag == "module-type")
         ref.module_type = Xany_cast<module_metadata::module_type_t>(data_);
+      else if (tag == "depend-on")
+        ref.dependencies.push_back(Xany_cast<string>(data_));
       tag = string();
     }
 

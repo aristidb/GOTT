@@ -38,8 +38,9 @@
 #include "metadata.hpp"
 #include "plugin_metadata.hpp"
 #include "module_metadata.hpp"
-#include <gott/syswrap/dl_unix.hpp>
+#include "module.hpp"
 #include <gott/syswrap/function_cast.hpp>
+#include <gott/exceptions.hpp>
 #include <boost/thread/once.hpp>
 #include <fstream>
 
@@ -52,13 +53,19 @@ boost::once_flag once_core = BOOST_ONCE_INIT;
 void noop() {}
 
 void do_load_standard() {
-  gott::dlopen_unix("libtdl.so", RTLD_NOW | RTLD_GLOBAL);
-  void *handle = gott::dlopen_unix("libplugin_tdl.so", RTLD_NOW | RTLD_GLOBAL);
+  load_core_metadata();
+
+  boost::optional<module_metadata const &> mod_meta =
+    find_module_metadata(tags::module_id = "gott::plugin::tdl_metadata");
+  if (!mod_meta)
+    throw gott::system_error("could not find TDL metadata loader");
+  boost::shared_ptr<module> mod(mod_meta.get().get_instance());
+
   typedef void (fun_t)(std::istream &);
   fun_t *do_extract_plugin_metadata = gott::function_cast<fun_t>(
-      gott::dlsym_unix(handle, "extract_plugin_metadata"));
+      mod->entity("extract_plugin_metadata"));
   fun_t *do_extract_module_metadata = gott::function_cast<fun_t>(
-      gott::dlsym_unix(handle, "extract_module_metadata"));
+      mod->entity("extract_module_metadata"));
 
   disable_plugin_metadata();
   {
@@ -73,18 +80,22 @@ void do_load_standard() {
     do_extract_module_metadata(in);
   }
   enable_module_metadata();
-
-  gott::dlclose_unix(handle);
 }
 
 void do_load_core() {
   // Load metadata for TDL, necessary for reading in the metadata.
   // Yes, this is what they call "boot-strapping".
   {
+    module_metadata library;
+    library.module_id = "tdl::library";
+    library.file_path = "tdl/libtdl.so";
+    add_module_metadata(library, true);
+  }
+  {
     module_metadata builtins;
     builtins.module_id = "tdl::builtins";
     builtins.file_path = "tdl/libtdl_builtins.so";
-    builtins.module_type = module_metadata::dynamic_native;
+    builtins.dependencies.push_back("tdl::library");
     add_module_metadata(builtins, true);
   }
   struct schema_type_adder {
@@ -106,6 +117,14 @@ void do_load_core() {
   add_schema_type("unordered");
   add_schema_type("tree");
   add_schema_type("node");
+  // The TDL metadata loader
+  {
+    module_metadata loader;
+    loader.module_id = "gott::plugin::tdl_metadata";
+    loader.file_path = "plugin/libplugin_tdl.so";
+    loader.dependencies.push_back("tdl::library");
+    add_module_metadata(loader, true);
+  }
 }
 }
 
