@@ -51,7 +51,9 @@ using gott::string;
 using std::vector;
 
 namespace {
-  typedef std::map<gott::atom, boost::shared_ptr<plugin_handle<type> > > map_t;
+  // those are NEVER unloaded because they depend on "us" and this leads to a
+  // deadly circular reference or something
+  typedef std::map<gott::atom, plugin_handle<type> * > map_t;
   map_t all_handles;
   boost::mutex mutex;
 }
@@ -64,7 +66,7 @@ rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
   boost::mutex::scoped_lock lock(mutex);
 
   if (all_handles.count(s) == 0) {
-    boost::shared_ptr<plugin_handle<type> > handle(new plugin_handle<type>(
+    plugin_handle<type> * handle(new plugin_handle<type>(
       find_plugin_metadata(
         tags::plugin_id = s,
         tags::interface = "tdl::schema::type",
@@ -73,7 +75,7 @@ rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
     all_handles.insert(map_t::value_type(s, handle));
   }
 
-  boost::shared_ptr<plugin_handle<type> > handle = all_handles.find(s)->second;
+  plugin_handle<type> * handle = all_handles.find(s)->second;
   type &type = *handle->get();
   abstract_rule abstract = type.get_abstract();
 
