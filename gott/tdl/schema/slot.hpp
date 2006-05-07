@@ -141,13 +141,13 @@ public:
   void operator=(slotcfg const &o) GOTT_EXPORT;
 
   /// Whether the object accepts 0 children.
-  bool prefix_optional() const;
+  bool prefix_optional() const GOTT_EXPORT;
   /// A variant of the object that does not accept 0 children.
-  slotcfg no_optional() const;
+  slotcfg no_optional() const GOTT_EXPORT;
   /// The mode the object is in.
   mode get_mode() const GOTT_EXPORT;
 
-  bool operator==(slotcfg const &o) const;
+  bool operator==(slotcfg const &o) const GOTT_EXPORT;
 
   /// Add an element.
   void add() GOTT_EXPORT;
