@@ -52,7 +52,7 @@ boost::once_flag once_core = BOOST_ONCE_INIT;
 void noop() {}
 
 void do_load_standard() {
-  void *handle = gott::dlopen_unix("libplugin_tdl.so", RTLD_LAZY);
+  void *handle = gott::dlopen_unix("libplugin_tdl.so", RTLD_NOW | RTLD_GLOBAL);
   typedef void (fun_t)(std::istream &);
   fun_t *do_extract_plugin_metadata = gott::function_cast<fun_t>(
       gott::dlsym_unix(handle, "extract_plugin_metadata"));
@@ -82,7 +82,7 @@ void do_load_core() {
   {
     module_metadata builtins;
     builtins.module_id = "tdl::builtins";
-    builtins.file_path = "tdl/libtdl.so";
+    builtins.file_path = "tdl/libtdl_builtins.so";
     builtins.module_type = module_metadata::dynamic_native;
     add_module_metadata(builtins, true);
   }

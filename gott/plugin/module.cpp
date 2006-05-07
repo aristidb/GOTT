@@ -62,7 +62,7 @@ public:
     case module_metadata::dynamic_native:
       return dlopen_unix(
           boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
-          RTLD_LAZY | RTLD_LOCAL);
+          RTLD_NOW | RTLD_GLOBAL);
     default:
       throw 0;
     }

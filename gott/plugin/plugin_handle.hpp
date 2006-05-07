@@ -40,7 +40,7 @@
 
 #include "plugin_base.hpp"
 #include "module.hpp"
-#include <boost/optional/optional_fwd.hpp>
+#include <boost/optional/optional.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
@@ -57,6 +57,9 @@ public:
 
   plugin_base *get_base() const GOTT_EXPORT;
 
+protected:
+  void fail_interface(plugin_metadata const &which) GOTT_EXPORT;
+
 private:
   class impl;
   boost::scoped_ptr<impl> p;
@@ -67,10 +70,16 @@ class plugin_handle : public plugin_handle_base {
 public:
   plugin_handle(plugin_metadata const &which)
   : plugin_handle_base(which),
-    p(dynamic_cast<ConcretePlugin *>(get_base())) {}
+    p(dynamic_cast<ConcretePlugin *>(get_base())) {
+    if (!p)
+      fail_interface(which);
+  }
   plugin_handle(boost::optional<plugin_metadata const &> const &which)
   : plugin_handle_base(which),
-    p(dynamic_cast<ConcretePlugin *>(get_base())) {}
+    p(dynamic_cast<ConcretePlugin *>(get_base())) {
+    if (!p)
+      fail_interface(which.get());
+  }
 
   ~plugin_handle() {}
 

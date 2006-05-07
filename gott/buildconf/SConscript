@@ -55,10 +55,10 @@ def CheckLinkerAsNeeded(context):
 	return result
 
 def CheckLinkerExportDynamic(context):
-    context.Message('Checking if linker supports --export-dynamic flag...')
+    context.Message('Checking if linker supports -E flag...')
 
     lastLinkFlags = context.env['LINKFLAGS'][:]
-    context.env.Append(LINKFLAGS = ['-Wl,--export-dynamic'])
+    context.env.Append(LINKFLAGS = ['-Wl,-E'])
 
     result = context.TryLink("int main() { }\n", '.cpp')
     if not result:
@@ -150,7 +150,7 @@ tests =	{
 conf = Configure(env, custom_tests = tests)
 AddSysOpts(conf.env)
 
-conf.LinkerAsNeeded()
+#conf.LinkerAsNeeded()
 conf.LinkerExportDynamic()
 if conf.env['OPTIMIZATION'] != 'none':
 	conf.Optimization()

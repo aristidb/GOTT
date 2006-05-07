@@ -73,7 +73,8 @@ rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
     all_handles.insert(map_t::value_type(s, handle));
   }
 
-  type &type = *all_handles.find(s)->second->get();
+  boost::shared_ptr<plugin_handle<type> > handle = all_handles.find(s)->second;
+  type &type = *handle->get();
   abstract_rule abstract = type.get_abstract();
 
   return rule_t(abstract, a, c);

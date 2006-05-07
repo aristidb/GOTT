@@ -76,3 +76,10 @@ plugin_handle_base::~plugin_handle_base() {}
 plugin_base *plugin_handle_base::get_base() const {
   return p->p;
 }
+
+void plugin_handle_base::fail_interface(plugin_metadata const &which) {
+  throw gott::system_error(
+      which.plugin_id.get_string()
+      + " : plugin does not support requested interface");
+}
+

@@ -7,7 +7,7 @@ file-path notify_fs/libnotify_inotify.so
 module-type dynamic-native
 
 module-id tdl::builtins
-file-path tdl/libtdl.so
+file-path tdl/libtdl_builtins.so
 module-type dynamic-native
 
 module-id gott::configuration
