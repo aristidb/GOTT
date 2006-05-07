@@ -70,13 +70,13 @@ class plugin_handle : public plugin_handle_base {
 public:
   plugin_handle(plugin_metadata const &which)
   : plugin_handle_base(which),
-    p(dynamic_cast<ConcretePlugin *>(get_base())) {
+    p(cast(get_base())) {
     if (!p)
       fail_interface(which);
   }
   plugin_handle(boost::optional<plugin_metadata const &> const &which)
   : plugin_handle_base(which),
-    p(dynamic_cast<ConcretePlugin *>(get_base())) {
+    p(cast(get_base())) {
     if (!p)
       fail_interface(which.get());
   }
@@ -91,6 +91,10 @@ public:
   ConcretePlugin const *get() const { return p; }
 private:
   ConcretePlugin *p;
+
+  static ConcretePlugin *cast(plugin_base *base) {
+    return static_cast<ConcretePlugin *>(base);
+  }
 };
 
 }}
