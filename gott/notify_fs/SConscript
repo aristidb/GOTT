@@ -40,10 +40,10 @@ import glob
 Import('env')
 
 if env['SYS_INOTIFY'] == 1:
-  env.SharedLibrary('notify_inotify', glob.glob('inotify/*.cpp'))
+  env.SharedLibrary('notify_inotify', glob.glob('inotify/*.cpp'), LIBS = [])
 
 if env['SYS_KQUEUE'] == 1:
-  env.SharedLibrary('notify_kqueue', glob.glob('kqueue/*.cpp'))
+  env.SharedLibrary('notify_kqueue', glob.glob('kqueue/*.cpp'), LIBS = [])
 
 libobj = glob.glob('*.cpp')
 libobj.remove('test.cpp')

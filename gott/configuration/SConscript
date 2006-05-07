@@ -39,5 +39,5 @@ import glob
 
 Import('env')
 
-env.SharedLibrary('config', glob.glob('*.cpp'))
+env.SharedLibrary('config', glob.glob('*.cpp'), LIBS = [])
 env.Program('config_test', glob.glob('test/*.cpp'))

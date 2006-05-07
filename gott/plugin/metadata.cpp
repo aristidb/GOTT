@@ -52,6 +52,7 @@ boost::once_flag once_core = BOOST_ONCE_INIT;
 void noop() {}
 
 void do_load_standard() {
+  gott::dlopen_unix("libtdl.so", RTLD_NOW | RTLD_GLOBAL);
   void *handle = gott::dlopen_unix("libplugin_tdl.so", RTLD_NOW | RTLD_GLOBAL);
   typedef void (fun_t)(std::istream &);
   fun_t *do_extract_plugin_metadata = gott::function_cast<fun_t>(

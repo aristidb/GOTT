@@ -55,7 +55,7 @@ env = env.Copy()
 env.Append(LIBS = 'tdl')
 
 builtin_sources = glob.glob('schema/types/*.cpp')
-env.SharedLibrary('tdl_builtins', builtin_sources)
+env.SharedLibrary('tdl_builtins', builtin_sources, LIBS = [])
 
 Export('env')
 

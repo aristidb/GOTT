@@ -55,16 +55,16 @@ def CheckLinkerAsNeeded(context):
 	return result
 
 def CheckLinkerExportDynamic(context):
-    context.Message('Checking if linker supports -E flag...')
+	context.Message('Checking if linker supports -E flag...')
 
-    lastLinkFlags = context.env['LINKFLAGS'][:]
-    context.env.Append(LINKFLAGS = ['-Wl,-E'])
+	lastLinkFlags = context.env['LINKFLAGS'][:]
+	context.env.Append(LINKFLAGS = ['-Wl,-E'])
 
-    result = context.TryLink("int main() { }\n", '.cpp')
-    if not result:
-        context.env.Replace(LINKFLAGS = lastLinkFlags)
-    context.Result(result)
-    return result
+	result = context.TryLink("int main() { }\n", '.cpp')
+	if not result:
+		context.env.Replace(LINKFLAGS = lastLinkFlags)
+	context.Result(result)
+	return result
 
 def CheckCompilerVisibility(context):
 	context.Message('Checking if compiler supports visibility attributes... ')
@@ -137,8 +137,8 @@ def CheckBoostDateTimeCanNanosec(context):
 print 'Configuration...'
 Import('env')
 tests =	{
-    'LinkerAsNeeded': CheckLinkerAsNeeded,
-    'LinkerExportDynamic': CheckLinkerExportDynamic,
+	'LinkerAsNeeded': CheckLinkerAsNeeded,
+	'LinkerExportDynamic': CheckLinkerExportDynamic,
 	'CompilerVisibility': CheckCompilerVisibility,
 	'Warnings': CheckWarnings,
 	'Optimization': CheckOptimization,
@@ -150,7 +150,7 @@ tests =	{
 conf = Configure(env, custom_tests = tests)
 AddSysOpts(conf.env)
 
-#conf.LinkerAsNeeded()
+conf.LinkerAsNeeded()
 conf.LinkerExportDynamic()
 if conf.env['OPTIMIZATION'] != 'none':
 	conf.Optimization()
@@ -165,23 +165,23 @@ if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 
 boost_thread_lib = 'boost_thread' + conf.env['BOOST_LIBSUFFIX']
 if not conf.CheckLib(boost_thread_lib, language = 'c++'):
-    print 'Boost threading library is not installed:', boost_thread_lib
-    Exit(1)
+	print 'Boost threading library is not installed:', boost_thread_lib
+	Exit(1)
 
 boost_date_time_lib = 'boost_date_time' + conf.env['BOOST_LIBSUFFIX']
 if not conf.CheckLib(boost_date_time_lib, language = 'c++'):
-    print 'Boost date_time library is not installed:', boost_date_time_lib
-    Exit(1)
+	print 'Boost date_time library is not installed:', boost_date_time_lib
+	Exit(1)
 
 #boost_popt_lib = 'boost_program_options' + conf.env['BOOST_LIBSUFFIX']
 #if not conf.CheckLib(boost_popt_lib, language = 'c++'):
-#  print 'Boost date_time library is not installed:', boost_date_time_lib
-#  Exit(1)
+#	print 'Boost date_time library is not installed:', boost_date_time_lib
+#	Exit(1)
 
 boost_fs_lib = 'boost_filesystem' + conf.env['BOOST_LIBSUFFIX']
 if not conf.CheckLib(boost_fs_lib, language = 'c++'):
-    print 'Boost filesystem library is not installed:', boost_fs_lib
-    Exit(1)
+	print 'Boost filesystem library is not installed:', boost_fs_lib
+	Exit(1)
 
 #conf.BoostDateTimeCanNanosec()
 
