@@ -116,10 +116,12 @@ void object::test<5>(int t) {
   std::ostringstream w;
   for (int i = 0; i < n; ++i)
     w << char('A' + i) << '\n';
-  run_test(w.str());
+  run_test(gott::string(w.str(), gott::ascii));
   stru::cf::nd_list c;
-  for (int i = 0; i < n; ++i)
-    c.push_back(S(Xany(std::string(1, 'A'+i)), "el"));
+  for (int i = 0; i < n; ++i) {
+    char buf[] = { 'A'+i, '\0' };
+    c.push_back(S(Xany(buf), "el"));
+  }
   C(M(c)).write_to(xp);
   ensure_equals("many", tree, xp);
 }

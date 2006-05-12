@@ -55,7 +55,7 @@ tut::tf wri("writer");
 }
 
 namespace tut {
-  void test(std::string input, std::string expected) {
+  void test(std::string const& input, std::string const& expected) {
     std::string new_string;
     tdl::structure::container old_interpretation;
     {

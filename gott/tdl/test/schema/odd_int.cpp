@@ -86,7 +86,7 @@ void object::test<1>(int n) {
     std::ostringstream w;
     for (int i = 0; i < n; ++i)
       w << i%10 << ',' << 0 << '\n';
-    run_test(w.str());
+    run_test(gott::string(w.str(), gott::ascii));
     fail("even");
   } catch (tdl::tdl_error const &m) {
     ensure_equals(m.module(), "TDL Schema matcher");
@@ -120,7 +120,7 @@ void object::test<14>(int t) {
   for (int i = 0; i < n; ++i) 
     w << i << ',' << 1 << '\n';
   w << 0;
-  run_test(w.str());
+  run_test(gott::string(w.str(), gott::ascii));
 
   stru::cf::nd_list c;
   for (int i = 0; i < n; ++i) {

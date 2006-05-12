@@ -83,7 +83,7 @@ void object::test<1>(int t) {
     if (i < n - 1)
       w << ',';
   }
-  run_test(w.str());
+  run_test(gott::string(w.str(), gott::ascii));
 
   stru::cf::nd_list c;
   for (int i = 0; i < n; ++i) {
@@ -104,7 +104,7 @@ void object::test<8>(int n) {
       if (i < n - 1)
         w << ',';
     }
-    run_test(w.str());
+    run_test(gott::string(w.str(), gott::ascii));
     fail("too many");
   } catch (tdl::tdl_error const &m) {
     ensure_equals(m.module(), "TDL Schema matcher");

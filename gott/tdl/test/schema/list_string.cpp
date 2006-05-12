@@ -75,8 +75,10 @@ template<> template<>
 void object::test<1>(int) {
   run_test("a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z");
   nd_list c;
-  for (char ch = 'a'; ch <= 'z'; ++ch)
-    c.push_back(S(Xany(std::string(1,ch)), "el"));
+  for (char ch = 'a'; ch <= 'z'; ++ch) {
+    char buf[] = { ch, '\0' };
+    c.push_back(S(Xany(buf), "el"));
+  }
   C(M(c)).write_to(xp);
   ensure_equals("alphabet", tree, xp);
 }

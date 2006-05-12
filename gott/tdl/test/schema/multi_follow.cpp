@@ -83,17 +83,16 @@ namespace {
 namespace tut {
 template<> template<>
 void object::test<1>(int i) {
-  try {
-  std::string out;
+  gott::string out;
   unsigned mask = (i - 1) & 0xF;
   if (mask & 0x1)
-    out += "1 ";
+    out = out + "1 ";
   if (mask & 0x2)
-    out += "2 ";
+    out = out + "2 ";
   if (mask & 0x4)
-    out += "3 ";
+    out = out + "3 ";
   if (mask & 0x8)
-    out += "4 ";
+    out = out + "4 ";
 
   run_test(out);
 
@@ -115,9 +114,6 @@ void object::test<1>(int i) {
 
   C(M(outer, "outer")).write_to(xp);
   ensure_equals("masked", tree, xp);
-  } catch(...) {
-    std::cout << std::flush;
-  }
 }
 
 template<> template<>

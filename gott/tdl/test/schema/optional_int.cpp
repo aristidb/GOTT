@@ -116,7 +116,7 @@ void object::test<5>(int t) {
   for (int i = 1; i <= n; ++i)
     w << i << '\n';
   try {
-    run_test(w.str());
+    run_test(gott::string(w.str(), gott::ascii));
     fail("many");
   } catch (tdl::tdl_error const &m) {
     ensure_equals(m.module(), "TDL Schema matcher");

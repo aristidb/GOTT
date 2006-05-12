@@ -80,7 +80,7 @@ void object::test<1>(int c) {
     std::ostringstream w;
     for (int i = 1; i < c; ++i) // 0-4
       w << (77 + i) << '\n';
-    run_test(w.str());
+    run_test(gott::string(w.str(), gott::ascii));
     fail("too few");
   } catch (tdl::tdl_error const &m) {
     ensure_equals(m.module(), "TDL Schema matcher");
@@ -92,7 +92,7 @@ void object::test<6>(int t) {
   std::ostringstream w;
   for (int i = 1; i < t; ++i) // 5-8
     w << '\n' << -i;
-  run_test(w.str());
+  run_test(gott::string(w.str(), gott::ascii));
   stru::cf::nd_list c;
   for (int i = 1; i < t; ++i)
     c.push_back(S(Xany(-i), "el"));
@@ -106,7 +106,7 @@ void object::test<10>(int c) {
     std::ostringstream w;
     for (int i = 1; i < c; ++i) // 9-...
       w << (77 + i) << '\n';
-    run_test(w.str());
+    run_test(gott::string(w.str(), gott::ascii));
     fail("too few");
   } catch (tdl::tdl_error const &m) {
     ensure_equals(m.module(), "TDL Schema matcher");
