@@ -59,6 +59,7 @@ public:
 
 private:
   GOTT_LOCAL void run();
+  GOTT_LOCAL bool running() const;
   GOTT_LOCAL void quit_local();
   GOTT_LOCAL sigc::signal0<void> &on_idle();
 

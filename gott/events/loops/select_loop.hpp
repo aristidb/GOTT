@@ -87,7 +87,7 @@ private:
   callback_map callbacks;
   selfpipe_message_manager message_mgr; 
   standard_signal_manager sig_mgr;
-  bool running;
+  bool running_;
   sigc::signal0<void> on_idle_;
   int wait;
 
@@ -105,6 +105,7 @@ private:
 
 private:
   GOTT_LOCAL void run();
+  GOTT_LOCAL bool running() const;
   GOTT_LOCAL void quit_local();
 
   GOTT_LOCAL void add_waitable();

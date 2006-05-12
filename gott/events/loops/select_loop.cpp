@@ -51,7 +51,7 @@ select_loop::select_loop()
 : standard_timer_manager(this),
   message_mgr(this),
   sig_mgr(&message_mgr),
-  running(false),
+  running_(false),
   wait(0) {
 }
 
@@ -109,14 +109,19 @@ void select_loop::remove_fd( int fd ) {
 }
 
 void select_loop::run(){
-  running = true;
+  struct running_helper {
+    bool &running_;
+    running_helper(bool &running_)
+      : running_(running_) { running_ =  true; }
+    ~running_helper() { running_ = false; }
+  } helper(running_);
 
   using namespace boost::posix_time;
   size_t n = callbacks.rbegin()->first + 1;
   timeval next_event, *t; 
 
   int num_fd;
-  while(running && wait > 0) {
+  while(running()) {
     boost::posix_time::time_duration td = time_left(true);
 
     if (has_timers()) {
@@ -129,8 +134,8 @@ void select_loop::run(){
     
     on_idle().emit();
 
-    if (!running || wait <= 0)
-      break;
+    if (!running())
+      return;
 
     try {
       num_fd = select_unix(
@@ -141,13 +146,13 @@ void select_loop::run(){
       // this holds the callbacks to call and the parameter
       // (see lower for explaination)
       typedef std::vector<std::pair<unsigned,
-	boost::function<void (unsigned)> > > call_t;
+        boost::function<void (unsigned)> > > call_t;
       call_t call;
 
       for( callback_map::const_iterator it = callbacks.begin(), 
-	     e = callbacks.end();
-	   num_fd && it!=callbacks.end();
-	   ++it) {
+          e = callbacks.end();
+	        num_fd && it!=callbacks.end();
+	        ++it) {
         unsigned mask = 0;
         if( FD_ISSET( it->first, &fd_sets.read_fds ) ) {
           mask |= fd_manager::read;
@@ -171,10 +176,13 @@ void select_loop::run(){
       // because a callback can invalidate map iterators by calling remove_fd
       // - This was a nasty bug to find!
       for(call_t::const_iterator it=call.begin(),
-	    e=call.end();
-	  it != e;
-	  ++it)
-	it->second(it->first);
+            e=call.end();
+      	  it != e;
+	        ++it) {
+        it->second(it->first);
+        if (!running())
+          return;
+      }
     } catch (errno_exception const &e) {
       if (e.number() != EINTR)
         throw;
@@ -194,12 +202,14 @@ void select_loop::run(){
 
     n = callbacks.rbegin()->first + 1;
   }
-
-  running = false;
 }
 
 void select_loop::quit_local() {
-  running = false;
+  running_ = false;
+}
+
+bool select_loop::running() const {
+  return running_ && wait > 0;
 }
 
 select_loop::~select_loop() {

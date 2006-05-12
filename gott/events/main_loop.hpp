@@ -66,6 +66,9 @@ public:
   /// Quit the main loop from inside.
   virtual void quit_local() = 0;
 
+  /// Check whether the main_loop is still active.
+  virtual bool running() const = 0;
+
   /**
    * The idle signal.
    * The idle signal is emitted (at least) whenever the main_loop is about to

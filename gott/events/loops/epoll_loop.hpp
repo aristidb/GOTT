@@ -72,6 +72,8 @@ private:
   GOTT_LOCAL void add_waitable();
   GOTT_LOCAL void remove_waitable();
 
+  GOTT_LOCAL bool running() const;
+
 private:
   GOTT_LOCAL
   void add_fd(int fd, unsigned mask, boost::function<void (unsigned)> const &,

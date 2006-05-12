@@ -111,6 +111,10 @@ void epoll_loop::quit_local() {
   p->running = false;
 }
 
+bool epoll_loop::running() const {
+  return p->running && p->wait > 0;
+}
+
 sigc::signal0<void> &epoll_loop::on_idle() {
   return p->on_idle;
 }
@@ -177,7 +181,7 @@ void epoll_loop::remove_fd(int fd) {
 
 void epoll_loop::run() {
   p->running = true;
-  while (p->running && p->wait > 0) {
+  while (running()) {
     int timeout = -1;
     if (has_timers()) {
       typedef boost::int64_t i64;
@@ -190,7 +194,7 @@ void epoll_loop::run() {
 
     p->on_idle.emit();
     
-    if (!p->running || p->wait <= 0)
+    if (!running())
       break;
     
     epoll_event event[64];
@@ -210,10 +214,13 @@ void epoll_loop::run() {
             mask |= fd_manager::exception;
           e.callback(mask);
         }
+        if (!running())
+          break;
       }
     } catch (errno_exception const &e) {
       if (e.number() != EINTR)
         throw;
     }
   }
+  p->running = false;
 }
