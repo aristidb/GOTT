@@ -54,9 +54,8 @@
 
 #include <boost/detail/atomic_count.hpp>
 
-using gott::string;
-using gott::range_t;
-
+namespace gott {
+  
 class string::impl {
 public:
   impl(range_t<utf8_t const *> d, bool o = true)
@@ -85,41 +84,41 @@ public:
   boost::detail::atomic_count ref_count;
 };
 
-void gott::intrusive_ptr_add_ref(string::impl *p) {
+inline void intrusive_ptr_add_ref(string::impl *p) {
   ++p->ref_count;
 }
 
-void gott::intrusive_ptr_release(string::impl *p) {
+inline void intrusive_ptr_release(string::impl *p) {
   if (--p->ref_count == 0)
     delete p;
 }
 
-string::string(string const &o) : p(o.p) {}
-string::string(string_buffer const &b)
+inline string::string(string const &o) : p(o.p) {}
+inline string::string(string_buffer const &b)
 : p(new impl(
       to_utf8_alloc(range(b).cast<char const *>(), utf32), true)) {}
 
-string::~string() {}
+inline string::~string() {}
 
-void string::set_up(range_t<utf8_t const *> const &d, bool o) {
+inline void string::set_up(range_t<utf8_t const *> const &d, bool o) {
   p = new impl(d, o);
 }
 
-void string::foreign(range_t<utf8_t const *> const &d) {
+inline void string::foreign(range_t<utf8_t const *> const &d) {
   p = new impl(d, impl::foreign_copy);
 }
 
-range_t<gott::utf8_t const *> string::as_utf8() const {
+inline range_t<gott::utf8_t const *> string::as_utf8() const {
   return range(p->data, p->size);
 }
 
-std::size_t string::length() const {
+inline std::size_t string::length() const {
   if (!p->length)
     p->length = as_utf32().size();
   return p->length;
 }
 
-char *string::c_string_alloc() const {
+inline char *string::c_string_alloc() const {
   char *result = new char[size() + 1];
   utf8_range r = as_utf8();
   char *out = result;
@@ -130,14 +129,14 @@ char *string::c_string_alloc() const {
 }
 
 #ifndef NO_STDLIB
-std::ostream &gott::operator<<(std::ostream &stream, string const &s) {
+inline std::ostream &operator<<(std::ostream &stream, string const &s) {
   for (utf8_t const *it = s.as_utf8().begin(); it < s.as_utf8().end(); ++it)
     stream << char(*it);
   return stream;
 }
 
 #ifdef HAVE_WIDE_STDLIB
-std::wostream &gott::operator<<(std::wostream &stream, string const &s) {
+inline std::wostream &operator<<(std::wostream &stream, string const &s) {
   for (utf8_iterator it = s.as_utf32().begin(); it < s.as_utf32().end(); ++it)
     stream << wchar_t(*it);
   return stream;
@@ -145,13 +144,13 @@ std::wostream &gott::operator<<(std::wostream &stream, string const &s) {
 #endif
 #endif
 
-bool gott::operator==(string const &a, string const &b) {
+inline bool operator==(string const &a, string const &b) {
   if (a.as_utf8().begin() == b.as_utf8().begin())
     return true;
   return a.as_utf8() == b.as_utf8();
 }
 
-int gott::compare(string const &a, string const &b) {
+inline int compare(string const &a, string const &b) {
   if (a.as_utf8().begin() == b.as_utf8().begin())
     return 0;
 
@@ -170,3 +169,4 @@ int gott::compare(string const &a, string const &b) {
   return *p2 - *p1;
 }
 
+}

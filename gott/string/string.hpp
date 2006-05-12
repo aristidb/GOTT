@@ -437,4 +437,6 @@ inline bool operator>=(string const &a, string const &b) {
 
 }
 
+#include "string_impl.hpp"
+
 #endif
