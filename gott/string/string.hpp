@@ -280,10 +280,10 @@ public:
   }
 
   /// Copy-Constructor.
-  string(string const &);
+  GOTT_LOCAL string(string const &);
 
   /// Destructor.
-  ~string();
+  GOTT_LOCAL ~string();
 
   /**
    * Swap with another string.
@@ -302,7 +302,7 @@ public:
   /**
    * Get the internally used UTF8 string.
    */
-  range_t<utf8_t const *> as_utf8() const;
+  GOTT_LOCAL range_t<utf8_t const *> as_utf8() const;
 
   /**
    * Access the string as UTF32.
@@ -314,7 +314,7 @@ public:
   /**
    * Get the number of characters (not bytes) in the string.
    */
-  std::size_t length() const;
+  GOTT_LOCAL std::size_t length() const;
 
   /**
    * Get the number of bytes the string needs as UTF8-encoded.
@@ -327,18 +327,18 @@ public:
    * Get a copy of the string with zero-termination in a freshly allocated
    * buffer.
    */
-  char *c_string_alloc() const;
+  GOTT_LOCAL char *c_string_alloc() const;
 
 private:
   class impl;
   typedef boost::intrusive_ptr<impl> pimpl;
   pimpl p;
 
-  void set_up(range_t<utf8_t const *> const &d, bool o);
-  void foreign(range_t<utf8_t const *> const &x);
+  GOTT_LOCAL void set_up(range_t<utf8_t const *> const &d, bool o);
+  GOTT_LOCAL void foreign(range_t<utf8_t const *> const &x);
 
-  friend void intrusive_ptr_add_ref(impl *) GOTT_EXPORT;
-  friend void intrusive_ptr_release(impl *) GOTT_EXPORT;
+  friend void intrusive_ptr_add_ref(impl *) GOTT_LOCAL;
+  friend void intrusive_ptr_release(impl *) GOTT_LOCAL;
 };
 
 #ifndef NO_STDLIB
@@ -346,7 +346,6 @@ private:
  * Print out a string.
  * @relates string
  */
-GOTT_EXPORT 
 std::basic_ostream<char, std::char_traits<char> > &
 operator<<(std::basic_ostream<char, std::char_traits<char> > &, 
            string const &);
@@ -355,7 +354,6 @@ operator<<(std::basic_ostream<char, std::char_traits<char> > &,
  * Print out a string.
  * @relates string
  */
-GOTT_EXPORT 
 std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &
 operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &, 
            string const &);
@@ -374,7 +372,7 @@ GOTT_LOCAL inline string operator +(string const &a, string const &b) {
  * Compare two strings for equality.
  * @relates string
  */
-GOTT_EXPORT bool operator==(string const &, string const &);
+GOTT_LOCAL bool operator==(string const &, string const &);
 
 /**
  * Compare two strings for inequality.
@@ -393,7 +391,7 @@ inline bool operator!=(string const &a, string const &b) {
  *   -  > 0 : @p a is lexicographically greater than @p b.
  * @relates string
  */
-GOTT_EXPORT int compare(string const &a, string const &b);
+GOTT_LOCAL int compare(string const &a, string const &b);
 
 /**
  * Compare two strings lexicographically,
