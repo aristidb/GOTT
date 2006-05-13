@@ -96,16 +96,16 @@ source_position meta_parser::parse(istream &in, source_position const &ww) {
 }
 
 void meta_parser::impl::exec(string const &line_) {
-  string::utf32_range line = line_.as_utf32();
-  gott::utf8_iterator pos = line.begin();
+  string::utf8_range line = line_.as_utf8();
+  gott::utf8_t const *pos = line.begin();
   for (; pos != line.end(); ++pos)
-    if (*pos == L' ')
+    if (*pos == ' ')
       break;
   
-  string cmd(range(line.begin(), pos));
-  while (*pos == L' ' && ++pos != line.end())
+  string cmd(gott::range(line.begin(), pos));
+  while (*pos == ' ' && ++pos != line.end())
     ;
-  string param(range(pos, line.end()));
+  string param(gott::range(pos, line.end()));
 
   cb_t::const_iterator it = cb.find(cmd);
 
