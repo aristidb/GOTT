@@ -74,6 +74,7 @@ private:
   bool saw_up;
   positioning::id last;
   bool unhappy;
+  bool no_req;
 
   expect expectation() const;
   bool play(ev::child_succeed const &);

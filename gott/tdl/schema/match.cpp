@@ -53,6 +53,10 @@
 
 //#define VERBOSE
 
+#ifdef VERBOSE
+#include <iostream>
+#endif
+
 using gott::string;
 using boost::shared_ptr;
 namespace structure = tdl::structure;
@@ -176,6 +180,9 @@ source_position const &match::where_out() const {
 }
 
 void match::parental_requirement(ev::event const &event, unsigned count) {
+#ifdef VERBOSE
+  std::cout << "requesting " << event << '*' << count << std::endl;
+#endif
   p->miss = impl::deferred_miss(event, count);
 }
 
@@ -217,6 +224,10 @@ void match::impl::handle_token(T const &e) {
     real_parental_requirement();
     miss.reset();
   }
+
+#ifdef VERBOSE
+  std::cout << '+';
+#endif
   
   pos.add(e, ref.where_out());
   handle_event(e, true);
@@ -248,8 +259,12 @@ void match::impl::handle_event(ev::event const &event, bool token) {
 
 bool match::impl::handle_item(ev::event const &event, bool token) {
 #ifdef VERBOSE
-  std::cout << get_name(*parse.back().the_item) << '{' << std::endl;
-  struct close { ~close() { std::cout << '}' << std::endl; } } x; (void)x;
+  item &x = *parse.back().the_item;
+  std::cout << x.name();
+  if (!x.attributes().tags().empty())
+    std::cout << '(' << x.attributes().tags()[0] << ')';
+  std::cout << '{' << std::endl;
+  struct close { ~close() { std::cout << '}' << std::endl; } } _x; (void)_x;
 #endif
   if (try_play(event, *parse.back().the_item)) {
     if (token) pos.consume();
@@ -315,12 +330,23 @@ void match::impl::fail_all() {
 }
 
 void match::impl::real_parental_requirement() {
+#ifdef VERBOSE
+  std::cout << "injecting needs: " << *miss->event << '*' << miss->count << std::endl;
+#endif
   Stack::iterator it = parse.end();
   if (it == parse.begin())
     fail_all();
   while (--it != parse.begin())
-    if (it->the_item->miss_events(*miss->event, miss->count))
+    if (it->the_item->miss_events(*miss->event, miss->count)) {
+#ifdef VERBOSE
+      std::cout << "  @ " << it->the_item->name();
+      rule_attr_t x = it->the_item->attributes();
+      if (!x.tags().empty())
+        std::cout << '(' << x.tags()[0] << ')';
+      std::cout << std::endl;
+#endif 
       return;
+    }
   fail_all();
 }
 

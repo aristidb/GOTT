@@ -53,7 +53,7 @@ match_follow_ordered::match_follow_ordered(rule_attr_t const &a,
                                            std::vector<rule_t> const &c, 
                                            match &m)
 : item(a, m), opened(0), saw_up(false), last(m.pos().current()), 
-    unhappy(false) {
+    unhappy(false), no_req(false) {
   for (std::vector<rule_t>::const_iterator it = c.begin(); it != c.end(); ++it)
     children.push_back(*it);
   pos = children.begin();
@@ -98,6 +98,7 @@ bool match_follow_ordered::play(ev::child_fail const &) {
     if (!this_flee)
       return true;
     matcher().pos().seek(last);
+    no_req = true;
     return false;
   }
   matcher().pos().seek(last);
@@ -135,7 +136,7 @@ item::expect match_follow_ordered::expectation() const {
   if (unhappy) 
     return need;
   if (!search_insertible()) 
-    return opened != 0 ? maybe : nothing;
+    return opened > 0 ? maybe : nothing;
   if (pos->rest_accept_empty)
     if (pos->slot.expectation() != need || pos->accept_empty) 
       return maybe;
@@ -143,7 +144,7 @@ item::expect match_follow_ordered::expectation() const {
 }
 
 bool match_follow_ordered::accept_empty(rule_attr_t const &,
-                                        std::vector<rule_t> const &children) {
+    std::vector<rule_t> const &children) {
   bool accept = true;
   for (std::vector<rule_t>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
@@ -157,7 +158,7 @@ gott::string match_follow_ordered::name() const {
 
 match_follow_ordered::~match_follow_ordered() {
   matcher().pos().forget(last);
-  if (expectation() != need && opened > 0) 
+  if (!no_req && expectation() != need && opened > 0) 
     matcher().parental_requirement(ev::up(), opened);
 }
 

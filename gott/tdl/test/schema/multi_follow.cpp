@@ -85,6 +85,7 @@ template<> template<>
 void object::test<1>(int i) {
   gott::string out;
   unsigned mask = (i - 1) & 0xF;
+
   if (mask & 0x1)
     out = out + "1 ";
   if (mask & 0x2)
@@ -110,7 +111,8 @@ void object::test<1>(int i) {
 
   nd_list outer;
   outer.push_back(M(inner1, "inner1"));
-  outer.push_back(M(inner2, "inner2"));
+  if (inner1.empty() || !inner2.empty())
+    outer.push_back(M(inner2, "inner2"));
 
   C(M(outer, "outer")).write_to(xp);
   ensure_equals("masked", tree, xp);
