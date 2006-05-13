@@ -84,11 +84,7 @@ source_position meta_parser::parse(istream &in, source_position const &ww) {
       }
       in.get();
       gott::string s;
-      {
-        std::string s_;
-        getline(in, s_);
-        s = gott::string(s_, gott::utf8);
-      }
+      gott::getline(in, s);
       {
         w.token_line = ++w.line;
         w.token = s;

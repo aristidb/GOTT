@@ -346,17 +346,15 @@ private:
  * Print out a string.
  * @relates string
  */
-std::basic_ostream<char, std::char_traits<char> > &
-operator<<(std::basic_ostream<char, std::char_traits<char> > &, 
-           string const &);
+GOTT_EXPORT
+std::ostream &operator<<(std::ostream &, string const &);
 
 /**
- * Print out a string.
+ * Read in a string on a line.
  * @relates string
  */
-std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &
-operator<<(std::basic_ostream<wchar_t, std::char_traits<wchar_t> > &, 
-           string const &);
+GOTT_EXPORT
+std::istream &getline(std::istream &, string &);
 #endif
 
 /**

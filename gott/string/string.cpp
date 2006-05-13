@@ -11,11 +11,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Automatical Wide String Printer.
+ * The Original Code is A String and Text Storage Library.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,21 +35,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_UTIL_MISC_AUTOCONV_HPP
-#define GOTT_UTIL_MISC_AUTOCONV_HPP
-
+#include "string.hpp"
+#include <istream>
 #include <ostream>
 
-inline std::ostream &operator<<(std::ostream &o, wchar_t const *in) {
-  typedef std::codecvt<wchar_t, char, mbstate_t> CCV;
-  CCV const &c = std::use_facet<CCV>(o.getloc());
-  std::mbstate_t st = std::mbstate_t();
-  std::size_t l = std::wcslen(in);
-  std::string out(l / c.encoding(), '$');
-  wchar_t const *in_n = 0;
-  char *out_n = 0;
-  c.out(st, in, in + l, in_n, &out[0], &out[0] + out.length(), out_n);
-  return o << out;
+#ifndef NO_STDLIB
+std::ostream &gott::operator<<(std::ostream &stream, string const &s) {
+  for (utf8_t const *it = s.as_utf8().begin(); it < s.as_utf8().end(); ++it)
+    stream << char(*it);
+  return stream;
 }
 
+std::istream &gott::getline(std::istream &stream, string &s) {
+  s = string();
+
+  char buf[2048];
+  while (stream) {
+    if (stream.peek() == '\n') {
+      stream.get();
+      break;
+    }
+    stream.get(buf, sizeof(buf));
+    s = s + string(zero_terminated(buf), string::literal);
+  }
+
+  return stream;
+}
 #endif

@@ -144,11 +144,7 @@ void exec_parse::run_parse() {
 }
 
 bool exec_parse::read_line() {
-  std::string line;
-  if (!getline(stream, line))
-    return false;
-  current_line = gott::string(line, gott::utf8);
-  return true;
+  return gott::getline(stream, current_line) || current_line.size() > 0;
 }
 
 void exec_parse::normal(unsigned last) {

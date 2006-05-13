@@ -54,4 +54,7 @@ int main() {
   atom A(offset(n.as_utf32(), x.length()));
   atom B(string(zero_terminated("Hallo, string-Welt!\n").cast<utf8_t const *>(), string::literal));
   cerr << (A == B) << '\n';
+
+  while (getline(std::cin, x))
+    std::cout << '<' << x << '>' << std::endl;
 }

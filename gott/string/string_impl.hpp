@@ -45,12 +45,6 @@
 #include <gott/range.hpp>
 #include <gott/range_algo.hpp>
 #include <gott/thunk.hpp>
-#ifndef NO_STDLIB
-#include <list>
-#include <vector>
-#include <ostream>
-#include <string>
-#endif
 
 #include <boost/detail/atomic_count.hpp>
 
@@ -127,22 +121,6 @@ inline char *string::c_string_alloc() const {
   *out = '\0';
   return result;
 }
-
-#ifndef NO_STDLIB
-inline std::ostream &operator<<(std::ostream &stream, string const &s) {
-  for (utf8_t const *it = s.as_utf8().begin(); it < s.as_utf8().end(); ++it)
-    stream << char(*it);
-  return stream;
-}
-
-#ifdef HAVE_WIDE_STDLIB
-inline std::wostream &operator<<(std::wostream &stream, string const &s) {
-  for (utf8_iterator it = s.as_utf32().begin(); it < s.as_utf32().end(); ++it)
-    stream << wchar_t(*it);
-  return stream;
-}
-#endif
-#endif
 
 inline bool operator==(string const &a, string const &b) {
   if (a.as_utf8().begin() == b.as_utf8().begin())
