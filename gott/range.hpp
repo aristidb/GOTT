@@ -46,6 +46,12 @@
 namespace gott {
 
 /**
+ * \name Range tools
+ * Functions and classes for dealing with iterator ranges.
+ * \{
+ */
+
+/**
  * Simple iterator-based range class.
  */
 template<class T> struct range_t {
@@ -286,6 +292,8 @@ template<class I>
 range_t<I> zero_terminated(I start) {
   return value_terminated(start, 0);
 }
+
+// \}
 
 }
 

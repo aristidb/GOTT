@@ -44,7 +44,8 @@
 
 namespace gott {
 
-/** \defgroup encoding Basic encoding handling functions
+/** 
+ * \name Basic encoding handling functions
  * Those are various functions for conveniently handling encoding.
  * @{
  */
