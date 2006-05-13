@@ -275,7 +275,7 @@ namespace events {
 	break;
 
       int n=kqueue::event_bsd(p->queue.access(), 0, 0, event_list, EVENTS_N,
-        		      has_timers_mem ? &tm : 0x0);
+        		      has_timers_mem ? &tm : 0x0); //FIXME: EINTR?
       for(int i=0; i<n; ++i) {        
         if(event_list[i].filter == EVFILT_SIGNAL) {
           impl::map_sig_hnd::iterator j = p->signals.find(event_list[i].ident);

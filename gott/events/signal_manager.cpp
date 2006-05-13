@@ -95,7 +95,7 @@ void standard_signal_manager::register_signal(
   struct sigaction act, old;
   act.sa_handler = signal_handler;
   sigemptyset(&act.sa_mask);
-  act.sa_flags = SA_RESTART;
+  act.sa_flags = 0;
 
   sigaction(sig, &act, &old);
   
