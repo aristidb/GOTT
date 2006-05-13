@@ -81,7 +81,7 @@ sigc::signal1<void, int> &standard_signal_manager::on_signal(int sig) {
 }
 
 namespace {
-  typedef std::map<int, std::pair<standard_signal_manager *, void (*)(int)> > 
+  typedef std::map<int, std::pair<standard_signal_manager *, struct sigaction> >
     sys_handler_map_t;
   static sys_handler_map_t sys_handlers;
 }
@@ -91,17 +91,22 @@ void standard_signal_manager::register_signal(
   if (sys_handlers.find(sig) != sys_handlers.end())
     throw user_error(
         "cannot register more than one standard_signal_manager per signal");
-  sys_handlers[sig] =
-    std::make_pair(
-        handler,
-        signal(sig, signal_handler));
+  
+  struct sigaction act, old;
+  act.sa_handler = signal_handler;
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = SA_RESTART;
+
+  sigaction(sig, &act, &old);
+  
+  sys_handlers[sig] = std::make_pair(handler, old);
 }
 
 void standard_signal_manager::unregister_all(standard_signal_manager *handler) {
   sys_handler_map_t::iterator it = sys_handlers.begin();
   while (it != sys_handlers.end())
     if (it->second.first == handler) {
-      ::signal(it->first, it->second.second); // reinstall old handler
+      sigaction(it->first, &it->second.second, 0);
       sys_handler_map_t::iterator del = it++;
       sys_handlers.erase(del);
     } else
