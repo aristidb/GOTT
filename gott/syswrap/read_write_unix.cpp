@@ -38,6 +38,7 @@
 #include "read_write_unix.hpp"
 #include "errno.hpp"
 #include <unistd.h>
+#include <errno.h>
 
 using std::size_t;
 
