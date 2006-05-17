@@ -37,8 +37,8 @@
 
 #include "module.hpp"
 #include "plugin_base.hpp"
-#include "module_metadata.hpp"
-#include "plugin_metadata.hpp"
+#include <gott/metadata/module.hpp>
+#include <gott/metadata/plugin.hpp>
 #include "plugin_builder.hpp"
 #include "plugin_configuration.hpp"
 #include <boost/scoped_array.hpp>

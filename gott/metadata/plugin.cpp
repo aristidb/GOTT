@@ -35,119 +35,120 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "module_metadata.hpp"
-#include "metadata.hpp"
-#include "validate.hpp"
+#include "plugin.hpp"
 #include "module.hpp"
+#include <gott/plugin/metadata.hpp>
+#include "validate.hpp"
 #include <gott/exceptions.hpp>
+#include <gott/range_algo.hpp>
 #include <boost/thread.hpp>
-#include <boost/weak_ptr.hpp>
-#include <vector>
 
 using namespace gott::plugin;
 using namespace gott;
 
-class module_metadata::impl {
+class plugin_metadata::impl {
 public:
-  boost::weak_ptr<module> instance;
   boost::optional<bool> validation;
   boost::mutex mutex;
 };
 
-module_metadata::module_metadata() 
-  : module_type(dynamic_native),
+plugin_metadata::plugin_metadata() : p(new impl) {}
+plugin_metadata::~plugin_metadata() {}
+plugin_metadata::plugin_metadata(plugin_metadata const &o)
+  : plugin_id(o.plugin_id),
+    interfaces(o.interfaces),
+    enclosing_module(o.enclosing_module),
+    symbol(o.symbol),
     p(new impl) {}
 
-module_metadata::module_metadata(module_metadata const &o) 
-  : module_id(o.module_id),
-    module_type(o.module_type),
-    file_path(o.file_path),
-    dependencies(o.dependencies),
-    p(new impl) {}
-
-void module_metadata::operator=(module_metadata const &o) {
-  module_id = o.module_id;
-  module_type = o.module_type;
-  file_path = o.file_path;
-  dependencies = o.dependencies;
+void plugin_metadata::operator=(plugin_metadata const &o) {
+  plugin_id = o.plugin_id;
+  interfaces = o.interfaces;
+  enclosing_module = o.enclosing_module;
+  symbol = o.symbol;
   p.reset(new impl);
 }
 
-module_metadata::~module_metadata() {}
+module_metadata const &plugin_metadata::enclosing_module_metadata(
+    bool do_load_standard_metadata) const {
+  boost::optional<module_metadata const &> res =
+    find_module_metadata(
+        enclosing_module,
+        tags::validate = false,
+        tags::load_standard_metadata = do_load_standard_metadata);
+  if (!res)
+    throw system_error("module not found");
+  return *res;
+}
 
-bool module_metadata::is_valid() const {
+bool plugin_metadata::is_valid() const {
   boost::mutex::scoped_lock lock(p->mutex);
   if (!p->validation)
     p->validation = detail::validate_metadata(*this);
   return *p->validation;
 }
 
-boost::shared_ptr<module> module_metadata::get_instance() const {
-  boost::mutex::scoped_lock lock(p->mutex);
-  if (!p->instance.expired())
-    return p->instance.lock();
-  boost::shared_ptr<module> result(new module(*this));
-  p->instance = result;
-  return result;
-}
-
 namespace {
   static boost::recursive_mutex metadata_biglock;
   #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
 
-  typedef std::vector<module_metadata> module_metadata_list_t;
-  static module_metadata_list_t known_module_metadata;
+  typedef std::vector<plugin_metadata> plugin_metadata_list_t;
+  static plugin_metadata_list_t known_plugin_metadata;
   static bool enabled = true;
-  static module_metadata_list_t core_module_metadata;
+  static plugin_metadata_list_t core_plugin_metadata;
 }
 
-void gott::plugin::enumerate_module_metadata_p(
-    boost::function<void (module_metadata const &)> const &callback,
-    boost::optional<QID const &> const &module_id,
+void gott::plugin::enumerate_plugin_metadata_p(
+    boost::function<void (plugin_metadata const &)> const &function,
+    boost::optional<QID const &> const &plugin_id,
+    boost::optional<QID const &> const &interface_id,
     bool cancel_early,
     bool do_load_standard_metadata,
     bool validate) {
   if (do_load_standard_metadata)
     load_standard_metadata();
   BIGLOCK;
-  module_metadata_list_t::iterator begin = known_module_metadata.begin();
-  module_metadata_list_t::iterator end = known_module_metadata.end();
+  plugin_metadata_list_t::iterator begin = known_plugin_metadata.begin();
+  plugin_metadata_list_t::iterator end = known_plugin_metadata.end();
   if (!enabled || begin == end) {
-    begin = core_module_metadata.begin();
-    end = core_module_metadata.end();
+    begin = core_plugin_metadata.begin();
+    end = core_plugin_metadata.end();
   }
-  for (module_metadata_list_t::iterator it = begin; it != end; ++it) {
-    if (module_id && it->module_id != *module_id)
+  for (plugin_metadata_list_t::iterator it = begin; it != end; ++it) {
+    if (plugin_id && it->plugin_id != *plugin_id)
+      continue;
+    if (interface_id && 
+        find(range(it->interfaces), *interface_id) == it->interfaces.end())
       continue;
     if (validate && !it->is_valid())
       continue;
-    callback(*it);
+    function(*it);
     if (cancel_early)
-      return;
+      break;
   }
 }
 
-void gott::plugin::add_module_metadata(
-    module_metadata const &metadata,
+void gott::plugin::add_plugin_metadata(
+    plugin_metadata const &metadata,
     bool core) {
   BIGLOCK;
   if (core)
-    core_module_metadata.push_back(metadata);
+    core_plugin_metadata.push_back(metadata);
   else
-    known_module_metadata.push_back(metadata);
+    known_plugin_metadata.push_back(metadata);
 }
 
-void gott::plugin::clear_module_metadata() {
+void gott::plugin::clear_plugin_metadata() {
   BIGLOCK;
-  module_metadata_list_t().swap(known_module_metadata);
+  plugin_metadata_list_t().swap(known_plugin_metadata);
 }
 
-void gott::plugin::disable_module_metadata() {
+void gott::plugin::disable_plugin_metadata() {
   BIGLOCK;
   enabled = false;
 }
 
-void gott::plugin::enable_module_metadata() {
+void gott::plugin::enable_plugin_metadata() {
   BIGLOCK;
   enabled = true;
 }

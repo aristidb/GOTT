@@ -42,7 +42,7 @@
 #include <gott/plugin/plugin_handle.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <gott/plugin/metadata.hpp>
-#include <gott/plugin/plugin_metadata.hpp>
-#include <gott/plugin/module_metadata.hpp>
+#include <gott/metadata/plugin.hpp>
+#include <gott/metadata/module.hpp>
 
 #endif

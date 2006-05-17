@@ -39,13 +39,6 @@ import glob
 
 Import('env')
 
-libobj = glob.glob('*.cpp')
-libobj.remove('test.cpp')
-libobj.remove('tdl_metadata.cpp')
-env.SharedLibrary('plugin', libobj)
-env = env.Copy()
-env.Append(LIBS = ['plugin'])
-
 env2 = env.Copy()
 env2.Append(LIBS = ['tdl'])
 env2.SharedLibrary('plugin_tdl', 'tdl_metadata.cpp', LIBS = [])

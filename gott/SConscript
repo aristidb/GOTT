@@ -40,7 +40,30 @@ Import('env')
 
 libobj = glob.glob('string/*.cpp')
 libobj += ['exceptions.cpp', 'xany/xany.cpp']
-env.SharedLibrary('gott_fundamentals', libobj)
+
+libobj_plugin = glob.glob('plugin/*.cpp')
+libobj_plugin.remove('plugin/test.cpp')
+libobj_plugin.remove('plugin/tdl_metadata.cpp')
+libobj += libobj_plugin
+
+libobj += glob.glob('metadata/*.cpp')
+
+libobj_syswrap = glob.glob('syswrap/*.cpp')
+if env['SYS_KQUEUE'] == 0:
+  libobj_syswrap.remove('syswrap/kqueue_bsd.cpp')
+if env['SYS_EPOLL'] == 0:
+  libobj_syswrap.remove('syswrap/epoll_linux.cpp')
+if env['SYS_INOTIFY'] == 0:
+  libobj_syswrap.remove('syswrap/inotify_linux.cpp')
+libobj_syswrap.remove('syswrap/test.cpp')
+
+libobj += libobj_syswrap
+
+
+
+env2 = env.Copy()
+env2.Append(LIBS = ['dl'])
+env2.SharedLibrary('gott_fundamentals', libobj)
 
 env = env.Copy()
 env.Append(LIBS = ['gott_fundamentals'])

@@ -1,5 +1,6 @@
 .
 tdl
+metadata
 plugin
 events
 configuration

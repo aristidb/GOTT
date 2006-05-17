@@ -38,22 +38,4 @@
 import glob
 Import('env')
 
-libobj = glob.glob('*.cpp')
-
-if env['SYS_KQUEUE'] == 0:
-  libobj.remove('kqueue_bsd.cpp')
-if env['SYS_EPOLL'] == 0:
-  libobj.remove('epoll_linux.cpp')
-if env['SYS_INOTIFY'] == 0:
-  libobj.remove('inotify_linux.cpp')
-
-libobj.remove('test.cpp')
-my_env = env.Copy()
-my_env.Append(LIBS = ['dl'])
-my_env.SharedLibrary('syswrap', libobj)
-env = env.Copy()
-env.Append(LIBS = ['syswrap'])
-
-Export('env')
-
 env.Program('test', 'test.cpp')

@@ -35,8 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "plugin_metadata.hpp"
-#include "module_metadata.hpp"
+#include <gott/metadata/plugin.hpp>
+#include <gott/metadata/module.hpp>
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>

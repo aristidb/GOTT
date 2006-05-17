@@ -36,8 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "validate.hpp"
-#include "plugin_metadata.hpp"
-#include "module_metadata.hpp"
+#include "plugin.hpp"
+#include "module.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <gott/string/stl.hpp>

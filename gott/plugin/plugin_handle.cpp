@@ -36,8 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "plugin_handle.hpp"
-#include "plugin_metadata.hpp"
-#include "module_metadata.hpp"
+#include <gott/metadata/plugin.hpp>
+#include <gott/metadata/module.hpp>
 #include "plugin_base.hpp"
 #include <gott/exceptions.hpp>
 

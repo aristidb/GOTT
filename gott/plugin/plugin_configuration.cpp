@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "plugin_configuration.hpp"
-#include "plugin_metadata.hpp"
+#include <gott/metadata/plugin.hpp>
 #include <boost/variant.hpp>
 #include <gott/xany/xany.hpp>
 #include <map>
