@@ -56,29 +56,6 @@ using std::istream;
 using std::ostream;
 
 namespace {
-  /*
-  ordered
-    named (plugin-id), node
-    unordered
-      :list named (has-interface), node
-      named (enclosing-module), node
-      named (symbol), node
-   */
-  static rule_t plugin_schema = 
-    rule("tdl::schema::ordered", rule_attr(coat = false),
-        boost::assign::list_of
-        (rule_one("tdl::schema::named", rule_attr(tag = "plugin-id"),
-                  rule("tdl::schema::node")))
-        (rule("tdl::schema::unordered", rule_attr(coat = false),
-          boost::assign::list_of
-          (rule_one("tdl::schema::named",
-                    rule_attr(tag = "has-interface", outer = list()),
-                    rule("tdl::schema::node")))
-          (rule_one("tdl::schema::named", rule_attr(tag = "enclosing-module"),
-                    rule("tdl::schema::node")))
-          (rule_one("tdl::schema::named", rule_attr(tag = "symbol"),
-                    rule("tdl::schema::node"))))));
-
   struct plugin_accepter : writable_structure {
     plugin_accepter(plugin_metadata &ref) : ref(ref) {}
 
@@ -107,6 +84,29 @@ namespace {
 
 extern "C"
 void gott::plugin::extract_plugin_metadata(istream &stream) {
+  /*
+  ordered
+    named (plugin-id), node
+    unordered
+      :list named (has-interface), node
+      named (enclosing-module), node
+      named (symbol), node
+   */
+  rule_t const plugin_schema = 
+    rule("tdl::schema::ordered", rule_attr(coat = false),
+        boost::assign::list_of
+        (rule_one("tdl::schema::named", rule_attr(tag = "plugin-id"),
+                  rule("tdl::schema::node")))
+        (rule("tdl::schema::unordered", rule_attr(coat = false),
+          boost::assign::list_of
+          (rule_one("tdl::schema::named",
+                    rule_attr(tag = "has-interface", outer = list()),
+                    rule("tdl::schema::node")))
+          (rule_one("tdl::schema::named", rule_attr(tag = "enclosing-module"),
+                    rule("tdl::schema::node")))
+          (rule_one("tdl::schema::named", rule_attr(tag = "symbol"),
+                    rule("tdl::schema::node"))))));
+
   struct multi_accepter : writable_structure {
     multi_accepter() : level(0), inner(current) {}
 
@@ -178,32 +178,6 @@ ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
 }
 
 namespace {
-  /*
-  ordered
-    named (module-id), node
-    unordered
-      named (file-path), node
-      named (module-type), enumeration $ dynamic-native
-   */
-  static rule_t module_schema = 
-    rule("tdl::schema::ordered", rule_attr(coat = false),
-        boost::assign::list_of
-        (rule_one("tdl::schema::named", rule_attr(tag = "module-id"),
-                  rule("tdl::schema::node")))
-        (rule("tdl::schema::unordered", rule_attr(coat = false),
-          boost::assign::list_of
-          (rule_one("tdl::schema::named", rule_attr(tag = "file-path"),
-                    rule("tdl::schema::node")))
-          (rule_one("tdl::schema::named", rule_attr(tag = "module-type"),
-                    rule("tdl::schema::node", rule_attr(
-                      tdl::schema::repatcher = new repatch_enumeration(
-                        boost::assign::list_of
-                        (string("dynamic-native"))
-                        .operator std::vector<string>())))))
-          (rule_one("tdl::schema::named",
-                    rule_attr(tag = "depend-on", outer = list()),
-                    rule("tdl::schema::node"))))));
-
   struct module_accepter : writable_structure {
     module_accepter(module_metadata &ref) : ref(ref) {}
 
@@ -232,6 +206,32 @@ namespace {
 
 extern "C"
 void gott::plugin::extract_module_metadata(istream &stream) {
+  /*
+  ordered
+    named (module-id), node
+    unordered
+      named (file-path), node
+      named (module-type), enumeration $ dynamic-native
+   */
+  rule_t const module_schema = 
+    rule("tdl::schema::ordered", rule_attr(coat = false),
+        boost::assign::list_of
+        (rule_one("tdl::schema::named", rule_attr(tag = "module-id"),
+                  rule("tdl::schema::node")))
+        (rule("tdl::schema::unordered", rule_attr(coat = false),
+          boost::assign::list_of
+          (rule_one("tdl::schema::named", rule_attr(tag = "file-path"),
+                    rule("tdl::schema::node")))
+          (rule_one("tdl::schema::named", rule_attr(tag = "module-type"),
+                    rule("tdl::schema::node", rule_attr(
+                      tdl::schema::repatcher = new repatch_enumeration(
+                        boost::assign::list_of
+                        (string("dynamic-native"))
+                        .operator std::vector<string>())))))
+          (rule_one("tdl::schema::named",
+                    rule_attr(tag = "depend-on", outer = list()),
+                    rule("tdl::schema::node"))))));
+
   struct multi_accepter : writable_structure {
     multi_accepter() : level(0), inner(current) {}
 
