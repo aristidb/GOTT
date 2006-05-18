@@ -48,7 +48,9 @@
 #include <boost/utility/in_place_factory.hpp>
 
 using gott::notify_fs::notification_engine;
+using gott::notify_fs::engine_factory;
 using gott::events::main_loop;
+using gott::plugin::plugin_handle;
 using namespace boost::lambda;
 
 gott::QID const notification_engine::qid(
@@ -57,10 +59,8 @@ gott::QID const notification_engine::qid(
 notification_engine::~notification_engine() {}
 
 namespace {
-gott::plugin::plugin_handle<gott::notify_fs::engine_factory> handle(
-    gott::plugin::find_plugin_metadata(
-      gott::plugin::tags::interface = "gott::notify_fs::engine_factory"));
-boost::mutex plugin_mutex;
+  boost::scoped_ptr<plugin_handle<engine_factory> > handle;
+  boost::mutex plugin_mutex;
 }
 
 notification_engine *notification_engine::get_for(main_loop &m) {
@@ -71,7 +71,11 @@ notification_engine *notification_engine::get_for(main_loop &m) {
   notification_engine *eng;
   {
   boost::mutex::scoped_lock lock(plugin_mutex);
-  eng = handle.get()->alloc(m);
+  if (!handle)
+    handle.reset(new plugin_handle<engine_factory>(
+        gott::plugin::find_plugin_metadata(
+          gott::plugin::tags::interface = "gott::notify_fs::engine_factory")));
+  eng = handle->get()->alloc(m);
   }
   
   slot = eng;
