@@ -39,16 +39,6 @@ import glob
 
 Import('env')
 
-libobj = glob.glob('*.cpp')
-
-libobj.remove('auto_loop_test.cpp')
-libobj.remove('mq_loop_test.cpp')
-env.SharedLibrary('events', libobj)
-env = env.Copy()
-env.Append(LIBS = ['events'])
-
-Export('env')
-
 SConscript(dirs = ['loops'])
 
 env.Program('auto_loop', 'auto_loop_test.cpp')
