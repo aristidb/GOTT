@@ -55,29 +55,17 @@ void noop() {}
 void do_load_standard() {
   load_core_metadata();
 
-  boost::optional<module_metadata const &> mod_meta =
-    find_module_metadata(tags::module_id = "gott::plugin::tdl_metadata");
-  if (!mod_meta)
-    throw gott::system_error("could not find TDL metadata loader");
-  boost::shared_ptr<module> mod(mod_meta.get().get_instance());
-
-  typedef void (fun_t)(std::istream &);
-  fun_t *do_extract_plugin_metadata = gott::function_cast<fun_t>(
-      mod->entity("extract_plugin_metadata"));
-  fun_t *do_extract_module_metadata = gott::function_cast<fun_t>(
-      mod->entity("extract_module_metadata"));
-
   disable_plugin_metadata();
   {
     std::ifstream in("plugin_registry.tdl");
-    do_extract_plugin_metadata(in);
+    extract_plugin_metadata(in);
   }
   enable_plugin_metadata();
 
   disable_module_metadata();
   {
     std::ifstream in("module_registry.tdl");
-    do_extract_module_metadata(in);
+    extract_module_metadata(in);
   }
   enable_module_metadata();
 }
@@ -86,16 +74,9 @@ void do_load_core() {
   // Load metadata for TDL, necessary for reading in the metadata.
   // Yes, this is what they call "boot-strapping".
   {
-    module_metadata library;
-    library.module_id = "tdl::library";
-    library.file_path = "tdl/libtdl.so";
-    add_module_metadata(library, true);
-  }
-  {
     module_metadata builtins;
     builtins.module_id = "tdl::builtins";
     builtins.file_path = "tdl/libtdl_builtins.so";
-    builtins.dependencies.push_back("tdl::library");
     add_module_metadata(builtins, true);
   }
   struct schema_type_adder {

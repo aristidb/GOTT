@@ -6,18 +6,8 @@ module-id gott::notify_fs::inotify
 file-path notify_fs/libnotify_inotify.so
 module-type dynamic-native
 
-module-id tdl::library
-file-path tdl/libtdl.so
-module-type dynamic-native
-
 module-id tdl::builtins
 file-path tdl/libtdl_builtins.so
-depend-on tdl::library
-module-type dynamic-native
-
-module-id gott::plugin::tdl_metadata
-file-path plugin/libplugin_tdl.so
-depend-on tdl::library
 module-type dynamic-native
 
 module-id gott::configuration

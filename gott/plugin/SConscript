@@ -39,11 +39,4 @@ import glob
 
 Import('env')
 
-env2 = env.Copy()
-env2.Append(LIBS = ['tdl'])
-env2.SharedLibrary('plugin_tdl', 'tdl_metadata.cpp', LIBS = [])
-env2.Append(LIBS = ['plugin_tdl'])
-
 #env2.Program('test.cpp')
-
-Export('env')

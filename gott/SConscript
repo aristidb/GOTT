@@ -36,6 +36,7 @@
 # ***** END LICENSE BLOCK *****
 
 import glob
+import os
 Import('env')
 
 libobj = glob.glob('string/*.cpp')
@@ -43,7 +44,6 @@ libobj += ['exceptions.cpp', 'xany/xany.cpp']
 
 libobj_plugin = glob.glob('plugin/*.cpp')
 libobj_plugin.remove('plugin/test.cpp')
-libobj_plugin.remove('plugin/tdl_metadata.cpp')
 libobj += libobj_plugin
 
 libobj += glob.glob('metadata/*.cpp')
@@ -59,14 +59,21 @@ libobj_syswrap.remove('syswrap/test.cpp')
 
 libobj += libobj_syswrap
 
-
+tdl_source_files = []
+for root, dirs, _ in os.walk('tdl'):
+        if 'test' in dirs:
+                dirs.remove('test')
+        if 'types' in dirs:
+                dirs.remove('types')
+        tdl_source_files += glob.glob(root + '/*.cpp')
+libobj += tdl_source_files
 
 env2 = env.Copy()
 env2.Append(LIBS = ['dl'])
-env2.SharedLibrary('gott_fundamentals', libobj)
+env2.SharedLibrary('gott_core', libobj)
 
 env = env.Copy()
-env.Append(LIBS = ['gott_fundamentals'])
+env.Append(LIBS = ['gott_core'])
 Export('env')
 
 env.Program('thunk_test', 'thunk.cpp')
