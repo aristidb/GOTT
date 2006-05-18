@@ -96,7 +96,9 @@ GOTT_EXPORT bool operator==(Xany const &lhs, Xany const &rhs);
 /**
  * Checks whether two typeless objects differ.
  */
-GOTT_EXPORT bool operator!=(Xany const &lhs, Xany const &rhs);
+inline bool operator!=(Xany const &lhs, Xany const &rhs) {
+  return !(lhs == rhs);
+}
 
 /**
  * Print a typeless object to a stream.

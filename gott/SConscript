@@ -56,7 +56,6 @@ if env['SYS_EPOLL'] == 0:
 if env['SYS_INOTIFY'] == 0:
   libobj_syswrap.remove('syswrap/inotify_linux.cpp')
 libobj_syswrap.remove('syswrap/test.cpp')
-
 libobj += libobj_syswrap
 
 tdl_source_files = []
@@ -71,8 +70,11 @@ libobj += tdl_source_files
 libobj_events = glob.glob('events/*.cpp')
 libobj_events.remove('events/auto_loop_test.cpp')
 libobj_events.remove('events/mq_loop_test.cpp')
-
 libobj += libobj_events
+
+libobj_notify_fs = glob.glob('notify_fs/*.cpp')
+libobj_notify_fs.remove('notify_fs/test.cpp')
+libobj += libobj_notify_fs
 
 env2 = env.Copy()
 env2.Append(LIBS = ['dl'])

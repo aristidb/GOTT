@@ -51,10 +51,6 @@ bool gott::xany::operator==(Xany const &lhs, Xany const &rhs) {
           .equals(lhs, rhs);
 }
 
-bool gott::xany::operator!=(Xany const &lhs, Xany const &rhs) {
-  return !(lhs == rhs);
-}
-
 std::ostream &gott::xany::operator<<(std::ostream &s, Xany const &v) {
   if (!v.empty()) {
     printable const &printer = 
