@@ -156,8 +156,8 @@ public:
 
   void create_loop(QID const &which) {
     TS_ASSERT_THROWS_NOTHING(
-        ploop = boost::in_place(gott::plugin::find_plugin_metadata(
-            gott::plugin::tags::plugin_id = which)));
+        ploop = boost::in_place(gott::metadata::find_plugin(
+            gott::metadata::tags::plugin_id = which)));
   }
   
   void select_loop() { create_loop("gott::events::select_loop"); }

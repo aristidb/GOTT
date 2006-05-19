@@ -37,43 +37,42 @@
 
 #include "plugin.hpp"
 #include "module.hpp"
-#include <gott/plugin/metadata.hpp>
+#include "load.hpp"
 #include "validate.hpp"
 #include <gott/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <boost/thread.hpp>
 
-using namespace gott::plugin;
-using namespace gott;
+using namespace gott::metadata;
+using gott::QID;
 
-class plugin_metadata::impl {
+class plugin::impl {
 public:
   boost::optional<bool> validation;
   boost::mutex mutex;
 };
 
-plugin_metadata::plugin_metadata() : p(new impl) {}
-plugin_metadata::~plugin_metadata() {}
-plugin_metadata::plugin_metadata(plugin_metadata const &o)
+plugin::plugin() : p(new impl) {}
+plugin::~plugin() {}
+plugin::plugin(plugin const &o)
   : plugin_id(o.plugin_id),
     interfaces(o.interfaces),
-    enclosing_module(o.enclosing_module),
+    enclosing_module_id(o.enclosing_module_id),
     symbol(o.symbol),
     p(new impl) {}
 
-void plugin_metadata::operator=(plugin_metadata const &o) {
+void plugin::operator=(plugin const &o) {
   plugin_id = o.plugin_id;
   interfaces = o.interfaces;
-  enclosing_module = o.enclosing_module;
+  enclosing_module_id = o.enclosing_module_id;
   symbol = o.symbol;
   p.reset(new impl);
 }
 
-module_metadata const &plugin_metadata::enclosing_module_metadata(
-    bool do_load_standard_metadata) const {
-  boost::optional<module_metadata const &> res =
-    find_module_metadata(
-        enclosing_module,
+module const &plugin::enclosing_module(bool do_load_standard_metadata) const {
+  boost::optional<module const &> res =
+    find_module(
+        enclosing_module_id,
         tags::validate = false,
         tags::load_standard_metadata = do_load_standard_metadata);
   if (!res)
@@ -81,10 +80,10 @@ module_metadata const &plugin_metadata::enclosing_module_metadata(
   return *res;
 }
 
-bool plugin_metadata::is_valid() const {
+bool plugin::is_valid() const {
   boost::mutex::scoped_lock lock(p->mutex);
   if (!p->validation)
-    p->validation = detail::validate_metadata(*this);
+    p->validation = detail::validate(*this);
   return *p->validation;
 }
 
@@ -92,29 +91,29 @@ namespace {
   static boost::recursive_mutex metadata_biglock;
   #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
 
-  typedef std::vector<plugin_metadata> plugin_metadata_list_t;
-  static plugin_metadata_list_t known_plugin_metadata;
+  typedef std::vector<plugin> plugin_list_t;
+  static plugin_list_t known_plugin;
   static bool enabled = true;
-  static plugin_metadata_list_t core_plugin_metadata;
+  static plugin_list_t core_plugin;
 }
 
-void gott::plugin::enumerate_plugin_metadata_p(
-    boost::function<void (plugin_metadata const &)> const &function,
+void gott::metadata::enumerate_plugins_p(
+    boost::function<void (plugin const &)> const &function,
     boost::optional<QID const &> const &plugin_id,
     boost::optional<QID const &> const &interface_id,
     bool cancel_early,
     bool do_load_standard_metadata,
     bool validate) {
   if (do_load_standard_metadata)
-    load_standard_metadata();
+    load_standard();
   BIGLOCK;
-  plugin_metadata_list_t::iterator begin = known_plugin_metadata.begin();
-  plugin_metadata_list_t::iterator end = known_plugin_metadata.end();
+  plugin_list_t::iterator begin = known_plugin.begin();
+  plugin_list_t::iterator end = known_plugin.end();
   if (!enabled || begin == end) {
-    begin = core_plugin_metadata.begin();
-    end = core_plugin_metadata.end();
+    begin = core_plugin.begin();
+    end = core_plugin.end();
   }
-  for (plugin_metadata_list_t::iterator it = begin; it != end; ++it) {
+  for (plugin_list_t::iterator it = begin; it != end; ++it) {
     if (plugin_id && it->plugin_id != *plugin_id)
       continue;
     if (interface_id && 
@@ -128,27 +127,27 @@ void gott::plugin::enumerate_plugin_metadata_p(
   }
 }
 
-void gott::plugin::add_plugin_metadata(
-    plugin_metadata const &metadata,
+void gott::metadata::add_plugin(
+    plugin const &metadata,
     bool core) {
   BIGLOCK;
   if (core)
-    core_plugin_metadata.push_back(metadata);
+    core_plugin.push_back(metadata);
   else
-    known_plugin_metadata.push_back(metadata);
+    known_plugin.push_back(metadata);
 }
 
-void gott::plugin::clear_plugin_metadata() {
+void gott::metadata::clear_plugin() {
   BIGLOCK;
-  plugin_metadata_list_t().swap(known_plugin_metadata);
+  plugin_list_t().swap(known_plugin);
 }
 
-void gott::plugin::disable_plugin_metadata() {
+void gott::metadata::disable_plugin() {
   BIGLOCK;
   enabled = false;
 }
 
-void gott::plugin::enable_plugin_metadata() {
+void gott::metadata::enable_plugin() {
   BIGLOCK;
   enabled = true;
 }

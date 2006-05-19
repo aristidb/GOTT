@@ -50,14 +50,14 @@
 #include <vector>
 #include <iosfwd>
 
-namespace gott { namespace plugin {
+namespace gott { namespace metadata {
 
-struct module_metadata;
+struct module;
 
 /**
  * A plugin's metadata.
  */
-struct plugin_metadata {
+struct plugin {
   /**
    * The plugin's unique identifier.
    */
@@ -73,9 +73,9 @@ struct plugin_metadata {
   /**
    * The module the plugin resides in.
    */
-  QID enclosing_module;
+  QID enclosing_module_id;
 
-  module_metadata const &enclosing_module_metadata(
+  module const &enclosing_module(
       bool load_standard_metadata = true) const GOTT_EXPORT;
 
   /**
@@ -85,10 +85,10 @@ struct plugin_metadata {
 
   bool is_valid() const;
 
-  plugin_metadata() GOTT_EXPORT;
-  ~plugin_metadata() GOTT_EXPORT;
-  plugin_metadata(plugin_metadata const &) GOTT_EXPORT;
-  void operator=(plugin_metadata const &) GOTT_EXPORT;
+  plugin() GOTT_EXPORT;
+  ~plugin() GOTT_EXPORT;
+  plugin(plugin const &) GOTT_EXPORT;
+  void operator=(plugin const &) GOTT_EXPORT;
 
 private:
   class impl;
@@ -108,11 +108,11 @@ struct interface_metadata {
  *                 interface if set.
  * \param cancel_early Cancel after the first record was found.
  * \param load_standard_metadata Call load_standard_metadata() first.
- * \see enumerate_plugin_metadata
+ * \see enumerate_plugin
  */
 GOTT_EXPORT
-void enumerate_plugin_metadata_p(
-    boost::function<void (plugin_metadata const &)> const &callback,
+void enumerate_plugins_p(
+    boost::function<void (plugin const &)> const &callback,
     boost::optional<QID const &> const &plugin_id,
     boost::optional<QID const &> const &interface,
     bool cancel_early,
@@ -129,11 +129,11 @@ typedef boost::parameter::parameters<
   tags::detail::validate
 > epm_params;
 
-BOOST_PARAMETER_FUN(void, enumerate_plugin_metadata, 1, 6, epm_params);
+BOOST_PARAMETER_FUN(void, enumerate_plugins, 1, 6, epm_params);
 
 template<class ArgPack>
-void enumerate_plugin_metadata_with_named_params(ArgPack const &args) {
-  enumerate_plugin_metadata_p(args[tags::callback],
+void enumerate_plugins_with_named_params(ArgPack const &args) {
+  enumerate_plugin_p(args[tags::callback],
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
       detail::get_opt_qid(args[tags::interface | boost::none]),
       args[tags::cancel_early | false],
@@ -148,14 +148,14 @@ typedef boost::parameter::parameters<
   tags::detail::validate
 > fpm_params;
 
-BOOST_PARAMETER_FUN(inline boost::optional<plugin_metadata const &>,
-    find_plugin_metadata, 0, 4, fpm_params);
+BOOST_PARAMETER_FUN(inline boost::optional<plugin const &>,
+    find_plugin, 0, 4, fpm_params);
 
 template<class ArgPack>
-boost::optional<plugin_metadata const &>
-find_plugin_metadata_with_named_params(ArgPack const &args) {
-  detail::find_functor<plugin_metadata> cb;
-  enumerate_plugin_metadata_p(boost::ref(cb),
+boost::optional<plugin const &>
+find_plugin_with_named_params(ArgPack const &args) {
+  detail::find_functor<plugin> cb;
+  enumerate_plugins_p(boost::ref(cb),
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
       detail::get_opt_qid(args[tags::interface | boost::none]),
       true,
@@ -174,8 +174,8 @@ find_plugin_metadata_with_named_params(ArgPack const &args) {
  *                       interface (optional).
  * \param tags::cancel_early Cancel after the first record was found.
  */
-void enumerate_plugin_metadata(
-    boost::function<void (plugin_metadata const &)> const &tags::callback,
+void enumerate_plugins(
+    boost::function<void (plugin const &)> const &tags::callback,
     QID const &tags::plugin_id,
     QID const &tags::interface,
     bool tags::cancel_early = false,
@@ -191,8 +191,8 @@ void enumerate_plugin_metadata(
  * \param tags::interface Requires the record to indicate support for the given
  *                        interface (optional).
  */
-boost::optional<plugin_metadata const &>
-find_plugin_metadata(
+boost::optional<plugin const &>
+find_plugin(
     QID const &tags::plugin_id,
     QID const &tags::interface,
     bool tags::load_standard_metadata = true,
@@ -206,23 +206,22 @@ find_plugin_metadata(
  * \param metadata The new metadata.
  */
 GOTT_EXPORT
-void add_plugin_metadata(plugin_metadata const &metadata, bool core = false);
+void add_plugin(plugin const &metadata, bool core = false);
 
 /**
  * Clear the plugin metadata database.
  */
-void clear_plugin_metadata();
+void clear_plugin();
 
-void disable_plugin_metadata();
-void enable_plugin_metadata();
+void disable_plugin();
+void enable_plugin();
 
 /**
  * Add a list of some plugins' metadata read from a stream. Thread-safe.
  * \param stream The stream to empty.
  */
-extern "C"
 GOTT_EXPORT
-void extract_plugin_metadata(std::istream &stream);
+void extract_plugin(std::istream &stream);
 
 /**
  * Write a plugin's metadata to a stream.
@@ -230,7 +229,7 @@ void extract_plugin_metadata(std::istream &stream);
  * \param in The metadata object to write.
  */
 GOTT_EXPORT
-std::ostream &operator<<(std::ostream &stream, plugin_metadata const &in);
+std::ostream &operator<<(std::ostream &stream, plugin const &in);
 
 }}
 

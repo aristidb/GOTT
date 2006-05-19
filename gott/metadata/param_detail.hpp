@@ -43,7 +43,7 @@
 #include <boost/optional/optional.hpp>
 #include <gott/string/qid.hpp>
 
-namespace gott { namespace plugin { 
+namespace gott { namespace metadata { 
   
 namespace tags {
   BOOST_PARAMETER_KEYWORD(detail, callback)

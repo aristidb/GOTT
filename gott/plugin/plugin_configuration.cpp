@@ -49,9 +49,9 @@ using boost::variant;
 
 class plugin_configuration::impl {
 public:
-  impl(plugin_metadata const &plugin) : plugin(plugin) {}
+  impl(metadata::plugin const &plugin) : plugin(plugin) {}
 
-  plugin_metadata plugin;
+  metadata::plugin plugin;
   
   typedef variant<Xany, hook const *> entry;
   typedef std::map<QID, entry> mapping;
@@ -59,7 +59,7 @@ public:
   mapping parameters;
 };
 
-plugin_configuration::plugin_configuration(plugin_metadata const &plugin) 
+plugin_configuration::plugin_configuration(metadata::plugin const &plugin) 
   : p(new impl(plugin)) {}
 
 plugin_configuration::~plugin_configuration() {}

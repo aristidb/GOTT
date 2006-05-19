@@ -35,16 +35,16 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "metadata.hpp"
-#include <gott/metadata/plugin.hpp>
-#include <gott/metadata/module.hpp>
+#include "load.hpp"
+#include "plugin.hpp"
 #include "module.hpp"
+#include <gott/plugin/module.hpp>
 #include <gott/syswrap/function_cast.hpp>
 #include <gott/exceptions.hpp>
 #include <boost/thread/once.hpp>
 #include <fstream>
 
-using namespace gott::plugin;
+using namespace gott::metadata;
 
 namespace {
 boost::once_flag once_standard = BOOST_ONCE_INIT;
@@ -53,40 +53,40 @@ boost::once_flag once_core = BOOST_ONCE_INIT;
 void noop() {}
 
 void do_load_standard() {
-  load_core_metadata();
+  load_core();
 
-  disable_plugin_metadata();
+  disable_plugin();
   {
     std::ifstream in("plugin_registry.tdl");
-    extract_plugin_metadata(in);
+    extract_plugin(in);
   }
-  enable_plugin_metadata();
+  enable_plugin();
 
-  disable_module_metadata();
+  disable_module();
   {
     std::ifstream in("module_registry.tdl");
-    extract_module_metadata(in);
+    extract_module(in);
   }
-  enable_module_metadata();
+  enable_module();
 }
 
 void do_load_core() {
   // Load metadata for TDL, necessary for reading in the metadata.
   // Yes, this is what they call "boot-strapping".
   {
-    module_metadata builtins;
+    module builtins;
     builtins.module_id = "tdl::builtins";
     builtins.file_path = "tdl/libtdl_builtins.so";
-    add_module_metadata(builtins, true);
+    add_module(builtins, true);
   }
   struct schema_type_adder {
     void operator()(gott::string const &s) {
-      plugin_metadata schema_type;
+      plugin schema_type;
       schema_type.plugin_id = "tdl::schema::" + s;
       schema_type.interfaces.push_back("tdl::schema::type");
-      schema_type.enclosing_module = "tdl::builtins";
+      schema_type.enclosing_module_id = "tdl::builtins";
       schema_type.symbol = "plugin_schema_" + s;
-      add_plugin_metadata(schema_type, true);
+      add_plugin(schema_type, true);
     }
   } add_schema_type;
   add_schema_type("any");
@@ -98,18 +98,10 @@ void do_load_core() {
   add_schema_type("unordered");
   add_schema_type("tree");
   add_schema_type("node");
-  // The TDL metadata loader
-  {
-    module_metadata loader;
-    loader.module_id = "gott::plugin::tdl_metadata";
-    loader.file_path = "plugin/libplugin_tdl.so";
-    loader.dependencies.push_back("tdl::library");
-    add_module_metadata(loader, true);
-  }
 }
 }
 
-void gott::plugin::load_standard_metadata() {
+void gott::metadata::load_standard() {
   static bool first = true; // protect against recursion
   if (!first)
     return;
@@ -117,6 +109,6 @@ void gott::plugin::load_standard_metadata() {
   boost::call_once(&do_load_standard, once_standard);
 }
 
-void gott::plugin::load_core_metadata() {
+void gott::metadata::load_core() {
   boost::call_once(&do_load_core, once_core);
 }

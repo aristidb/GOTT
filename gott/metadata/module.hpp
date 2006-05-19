@@ -50,12 +50,15 @@
 #include <iosfwd>
 #include <vector>
 
-namespace gott { namespace plugin {
+namespace gott { 
+namespace plugin { class module; }
+
+namespace metadata {
 
 /**
  *
  */
-struct module_metadata {
+struct module {
   /**
    * The module's unique identifier.
    */
@@ -79,10 +82,10 @@ struct module_metadata {
   typedef std::vector<QID> module_list_t;
   module_list_t dependencies;
 
-  module_metadata() GOTT_EXPORT;
-  ~module_metadata() GOTT_EXPORT;
-  module_metadata(module_metadata const &o) GOTT_EXPORT;
-  void operator=(module_metadata const &o) GOTT_EXPORT;
+  module() GOTT_EXPORT;
+  ~module() GOTT_EXPORT;
+  module(module const &o) GOTT_EXPORT;
+  void operator=(module const &o) GOTT_EXPORT;
 
   /**
    * Check whether the metadata is valid. Thread-safe.
@@ -92,7 +95,7 @@ struct module_metadata {
   /**
    * Get a module instance for this metadata. Thread-safe.
    */
-  boost::shared_ptr<class module> get_instance() const GOTT_EXPORT;
+  boost::shared_ptr<gott::plugin::module> get_instance() const GOTT_EXPORT;
 
 private:
   class impl;
@@ -100,8 +103,8 @@ private:
 };
 
 GOTT_EXPORT
-void enumerate_module_metadata_p(
-    boost::function<void (module_metadata const &)> const &callback,
+void enumerate_modules_p(
+    boost::function<void (module const &)> const &callback,
     boost::optional<QID const &> const &module_id,
     bool cancel_early,
     bool load_standard_metadata,
@@ -117,11 +120,11 @@ typedef boost::parameter::parameters<
     tags::detail::validate
   > emm_params;
 
-BOOST_PARAMETER_FUN(void, enumerate_module_metadata, 1, 5, emm_params);
+BOOST_PARAMETER_FUN(void, enumerate_modules, 1, 5, emm_params);
 
 template<class ArgPack>
-void enumerate_module_metadata_with_named_params(ArgPack const &args) {
-  enumerate_module_metadata_p(
+void enumerate_modules_with_named_params(ArgPack const &args) {
+  enumerate_modules_p(
       args[tags::callback],
       detail::get_opt_qid(args[tags::module_id | boost::none]),
       args[tags::cancel_early | false],
@@ -136,14 +139,14 @@ typedef boost::parameter::parameters<
   > fmm_params;
 
 BOOST_PARAMETER_FUN(
-    inline boost::optional<module_metadata const &>, find_module_metadata,
+    inline boost::optional<module const &>, find_module,
     0, 3, fmm_params);
 
 template<class ArgPack>
-boost::optional<module_metadata const &>
-find_module_metadata_with_named_params(ArgPack const &args) {
-  detail::find_functor<module_metadata> cb;
-  enumerate_module_metadata_p(
+boost::optional<module const &>
+find_module_with_named_params(ArgPack const &args) {
+  detail::find_functor<module> cb;
+  enumerate_modules_p(
       boost::ref(cb),
       detail::get_opt_qid(args[tags::module_id | boost::none]),
       true,
@@ -152,34 +155,33 @@ find_module_metadata_with_named_params(ArgPack const &args) {
   return cb.result;
 }
 #else//=>IN_DOXY
-void enumerate_module_metadata(
-    boost::function<void (module_metadata const &)> const &tags::callback,
+void enumerate_modules(
+    boost::function<void (module const &)> const &tags::callback,
     QID const &tags::module_id,
     bool tags::cancel_early = false,
     bool tags::load_standard_metadata = true,
     bool tags::validate = true);
 
-boost::optional<module_metadata const &>
-find_module_metadata(
+boost::optional<module const &>
+find_module(
     QID const &tags::module_id,
     bool tags::load_standard_metadata = true,
     bool tags::validate = true);
 #endif
 
 GOTT_EXPORT
-void add_module_metadata(module_metadata const &metadata, bool core = false);
+void add_module(module const &metadata, bool core = false);
 
-void clear_module_metadata();
+void clear_module();
 
-void disable_module_metadata();
-void enable_module_metadata();
-
-extern "C"
-GOTT_EXPORT
-void extract_module_metadata(std::istream &stream);
+void disable_module();
+void enable_module();
 
 GOTT_EXPORT
-std::ostream &operator<<(std::ostream &stream, module_metadata const &in);
+void extract_module(std::istream &stream);
+
+GOTT_EXPORT
+std::ostream &operator<<(std::ostream &stream, module const &in);
 
 }}
 

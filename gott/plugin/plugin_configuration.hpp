@@ -44,15 +44,14 @@
 namespace gott {
 class QID;
 namespace xany { class Xany; }
+namespace metadata { struct plugin; }
 
 namespace plugin {
-
-class plugin_metadata;
 class hook;
 
 class plugin_configuration {
 public:
-  plugin_configuration(plugin_metadata const &) GOTT_EXPORT;
+  plugin_configuration(metadata::plugin const &) GOTT_EXPORT;
   plugin_configuration(plugin_configuration const &) GOTT_EXPORT;
   ~plugin_configuration() GOTT_EXPORT;
 

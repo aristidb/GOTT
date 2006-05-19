@@ -38,15 +38,15 @@
 #ifndef GOTT_PLUGIN_VALIDATE_HPP
 #define GOTT_PLUGIN_VALIDATE_HPP
 
-namespace gott { namespace plugin {
+namespace gott { namespace metadata {
 
-struct plugin_metadata;
-struct module_metadata;
+struct plugin;
+struct module;
 
 namespace detail {
 
-bool validate_metadata(plugin_metadata const &);
-bool validate_metadata(module_metadata const &);
+bool validate(plugin const &);
+bool validate(module const &);
 
 }
 

@@ -41,12 +41,14 @@
 #include <gott/string/string.hpp>
 #include <gott/string/atom.hpp>
 #include <gott/plugin.hpp>
+#include <gott/metadata/load.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
 
 using namespace tdl::schema;
-using namespace gott::plugin;
+using namespace gott::metadata;
+using gott::plugin::plugin_handle;
 using gott::string;
 using std::vector;
 
@@ -60,14 +62,14 @@ namespace {
 
 rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
     vector<rule_t> const &c) {
-  load_core_metadata();
-  load_standard_metadata();
+  load_core();
+  load_standard();
 
   boost::mutex::scoped_lock lock(mutex);
 
   if (all_handles.count(s) == 0) {
     plugin_handle<type> * handle(new plugin_handle<type>(
-      find_plugin_metadata(
+      find_plugin(
         tags::plugin_id = s,
         tags::interface = "tdl::schema::type",
         tags::load_standard_metadata = false)));

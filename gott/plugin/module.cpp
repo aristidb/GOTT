@@ -57,13 +57,13 @@ private:
   void *handle;
   
 public:
-  impl(module_metadata const &which)
+  impl(metadata::module const &which)
   : handle(0) {
-    module_metadata::module_list_t::const_iterator it 
+    metadata::module::module_list_t::const_iterator it 
       = which.dependencies.begin();
     for (; it != which.dependencies.end(); ++it) {
-      boost::optional<module_metadata const &> dep 
-        = find_module_metadata(tags::module_id = *it);
+      boost::optional<metadata::module const &> dep 
+        = metadata::find_module(metadata::tags::module_id = *it);
       if (!dep)
         throw system_error("could not find dependency " + it->get_string());
       dependencies.push_back(dep.get().get_instance());
@@ -71,12 +71,12 @@ public:
     handle = get_handle(which);
   }
 
-  static void *get_handle(module_metadata const &which) {
+  static void *get_handle(metadata::module const &which) {
     switch (which.module_type) {
-    case module_metadata::dynamic_native:
+    case metadata::module::dynamic_native:
       return dlopen_unix(
           boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
-          RTLD_NOW | RTLD_GLOBAL);
+          RTLD_LAZY | RTLD_GLOBAL);
     default:
       throw 0;
     }
@@ -97,19 +97,19 @@ public:
   }
 };
 
-module::module(module_metadata const &which) : p(new impl(which)) {}
+module::module(metadata::module const &which) : p(new impl(which)) {}
 module::~module() {}
 
 void *module::entity(gott::string const &symbol) {
   return p->entity(symbol);
 }
 
-plugin_base *module::load_plugin(plugin_metadata const &which) {
+plugin_base *module::load_plugin(metadata::plugin const &which) {
   return load_plugin(which, plugin_configuration(which));
 }
 
 plugin_base *module::load_plugin(
-    plugin_metadata const &which,
+    metadata::plugin const &which,
     plugin_configuration const &conf) {
   plugin_builder *fun = function_cast<plugin_builder>(entity(which.symbol));
   return fun(conf);

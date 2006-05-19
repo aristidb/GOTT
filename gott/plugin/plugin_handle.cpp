@@ -45,8 +45,8 @@ using namespace gott::plugin;
 
 class plugin_handle_base::impl {
 public:
-  impl(plugin_metadata const &which)
-    : mod(which.enclosing_module_metadata().get_instance()),
+  impl(metadata::plugin const &which)
+    : mod(which.enclosing_module().get_instance()),
       p(mod->load_plugin(which)) {}
 
   ~impl() { delete p; }
@@ -55,20 +55,20 @@ public:
   plugin_base *p;
 };
 
-plugin_handle_base::plugin_handle_base(plugin_metadata const &which)
+plugin_handle_base::plugin_handle_base(metadata::plugin const &which)
 : p(new impl(which)) {}
 
 namespace {
-plugin_metadata const &unwrap(
-    boost::optional<plugin_metadata const &> const &which) {
-  if (!which)
-    throw gott::system_error("plugin not found");
-  return which.get();
-}
+  gott::metadata::plugin const &unwrap(
+      boost::optional<gott::metadata::plugin const &> const &which) {
+    if (!which)
+      throw gott::system_error("plugin not found");
+    return which.get();
+  }
 }
 
 plugin_handle_base::plugin_handle_base(
-    boost::optional<plugin_metadata const &> const &which)
+    boost::optional<metadata::plugin const &> const &which)
 : p(new impl(unwrap(which))) {}
 
 plugin_handle_base::~plugin_handle_base() {}
@@ -77,7 +77,7 @@ plugin_base *plugin_handle_base::get_base() const {
   return p->p;
 }
 
-void plugin_handle_base::fail_interface(plugin_metadata const &which) {
+void plugin_handle_base::fail_interface(metadata::plugin const &which) {
   throw gott::system_error(
       which.plugin_id.get_string()
       + " : plugin does not support requested interface");

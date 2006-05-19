@@ -45,7 +45,7 @@
 namespace gott { 
 
 class QID;
-namespace plugin { struct plugin_metadata; }
+namespace metadata { struct plugin; }
 
 namespace events {
 class loop_requirement;
@@ -56,7 +56,7 @@ public:
   GOTT_EXPORT main_loop_factory();
   GOTT_EXPORT ~main_loop_factory();
   GOTT_EXPORT bool try_add(loop_requirement const &);
-  GOTT_EXPORT plugin::plugin_metadata const &get() const;
+  GOTT_EXPORT metadata::plugin const &get() const;
 
 public: // internal
   bool try_add_feature(QID const &);

@@ -40,13 +40,13 @@
 
 #include <gott/visibility.hpp>
 
-namespace gott { namespace plugin {
+namespace gott { namespace metadata {
 
 GOTT_EXPORT
-void load_core_metadata();
+void load_core();
 
 GOTT_EXPORT
-void load_standard_metadata();
+void load_standard();
 
 }}
 

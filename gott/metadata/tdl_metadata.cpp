@@ -35,8 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <gott/metadata/plugin.hpp>
-#include <gott/metadata/module.hpp>
+#include "plugin.hpp"
+#include "module.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>
@@ -47,19 +47,19 @@
 #include <gott/tdl/write/writer.hpp>
 #include <boost/assign/list_of.hpp>
 
-using namespace gott::plugin;
+using namespace gott::metadata;
 using namespace gott::xany;
-using namespace gott;
 using namespace tdl::schema;
 using namespace tdl::structure;
+using gott::string;
 using std::istream;
 using std::ostream;
 
 namespace {
   struct plugin_accepter : writable_structure {
-    plugin_accepter(plugin_metadata &ref) : ref(ref) {}
+    plugin_accepter(plugin &ref) : ref(ref) {}
 
-    plugin_metadata &ref;
+    plugin &ref;
 
     string tag;
     Xany data_;
@@ -71,7 +71,7 @@ namespace {
       else if (tag == "plugin-id")
         ref.plugin_id = Xany_cast<string>(data_);
       else if (tag == "enclosing-module")
-        ref.enclosing_module = Xany_cast<string>(data_);
+        ref.enclosing_module_id = Xany_cast<string>(data_);
       else if (tag == "symbol")
         ref.symbol = Xany_cast<string>(data_);
       tag = string();
@@ -82,8 +82,7 @@ namespace {
   };
 }
 
-extern "C"
-void gott::plugin::extract_plugin_metadata(istream &stream) {
+void gott::metadata::extract_plugin(istream &stream) {
   /*
   ordered
     named (plugin-id), node
@@ -111,12 +110,12 @@ void gott::plugin::extract_plugin_metadata(istream &stream) {
     multi_accepter() : level(0), inner(current) {}
 
     unsigned level;
-    plugin_metadata current;
+    plugin current;
     plugin_accepter inner;
 
     void begin(tdl::source_position const &w) {
       if (level == 0) {
-        current = plugin_metadata();
+        current = plugin();
       } else
         inner.begin(w);
       ++level;
@@ -124,7 +123,7 @@ void gott::plugin::extract_plugin_metadata(istream &stream) {
     void end() {
       --level;
       if (level == 0) {
-        add_plugin_metadata(current);
+        add_plugin(current);
       } else
         inner.end();
     }
@@ -141,7 +140,7 @@ void gott::plugin::extract_plugin_metadata(istream &stream) {
       adapter).parse(stream);
 }
 
-ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
+ostream &gott::metadata::operator<<(ostream &stream, plugin const &val) {
   tdl::tdl_writer w(stream, 2);
   w.down();
   {
@@ -153,7 +152,7 @@ ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
   {
     w.node("enclosing-module");
     w.down();
-      w.node(val.enclosing_module.get_string());
+      w.node(val.enclosing_module_id.get_string());
     w.up();
   }
   {
@@ -163,7 +162,7 @@ ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
     w.up();
   }
   {
-    for (plugin_metadata::interface_list_t::const_iterator it =
+    for (plugin::interface_list_t::const_iterator it =
           val.interfaces.begin();
         it != val.interfaces.end();
         ++it) {
@@ -179,9 +178,9 @@ ostream &gott::plugin::operator<<(ostream &stream, plugin_metadata const &val) {
 
 namespace {
   struct module_accepter : writable_structure {
-    module_accepter(module_metadata &ref) : ref(ref) {}
+    module_accepter(module &ref) : ref(ref) {}
 
-    module_metadata &ref;
+    module &ref;
 
     string tag;
     Xany data_;
@@ -193,7 +192,7 @@ namespace {
       else if (tag == "file-path")
         ref.file_path = Xany_cast<string>(data_);
       else if (tag == "module-type")
-        ref.module_type = Xany_cast<module_metadata::module_type_t>(data_);
+        ref.module_type = Xany_cast<module::module_type_t>(data_);
       else if (tag == "depend-on")
         ref.dependencies.push_back(Xany_cast<string>(data_));
       tag = string();
@@ -204,8 +203,7 @@ namespace {
   };
 }
 
-extern "C"
-void gott::plugin::extract_module_metadata(istream &stream) {
+void gott::metadata::extract_module(istream &stream) {
   /*
   ordered
     named (module-id), node
@@ -236,12 +234,12 @@ void gott::plugin::extract_module_metadata(istream &stream) {
     multi_accepter() : level(0), inner(current) {}
 
     unsigned level;
-    module_metadata current;
+    module current;
     module_accepter inner;
 
     void begin(tdl::source_position const &w) {
       if (level == 0) {
-        current = module_metadata();
+        current = module();
       } else
         inner.begin(w);
       ++level;
@@ -249,7 +247,7 @@ void gott::plugin::extract_module_metadata(istream &stream) {
     void end() {
       --level;
       if (level == 0) {
-        add_module_metadata(current);
+        add_module(current);
       } else
         inner.end();
     }
@@ -266,7 +264,7 @@ void gott::plugin::extract_module_metadata(istream &stream) {
       adapter).parse(stream);
 }
 
-ostream &gott::plugin::operator<<(ostream &stream, module_metadata const &val) {
+ostream &gott::metadata::operator<<(ostream &stream, module const &val) {
   tdl::tdl_writer w(stream, 2);
   w.down();
   {
@@ -285,7 +283,7 @@ ostream &gott::plugin::operator<<(ostream &stream, module_metadata const &val) {
     w.node("module-type");
     w.down();
       switch (val.module_type) {
-      case module_metadata::dynamic_native:
+      case module::dynamic_native:
         w.node("dynamic-native");
         break;
       }

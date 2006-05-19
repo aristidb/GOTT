@@ -43,24 +43,26 @@
 #include <boost/noncopyable.hpp>
 
 namespace gott {
-class string;
+  class string;
+
+namespace metadata {
+  struct plugin;
+  struct module;
+}
 
 namespace plugin {
 class plugin_base;
 class plugin_configuration;
-struct module_metadata;
-struct plugin_metadata;
-
 class module : boost::noncopyable {
 public:
-  GOTT_EXPORT module(module_metadata const &which);
+  GOTT_EXPORT module(metadata::module const &which);
   GOTT_EXPORT ~module();
 
   GOTT_EXPORT void *entity(gott::string const &symbol);
 
-  GOTT_EXPORT plugin_base *load_plugin(plugin_metadata const &which);
+  GOTT_EXPORT plugin_base *load_plugin(metadata::plugin const &which);
   GOTT_EXPORT plugin_base *load_plugin(
-      plugin_metadata const &which,
+      metadata::plugin const &which,
       plugin_configuration const &conf);
 
 private:

@@ -42,12 +42,9 @@
 #include <boost/filesystem/operations.hpp>
 #include <gott/string/stl.hpp>
 
-using gott::plugin::plugin_metadata;
-using gott::plugin::module_metadata;
-
-bool gott::plugin::detail::validate_metadata(plugin_metadata const &which) {
+bool gott::metadata::detail::validate(plugin const &which) {
   try {
-    if (!which.enclosing_module_metadata().is_valid())
+    if (!which.enclosing_module().is_valid())
       return false;
   } catch (gott::system_error const &e) {
     return false;
@@ -55,7 +52,7 @@ bool gott::plugin::detail::validate_metadata(plugin_metadata const &which) {
   return true;
 }
 
-bool gott::plugin::detail::validate_metadata(module_metadata const &which) {
+bool gott::metadata::detail::validate(module const &which) {
   if (!boost::filesystem::exists(to_string(which.file_path)))
     return false;
   return true;
