@@ -42,6 +42,7 @@
 #include <gott/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <boost/thread.hpp>
+#include <map>
 
 using namespace gott::metadata;
 using gott::QID;
@@ -91,10 +92,10 @@ namespace {
   static boost::recursive_mutex metadata_biglock;
   #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
 
-  typedef std::vector<plugin> plugin_list_t;
+  typedef std::list<plugin> plugin_list_t;
   static plugin_list_t known_plugin;
-  static bool enabled = true;
-  static plugin_list_t core_plugin;
+  typedef std::multimap<gott::string, plugin_list_t::iterator> res_map_t;
+  static res_map_t resources;
 }
 
 void gott::metadata::enumerate_plugins_p(
@@ -109,10 +110,6 @@ void gott::metadata::enumerate_plugins_p(
   BIGLOCK;
   plugin_list_t::iterator begin = known_plugin.begin();
   plugin_list_t::iterator end = known_plugin.end();
-  if (!enabled || begin == end) {
-    begin = core_plugin.begin();
-    end = core_plugin.end();
-  }
   for (plugin_list_t::iterator it = begin; it != end; ++it) {
     if (plugin_id && it->plugin_id != *plugin_id)
       continue;
@@ -129,25 +126,17 @@ void gott::metadata::enumerate_plugins_p(
 
 void gott::metadata::add_plugin(
     plugin const &metadata,
-    bool core) {
+    string const &resource) {
   BIGLOCK;
-  if (core)
-    core_plugin.push_back(metadata);
-  else
-    known_plugin.push_back(metadata);
+  known_plugin.push_front(metadata);
+  resources.insert(std::make_pair(resource, known_plugin.begin()));
 }
 
-void gott::metadata::clear_plugin() {
+void gott::metadata::remove_plugin_resource(string const &resource) {
   BIGLOCK;
-  plugin_list_t().swap(known_plugin);
-}
-
-void gott::metadata::disable_plugin() {
-  BIGLOCK;
-  enabled = false;
-}
-
-void gott::metadata::enable_plugin() {
-  BIGLOCK;
-  enabled = true;
+  std::pair<res_map_t::iterator, res_map_t::iterator> rng
+    = resources.equal_range(resource);
+  for (res_map_t::iterator it = rng.first; it != rng.second; ++it)
+    known_plugin.erase(it->second);
+  resources.erase(rng.first, rng.second);
 }

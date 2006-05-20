@@ -35,8 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_PLUGIN_METADATA_HPP
-#define GOTT_PLUGIN_PLUGIN_METADATA_HPP
+#ifndef GOTT_METADATA_PLUGIN_HPP
+#define GOTT_METADATA_PLUGIN_HPP
 
 #include "param_detail.hpp"
 #include <gott/string/string.hpp>
@@ -205,23 +205,21 @@ find_plugin(
  * This function does not record the plugin persistently. Thread-safe.
  * \param metadata The new metadata.
  */
-GOTT_EXPORT
-void add_plugin(plugin const &metadata, bool core = false);
+void add_plugin(plugin const &metadata, string const &resource);
 
-/**
- * Clear the plugin metadata database.
- */
-void clear_plugin();
+void remove_plugin_resource(string const &resource);
 
-void disable_plugin();
-void enable_plugin();
+class transaction;
 
 /**
  * Add a list of some plugins' metadata read from a stream. Thread-safe.
  * \param stream The stream to empty.
  */
 GOTT_EXPORT
-void extract_plugin(std::istream &stream);
+void update_plugin_resource(
+    std::istream &stream,
+    gott::string const &resource,
+    transaction &tr);
 
 /**
  * Write a plugin's metadata to a stream.

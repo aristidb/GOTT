@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Plugin / Loadable Module Engine.
+ * The Original Code is Metadata for GOTT.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
@@ -35,49 +35,33 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_METADATA_PARAM_DETAIL_HPP
-#define GOTT_METADATA_PARAM_DETAIL_HPP
+#ifndef GOTT_METADATA_TRANSACTION_HPP
+#define GOTT_METADATA_TRANSACTION_HPP
 
-#include <boost/parameter/keyword.hpp>
-#include <boost/none.hpp>
-#include <boost/optional/optional.hpp>
-#include <gott/string/qid.hpp>
+#include <gott/visibility.hpp>
+#include <boost/scoped_ptr.hpp>
 
-namespace gott { namespace metadata { 
-  
-namespace tags {
-  BOOST_PARAMETER_KEYWORD(detail, callback)
-  BOOST_PARAMETER_KEYWORD(detail, plugin_id)
-  BOOST_PARAMETER_KEYWORD(detail, module_id)
-  BOOST_PARAMETER_KEYWORD(detail, interface)
-  BOOST_PARAMETER_KEYWORD(detail, cancel_early)
-  BOOST_PARAMETER_KEYWORD(detail, load_standard_metadata)
-  BOOST_PARAMETER_KEYWORD(detail, validate)
-}
+namespace gott {
+  class string;
 
-namespace detail {
-  template<class T>
-  QID get_opt_qid(T const &x) {
-    return x;
-  }
+namespace metadata {
+  struct plugin;
+  struct module;
 
-  inline QID const &get_opt_qid(QID const &x) {
-    return x;
-  }
+class transaction {
+public:
+  GOTT_EXPORT transaction();
+  GOTT_EXPORT ~transaction();
+  GOTT_EXPORT void commit();
 
-  inline boost::none_t get_opt_qid(boost::none_t) {
-    return boost::none;
-  }
-  
-  template<class T>
-  struct find_functor {
-    find_functor() {}
-    boost::optional<T const &> result;
-    void operator() (T const &x) {
-      result = x;
-    }
-  };
-}
+  GOTT_EXPORT void remove_resource(string const &resource);
+  GOTT_EXPORT void add_plugin(plugin const &record, string const &resource);
+  GOTT_EXPORT void add_module(module const &record, string const &resource);
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
+};
 
 }}
 

@@ -35,8 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_VALIDATE_HPP
-#define GOTT_PLUGIN_VALIDATE_HPP
+#ifndef GOTT_METADATA_VALIDATE_HPP
+#define GOTT_METADATA_VALIDATE_HPP
 
 namespace gott { namespace metadata {
 

@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "load.hpp"
+#include "transaction.hpp"
 #include "plugin.hpp"
 #include "module.hpp"
 #include <gott/plugin/module.hpp>
@@ -55,19 +56,18 @@ void noop() {}
 void do_load_standard() {
   load_core();
 
-  disable_plugin();
+  transaction tr;
+  tr.remove_resource("core");
   {
-    std::ifstream in("plugin_registry.tdl");
-    extract_plugin(in);
+    std::ifstream in("./plugin_registry.tdl");
+    update_plugin_resource(in, "./plugin_registry.tdl", tr);
   }
-  enable_plugin();
 
-  disable_module();
   {
-    std::ifstream in("module_registry.tdl");
-    extract_module(in);
+    std::ifstream in("./module_registry.tdl");
+    update_module_resource(in, "./module_registry.tdl", tr);
   }
-  enable_module();
+  tr.commit();
 }
 
 void do_load_core() {
@@ -77,7 +77,7 @@ void do_load_core() {
     module builtins;
     builtins.module_id = "tdl::builtins";
     builtins.file_path = "tdl/libtdl_builtins.so";
-    add_module(builtins, true);
+    add_module(builtins, "core");
   }
   struct schema_type_adder {
     void operator()(gott::string const &s) {
@@ -86,7 +86,7 @@ void do_load_core() {
       schema_type.interfaces.push_back("tdl::schema::type");
       schema_type.enclosing_module_id = "tdl::builtins";
       schema_type.symbol = "plugin_schema_" + s;
-      add_plugin(schema_type, true);
+      add_plugin(schema_type, "core");
     }
   } add_schema_type;
   add_schema_type("any");

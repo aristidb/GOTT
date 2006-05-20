@@ -37,6 +37,7 @@
 
 #include "plugin.hpp"
 #include "module.hpp"
+#include "transaction.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>
@@ -82,7 +83,11 @@ namespace {
   };
 }
 
-void gott::metadata::extract_plugin(istream &stream) {
+void gott::metadata::update_plugin_resource(
+    istream &stream,
+    string const &resource,
+    transaction &tr) {
+  tr.remove_resource(resource);
   /*
   ordered
     named (plugin-id), node
@@ -107,8 +112,11 @@ void gott::metadata::extract_plugin(istream &stream) {
                     rule("tdl::schema::node"))))));
 
   struct multi_accepter : writable_structure {
-    multi_accepter() : level(0), inner(current) {}
+    multi_accepter(string const &resource, transaction &tr) 
+      : resource(resource), tr(tr), level(0), inner(current) {}
 
+    string const &resource;
+    transaction &tr;
     unsigned level;
     plugin current;
     plugin_accepter inner;
@@ -123,7 +131,7 @@ void gott::metadata::extract_plugin(istream &stream) {
     void end() {
       --level;
       if (level == 0) {
-        add_plugin(current);
+        tr.add_plugin(current, resource);
       } else
         inner.end();
     }
@@ -131,7 +139,7 @@ void gott::metadata::extract_plugin(istream &stream) {
     void data(Xany const &x) { inner.data(x); }
     void add_tag(string const &s) { inner.add_tag(s); }
   };
-  multi_accepter out;
+  multi_accepter out(resource, tr);
   revocable_adapter adapter(out);
   match(
       rule_one("tdl::schema::document", rule_attr(coat = false),
@@ -203,7 +211,11 @@ namespace {
   };
 }
 
-void gott::metadata::extract_module(istream &stream) {
+void gott::metadata::update_module_resource(
+    istream &stream,
+    string const &resource,
+    transaction &tr) {
+  tr.remove_resource(resource);
   /*
   ordered
     named (module-id), node
@@ -231,8 +243,11 @@ void gott::metadata::extract_module(istream &stream) {
                     rule("tdl::schema::node"))))));
 
   struct multi_accepter : writable_structure {
-    multi_accepter() : level(0), inner(current) {}
+    multi_accepter(string const &resource, transaction &tr)
+      : resource(resource), tr(tr), level(0), inner(current) {}
 
+    string const &resource;
+    transaction &tr;
     unsigned level;
     module current;
     module_accepter inner;
@@ -247,7 +262,7 @@ void gott::metadata::extract_module(istream &stream) {
     void end() {
       --level;
       if (level == 0) {
-        add_module(current);
+        tr.add_module(current, resource);
       } else
         inner.end();
     }
@@ -255,7 +270,7 @@ void gott::metadata::extract_module(istream &stream) {
     void data(Xany const &x) { inner.data(x); }
     void add_tag(string const &s) { inner.add_tag(s); }
   };
-  multi_accepter out;
+  multi_accepter out(resource, tr);
   revocable_adapter adapter(out);
   match(
       rule_one("tdl::schema::document", rule_attr(coat = false),

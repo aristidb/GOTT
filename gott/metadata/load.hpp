@@ -35,8 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_METADATA_HPP
-#define GOTT_PLUGIN_METADATA_HPP
+#ifndef GOTT_METADATA_LOAD_HPP
+#define GOTT_METADATA_LOAD_HPP
 
 #include <gott/visibility.hpp>
 

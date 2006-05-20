@@ -35,8 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_MODULE_METADATA_HPP
-#define GOTT_PLUGIN_MODULE_METADATA_HPP
+#ifndef GOTT_METADATA_MODULE_HPP
+#define GOTT_METADATA_MODULE_HPP
 
 #include "param_detail.hpp"
 #include <gott/string/qid.hpp>
@@ -169,16 +169,17 @@ find_module(
     bool tags::validate = true);
 #endif
 
-GOTT_EXPORT
-void add_module(module const &metadata, bool core = false);
+void add_module(module const &metadata, string const &resource);
 
-void clear_module();
+void remove_module_resource(string const &which);
 
-void disable_module();
-void enable_module();
+class transaction;
 
 GOTT_EXPORT
-void extract_module(std::istream &stream);
+void update_module_resource(
+    std::istream &stream,
+    gott::string const &resource,
+    transaction &tr);
 
 GOTT_EXPORT
 std::ostream &operator<<(std::ostream &stream, module const &in);

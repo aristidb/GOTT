@@ -43,6 +43,7 @@
 #include <boost/thread.hpp>
 #include <boost/weak_ptr.hpp>
 #include <vector>
+#include <map>
 
 using namespace gott::metadata;
 using namespace gott;
@@ -96,10 +97,10 @@ namespace {
   static boost::recursive_mutex metadata_biglock;
   #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
 
-  typedef std::vector<module> module_list_t;
+  typedef std::list<module> module_list_t;
   static module_list_t known_module;
-  static bool enabled = true;
-  static module_list_t core_module;
+  typedef std::multimap<string, module_list_t::iterator> res_map_t;
+  static res_map_t resources;
 }
 
 void gott::metadata::enumerate_modules_p(
@@ -113,10 +114,6 @@ void gott::metadata::enumerate_modules_p(
   BIGLOCK;
   module_list_t::iterator begin = known_module.begin();
   module_list_t::iterator end = known_module.end();
-  if (!enabled || begin == end) {
-    begin = core_module.begin();
-    end = core_module.end();
-  }
   for (module_list_t::iterator it = begin; it != end; ++it) {
     if (module_id && it->module_id != *module_id)
       continue;
@@ -130,25 +127,17 @@ void gott::metadata::enumerate_modules_p(
 
 void gott::metadata::add_module(
     module const &metadata,
-    bool core) {
+    string const &resource) {
   BIGLOCK;
-  if (core)
-    core_module.push_back(metadata);
-  else
-    known_module.push_back(metadata);
+  known_module.push_front(metadata);
+  resources.insert(std::make_pair(resource, known_module.begin()));
 }
 
-void gott::metadata::clear_module() {
+void gott::metadata::remove_module_resource(string const &resource) {
   BIGLOCK;
-  module_list_t().swap(known_module);
-}
-
-void gott::metadata::disable_module() {
-  BIGLOCK;
-  enabled = false;
-}
-
-void gott::metadata::enable_module() {
-  BIGLOCK;
-  enabled = true;
+  std::pair<res_map_t::iterator, res_map_t::iterator> rng
+    = resources.equal_range(resource);
+  for (res_map_t::iterator it = rng.first; it != rng.second; ++it)
+    known_module.erase(it->second);
+  resources.erase(rng.first, rng.second);
 }
