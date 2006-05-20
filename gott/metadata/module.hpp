@@ -82,24 +82,17 @@ struct module {
   typedef std::vector<QID> module_list_t;
   module_list_t dependencies;
 
-  module() GOTT_EXPORT;
-  ~module() GOTT_EXPORT;
-  module(module const &o) GOTT_EXPORT;
-  void operator=(module const &o) GOTT_EXPORT;
-
   /**
    * Check whether the metadata is valid. Thread-safe.
    */
-  bool is_valid() const GOTT_EXPORT;
+  bool is_valid() const;
 
   /**
    * Get a module instance for this metadata. Thread-safe.
    */
   boost::shared_ptr<gott::plugin::module> get_instance() const GOTT_EXPORT;
 
-private:
-  class impl;
-  boost::scoped_ptr<impl> p;
+  module() : module_type(dynamic_native) {}
 };
 
 GOTT_EXPORT
@@ -169,9 +162,10 @@ find_module(
     bool tags::validate = true);
 #endif
 
+namespace detail {
 void add_module(module const &metadata, string const &resource);
-
 void remove_module_resource(string const &which);
+}
 
 class transaction;
 

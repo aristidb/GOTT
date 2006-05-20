@@ -39,6 +39,7 @@
 #include "module.hpp"
 #include "load.hpp"
 #include "validate.hpp"
+#include "database.hpp"
 #include <gott/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <boost/thread.hpp>
@@ -46,29 +47,6 @@
 
 using namespace gott::metadata;
 using gott::QID;
-
-class plugin::impl {
-public:
-  boost::optional<bool> validation;
-  boost::mutex mutex;
-};
-
-plugin::plugin() : p(new impl) {}
-plugin::~plugin() {}
-plugin::plugin(plugin const &o)
-  : plugin_id(o.plugin_id),
-    interfaces(o.interfaces),
-    enclosing_module_id(o.enclosing_module_id),
-    symbol(o.symbol),
-    p(new impl) {}
-
-void plugin::operator=(plugin const &o) {
-  plugin_id = o.plugin_id;
-  interfaces = o.interfaces;
-  enclosing_module_id = o.enclosing_module_id;
-  symbol = o.symbol;
-  p.reset(new impl);
-}
 
 module const &plugin::enclosing_module(bool do_load_standard_metadata) const {
   boost::optional<module const &> res =
@@ -82,16 +60,10 @@ module const &plugin::enclosing_module(bool do_load_standard_metadata) const {
 }
 
 bool plugin::is_valid() const {
-  boost::mutex::scoped_lock lock(p->mutex);
-  if (!p->validation)
-    p->validation = detail::validate(*this);
-  return *p->validation;
+  return detail::validate(*this);
 }
 
 namespace {
-  static boost::recursive_mutex metadata_biglock;
-  #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
-
   typedef std::list<plugin> plugin_list_t;
   static plugin_list_t known_plugin;
   typedef std::multimap<gott::string, plugin_list_t::iterator> res_map_t;
@@ -107,10 +79,10 @@ void gott::metadata::enumerate_plugins_p(
     bool validate) {
   if (do_load_standard_metadata)
     load_standard();
-  BIGLOCK;
-  plugin_list_t::iterator begin = known_plugin.begin();
-  plugin_list_t::iterator end = known_plugin.end();
-  for (plugin_list_t::iterator it = begin; it != end; ++it) {
+  global_mutex::scoped_lock lock(get_global_lock());
+  plugin_list_t::const_iterator begin = known_plugin.begin();
+  plugin_list_t::const_iterator end = known_plugin.end();
+  for (plugin_list_t::const_iterator it = begin; it != end; ++it) {
     if (plugin_id && it->plugin_id != *plugin_id)
       continue;
     if (interface_id && 
@@ -124,16 +96,14 @@ void gott::metadata::enumerate_plugins_p(
   }
 }
 
-void gott::metadata::add_plugin(
+void gott::metadata::detail::add_plugin(
     plugin const &metadata,
     string const &resource) {
-  BIGLOCK;
   known_plugin.push_front(metadata);
   resources.insert(std::make_pair(resource, known_plugin.begin()));
 }
 
-void gott::metadata::remove_plugin_resource(string const &resource) {
-  BIGLOCK;
+void gott::metadata::detail::remove_plugin_resource(string const &resource) {
   std::pair<res_map_t::iterator, res_map_t::iterator> rng
     = resources.equal_range(resource);
   for (res_map_t::iterator it = rng.first; it != rng.second; ++it)

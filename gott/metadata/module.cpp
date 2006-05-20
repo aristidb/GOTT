@@ -36,8 +36,9 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "module.hpp"
-#include <gott/metadata/load.hpp>
+#include "load.hpp"
 #include "validate.hpp"
+#include "database.hpp"
 #include <gott/plugin/module.hpp>
 #include <gott/exceptions.hpp>
 #include <boost/thread.hpp>
@@ -48,55 +49,17 @@
 using namespace gott::metadata;
 using namespace gott;
 
-class module::impl {
-public:
-  boost::weak_ptr<gott::plugin::module> instance;
-  boost::optional<bool> validation;
-  boost::mutex mutex;
-};
-
-module::module() 
-  : module_type(dynamic_native),
-    p(new impl) {}
-
-module::module(module const &o) 
-  : module_id(o.module_id),
-    module_type(o.module_type),
-    file_path(o.file_path),
-    dependencies(o.dependencies),
-    p(new impl) {}
-
-void module::operator=(module const &o) {
-  module_id = o.module_id;
-  module_type = o.module_type;
-  file_path = o.file_path;
-  dependencies = o.dependencies;
-  p.reset(new impl);
-}
-
-module::~module() {}
-
 bool module::is_valid() const {
-  boost::mutex::scoped_lock lock(p->mutex);
-  if (!p->validation)
-    p->validation = detail::validate(*this);
-  return *p->validation;
+  return detail::validate(*this);
 }
 
 boost::shared_ptr<gott::plugin::module> module::get_instance() const {
-  boost::mutex::scoped_lock lock(p->mutex);
-  if (!p->instance.expired())
-    return p->instance.lock();
   boost::shared_ptr<gott::plugin::module> result(
       new gott::plugin::module(*this));
-  p->instance = result;
   return result;
 }
 
 namespace {
-  static boost::recursive_mutex metadata_biglock;
-  #define BIGLOCK boost::recursive_mutex::scoped_lock B_lock(metadata_biglock)
-
   typedef std::list<module> module_list_t;
   static module_list_t known_module;
   typedef std::multimap<string, module_list_t::iterator> res_map_t;
@@ -111,10 +74,10 @@ void gott::metadata::enumerate_modules_p(
     bool validate) {
   if (do_load_standard_metadata)
     load_standard();
-  BIGLOCK;
-  module_list_t::iterator begin = known_module.begin();
-  module_list_t::iterator end = known_module.end();
-  for (module_list_t::iterator it = begin; it != end; ++it) {
+  global_mutex::scoped_lock lock(get_global_lock());
+  module_list_t::const_iterator begin = known_module.begin();
+  module_list_t::const_iterator end = known_module.end();
+  for (module_list_t::const_iterator it = begin; it != end; ++it) {
     if (module_id && it->module_id != *module_id)
       continue;
     if (validate && !it->is_valid())
@@ -125,16 +88,14 @@ void gott::metadata::enumerate_modules_p(
   }
 }
 
-void gott::metadata::add_module(
+void gott::metadata::detail::add_module(
     module const &metadata,
     string const &resource) {
-  BIGLOCK;
   known_module.push_front(metadata);
   resources.insert(std::make_pair(resource, known_module.begin()));
 }
 
-void gott::metadata::remove_module_resource(string const &resource) {
-  BIGLOCK;
+void gott::metadata::detail::remove_module_resource(string const &resource) {
   std::pair<res_map_t::iterator, res_map_t::iterator> rng
     = resources.equal_range(resource);
   for (res_map_t::iterator it = rng.first; it != rng.second; ++it)

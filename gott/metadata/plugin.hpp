@@ -84,15 +84,6 @@ struct plugin {
   string symbol;
 
   bool is_valid() const;
-
-  plugin() GOTT_EXPORT;
-  ~plugin() GOTT_EXPORT;
-  plugin(plugin const &) GOTT_EXPORT;
-  void operator=(plugin const &) GOTT_EXPORT;
-
-private:
-  class impl;
-  boost::scoped_ptr<impl> p;
 };
 
 struct interface_metadata {
@@ -200,14 +191,10 @@ find_plugin(
     );
 #endif
 
-/**
- * Add a plugin or rather its' metadata to the relevant (in-memory) database.
- * This function does not record the plugin persistently. Thread-safe.
- * \param metadata The new metadata.
- */
+namespace detail {
 void add_plugin(plugin const &metadata, string const &resource);
-
 void remove_plugin_resource(string const &resource);
+}
 
 class transaction;
 

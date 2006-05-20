@@ -73,31 +73,33 @@ void do_load_standard() {
 void do_load_core() {
   // Load metadata for TDL, necessary for reading in the metadata.
   // Yes, this is what they call "boot-strapping".
+  transaction tr;
   {
     module builtins;
     builtins.module_id = "tdl::builtins";
     builtins.file_path = "tdl/libtdl_builtins.so";
-    add_module(builtins, "core");
+    tr.add_module(builtins, "core");
   }
   struct schema_type_adder {
-    void operator()(gott::string const &s) {
+    void operator()(gott::string const &s, transaction &tr) {
       plugin schema_type;
       schema_type.plugin_id = "tdl::schema::" + s;
       schema_type.interfaces.push_back("tdl::schema::type");
       schema_type.enclosing_module_id = "tdl::builtins";
       schema_type.symbol = "plugin_schema_" + s;
-      add_plugin(schema_type, "core");
+      tr.add_plugin(schema_type, "core");
     }
   } add_schema_type;
-  add_schema_type("any");
-  add_schema_type("document");
-  add_schema_type("follow");
-  add_schema_type("list");
-  add_schema_type("named");
-  add_schema_type("ordered");
-  add_schema_type("unordered");
-  add_schema_type("tree");
-  add_schema_type("node");
+  add_schema_type("any", tr);
+  add_schema_type("document", tr);
+  add_schema_type("follow", tr);
+  add_schema_type("list", tr);
+  add_schema_type("named", tr);
+  add_schema_type("ordered", tr);
+  add_schema_type("unordered", tr);
+  add_schema_type("tree", tr);
+  add_schema_type("node", tr);
+  tr.commit();
 }
 }
 
