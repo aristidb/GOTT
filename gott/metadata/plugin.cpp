@@ -45,11 +45,13 @@
 #include <boost/thread.hpp>
 #include <map>
 
+#include<iostream>//FIXME
+
 using namespace gott::metadata;
 using gott::QID;
 
-module const &plugin::enclosing_module(bool do_load_standard_metadata) const {
-  boost::optional<module const &> res =
+module plugin::enclosing_module(bool do_load_standard_metadata) const {
+  boost::optional<module> res =
     find_module(
         enclosing_module_id,
         tags::validate = false,
@@ -97,8 +99,17 @@ void gott::metadata::enumerate_plugins_p(
 }
 
 void gott::metadata::detail::add_plugin(
-    plugin const &metadata,
+    QID const &plugin_id,
+    QID const &supported_interface,
+    QID const &enclosing_module,
+    string const &symbol,
     string const &resource) {
+  plugin metadata;
+  metadata.plugin_id = plugin_id;
+  metadata.interfaces.push_back(supported_interface);
+  metadata.enclosing_module_id = enclosing_module;
+  metadata.symbol = symbol;
+
   known_plugin.push_front(metadata);
   resources.insert(std::make_pair(resource, known_plugin.begin()));
 }

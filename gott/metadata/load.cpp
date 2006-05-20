@@ -74,20 +74,20 @@ void do_load_core() {
   // Load metadata for TDL, necessary for reading in the metadata.
   // Yes, this is what they call "boot-strapping".
   transaction tr;
-  {
-    module builtins;
-    builtins.module_id = "tdl::builtins";
-    builtins.file_path = "tdl/libtdl_builtins.so";
-    tr.add_module(builtins, "core");
-  }
+  tr.add_module(
+        "tdl::builtins",
+        module::dynamic_native,
+        "tdl/libtdl_builtins.so",
+        std::vector<gott::QID>(),
+        "core");
   struct schema_type_adder {
     void operator()(gott::string const &s, transaction &tr) {
-      plugin schema_type;
-      schema_type.plugin_id = "tdl::schema::" + s;
-      schema_type.interfaces.push_back("tdl::schema::type");
-      schema_type.enclosing_module_id = "tdl::builtins";
-      schema_type.symbol = "plugin_schema_" + s;
-      tr.add_plugin(schema_type, "core");
+      tr.add_plugin(
+          "tdl::schema::" + s,
+          "tdl::schema::type",
+          "tdl::builtins",
+          "plugin_schema_" + s,
+          "core");
     }
   } add_schema_type;
   add_schema_type("any", tr);

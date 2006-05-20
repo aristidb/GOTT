@@ -49,6 +49,43 @@
 using namespace gott::metadata;
 using namespace gott;
 
+namespace {
+  typedef std::list<
+    boost::tuple<
+      QID,
+      module::module_type_t,
+      string,
+      std::vector<QID>
+    > > module_list_t;
+  static module_list_t known_module;
+  typedef std::multimap<string, module_list_t::iterator> res_map_t;
+  static res_map_t resources;
+}
+
+QID const &module::module_id() const {
+  return static_cast<module_list_t::value_type const *>(handle)->get<0>();
+}
+
+module::module_type_t module::module_type() const {
+  return static_cast<module_list_t::value_type const *>(handle)->get<1>();
+}
+
+string const &module::file_path() const {
+  return static_cast<module_list_t::value_type const *>(handle)->get<2>();
+}
+
+void module::enumerate_dependencies(
+    boost::function<void (module const &)> const &fun) const {
+  std::vector<QID> const &v = 
+    static_cast<module_list_t::value_type const *>(handle)->get<3>();
+  for (std::vector<QID>::const_iterator it = v.begin(); it != v.end(); ++it) {
+    boost::optional<module> mod = find_module(*it);
+    if (!mod)
+      throw gott::system_error("module dependency not found");
+    fun(*mod);
+  }
+}
+
 bool module::is_valid() const {
   return detail::validate(*this);
 }
@@ -57,13 +94,6 @@ boost::shared_ptr<gott::plugin::module> module::get_instance() const {
   boost::shared_ptr<gott::plugin::module> result(
       new gott::plugin::module(*this));
   return result;
-}
-
-namespace {
-  typedef std::list<module> module_list_t;
-  static module_list_t known_module;
-  typedef std::multimap<string, module_list_t::iterator> res_map_t;
-  static res_map_t resources;
 }
 
 void gott::metadata::enumerate_modules_p(
@@ -78,20 +108,25 @@ void gott::metadata::enumerate_modules_p(
   module_list_t::const_iterator begin = known_module.begin();
   module_list_t::const_iterator end = known_module.end();
   for (module_list_t::const_iterator it = begin; it != end; ++it) {
-    if (module_id && it->module_id != *module_id)
+    module current(&*it);
+    if (module_id && current.module_id() != *module_id)
       continue;
-    if (validate && !it->is_valid())
+    if (validate && !current.is_valid())
       continue;
-    callback(*it);
+    callback(current);
     if (cancel_early)
       return;
   }
 }
 
 void gott::metadata::detail::add_module(
-    module const &metadata,
+    QID const &module_id,
+    module::module_type_t module_type,
+    string const &file_path,
+    std::vector<QID> const &dependencies,
     string const &resource) {
-  known_module.push_front(metadata);
+  known_module.push_back(module_list_t::value_type(
+        module_id, module_type, file_path, dependencies));
   resources.insert(std::make_pair(resource, known_module.begin()));
 }
 

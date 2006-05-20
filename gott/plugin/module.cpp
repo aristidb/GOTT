@@ -47,35 +47,34 @@
 #include <gott/syswrap/dl_unix.hpp>
 #include <gott/syswrap/function_cast.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/lambda/bind.hpp>
 
 using gott::plugin::module;
 using gott::plugin::plugin_base;
 
 class module::impl {
 private:
-  std::vector<boost::shared_ptr<module> > dependencies;
+  typedef std::vector<boost::shared_ptr<module> > dep_list_t;
+  dep_list_t dependencies;
   void *handle;
   
 public:
   impl(metadata::module const &which)
   : handle(0) {
-    metadata::module::module_list_t::const_iterator it 
-      = which.dependencies.begin();
-    for (; it != which.dependencies.end(); ++it) {
-      boost::optional<metadata::module const &> dep 
-        = metadata::find_module(metadata::tags::module_id = *it);
-      if (!dep)
-        throw system_error("could not find dependency " + it->get_string());
-      dependencies.push_back(dep.get().get_instance());
+    {
+      using namespace boost::lambda;
+      which.enumerate_dependencies(
+          bind(&dep_list_t::push_back, &dependencies,
+            bind(&metadata::module::get_instance, _1)));
     }
     handle = get_handle(which);
   }
 
   static void *get_handle(metadata::module const &which) {
-    switch (which.module_type) {
+    switch (which.module_type()) {
     case metadata::module::dynamic_native:
       return dlopen_unix(
-          boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
+          boost::scoped_array<char>(which.file_path().c_string_alloc()).get(),
           RTLD_LAZY | RTLD_GLOBAL);
     default:
       throw 0;

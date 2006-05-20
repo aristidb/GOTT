@@ -43,6 +43,7 @@
 #include <gott/string/string.hpp>
 #include <boost/function.hpp>
 #include <boost/optional/optional.hpp>
+#include <boost/tuple/tuple.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -58,11 +59,15 @@ namespace metadata {
 /**
  *
  */
-struct module {
+class module {
+public:
+  explicit module(void const *handle) : handle(handle) {}
+  module(module const &o) : handle(o.handle) {}
+  
   /**
    * The module's unique identifier.
    */
-  QID module_id;
+  GOTT_EXPORT QID const &module_id() const;
 
   /**
    * The types a module might have.
@@ -72,27 +77,28 @@ struct module {
   /**
    * The type of the module.
    */
-  module_type_t module_type;
+  GOTT_EXPORT module_type_t module_type() const;
 
   /**
    * The file where the plugin resides.
    */
-  string file_path;
+  GOTT_EXPORT string const &file_path() const;
 
-  typedef std::vector<QID> module_list_t;
-  module_list_t dependencies;
+  GOTT_EXPORT void enumerate_dependencies(
+      boost::function<void (module const &)> const &) const;
 
   /**
    * Check whether the metadata is valid. Thread-safe.
    */
-  bool is_valid() const;
+  GOTT_EXPORT bool is_valid() const;
 
   /**
    * Get a module instance for this metadata. Thread-safe.
    */
-  boost::shared_ptr<gott::plugin::module> get_instance() const GOTT_EXPORT;
+  GOTT_EXPORT boost::shared_ptr<gott::plugin::module> get_instance() const;
 
-  module() : module_type(dynamic_native) {}
+private:
+  void const *handle;
 };
 
 GOTT_EXPORT
@@ -132,11 +138,11 @@ typedef boost::parameter::parameters<
   > fmm_params;
 
 BOOST_PARAMETER_FUN(
-    inline boost::optional<module const &>, find_module,
+    inline boost::optional<module>, find_module,
     0, 3, fmm_params);
 
 template<class ArgPack>
-boost::optional<module const &>
+boost::optional<module>
 find_module_with_named_params(ArgPack const &args) {
   detail::find_functor<module> cb;
   enumerate_modules_p(
@@ -155,7 +161,7 @@ void enumerate_modules(
     bool tags::load_standard_metadata = true,
     bool tags::validate = true);
 
-boost::optional<module const &>
+boost::optional<module>
 find_module(
     QID const &tags::module_id,
     bool tags::load_standard_metadata = true,
@@ -163,7 +169,12 @@ find_module(
 #endif
 
 namespace detail {
-void add_module(module const &metadata, string const &resource);
+void add_module(
+    QID const &module_id,
+    module::module_type_t module_type,
+    string const &file_path,
+    std::vector<QID> const &dependencies,
+    string const &resource);
 void remove_module_resource(string const &which);
 }
 

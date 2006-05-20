@@ -60,9 +60,9 @@ bool main_loop_factory::try_add_feature(QID const &) {
   return true; // FIXME
 }
 
-gott::metadata::plugin const &main_loop_factory::get() const {
+gott::metadata::plugin main_loop_factory::get() const {
   using namespace gott::metadata;
-  boost::optional<metadata::plugin const &> result =
+  boost::optional<metadata::plugin> result =
     find_plugin(tags::interface = "gott::events::main_loop");
   if (!result)
     throw system_error("could not find appropriate main loop");

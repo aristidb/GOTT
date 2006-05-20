@@ -41,7 +41,7 @@
 namespace gott { namespace metadata {
 
 struct plugin;
-struct module;
+class module;
 
 namespace detail {
 

@@ -52,7 +52,7 @@
 
 namespace gott { namespace metadata {
 
-struct module;
+class module;
 
 /**
  * A plugin's metadata.
@@ -75,8 +75,7 @@ struct plugin {
    */
   QID enclosing_module_id;
 
-  module const &enclosing_module(
-      bool load_standard_metadata = true) const GOTT_EXPORT;
+  module enclosing_module(bool load_standard_metadata = true) const GOTT_EXPORT;
 
   /**
    * The entry smbol of the plugin.
@@ -139,11 +138,11 @@ typedef boost::parameter::parameters<
   tags::detail::validate
 > fpm_params;
 
-BOOST_PARAMETER_FUN(inline boost::optional<plugin const &>,
+BOOST_PARAMETER_FUN(inline boost::optional<plugin>,
     find_plugin, 0, 4, fpm_params);
 
 template<class ArgPack>
-boost::optional<plugin const &>
+boost::optional<plugin>
 find_plugin_with_named_params(ArgPack const &args) {
   detail::find_functor<plugin> cb;
   enumerate_plugins_p(boost::ref(cb),
@@ -182,7 +181,7 @@ void enumerate_plugins(
  * \param tags::interface Requires the record to indicate support for the given
  *                        interface (optional).
  */
-boost::optional<plugin const &>
+boost::optional<plugin>
 find_plugin(
     QID const &tags::plugin_id,
     QID const &tags::interface,
@@ -192,7 +191,12 @@ find_plugin(
 #endif
 
 namespace detail {
-void add_plugin(plugin const &metadata, string const &resource);
+void add_plugin(
+    QID const &plugin_id,
+    QID const &supported_interface,
+    QID const &enclosing_module,
+    string const &symbol,
+    string const &resource);
 void remove_plugin_resource(string const &resource);
 }
 

@@ -40,7 +40,7 @@
 #include "module.hpp"
 #include "database.hpp"
 #include <vector>
-#include <utility>
+#include <boost/tuple/tuple.hpp>
 
 using gott::metadata::transaction;
 
@@ -48,9 +48,21 @@ class transaction::impl {
 public:
   typedef std::vector<string> res_lst;
   res_lst remove_resources;
-  typedef std::vector<std::pair<plugin, string> > plg_lst;
+  typedef
+    std::vector<
+      boost::tuple<QID, QID, QID, string, string> >
+    plg_lst;
   plg_lst insert_plugins;
-  typedef std::vector<std::pair<module, string> > mod_lst;
+  typedef
+    std::vector<
+      boost::tuple<
+        QID,
+        module::module_type_t,
+        string,
+        std::vector<QID>,
+        string
+        > >
+    mod_lst;
   mod_lst insert_modules;
 };
 
@@ -68,21 +80,43 @@ void transaction::commit() {
   for (impl::plg_lst::iterator it = p->insert_plugins.begin();
       it != p->insert_plugins.end();
       ++it)
-    detail::add_plugin(it->first, it->second);
+    detail::add_plugin(
+        it->get<0>(),
+        it->get<1>(),
+        it->get<2>(),
+        it->get<3>(),
+        it->get<4>());
   for (impl::mod_lst::iterator it = p->insert_modules.begin();
       it != p->insert_modules.end();
       ++it)
-    detail::add_module(it->first, it->second);
-}
-
-void transaction::add_plugin(plugin const &x, string const &r) {
-  p->insert_plugins.push_back(std::make_pair(x, r));
-}
-
-void transaction::add_module(module const &x, string const &r) {
-  p->insert_modules.push_back(std::make_pair(x, r));
+    detail::add_module(
+        it->get<0>(),
+        it->get<1>(),
+        it->get<2>(),
+        it->get<3>(),
+        it->get<4>());
 }
 
 void transaction::remove_resource(string const &r) {
   p->remove_resources.push_back(r);
+}
+
+void transaction::add_plugin(
+    QID const &plugin_id,
+    QID const &supported_interface,
+    QID const &enclosing_module,
+    string const &symbol,
+    string const &resource) {
+  p->insert_plugins.push_back(impl::plg_lst::value_type(
+        plugin_id, supported_interface, enclosing_module, symbol, resource));
+}
+
+void transaction::add_module(
+    QID const &module_id,
+    module::module_type_t module_type,
+    string const &file_path,
+    std::vector<QID> const &dependencies,
+    string const &resource) {
+  p->insert_modules.push_back(impl::mod_lst::value_type(
+        module_id, module_type, file_path, dependencies, resource));
 }

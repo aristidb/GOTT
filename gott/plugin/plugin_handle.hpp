@@ -40,6 +40,7 @@
 
 #include "plugin_base.hpp"
 #include "module.hpp"
+#include <gott/metadata/plugin.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -52,7 +53,7 @@ class plugin_handle_base {
 public:
   plugin_handle_base(metadata::plugin const &which) GOTT_EXPORT;
   GOTT_EXPORT
-  plugin_handle_base(boost::optional<metadata::plugin const &> const &which);
+  plugin_handle_base(boost::optional<metadata::plugin> const &which);
   ~plugin_handle_base() GOTT_EXPORT;
 
   plugin_base *get_base() const GOTT_EXPORT;
@@ -74,7 +75,7 @@ public:
     if (!p)
       fail_interface(which);
   }
-  plugin_handle(boost::optional<metadata::plugin const &> const &which)
+  plugin_handle(boost::optional<metadata::plugin> const &which)
   : plugin_handle_base(which),
     p(cast(get_base())) {
     if (!p)

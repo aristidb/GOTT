@@ -53,7 +53,7 @@ bool gott::metadata::detail::validate(plugin const &which) {
 }
 
 bool gott::metadata::detail::validate(module const &which) {
-  if (!boost::filesystem::exists(to_string(which.file_path)))
+  if (!boost::filesystem::exists(to_string(which.file_path())))
     return false;
   return true;
 }

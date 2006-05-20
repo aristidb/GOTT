@@ -46,6 +46,7 @@
 #include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/tdl/structure/repatchers/enumeration.hpp>
 #include <gott/tdl/write/writer.hpp>
+#include <gott/string/qid.hpp>
 #include <boost/assign/list_of.hpp>
 
 using namespace gott::metadata;
@@ -53,14 +54,16 @@ using namespace gott::xany;
 using namespace tdl::schema;
 using namespace tdl::structure;
 using gott::string;
+using gott::QID;
 using std::istream;
 using std::ostream;
 
 namespace {
   struct plugin_accepter : writable_structure {
-    plugin_accepter(plugin &ref) : ref(ref) {}
-
-    plugin &ref;
+    QID plugin_id;
+    QID interface;
+    QID enclosing_module_id;
+    string symbol;
 
     string tag;
     Xany data_;
@@ -68,13 +71,13 @@ namespace {
     void begin(tdl::source_position const &) {}
     void end() {
       if (tag == "has-interface")
-        ref.interfaces.push_back(Xany_cast<string>(data_));
+        interface = Xany_cast<string>(data_);
       else if (tag == "plugin-id")
-        ref.plugin_id = Xany_cast<string>(data_);
+        plugin_id = Xany_cast<string>(data_);
       else if (tag == "enclosing-module")
-        ref.enclosing_module_id = Xany_cast<string>(data_);
+        enclosing_module_id = Xany_cast<string>(data_);
       else if (tag == "symbol")
-        ref.symbol = Xany_cast<string>(data_);
+        symbol = Xany_cast<string>(data_);
       tag = string();
     }
 
@@ -104,7 +107,7 @@ void gott::metadata::update_plugin_resource(
         (rule("tdl::schema::unordered", rule_attr(coat = false),
           boost::assign::list_of
           (rule_one("tdl::schema::named",
-                    rule_attr(tag = "has-interface", outer = list()),
+                    rule_attr(tag = "has-interface"),
                     rule("tdl::schema::node")))
           (rule_one("tdl::schema::named", rule_attr(tag = "enclosing-module"),
                     rule("tdl::schema::node")))
@@ -113,26 +116,30 @@ void gott::metadata::update_plugin_resource(
 
   struct multi_accepter : writable_structure {
     multi_accepter(string const &resource, transaction &tr) 
-      : resource(resource), tr(tr), level(0), inner(current) {}
+      : resource(resource), tr(tr), level(0), inner() {}
 
     string const &resource;
     transaction &tr;
     unsigned level;
-    plugin current;
     plugin_accepter inner;
 
     void begin(tdl::source_position const &w) {
-      if (level == 0) {
-        current = plugin();
-      } else
+      if (level == 0)
+        inner = plugin_accepter();
+      else
         inner.begin(w);
       ++level;
     }
     void end() {
       --level;
-      if (level == 0) {
-        tr.add_plugin(current, resource);
-      } else
+      if (level == 0)
+        tr.add_plugin(
+            inner.plugin_id,
+            inner.interface,
+            inner.enclosing_module_id,
+            inner.symbol,
+            resource);
+      else
         inner.end();
     }
 
@@ -185,10 +192,12 @@ ostream &gott::metadata::operator<<(ostream &stream, plugin const &val) {
 }
 
 namespace {
-  struct module_accepter : writable_structure {
-    module_accepter(module &ref) : ref(ref) {}
-
-    module &ref;
+  class module_accepter : writable_structure {
+  public:
+    QID module_id;
+    string file_path;
+    module::module_type_t module_type;
+    std::vector<QID> dependencies;
 
     string tag;
     Xany data_;
@@ -196,13 +205,13 @@ namespace {
     void begin(tdl::source_position const &) {}
     void end() {
       if (tag == "module-id")
-        ref.module_id = Xany_cast<string>(data_);
+        module_id = Xany_cast<string>(data_);
       else if (tag == "file-path")
-        ref.file_path = Xany_cast<string>(data_);
+        file_path = Xany_cast<string>(data_);
       else if (tag == "module-type")
-        ref.module_type = Xany_cast<module::module_type_t>(data_);
+        module_type = Xany_cast<module::module_type_t>(data_);
       else if (tag == "depend-on")
-        ref.dependencies.push_back(Xany_cast<string>(data_));
+        dependencies.push_back(Xany_cast<string>(data_));
       tag = string();
     }
 
@@ -244,26 +253,30 @@ void gott::metadata::update_module_resource(
 
   struct multi_accepter : writable_structure {
     multi_accepter(string const &resource, transaction &tr)
-      : resource(resource), tr(tr), level(0), inner(current) {}
+      : resource(resource), tr(tr), level(0) {}
 
     string const &resource;
     transaction &tr;
     unsigned level;
-    module current;
     module_accepter inner;
 
     void begin(tdl::source_position const &w) {
-      if (level == 0) {
-        current = module();
-      } else
+      if (level == 0)
+        inner = module_accepter();
+      else
         inner.begin(w);
       ++level;
     }
     void end() {
       --level;
-      if (level == 0) {
-        tr.add_module(current, resource);
-      } else
+      if (level == 0)
+        tr.add_module(
+            inner.module_id,
+            inner.module_type,
+            inner.file_path,
+            inner.dependencies,
+            resource);
+      else
         inner.end();
     }
 
@@ -279,31 +292,45 @@ void gott::metadata::update_module_resource(
       adapter).parse(stream);
 }
 
+namespace {
+  struct dep_t {
+    tdl::tdl_writer &w;
+    void operator() (module const &x) const {
+      w.node("depend-on");
+      w.down();
+        w.node(x.module_id().get_string());
+      w.up();
+    }
+  };
+}
+
 ostream &gott::metadata::operator<<(ostream &stream, module const &val) {
   tdl::tdl_writer w(stream, 2);
   w.down();
   {
     w.node("module-id"); 
     w.down();
-      w.node(val.module_id.get_string());
+      w.node(val.module_id().get_string());
     w.up();
   }
   {
     w.node("file-path");
     w.down();
-      w.node(val.file_path);
+      w.node(val.file_path());
     w.up();
   }
   {
     w.node("module-type");
     w.down();
-      switch (val.module_type) {
+      switch (val.module_type()) {
       case module::dynamic_native:
         w.node("dynamic-native");
         break;
       }
     w.up();
   }
+  dep_t dep = { w };
+  val.enumerate_dependencies(dep);
   w.up();
   return stream;
 }

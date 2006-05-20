@@ -56,7 +56,7 @@ public:
   GOTT_EXPORT main_loop_factory();
   GOTT_EXPORT ~main_loop_factory();
   GOTT_EXPORT bool try_add(loop_requirement const &);
-  GOTT_EXPORT metadata::plugin const &get() const;
+  GOTT_EXPORT metadata::plugin get() const;
 
 public: // internal
   bool try_add_feature(QID const &);

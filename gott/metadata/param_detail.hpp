@@ -72,7 +72,7 @@ namespace detail {
   template<class T>
   struct find_functor {
     find_functor() {}
-    boost::optional<T const &> result;
+    boost::optional<T> result;
     void operator() (T const &x) {
       result = x;
     }

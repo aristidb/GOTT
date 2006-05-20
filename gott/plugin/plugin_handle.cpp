@@ -60,7 +60,7 @@ plugin_handle_base::plugin_handle_base(metadata::plugin const &which)
 
 namespace {
   gott::metadata::plugin const &unwrap(
-      boost::optional<gott::metadata::plugin const &> const &which) {
+      boost::optional<gott::metadata::plugin> const &which) {
     if (!which)
       throw gott::system_error("plugin not found");
     return which.get();
@@ -68,7 +68,7 @@ namespace {
 }
 
 plugin_handle_base::plugin_handle_base(
-    boost::optional<metadata::plugin const &> const &which)
+    boost::optional<metadata::plugin> const &which)
 : p(new impl(unwrap(which))) {}
 
 plugin_handle_base::~plugin_handle_base() {}
