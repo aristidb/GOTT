@@ -45,7 +45,7 @@
 namespace gott { 
 
 class QID;
-namespace metadata { struct plugin; }
+namespace metadata { class plugin; }
 
 namespace events {
 class loop_requirement;

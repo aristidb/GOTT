@@ -42,7 +42,7 @@ int main() {
         tags::validate = false, tags::load_standard_metadata = false))
     cout << "Plugin fox does NOT support interface bar!\n";
 
-  boost::optional<plugin const &> x =
+  boost::optional<plugin> x =
     find_plugin(
         tags::interface = "boo",
         tags::validate = false, tags::load_standard_metadata = false);

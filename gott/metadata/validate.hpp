@@ -40,7 +40,7 @@
 
 namespace gott { namespace metadata {
 
-struct plugin;
+class plugin;
 class module;
 
 namespace detail {

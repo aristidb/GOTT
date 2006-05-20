@@ -59,7 +59,7 @@ plugin_handle_base::plugin_handle_base(metadata::plugin const &which)
 : p(new impl(which)) {}
 
 namespace {
-  gott::metadata::plugin const &unwrap(
+  gott::metadata::plugin unwrap(
       boost::optional<gott::metadata::plugin> const &which) {
     if (!which)
       throw gott::system_error("plugin not found");
@@ -79,7 +79,7 @@ plugin_base *plugin_handle_base::get_base() const {
 
 void plugin_handle_base::fail_interface(metadata::plugin const &which) {
   throw gott::system_error(
-      which.plugin_id.get_string()
+      which.plugin_id().get_string()
       + " : plugin does not support requested interface");
 }
 

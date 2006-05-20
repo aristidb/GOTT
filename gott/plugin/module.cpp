@@ -110,6 +110,6 @@ plugin_base *module::load_plugin(metadata::plugin const &which) {
 plugin_base *module::load_plugin(
     metadata::plugin const &which,
     plugin_configuration const &conf) {
-  plugin_builder *fun = function_cast<plugin_builder>(entity(which.symbol));
+  plugin_builder *fun = function_cast<plugin_builder>(entity(which.symbol()));
   return fun(conf);
 }

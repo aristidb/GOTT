@@ -161,31 +161,26 @@ ostream &gott::metadata::operator<<(ostream &stream, plugin const &val) {
   {
     w.node("plugin-id"); 
     w.down();
-      w.node(val.plugin_id.get_string());
+      w.node(val.plugin_id().get_string());
     w.up();
   }
   {
     w.node("enclosing-module");
     w.down();
-      w.node(val.enclosing_module_id.get_string());
+      w.node(val.enclosing_module_id().get_string());
     w.up();
   }
   {
     w.node("symbol");
     w.down();
-      w.node(val.symbol);
+      w.node(val.symbol());
     w.up();
   }
   {
-    for (plugin::interface_list_t::const_iterator it =
-          val.interfaces.begin();
-        it != val.interfaces.end();
-        ++it) {
-      w.node("has-interface");
-      w.down();
-        w.node(it->get_string());
-      w.up();
-    }
+    w.node("has-interface");
+    w.down();
+      w.node(val.supported_interface_id().get_string());
+    w.up();
   }
   w.up();
   return stream;

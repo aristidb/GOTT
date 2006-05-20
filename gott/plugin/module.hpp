@@ -46,7 +46,7 @@ namespace gott {
   class string;
 
 namespace metadata {
-  struct plugin;
+  class plugin;
   class module;
 }
 

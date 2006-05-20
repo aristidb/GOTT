@@ -57,32 +57,42 @@ class module;
 /**
  * A plugin's metadata.
  */
-struct plugin {
+class plugin {
+public:
+  explicit plugin(void const *handle) : handle(handle) {}
+
   /**
    * The plugin's unique identifier.
    */
-  QID plugin_id;
-
-  typedef std::vector<QID> interface_list_t;
+  GOTT_EXPORT
+  QID const &plugin_id() const;
 
   /**
-   * The list of interfaces that the plugin supports.
+   * The interface that the plugin supports.
    */
-  interface_list_t interfaces;
+  GOTT_EXPORT
+  QID const &supported_interface_id() const;
+
+  GOTT_EXPORT
+  QID const &enclosing_module_id() const;
 
   /**
    * The module the plugin resides in.
    */
-  QID enclosing_module_id;
-
-  module enclosing_module(bool load_standard_metadata = true) const GOTT_EXPORT;
+  GOTT_EXPORT
+  module enclosing_module(bool load_standard_metadata = true) const;
 
   /**
    * The entry smbol of the plugin.
    */
-  string symbol;
+  GOTT_EXPORT
+  string const &symbol() const;
 
+public: //internal
   bool is_valid() const;
+
+private:
+  void const *handle;
 };
 
 struct interface_metadata {

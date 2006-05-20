@@ -44,16 +44,41 @@
 #include <gott/range_algo.hpp>
 #include <boost/thread.hpp>
 #include <map>
+#include <boost/tuple/tuple.hpp>
 
 #include<iostream>//FIXME
 
 using namespace gott::metadata;
 using gott::QID;
+using gott::string;
+
+namespace {
+  typedef std::list<boost::tuple<QID, QID, QID, string> > plugin_list_t;
+  static plugin_list_t known_plugin;
+  typedef std::multimap<gott::string, plugin_list_t::iterator> res_map_t;
+  static res_map_t resources;
+}
+
+QID const &plugin::plugin_id() const {
+  return static_cast<plugin_list_t::value_type const *>(handle)->get<0>();
+}
+
+QID const &plugin::supported_interface_id() const {
+  return static_cast<plugin_list_t::value_type const *>(handle)->get<1>();
+}
+
+QID const &plugin::enclosing_module_id() const {
+  return static_cast<plugin_list_t::value_type const *>(handle)->get<2>();
+}
+
+string const &plugin::symbol() const {
+  return static_cast<plugin_list_t::value_type const *>(handle)->get<3>();
+}
 
 module plugin::enclosing_module(bool do_load_standard_metadata) const {
   boost::optional<module> res =
     find_module(
-        enclosing_module_id,
+        enclosing_module_id(),
         tags::validate = false,
         tags::load_standard_metadata = do_load_standard_metadata);
   if (!res)
@@ -63,13 +88,6 @@ module plugin::enclosing_module(bool do_load_standard_metadata) const {
 
 bool plugin::is_valid() const {
   return detail::validate(*this);
-}
-
-namespace {
-  typedef std::list<plugin> plugin_list_t;
-  static plugin_list_t known_plugin;
-  typedef std::multimap<gott::string, plugin_list_t::iterator> res_map_t;
-  static res_map_t resources;
 }
 
 void gott::metadata::enumerate_plugins_p(
@@ -85,14 +103,14 @@ void gott::metadata::enumerate_plugins_p(
   plugin_list_t::const_iterator begin = known_plugin.begin();
   plugin_list_t::const_iterator end = known_plugin.end();
   for (plugin_list_t::const_iterator it = begin; it != end; ++it) {
-    if (plugin_id && it->plugin_id != *plugin_id)
+    plugin current(&*it);
+    if (plugin_id && current.plugin_id() != *plugin_id)
       continue;
-    if (interface_id && 
-        find(range(it->interfaces), *interface_id) == it->interfaces.end())
+    if (interface_id && current.supported_interface_id() != *interface_id)
       continue;
-    if (validate && !it->is_valid())
+    if (validate && !current.is_valid())
       continue;
-    function(*it);
+    function(current);
     if (cancel_early)
       break;
   }
@@ -104,13 +122,8 @@ void gott::metadata::detail::add_plugin(
     QID const &enclosing_module,
     string const &symbol,
     string const &resource) {
-  plugin metadata;
-  metadata.plugin_id = plugin_id;
-  metadata.interfaces.push_back(supported_interface);
-  metadata.enclosing_module_id = enclosing_module;
-  metadata.symbol = symbol;
-
-  known_plugin.push_front(metadata);
+  known_plugin.push_front(plugin_list_t::value_type(
+        plugin_id, supported_interface, enclosing_module, symbol));
   resources.insert(std::make_pair(resource, known_plugin.begin()));
 }
 

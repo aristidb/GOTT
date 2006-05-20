@@ -44,7 +44,7 @@
 namespace gott {
 class QID;
 namespace xany { class Xany; }
-namespace metadata { struct plugin; }
+namespace metadata { class plugin; }
 
 namespace plugin {
 class hook;

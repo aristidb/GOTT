@@ -62,7 +62,6 @@ namespace metadata {
 class module {
 public:
   explicit module(void const *handle) : handle(handle) {}
-  module(module const &o) : handle(o.handle) {}
   
   /**
    * The module's unique identifier.
