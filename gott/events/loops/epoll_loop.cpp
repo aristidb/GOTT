@@ -214,8 +214,6 @@ void epoll_loop::run() {
             mask |= fd_manager::exception;
           e.callback(mask);
         }
-        if (!running())
-          break;
       }
     } catch (errno_exception const &e) {
       if (e.number() != EINTR)

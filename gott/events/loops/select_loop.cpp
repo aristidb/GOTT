@@ -180,8 +180,6 @@ void select_loop::run(){
       	  it != e;
 	        ++it) {
         it->second(it->first);
-        if (!running())
-          return;
       }
     } catch (errno_exception const &e) {
       if (e.number() != EINTR)
