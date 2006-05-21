@@ -71,7 +71,7 @@ typedef
   boost::mpl::vector<plugin_handle>
   plugin_sort_list;
 typedef
-  boost::mpl::vector<module_handle, plugin_id, symbol, module_handle>
+  boost::mpl::vector<plugin_handle, plugin_id, symbol, module_handle>
   plugin_field_list;
 
 typedef
