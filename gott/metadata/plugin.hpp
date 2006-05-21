@@ -59,7 +59,7 @@ class module;
  */
 class plugin {
 public:
-  explicit plugin(void const *handle) : handle(handle) {}
+  explicit plugin(handle_t handle) : handle(handle) {}
 
   /**
    * The plugin's unique identifier.
@@ -92,7 +92,7 @@ public: //internal
   bool is_valid() const;
 
 private:
-  void const *handle;
+  handle_t handle;
 };
 
 struct interface_metadata {

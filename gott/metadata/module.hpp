@@ -39,6 +39,7 @@
 #define GOTT_METADATA_MODULE_HPP
 
 #include "param_detail.hpp"
+#include "handle.hpp"
 #include <gott/string/qid.hpp>
 #include <gott/string/string.hpp>
 #include <boost/function.hpp>
@@ -61,7 +62,7 @@ namespace metadata {
  */
 class module {
 public:
-  explicit module(void const *handle) : handle(handle) {}
+  explicit module(handle_t handle) : handle(handle) {}
   
   /**
    * The module's unique identifier.
@@ -97,7 +98,7 @@ public:
   GOTT_EXPORT boost::shared_ptr<gott::plugin::module> get_instance() const;
 
 private:
-  void const *handle;
+  handle_t handle;
 };
 
 GOTT_EXPORT
