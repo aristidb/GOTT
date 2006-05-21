@@ -110,16 +110,16 @@ namespace boost { namespace rel {
 		{}
 
 		template<class R>
-			void operator()(R& r, key_index_tag tag) const;
+			void operator()(R& r, key_index_tag const &tag) const;
 
         template<class R>
-			void operator()(R& r, iterator_index_tag tag) const;
+			void operator()(R& r, iterator_index_tag const &tag) const;
 
         template<class R>
-			void operator()(R& r, cache_tag tag) const;
+			void operator()(R& r, cache_tag const &tag) const;
 
         template<class R>
-			void operator()(R& r, cover_tag) const
+			void operator()(R& r, cover_tag const &) const
 		{
 			r.register_expression(reg_);
 		}
@@ -181,19 +181,19 @@ namespace boost { namespace rel {
 	};
 
 	template<class R>
-    void expression_registry_traverse_functor::operator()(R& r, key_index_tag tag) const
+    void expression_registry_traverse_functor::operator()(R& r, key_index_tag const &tag) const
     {
         reg_->add_node(node_proxy::ptr(new key_index_proxy_impl<R>(r)));
     }
 
     template<class R>
-    void expression_registry_traverse_functor::operator()(R& r, iterator_index_tag tag) const
+    void expression_registry_traverse_functor::operator()(R& r, iterator_index_tag const &tag) const
     {
     	reg_->add_node(node_proxy::ptr(new node_proxy_impl<R>(r)));
     }
 
     template<class R>
-    void expression_registry_traverse_functor::operator()(R& r, cache_tag tag) const
+    void expression_registry_traverse_functor::operator()(R& r, cache_tag const &tag) const
     {
     	reg_->add_node(node_proxy::ptr(new node_proxy_impl<R>(r)));
     }
