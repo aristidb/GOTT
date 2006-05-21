@@ -39,6 +39,7 @@
 #define GOTT_METADATA_PLUGIN_HPP
 
 #include "param_detail.hpp"
+#include "handle.hpp"
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/function.hpp>
