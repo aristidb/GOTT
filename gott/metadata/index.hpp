@@ -35,20 +35,15 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "database.hpp"
-#include <boost/thread/once.hpp>
+#ifndef GOTT_METADATA_INDEX_HPP
+#define GOTT_METADATA_INDEX_HPP
 
-namespace {
-gott::metadata::global_mutex *the_lock;
+#include "tables.hpp"
 
-void init_lock() {
-  the_lock = new gott::metadata::global_mutex;
-}
+namespace gott { namespace metadata { namespace detail {
 
-boost::once_flag init_once = BOOST_ONCE_INIT;
-}
 
-gott::metadata::global_mutex &gott::metadata::get_global_lock() {
-  boost::call_once(&init_lock, init_once);
-  return *the_lock;
-}
+
+}}}
+
+#endif

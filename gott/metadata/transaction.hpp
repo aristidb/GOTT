@@ -13,7 +13,7 @@
  *
  * The Original Code is Metadata for GOTT.
  *
- * The Initial Developer of the Original Code is
+ * The Initial Developer of the Original Code is Metadata for GOTT
  * Aristid Breitkreuz (aribrei@arcor.de).
  * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.

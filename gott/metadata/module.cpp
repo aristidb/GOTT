@@ -39,6 +39,7 @@
 #include "load.hpp"
 #include "validate.hpp"
 #include "database.hpp"
+#include "tables.hpp"
 #include <gott/plugin/module.hpp>
 #include <gott/exceptions.hpp>
 #include <boost/thread.hpp>
