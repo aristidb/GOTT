@@ -71,7 +71,7 @@ typedef
   boost::mpl::vector<plugin_handle>
   plugin_sort_list;
 typedef
-  boost::mpl::vector<module_handle, plugin_id, symbol>
+  boost::mpl::vector<module_handle, plugin_id, symbol, module_handle>
   plugin_field_list;
 
 typedef
@@ -81,21 +81,43 @@ typedef
   boost::mpl::vector<interface_handle, interface_id>
   interface_field_list;
 
+typedef
+  boost::mpl::vector<>
+  plugin_interfaces_sort_list;
+typedef
+  boost::mpl::vector<plugin_handle, interface_handle>
+  plugin_interfaces_field_list;
+
+typedef
+  boost::mpl::vector<>
+  module_dependencies_sort_list;
+typedef
+  boost::mpl::vector<module_handle, boost::rel::alias<module_handle> >
+  module_dependencies_field_list;
+
 // Table information
 struct module_info
-  : boost::rel::table_info<module_sort_list, module_field_list> {};
+  : boost::rel::table_info<module_field_list, module_sort_list> {};
 struct plugin_info
-  : boost::rel::table_info<plugin_sort_list, plugin_field_list> {};
+  : boost::rel::table_info<plugin_field_list, plugin_sort_list> {};
 struct interface_info
-  : boost::rel::table_info<interface_sort_list, interface_field_list> {};
+  : boost::rel::table_info<interface_field_list, interface_sort_list> {};
+struct plugin_interfaces_info
+  : boost::rel::table_info<plugin_interfaces_field_list,
+                           plugin_interfaces_sort_list> {};
+struct module_dependencies_info
+  : boost::rel::table_info<module_dependencies_field_list,
+                           module_dependencies_sort_list> {};
 
 typedef boost::rel::table<module_info> module_table_t;
 typedef boost::rel::table<plugin_info> plugin_table_t;
 typedef boost::rel::table<interface_info> interface_table_t;
+typedef boost::rel::table<plugin_interfaces_info> plugin_interfaces_table_t;
 
 module_table_t &get_module_table();
 plugin_table_t &get_plugin_table();
 interface_table_t &get_interface_table();
+plugin_interfaces_table_t &get_plugin_interfaces_table();
 
 }}}
 

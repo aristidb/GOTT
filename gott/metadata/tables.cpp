@@ -54,4 +54,9 @@ interface_table_t &get_interface_table() {
   return the_table;
 }
 
+plugin_interfaces_table_t &get_plugin_interfaces_table() {
+  static plugin_interfaces_table_t the_table;
+  return the_table;
+}
+
 }}}
