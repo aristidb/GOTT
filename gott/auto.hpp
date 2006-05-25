@@ -39,5 +39,7 @@
 #define GOTT_AUTO_HPP
 
 #define GOTT_AUTO(var, value) typeof(value) var = (value)
+#define GOTT_AUTO_CREF(var, value) typeof(value) const &var = (value)
+#define GOTT_AUTO_REF(var, value) typeof(value) &var = (value)
 
 #endif
