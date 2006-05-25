@@ -37,8 +37,8 @@
 
 #include "tables.hpp"
 
-namespace gott { namespace metadata { namespace detail {
-
+namespace gott { namespace metadata_db {
+  
 module_table_t &get_module_table() {
   static module_table_t the_table;
   return the_table;
@@ -59,4 +59,9 @@ plugin_interfaces_table_t &get_plugin_interfaces_table() {
   return the_table;
 }
 
-}}}
+module_dependencies_table_t &get_module_dependencies_table() {
+  static module_dependencies_table_t the_table;
+  return the_table;
+}
+
+}}

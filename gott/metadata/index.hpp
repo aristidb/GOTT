@@ -39,11 +39,27 @@
 #define GOTT_METADATA_INDEX_HPP
 
 #include "tables.hpp"
+#include <gott/auto.hpp>
 
-namespace gott { namespace metadata { namespace detail {
+namespace gott { namespace metadata_db {
 
+GOTT_AUTO(
+    module_by_id,
+    rtl::key_index<mpl::vector<module_id> >(get_module_table()));
 
+GOTT_AUTO(
+    plugin_by_id,
+    rtl::key_index<mpl::vector<plugin_id> >(get_plugin_table()));
 
-}}}
+GOTT_AUTO(
+    interface_by_id,
+    rtl::key_index<mpl::vector<interface_id> >(get_interface_table()));
+
+GOTT_AUTO(
+    module_dependencies_by_dependant,
+    rtl::key_index<mpl::vector<module_handle> >(
+      get_module_dependencies_table()));
+
+}}
 
 #endif

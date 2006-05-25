@@ -44,81 +44,88 @@
 #include <gott/string/qid.hpp>
 #include <boost/rtl/rtl.hpp>
 
-namespace gott { namespace metadata { namespace detail {
+namespace gott { namespace metadata_db {
+
+namespace rtl = boost::rel;
+namespace mpl = boost::mpl;
 
 // Columns
-BOOST_RTL_DEFINE_COLUMN(handle_t, module_handle)
+BOOST_RTL_DEFINE_COLUMN(string, resource)
+
+BOOST_RTL_DEFINE_COLUMN(metadata::handle_t, module_handle)
 BOOST_RTL_DEFINE_COLUMN(QID, module_id)
-BOOST_RTL_DEFINE_COLUMN(module::module_type_t, module_type)
+BOOST_RTL_DEFINE_COLUMN(metadata::module::module_type_t, module_type)
 BOOST_RTL_DEFINE_COLUMN(string, file_path)
 
-BOOST_RTL_DEFINE_COLUMN(handle_t, plugin_handle)
+BOOST_RTL_DEFINE_COLUMN(metadata::handle_t, plugin_handle)
 BOOST_RTL_DEFINE_COLUMN(QID, plugin_id)
 BOOST_RTL_DEFINE_COLUMN(string, symbol)
 
-BOOST_RTL_DEFINE_COLUMN(handle_t, interface_handle)
+BOOST_RTL_DEFINE_COLUMN(metadata::handle_t, interface_handle)
 BOOST_RTL_DEFINE_COLUMN(QID, interface_id)
 
 // Field lists
 typedef 
-  boost::mpl::vector<module_handle>
+  mpl::vector<module_handle>
   module_sort_list;
 typedef
-  boost::mpl::vector<module_handle, module_id, module_type, file_path>
+  mpl::vector<module_handle, module_id, module_type, file_path>
   module_field_list;
 
 typedef
-  boost::mpl::vector<plugin_handle>
+  mpl::vector<plugin_handle>
   plugin_sort_list;
 typedef
-  boost::mpl::vector<plugin_handle, plugin_id, symbol, module_handle>
+  mpl::vector<plugin_handle, plugin_id, symbol, module_handle>
   plugin_field_list;
 
 typedef
-  boost::mpl::vector<interface_handle>
+  mpl::vector<interface_handle>
   interface_sort_list;
 typedef
-  boost::mpl::vector<interface_handle, interface_id>
+  mpl::vector<interface_handle, interface_id>
   interface_field_list;
 
 typedef
-  boost::mpl::vector<>
+  mpl::vector<>
   plugin_interfaces_sort_list;
 typedef
-  boost::mpl::vector<plugin_handle, interface_handle>
+  mpl::vector<plugin_handle, interface_handle>
   plugin_interfaces_field_list;
 
 typedef
-  boost::mpl::vector<>
+  mpl::vector<>
   module_dependencies_sort_list;
 typedef
-  boost::mpl::vector<module_handle, boost::rel::alias<module_handle> >
+  mpl::vector<module_handle, rtl::alias<module_handle> >
   module_dependencies_field_list;
 
 // Table information
 struct module_info
-  : boost::rel::table_info<module_field_list, module_sort_list> {};
+  : rtl::table_info<module_field_list, module_sort_list> {};
 struct plugin_info
-  : boost::rel::table_info<plugin_field_list, plugin_sort_list> {};
+  : rtl::table_info<plugin_field_list, plugin_sort_list> {};
 struct interface_info
-  : boost::rel::table_info<interface_field_list, interface_sort_list> {};
+  : rtl::table_info<interface_field_list, interface_sort_list> {};
 struct plugin_interfaces_info
-  : boost::rel::table_info<plugin_interfaces_field_list,
-                           plugin_interfaces_sort_list> {};
+  : rtl::table_info<plugin_interfaces_field_list,
+                    plugin_interfaces_sort_list> {};
 struct module_dependencies_info
-  : boost::rel::table_info<module_dependencies_field_list,
-                           module_dependencies_sort_list> {};
+  : rtl::table_info<module_dependencies_field_list,
+                    module_dependencies_sort_list> {};
 
-typedef boost::rel::table<module_info> module_table_t;
-typedef boost::rel::table<plugin_info> plugin_table_t;
-typedef boost::rel::table<interface_info> interface_table_t;
-typedef boost::rel::table<plugin_interfaces_info> plugin_interfaces_table_t;
+typedef rtl::table<module_info> module_table_t;
+typedef rtl::table<plugin_info> plugin_table_t;
+typedef rtl::table<interface_info> interface_table_t;
+typedef rtl::table<plugin_interfaces_info> plugin_interfaces_table_t;
+typedef rtl::table<module_dependencies_info> module_dependencies_table_t;
 
 module_table_t &get_module_table();
 plugin_table_t &get_plugin_table();
 interface_table_t &get_interface_table();
 plugin_interfaces_table_t &get_plugin_interfaces_table();
+module_dependencies_table_t &get_module_dependencies_table();
 
-}}}
+}}
 
 #endif
