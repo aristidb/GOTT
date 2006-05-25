@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include "load.hpp"
 #include "plugin.hpp"
 #include "module.hpp"
 #include "transaction.hpp"
@@ -328,4 +329,68 @@ ostream &gott::metadata::operator<<(ostream &stream, module const &val) {
   val.enumerate_dependencies(dep);
   w.up();
   return stream;
+}
+
+namespace {
+  class interface_accepter : public writable_structure {
+  public:
+    QID interface_id;
+
+    string tag_;
+    Xany data_;
+
+    void begin(tdl::source_position const &) {}
+    void end() {
+      if (tag_ == "interface-id")
+        interface_id = Xany_cast<string>(data_);
+      tag_ = string();
+    }
+    void data(Xany const &x) { data_ = x; }
+    void add_tag(string const &x) { tag_ = x; }
+  };
+}
+
+void gott::metadata::update_interface_resource(
+    istream &stream,
+    string const &resource,
+    transaction &tr) {
+  tr.remove_resource(resource);
+  rule_t const interface_schema =
+    rule_one("tdl::schema::named", rule_attr(tag = "interface-id"),
+        rule("tdl::schema::node"));
+
+  struct multi_accepter : writable_structure {
+    multi_accepter(string const &resource, transaction &tr)
+      : resource(resource), tr(tr), level(0) {}
+
+    string const &resource;
+    transaction &tr;
+    unsigned level;
+    interface_accepter inner;
+
+    void begin(tdl::source_position const &w) {
+      if (level == 0)
+        inner = interface_accepter();
+      else
+        inner.begin(w);
+      ++level;
+    }
+    void end() {
+      --level;
+      if (level == 0)
+        tr.add_interface(inner.interface_id, resource);
+      else
+        inner.end();
+    }
+
+    void data(Xany const &x) { inner.data(x); }
+    void add_tag(string const &s) { inner.add_tag(s); }
+  };
+  multi_accepter out(resource, tr);
+  revocable_adapter adapter(out);
+  match(
+      rule_one("tdl::schema::document", rule_attr(coat = false),
+        rule_one("tdl::schema::ordered", rule_attr(outer = list()),
+          interface_schema)),
+      adapter).parse(stream);
 }

@@ -178,14 +178,6 @@ void add_module(
 void remove_module_resource(string const &which);
 }
 
-class transaction;
-
-GOTT_EXPORT
-void update_module_resource(
-    std::istream &stream,
-    gott::string const &resource,
-    transaction &tr);
-
 GOTT_EXPORT
 std::ostream &operator<<(std::ostream &stream, module const &in);
 

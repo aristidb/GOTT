@@ -67,6 +67,11 @@ void do_load_standard() {
     std::ifstream in("./module_registry.tdl");
     update_module_resource(in, "./module_registry.tdl", tr);
   }
+
+  {
+    std::ifstream in("./interface_registry.tdl");
+    update_interface_resource(in, "./interface_registry.tdl", tr);
+  }
   tr.commit();
 }
 
@@ -99,6 +104,7 @@ void do_load_core() {
   add_schema_type("unordered", tr);
   add_schema_type("tree", tr);
   add_schema_type("node", tr);
+  tr.add_interface("tdl::schema::type", "core");
   tr.commit();
 }
 }

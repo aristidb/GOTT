@@ -39,14 +39,38 @@
 #define GOTT_METADATA_LOAD_HPP
 
 #include <gott/visibility.hpp>
+#include <iosfwd>
 
-namespace gott { namespace metadata {
+namespace gott {
+  class string;
+
+namespace metadata {
 
 GOTT_EXPORT
 void load_core();
 
 GOTT_EXPORT
 void load_standard();
+
+class transaction;
+
+GOTT_EXPORT
+void update_module_resource(
+    std::istream &stream,
+    gott::string const &resource,
+    transaction &tr);
+
+GOTT_EXPORT
+void update_plugin_resource(
+    std::istream &stream,
+    gott::string const &resource,
+    transaction &tr);
+
+GOTT_EXPORT
+void update_interface_resource(
+    std::istream &stream,
+    gott::string const &resource,
+    transaction &tr);
 
 }}
 

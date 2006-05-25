@@ -211,18 +211,6 @@ void add_plugin(
 void remove_plugin_resource(string const &resource);
 }
 
-class transaction;
-
-/**
- * Add a list of some plugins' metadata read from a stream. Thread-safe.
- * \param stream The stream to empty.
- */
-GOTT_EXPORT
-void update_plugin_resource(
-    std::istream &stream,
-    gott::string const &resource,
-    transaction &tr);
-
 /**
  * Write a plugin's metadata to a stream.
  * \param stream The stream to write to.

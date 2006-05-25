@@ -41,6 +41,7 @@
 #include "database.hpp"
 #include <vector>
 #include <boost/tuple/tuple.hpp>
+#include <iostream>//FIXME
 
 using gott::metadata::transaction;
 
@@ -119,4 +120,9 @@ void transaction::add_module(
     string const &resource) {
   p->insert_modules.push_back(impl::mod_lst::value_type(
         module_id, module_type, file_path, dependencies, resource));
+}
+
+void transaction::add_interface(
+    QID const &/*interface_id*/,
+    string const &/*resource*/) {
 }

@@ -59,11 +59,14 @@ public:
       std::vector<QID> const &dependencies,
       string const &resource);
   GOTT_EXPORT void add_plugin(
-    QID const &plugin_id,
-    QID const &supported_interface,
-    QID const &enclosing_module,
-    string const &symbol,
-    string const &resource);
+      QID const &plugin_id,
+      QID const &supported_interface,
+      QID const &enclosing_module,
+      string const &symbol,
+      string const &resource);
+  GOTT_EXPORT void add_interface(
+      QID const &interface_id,
+      string const &resource);
 
 private:
   class impl;
