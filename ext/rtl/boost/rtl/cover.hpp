@@ -162,8 +162,8 @@ namespace boost { namespace rel {
 
 	struct functor_proxy
 	{
+        virtual ~functor_proxy() {}
 		virtual void uncover() const = 0; 
-    virtual ~functor_proxy() {}
 	};
 
 	template<class Tuple, class SortList>
