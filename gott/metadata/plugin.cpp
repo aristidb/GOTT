@@ -69,6 +69,10 @@ QID const &plugin::supported_interface_id() const {
   return known_plugin[handle].get<1>();
 }
 
+bool plugin::supports_interface(QID const &x) const {
+  return supported_interface_id() == x;
+}
+
 QID const &plugin::enclosing_module_id() const {
   return known_plugin[handle].get<2>();
 }

@@ -35,26 +35,36 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_METADATA_INDEX_HPP
-#define GOTT_METADATA_INDEX_HPP
+#include "interface.hpp"
+#include "database.hpp"
+#include <gott/exceptions.hpp>
 
-#include "tables.hpp"
-#include <gott/auto.hpp>
+using gott::QID;
+using namespace gott::metadata;
+using namespace gott::metadata_db;
 
-namespace gott { namespace metadata_db {
+namespace {
+template<class Ret, class T>
+Ret get_attribute(handle_t const &handle, T const &attribute) {
+  global_mutex::scoped_lock lock(get_global_lock());
+  GOTT_AUTO(
+      obj_sel,
+      rtl::selection_eq(
+        get_interface_table(),
+        rtl::row<mpl::vector<interface_handle> >(handle)));
 
-GOTT_AUTO_OBJFN(
-    module_by_id,
-    rtl::key_index<mpl::vector<module_id> >(get_module_table()));
+  if (obj_sel.begin() == obj_sel.end() ||
+      ++obj_sel.begin() != obj_sel.end())
+    throw gott::internal_error(
+        "metadata integrity: interface query did not "
+        "deliver exactly one item");
 
-GOTT_AUTO_OBJFN(
-    plugin_by_id,
-    rtl::key_index<mpl::vector<plugin_id> >(get_plugin_table()));
+  GOTT_AUTO_CREF(obj, *obj_sel.begin());
+  
+  return obj[attribute];
+}
+}
 
-GOTT_AUTO_OBJFN(
-    interface_by_id,
-    rtl::key_index<mpl::vector<interface_id> >(get_interface_table()));
-
-}}
-
-#endif
+QID interface::interface_id() const {
+  return get_attribute<QID>(handle, metadata_db::interface_id());
+}

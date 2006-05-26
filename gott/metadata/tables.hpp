@@ -87,18 +87,18 @@ typedef
   interface_field_list;
 
 typedef
-  mpl::vector<>
-  plugin_interfaces_sort_list;
-typedef
   mpl::vector<plugin_handle, interface_handle>
   plugin_interfaces_field_list;
-
 typedef
-  mpl::vector<>
-  module_dependencies_sort_list;
+  plugin_interfaces_field_list
+  plugin_interfaces_sort_list;
+
 typedef
   mpl::vector<module_handle, rtl::alias<module_handle> >
   module_dependencies_field_list;
+typedef
+  module_dependencies_field_list
+  module_dependencies_sort_list;
 
 // Table information
 struct module_info

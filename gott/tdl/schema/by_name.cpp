@@ -71,7 +71,7 @@ rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
     plugin_handle<type> * handle(new plugin_handle<type>(
       find_plugin(
         tags::plugin_id = s,
-        tags::interface = "tdl::schema::type",
+        tags::interface_id = "tdl::schema::type",
         tags::load_standard_metadata = false)));
 
     all_handles.insert(map_t::value_type(s, handle));

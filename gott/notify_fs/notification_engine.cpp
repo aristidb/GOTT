@@ -71,10 +71,10 @@ notification_engine *notification_engine::get_for(main_loop &m) {
   notification_engine *eng;
   {
   boost::mutex::scoped_lock lock(plugin_mutex);
+  using namespace gott::metadata;
   if (!handle)
     handle.reset(new plugin_handle<engine_factory>(
-        gott::metadata::find_plugin(
-          gott::metadata::tags::interface = "gott::notify_fs::engine_factory")));
+        find_plugin(tags::interface_id = "gott::notify_fs::engine_factory")));
   eng = handle->get()->alloc(m);
   }
   

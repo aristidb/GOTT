@@ -75,6 +75,9 @@ public:
   QID const &supported_interface_id() const;
 
   GOTT_EXPORT
+  bool supports_interface(QID const &) const;
+
+  GOTT_EXPORT
   QID const &enclosing_module_id() const;
 
   /**
@@ -94,10 +97,6 @@ public: //internal
 
 private:
   handle_t handle;
-};
-
-struct interface_metadata {
-  QID interface_id;
 };
 
 /**
@@ -124,7 +123,7 @@ void enumerate_plugins_p(
 typedef boost::parameter::parameters<
   tags::detail::callback,
   tags::detail::plugin_id,
-  tags::detail::interface,
+  tags::detail::interface_id,
   tags::detail::cancel_early,
   tags::detail::load_standard_metadata,
   tags::detail::validate
@@ -136,7 +135,7 @@ template<class ArgPack>
 void enumerate_plugins_with_named_params(ArgPack const &args) {
   enumerate_plugin_p(args[tags::callback],
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
-      detail::get_opt_qid(args[tags::interface | boost::none]),
+      detail::get_opt_qid(args[tags::interface_id | boost::none]),
       args[tags::cancel_early | false],
       args[tags::load_standard_metadata | true],
       args[tags::validate | true]);
@@ -144,7 +143,7 @@ void enumerate_plugins_with_named_params(ArgPack const &args) {
 
 typedef boost::parameter::parameters<
   tags::detail::plugin_id,
-  tags::detail::interface,
+  tags::detail::interface_id,
   tags::detail::load_standard_metadata,
   tags::detail::validate
 > fpm_params;
@@ -158,7 +157,7 @@ find_plugin_with_named_params(ArgPack const &args) {
   detail::find_functor<plugin> cb;
   enumerate_plugins_p(boost::ref(cb),
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
-      detail::get_opt_qid(args[tags::interface | boost::none]),
+      detail::get_opt_qid(args[tags::interface_id | boost::none]),
       true,
       args[tags::load_standard_metadata | true],
       args[tags::validate | true]);

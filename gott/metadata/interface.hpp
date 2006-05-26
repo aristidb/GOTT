@@ -35,25 +35,33 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_METADATA_INDEX_HPP
-#define GOTT_METADATA_INDEX_HPP
+#ifndef GOTT_METADATA_INTERFACE_HPP
+#define GOTT_METADATA_INTERFACE_HPP
 
-#include "tables.hpp"
-#include <gott/auto.hpp>
+#include "handle.hpp"
+#include "param_detail.hpp"
+#include <gott/string/qid.hpp>
+#include <boost/function.hpp>
 
-namespace gott { namespace metadata_db {
+namespace gott { namespace metadata {
 
-GOTT_AUTO_OBJFN(
-    module_by_id,
-    rtl::key_index<mpl::vector<module_id> >(get_module_table()));
+class interface {
+public:
+  interface(handle_t handle) : handle(handle) {}
 
-GOTT_AUTO_OBJFN(
-    plugin_by_id,
-    rtl::key_index<mpl::vector<plugin_id> >(get_plugin_table()));
+  GOTT_EXPORT
+  QID interface_id() const;
 
-GOTT_AUTO_OBJFN(
-    interface_by_id,
-    rtl::key_index<mpl::vector<interface_id> >(get_interface_table()));
+private:
+  handle_t handle;
+};
+
+GOTT_EXPORT
+void enumerate_interfaces_p(
+    boost::optional<QID const &> const &interface_id,
+    boost::function<void (interface const &)> const &callback);
+
+
 
 }}
 
