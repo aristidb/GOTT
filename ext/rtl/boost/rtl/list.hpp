@@ -71,7 +71,7 @@ namespace boost { namespace rel {
                 breakable_for_each_t<typename boost::mpl::next<Begin>::type, End, F>::run(f);
 		}
         template<class Unused>
-    		static void do_run(F f, boost::mpl::true_)
+    		static void do_run(F, boost::mpl::true_)
 		{}
 	};
 	template<class Sequence, class F>
