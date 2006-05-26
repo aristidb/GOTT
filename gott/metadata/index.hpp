@@ -57,7 +57,7 @@ GOTT_AUTO(
 
 GOTT_AUTO(
     module_dependencies_by_dependant,
-    rtl::key_index<mpl::vector<module_handle> >(
+    rtl::iterator_index<mpl::vector<module_handle> >(
       get_module_dependencies_table()));
 
 }}

@@ -41,7 +41,6 @@
 #include "database.hpp"
 #include <vector>
 #include <boost/tuple/tuple.hpp>
-#include <iostream>//FIXME
 
 using gott::metadata::transaction;
 
