@@ -238,7 +238,7 @@ namespace boost { namespace rel {
  		}
 
     	template<class F>
-    		void traverse_args(F f) const
+    		void traverse_args(F) const
     	{}
     
    	private:
