@@ -42,4 +42,10 @@
 #define GOTT_AUTO_CREF(var, value) typeof(value) const &var = (value)
 #define GOTT_AUTO_REF(var, value) typeof(value) &var = (value)
 
+#define GOTT_AUTO_OBJFN(var, value) \
+  inline typeof(value) &var() { \
+    static typeof(value) the_object = (value); \
+    return the_object; \
+  }
+
 #endif
