@@ -69,21 +69,21 @@ typedef
   mpl::vector<module_handle>
   module_sort_list;
 typedef
-  mpl::vector<module_handle, module_id, module_type, file_path>
+  mpl::vector<module_handle, module_id, module_type, file_path, resource>
   module_field_list;
 
 typedef
   mpl::vector<plugin_handle>
   plugin_sort_list;
 typedef
-  mpl::vector<plugin_handle, plugin_id, symbol, module_handle>
+  mpl::vector<plugin_handle, plugin_id, symbol, module_handle, resource>
   plugin_field_list;
 
 typedef
   mpl::vector<interface_handle>
   interface_sort_list;
 typedef
-  mpl::vector<interface_handle, interface_id>
+  mpl::vector<interface_handle, interface_id, resource>
   interface_field_list;
 
 typedef

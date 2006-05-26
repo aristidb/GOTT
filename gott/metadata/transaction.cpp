@@ -64,6 +64,14 @@ public:
         > >
     mod_lst;
   mod_lst insert_modules;
+  typedef
+    std::vector<
+      boost::tuple<
+        QID,
+        string
+        > >
+    if_lst;
+  if_lst insert_interfaces;
 };
 
 transaction::transaction() : p(new impl) {}
@@ -122,6 +130,8 @@ void transaction::add_module(
 }
 
 void transaction::add_interface(
-    QID const &/*interface_id*/,
-    string const &/*resource*/) {
+    QID const &interface_id,
+    string const &resource) {
+  p->insert_interfaces.push_back(impl::if_lst::value_type(
+        interface_id, resource));
 }
