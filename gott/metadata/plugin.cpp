@@ -53,26 +53,28 @@ using gott::QID;
 using gott::string;
 
 namespace {
-  typedef std::list<boost::tuple<QID, QID, QID, string> > plugin_list_t;
+  typedef boost::tuple<QID, QID, QID, string> desc_t;
+  typedef std::map<handle_t, desc_t> 
+    plugin_list_t;
   static plugin_list_t known_plugin;
-  typedef std::multimap<gott::string, plugin_list_t::iterator> res_map_t;
+  typedef std::multimap<gott::string, handle_t> res_map_t;
   static res_map_t resources;
 }
 
 QID const &plugin::plugin_id() const {
-  return static_cast<plugin_list_t::value_type const *>(handle)->get<0>();
+  return known_plugin[handle].get<0>();
 }
 
 QID const &plugin::supported_interface_id() const {
-  return static_cast<plugin_list_t::value_type const *>(handle)->get<1>();
+  return known_plugin[handle].get<1>();
 }
 
 QID const &plugin::enclosing_module_id() const {
-  return static_cast<plugin_list_t::value_type const *>(handle)->get<2>();
+  return known_plugin[handle].get<2>();
 }
 
 string const &plugin::symbol() const {
-  return static_cast<plugin_list_t::value_type const *>(handle)->get<3>();
+  return known_plugin[handle].get<3>();
 }
 
 module plugin::enclosing_module(bool do_load_standard_metadata) const {
@@ -103,7 +105,7 @@ void gott::metadata::enumerate_plugins_p(
   plugin_list_t::const_iterator begin = known_plugin.begin();
   plugin_list_t::const_iterator end = known_plugin.end();
   for (plugin_list_t::const_iterator it = begin; it != end; ++it) {
-    plugin current(&*it);
+    plugin current(it->first);
     if (plugin_id && current.plugin_id() != *plugin_id)
       continue;
     if (interface_id && current.supported_interface_id() != *interface_id)
@@ -122,9 +124,10 @@ void gott::metadata::detail::add_plugin(
     QID const &enclosing_module,
     string const &symbol,
     string const &resource) {
-  known_plugin.push_front(plugin_list_t::value_type(
-        plugin_id, supported_interface, enclosing_module, symbol));
-  resources.insert(std::make_pair(resource, known_plugin.begin()));
+  handle_t h;
+  known_plugin[h] = 
+    desc_t(plugin_id, supported_interface, enclosing_module, symbol);
+  resources.insert(std::make_pair(resource, h));
 }
 
 void gott::metadata::detail::remove_plugin_resource(string const &resource) {

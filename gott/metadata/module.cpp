@@ -51,34 +51,35 @@ using namespace gott::metadata;
 using namespace gott;
 
 namespace {
-  typedef std::list<
+  typedef
     boost::tuple<
       QID,
       module::module_type_t,
       string,
       std::vector<QID>
-    > > module_list_t;
+    >
+    desc_t;
+  typedef std::map<handle_t, desc_t> module_list_t;
   static module_list_t known_module;
-  typedef std::multimap<string, module_list_t::iterator> res_map_t;
+  typedef std::multimap<string, handle_t> res_map_t;
   static res_map_t resources;
 }
 
 QID const &module::module_id() const {
-  return static_cast<module_list_t::value_type const *>(handle)->get<0>();
+  return known_module[handle].get<0>();
 }
 
 module::module_type_t module::module_type() const {
-  return static_cast<module_list_t::value_type const *>(handle)->get<1>();
+  return known_module[handle].get<1>();
 }
 
 string const &module::file_path() const {
-  return static_cast<module_list_t::value_type const *>(handle)->get<2>();
+  return known_module[handle].get<2>();
 }
 
 void module::enumerate_dependencies(
     boost::function<void (module const &)> const &fun) const {
-  std::vector<QID> const &v = 
-    static_cast<module_list_t::value_type const *>(handle)->get<3>();
+  std::vector<QID> const &v = known_module[handle].get<3>();
   for (std::vector<QID>::const_iterator it = v.begin(); it != v.end(); ++it) {
     boost::optional<module> mod = find_module(*it);
     if (!mod)
@@ -109,7 +110,7 @@ void gott::metadata::enumerate_modules_p(
   module_list_t::const_iterator begin = known_module.begin();
   module_list_t::const_iterator end = known_module.end();
   for (module_list_t::const_iterator it = begin; it != end; ++it) {
-    module current(&*it);
+    module current(it->first);
     if (module_id && current.module_id() != *module_id)
       continue;
     if (validate && !current.is_valid())
@@ -126,9 +127,10 @@ void gott::metadata::detail::add_module(
     string const &file_path,
     std::vector<QID> const &dependencies,
     string const &resource) {
-  known_module.push_back(module_list_t::value_type(
-        module_id, module_type, file_path, dependencies));
-  resources.insert(std::make_pair(resource, known_module.begin()));
+  handle_t h;
+  known_module[h] = desc_t(
+        module_id, module_type, file_path, dependencies);
+  resources.insert(std::make_pair(resource, h));
 }
 
 void gott::metadata::detail::remove_module_resource(string const &resource) {

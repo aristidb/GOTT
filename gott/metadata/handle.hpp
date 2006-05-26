@@ -38,9 +38,29 @@
 #ifndef GOTT_METADATA_HANDLE_HPP
 #define GOTT_METADATA_HANDLE_HPP
 
+#include <boost/detail/atomic_count.hpp>
+
 namespace gott { namespace metadata {
 
-typedef void const *handle_t;
+class handle_t {
+public:
+  handle_t() : p(new boost::detail::atomic_count(1)) {}
+  handle_t(handle_t const &o) : p(o.p) { ++*p; }
+  ~handle_t() { if (!--*p) delete p; }
+  
+  void swap(handle_t &o) {
+    boost::detail::atomic_count *tmp = p;
+    p = o.p;
+    o.p = tmp;
+  }
+  void operator=(handle_t o) { o.swap(*this); }
+  
+  bool operator==(handle_t const &o) const { return p == o.p; }
+  bool operator<(handle_t const &o) const { return p < o.p; }
+
+private:
+  boost::detail::atomic_count *p;
+};
 
 }}
 
