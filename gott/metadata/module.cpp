@@ -39,7 +39,6 @@
 #include "load.hpp"
 #include "validate.hpp"
 #include "database.hpp"
-#include "tables.hpp"
 #include <gott/plugin/module.hpp>
 #include <gott/exceptions.hpp>
 #include <boost/thread.hpp>
@@ -106,7 +105,7 @@ void gott::metadata::enumerate_modules_p(
     bool validate) {
   if (do_load_standard_metadata)
     load_standard();
-  global_mutex::scoped_lock lock(get_global_lock());
+  metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
   module_list_t::const_iterator begin = known_module.begin();
   module_list_t::const_iterator end = known_module.end();
   for (module_list_t::const_iterator it = begin; it != end; ++it) {

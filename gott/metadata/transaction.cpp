@@ -70,7 +70,7 @@ transaction::transaction() : p(new impl) {}
 transaction::~transaction() {}
 
 void transaction::commit() {
-  global_mutex::scoped_lock lock(get_global_lock());
+  metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
   for (impl::res_lst::iterator it = p->remove_resources.begin();
       it != p->remove_resources.end();
       ++it) {

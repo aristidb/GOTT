@@ -39,16 +39,16 @@
 #include <boost/thread/once.hpp>
 
 namespace {
-gott::metadata::global_mutex *the_lock;
+gott::metadata_db::global_mutex *the_lock;
 
 void init_lock() {
-  the_lock = new gott::metadata::global_mutex;
+  the_lock = new gott::metadata_db::global_mutex;
 }
 
 boost::once_flag init_once = BOOST_ONCE_INIT;
 }
 
-gott::metadata::global_mutex &gott::metadata::get_global_lock() {
+gott::metadata_db::global_mutex &gott::metadata_db::get_global_lock() {
   boost::call_once(&init_lock, init_once);
   return *the_lock;
 }

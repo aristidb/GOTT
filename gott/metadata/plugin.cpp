@@ -101,7 +101,7 @@ void gott::metadata::enumerate_plugins_p(
     bool validate) {
   if (do_load_standard_metadata)
     load_standard();
-  global_mutex::scoped_lock lock(get_global_lock());
+  metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
   plugin_list_t::const_iterator begin = known_plugin.begin();
   plugin_list_t::const_iterator end = known_plugin.end();
   for (plugin_list_t::const_iterator it = begin; it != end; ++it) {
