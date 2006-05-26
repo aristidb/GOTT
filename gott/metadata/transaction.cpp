@@ -38,9 +38,13 @@
 #include "transaction.hpp"
 #include "plugin.hpp"
 #include "module.hpp"
+#include "interface.hpp"
 #include "database.hpp"
 #include <vector>
 #include <boost/tuple/tuple.hpp>
+#include <boost/rtl/key_index_delta.hpp>
+#include <boost/rtl/table_delta.hpp>
+#include<iostream>//FIXME
 
 using gott::metadata::transaction;
 
@@ -77,6 +81,12 @@ public:
 transaction::transaction() : p(new impl) {}
 transaction::~transaction() {}
 
+struct print_ftor {//FIXME
+  void operator() (gott::metadata::interface const &x) const {
+    std::cout << x.interface_id().get_string() << std::endl;
+  }
+};
+
 void transaction::commit() {
   metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
   for (impl::res_lst::iterator it = p->remove_resources.begin();
@@ -103,6 +113,23 @@ void transaction::commit() {
         it->get<2>(),
         it->get<3>(),
         it->get<4>());
+
+  using namespace metadata_db;
+  rtl::transaction tr;
+  for (impl::if_lst::iterator it = p->insert_interfaces.begin();
+      it != p->insert_interfaces.end();
+      ++it)
+    tr.insert(get_interface_table(), interface_table_t::value_type(
+          handle_t(), it->get<0>(), it->get<1>()));
+
+  rtl::expression_registry exprs;
+  exprs.add(get_module_by_id());
+  exprs.add(get_plugin_by_id());
+  exprs.add(get_interface_by_id());
+  tr.commit(exprs);
+
+  std::cout << "all interfaces:" << std::endl;
+  enumerate_interfaces(print_ftor(), tags::load_standard_metadata = false);
 }
 
 void transaction::remove_resource(string const &r) {
