@@ -133,7 +133,7 @@ BOOST_PARAMETER_FUN(void, enumerate_plugins, 1, 6, epm_params);
 
 template<class ArgPack>
 void enumerate_plugins_with_named_params(ArgPack const &args) {
-  enumerate_plugin_p(args[tags::callback],
+  enumerate_plugins_p(args[tags::callback],
       detail::get_opt_qid(args[tags::plugin_id | boost::none]),
       detail::get_opt_qid(args[tags::interface_id | boost::none]),
       args[tags::cancel_early | false],

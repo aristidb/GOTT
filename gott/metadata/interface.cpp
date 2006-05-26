@@ -37,6 +37,7 @@
 
 #include "interface.hpp"
 #include "database.hpp"
+#include "load.hpp"
 #include <gott/exceptions.hpp>
 
 using gott::QID;
@@ -67,4 +68,43 @@ Ret get_attribute(handle_t const &handle, T const &attribute) {
 
 QID interface::interface_id() const {
   return get_attribute<QID>(handle, metadata_db::interface_id());
+}
+
+namespace {
+template<class T>
+void enumerate_internal(
+    T const &rel,
+    boost::function<void (interface const &)> const &callback,
+    bool cancel_early,
+    bool validate) {
+  for (typename T::const_iterator it = rel.begin(); it != rel.end(); ++it) {
+    callback(interface(it.get(interface_handle())));
+    if (cancel_early)
+      break;
+  }
+}
+}
+
+void gott::metadata::enumerate_interfaces_p(
+    boost::function<void (interface const &)> const &callback,
+    boost::optional<QID const &> const &interface_id,
+    bool cancel_early,
+    bool load_standard_metadata,
+    bool validate) {
+  if (load_standard_metadata)
+    load_standard();
+  global_mutex::scoped_lock lock(get_global_lock());
+  if (!interface_id)
+    return enumerate_internal(
+        get_interface_table(),
+        callback,
+        cancel_early,
+        validate);
+  return enumerate_internal(
+      rtl::selection_eq(
+        get_interface_by_id(),
+        rtl::row<mpl::vector<metadata_db::interface_id> >(interface_id.get())),
+      callback,
+      cancel_early,
+      validate);
 }

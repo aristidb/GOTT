@@ -46,8 +46,6 @@
 #include <map>
 #include <boost/tuple/tuple.hpp>
 
-#include<iostream>//FIXME
-
 using namespace gott::metadata;
 using gott::QID;
 using gott::string;

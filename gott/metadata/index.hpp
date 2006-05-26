@@ -44,15 +44,15 @@
 namespace gott { namespace metadata_db {
 
 GOTT_AUTO_OBJFN(
-    module_by_id,
+    get_module_by_id,
     rtl::key_index<mpl::vector<module_id> >(get_module_table()));
 
 GOTT_AUTO_OBJFN(
-    plugin_by_id,
+    get_plugin_by_id,
     rtl::key_index<mpl::vector<plugin_id> >(get_plugin_table()));
 
 GOTT_AUTO_OBJFN(
-    interface_by_id,
+    get_interface_by_id,
     rtl::key_index<mpl::vector<interface_id> >(get_interface_table()));
 
 }}

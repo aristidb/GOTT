@@ -42,6 +42,8 @@
 #include "param_detail.hpp"
 #include <gott/string/qid.hpp>
 #include <boost/function.hpp>
+#include <boost/parameter/parameters.hpp>
+#include <boost/parameter/macros.hpp>
 
 namespace gott { namespace metadata {
 
@@ -58,10 +60,51 @@ private:
 
 GOTT_EXPORT
 void enumerate_interfaces_p(
+    boost::function<void (interface const &)> const &callback,
     boost::optional<QID const &> const &interface_id,
-    boost::function<void (interface const &)> const &callback);
+    bool cancel_early,
+    bool load_standard_metadata,
+    bool validate);
 
+typedef boost::parameter::parameters<
+  tags::detail::callback,
+  tags::detail::interface_id,
+  tags::detail::cancel_early,
+  tags::detail::load_standard_metadata,
+  tags::detail::validate
+> eim_params;
 
+BOOST_PARAMETER_FUN(void, enumerate_interfaces, 1, 5, eim_params);
+
+template<class ArgPack>
+void enumerate_interfaces_with_named_params(ArgPack const &args) {
+  enumerate_interfaces_p(args[tags::callback],
+      detail::get_opt_qid(args[tags::interface_id | boost::none]),
+      args[tags::cancel_early | false],
+      args[tags::load_standard_metadata | true],
+      args[tags::validate | true]);
+}
+
+typedef boost::parameter::parameters<
+  tags::detail::interface_id,
+  tags::detail::load_standard_metadata,
+  tags::detail::validate
+> fim_params;
+
+BOOST_PARAMETER_FUN(inline boost::optional<interface>,
+    find_interface, 0, 3, fim_params);
+
+template<class ArgPack>
+boost::optional<interface>
+find_interface_with_named_params(ArgPack const &args) {
+  detail::find_functor<interface> cb;
+  enumerate_interfaces_p(boost::ref(cb),
+      detail::get_opt_qid(args[tags::interface_id | boost::none]),
+      true,
+      args[tags::load_standard_metadata | true],
+      args[tags::validate | true]);
+  return cb.result;
+}
 
 }}
 
