@@ -114,23 +114,56 @@ void transaction::commit() {
   }
 
   using namespace metadata_db;
+  using namespace boost::lambda;
   rtl::transaction tr;
 
+  // mark obsolete resources' metadata
   GOTT_FOREACH_RANGE(it, p->remove_resources) {
-    using namespace boost::lambda;
+    std::cout << "obsoleting resource... " << *it << std::endl;
+    // mark interfaces from obsolete resource
     GOTT_AUTO(obsolete_interfaces,
         rtl::selection(
           get_interface_table(),
           _1[metadata_db::resource()] == *it));
-    GOTT_FOREACH_RANGE(jt, obsolete_interfaces)
-      tr.remove(get_interface_table(), *jt);
+    GOTT_FOREACH_RANGE(jt, obsolete_interfaces) {
+      interface_table_t::value_type x = *jt;
+      std::cout << "obsoleting " << x[interface_id()].get_string() << std::endl;
+      x[obsolete()] = true;
+      tr.update(get_interface_table(), *jt);
+    }
   }
 
-  GOTT_FOREACH_RANGE(it, p->insert_interfaces) {
-    tr.insert(get_interface_table(), interface_table_t::value_type(
-          handle_t(), it->get<0>(), it->get<1>()));
+  // add fresh metadata
+  {
+    // add fresh interfaces
+    GOTT_FOREACH_RANGE(it, p->insert_interfaces) {
+      GOTT_AUTO(candidates,
+          selection_eq(
+            get_interface_by_id(),
+            rtl::row<mpl::vector<interface_id> >(it->get<0>())));
+      GOTT_AUTO_CREF(duplicates, candidates); // interface-id is the only data
+      if (duplicates.begin() == duplicates.end()) {
+        std::cout << "inserting ";
+        // ... no duplicate => insert
+        tr.insert(get_interface_table(), interface_table_t::value_type(
+              handle_t(),
+              it->get<0>(),
+              it->get<1>(),
+              false));
+      } else {
+        std::cout << "updating ";
+        // ... duplicate => reuse handle
+        tr.update(get_interface_table(), interface_table_t::value_type(
+              duplicates.begin().get(interface_handle()),
+              it->get<0>(),
+              it->get<1>(),
+              false));
+      }
+      std::cout << it->get<0>().get_string() << std::endl;
+    }
   }
 
+  // update indexes and commit
   rtl::expression_registry exprs;
   exprs.add(get_module_by_id());
   exprs.add(get_plugin_by_id());

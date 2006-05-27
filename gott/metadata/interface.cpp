@@ -80,6 +80,8 @@ void enumerate_internal(
     bool cancel_early,
     bool validate) {
   for (typename T::const_iterator it = rel.begin(); it != rel.end(); ++it) {
+    if (it.get(obsolete()))
+      continue;
     callback(interface(it.get(interface_handle())));
     if (cancel_early)
       break;

@@ -51,6 +51,7 @@ namespace mpl = boost::mpl;
 
 // Columns
 BOOST_RTL_DEFINE_COLUMN(string, resource)
+BOOST_RTL_DEFINE_COLUMN(bool, obsolete)
 
 BOOST_RTL_DEFINE_COLUMN(metadata::handle_t, module_handle)
 BOOST_RTL_DEFINE_COLUMN(QID, module_id)
@@ -69,21 +70,24 @@ typedef
   mpl::vector<module_handle>
   module_sort_list;
 typedef
-  mpl::vector<module_handle, module_id, module_type, file_path, resource>
+  mpl::vector<module_handle, module_id, module_type, file_path,
+              resource, obsolete>
   module_field_list;
 
 typedef
   mpl::vector<plugin_handle>
   plugin_sort_list;
 typedef
-  mpl::vector<plugin_handle, plugin_id, symbol, module_handle, resource>
+  mpl::vector<plugin_handle, plugin_id, symbol, module_handle,
+              resource, obsolete>
   plugin_field_list;
 
 typedef
   mpl::vector<interface_handle>
   interface_sort_list;
 typedef
-  mpl::vector<interface_handle, interface_id, resource>
+  mpl::vector<interface_handle, interface_id,
+              resource, obsolete>
   interface_field_list;
 
 typedef
