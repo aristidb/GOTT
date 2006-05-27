@@ -59,7 +59,7 @@ public:
   res_lst remove_resources;
   typedef
     std::vector<
-      boost::tuple<QID, QID, QID, string, string> >
+      boost::tuple<QID, std::vector<QID>, QID, string, string> >
     plg_lst;
   plg_lst insert_plugins;
   typedef
@@ -101,7 +101,7 @@ void transaction::commit() {
   GOTT_FOREACH_RANGE(it, p->insert_plugins) {
     detail::add_plugin(
         it->get<0>(),
-        it->get<1>(),
+        it->get<1>().front(),
         it->get<2>(),
         it->get<3>(),
         it->get<4>());
@@ -261,7 +261,7 @@ void transaction::commit() {
   // add fresh plugins
   GOTT_FOREACH_RANGE(it, p->insert_plugins) {
     GOTT_AUTO_CREF(new_id, it->get<0>());
-    std::vector<QID> supported_interfaces(1, it->get<1>());
+    GOTT_AUTO_CREF(supported_interfaces, it->get<1>());
     GOTT_AUTO_CREF(new_module_id, it->get<2>());
     GOTT_AUTO_CREF(new_symbol, it->get<3>());
     GOTT_AUTO_CREF(new_resource, it->get<4>());
@@ -348,12 +348,12 @@ void transaction::remove_resource(string const &r) {
 
 void transaction::add_plugin(
     QID const &plugin_id,
-    QID const &supported_interface,
+    std::vector<QID> const &supported_interfaces,
     QID const &enclosing_module,
     string const &symbol,
     string const &resource) {
   p->insert_plugins.push_back(impl::plg_lst::value_type(
-        plugin_id, supported_interface, enclosing_module, symbol, resource));
+        plugin_id, supported_interfaces, enclosing_module, symbol, resource));
 }
 
 void transaction::add_module(

@@ -62,7 +62,7 @@ using std::ostream;
 namespace {
   struct plugin_accepter : writable_structure {
     QID plugin_id;
-    QID interface;
+    std::vector<QID> interfaces;
     QID enclosing_module_id;
     string symbol;
 
@@ -72,7 +72,7 @@ namespace {
     void begin(tdl::source_position const &) {}
     void end() {
       if (tag == "has-interface")
-        interface = Xany_cast<string>(data_);
+        interfaces.push_back(Xany_cast<string>(data_));
       else if (tag == "plugin-id")
         plugin_id = Xany_cast<string>(data_);
       else if (tag == "enclosing-module")
@@ -136,7 +136,7 @@ void gott::metadata::update_plugin_resource(
       if (level == 0)
         tr.add_plugin(
             inner.plugin_id,
-            inner.interface,
+            inner.interfaces,
             inner.enclosing_module_id,
             inner.symbol,
             resource);

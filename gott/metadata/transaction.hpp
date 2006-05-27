@@ -51,20 +51,21 @@ public:
   GOTT_EXPORT ~transaction();
   GOTT_EXPORT void commit();
 
-  GOTT_EXPORT void remove_resource(string const &resource);
-  GOTT_EXPORT void add_module(
+public: //internal
+  void remove_resource(string const &resource);
+  void add_module(
       QID const &module_id,
       module::module_type_t module_type,
       string const &file_path,
       std::vector<QID> const &dependencies,
       string const &resource);
-  GOTT_EXPORT void add_plugin(
+  void add_plugin(
       QID const &plugin_id,
-      QID const &supported_interface,
+      std::vector<QID> const &supported_interfaces,
       QID const &enclosing_module,
       string const &symbol,
       string const &resource);
-  GOTT_EXPORT void add_interface(
+  void add_interface(
       QID const &interface_id,
       string const &resource);
 

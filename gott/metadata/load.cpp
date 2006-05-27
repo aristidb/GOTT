@@ -89,7 +89,7 @@ void do_load_core() {
     void operator()(gott::string const &s, transaction &tr) {
       tr.add_plugin(
           "tdl::schema::" + s,
-          "tdl::schema::type",
+          std::vector<gott::QID>(1, "tdl::schema::type"),
           "tdl::builtins",
           "plugin_schema_" + s,
           "core");
