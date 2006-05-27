@@ -37,6 +37,8 @@
 
 #include "interface.hpp"
 #include "database.hpp"
+#include "tables.hpp"
+#include "index.hpp"
 #include "load.hpp"
 #include <gott/exceptions.hpp>
 
@@ -81,6 +83,7 @@ void enumerate_internal(
     callback(interface(it.get(interface_handle())));
     if (cancel_early)
       break;
+    (void)validate;//nothing to check here
   }
 }
 }

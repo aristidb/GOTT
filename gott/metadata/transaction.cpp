@@ -40,6 +40,8 @@
 #include "module.hpp"
 #include "interface.hpp"
 #include "database.hpp"
+#include "tables.hpp"
+#include "index.hpp"
 #include <vector>
 #include <boost/tuple/tuple.hpp>
 #include <boost/rtl/key_index_delta.hpp>

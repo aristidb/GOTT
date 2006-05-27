@@ -39,6 +39,7 @@
 #define GOTT_METADATA_HANDLE_HPP
 
 #include <boost/detail/atomic_count.hpp>
+#include "database.hpp"
 
 namespace gott { namespace metadata {
 

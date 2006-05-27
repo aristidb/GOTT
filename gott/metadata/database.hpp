@@ -39,8 +39,6 @@
 #define GOTT_METADATA_DATABASE_HPP
 
 #include <boost/thread/recursive_mutex.hpp>
-#include "tables.hpp"
-#include "index.hpp"
 
 namespace gott { namespace metadata_db {
 
