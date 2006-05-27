@@ -48,12 +48,12 @@
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <vector>
 #include <iosfwd>
 
 namespace gott { namespace metadata {
 
 class module;
+class interface;
 
 /**
  * A plugin's metadata.
@@ -68,17 +68,15 @@ public:
   GOTT_EXPORT
   QID plugin_id() const;
 
-  /**
-   * The interface that the plugin supports.
-   */
   GOTT_EXPORT
-  QID supported_interface_id() const;
+  bool supports_interface(interface const &) const;
 
   GOTT_EXPORT
-  bool supports_interface(QID const &) const;
+  bool supports_interface_id(QID const &) const;
 
   GOTT_EXPORT
-  QID enclosing_module_id() const;
+  void enumerate_supported_interfaces(
+      boost::function<void (interface const &)> const &callback) const;
 
   /**
    * The module the plugin resides in.

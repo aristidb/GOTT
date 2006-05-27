@@ -38,6 +38,7 @@
 #include "load.hpp"
 #include "plugin.hpp"
 #include "module.hpp"
+#include "interface.hpp"
 #include "transaction.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
@@ -49,6 +50,7 @@
 #include <gott/tdl/write/writer.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
 
 using namespace gott::metadata;
 using namespace gott::xany;
@@ -156,6 +158,15 @@ void gott::metadata::update_plugin_resource(
       adapter).parse(stream);
 }
 
+namespace {
+void dump_interface(tdl::tdl_writer &w, interface const &x) {
+  w.node("has-interface");
+  w.down();
+    w.node(x.interface_id().get_string());
+  w.up();
+}
+}
+
 ostream &gott::metadata::operator<<(ostream &stream, plugin const &val) {
   tdl::tdl_writer w(stream, 2);
   w.down();
@@ -168,7 +179,7 @@ ostream &gott::metadata::operator<<(ostream &stream, plugin const &val) {
   {
     w.node("enclosing-module");
     w.down();
-      w.node(val.enclosing_module_id().get_string());
+      w.node(val.enclosing_module().module_id().get_string());
     w.up();
   }
   {
@@ -177,12 +188,8 @@ ostream &gott::metadata::operator<<(ostream &stream, plugin const &val) {
       w.node(val.symbol());
     w.up();
   }
-  {
-    w.node("has-interface");
-    w.down();
-      w.node(val.supported_interface_id().get_string());
-    w.up();
-  }
+  val.enumerate_supported_interfaces(
+      boost::bind(&dump_interface, boost::ref(w), _1));
   w.up();
   return stream;
 }

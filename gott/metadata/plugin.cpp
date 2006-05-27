@@ -37,6 +37,7 @@
 
 #include "plugin.hpp"
 #include "module.hpp"
+#include "interface.hpp"
 #include "load.hpp"
 #include "validate.hpp"
 #include "database.hpp"
@@ -45,6 +46,9 @@
 #include <boost/thread.hpp>
 #include <map>
 #include <boost/tuple/tuple.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/if.hpp>
+#include <boost/lambda/bind.hpp>
 
 using namespace gott::metadata;
 using gott::QID;
@@ -63,16 +67,28 @@ QID plugin::plugin_id() const {
   return known_plugin[handle].get<0>();
 }
 
-QID plugin::supported_interface_id() const {
-  return known_plugin[handle].get<1>();
+bool plugin::supports_interface(interface const &x) const {
+  return known_plugin[handle].get<1>() == x.interface_id();
 }
 
-bool plugin::supports_interface(QID const &x) const {
-  return supported_interface_id() == x;
+void plugin::enumerate_supported_interfaces(
+    boost::function<void (interface const &)> const &callback) const {
+  boost::optional<interface> res = find_interface(known_plugin[handle].get<1>(),
+        tags::validate = false,
+        tags::load_standard_metadata = false);
+  if (!res)
+    throw system_error("interface not found");
+  callback(*res);
 }
 
-QID plugin::enclosing_module_id() const {
-  return known_plugin[handle].get<2>();
+bool plugin::supports_interface_id(QID const &id) const {
+  using namespace boost::lambda;
+  bool value = false;
+  enumerate_supported_interfaces(
+      if_then(
+        id == bind(&interface::interface_id, _1),
+        var(value) = true));
+  return value;
 }
 
 string plugin::symbol() const {
@@ -82,7 +98,7 @@ string plugin::symbol() const {
 module plugin::enclosing_module(bool do_load_standard_metadata) const {
   boost::optional<module> res =
     find_module(
-        enclosing_module_id(),
+        known_plugin[handle].get<2>(),
         tags::validate = false,
         tags::load_standard_metadata = do_load_standard_metadata);
   if (!res)
@@ -110,7 +126,7 @@ void gott::metadata::enumerate_plugins_p(
     plugin current(it->first);
     if (plugin_id && current.plugin_id() != *plugin_id)
       continue;
-    if (interface_id && current.supported_interface_id() != *interface_id)
+    if (interface_id && !current.supports_interface_id(*interface_id))
       continue;
     if (validate && !current.is_valid())
       continue;
