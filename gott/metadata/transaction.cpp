@@ -95,21 +95,12 @@ struct print_ftor {//FIXME
 void transaction::commit() {
   metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
   GOTT_FOREACH_RANGE(it, p->remove_resources) {
-    detail::remove_module_resource(*it);
     detail::remove_plugin_resource(*it);
   }
   GOTT_FOREACH_RANGE(it, p->insert_plugins) {
     detail::add_plugin(
         it->get<0>(),
         it->get<1>().front(),
-        it->get<2>(),
-        it->get<3>(),
-        it->get<4>());
-  }
-  GOTT_FOREACH_RANGE(it, p->insert_modules) {
-    detail::add_module(
-        it->get<0>(),
-        it->get<1>(),
         it->get<2>(),
         it->get<3>(),
         it->get<4>());

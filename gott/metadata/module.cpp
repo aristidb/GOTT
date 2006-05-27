@@ -39,53 +39,59 @@
 #include "load.hpp"
 #include "validate.hpp"
 #include "database.hpp"
+#include "tables.hpp"
+#include "index.hpp"
 #include <gott/plugin/module.hpp>
 #include <gott/exceptions.hpp>
-#include <boost/thread.hpp>
-#include <boost/weak_ptr.hpp>
-#include <vector>
-#include <map>
 
 using namespace gott::metadata;
 using namespace gott::metadata_db;
 using namespace gott;
 
 namespace {
-  typedef
-    boost::tuple<
-      QID,
-      module::module_type_t,
-      string,
-      std::vector<QID>
-    >
-    desc_t;
-  typedef std::map<handle_t, desc_t> module_list_t;
-  static module_list_t known_module;
-  typedef std::multimap<string, handle_t> res_map_t;
-  static res_map_t resources;
+template<class Ret, class T>
+Ret get_attribute(handle_t const &handle, T const &attribute) {
+  global_mutex::scoped_lock lock(get_global_lock());
+  GOTT_AUTO(
+      obj_sel,
+      rtl::selection_eq(
+        get_module_table(),
+        rtl::row<mpl::vector<module_handle> >(handle)));
+
+  if (obj_sel.begin() == obj_sel.end() ||
+      ++obj_sel.begin() != obj_sel.end())
+    throw gott::internal_error(
+        "metadata integrity: interface query did not "
+        "deliver exactly one item");
+
+  GOTT_AUTO_CREF(obj, *obj_sel.begin());
+  
+  return obj[attribute];
+}
 }
 
 QID module::module_id() const {
-  return known_module[handle].get<0>();
+  return get_attribute<QID>(handle, metadata_db::module_id());
 }
 
 module::module_type_t module::module_type() const {
-  return known_module[handle].get<1>();
+  return get_attribute<module_type_t>(handle, metadata_db::module_type());
 }
 
 string module::file_path() const {
-  return known_module[handle].get<2>();
+  return get_attribute<string>(handle, metadata_db::file_path());
 }
 
 void module::enumerate_dependencies(
     boost::function<void (module const &)> const &fun) const {
-  std::vector<QID> const &v = known_module[handle].get<3>();
-  for (std::vector<QID>::const_iterator it = v.begin(); it != v.end(); ++it) {
-    boost::optional<module> mod = find_module(*it);
-    if (!mod)
-      throw gott::system_error("module dependency not found");
-    fun(*mod);
-  }
+  global_mutex::scoped_lock lock(get_global_lock());
+  GOTT_AUTO(deps,
+      rtl::projection<mpl::vector<rtl::alias<module_handle> > >(
+        rtl::selection_eq(
+          get_module_dependencies_table(),
+          rtl::row<mpl::vector<module_handle> >(handle))));
+  GOTT_FOREACH_RANGE(it, deps)
+    fun(module(it.get(rtl::alias<module_handle>())));
 }
 
 bool module::is_valid() const {
@@ -98,6 +104,24 @@ boost::shared_ptr<gott::plugin::module> module::get_instance() const {
   return result;
 }
 
+namespace {
+template<class T>
+void enumerate_modules_internal(
+    T const &rel,
+    boost::function<void (module const &)> const &callback,
+    bool cancel_early,
+    bool validate) {
+  GOTT_FOREACH_RANGE(it, rel) {
+    module current(it.get(module_handle()));
+    if (validate && !current.is_valid())
+      continue;
+    callback(current);
+    if (cancel_early)
+      return;
+  }
+}
+}
+
 void gott::metadata::enumerate_modules_p(
     boost::function<void (module const &)> const &callback,
     boost::optional<QID const &> const &module_id,
@@ -107,36 +131,18 @@ void gott::metadata::enumerate_modules_p(
   if (do_load_standard_metadata)
     load_standard();
   metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
-  module_list_t::const_iterator begin = known_module.begin();
-  module_list_t::const_iterator end = known_module.end();
-  for (module_list_t::const_iterator it = begin; it != end; ++it) {
-    module current(it->first);
-    if (module_id && current.module_id() != *module_id)
-      continue;
-    if (validate && !current.is_valid())
-      continue;
-    callback(current);
-    if (cancel_early)
-      return;
-  }
+  if (module_id)
+    return enumerate_modules_internal(
+        rtl::selection_eq(
+          get_module_by_id(),
+          rtl::row<mpl::vector<metadata_db::module_id> >(*module_id)),
+        callback,
+        cancel_early,
+        validate);
+  return enumerate_modules_internal(
+      get_module_table(),
+      callback,
+      cancel_early,
+      validate);
 }
 
-void gott::metadata::detail::add_module(
-    QID const &module_id,
-    module::module_type_t module_type,
-    string const &file_path,
-    std::vector<QID> const &dependencies,
-    string const &resource) {
-  handle_t h;
-  known_module[h] = desc_t(
-        module_id, module_type, file_path, dependencies);
-  resources.insert(std::make_pair(resource, h));
-}
-
-void gott::metadata::detail::remove_module_resource(string const &resource) {
-  std::pair<res_map_t::iterator, res_map_t::iterator> rng
-    = resources.equal_range(resource);
-  for (res_map_t::iterator it = rng.first; it != rng.second; ++it)
-    known_module.erase(it->second);
-  resources.erase(rng.first, rng.second);
-}

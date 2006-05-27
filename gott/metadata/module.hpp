@@ -168,16 +168,6 @@ find_module(
     bool tags::validate = true);
 #endif
 
-namespace detail {
-void add_module(
-    QID const &module_id,
-    module::module_type_t module_type,
-    string const &file_path,
-    std::vector<QID> const &dependencies,
-    string const &resource);
-void remove_module_resource(string const &which);
-}
-
 GOTT_EXPORT
 std::ostream &operator<<(std::ostream &stream, module const &in);
 
