@@ -44,6 +44,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/rtl/key_index_delta.hpp>
 #include <boost/rtl/table_delta.hpp>
+#include <boost/rtl/lambda_support.hpp>
 #include<iostream>//FIXME
 
 using gott::metadata::transaction;
@@ -112,6 +113,16 @@ void transaction::commit() {
 
   using namespace metadata_db;
   rtl::transaction tr;
+
+  GOTT_FOREACH_RANGE(it, p->remove_resources) {
+    using namespace boost::lambda;
+    GOTT_AUTO(obsolete_interfaces,
+        rtl::selection(
+          get_interface_table(),
+          _1[metadata_db::resource()] == *it));
+    GOTT_FOREACH_RANGE(jt, obsolete_interfaces)
+      tr.remove(get_interface_table(), *jt);
+  }
 
   GOTT_FOREACH_RANGE(it, p->insert_interfaces) {
     tr.insert(get_interface_table(), interface_table_t::value_type(
