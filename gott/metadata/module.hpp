@@ -67,7 +67,7 @@ public:
   /**
    * The module's unique identifier.
    */
-  GOTT_EXPORT QID const &module_id() const;
+  GOTT_EXPORT QID module_id() const;
 
   /**
    * The types a module might have.
@@ -82,7 +82,7 @@ public:
   /**
    * The file where the plugin resides.
    */
-  GOTT_EXPORT string const &file_path() const;
+  GOTT_EXPORT string file_path() const;
 
   GOTT_EXPORT void enumerate_dependencies(
       boost::function<void (module const &)> const &) const;

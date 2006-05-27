@@ -66,19 +66,19 @@ public:
    * The plugin's unique identifier.
    */
   GOTT_EXPORT
-  QID const &plugin_id() const;
+  QID plugin_id() const;
 
   /**
    * The interface that the plugin supports.
    */
   GOTT_EXPORT
-  QID const &supported_interface_id() const;
+  QID supported_interface_id() const;
 
   GOTT_EXPORT
   bool supports_interface(QID const &) const;
 
   GOTT_EXPORT
-  QID const &enclosing_module_id() const;
+  QID enclosing_module_id() const;
 
   /**
    * The module the plugin resides in.
@@ -90,7 +90,7 @@ public:
    * The entry smbol of the plugin.
    */
   GOTT_EXPORT
-  string const &symbol() const;
+  string symbol() const;
 
 public: //internal
   bool is_valid() const;

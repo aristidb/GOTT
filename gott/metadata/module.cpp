@@ -47,6 +47,7 @@
 #include <map>
 
 using namespace gott::metadata;
+using namespace gott::metadata_db;
 using namespace gott;
 
 namespace {
@@ -64,7 +65,7 @@ namespace {
   static res_map_t resources;
 }
 
-QID const &module::module_id() const {
+QID module::module_id() const {
   return known_module[handle].get<0>();
 }
 
@@ -72,7 +73,7 @@ module::module_type_t module::module_type() const {
   return known_module[handle].get<1>();
 }
 
-string const &module::file_path() const {
+string module::file_path() const {
   return known_module[handle].get<2>();
 }
 
