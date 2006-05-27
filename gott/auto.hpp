@@ -48,4 +48,10 @@
     return the_object; \
   }
 
+#define GOTT_FOREACH(it, begin, end) \
+  for (GOTT_AUTO(it, begin); it != end; ++it)
+
+#define GOTT_FOREACH_RANGE(it, obj) \
+  GOTT_FOREACH(it, obj.begin(), obj.end())
+
 #endif
