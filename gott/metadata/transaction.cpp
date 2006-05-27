@@ -42,6 +42,8 @@
 #include "database.hpp"
 #include "tables.hpp"
 #include "index.hpp"
+#include <gott/range.hpp>
+#include <gott/exceptions.hpp>
 #include <vector>
 #include <boost/tuple/tuple.hpp>
 #include <boost/rtl/key_index_delta.hpp>
@@ -119,7 +121,7 @@ void transaction::commit() {
 
   // mark obsolete resources' metadata
   GOTT_FOREACH_RANGE(it, p->remove_resources) {
-    std::cout << "obsoleting resource... " << *it << std::endl;
+    std::cout << "$obsoleting resource... " << *it << std::endl;
     // mark interfaces from obsolete resource
     GOTT_AUTO(obsolete_interfaces,
         rtl::selection(
@@ -127,40 +129,206 @@ void transaction::commit() {
           _1[metadata_db::resource()] == *it));
     GOTT_FOREACH_RANGE(jt, obsolete_interfaces) {
       interface_table_t::value_type x = *jt;
-      std::cout << "obsoleting " << x[interface_id()].get_string() << std::endl;
+      std::cout << "obsoleting interface " << x[interface_id()].get_string()
+        << std::endl;
       x[obsolete()] = true;
-      tr.update(get_interface_table(), *jt);
+      tr.update(get_interface_table(), x);
+    }
+
+    // mark modules from obsolete resource
+    GOTT_AUTO(obsolete_modules,
+        rtl::selection(
+          get_module_table(),
+          _1[metadata_db::resource()] == *it));
+    GOTT_FOREACH_RANGE(jt, obsolete_modules) {
+      module_table_t::value_type x = *jt;
+      std::cout << "obsoleting module " << x[module_id()].get_string()
+        << std::endl;
+      x[obsolete()] = true;
+      tr.update(get_module_table(), x);
+    }
+
+    // mark plugins from obsolete resource
+    GOTT_AUTO(obsolete_plugins,
+        rtl::selection(
+          get_plugin_table(),
+          _1[metadata_db::resource()] == *it));
+    GOTT_FOREACH_RANGE(jt, obsolete_plugins) {
+      plugin_table_t::value_type x = *jt;
+      std::cout << "obsoleting plugin " << x[plugin_id()].get_string()
+        << std::endl;
+      x[obsolete()] = true;
+      tr.update(get_plugin_table(), x);
     }
   }
 
-  // add fresh metadata
-  {
-    // add fresh interfaces
-    GOTT_FOREACH_RANGE(it, p->insert_interfaces) {
-      GOTT_AUTO(candidates,
-          selection_eq(
-            get_interface_by_id(),
-            rtl::row<mpl::vector<interface_id> >(it->get<0>())));
-      GOTT_AUTO_CREF(duplicates, candidates); // interface-id is the only data
-      if (duplicates.begin() == duplicates.end()) {
-        std::cout << "inserting ";
-        // ... no duplicate => insert
-        tr.insert(get_interface_table(), interface_table_t::value_type(
-              handle_t(),
-              it->get<0>(),
-              it->get<1>(),
-              false));
-      } else {
-        std::cout << "updating ";
-        // ... duplicate => reuse handle
-        tr.update(get_interface_table(), interface_table_t::value_type(
-              duplicates.begin().get(interface_handle()),
-              it->get<0>(),
-              it->get<1>(),
-              false));
-      }
-      std::cout << it->get<0>().get_string() << std::endl;
+  // add fresh interfaces
+  GOTT_FOREACH_RANGE(it, p->insert_interfaces) {
+    GOTT_AUTO_CREF(new_id, it->get<0>());
+    GOTT_AUTO_CREF(new_resource, it->get<1>());
+
+    GOTT_AUTO(candidates,
+        selection_eq(
+          get_interface_by_id(),
+          rtl::row<mpl::vector<interface_id> >(new_id)));
+    GOTT_AUTO_CREF(duplicates, candidates); // interface-id is the only data
+    if (duplicates.begin() == duplicates.end()) {
+      std::cout << "inserting ";
+      // ... no duplicate => insert
+      tr.insert(get_interface_table(), interface_table_t::value_type(
+            handle_t(),
+            new_id,
+            new_resource,
+            false));
+    } else {
+      std::cout << "updating ";
+      // ... duplicate => reuse handle
+      tr.update(get_interface_table(), interface_table_t::value_type(
+            duplicates.begin().get(interface_handle()),
+            new_id,
+            new_resource,
+            false));
     }
+    std::cout << new_id.get_string() << std::endl;
+  }
+
+  std::vector<std::pair<handle_t, impl::mod_lst::iterator> > added_new_modules;
+
+  // add fresh modules (ignore dependencies for now)
+  GOTT_FOREACH_RANGE(it, p->insert_modules) {
+    GOTT_AUTO_CREF(new_id, it->get<0>());
+    GOTT_AUTO_CREF(new_type, it->get<1>());
+    GOTT_AUTO_CREF(new_file, it->get<2>());
+    GOTT_AUTO_CREF(new_resource, it->get<4>());
+
+    GOTT_AUTO(candidates,
+        selection_eq(
+          get_module_by_id(),
+          rtl::row<mpl::vector<module_id> >(new_id)));
+    // FIXME: check whether dependencies are the same
+    GOTT_AUTO(duplicates,
+        selection(
+          candidates,
+          _1[module_type()] == new_type &&
+          _1[file_path()] == new_file));
+    if (duplicates.begin() == duplicates.end()) {
+      std::cout << "inserting module ";
+      // ... no duplicate => insert
+      handle_t handle;
+      tr.insert(get_module_table(), module_table_t::value_type(
+            handle,
+            new_id,
+            new_type,
+            new_file,
+            new_resource,
+            false));
+      added_new_modules.push_back(std::make_pair(handle, it));
+    } else {
+      std::cout << "updating module ";
+      // ... duplicate => reuse handle
+      tr.update(get_module_table(), module_table_t::value_type(
+            duplicates.begin().get(module_handle()),
+            new_id,
+            new_type,
+            new_file,
+            new_resource,
+            false));
+    }
+    std::cout << new_id.get_string() << std::endl;
+  }
+
+  // now care about their dependencies
+  GOTT_FOREACH_RANGE(it, added_new_modules) {
+    GOTT_AUTO_CREF(deps, it->second->get<3>());
+    GOTT_FOREACH_RANGE(jt, deps) {
+      std::cout << "+dep " << it->second->get<0>().get_string()
+        << " on " << jt->get_string() << std::endl;
+      GOTT_AUTO(exact_dependency_list,
+          rtl::selection_eq(
+            rtl::modified(get_module_by_id(), tr),
+            rtl::row<mpl::vector<module_id> >(*jt)));
+      if (exact_dependency_list.begin() == exact_dependency_list.end())
+        throw gott::system_error("module dependency not found");
+      handle_t dep_handle =
+        exact_dependency_list.begin().get(module_handle());
+      
+      tr.insert(get_module_dependencies_table(),
+          module_dependencies_table_t::value_type(
+            it->first, dep_handle));
+    }
+  }
+
+  // add fresh plugins
+  GOTT_FOREACH_RANGE(it, p->insert_plugins) {
+    GOTT_AUTO_CREF(new_id, it->get<0>());
+    std::vector<QID> supported_interfaces(1, it->get<1>());
+    GOTT_AUTO_CREF(new_module_id, it->get<2>());
+    GOTT_AUTO_CREF(new_symbol, it->get<3>());
+    GOTT_AUTO_CREF(new_resource, it->get<4>());
+
+    // search enclosing module first
+    GOTT_AUTO(enclosing_module_list,
+        rtl::selection_eq(
+          rtl::modified(get_module_by_id(), tr),
+          rtl::row<mpl::vector<module_id> >(new_module_id)));
+    if (enclosing_module_list.begin() == enclosing_module_list.end())
+      throw gott::system_error("enclosing module not found");
+    handle_t enclosing_module_handle =
+        enclosing_module_list.begin().get(module_handle());
+
+    GOTT_AUTO(candidates,
+        selection_eq(
+          get_plugin_by_id(),
+          rtl::row<mpl::vector<plugin_id> >(new_id)));
+    // FIXME: check whether supported interfaces are the same
+    GOTT_AUTO(duplicates,
+        selection(
+          candidates,
+          _1[symbol()] == new_symbol &&
+          _1[module_handle()] == enclosing_module_handle));
+    if (duplicates.begin() == duplicates.end()) {
+      std::cout << "inserting plugin (";
+      // ... no duplicate => insert
+      handle_t handle;
+      tr.insert(get_plugin_table(), plugin_table_t::value_type(
+            handle,
+            new_id,
+            new_symbol,
+            enclosing_module_handle,
+            new_resource,
+            false));
+
+      // add supported interfaces
+      GOTT_FOREACH_RANGE(jt, supported_interfaces) {
+        std::cout << jt->get_string() << ' ' << std::flush;
+        // search the actual interface first
+        GOTT_AUTO(supported_interface_list,
+            rtl::selection_eq(
+              rtl::modified(get_interface_by_id(), tr),
+              rtl::row<mpl::vector<interface_id> >(*jt)));
+        if (supported_interface_list.begin() == supported_interface_list.end())
+          throw gott::system_error("supported interface not found");
+        handle_t the_interface_handle =
+          supported_interface_list.begin().get(interface_handle());
+
+        tr.insert(get_plugin_interfaces_table(),
+            plugin_interfaces_table_t::value_type(
+              handle,
+              the_interface_handle));
+      }
+      std::cout << ')';
+    } else {
+      std::cout << "updating plugin ";
+      // ... duplicate => just update
+      tr.update(get_plugin_table(), plugin_table_t::value_type(
+            duplicates.begin().get(plugin_handle()),
+            new_id,
+            new_symbol,
+            enclosing_module_handle,
+            new_resource,
+            false));
+    }
+    std::cout << new_id.get_string() << std::endl;
   }
 
   // update indexes and commit
