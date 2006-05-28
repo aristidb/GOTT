@@ -79,7 +79,7 @@ void enumerate_internal(
     boost::function<void (interface const &)> const &callback,
     bool cancel_early,
     bool validate) {
-  for (typename T::const_iterator it = rel.begin(); it != rel.end(); ++it) {
+  GOTT_FOREACH_RANGE(it, rel) {
     if (it.get(obsolete()))
       continue;
     callback(interface(it.get(interface_handle())));

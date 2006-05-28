@@ -130,6 +130,8 @@ void enumerate_plugins_internal(
     bool cancel_early,
     bool validate) {
   GOTT_FOREACH_RANGE(it, rel) {
+    if (it.get(obsolete()))
+      continue;
     plugin current(it.get(plugin_handle()));
     if (validate && !current.is_valid())
       continue;

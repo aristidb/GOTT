@@ -112,6 +112,8 @@ void enumerate_modules_internal(
     bool cancel_early,
     bool validate) {
   GOTT_FOREACH_RANGE(it, rel) {
+    if (it.get(obsolete()))
+      continue;
     module current(it.get(module_handle()));
     if (validate && !current.is_valid())
       continue;
