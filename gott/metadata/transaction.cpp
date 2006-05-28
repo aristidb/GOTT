@@ -49,7 +49,6 @@
 #include <boost/rtl/key_index_delta.hpp>
 #include <boost/rtl/table_delta.hpp>
 #include <boost/rtl/lambda_support.hpp>
-#include<iostream>//FIXME
 
 using gott::metadata::transaction;
 
@@ -86,12 +85,6 @@ public:
 transaction::transaction() : p(new impl) {}
 transaction::~transaction() {}
 
-struct print_ftor {//FIXME
-  void operator() (gott::metadata::interface const &x) const {
-    std::cout << x.interface_id().get_string() << std::endl;
-  }
-};
-
 void transaction::commit() {
   using namespace metadata_db;
   using namespace boost::lambda;
@@ -102,7 +95,6 @@ void transaction::commit() {
 
   // mark obsolete resources' metadata
   GOTT_FOREACH_RANGE(it, p->remove_resources) {
-    std::cout << "$obsoleting resource... " << *it << std::endl;
     // mark interfaces from obsolete resource
     GOTT_AUTO(obsolete_interfaces,
         rtl::selection(
@@ -110,8 +102,6 @@ void transaction::commit() {
           _1[metadata_db::resource()] == *it));
     GOTT_FOREACH_RANGE(jt, obsolete_interfaces) {
       interface_table_t::value_type x = *jt;
-      std::cout << "obsoleting interface " << x[interface_id()].get_string()
-        << std::endl;
       x[obsolete()] = true;
       tr.update(get_interface_table(), x);
     }
@@ -123,8 +113,6 @@ void transaction::commit() {
           _1[metadata_db::resource()] == *it));
     GOTT_FOREACH_RANGE(jt, obsolete_modules) {
       module_table_t::value_type x = *jt;
-      std::cout << "obsoleting module " << x[module_id()].get_string()
-        << std::endl;
       x[obsolete()] = true;
       tr.update(get_module_table(), x);
     }
@@ -136,8 +124,6 @@ void transaction::commit() {
           _1[metadata_db::resource()] == *it));
     GOTT_FOREACH_RANGE(jt, obsolete_plugins) {
       plugin_table_t::value_type x = *jt;
-      std::cout << "obsoleting plugin " << x[plugin_id()].get_string()
-        << std::endl;
       x[obsolete()] = true;
       tr.update(get_plugin_table(), x);
     }
@@ -154,7 +140,6 @@ void transaction::commit() {
           rtl::row<mpl::vector1<interface_id> >(new_id)));
     GOTT_AUTO_CREF(duplicates, candidates); // interface-id is the only data
     if (duplicates.begin() == duplicates.end()) {
-      std::cout << "inserting ";
       // ... no duplicate => insert
       tr.insert(get_interface_table(), interface_table_t::value_type(
             handle_t(),
@@ -162,7 +147,6 @@ void transaction::commit() {
             new_resource,
             false));
     } else {
-      std::cout << "updating ";
       // ... duplicate => reuse handle
       tr.update(get_interface_table(), interface_table_t::value_type(
             duplicates.begin().get(interface_handle()),
@@ -170,7 +154,6 @@ void transaction::commit() {
             new_resource,
             false));
     }
-    std::cout << new_id.get_string() << std::endl;
   }
 
   std::vector<std::pair<handle_t, impl::mod_lst::iterator> > added_new_modules;
@@ -193,7 +176,6 @@ void transaction::commit() {
           _1[module_type()] == new_type &&
           _1[file_path()] == new_file));
     if (duplicates.begin() == duplicates.end()) {
-      std::cout << "inserting module ";
       // ... no duplicate => insert
       handle_t handle;
       tr.insert(get_module_table(), module_table_t::value_type(
@@ -205,7 +187,6 @@ void transaction::commit() {
             false));
       added_new_modules.push_back(std::make_pair(handle, it));
     } else {
-      std::cout << "updating module ";
       // ... duplicate => reuse handle
       tr.update(get_module_table(), module_table_t::value_type(
             duplicates.begin().get(module_handle()),
@@ -215,15 +196,12 @@ void transaction::commit() {
             new_resource,
             false));
     }
-    std::cout << new_id.get_string() << std::endl;
   }
 
   // now care about their dependencies
   GOTT_FOREACH_RANGE(it, added_new_modules) {
     GOTT_AUTO_CREF(deps, it->second->get<3>());
     GOTT_FOREACH_RANGE(jt, deps) {
-      std::cout << "+dep " << it->second->get<0>().get_string()
-        << " on " << jt->get_string() << std::endl;
       GOTT_AUTO(exact_dependency_list,
           rtl::selection_eq(
             rtl::modified(get_module_by_id(), tr),
@@ -268,7 +246,6 @@ void transaction::commit() {
           _1[symbol()] == new_symbol &&
           _1[module_handle()] == enclosing_module_handle));
     if (duplicates.begin() == duplicates.end()) {
-      std::cout << "inserting plugin (";
       // ... no duplicate => insert
       handle_t handle;
       tr.insert(get_plugin_table(), plugin_table_t::value_type(
@@ -281,7 +258,6 @@ void transaction::commit() {
 
       // add supported interfaces
       GOTT_FOREACH_RANGE(jt, supported_interfaces) {
-        std::cout << jt->get_string() << ' ' << std::flush;
         // search the actual interface first
         GOTT_AUTO(supported_interface_list,
             rtl::selection_eq(
@@ -297,9 +273,7 @@ void transaction::commit() {
               handle,
               the_interface_handle));
       }
-      std::cout << ')';
     } else {
-      std::cout << "updating plugin ";
       // ... duplicate => just update
       tr.update(get_plugin_table(), plugin_table_t::value_type(
             duplicates.begin().get(plugin_handle()),
@@ -309,7 +283,6 @@ void transaction::commit() {
             new_resource,
             false));
     }
-    std::cout << new_id.get_string() << std::endl;
   }
 
   // update indexes and commit
@@ -319,9 +292,6 @@ void transaction::commit() {
   exprs.add(get_interface_by_id());
   exprs.add(get_plugin_with_interface());
   tr.commit(exprs);
-
-  std::cout << "all interfaces:" << std::endl;
-  enumerate_interfaces(print_ftor(), tags::load_standard_metadata = false);
 }
 
 void transaction::remove_resource(string const &r) {

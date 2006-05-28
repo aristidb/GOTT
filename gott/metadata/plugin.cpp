@@ -82,6 +82,7 @@ QID plugin::plugin_id() const {
 }
 
 bool plugin::supports_interface(interface const &x) const {
+  global_mutex::scoped_lock lock(get_global_lock());
   GOTT_AUTO(sel,
       rtl::selection_eq(
         get_plugin_interfaces_table(),
