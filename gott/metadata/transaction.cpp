@@ -93,21 +93,11 @@ struct print_ftor {//FIXME
 };
 
 void transaction::commit() {
-  metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
-  GOTT_FOREACH_RANGE(it, p->remove_resources) {
-    detail::remove_plugin_resource(*it);
-  }
-  GOTT_FOREACH_RANGE(it, p->insert_plugins) {
-    detail::add_plugin(
-        it->get<0>(),
-        it->get<1>().front(),
-        it->get<2>(),
-        it->get<3>(),
-        it->get<4>());
-  }
-
   using namespace metadata_db;
   using namespace boost::lambda;
+
+  metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
+
   rtl::transaction tr;
 
   // mark obsolete resources' metadata
@@ -161,7 +151,7 @@ void transaction::commit() {
     GOTT_AUTO(candidates,
         selection_eq(
           get_interface_by_id(),
-          rtl::row<mpl::vector<interface_id> >(new_id)));
+          rtl::row<mpl::vector1<interface_id> >(new_id)));
     GOTT_AUTO_CREF(duplicates, candidates); // interface-id is the only data
     if (duplicates.begin() == duplicates.end()) {
       std::cout << "inserting ";
@@ -195,7 +185,7 @@ void transaction::commit() {
     GOTT_AUTO(candidates,
         selection_eq(
           get_module_by_id(),
-          rtl::row<mpl::vector<module_id> >(new_id)));
+          rtl::row<mpl::vector1<module_id> >(new_id)));
     // FIXME: check whether dependencies are the same
     GOTT_AUTO(duplicates,
         selection(
@@ -237,7 +227,7 @@ void transaction::commit() {
       GOTT_AUTO(exact_dependency_list,
           rtl::selection_eq(
             rtl::modified(get_module_by_id(), tr),
-            rtl::row<mpl::vector<module_id> >(*jt)));
+            rtl::row<mpl::vector1<module_id> >(*jt)));
       if (exact_dependency_list.begin() == exact_dependency_list.end())
         throw gott::system_error("module dependency not found");
       handle_t dep_handle =
@@ -261,7 +251,7 @@ void transaction::commit() {
     GOTT_AUTO(enclosing_module_list,
         rtl::selection_eq(
           rtl::modified(get_module_by_id(), tr),
-          rtl::row<mpl::vector<module_id> >(new_module_id)));
+          rtl::row<mpl::vector1<module_id> >(new_module_id)));
     if (enclosing_module_list.begin() == enclosing_module_list.end())
       throw gott::system_error("enclosing module not found");
     handle_t enclosing_module_handle =
@@ -270,7 +260,7 @@ void transaction::commit() {
     GOTT_AUTO(candidates,
         selection_eq(
           get_plugin_by_id(),
-          rtl::row<mpl::vector<plugin_id> >(new_id)));
+          rtl::row<mpl::vector1<plugin_id> >(new_id)));
     // FIXME: check whether supported interfaces are the same
     GOTT_AUTO(duplicates,
         selection(
@@ -296,7 +286,7 @@ void transaction::commit() {
         GOTT_AUTO(supported_interface_list,
             rtl::selection_eq(
               rtl::modified(get_interface_by_id(), tr),
-              rtl::row<mpl::vector<interface_id> >(*jt)));
+              rtl::row<mpl::vector1<interface_id> >(*jt)));
         if (supported_interface_list.begin() == supported_interface_list.end())
           throw gott::system_error("supported interface not found");
         handle_t the_interface_handle =
@@ -327,6 +317,7 @@ void transaction::commit() {
   exprs.add(get_module_by_id());
   exprs.add(get_plugin_by_id());
   exprs.add(get_interface_by_id());
+  exprs.add(get_plugin_with_interface());
   tr.commit(exprs);
 
   std::cout << "all interfaces:" << std::endl;

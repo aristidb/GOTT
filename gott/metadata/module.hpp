@@ -63,6 +63,8 @@ namespace metadata {
 class module {
 public:
   explicit module(handle_t handle) : handle(handle) {}
+
+  handle_t const &get_handle() const { return handle; }
   
   /**
    * The module's unique identifier.

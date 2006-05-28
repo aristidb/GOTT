@@ -67,38 +67,38 @@ BOOST_RTL_DEFINE_COLUMN(QID, interface_id)
 
 // Field lists
 typedef 
-  mpl::vector<module_handle>
+  mpl::vector1<module_handle>
   module_sort_list;
 typedef
-  mpl::vector<module_handle, module_id, module_type, file_path,
+  mpl::vector6<module_handle, module_id, module_type, file_path,
               resource, obsolete>
   module_field_list;
 
 typedef
-  mpl::vector<plugin_handle>
+  mpl::vector1<plugin_handle>
   plugin_sort_list;
 typedef
-  mpl::vector<plugin_handle, plugin_id, symbol, module_handle,
+  mpl::vector6<plugin_handle, plugin_id, symbol, module_handle,
               resource, obsolete>
   plugin_field_list;
 
 typedef
-  mpl::vector<interface_handle>
+  mpl::vector1<interface_handle>
   interface_sort_list;
 typedef
-  mpl::vector<interface_handle, interface_id,
+  mpl::vector4<interface_handle, interface_id,
               resource, obsolete>
   interface_field_list;
 
 typedef
-  mpl::vector<plugin_handle, interface_handle>
+  mpl::vector2<plugin_handle, interface_handle>
   plugin_interfaces_field_list;
 typedef
   plugin_interfaces_field_list
   plugin_interfaces_sort_list;
 
 typedef
-  mpl::vector<module_handle, rtl::alias<module_handle> >
+  mpl::vector2<module_handle, rtl::alias<module_handle> >
   module_dependencies_field_list;
 typedef
   module_dependencies_field_list

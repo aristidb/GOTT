@@ -82,13 +82,15 @@ public:
    * The module the plugin resides in.
    */
   GOTT_EXPORT
-  module enclosing_module(bool load_standard_metadata = true) const;
+  module enclosing_module() const;
 
   /**
    * The entry smbol of the plugin.
    */
   GOTT_EXPORT
   string symbol() const;
+
+  handle_t const &get_handle() const { return handle; }
 
 public: //internal
   bool is_valid() const;
@@ -197,16 +199,6 @@ find_plugin(
     bool tags::validate = true
     );
 #endif
-
-namespace detail {
-void add_plugin(
-    QID const &plugin_id,
-    QID const &supported_interface,
-    QID const &enclosing_module,
-    string const &symbol,
-    string const &resource);
-void remove_plugin_resource(string const &resource);
-}
 
 /**
  * Write a plugin's metadata to a stream.

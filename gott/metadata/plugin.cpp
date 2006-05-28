@@ -41,44 +41,63 @@
 #include "load.hpp"
 #include "validate.hpp"
 #include "database.hpp"
+#include "tables.hpp"
+#include "index.hpp"
 #include <gott/exceptions.hpp>
-#include <gott/range_algo.hpp>
-#include <boost/thread.hpp>
-#include <map>
-#include <boost/tuple/tuple.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/if.hpp>
 #include <boost/lambda/bind.hpp>
+#include <boost/lambda/construct.hpp>
+#include <boost/rtl/lambda_support.hpp>
 
 using namespace gott::metadata;
+using namespace gott::metadata_db;
 using gott::QID;
 using gott::string;
 
 namespace {
-  typedef boost::tuple<QID, QID, QID, string> desc_t;
-  typedef std::map<handle_t, desc_t> 
-    plugin_list_t;
-  static plugin_list_t known_plugin;
-  typedef std::multimap<gott::string, handle_t> res_map_t;
-  static res_map_t resources;
+template<class Ret, class T>
+Ret get_attribute(handle_t const &handle, T const &attribute) {
+  global_mutex::scoped_lock lock(get_global_lock());
+  GOTT_AUTO(
+      obj_sel,
+      rtl::selection_eq(
+        get_plugin_table(),
+        rtl::row<mpl::vector1<plugin_handle> >(handle)));
+
+  if (obj_sel.begin() == obj_sel.end() ||
+      ++obj_sel.begin() != obj_sel.end())
+    throw gott::internal_error(
+        "metadata integrity: plugin query did not "
+        "deliver exactly one item");
+
+  GOTT_AUTO_CREF(obj, *obj_sel.begin());
+  
+  return obj[attribute];
+}
 }
 
 QID plugin::plugin_id() const {
-  return known_plugin[handle].get<0>();
+  return get_attribute<QID>(handle, metadata_db::plugin_id());
 }
 
 bool plugin::supports_interface(interface const &x) const {
-  return known_plugin[handle].get<1>() == x.interface_id();
+  GOTT_AUTO(sel,
+      rtl::selection_eq(
+        get_plugin_interfaces_table(),
+        plugin_interfaces_table_t::value_type(handle, x.get_handle())));
+  return sel.begin() != sel.end();
 }
 
 void plugin::enumerate_supported_interfaces(
     boost::function<void (interface const &)> const &callback) const {
-  boost::optional<interface> res = find_interface(known_plugin[handle].get<1>(),
-        tags::validate = false,
-        tags::load_standard_metadata = false);
-  if (!res)
-    throw system_error("interface not found");
-  callback(*res);
+  global_mutex::scoped_lock lock(get_global_lock());
+  GOTT_AUTO(sel,
+      rtl::selection_eq(
+        get_plugin_interfaces_table(),
+        rtl::row<mpl::vector1<plugin_handle> >(handle)));
+  GOTT_FOREACH_RANGE(it, sel)
+    callback(interface(it.get(interface_handle())));
 }
 
 bool plugin::supports_interface_id(QID const &id) const {
@@ -92,42 +111,26 @@ bool plugin::supports_interface_id(QID const &id) const {
 }
 
 string plugin::symbol() const {
-  return known_plugin[handle].get<3>();
+  return get_attribute<string>(handle, metadata_db::symbol());
 }
 
-module plugin::enclosing_module(bool do_load_standard_metadata) const {
-  boost::optional<module> res =
-    find_module(
-        known_plugin[handle].get<2>(),
-        tags::validate = false,
-        tags::load_standard_metadata = do_load_standard_metadata);
-  if (!res)
-    throw system_error("module not found");
-  return *res;
+module plugin::enclosing_module() const {
+  return module(get_attribute<handle_t>(handle, metadata_db::module_handle()));
 }
 
 bool plugin::is_valid() const {
   return detail::validate(*this);
 }
 
-void gott::metadata::enumerate_plugins_p(
+namespace {
+template<class T>
+void enumerate_plugins_internal(
+    T const &rel,
     boost::function<void (plugin const &)> const &function,
-    boost::optional<QID const &> const &plugin_id,
-    boost::optional<QID const &> const &interface_id,
     bool cancel_early,
-    bool do_load_standard_metadata,
     bool validate) {
-  if (do_load_standard_metadata)
-    load_standard();
-  metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
-  plugin_list_t::const_iterator begin = known_plugin.begin();
-  plugin_list_t::const_iterator end = known_plugin.end();
-  for (plugin_list_t::const_iterator it = begin; it != end; ++it) {
-    plugin current(it->first);
-    if (plugin_id && current.plugin_id() != *plugin_id)
-      continue;
-    if (interface_id && !current.supports_interface_id(*interface_id))
-      continue;
+  GOTT_FOREACH_RANGE(it, rel) {
+    plugin current(it.get(plugin_handle()));
     if (validate && !current.is_valid())
       continue;
     function(current);
@@ -136,22 +139,56 @@ void gott::metadata::enumerate_plugins_p(
   }
 }
 
-void gott::metadata::detail::add_plugin(
-    QID const &plugin_id,
-    QID const &supported_interface,
-    QID const &enclosing_module,
-    string const &symbol,
-    string const &resource) {
-  handle_t h;
-  known_plugin[h] = 
-    desc_t(plugin_id, supported_interface, enclosing_module, symbol);
-  resources.insert(std::make_pair(resource, h));
+bool check_interface(QID const &ifc, handle_t const &handle) {
+  return plugin(handle).supports_interface_id(ifc);
+}
 }
 
-void gott::metadata::detail::remove_plugin_resource(string const &resource) {
-  std::pair<res_map_t::iterator, res_map_t::iterator> rng
-    = resources.equal_range(resource);
-  for (res_map_t::iterator it = rng.first; it != rng.second; ++it)
-    known_plugin.erase(it->second);
-  resources.erase(rng.first, rng.second);
+void gott::metadata::enumerate_plugins_p(
+    boost::function<void (plugin const &)> const &function,
+    boost::optional<QID const &> const &the_plugin_id,
+    boost::optional<QID const &> const &the_interface_id,
+    bool cancel_early,
+    bool do_load_standard_metadata,
+    bool validate) {
+  if (do_load_standard_metadata)
+    load_standard();
+  metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
+  using namespace boost::lambda;
+  if (the_plugin_id) {
+    GOTT_AUTO(
+        sel,
+        rtl::selection_eq(
+          get_plugin_by_id(),
+          rtl::row<mpl::vector1<plugin_id> >(*the_plugin_id)));
+    if (!the_interface_id)
+      return enumerate_plugins_internal(sel, function, cancel_early, validate);
+    return enumerate_plugins_internal(
+        rtl::selection(
+          rtl::join_eq<mpl::vector1<plugin_handle> >(
+            sel,
+            get_plugin_interfaces_table()),
+          bind(
+            &check_interface,
+            *the_interface_id,
+            _1[plugin_handle()])),
+        function, cancel_early, validate);
+  }
+  if (the_interface_id) {
+    GOTT_AUTO(
+        interfaces,
+        rtl::selection_eq(
+          get_interface_by_id(),
+          rtl::row<mpl::vector1<interface_id> >(*the_interface_id))
+        );
+    GOTT_AUTO(
+        sel,
+        rtl::join_eq<mpl::vector1<interface_handle> >(
+          interfaces,
+          get_plugin_with_interface()));
+    return enumerate_plugins_internal(sel, function, cancel_early, validate);
+  }
+  GOTT_AUTO_CREF(sel, get_plugin_table());
+  return enumerate_plugins_internal(sel, function, cancel_early, validate);
 }
+

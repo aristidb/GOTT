@@ -54,7 +54,7 @@ Ret get_attribute(handle_t const &handle, T const &attribute) {
       obj_sel,
       rtl::selection_eq(
         get_interface_table(),
-        rtl::row<mpl::vector<interface_handle> >(handle)));
+        rtl::row<mpl::vector1<interface_handle> >(handle)));
 
   if (obj_sel.begin() == obj_sel.end() ||
       ++obj_sel.begin() != obj_sel.end())
@@ -108,7 +108,7 @@ void gott::metadata::enumerate_interfaces_p(
   return enumerate_internal(
       rtl::selection_eq(
         get_interface_by_id(),
-        rtl::row<mpl::vector<metadata_db::interface_id> >(interface_id.get())),
+        rtl::row<mpl::vector1<metadata_db::interface_id> >(interface_id.get())),
       callback,
       cancel_early,
       validate);

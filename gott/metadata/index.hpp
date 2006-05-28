@@ -45,15 +45,20 @@ namespace gott { namespace metadata_db {
 
 GOTT_AUTO_OBJFN(
     get_module_by_id,
-    rtl::key_index<mpl::vector<module_id> >(get_module_table()));
+    rtl::key_index<mpl::vector1<module_id> >(get_module_table()));
 
 GOTT_AUTO_OBJFN(
     get_plugin_by_id,
-    rtl::key_index<mpl::vector<plugin_id> >(get_plugin_table()));
+    rtl::key_index<mpl::vector1<plugin_id> >(get_plugin_table()));
 
 GOTT_AUTO_OBJFN(
     get_interface_by_id,
-    rtl::key_index<mpl::vector<interface_id> >(get_interface_table()));
+    rtl::key_index<mpl::vector1<interface_id> >(get_interface_table()));
+
+GOTT_AUTO_OBJFN(
+    get_plugin_with_interface,
+    rtl::key_index<mpl::vector1<interface_handle> >(
+      get_plugin_interfaces_table()));
 
 }}
 

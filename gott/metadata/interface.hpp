@@ -54,6 +54,8 @@ public:
   GOTT_EXPORT
   QID interface_id() const;
 
+  handle_t const &get_handle() const { return handle; }
+
 private:
   handle_t handle;
 };

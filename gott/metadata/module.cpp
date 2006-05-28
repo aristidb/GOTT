@@ -56,12 +56,12 @@ Ret get_attribute(handle_t const &handle, T const &attribute) {
       obj_sel,
       rtl::selection_eq(
         get_module_table(),
-        rtl::row<mpl::vector<module_handle> >(handle)));
+        rtl::row<mpl::vector1<module_handle> >(handle)));
 
   if (obj_sel.begin() == obj_sel.end() ||
       ++obj_sel.begin() != obj_sel.end())
     throw gott::internal_error(
-        "metadata integrity: interface query did not "
+        "metadata integrity: module query did not "
         "deliver exactly one item");
 
   GOTT_AUTO_CREF(obj, *obj_sel.begin());
@@ -86,10 +86,10 @@ void module::enumerate_dependencies(
     boost::function<void (module const &)> const &fun) const {
   global_mutex::scoped_lock lock(get_global_lock());
   GOTT_AUTO(deps,
-      rtl::projection<mpl::vector<rtl::alias<module_handle> > >(
+      rtl::projection<mpl::vector1<rtl::alias<module_handle> > >(
         rtl::selection_eq(
           get_module_dependencies_table(),
-          rtl::row<mpl::vector<module_handle> >(handle))));
+          rtl::row<mpl::vector1<module_handle> >(handle))));
   GOTT_FOREACH_RANGE(it, deps)
     fun(module(it.get(rtl::alias<module_handle>())));
 }
@@ -135,7 +135,7 @@ void gott::metadata::enumerate_modules_p(
     return enumerate_modules_internal(
         rtl::selection_eq(
           get_module_by_id(),
-          rtl::row<mpl::vector<metadata_db::module_id> >(*module_id)),
+          rtl::row<mpl::vector1<metadata_db::module_id> >(*module_id)),
         callback,
         cancel_early,
         validate);
