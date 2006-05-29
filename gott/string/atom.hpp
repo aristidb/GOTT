@@ -95,8 +95,7 @@ inline bool operator>=(atom const &a, atom const &b) {
   return !(a < b);
 }
 
-GOTT_EXPORT
-std::ostream &operator<<(std::ostream &os, atom const &x) {
+inline std::ostream &operator<<(std::ostream &os, atom const &x) {
   return os << x.get_string();
 }
 
