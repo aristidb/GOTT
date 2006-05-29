@@ -62,6 +62,8 @@ using std::ostream;
 
 namespace {
   struct plugin_accepter : writable_structure {
+    plugin_accepter() : priority(1) {}
+    
     QID plugin_id;
     std::vector<QID> interfaces;
     QID enclosing_module_id;
