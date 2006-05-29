@@ -39,7 +39,8 @@
 #define GOTT_METADATA_TABLES_HPP
 
 #include "handle.hpp"
-#include "../module.hpp"
+#include "../module.hpp" // for metadata::module::module_type_t
+#include "../plugin.hpp" // for metadata::plugin_priority
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/rtl/rtl.hpp>
@@ -53,7 +54,7 @@ namespace mpl = boost::mpl;
 BOOST_RTL_DEFINE_COLUMN(string, resource)
 BOOST_RTL_DEFINE_COLUMN(bool, obsolete)
 // attention: the lower the value, the higher the priority
-BOOST_RTL_DEFINE_COLUMN(int, priority)
+BOOST_RTL_DEFINE_COLUMN(metadata::plugin_priority, priority)
 
 BOOST_RTL_DEFINE_COLUMN(metadata::handle_t, module_handle)
 BOOST_RTL_DEFINE_COLUMN(QID, module_id)
@@ -77,7 +78,7 @@ typedef
   module_field_list;
 
 typedef
-  mpl::vector2<plugin_handle, priority>
+  mpl::vector1<plugin_handle>
   plugin_sort_list;
 typedef
   mpl::vector7<plugin_handle, priority, plugin_id, symbol, module_handle,

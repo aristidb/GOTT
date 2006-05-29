@@ -92,7 +92,7 @@ module_by_id_t &get_module_by_id();
 typedef
   rtl::key_index_t<
     new_plugins_t,
-    mpl::vector2<plugin_id, priority>
+    mpl::vector1<plugin_id>
   >::type
   plugin_by_id_t;
 

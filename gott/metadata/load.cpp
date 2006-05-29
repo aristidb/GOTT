@@ -92,7 +92,7 @@ void do_load_core() {
           std::vector<gott::QID>(1, "tdl::schema::type"),
           "tdl::builtins",
           "plugin_schema_" + s,
-          0,
+          normal_priority,
           "core");
     }
   } add_schema_type;

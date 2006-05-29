@@ -50,6 +50,7 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/construct.hpp>
 #include <boost/rtl/lambda_support.hpp>
+#include <boost/rtl/invert.hpp>
 
 using namespace gott::metadata;
 using namespace gott::metadata_db;
@@ -116,6 +117,10 @@ string plugin::symbol() const {
   return get_attribute<string>(handle, metadata_db::symbol());
 }
 
+plugin_priority plugin::priority() const {
+  return get_attribute<plugin_priority>(handle, metadata_db::priority());
+}
+
 module plugin::enclosing_module() const {
   return module(get_attribute<handle_t>(handle, metadata_db::module_handle()));
 }
@@ -125,20 +130,34 @@ bool plugin::is_valid() const {
 }
 
 namespace {
+bool enumerate_plugins_internal2(
+    std::vector<plugin> const &plugins,
+    boost::function<void (plugin const &)> const &function,
+    bool cancel_early) {
+  GOTT_FOREACH_RANGE(it, plugins) {
+    function(*it);
+    if (cancel_early)
+      return true;
+  }
+  return false;
+}
+
 template<class T>
 void enumerate_plugins_internal(
     T const &rel,
     boost::function<void (plugin const &)> const &function,
     bool cancel_early,
     bool validate) {
+  std::vector<plugin> by_priority[INVALID_PRIORITY];
   GOTT_FOREACH_RANGE(it, rel) {
     plugin current(it.get(plugin_handle()));
     if (validate && !current.is_valid())
       continue;
-    function(current);
-    if (cancel_early)
-      break;
+    by_priority[current.priority()].push_back(current);
   }
+  for (int i = 0; i < INVALID_PRIORITY; ++i)
+    if (enumerate_plugins_internal2(by_priority[i], function, cancel_early))
+      break;
 }
 
 bool check_interface(QID const &ifc, handle_t const &handle) {
@@ -155,7 +174,7 @@ void gott::metadata::enumerate_plugins_p(
     bool validate) {
   if (do_load_standard_metadata)
     load_standard();
-  metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
+  global_mutex::scoped_lock lock(get_global_lock());
   using namespace boost::lambda;
   if (the_plugin_id) {
     GOTT_AUTO(

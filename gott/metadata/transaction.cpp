@@ -64,7 +64,7 @@ public:
     std::vector<QID> supported_interfaces;
     QID enclosing_module;
     string symbol;
-    int priority;
+    plugin_priority priority;
     string resource;
   };
 
@@ -283,7 +283,6 @@ void transaction::commit_plugins() {
     GOTT_AUTO(duplicates,
         selection(
           candidates,
-          _1[priority()] == it->priority &&
           _1[symbol()] == it->symbol &&
           _1[module_handle()] == enclosing_module_handle));
     if (duplicates.begin() == duplicates.end()) {
@@ -362,7 +361,7 @@ void transaction::add_plugin(
     std::vector<QID> const &supported_interfaces,
     QID const &enclosing_module,
     string const &symbol,
-    int priority,
+    plugin_priority priority,
     string const &resource) {
   impl::plugin_info x =
     { 

@@ -62,13 +62,13 @@ using std::ostream;
 
 namespace {
   struct plugin_accepter : writable_structure {
-    plugin_accepter() : priority(1) {}
+    plugin_accepter() : priority(normal_priority) {}
     
     QID plugin_id;
     std::vector<QID> interfaces;
     QID enclosing_module_id;
     string symbol;
-    int priority;
+    plugin_priority priority;
 
     string tag;
     Xany data_;
@@ -84,7 +84,7 @@ namespace {
       else if (tag == "symbol")
         symbol = Xany_cast<string>(data_);
       else if (tag == "priority")
-        priority = Xany_cast<int>(data_);
+        priority = Xany_cast<plugin_priority>(data_);
       tag = string();
     }
 

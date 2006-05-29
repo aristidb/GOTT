@@ -54,6 +54,10 @@ namespace gott { namespace metadata {
 class module;
 class interface;
 
+enum plugin_priority {
+  high_priority, normal_priority, low_priority, INVALID_PRIORITY
+};
+
 /**
  * A plugin's metadata.
  */
@@ -76,6 +80,9 @@ public:
   GOTT_EXPORT
   void enumerate_supported_interfaces(
       boost::function<void (interface const &)> const &callback) const;
+
+  GOTT_EXPORT
+  plugin_priority priority() const;
 
   /**
    * The module the plugin resides in.

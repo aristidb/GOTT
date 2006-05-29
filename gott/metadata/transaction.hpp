@@ -39,6 +39,7 @@
 #define GOTT_METADATA_TRANSACTION_HPP
 
 #include "module.hpp"
+#include "plugin.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <iosfwd>
@@ -76,7 +77,7 @@ public: //internal
       std::vector<QID> const &supported_interfaces,
       QID const &enclosing_module,
       string const &symbol,
-      int priority,
+      plugin_priority priority,
       string const &resource);
   void add_interface(
       QID const &interface_id,
