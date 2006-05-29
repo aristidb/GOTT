@@ -35,11 +35,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "load.hpp"
-#include "plugin.hpp"
-#include "module.hpp"
-#include "interface.hpp"
-#include "transaction.hpp"
+#include "../load.hpp"
+#include "../plugin.hpp"
+#include "../module.hpp"
+#include "../interface.hpp"
+#include "../transaction.hpp"
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/by_name.hpp>
@@ -47,7 +47,6 @@
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/tdl/structure/repatchers/enumeration.hpp>
-#include <gott/tdl/write/writer.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
@@ -89,7 +88,7 @@ namespace {
   };
 }
 
-void gott::metadata::update_plugin_resource(
+void gott::metadata::detail::update_plugin_resource(
     istream &stream,
     string const &resource,
     transaction &tr) {
@@ -159,42 +158,6 @@ void gott::metadata::update_plugin_resource(
 }
 
 namespace {
-void dump_interface(tdl::tdl_writer &w, interface const &x) {
-  w.node("has-interface");
-  w.down();
-    w.node(x.interface_id().get_string());
-  w.up();
-}
-}
-
-ostream &gott::metadata::operator<<(ostream &stream, plugin const &val) {
-  tdl::tdl_writer w(stream, 2);
-  w.down();
-  {
-    w.node("plugin-id"); 
-    w.down();
-      w.node(val.plugin_id().get_string());
-    w.up();
-  }
-  {
-    w.node("enclosing-module");
-    w.down();
-      w.node(val.enclosing_module().module_id().get_string());
-    w.up();
-  }
-  {
-    w.node("symbol");
-    w.down();
-      w.node(val.symbol());
-    w.up();
-  }
-  val.enumerate_supported_interfaces(
-      boost::bind(&dump_interface, boost::ref(w), _1));
-  w.up();
-  return stream;
-}
-
-namespace {
   class module_accepter : writable_structure {
   public:
     QID module_id;
@@ -223,7 +186,7 @@ namespace {
   };
 }
 
-void gott::metadata::update_module_resource(
+void gott::metadata::detail::update_module_resource(
     istream &stream,
     string const &resource,
     transaction &tr) {
@@ -296,49 +259,6 @@ void gott::metadata::update_module_resource(
 }
 
 namespace {
-  struct dep_t {
-    tdl::tdl_writer &w;
-    void operator() (module const &x) const {
-      w.node("depend-on");
-      w.down();
-        w.node(x.module_id().get_string());
-      w.up();
-    }
-  };
-}
-
-ostream &gott::metadata::operator<<(ostream &stream, module const &val) {
-  tdl::tdl_writer w(stream, 2);
-  w.down();
-  {
-    w.node("module-id"); 
-    w.down();
-      w.node(val.module_id().get_string());
-    w.up();
-  }
-  {
-    w.node("file-path");
-    w.down();
-      w.node(val.file_path());
-    w.up();
-  }
-  {
-    w.node("module-type");
-    w.down();
-      switch (val.module_type()) {
-      case module::dynamic_native:
-        w.node("dynamic-native");
-        break;
-      }
-    w.up();
-  }
-  dep_t dep = { w };
-  val.enumerate_dependencies(dep);
-  w.up();
-  return stream;
-}
-
-namespace {
   class interface_accepter : public writable_structure {
   public:
     QID interface_id;
@@ -357,7 +277,7 @@ namespace {
   };
 }
 
-void gott::metadata::update_interface_resource(
+void gott::metadata::detail::update_interface_resource(
     istream &stream,
     string const &resource,
     transaction &tr) {

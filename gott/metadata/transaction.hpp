@@ -40,11 +40,16 @@
 
 #include "module.hpp"
 #include <boost/scoped_ptr.hpp>
+#include <vector>
+#include <iosfwd>
 
 namespace gott {
   class string;
 
 namespace metadata {
+
+enum resource_kind { interface_resource, plugin_resource, module_resource };
+
 class transaction {
 public:
   GOTT_EXPORT transaction();
@@ -52,6 +57,12 @@ public:
   GOTT_EXPORT void commit();
 
   GOTT_EXPORT void remove_resource(string const &resource);
+
+  GOTT_EXPORT
+  void update_resource(
+      std::istream &stream,
+      string const &resource,
+      resource_kind kind);
 
 public: //internal
   void add_module(

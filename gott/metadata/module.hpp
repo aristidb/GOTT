@@ -44,22 +44,15 @@
 #include <gott/string/string.hpp>
 #include <boost/function.hpp>
 #include <boost/optional/optional.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
-#include <iosfwd>
-#include <vector>
 
 namespace gott { 
 namespace plugin { class module; }
 
 namespace metadata {
 
-/**
- *
- */
 class module {
 public:
   explicit module(handle_t handle) : handle(handle) {}
@@ -169,9 +162,6 @@ find_module(
     bool tags::load_standard_metadata = true,
     bool tags::validate = true);
 #endif
-
-GOTT_EXPORT
-std::ostream &operator<<(std::ostream &stream, module const &in);
 
 }}
 

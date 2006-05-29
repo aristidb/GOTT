@@ -54,23 +54,22 @@ void load_standard();
 
 class transaction;
 
-GOTT_EXPORT
+namespace detail {
 void update_module_resource(
     std::istream &stream,
     gott::string const &resource,
     transaction &tr);
 
-GOTT_EXPORT
 void update_plugin_resource(
     std::istream &stream,
     gott::string const &resource,
     transaction &tr);
 
-GOTT_EXPORT
 void update_interface_resource(
     std::istream &stream,
     gott::string const &resource,
     transaction &tr);
+}
 
 }}
 

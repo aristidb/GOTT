@@ -48,6 +48,7 @@
 #include <gott/syswrap/function_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lambda/bind.hpp>
+#include <vector>
 
 using gott::plugin::module;
 using gott::plugin::plugin_base;

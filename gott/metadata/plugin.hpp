@@ -48,7 +48,6 @@
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <iosfwd>
 
 namespace gott { namespace metadata {
 
@@ -199,14 +198,6 @@ find_plugin(
     bool tags::validate = true
     );
 #endif
-
-/**
- * Write a plugin's metadata to a stream.
- * \param stream The stream to write to.
- * \param in The metadata object to write.
- */
-GOTT_EXPORT
-std::ostream &operator<<(std::ostream &stream, plugin const &in);
 
 }}
 

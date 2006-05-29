@@ -60,17 +60,17 @@ void do_load_standard() {
   tr.remove_resource("core");
   {
     std::ifstream in("./plugin_registry.tdl");
-    update_plugin_resource(in, "./plugin_registry.tdl", tr);
+    tr.update_resource(in, "./plugin_registry.tdl", plugin_resource);
   }
 
   {
     std::ifstream in("./module_registry.tdl");
-    update_module_resource(in, "./module_registry.tdl", tr);
+    tr.update_resource(in, "./module_registry.tdl", module_resource);
   }
 
   {
     std::ifstream in("./interface_registry.tdl");
-    update_interface_resource(in, "./interface_registry.tdl", tr);
+    tr.update_resource(in, "./interface_registry.tdl", interface_resource);
   }
   tr.commit();
 }

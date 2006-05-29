@@ -39,6 +39,7 @@
 #include "plugin.hpp"
 #include "module.hpp"
 #include "interface.hpp"
+#include "load.hpp"
 #include "detail/database.hpp"
 #include "detail/tables.hpp"
 #include "detail/index.hpp"
@@ -296,6 +297,23 @@ void transaction::commit() {
 
 void transaction::remove_resource(string const &r) {
   p->remove_resources.push_back(r);
+}
+
+void transaction::update_resource(
+    std::istream &stream,
+    string const &resource,
+    resource_kind kind) {
+  switch (kind) {
+  case interface_resource:
+    detail::update_interface_resource(stream, resource, *this);
+    break;
+  case module_resource:
+    detail::update_module_resource(stream, resource, *this);
+    break;
+  case plugin_resource:
+    detail::update_plugin_resource(stream, resource, *this);
+    break;
+  }
 }
 
 void transaction::add_plugin(
