@@ -44,6 +44,7 @@
 #include "detail/tables.hpp"
 #include "detail/index.hpp"
 #include <gott/exceptions.hpp>
+#include <gott/auto.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/if.hpp>
 #include <boost/lambda/bind.hpp>
@@ -131,8 +132,6 @@ void enumerate_plugins_internal(
     bool cancel_early,
     bool validate) {
   GOTT_FOREACH_RANGE(it, rel) {
-    if (it.get(obsolete()))
-      continue;
     plugin current(it.get(plugin_handle()));
     if (validate && !current.is_valid())
       continue;
@@ -191,7 +190,7 @@ void gott::metadata::enumerate_plugins_p(
           get_plugin_with_interface()));
     return enumerate_plugins_internal(sel, function, cancel_early, validate);
   }
-  GOTT_AUTO_CREF(sel, get_plugin_table());
+  GOTT_AUTO_CREF(sel, get_new_plugins());
   return enumerate_plugins_internal(sel, function, cancel_early, validate);
 }
 

@@ -39,27 +39,75 @@
 #define GOTT_METADATA_INDEX_HPP
 
 #include "tables.hpp"
-#include <gott/auto.hpp>
 
 namespace gott { namespace metadata_db {
 
+struct check_new_t {
+  template<class T>
+  bool operator() (T const &x) const {
+    return !x[obsolete()];
+  }
+};
+
+// Index tables by filtering obsolete
+
 typedef
-  rtl::key_index_t<module_table_t, mpl::vector1<module_id> >::type
+  rtl::selection_t<
+    module_table_t,
+    check_new_t
+  >::type
+  new_modules_t;
+
+new_modules_t &get_new_modules();
+
+typedef
+  rtl::selection_t<
+    plugin_table_t,
+    check_new_t
+  >::type
+  new_plugins_t;
+
+new_plugins_t &get_new_plugins();
+
+typedef
+  rtl::selection_t<
+    interface_table_t,
+    check_new_t
+  >::type
+  new_interfaces_t;
+
+new_interfaces_t &get_new_interfaces();
+
+// Index tables by IDs
+
+typedef
+  rtl::key_index_t<
+    new_modules_t,
+    mpl::vector1<module_id>
+  >::type
   module_by_id_t;
 
 module_by_id_t &get_module_by_id();
 
 typedef
-  rtl::key_index_t<plugin_table_t, mpl::vector1<plugin_id> >::type
+  rtl::key_index_t<
+    new_plugins_t,
+    mpl::vector1<plugin_id>
+  >::type
   plugin_by_id_t;
 
 plugin_by_id_t &get_plugin_by_id();
 
 typedef
-  rtl::key_index_t<interface_table_t, mpl::vector1<interface_id> >::type
+  rtl::key_index_t<
+    new_interfaces_t,
+    mpl::vector1<interface_id>
+  >::type
   interface_by_id_t;
 
 interface_by_id_t &get_interface_by_id();
+
+// Reverse index
 
 typedef
   rtl::key_index_t<

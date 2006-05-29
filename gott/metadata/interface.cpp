@@ -41,6 +41,7 @@
 #include "detail/index.hpp"
 #include "load.hpp"
 #include <gott/exceptions.hpp>
+#include <gott/auto.hpp>
 
 using gott::QID;
 using namespace gott::metadata;
@@ -80,8 +81,6 @@ void enumerate_internal(
     bool cancel_early,
     bool validate) {
   GOTT_FOREACH_RANGE(it, rel) {
-    if (it.get(obsolete()))
-      continue;
     callback(interface(it.get(interface_handle())));
     if (cancel_early)
       break;
@@ -101,7 +100,7 @@ void gott::metadata::enumerate_interfaces_p(
   global_mutex::scoped_lock lock(get_global_lock());
   if (!interface_id)
     return enumerate_internal(
-        get_interface_table(),
+        get_new_interfaces(),
         callback,
         cancel_early,
         validate);

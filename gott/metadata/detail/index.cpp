@@ -42,21 +42,37 @@ using namespace boost::mpl;
 
 namespace gott { namespace metadata_db {
 
+new_modules_t &get_new_modules() {
+  static new_modules_t obj = rtl::selection(get_module_table(), check_new_t());
+  return obj;
+}
+
+new_plugins_t &get_new_plugins() {
+  static new_plugins_t obj = rtl::selection(get_plugin_table(), check_new_t());
+  return obj;
+}
+
+new_interfaces_t &get_new_interfaces() {
+  static new_interfaces_t obj =
+    rtl::selection(get_interface_table(), check_new_t());
+  return obj;
+}
+
 module_by_id_t &get_module_by_id() {
   static module_by_id_t obj = 
-    key_index<vector1<module_id> >(get_module_table());
+    key_index<vector1<module_id> >(get_new_modules());
   return obj;
 }
 
 plugin_by_id_t &get_plugin_by_id() {
   static plugin_by_id_t obj = 
-    key_index<vector1<plugin_id> >(get_plugin_table());
+    key_index<vector1<plugin_id> >(get_new_plugins());
   return obj;
 }
 
 interface_by_id_t &get_interface_by_id() {
   static interface_by_id_t obj = 
-    key_index<vector1<interface_id> >(get_interface_table());
+    key_index<vector1<interface_id> >(get_new_interfaces());
   return obj;
 }
 

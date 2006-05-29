@@ -45,11 +45,13 @@
 #include "detail/index.hpp"
 #include <gott/range.hpp>
 #include <gott/exceptions.hpp>
-#include <vector>
-#include <boost/tuple/tuple.hpp>
+#include <gott/auto.hpp>
 #include <boost/rtl/key_index_delta.hpp>
 #include <boost/rtl/table_delta.hpp>
+#include <boost/rtl/selection_delta.hpp>
+#include <boost/rtl/range_selection_delta.hpp>
 #include <boost/rtl/lambda_support.hpp>
+#include <vector>
 
 using gott::metadata::transaction;
 
@@ -205,9 +207,11 @@ void transaction::commit() {
   GOTT_FOREACH_RANGE(it, added_new_modules) {
     GOTT_FOREACH_RANGE(jt, it->second->dependencies) {
       GOTT_AUTO(exact_dependency_list,
-          rtl::selection_eq(
-            rtl::modified(get_module_by_id(), tr),
-            rtl::row<mpl::vector1<module_id> >(*jt)));
+          rtl::modified(
+            rtl::selection_eq(
+              get_module_by_id(),
+              rtl::row<mpl::vector1<module_id> >(*jt)),
+            tr));
       if (exact_dependency_list.begin() == exact_dependency_list.end())
         throw gott::system_error("module dependency not found");
       handle_t dep_handle =
@@ -223,9 +227,11 @@ void transaction::commit() {
   GOTT_FOREACH_RANGE(it, p->insert_plugins) {
     // search enclosing module first
     GOTT_AUTO(enclosing_module_list,
-        rtl::selection_eq(
-          rtl::modified(get_module_by_id(), tr),
-          rtl::row<mpl::vector1<module_id> >(it->enclosing_module)));
+        rtl::modified(
+          rtl::selection_eq(
+            get_module_by_id(),
+            rtl::row<mpl::vector1<module_id> >(it->enclosing_module)),
+          tr));
     if (enclosing_module_list.begin() == enclosing_module_list.end())
       throw gott::system_error("enclosing module not found");
     handle_t enclosing_module_handle =
@@ -256,9 +262,11 @@ void transaction::commit() {
       GOTT_FOREACH_RANGE(jt, it->supported_interfaces) {
         // search the actual interface first
         GOTT_AUTO(supported_interface_list,
-            rtl::selection_eq(
-              rtl::modified(get_interface_by_id(), tr),
-              rtl::row<mpl::vector1<interface_id> >(*jt)));
+            rtl::modified(
+              rtl::selection_eq(
+                get_interface_by_id(),
+                rtl::row<mpl::vector1<interface_id> >(*jt)),
+              tr));
         if (supported_interface_list.begin() == supported_interface_list.end())
           throw gott::system_error("supported interface not found");
         handle_t the_interface_handle =
@@ -283,6 +291,9 @@ void transaction::commit() {
 
   // update indexes and commit
   rtl::expression_registry exprs;
+  exprs.add(get_new_modules());
+  exprs.add(get_new_plugins());
+  exprs.add(get_new_interfaces());
   exprs.add(get_module_by_id());
   exprs.add(get_plugin_by_id());
   exprs.add(get_interface_by_id());

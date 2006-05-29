@@ -43,6 +43,7 @@
 #include "detail/index.hpp"
 #include <gott/plugin/module.hpp>
 #include <gott/exceptions.hpp>
+#include <gott/auto.hpp>
 
 using namespace gott::metadata;
 using namespace gott::metadata_db;
@@ -112,8 +113,6 @@ void enumerate_modules_internal(
     bool cancel_early,
     bool validate) {
   GOTT_FOREACH_RANGE(it, rel) {
-    if (it.get(obsolete()))
-      continue;
     module current(it.get(module_handle()));
     if (validate && !current.is_valid())
       continue;
@@ -142,7 +141,7 @@ void gott::metadata::enumerate_modules_p(
         cancel_early,
         validate);
   return enumerate_modules_internal(
-      get_module_table(),
+      get_new_modules(),
       callback,
       cancel_early,
       validate);
