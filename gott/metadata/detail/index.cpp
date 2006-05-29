@@ -35,41 +35,35 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_METADATA_INDEX_HPP
-#define GOTT_METADATA_INDEX_HPP
+#include "index.hpp"
 
-#include "tables.hpp"
-#include <gott/auto.hpp>
+using namespace boost::rel;
+using namespace boost::mpl;
 
 namespace gott { namespace metadata_db {
 
-typedef
-  rtl::key_index_t<module_table_t, mpl::vector1<module_id> >::type
-  module_by_id_t;
+module_by_id_t &get_module_by_id() {
+  static module_by_id_t obj = 
+    key_index<vector1<module_id> >(get_module_table());
+  return obj;
+}
 
-module_by_id_t &get_module_by_id();
+plugin_by_id_t &get_plugin_by_id() {
+  static plugin_by_id_t obj = 
+    key_index<vector1<plugin_id> >(get_plugin_table());
+  return obj;
+}
 
-typedef
-  rtl::key_index_t<plugin_table_t, mpl::vector1<plugin_id> >::type
-  plugin_by_id_t;
+interface_by_id_t &get_interface_by_id() {
+  static interface_by_id_t obj = 
+    key_index<vector1<interface_id> >(get_interface_table());
+  return obj;
+}
 
-plugin_by_id_t &get_plugin_by_id();
-
-typedef
-  rtl::key_index_t<interface_table_t, mpl::vector1<interface_id> >::type
-  interface_by_id_t;
-
-interface_by_id_t &get_interface_by_id();
-
-typedef
-  rtl::key_index_t<
-    plugin_interfaces_table_t,
-    mpl::vector1<interface_handle>
-  >::type
-  plugin_with_interface_t;
-
-plugin_with_interface_t &get_plugin_with_interface();
+plugin_with_interface_t &get_plugin_with_interface() {
+  static plugin_with_interface_t obj =
+    key_index<vector1<interface_handle> >(get_plugin_interfaces_table());
+  return obj;
+}
 
 }}
-
-#endif
