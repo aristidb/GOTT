@@ -36,9 +36,9 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "interface.hpp"
-#include "database.hpp"
-#include "tables.hpp"
-#include "index.hpp"
+#include "detail/database.hpp"
+#include "detail/tables.hpp"
+#include "detail/index.hpp"
 #include "load.hpp"
 #include <gott/exceptions.hpp>
 

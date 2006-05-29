@@ -38,8 +38,8 @@
 #ifndef GOTT_METADATA_INTERFACE_HPP
 #define GOTT_METADATA_INTERFACE_HPP
 
-#include "handle.hpp"
-#include "param_detail.hpp"
+#include "detail/handle.hpp"
+#include "detail/param.hpp"
 #include <gott/string/qid.hpp>
 #include <boost/function.hpp>
 #include <boost/parameter/parameters.hpp>

@@ -39,9 +39,9 @@
 #include "plugin.hpp"
 #include "module.hpp"
 #include "interface.hpp"
-#include "database.hpp"
-#include "tables.hpp"
-#include "index.hpp"
+#include "detail/database.hpp"
+#include "detail/tables.hpp"
+#include "detail/index.hpp"
 #include <gott/range.hpp>
 #include <gott/exceptions.hpp>
 #include <vector>

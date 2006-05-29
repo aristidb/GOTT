@@ -51,8 +51,9 @@ public:
   GOTT_EXPORT ~transaction();
   GOTT_EXPORT void commit();
 
+  GOTT_EXPORT void remove_resource(string const &resource);
+
 public: //internal
-  void remove_resource(string const &resource);
   void add_module(
       QID const &module_id,
       module::module_type_t module_type,

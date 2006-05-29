@@ -39,7 +39,7 @@
 #define GOTT_METADATA_TABLES_HPP
 
 #include "handle.hpp"
-#include "module.hpp"
+#include "../module.hpp"
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/rtl/rtl.hpp>

@@ -37,10 +37,10 @@
 
 #include "module.hpp"
 #include "load.hpp"
-#include "validate.hpp"
-#include "database.hpp"
-#include "tables.hpp"
-#include "index.hpp"
+#include "detail/validate.hpp"
+#include "detail/database.hpp"
+#include "detail/tables.hpp"
+#include "detail/index.hpp"
 #include <gott/plugin/module.hpp>
 #include <gott/exceptions.hpp>
 
