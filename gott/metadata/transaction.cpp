@@ -57,29 +57,37 @@ class transaction::impl {
 public:
   typedef std::vector<string> res_lst;
   res_lst remove_resources;
-  typedef
-    std::vector<
-      boost::tuple<QID, std::vector<QID>, QID, string, string> >
-    plg_lst;
+
+  struct plugin_info {
+    QID plugin_id;
+    std::vector<QID> supported_interfaces;
+    QID enclosing_module;
+    string symbol;
+    string resource;
+  };
+
+  typedef std::vector<plugin_info> plg_lst;
+
   plg_lst insert_plugins;
-  typedef
-    std::vector<
-      boost::tuple<
-        QID,
-        module::module_type_t,
-        string,
-        std::vector<QID>,
-        string
-        > >
-    mod_lst;
+
+  struct module_info {
+    QID module_id;
+    module::module_type_t module_type;
+    string file_path;
+    std::vector<QID> dependencies;
+    string resource;
+  };
+  
+  typedef std::vector<module_info> mod_lst;
+
   mod_lst insert_modules;
-  typedef
-    std::vector<
-      boost::tuple<
-        QID,
-        string
-        > >
-    if_lst;
+
+  struct interface_info {
+    QID interface_id;
+    string resource;
+  };
+
+  typedef std::vector<interface_info> if_lst;
   if_lst insert_interfaces;
 };
 
@@ -132,77 +140,70 @@ void transaction::commit() {
 
   // add fresh interfaces
   GOTT_FOREACH_RANGE(it, p->insert_interfaces) {
-    GOTT_AUTO_CREF(new_id, it->get<0>());
-    GOTT_AUTO_CREF(new_resource, it->get<1>());
-
     GOTT_AUTO(candidates,
         selection_eq(
           get_interface_by_id(),
-          rtl::row<mpl::vector1<interface_id> >(new_id)));
+          rtl::row<mpl::vector1<interface_id> >(it->interface_id)));
     GOTT_AUTO_CREF(duplicates, candidates); // interface-id is the only data
     if (duplicates.begin() == duplicates.end()) {
       // ... no duplicate => insert
       tr.insert(get_interface_table(), interface_table_t::value_type(
             handle_t(),
-            new_id,
-            new_resource,
+            it->interface_id,
+            it->resource,
             false));
     } else {
       // ... duplicate => reuse handle
       tr.update(get_interface_table(), interface_table_t::value_type(
             duplicates.begin().get(interface_handle()),
-            new_id,
-            new_resource,
+            it->interface_id,
+            it->resource,
             false));
     }
   }
 
   std::vector<std::pair<handle_t, impl::mod_lst::iterator> > added_new_modules;
+  added_new_modules.reserve(p->insert_modules.size());
 
   // add fresh modules (ignore dependencies for now)
   GOTT_FOREACH_RANGE(it, p->insert_modules) {
-    GOTT_AUTO_CREF(new_id, it->get<0>());
-    GOTT_AUTO_CREF(new_type, it->get<1>());
-    GOTT_AUTO_CREF(new_file, it->get<2>());
-    GOTT_AUTO_CREF(new_resource, it->get<4>());
-
     GOTT_AUTO(candidates,
         selection_eq(
           get_module_by_id(),
-          rtl::row<mpl::vector1<module_id> >(new_id)));
+          rtl::row<mpl::vector1<module_id> >(it->module_id)));
     // FIXME: check whether dependencies are the same
     GOTT_AUTO(duplicates,
         selection(
           candidates,
-          _1[module_type()] == new_type &&
-          _1[file_path()] == new_file));
+          _1[module_type()] == it->module_type &&
+          _1[file_path()] == it->file_path));
     if (duplicates.begin() == duplicates.end()) {
       // ... no duplicate => insert
       handle_t handle;
       tr.insert(get_module_table(), module_table_t::value_type(
             handle,
-            new_id,
-            new_type,
-            new_file,
-            new_resource,
+            it->module_id,
+            it->module_type,
+            it->file_path,
+            it->resource,
             false));
+      // remember, for dependency injection later
       added_new_modules.push_back(std::make_pair(handle, it));
     } else {
       // ... duplicate => reuse handle
       tr.update(get_module_table(), module_table_t::value_type(
             duplicates.begin().get(module_handle()),
-            new_id,
-            new_type,
-            new_file,
-            new_resource,
+            it->module_id,
+            it->module_type,
+            it->file_path,
+            it->resource,
             false));
     }
   }
 
   // now care about their dependencies
   GOTT_FOREACH_RANGE(it, added_new_modules) {
-    GOTT_AUTO_CREF(deps, it->second->get<3>());
-    GOTT_FOREACH_RANGE(jt, deps) {
+    GOTT_FOREACH_RANGE(jt, it->second->dependencies) {
       GOTT_AUTO(exact_dependency_list,
           rtl::selection_eq(
             rtl::modified(get_module_by_id(), tr),
@@ -220,17 +221,11 @@ void transaction::commit() {
 
   // add fresh plugins
   GOTT_FOREACH_RANGE(it, p->insert_plugins) {
-    GOTT_AUTO_CREF(new_id, it->get<0>());
-    GOTT_AUTO_CREF(supported_interfaces, it->get<1>());
-    GOTT_AUTO_CREF(new_module_id, it->get<2>());
-    GOTT_AUTO_CREF(new_symbol, it->get<3>());
-    GOTT_AUTO_CREF(new_resource, it->get<4>());
-
     // search enclosing module first
     GOTT_AUTO(enclosing_module_list,
         rtl::selection_eq(
           rtl::modified(get_module_by_id(), tr),
-          rtl::row<mpl::vector1<module_id> >(new_module_id)));
+          rtl::row<mpl::vector1<module_id> >(it->enclosing_module)));
     if (enclosing_module_list.begin() == enclosing_module_list.end())
       throw gott::system_error("enclosing module not found");
     handle_t enclosing_module_handle =
@@ -239,26 +234,26 @@ void transaction::commit() {
     GOTT_AUTO(candidates,
         selection_eq(
           get_plugin_by_id(),
-          rtl::row<mpl::vector1<plugin_id> >(new_id)));
+          rtl::row<mpl::vector1<plugin_id> >(it->plugin_id)));
     // FIXME: check whether supported interfaces are the same
     GOTT_AUTO(duplicates,
         selection(
           candidates,
-          _1[symbol()] == new_symbol &&
+          _1[symbol()] == it->symbol &&
           _1[module_handle()] == enclosing_module_handle));
     if (duplicates.begin() == duplicates.end()) {
       // ... no duplicate => insert
       handle_t handle;
       tr.insert(get_plugin_table(), plugin_table_t::value_type(
             handle,
-            new_id,
-            new_symbol,
+            it->plugin_id,
+            it->symbol,
             enclosing_module_handle,
-            new_resource,
+            it->resource,
             false));
 
       // add supported interfaces
-      GOTT_FOREACH_RANGE(jt, supported_interfaces) {
+      GOTT_FOREACH_RANGE(jt, it->supported_interfaces) {
         // search the actual interface first
         GOTT_AUTO(supported_interface_list,
             rtl::selection_eq(
@@ -278,10 +273,10 @@ void transaction::commit() {
       // ... duplicate => just update
       tr.update(get_plugin_table(), plugin_table_t::value_type(
             duplicates.begin().get(plugin_handle()),
-            new_id,
-            new_symbol,
+            it->plugin_id,
+            it->symbol,
             enclosing_module_handle,
-            new_resource,
+            it->resource,
             false));
     }
   }
@@ -322,8 +317,9 @@ void transaction::add_plugin(
     QID const &enclosing_module,
     string const &symbol,
     string const &resource) {
-  p->insert_plugins.push_back(impl::plg_lst::value_type(
-        plugin_id, supported_interfaces, enclosing_module, symbol, resource));
+  impl::plugin_info x =
+    { plugin_id, supported_interfaces, enclosing_module, symbol, resource };
+  p->insert_plugins.push_back(x);
 }
 
 void transaction::add_module(
@@ -332,13 +328,15 @@ void transaction::add_module(
     string const &file_path,
     std::vector<QID> const &dependencies,
     string const &resource) {
-  p->insert_modules.push_back(impl::mod_lst::value_type(
-        module_id, module_type, file_path, dependencies, resource));
+  impl::module_info x =
+    { module_id, module_type, file_path, dependencies, resource };
+  p->insert_modules.push_back(x);
 }
 
 void transaction::add_interface(
     QID const &interface_id,
     string const &resource) {
-  p->insert_interfaces.push_back(impl::if_lst::value_type(
-        interface_id, resource));
+  impl::interface_info x =
+    { interface_id, resource };
+  p->insert_interfaces.push_back(x);
 }
