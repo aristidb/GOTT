@@ -70,9 +70,11 @@ plugin-id gott::events::kqueue_loop
 has-interface gott::events::main_loop
 enclosing-module gott::events::kqueue_loop
 symbol plugin
+priority high
 
 plugin-id gott::events::epoll_loop
 has-interface gott::events::main_loop
 enclosing-module gott::events::epoll_loop
 symbol plugin
+priority high
 

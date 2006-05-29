@@ -66,6 +66,7 @@ namespace {
     std::vector<QID> interfaces;
     QID enclosing_module_id;
     string symbol;
+    int priority;
 
     string tag;
     Xany data_;
@@ -80,6 +81,8 @@ namespace {
         enclosing_module_id = Xany_cast<string>(data_);
       else if (tag == "symbol")
         symbol = Xany_cast<string>(data_);
+      else if (tag == "priority")
+        priority = Xany_cast<int>(data_);
       tag = string();
     }
 
@@ -114,7 +117,17 @@ void gott::metadata::detail::update_plugin_resource(
           (rule_one("tdl::schema::named", rule_attr(tag = "enclosing-module"),
                     rule("tdl::schema::node")))
           (rule_one("tdl::schema::named", rule_attr(tag = "symbol"),
-                    rule("tdl::schema::node"))))));
+                    rule("tdl::schema::node")))
+          (rule_one("tdl::schema::named",
+                    rule_attr(tag = "priority", outer = optional()),
+                    rule("tdl::schema::node",
+                      rule_attr(
+                        tdl::schema::repatcher = new repatch_enumeration(
+                          boost::assign::list_of
+                          (string("high"))
+                          (string("normal"))
+                          (string("low"))
+                          .operator std::vector<string>()))))))));
 
   struct multi_accepter : writable_structure {
     multi_accepter(string const &resource, transaction &tr) 
@@ -140,6 +153,7 @@ void gott::metadata::detail::update_plugin_resource(
             inner.interfaces,
             inner.enclosing_module_id,
             inner.symbol,
+            inner.priority,
             resource);
       else
         inner.end();

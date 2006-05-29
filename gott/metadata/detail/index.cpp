@@ -66,7 +66,7 @@ module_by_id_t &get_module_by_id() {
 
 plugin_by_id_t &get_plugin_by_id() {
   static plugin_by_id_t obj = 
-    key_index<vector1<plugin_id> >(get_new_plugins());
+    key_index<vector2<plugin_id, priority> >(get_new_plugins());
   return obj;
 }
 

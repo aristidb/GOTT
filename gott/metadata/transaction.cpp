@@ -46,11 +46,10 @@
 #include <gott/range.hpp>
 #include <gott/exceptions.hpp>
 #include <gott/auto.hpp>
-#include <boost/rtl/key_index_delta.hpp>
-#include <boost/rtl/table_delta.hpp>
-#include <boost/rtl/selection_delta.hpp>
-#include <boost/rtl/range_selection_delta.hpp>
 #include <boost/rtl/lambda_support.hpp>
+#include <boost/rtl/key_index_delta.hpp>
+#include <boost/rtl/selection_delta.hpp>
+#include <boost/rtl/table_delta.hpp>
 #include <vector>
 
 using gott::metadata::transaction;
@@ -65,6 +64,7 @@ public:
     std::vector<QID> supported_interfaces;
     QID enclosing_module;
     string symbol;
+    int priority;
     string resource;
   };
 
@@ -97,14 +97,18 @@ transaction::transaction() : p(new impl) {}
 transaction::~transaction() {}
 
 void transaction::commit() {
-  using namespace metadata_db;
-  using namespace boost::lambda;
-
   metadata_db::global_mutex::scoped_lock lock(metadata_db::get_global_lock());
+  commit_modules();
+  commit_interfaces();
+  commit_plugins();
+}
+
+void transaction::commit_interfaces() {
+  using namespace gott::metadata_db;
+  using namespace boost::lambda;
 
   rtl::transaction tr;
 
-  // mark obsolete resources' metadata
   GOTT_FOREACH_RANGE(it, p->remove_resources) {
     // mark interfaces from obsolete resource
     GOTT_AUTO(obsolete_interfaces,
@@ -116,34 +120,12 @@ void transaction::commit() {
       x[obsolete()] = true;
       tr.update(get_interface_table(), x);
     }
-
-    // mark modules from obsolete resource
-    GOTT_AUTO(obsolete_modules,
-        rtl::selection(
-          get_module_table(),
-          _1[metadata_db::resource()] == *it));
-    GOTT_FOREACH_RANGE(jt, obsolete_modules) {
-      module_table_t::value_type x = *jt;
-      x[obsolete()] = true;
-      tr.update(get_module_table(), x);
-    }
-
-    // mark plugins from obsolete resource
-    GOTT_AUTO(obsolete_plugins,
-        rtl::selection(
-          get_plugin_table(),
-          _1[metadata_db::resource()] == *it));
-    GOTT_FOREACH_RANGE(jt, obsolete_plugins) {
-      plugin_table_t::value_type x = *jt;
-      x[obsolete()] = true;
-      tr.update(get_plugin_table(), x);
-    }
   }
 
   // add fresh interfaces
   GOTT_FOREACH_RANGE(it, p->insert_interfaces) {
     GOTT_AUTO(candidates,
-        selection_eq(
+        rtl::selection_eq(
           get_interface_by_id(),
           rtl::row<mpl::vector1<interface_id> >(it->interface_id)));
     GOTT_AUTO_CREF(duplicates, candidates); // interface-id is the only data
@@ -164,62 +146,120 @@ void transaction::commit() {
     }
   }
 
-  std::vector<std::pair<handle_t, impl::mod_lst::iterator> > added_new_modules;
-  added_new_modules.reserve(p->insert_modules.size());
+  // commit and update indexes
+  rtl::expression_registry exprs;
+  exprs.add(get_new_interfaces());
+  exprs.add(get_interface_by_id());
+  tr.commit(exprs);
+}
 
-  // add fresh modules (ignore dependencies for now)
-  GOTT_FOREACH_RANGE(it, p->insert_modules) {
-    GOTT_AUTO(candidates,
-        selection_eq(
-          get_module_by_id(),
-          rtl::row<mpl::vector1<module_id> >(it->module_id)));
-    // FIXME: check whether dependencies are the same
-    GOTT_AUTO(duplicates,
-        selection(
-          candidates,
-          _1[module_type()] == it->module_type &&
-          _1[file_path()] == it->file_path));
-    if (duplicates.begin() == duplicates.end()) {
-      // ... no duplicate => insert
-      handle_t handle;
-      tr.insert(get_module_table(), module_table_t::value_type(
-            handle,
-            it->module_id,
-            it->module_type,
-            it->file_path,
-            it->resource,
-            false));
-      // remember, for dependency injection later
-      added_new_modules.push_back(std::make_pair(handle, it));
-    } else {
-      // ... duplicate => reuse handle
-      tr.update(get_module_table(), module_table_t::value_type(
-            duplicates.begin().get(module_handle()),
-            it->module_id,
-            it->module_type,
-            it->file_path,
-            it->resource,
-            false));
+void transaction::commit_modules() {
+  using namespace gott::metadata_db;
+  using namespace boost::lambda;
+  
+  std::vector<std::pair<handle_t, impl::mod_lst::iterator> > added;
+  added.reserve(p->insert_modules.size());
+
+  {
+    rtl::transaction tr;
+
+    GOTT_FOREACH_RANGE(it, p->remove_resources) {
+      // mark modules from obsolete resource
+      GOTT_AUTO(obsolete_modules,
+          rtl::selection(
+            get_module_table(),
+            _1[metadata_db::resource()] == *it));
+      GOTT_FOREACH_RANGE(jt, obsolete_modules) {
+        module_table_t::value_type x = *jt;
+        x[obsolete()] = true;
+        tr.update(get_module_table(), x);
+      }
     }
+
+    // add fresh modules (ignore dependencies for now)
+    GOTT_FOREACH_RANGE(it, p->insert_modules) {
+      GOTT_AUTO(candidates,
+          rtl::selection_eq(
+            get_module_by_id(),
+            rtl::row<mpl::vector1<module_id> >(it->module_id)));
+      // FIXME: check whether dependencies are the same
+      GOTT_AUTO(duplicates,
+          selection(
+            candidates,
+            _1[module_type()] == it->module_type &&
+            _1[file_path()] == it->file_path));
+      if (duplicates.begin() == duplicates.end()) {
+        // ... no duplicate => insert
+        handle_t handle;
+        tr.insert(get_module_table(), module_table_t::value_type(
+              handle,
+              it->module_id,
+              it->module_type,
+              it->file_path,
+              it->resource,
+              false));
+        // remember, for dependency injection later
+        added.push_back(std::make_pair(handle, it));
+      } else {
+        // ... duplicate => reuse handle
+        tr.update(get_module_table(), module_table_t::value_type(
+              duplicates.begin().get(module_handle()),
+              it->module_id,
+              it->module_type,
+              it->file_path,
+              it->resource,
+              false));
+      }
+    }
+
+    rtl::expression_registry exprs;
+    exprs.add(get_new_modules());
+    exprs.add(get_module_by_id());
+    tr.commit(exprs);
   }
 
-  // now care about their dependencies
-  GOTT_FOREACH_RANGE(it, added_new_modules) {
-    GOTT_FOREACH_RANGE(jt, it->second->dependencies) {
-      GOTT_AUTO(exact_dependency_list,
-          rtl::modified(
+  {
+    rtl::transaction tr;
+
+    // now care about their dependencies
+    GOTT_FOREACH_RANGE(it, added) {
+      GOTT_FOREACH_RANGE(jt, it->second->dependencies) {
+        GOTT_AUTO(exact_dependency_list,
             rtl::selection_eq(
               get_module_by_id(),
-              rtl::row<mpl::vector1<module_id> >(*jt)),
-            tr));
-      if (exact_dependency_list.begin() == exact_dependency_list.end())
-        throw gott::system_error("module dependency not found");
-      handle_t dep_handle =
-        exact_dependency_list.begin().get(module_handle());
+              rtl::row<mpl::vector1<module_id> >(*jt)));
+        if (exact_dependency_list.begin() == exact_dependency_list.end())
+          throw gott::system_error("module dependency not found");
+        handle_t dep_handle =
+          exact_dependency_list.begin().get(module_handle());
       
-      tr.insert(get_module_dependencies_table(),
-          module_dependencies_table_t::value_type(
-            it->first, dep_handle));
+        tr.insert(get_module_dependencies_table(),
+            module_dependencies_table_t::value_type(
+              it->first, dep_handle));
+      }
+    }
+    
+    rtl::expression_registry exprs;
+    tr.commit(exprs);
+  }
+}
+
+void transaction::commit_plugins() {
+  using namespace gott::metadata_db;
+  using namespace boost::lambda;
+
+  rtl::transaction tr;
+
+  GOTT_FOREACH_RANGE(it, p->remove_resources) {
+    // mark plugins from obsolete resource
+    GOTT_AUTO(obsolete_plugins,
+        rtl::selection(
+          get_plugin_table(),
+          _1[metadata_db::resource()] == *it));
+    GOTT_FOREACH_RANGE(jt, obsolete_plugins) {
+      plugin_table_t::value_type x = *jt;
+      x[obsolete()] = true;
+      tr.update(get_plugin_table(), x);
     }
   }
 
@@ -227,24 +267,23 @@ void transaction::commit() {
   GOTT_FOREACH_RANGE(it, p->insert_plugins) {
     // search enclosing module first
     GOTT_AUTO(enclosing_module_list,
-        rtl::modified(
-          rtl::selection_eq(
-            get_module_by_id(),
-            rtl::row<mpl::vector1<module_id> >(it->enclosing_module)),
-          tr));
+        rtl::selection_eq(
+          get_module_by_id(),
+          rtl::row<mpl::vector1<module_id> >(it->enclosing_module)));
     if (enclosing_module_list.begin() == enclosing_module_list.end())
       throw gott::system_error("enclosing module not found");
     handle_t enclosing_module_handle =
         enclosing_module_list.begin().get(module_handle());
 
     GOTT_AUTO(candidates,
-        selection_eq(
+        rtl::selection_eq(
           get_plugin_by_id(),
           rtl::row<mpl::vector1<plugin_id> >(it->plugin_id)));
     // FIXME: check whether supported interfaces are the same
     GOTT_AUTO(duplicates,
         selection(
           candidates,
+          _1[priority()] == it->priority &&
           _1[symbol()] == it->symbol &&
           _1[module_handle()] == enclosing_module_handle));
     if (duplicates.begin() == duplicates.end()) {
@@ -252,6 +291,7 @@ void transaction::commit() {
       handle_t handle;
       tr.insert(get_plugin_table(), plugin_table_t::value_type(
             handle,
+            it->priority,
             it->plugin_id,
             it->symbol,
             enclosing_module_handle,
@@ -262,11 +302,9 @@ void transaction::commit() {
       GOTT_FOREACH_RANGE(jt, it->supported_interfaces) {
         // search the actual interface first
         GOTT_AUTO(supported_interface_list,
-            rtl::modified(
-              rtl::selection_eq(
-                get_interface_by_id(),
-                rtl::row<mpl::vector1<interface_id> >(*jt)),
-              tr));
+            rtl::selection_eq(
+              get_interface_by_id(),
+              rtl::row<mpl::vector1<interface_id> >(*jt)));
         if (supported_interface_list.begin() == supported_interface_list.end())
           throw gott::system_error("supported interface not found");
         handle_t the_interface_handle =
@@ -281,6 +319,7 @@ void transaction::commit() {
       // ... duplicate => just update
       tr.update(get_plugin_table(), plugin_table_t::value_type(
             duplicates.begin().get(plugin_handle()),
+            it->priority,
             it->plugin_id,
             it->symbol,
             enclosing_module_handle,
@@ -291,12 +330,8 @@ void transaction::commit() {
 
   // update indexes and commit
   rtl::expression_registry exprs;
-  exprs.add(get_new_modules());
   exprs.add(get_new_plugins());
-  exprs.add(get_new_interfaces());
-  exprs.add(get_module_by_id());
   exprs.add(get_plugin_by_id());
-  exprs.add(get_interface_by_id());
   exprs.add(get_plugin_with_interface());
   tr.commit(exprs);
 }
@@ -327,9 +362,17 @@ void transaction::add_plugin(
     std::vector<QID> const &supported_interfaces,
     QID const &enclosing_module,
     string const &symbol,
+    int priority,
     string const &resource) {
   impl::plugin_info x =
-    { plugin_id, supported_interfaces, enclosing_module, symbol, resource };
+    { 
+      plugin_id,
+      supported_interfaces,
+      enclosing_module,
+      symbol,
+      priority,
+      resource
+    };
   p->insert_plugins.push_back(x);
 }
 
@@ -340,7 +383,13 @@ void transaction::add_module(
     std::vector<QID> const &dependencies,
     string const &resource) {
   impl::module_info x =
-    { module_id, module_type, file_path, dependencies, resource };
+    {
+      module_id,
+      module_type,
+      file_path,
+      dependencies,
+      resource
+    };
   p->insert_modules.push_back(x);
 }
 
@@ -348,6 +397,9 @@ void transaction::add_interface(
     QID const &interface_id,
     string const &resource) {
   impl::interface_info x =
-    { interface_id, resource };
+    {
+      interface_id,
+      resource
+    };
   p->insert_interfaces.push_back(x);
 }

@@ -76,6 +76,7 @@ public: //internal
       std::vector<QID> const &supported_interfaces,
       QID const &enclosing_module,
       string const &symbol,
+      int priority,
       string const &resource);
   void add_interface(
       QID const &interface_id,
@@ -84,6 +85,10 @@ public: //internal
 private:
   class impl;
   boost::scoped_ptr<impl> p;
+
+  void commit_modules();
+  void commit_plugins();
+  void commit_interfaces();
 };
 
 }}

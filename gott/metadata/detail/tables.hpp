@@ -52,6 +52,8 @@ namespace mpl = boost::mpl;
 // Columns
 BOOST_RTL_DEFINE_COLUMN(string, resource)
 BOOST_RTL_DEFINE_COLUMN(bool, obsolete)
+// attention: the lower the value, the higher the priority
+BOOST_RTL_DEFINE_COLUMN(int, priority)
 
 BOOST_RTL_DEFINE_COLUMN(metadata::handle_t, module_handle)
 BOOST_RTL_DEFINE_COLUMN(QID, module_id)
@@ -75,10 +77,10 @@ typedef
   module_field_list;
 
 typedef
-  mpl::vector1<plugin_handle>
+  mpl::vector2<plugin_handle, priority>
   plugin_sort_list;
 typedef
-  mpl::vector6<plugin_handle, plugin_id, symbol, module_handle,
+  mpl::vector7<plugin_handle, priority, plugin_id, symbol, module_handle,
               resource, obsolete>
   plugin_field_list;
 
