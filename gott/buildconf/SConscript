@@ -81,6 +81,21 @@ def CheckCompilerVisibility(context):
 	context.Result(result)
 	return result
 
+def CheckTemplateRepo(context):
+	context.Message('Checking if compiler supports -frepo...')
+	lastCXXFLAGS = context.env['CCFLAGS'][:]
+	lastLINKFLAGS = context.env['LINKFLAGS'][:]
+
+	context.env.Append(CXXFLAGS = ['-frepo'])
+	context.env.Append(LINKFLAGS = ['-frepo'])
+
+	result = context.TryCompile("int var;", '.cpp')
+	if not result:
+		context.env.Replace(CXXFLAGS = lastCXXFLAGS)
+		context.env.Replace(LINKFLAGS = lastLINKFLAGS)
+	context.Result(result)
+	return result
+
 def CheckWarnings(context):
 	context.Message('Checking if compiler supports gcc-style warnings... ')
 	lastCCFLAGS = context.env['CCFLAGS'][:]
@@ -144,7 +159,8 @@ tests =	{
 	'Optimization': CheckOptimization,
 	'Debug': CheckDebug,
 	'PkgConfigPkg': CheckPkgConfigPkg,
-	'BoostDateTimeCanNanosec': CheckBoostDateTimeCanNanosec
+	'BoostDateTimeCanNanosec': CheckBoostDateTimeCanNanosec,
+	'TemplateRepo': CheckTemplateRepo
 }
 
 conf = Configure(env, custom_tests = tests)
@@ -152,6 +168,7 @@ AddSysOpts(conf.env)
 
 conf.LinkerAsNeeded()
 conf.LinkerExportDynamic()
+#conf.TemplateRepo()
 if conf.env['OPTIMIZATION'] != 'none':
 	conf.Optimization()
 conf.Warnings()
