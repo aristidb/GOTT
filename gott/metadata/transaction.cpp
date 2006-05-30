@@ -224,14 +224,14 @@ void transaction::commit_modules() {
     // now care about their dependencies
     GOTT_FOREACH_RANGE(it, added) {
       GOTT_FOREACH_RANGE(jt, it->second->dependencies) {
-        GOTT_AUTO(exact_dependency_list,
-            rtl::selection_eq(
-              get_module_by_id(),
-              rtl::row<mpl::vector1<module_id> >(*jt)));
-        if (exact_dependency_list.begin() == exact_dependency_list.end())
+        boost::optional<module> dep = 
+          find_module(
+              tags::module_id = *jt,
+              tags::load_standard_metadata = false,
+              tags::validate = false);
+        if (!dep)
           throw gott::system_error("module dependency not found");
-        handle_t dep_handle =
-          exact_dependency_list.begin().get(module_handle());
+        handle_t dep_handle = dep->get_handle();
       
         tr.insert(get_module_dependencies_table(),
             module_dependencies_table_t::value_type(
@@ -265,15 +265,14 @@ void transaction::commit_plugins() {
 
   // add fresh plugins
   GOTT_FOREACH_RANGE(it, p->insert_plugins) {
-    // search enclosing module first
-    GOTT_AUTO(enclosing_module_list,
-        rtl::selection_eq(
-          get_module_by_id(),
-          rtl::row<mpl::vector1<module_id> >(it->enclosing_module)));
-    if (enclosing_module_list.begin() == enclosing_module_list.end())
+    boost::optional<module> enclosing_module =
+      find_module(
+          tags::module_id = it->enclosing_module,
+          tags::validate = false,
+          tags::load_standard_metadata = false);
+    if (!enclosing_module)
       throw gott::system_error("enclosing module not found");
-    handle_t enclosing_module_handle =
-        enclosing_module_list.begin().get(module_handle());
+    handle_t enclosing_module_handle = enclosing_module->get_handle();
 
     GOTT_AUTO(candidates,
         rtl::selection_eq(
@@ -299,15 +298,14 @@ void transaction::commit_plugins() {
 
       // add supported interfaces
       GOTT_FOREACH_RANGE(jt, it->supported_interfaces) {
-        // search the actual interface first
-        GOTT_AUTO(supported_interface_list,
-            rtl::selection_eq(
-              get_interface_by_id(),
-              rtl::row<mpl::vector1<interface_id> >(*jt)));
-        if (supported_interface_list.begin() == supported_interface_list.end())
+        boost::optional<interface> supported_interface =
+          find_interface(
+              tags::interface_id = *jt,
+              tags::validate = false,
+              tags::load_standard_metadata = false);
+        if (!supported_interface)
           throw gott::system_error("supported interface not found");
-        handle_t the_interface_handle =
-          supported_interface_list.begin().get(interface_handle());
+        handle_t the_interface_handle = supported_interface->get_handle();
 
         tr.insert(get_plugin_interfaces_table(),
             plugin_interfaces_table_t::value_type(
