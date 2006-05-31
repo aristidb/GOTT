@@ -80,9 +80,14 @@ libobj += libobj_notify_fs
 env2 = env.Copy()
 env2.Append(LIBS = ['dl'])
 env2.SharedLibrary('gott_core', libobj)
-
 env = env.Copy()
 env.Append(LIBS = ['gott_core'])
+
+libobj_graphics = glob.glob('graphics/*.cpp')
+env.SharedLibrary('gott_graphics', libobj_graphics)
+env = env.Copy()
+env.Append(LIBS = ['gott_graphics'])
+
 Export('env')
 
 env.Program('thunk_test', 'thunk.cpp')
