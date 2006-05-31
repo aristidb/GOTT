@@ -43,6 +43,9 @@ Import('env')
 builtin_sources = glob.glob('schema/types/*.cpp')
 env.SharedLibrary('tdl_builtins', builtin_sources, LIBS = [])
 
+lang_sources = glob.glob('schema_lang/types/*.cpp')
+#env.SharedLibrary('tdl_schema_lang', lang_sources, LIBS = [])
+
 module_test_obj = [
     'test/test_tut.cpp', 
     'test/simple_parse.cpp', 
