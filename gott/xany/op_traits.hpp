@@ -43,7 +43,11 @@
 
 namespace gott { namespace xany {
 
-template<class T, bool fundamental = boost::is_fundamental<T>::value>
+template<
+  class T, 
+  bool fundamental =
+    boost::is_fundamental<T>::value || boost::is_pointer<T>::value
+>
 struct default_op_traits {
   typedef typename T::equality_comparable equality_comparable;
   typedef typename T::printable printable;
