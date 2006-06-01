@@ -40,14 +40,83 @@
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/item.hpp>
 #include <gott/tdl/schema/type.hpp>
+#include <gott/tdl/schema/rule_attr.hpp>
+#include <gott/tdl/structure/repatch.hpp>
+#include <gott/tdl/structure/repatcher_by_name.hpp>
 
 using namespace tdl::schema;
+namespace structure = tdl::structure;
+using structure::writable_structure;
 
 namespace {
+class repatcher_maker : public structure::concrete_repatcher<repatcher_maker> {
+  writable_structure *deferred_write(writable_structure &target) {
+    class context : public writable_structure {
+    public:
+      context(writable_structure &target)
+      : target(target),
+        getter(structure::repatcher_by_name().chain_alloc()),
+        level(0) {}
+
+    private:
+      void begin(tdl::source_position const &w) {
+        last_position = w;
+        if (level++ > 0)
+          getter->begin(w);
+      }
+
+      void end() {
+        if (--level > 0)
+          getter->end();
+        else {
+          target.begin(last_position);
+            target.add_tag("repatcher");
+            target.data(gott::xany::Xany(getter->result_alloc()));
+          target.end();
+          getter.reset(structure::repatcher_by_name().chain_alloc());
+        }
+      }
+
+      void data(gott::xany::Xany const &x) {
+        getter->data(x);
+      }
+
+      void add_tag(gott::string const &x) {
+        getter->add_tag(x);
+      }
+
+      writable_structure &target;
+      boost::scoped_ptr<structure::repatcher_getter> getter;
+      unsigned long level;
+      tdl::source_position last_position;
+    };
+    return new context(target);
+  }
+};
+
 class matcher : public item {
 public:
+  matcher(
+      rule_attr_t const &attr,
+      std::vector<rule_t> const &children,
+      match &ref)
+  : item(attr, ref) {
+    ref.add(
+      rule_one("tdl::schema::ordered", rule_attr(),
+          rule("tdl::schema::tree", rule_attr(outer = list()))));
+    (void)children; //TODO: check that there are _no_ children
+  }
+
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
   { return true; }
+
+  expect expectation() const {
+    return maybe;
+  }
+
+  gott::string name() const {
+    return gott::string("tdl::schema_lang::repatcher");
+  }
 };
 }
 

@@ -72,6 +72,7 @@ public:
   repatcher_getter *chain_alloc() const;
 
 private:
+  //FIXME: make thread-safe
   std::map<gott::string, boost::function<repatcher_getter *()> > repo;
 };
 
