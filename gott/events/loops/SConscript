@@ -5,4 +5,4 @@ if env['SYS_EPOLL']:
 	env.SharedLibrary('epoll_loop', 'epoll_loop.cpp', LIBS = [])
 if env['SYS_KQUEUE']:
 	env.SharedLibrary('kqueue_loop', 'kqueue_loop.cpp', LIBS = [])
-env.SharedLibrary('message_queue_loop', 'message_queue_loop.cpp')
+env.SharedLibrary('message_queue_loop', 'message_queue_loop.cpp', LIBS = [])
