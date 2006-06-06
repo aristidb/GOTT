@@ -126,6 +126,7 @@ module plugin::enclosing_module() const {
 }
 
 bool plugin::is_valid() const {
+  //TODO: do some caching
   return detail::validate(*this);
 }
 

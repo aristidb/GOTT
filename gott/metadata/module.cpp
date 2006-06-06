@@ -96,10 +96,12 @@ void module::enumerate_dependencies(
 }
 
 bool module::is_valid() const {
+  //TODO: do some caching
   return detail::validate(*this);
 }
 
 boost::shared_ptr<gott::plugin::module> module::get_instance() const {
+  //TODO: do some caching
   boost::shared_ptr<gott::plugin::module> result(
       new gott::plugin::module(*this));
   return result;
