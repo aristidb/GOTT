@@ -51,8 +51,6 @@ namespace {
 boost::once_flag once_standard = BOOST_ONCE_INIT;
 boost::once_flag once_core = BOOST_ONCE_INIT;
 
-void noop() {}
-
 void do_load_standard() {
   load_core();
 
