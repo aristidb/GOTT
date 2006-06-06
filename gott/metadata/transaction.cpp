@@ -50,15 +50,15 @@
 #include <boost/rtl/key_index_delta.hpp>
 #include <boost/rtl/selection_delta.hpp>
 #include <boost/rtl/table_delta.hpp>
+#include <boost/lambda/bind.hpp>
 #include <vector>
+#include <set>
 
-using gott::metadata::transaction;
+using namespace gott::metadata;
+using gott::QID;
+using gott::string;
 
-class transaction::impl {
-public:
-  typedef std::vector<string> res_lst;
-  res_lst remove_resources;
-
+namespace {
   struct plugin_info {
     QID plugin_id;
     std::vector<QID> supported_interfaces;
@@ -68,10 +68,6 @@ public:
     string resource;
   };
 
-  typedef std::vector<plugin_info> plg_lst;
-
-  plg_lst insert_plugins;
-
   struct module_info {
     QID module_id;
     module::module_type_t module_type;
@@ -79,15 +75,23 @@ public:
     std::vector<QID> dependencies;
     string resource;
   };
-  
-  typedef std::vector<module_info> mod_lst;
-
-  mod_lst insert_modules;
 
   struct interface_info {
     QID interface_id;
     string resource;
   };
+}
+
+class transaction::impl {
+public:
+  typedef std::vector<string> res_lst;
+  res_lst remove_resources;
+
+  typedef std::vector<plugin_info> plg_lst;
+  plg_lst insert_plugins;
+
+  typedef std::vector<module_info> mod_lst;
+  mod_lst insert_modules;
 
   typedef std::vector<interface_info> if_lst;
   if_lst insert_interfaces;
@@ -153,6 +157,65 @@ void transaction::commit_interfaces() {
   tr.commit(exprs);
 }
 
+namespace {
+  QID get_id(module const &mod) {
+    return mod.module_id();
+  }
+
+  QID get_id(interface const &ifc) {
+    return ifc.interface_id();
+  }
+
+  // compare a std::vector of QIDs with an enumerated list of QIDs
+  struct compare_qids {
+    compare_qids(std::vector<QID> const &vector) : expected(vector.size()) {
+      GOTT_FOREACH_RANGE(it, vector)
+        set.insert(*it);
+    }
+
+    std::set<QID> set;
+    unsigned long count;
+    unsigned long expected;
+
+    void reset() { count = 0; }
+    
+    template<class T>
+    void operator() (T const &x) {
+      count += set.count(get_id(x));
+    }
+
+    bool operator!() const {
+      return count != expected;
+    }
+  };
+
+  // compares a module row with its potential information
+  struct module_comparer {
+    module_comparer(module_info const &ref) 
+      : ref(ref), check_deps(ref.dependencies) {}
+
+    module_info const &ref;
+    mutable compare_qids check_deps;
+
+    template<class Row>
+    bool operator()(Row const &cand) const {
+      using namespace gott::metadata_db;
+
+      // check whether dependencies are the same
+      check_deps.reset();
+      module(cand[module_handle()]).enumerate_dependencies(
+          boost::ref(check_deps));
+      if (!check_deps)
+        return false;
+      
+      // check other attributes
+      return
+        cand[module_type()] == ref.module_type &&
+        cand[file_path()] == ref.file_path;
+    }
+  };
+}
+
 void transaction::commit_modules() {
   using namespace gott::metadata_db;
   using namespace boost::lambda;
@@ -182,12 +245,8 @@ void transaction::commit_modules() {
           rtl::selection_eq(
             get_module_by_id(),
             rtl::row<mpl::vector1<module_id> >(it->module_id)));
-      // FIXME: check whether dependencies are the same
-      GOTT_AUTO(duplicates,
-          selection(
-            candidates,
-            _1[module_type()] == it->module_type &&
-            _1[file_path()] == it->file_path));
+      
+      GOTT_AUTO(duplicates, selection(candidates, module_comparer(*it)));
       if (duplicates.begin() == duplicates.end()) {
         // ... no duplicate => insert
         handle_t handle;
@@ -244,6 +303,35 @@ void transaction::commit_modules() {
   }
 }
 
+namespace {
+  // compare plugin_info and rtl row (like module_comparer, just for plugin)
+  struct plugin_comparer {
+    plugin_comparer(plugin_info const &ref, handle_t enc)
+      : ref(ref), check_ifc(ref.supported_interfaces), enclosing_mod(enc) {}
+
+    plugin_info const &ref;
+    mutable compare_qids check_ifc;
+    handle_t enclosing_mod;
+    
+    template<class Row>
+    bool operator() (Row const &cand) const {
+      using namespace gott::metadata_db;
+
+      // check whether supported interfaces are the same
+      check_ifc.reset();
+      plugin(cand[plugin_handle()])
+        .enumerate_supported_interfaces(boost::ref(check_ifc));
+      if (!check_ifc)
+        return false;
+      
+      // check other attributes
+      return
+        cand[module_handle()] == enclosing_mod &&
+        cand[symbol()] == ref.symbol;
+    }
+  };
+}
+
 void transaction::commit_plugins() {
   using namespace gott::metadata_db;
   using namespace boost::lambda;
@@ -265,7 +353,7 @@ void transaction::commit_plugins() {
 
   // add fresh plugins
   GOTT_FOREACH_RANGE(it, p->insert_plugins) {
-    boost::optional<module> enclosing_module =
+   boost::optional<module> enclosing_module =
       find_module(
           tags::module_id = it->enclosing_module,
           tags::validate = false,
@@ -273,17 +361,13 @@ void transaction::commit_plugins() {
     if (!enclosing_module)
       throw gott::system_error("enclosing module not found");
     handle_t enclosing_module_handle = enclosing_module->get_handle();
-
+ 
     GOTT_AUTO(candidates,
         rtl::selection_eq(
           get_plugin_by_id(),
           rtl::row<mpl::vector1<plugin_id> >(it->plugin_id)));
-    // FIXME: check whether supported interfaces are the same
     GOTT_AUTO(duplicates,
-        selection(
-          candidates,
-          _1[symbol()] == it->symbol &&
-          _1[module_handle()] == enclosing_module_handle));
+        selection(candidates, plugin_comparer(*it, enclosing_module_handle)));
     if (duplicates.begin() == duplicates.end()) {
       // ... no duplicate => insert
       handle_t handle;
@@ -361,7 +445,7 @@ void transaction::add_plugin(
     string const &symbol,
     plugin_priority priority,
     string const &resource) {
-  impl::plugin_info x =
+  plugin_info x =
     { 
       plugin_id,
       supported_interfaces,
@@ -379,7 +463,7 @@ void transaction::add_module(
     string const &file_path,
     std::vector<QID> const &dependencies,
     string const &resource) {
-  impl::module_info x =
+  module_info x =
     {
       module_id,
       module_type,
@@ -393,7 +477,7 @@ void transaction::add_module(
 void transaction::add_interface(
     QID const &interface_id,
     string const &resource) {
-  impl::interface_info x =
+  interface_info x =
     {
       interface_id,
       resource
