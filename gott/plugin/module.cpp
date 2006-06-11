@@ -60,7 +60,7 @@ private:
   void *handle;
   
 public:
-  impl(metadata::module const &which)
+  impl(module_descriptor const &which)
   : handle(0) {
     {
       using namespace boost::lambda;
@@ -97,7 +97,7 @@ public:
   }
 };
 
-module::module(metadata::module const &which) : p(new impl(which)) {}
+module::module(module_descriptor const &which) : p(new impl(which)) {}
 module::~module() {}
 
 void *module::entity(gott::string const &symbol) {

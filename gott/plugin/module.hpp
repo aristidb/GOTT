@@ -39,35 +39,34 @@
 #define GOTT_PLUGIN_MODULE_HPP
 
 #include <gott/visibility.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
 namespace gott {
   class string;
 
-namespace metadata {
-  class plugin;
-  class module;
-}
-
 namespace plugin {
+
+class module_descriptor;
+class plugin_descriptor;
 class plugin_base;
 class plugin_configuration;
+
 class module : boost::noncopyable {
 public:
-  GOTT_EXPORT module(metadata::module const &which);
+  GOTT_EXPORT module(module_descriptor const &which);
   GOTT_EXPORT ~module();
 
   GOTT_EXPORT void *entity(gott::string const &symbol);
 
-  GOTT_EXPORT plugin_base *load_plugin(metadata::plugin const &which);
+  GOTT_EXPORT plugin_base *load_plugin(plugin_descriptor const &which);
   GOTT_EXPORT plugin_base *load_plugin(
-      metadata::plugin const &which,
+      plugin_descriptor const &which,
       plugin_configuration const &conf);
 
 private:
   class impl;
-  boost::scoped_ptr<impl> p;
+  boost::shared_ptr<impl> p;
 };
 
 }}
