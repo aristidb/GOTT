@@ -36,8 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "plugin_handle.hpp"
-#include <gott/metadata/plugin.hpp>
-#include <gott/metadata/module.hpp>
+#include "selector.hpp"
+#include "descriptor.hpp"
 #include "plugin_base.hpp"
 #include <gott/exceptions.hpp>
 
@@ -45,41 +45,27 @@ using namespace gott::plugin;
 
 class plugin_handle_base::impl {
 public:
-  impl(metadata::plugin const &which)
-    : mod(which.enclosing_module().get_instance()),
-      p(mod->load_plugin(which)) {}
-
-  ~impl() { delete p; }
+  impl(selector const &sel) {
+    std::pair<plugin_descriptor, module_descriptor> desc = sel.get();
+    mod.reset(new module(desc.second));
+    p.reset(mod->load_plugin(desc.first));
+  }
 
   boost::shared_ptr<module> mod;
-  plugin_base *p;
+  boost::scoped_ptr<plugin_base> p;
 };
 
-plugin_handle_base::plugin_handle_base(metadata::plugin const &which)
-: p(new impl(which)) {}
-
-namespace {
-  gott::metadata::plugin unwrap(
-      boost::optional<gott::metadata::plugin> const &which) {
-    if (!which)
-      throw gott::system_error("plugin not found");
-    return which.get();
-  }
-}
-
-plugin_handle_base::plugin_handle_base(
-    boost::optional<metadata::plugin> const &which)
-: p(new impl(unwrap(which))) {}
+plugin_handle_base::plugin_handle_base(selector const &sel)
+: p(new impl(sel)) {}
 
 plugin_handle_base::~plugin_handle_base() {}
 
 plugin_base *plugin_handle_base::get_base() const {
-  return p->p;
+  return p->p.get();
 }
 
-void plugin_handle_base::fail_interface(metadata::plugin const &which) {
+void plugin_handle_base::fail_interface() {
   throw gott::system_error(
-      which.plugin_id().get_string()
-      + " : plugin does not support requested interface");
+      "plugin does not support requested interface");
 }
 

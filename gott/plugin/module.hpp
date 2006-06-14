@@ -50,7 +50,6 @@ namespace plugin {
 class module_descriptor;
 class plugin_descriptor;
 class plugin_base;
-class plugin_configuration;
 
 class module : boost::noncopyable {
 public:
@@ -60,9 +59,6 @@ public:
   GOTT_EXPORT void *entity(gott::string const &symbol);
 
   GOTT_EXPORT plugin_base *load_plugin(plugin_descriptor const &which);
-  GOTT_EXPORT plugin_base *load_plugin(
-      plugin_descriptor const &which,
-      plugin_configuration const &conf);
 
 private:
   class impl;

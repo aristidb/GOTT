@@ -37,10 +37,8 @@
 
 #include "module.hpp"
 #include "plugin_base.hpp"
-#include <gott/metadata/module.hpp>
-#include <gott/metadata/plugin.hpp>
+#include "descriptor.hpp"
 #include "plugin_builder.hpp"
-#include "plugin_configuration.hpp"
 #include <boost/scoped_array.hpp>
 #include <gott/string/string.hpp>
 #include <gott/exceptions.hpp>
@@ -62,24 +60,14 @@ private:
 public:
   impl(module_descriptor const &which)
   : handle(0) {
-    {
-      using namespace boost::lambda;
-      which.enumerate_dependencies(
-          bind(&dep_list_t::push_back, &dependencies,
-            bind(&metadata::module::get_instance, _1)));
-    }
+    //FIXME: load dependencies
     handle = get_handle(which);
   }
 
-  static void *get_handle(metadata::module const &which) {
-    switch (which.module_type()) {
-    case metadata::module::dynamic_native:
-      return dlopen_unix(
-          boost::scoped_array<char>(which.file_path().c_string_alloc()).get(),
-          RTLD_LAZY | RTLD_GLOBAL);
-    default:
-      throw 0;
-    }
+  static void *get_handle(module_descriptor const &which) {
+    return dlopen_unix(
+        boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
+        RTLD_LAZY | RTLD_GLOBAL);
   }
 
   ~impl() {
@@ -104,13 +92,7 @@ void *module::entity(gott::string const &symbol) {
   return p->entity(symbol);
 }
 
-plugin_base *module::load_plugin(metadata::plugin const &which) {
-  return load_plugin(which, plugin_configuration(which));
-}
-
-plugin_base *module::load_plugin(
-    metadata::plugin const &which,
-    plugin_configuration const &conf) {
-  plugin_builder *fun = function_cast<plugin_builder>(entity(which.symbol()));
-  return fun(conf);
+plugin_base *module::load_plugin(plugin_descriptor const &which) {
+  plugin_builder *fun = function_cast<plugin_builder>(entity(which.symbol));
+  return fun();
 }

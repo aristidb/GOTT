@@ -48,14 +48,13 @@ class string;
 
 namespace plugin {
 
-class plugin_descriptor;
+class selector;
 
 class plugin_handle_base {
 public:
   GOTT_EXPORT
-  plugin_handle_base(
-      module_descriptor const &mod,
-      plugin_descriptor const &which);
+  plugin_handle_base(selector const &sel);
+  
   ~plugin_handle_base() GOTT_EXPORT;
 
   plugin_base *get_base() const GOTT_EXPORT;
@@ -66,15 +65,14 @@ protected:
 private:
   class impl;
   boost::scoped_ptr<impl> p;
-};    
+};   
 
 template<class ConcretePlugin>
 class plugin_handle : public plugin_handle_base {
 public:
-  plugin_handle(module_descriptor const &mod, plugin_descriptor const &which)
-  : plugin_handle_base(which), p(cast(get_base())) {
-    if (!p)
-      fail_interface();
+  plugin_handle(selector const &sel)
+  : plugin_handle_base(sel), p(cast(get_base())) {
+    if (!p) fail_interface();
   }
 
   ~plugin_handle() {}

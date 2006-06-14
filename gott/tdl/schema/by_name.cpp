@@ -47,8 +47,7 @@
 #include <map>
 
 using namespace tdl::schema;
-using namespace gott::metadata;
-using gott::plugin::plugin_handle;
+using namespace gott::plugin;
 using gott::string;
 using std::vector;
 
@@ -62,17 +61,12 @@ namespace {
 
 rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
     vector<rule_t> const &c) {
-  load_core();
-  load_standard();
-
+  gott::metadata::load_standard();
   boost::mutex::scoped_lock lock(mutex);
 
   if (all_handles.count(s) == 0) {
     plugin_handle<type> * handle(new plugin_handle<type>(
-      find_plugin(
-        tags::plugin_id = s,
-        tags::interface_id = "tdl::schema::type",
-        tags::load_standard_metadata = false)));
+          with_plugin_id(s) && with_interface_id("tdl::schema::type")));
 
     all_handles.insert(map_t::value_type(s, handle));
   }

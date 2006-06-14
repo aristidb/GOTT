@@ -100,13 +100,6 @@ bool module::is_valid() const {
   return detail::validate(*this);
 }
 
-boost::shared_ptr<gott::plugin::module> module::get_instance() const {
-  //TODO: do some caching
-  boost::shared_ptr<gott::plugin::module> result(
-      new gott::plugin::module(*this));
-  return result;
-}
-
 namespace {
 template<class T>
 void enumerate_modules_internal(

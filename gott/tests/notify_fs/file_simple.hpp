@@ -61,7 +61,7 @@ class notify_fs_file_simple_test : public CxxTest::TestSuite
   gott::plugin::plugin_handle<gott::events::main_loop> loop;
 
 public:
-  static gott::metadata::plugin which_main_loop() {
+  static gott::plugin::selector which_main_loop() {
     gott::events::main_loop_factory fact;
     fact.try_add(gott::events::feature<gott::notify_fs::notification_engine>());
     return fact.get();
