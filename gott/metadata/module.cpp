@@ -51,13 +51,13 @@ using namespace gott;
 
 namespace {
 template<class Ret, class T>
-Ret get_attribute(handle_t const &handle, T const &attribute) {
+Ret get_attribute(string const &path, T const &attribute) {
   global_mutex::scoped_lock lock(get_global_lock());
   GOTT_AUTO(
       obj_sel,
       rtl::selection_eq(
         get_module_table(),
-        rtl::row<mpl::vector1<module_handle> >(handle)));
+        rtl::row<mpl::vector1<file_path> >(path)));
 
   if (obj_sel.begin() == obj_sel.end() ||
       ++obj_sel.begin() != obj_sel.end())
@@ -72,27 +72,23 @@ Ret get_attribute(handle_t const &handle, T const &attribute) {
 }
 
 QID module::module_id() const {
-  return get_attribute<QID>(handle, metadata_db::module_id());
+  return get_attribute<QID>(file_path_, metadata_db::module_id());
 }
 
 module::module_type_t module::module_type() const {
-  return get_attribute<module_type_t>(handle, metadata_db::module_type());
-}
-
-string module::file_path() const {
-  return get_attribute<string>(handle, metadata_db::file_path());
+  return get_attribute<module_type_t>(file_path_, metadata_db::module_type());
 }
 
 void module::enumerate_dependencies(
     boost::function<void (module const &)> const &fun) const {
   global_mutex::scoped_lock lock(get_global_lock());
   GOTT_AUTO(deps,
-      rtl::projection<mpl::vector1<rtl::alias<module_handle> > >(
+      rtl::projection<mpl::vector1<rtl::alias<metadata_db::file_path> > >(
         rtl::selection_eq(
           get_module_dependencies_table(),
-          rtl::row<mpl::vector1<module_handle> >(handle))));
+          rtl::row<mpl::vector1<metadata_db::file_path> >(file_path_))));
   GOTT_FOREACH_RANGE(it, deps)
-    fun(module(it.get(rtl::alias<module_handle>())));
+    fun(module(it.get(rtl::alias<metadata_db::file_path>())));
 }
 
 bool module::is_valid() const {
@@ -108,7 +104,7 @@ void enumerate_modules_internal(
     bool cancel_early,
     bool validate) {
   GOTT_FOREACH_RANGE(it, rel) {
-    module current(it.get(module_handle()));
+    module current(it.get(file_path()));
     if (validate && !current.is_valid())
       continue;
     callback(current);

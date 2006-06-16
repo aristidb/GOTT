@@ -136,14 +136,12 @@ void transaction::commit_interfaces() {
     if (duplicates.begin() == duplicates.end()) {
       // ... no duplicate => insert
       tr.insert(get_interface_table(), interface_table_t::value_type(
-            handle_t(),
             it->interface_id,
             it->resource,
             false));
     } else {
       // ... duplicate => reuse handle
       tr.update(get_interface_table(), interface_table_t::value_type(
-            duplicates.begin().get(interface_handle()),
             it->interface_id,
             it->resource,
             false));
@@ -153,7 +151,7 @@ void transaction::commit_interfaces() {
   // commit and update indexes
   rtl::expression_registry exprs;
   exprs.add(get_new_interfaces());
-  exprs.add(get_interface_by_id());
+  //NO NEED: exprs.add(get_interface_by_id());
   tr.commit(exprs);
 }
 
@@ -203,15 +201,14 @@ namespace {
 
       // check whether dependencies are the same
       check_deps.reset();
-      module(cand[module_handle()]).enumerate_dependencies(
+      module(cand[file_path()]).enumerate_dependencies(
           boost::ref(check_deps));
       if (!check_deps)
         return false;
       
       // check other attributes
       return
-        cand[module_type()] == ref.module_type &&
-        cand[file_path()] == ref.file_path;
+        cand[module_type()] == ref.module_type;
     }
   };
 }
@@ -220,7 +217,7 @@ void transaction::commit_modules() {
   using namespace gott::metadata_db;
   using namespace boost::lambda;
   
-  std::vector<std::pair<handle_t, impl::mod_lst::iterator> > added;
+  std::vector<impl::mod_lst::iterator> added;
   added.reserve(p->insert_modules.size());
 
   {
@@ -249,20 +246,17 @@ void transaction::commit_modules() {
       GOTT_AUTO(duplicates, selection(candidates, module_comparer(*it)));
       if (duplicates.begin() == duplicates.end()) {
         // ... no duplicate => insert
-        handle_t handle;
         tr.insert(get_module_table(), module_table_t::value_type(
-              handle,
               it->module_id,
               it->module_type,
               it->file_path,
               it->resource,
               false));
         // remember, for dependency injection later
-        added.push_back(std::make_pair(handle, it));
+        added.push_back(it);
       } else {
         // ... duplicate => reuse handle
         tr.update(get_module_table(), module_table_t::value_type(
-              duplicates.begin().get(module_handle()),
               it->module_id,
               it->module_type,
               it->file_path,
@@ -282,7 +276,7 @@ void transaction::commit_modules() {
 
     // now care about their dependencies
     GOTT_FOREACH_RANGE(it, added) {
-      GOTT_FOREACH_RANGE(jt, it->second->dependencies) {
+      GOTT_FOREACH_RANGE(jt, (*it)->dependencies) {
         boost::optional<module> dep = 
           find_module(
               tags::module_id = *jt,
@@ -290,11 +284,10 @@ void transaction::commit_modules() {
               tags::validate = false);
         if (!dep)
           throw gott::system_error("module dependency not found");
-        handle_t dep_handle = dep->get_handle();
       
         tr.insert(get_module_dependencies_table(),
             module_dependencies_table_t::value_type(
-              it->first, dep_handle));
+              (*it)->file_path, dep->file_path()));
       }
     }
     
@@ -306,12 +299,13 @@ void transaction::commit_modules() {
 namespace {
   // compare plugin_info and rtl row (like module_comparer, just for plugin)
   struct plugin_comparer {
-    plugin_comparer(plugin_info const &ref, handle_t enc)
-      : ref(ref), check_ifc(ref.supported_interfaces), enclosing_mod(enc) {}
+    plugin_comparer(plugin_info const &ref, string enc_path)
+      : ref(ref), check_ifc(ref.supported_interfaces), enclosing_mod(enc_path)
+      {}
 
     plugin_info const &ref;
     mutable compare_qids check_ifc;
-    handle_t enclosing_mod;
+    string enclosing_mod;
     
     template<class Row>
     bool operator() (Row const &cand) const {
@@ -319,15 +313,13 @@ namespace {
 
       // check whether supported interfaces are the same
       check_ifc.reset();
-      plugin(cand[plugin_handle()])
+      plugin(module(cand[file_path()]), cand[symbol()])
         .enumerate_supported_interfaces(boost::ref(check_ifc));
       if (!check_ifc)
         return false;
       
       // check other attributes
-      return
-        cand[module_handle()] == enclosing_mod &&
-        cand[symbol()] == ref.symbol;
+      return true;
     }
   };
 }
@@ -360,50 +352,39 @@ void transaction::commit_plugins() {
           tags::load_standard_metadata = false);
     if (!enclosing_module)
       throw gott::system_error("enclosing module not found");
-    handle_t enclosing_module_handle = enclosing_module->get_handle();
+    string file_path = enclosing_module->file_path();
  
     GOTT_AUTO(candidates,
         rtl::selection_eq(
           get_plugin_by_id(),
           rtl::row<mpl::vector1<plugin_id> >(it->plugin_id)));
     GOTT_AUTO(duplicates,
-        selection(candidates, plugin_comparer(*it, enclosing_module_handle)));
+        selection(candidates, plugin_comparer(*it, file_path)));
     if (duplicates.begin() == duplicates.end()) {
       // ... no duplicate => insert
-      handle_t handle;
       tr.insert(get_plugin_table(), plugin_table_t::value_type(
-            handle,
             it->priority,
             it->plugin_id,
             it->symbol,
-            enclosing_module_handle,
+            file_path,
             it->resource,
             false));
 
       // add supported interfaces
       GOTT_FOREACH_RANGE(jt, it->supported_interfaces) {
-        boost::optional<interface> supported_interface =
-          find_interface(
-              tags::interface_id = *jt,
-              tags::validate = false,
-              tags::load_standard_metadata = false);
-        if (!supported_interface)
-          throw gott::system_error("supported interface not found");
-        handle_t the_interface_handle = supported_interface->get_handle();
-
         tr.insert(get_plugin_interfaces_table(),
             plugin_interfaces_table_t::value_type(
-              handle,
-              the_interface_handle));
+              it->symbol,
+              file_path,
+              *jt));
       }
     } else {
       // ... duplicate => just update
       tr.update(get_plugin_table(), plugin_table_t::value_type(
-            duplicates.begin().get(plugin_handle()),
             it->priority,
             it->plugin_id,
             it->symbol,
-            enclosing_module_handle,
+            file_path,
             it->resource,
             false));
     }

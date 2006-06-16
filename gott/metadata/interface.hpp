@@ -38,7 +38,6 @@
 #ifndef GOTT_METADATA_INTERFACE_HPP
 #define GOTT_METADATA_INTERFACE_HPP
 
-#include "detail/handle.hpp"
 #include "detail/param.hpp"
 #include <gott/string/qid.hpp>
 #include <boost/function.hpp>
@@ -49,15 +48,12 @@ namespace gott { namespace metadata {
 
 class interface {
 public:
-  interface(handle_t handle) : handle(handle) {}
+  interface(QID const &interface_id) : interface_id_(interface_id) {}
 
-  GOTT_EXPORT
-  QID interface_id() const;
-
-  handle_t const &get_handle() const { return handle; }
+  QID interface_id() const { return interface_id_; }
 
 private:
-  handle_t handle;
+  QID interface_id_;
 };
 
 GOTT_EXPORT

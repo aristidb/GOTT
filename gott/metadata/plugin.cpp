@@ -46,11 +46,7 @@
 #include <gott/exceptions.hpp>
 #include <gott/auto.hpp>
 #include <boost/lambda/lambda.hpp>
-#include <boost/lambda/if.hpp>
-#include <boost/lambda/bind.hpp>
-#include <boost/lambda/construct.hpp>
 #include <boost/rtl/lambda_support.hpp>
-#include <boost/rtl/invert.hpp>
 
 using namespace gott::metadata;
 using namespace gott::metadata_db;
@@ -59,13 +55,13 @@ using gott::string;
 
 namespace {
 template<class Ret, class T>
-Ret get_attribute(handle_t const &handle, T const &attribute) {
+Ret get_attribute(module const &mod, string const &sym, T const &attribute) {
   global_mutex::scoped_lock lock(get_global_lock());
   GOTT_AUTO(
       obj_sel,
       rtl::selection_eq(
         get_plugin_table(),
-        rtl::row<mpl::vector1<plugin_handle> >(handle)));
+        rtl::row<mpl::vector2<symbol, file_path> >(sym, mod.file_path())));
 
   if (obj_sel.begin() == obj_sel.end() ||
       ++obj_sel.begin() != obj_sel.end())
@@ -80,16 +76,12 @@ Ret get_attribute(handle_t const &handle, T const &attribute) {
 }
 
 QID plugin::plugin_id() const {
-  return get_attribute<QID>(handle, metadata_db::plugin_id());
+  return get_attribute<QID>(
+      enclosing_module_, symbol_, metadata_db::plugin_id());
 }
 
 bool plugin::supports_interface(interface const &x) const {
-  global_mutex::scoped_lock lock(get_global_lock());
-  GOTT_AUTO(sel,
-      rtl::selection_eq(
-        get_plugin_interfaces_table(),
-        plugin_interfaces_table_t::value_type(handle, x.get_handle())));
-  return sel.begin() != sel.end();
+  return supports_interface_id(x.interface_id());
 }
 
 void plugin::enumerate_supported_interfaces(
@@ -98,31 +90,28 @@ void plugin::enumerate_supported_interfaces(
   GOTT_AUTO(sel,
       rtl::selection_eq(
         get_plugin_interfaces_table(),
-        rtl::row<mpl::vector1<plugin_handle> >(handle)));
+        rtl::row<mpl::vector2<metadata_db::symbol, file_path> >(
+          symbol_,
+          enclosing_module_.file_path())));
   GOTT_FOREACH_RANGE(it, sel)
-    callback(interface(it.get(interface_handle())));
+    callback(interface(it.get(interface_id())));
 }
 
 bool plugin::supports_interface_id(QID const &id) const {
-  using namespace boost::lambda;
-  bool value = false;
-  enumerate_supported_interfaces(
-      if_then(
-        id == bind(&interface::interface_id, _1),
-        var(value) = true));
-  return value;
-}
-
-string plugin::symbol() const {
-  return get_attribute<string>(handle, metadata_db::symbol());
+  global_mutex::scoped_lock lock(get_global_lock());
+  GOTT_AUTO(sel,
+      rtl::selection_eq(
+        get_plugin_interfaces_table(),
+        plugin_interfaces_table_t::value_type(
+          symbol_,
+          enclosing_module_.file_path(),
+          id)));
+  return sel.begin() != sel.end();
 }
 
 plugin_priority plugin::priority() const {
-  return get_attribute<plugin_priority>(handle, metadata_db::priority());
-}
-
-module plugin::enclosing_module() const {
-  return module(get_attribute<handle_t>(handle, metadata_db::module_handle()));
+  return get_attribute<plugin_priority>(
+      enclosing_module_, symbol_, metadata_db::priority());
 }
 
 bool plugin::is_valid() const {
@@ -151,7 +140,7 @@ void enumerate_plugins_internal(
     bool validate) {
   std::vector<plugin> by_priority[INVALID_PRIORITY];
   GOTT_FOREACH_RANGE(it, rel) {
-    plugin current(it.get(plugin_handle()));
+    plugin current(module(it[file_path()]), it[symbol()]);
     if (validate && !current.is_valid())
       continue;
     by_priority[current.priority()].push_back(current);
@@ -159,10 +148,6 @@ void enumerate_plugins_internal(
   for (int i = 0; i < INVALID_PRIORITY; ++i)
     if (enumerate_plugins_internal2(by_priority[i], function, cancel_early))
       break;
-}
-
-bool check_interface(QID const &ifc, handle_t const &handle) {
-  return plugin(handle).supports_interface_id(ifc);
 }
 }
 
@@ -187,27 +172,18 @@ void gott::metadata::enumerate_plugins_p(
       return enumerate_plugins_internal(sel, function, cancel_early, validate);
     return enumerate_plugins_internal(
         rtl::selection(
-          rtl::join_eq<mpl::vector1<plugin_handle> >(
+          rtl::join_eq<mpl::vector2<symbol, file_path> >(
             sel,
             get_plugin_interfaces_table()),
-          bind(
-            &check_interface,
-            *the_interface_id,
-            _1[plugin_handle()])),
+          _1[interface_id()] == *the_interface_id),
         function, cancel_early, validate);
   }
   if (the_interface_id) {
     GOTT_AUTO(
-        interfaces,
-        rtl::selection_eq(
-          get_interface_by_id(),
-          rtl::row<mpl::vector1<interface_id> >(*the_interface_id))
-        );
-    GOTT_AUTO(
         sel,
-        rtl::join_eq<mpl::vector1<interface_handle> >(
-          interfaces,
-          get_plugin_with_interface()));
+        rtl::selection_eq(
+          get_plugin_with_interface(),
+          rtl::row<mpl::vector1<interface_id> >(*the_interface_id)));
     return enumerate_plugins_internal(sel, function, cancel_early, validate);
   }
   GOTT_AUTO_CREF(sel, get_new_plugins());
