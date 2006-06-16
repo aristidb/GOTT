@@ -44,8 +44,6 @@
 #include <gott/exceptions.hpp>
 #include <gott/syswrap/dl_unix.hpp>
 #include <gott/syswrap/function_cast.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/lambda/bind.hpp>
 #include <vector>
 
 using gott::plugin::module;
@@ -53,7 +51,7 @@ using gott::plugin::plugin_base;
 
 class module::impl {
 private:
-  typedef std::vector<boost::shared_ptr<module> > dep_list_t;
+  typedef std::vector<module> dep_list_t;
   dep_list_t dependencies;
   void *handle;
   

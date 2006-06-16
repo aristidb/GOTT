@@ -45,18 +45,15 @@ using namespace gott::plugin;
 
 class plugin_handle_base::impl {
 public:
-  impl(selector const &sel) {
-    std::pair<plugin_descriptor, module_descriptor> desc = sel.get();
-    mod.reset(new module(desc.second));
-    p.reset(mod->load_plugin(desc.first));
-  }
+  impl(std::pair<plugin_descriptor, module_descriptor> const &desc)
+  : mod(desc.second), p(mod.load_plugin(desc.first)) {}
 
-  boost::shared_ptr<module> mod;
+  module mod;
   boost::scoped_ptr<plugin_base> p;
 };
 
 plugin_handle_base::plugin_handle_base(selector const &sel)
-: p(new impl(sel)) {}
+: p(new impl(sel.get())) {}
 
 plugin_handle_base::~plugin_handle_base() {}
 

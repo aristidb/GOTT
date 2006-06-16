@@ -46,7 +46,6 @@
 #include <boost/optional/optional.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace gott { 
 namespace plugin { class module; }
@@ -86,11 +85,6 @@ public:
    * Check whether the metadata is valid. Thread-safe.
    */
   GOTT_EXPORT bool is_valid() const;
-
-  /**
-   * Get a module instance for this metadata. Thread-safe.
-   */
-  GOTT_EXPORT boost::shared_ptr<gott::plugin::module> get_instance() const;
 
 private:
   handle_t handle;
