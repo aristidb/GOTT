@@ -48,32 +48,6 @@ using namespace gott::metadata;
 using namespace gott::metadata_db;
 
 namespace {
-template<class Ret, class T>
-Ret get_attribute(handle_t const &handle, T const &attribute) {
-  global_mutex::scoped_lock lock(get_global_lock());
-  GOTT_AUTO(
-      obj_sel,
-      rtl::selection_eq(
-        get_interface_table(),
-        rtl::row<mpl::vector1<interface_handle> >(handle)));
-
-  if (obj_sel.begin() == obj_sel.end() ||
-      ++obj_sel.begin() != obj_sel.end())
-    throw gott::internal_error(
-        "metadata integrity: interface query did not "
-        "deliver exactly one item");
-
-  GOTT_AUTO_CREF(obj, *obj_sel.begin());
-  
-  return obj[attribute];
-}
-}
-
-QID interface::interface_id() const {
-  return get_attribute<QID>(handle, metadata_db::interface_id());
-}
-
-namespace {
 template<class T>
 void enumerate_internal(
     T const &rel,
@@ -81,7 +55,7 @@ void enumerate_internal(
     bool cancel_early,
     bool validate) {
   GOTT_FOREACH_RANGE(it, rel) {
-    callback(interface(it.get(interface_handle())));
+    callback(interface(it.get(interface_id())));
     if (cancel_early)
       break;
     (void)validate;//nothing to check here

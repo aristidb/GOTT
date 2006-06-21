@@ -40,7 +40,6 @@
 
 #include "plugin_base.hpp"
 #include "module.hpp"
-#include <gott/metadata/plugin.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -49,37 +48,31 @@ class string;
 
 namespace plugin {
 
+class selector;
+
 class plugin_handle_base {
 public:
-  plugin_handle_base(metadata::plugin const &which) GOTT_EXPORT;
   GOTT_EXPORT
-  plugin_handle_base(boost::optional<metadata::plugin> const &which);
+  plugin_handle_base(selector const &sel);
+  
   ~plugin_handle_base() GOTT_EXPORT;
 
   plugin_base *get_base() const GOTT_EXPORT;
 
 protected:
-  void fail_interface(metadata::plugin const &which) GOTT_EXPORT;
+  void fail_interface() GOTT_EXPORT;
 
 private:
   class impl;
   boost::scoped_ptr<impl> p;
-};    
+};   
 
 template<class ConcretePlugin>
 class plugin_handle : public plugin_handle_base {
 public:
-  plugin_handle(metadata::plugin const &which)
-  : plugin_handle_base(which),
-    p(cast(get_base())) {
-    if (!p)
-      fail_interface(which);
-  }
-  plugin_handle(boost::optional<metadata::plugin> const &which)
-  : plugin_handle_base(which),
-    p(cast(get_base())) {
-    if (!p)
-      fail_interface(which.get());
+  plugin_handle(selector const &sel)
+  : plugin_handle_base(sel), p(cast(get_base())) {
+    if (!p) fail_interface();
   }
 
   ~plugin_handle() {}
@@ -90,6 +83,7 @@ public:
   ConcretePlugin const *operator->() const { return p; }
   ConcretePlugin *get() { return p; }
   ConcretePlugin const *get() const { return p; }
+
 private:
   ConcretePlugin *p;
 

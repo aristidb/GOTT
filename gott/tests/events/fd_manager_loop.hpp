@@ -57,6 +57,8 @@
 #include <gott/events/fd_manager.hpp>
 
 #include <boost/utility/in_place_factory.hpp>
+#include <boost/optional/optional.hpp>
+#include <boost/none.hpp>
 
 using namespace gott;
 using namespace gott::events;
@@ -156,8 +158,7 @@ public:
 
   void create_loop(QID const &which) {
     TS_ASSERT_THROWS_NOTHING(
-        ploop = boost::in_place(gott::metadata::find_plugin(
-            gott::metadata::tags::plugin_id = which)));
+        ploop = boost::in_place(gott::plugin::with_plugin_id(which)));
   }
   
   void select_loop() { create_loop("gott::events::select_loop"); }

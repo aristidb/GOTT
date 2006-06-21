@@ -71,14 +71,12 @@ plugin_by_id_t &get_plugin_by_id() {
 }
 
 interface_by_id_t &get_interface_by_id() {
-  static interface_by_id_t obj = 
-    key_index<vector1<interface_id> >(get_new_interfaces());
-  return obj;
+  return get_new_interfaces();
 }
 
 plugin_with_interface_t &get_plugin_with_interface() {
   static plugin_with_interface_t obj =
-    key_index<vector1<interface_handle> >(get_plugin_interfaces_table());
+    key_index<vector1<interface_id> >(get_plugin_interfaces_table());
   return obj;
 }
 

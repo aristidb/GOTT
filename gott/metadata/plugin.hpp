@@ -39,7 +39,6 @@
 #define GOTT_METADATA_PLUGIN_HPP
 
 #include "detail/param.hpp"
-#include "detail/handle.hpp"
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/function.hpp>
@@ -48,6 +47,7 @@
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
 #include <boost/scoped_ptr.hpp>
+#include "module.hpp"
 
 namespace gott { namespace metadata {
 
@@ -63,7 +63,8 @@ enum plugin_priority {
  */
 class plugin {
 public:
-  explicit plugin(handle_t handle) : handle(handle) {}
+  plugin(module const &enclosing_module, string const &symbol)
+    : enclosing_module_(enclosing_module), symbol_(symbol) {}
 
   /**
    * The plugin's unique identifier.
@@ -87,22 +88,19 @@ public:
   /**
    * The module the plugin resides in.
    */
-  GOTT_EXPORT
-  module enclosing_module() const;
+  module enclosing_module() const { return enclosing_module_; }
 
   /**
    * The entry smbol of the plugin.
    */
-  GOTT_EXPORT
-  string symbol() const;
-
-  handle_t const &get_handle() const { return handle; }
+  string symbol() const { return symbol_; }
 
 public: //internal
   bool is_valid() const;
 
 private:
-  handle_t handle;
+  module enclosing_module_;
+  string symbol_;
 };
 
 /**

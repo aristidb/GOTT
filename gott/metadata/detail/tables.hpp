@@ -38,7 +38,6 @@
 #ifndef GOTT_METADATA_TABLES_HPP
 #define GOTT_METADATA_TABLES_HPP
 
-#include "handle.hpp"
 #include "../module.hpp" // for metadata::module::module_type_t
 #include "../plugin.hpp" // for metadata::plugin_priority
 #include <gott/string/string.hpp>
@@ -56,52 +55,46 @@ BOOST_RTL_DEFINE_COLUMN(bool, obsolete)
 // attention: the lower the value, the higher the priority
 BOOST_RTL_DEFINE_COLUMN(metadata::plugin_priority, priority)
 
-BOOST_RTL_DEFINE_COLUMN(metadata::handle_t, module_handle)
 BOOST_RTL_DEFINE_COLUMN(QID, module_id)
 BOOST_RTL_DEFINE_COLUMN(metadata::module::module_type_t, module_type)
 BOOST_RTL_DEFINE_COLUMN(string, file_path)
 
-BOOST_RTL_DEFINE_COLUMN(metadata::handle_t, plugin_handle)
 BOOST_RTL_DEFINE_COLUMN(QID, plugin_id)
 BOOST_RTL_DEFINE_COLUMN(string, symbol)
 
-BOOST_RTL_DEFINE_COLUMN(metadata::handle_t, interface_handle)
 BOOST_RTL_DEFINE_COLUMN(QID, interface_id)
 
 // Field lists
 typedef 
-  mpl::vector1<module_handle>
+  mpl::vector1<file_path>
   module_sort_list;
 typedef
-  mpl::vector6<module_handle, module_id, module_type, file_path,
-              resource, obsolete>
+  mpl::vector5<module_id, module_type, file_path, resource, obsolete>
   module_field_list;
 
 typedef
-  mpl::vector1<plugin_handle>
+  mpl::vector2<symbol, file_path>
   plugin_sort_list;
 typedef
-  mpl::vector7<plugin_handle, priority, plugin_id, symbol, module_handle,
-              resource, obsolete>
+  mpl::vector6<priority, plugin_id, symbol, file_path, resource, obsolete>
   plugin_field_list;
 
 typedef
-  mpl::vector1<interface_handle>
+  mpl::vector1<interface_id>
   interface_sort_list;
 typedef
-  mpl::vector4<interface_handle, interface_id,
-              resource, obsolete>
+  mpl::vector3<interface_id, resource, obsolete>
   interface_field_list;
 
 typedef
-  mpl::vector2<plugin_handle, interface_handle>
+  mpl::vector3<symbol, file_path, interface_id>
   plugin_interfaces_field_list;
 typedef
   plugin_interfaces_field_list
   plugin_interfaces_sort_list;
 
 typedef
-  mpl::vector2<module_handle, rtl::alias<module_handle> >
+  mpl::vector2<file_path, rtl::alias<file_path> >
   module_dependencies_field_list;
 typedef
   module_dependencies_field_list

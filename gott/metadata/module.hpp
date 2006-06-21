@@ -39,14 +39,12 @@
 #define GOTT_METADATA_MODULE_HPP
 
 #include "detail/param.hpp"
-#include "detail/handle.hpp"
 #include <gott/string/qid.hpp>
 #include <gott/string/string.hpp>
 #include <boost/function.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/parameter/parameters.hpp>
 #include <boost/parameter/macros.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace gott { 
 namespace plugin { class module; }
@@ -55,10 +53,8 @@ namespace metadata {
 
 class module {
 public:
-  explicit module(handle_t handle) : handle(handle) {}
+  module(string file_path) : file_path_(file_path) {}
 
-  handle_t const &get_handle() const { return handle; }
-  
   /**
    * The module's unique identifier.
    */
@@ -77,7 +73,7 @@ public:
   /**
    * The file where the plugin resides.
    */
-  GOTT_EXPORT string file_path() const;
+  string file_path() const { return file_path_; }
 
   GOTT_EXPORT void enumerate_dependencies(
       boost::function<void (module const &)> const &) const;
@@ -87,13 +83,8 @@ public:
    */
   GOTT_EXPORT bool is_valid() const;
 
-  /**
-   * Get a module instance for this metadata. Thread-safe.
-   */
-  GOTT_EXPORT boost::shared_ptr<gott::plugin::module> get_instance() const;
-
 private:
-  handle_t handle;
+  string file_path_;
 };
 
 GOTT_EXPORT

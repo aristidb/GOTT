@@ -99,10 +99,7 @@ typedef
 plugin_by_id_t &get_plugin_by_id();
 
 typedef
-  rtl::key_index_t<
-    new_interfaces_t,
-    mpl::vector1<interface_id>
-  >::type
+  new_interfaces_t
   interface_by_id_t;
 
 interface_by_id_t &get_interface_by_id();
@@ -112,7 +109,7 @@ interface_by_id_t &get_interface_by_id();
 typedef
   rtl::key_index_t<
     plugin_interfaces_table_t,
-    mpl::vector1<interface_handle>
+    mpl::vector1<interface_id>
   >::type
   plugin_with_interface_t;
 

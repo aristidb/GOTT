@@ -141,7 +141,8 @@ selector::get() const {
     enumerate_modules(
         push_back(modules),
         tags::module_id = p->module_id.get());
-    if (p->plugin_id || p->module_id) { // filter
+#if 0
+    if (p->plugin_id || p->interface_id_id) { // filter
       vector<metadata::module> old_modules;
       old_modules.swap(modules);
       vector<metadata::module> plugin_modules;
@@ -158,6 +159,7 @@ selector::get() const {
           if (it->get_handle() == jt->get_handle())
             modules.push_back(*it);
     }
+#endif
   } else {
     for (vector<metadata::plugin>::const_iterator it = plugins.begin();
         it != plugins.end();
