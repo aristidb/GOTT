@@ -63,7 +63,7 @@ public:
 meta_parser::meta_parser() : p(new impl) {
 }
 
-meta_parser::~meta_parser() {}
+meta_parser::~meta_parser() { delete p; }
 
 source_position meta_parser::parse(istream &in, source_position const &ww) {
   source_position &w = p->where = ww;

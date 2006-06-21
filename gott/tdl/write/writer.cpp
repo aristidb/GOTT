@@ -180,7 +180,7 @@ private:
 tdl_writer::tdl_writer(std::ostream &out, unsigned width) 
   : p(new impl(out, width)) {}
 
-tdl_writer::~tdl_writer() {}
+tdl_writer::~tdl_writer() { delete p; }
 
 void tdl_writer::down() {
   p->indentation += p->width;

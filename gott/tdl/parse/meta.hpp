@@ -40,7 +40,6 @@
 
 #include "../source_position.hpp"
 #include <boost/function.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <gott/visibility.hpp>
 
 namespace gott {
@@ -102,7 +101,7 @@ public:
 
 private:
   class impl;
-  boost::scoped_ptr<impl> p;
+  impl *p;
 };
 
 }

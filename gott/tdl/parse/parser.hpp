@@ -39,7 +39,6 @@
 #define GOTT_UTIL_TDL_SimplE_PARSER_H
 
 #include <gott/tdl/source_position.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <iosfwd>
 
 namespace tdl {

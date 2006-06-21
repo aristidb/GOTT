@@ -39,7 +39,6 @@
 #define GOTT_TDL_WRITE_WRITER_HPP
 
 #include <gott/tdl/parse/parser.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <iosfwd>
 
@@ -64,7 +63,7 @@ public:
 
 private:
   class impl;
-  boost::scoped_ptr<impl> p;
+  impl *p;
 };
 
 }

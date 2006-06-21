@@ -40,6 +40,9 @@ import glob
 
 Import('env')
 
+simple_sources = glob.glob('parse/*.cpp') + glob.glob('write/*.cpp')
+env.StaticLibrary('tdl_simple', simple_sources, LIBS = [])
+
 builtin_sources = glob.glob('schema/types/*.cpp')
 env.SharedLibrary('tdl_builtins', builtin_sources, LIBS = [])
 
