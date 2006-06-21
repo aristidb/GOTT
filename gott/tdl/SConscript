@@ -41,6 +41,8 @@ import glob
 Import('env')
 
 simple_sources = glob.glob('parse/*.cpp') + glob.glob('write/*.cpp')
+simple_sources += ['exceptions.cpp', '../exceptions.cpp']
+simple_sources += glob.glob('../string/*.cpp')
 env.StaticLibrary('tdl_simple', simple_sources, LIBS = [])
 
 builtin_sources = glob.glob('schema/types/*.cpp')
