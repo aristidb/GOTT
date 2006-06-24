@@ -39,8 +39,8 @@
 #include "descriptor.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/optional/optional.hpp>
-#include <gott/metadata/module.hpp>
-#include <gott/metadata/plugin.hpp>
+#include "metadata/module.hpp"
+#include "metadata/plugin.hpp"
 #include <algorithm>
 #include <vector>
 

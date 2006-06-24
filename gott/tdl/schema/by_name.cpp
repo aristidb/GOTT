@@ -41,7 +41,7 @@
 #include <gott/string/string.hpp>
 #include <gott/string/atom.hpp>
 #include <gott/plugin.hpp>
-#include <gott/metadata/load.hpp>
+#include <gott/plugin/metadata/load.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>

@@ -46,8 +46,8 @@ libobj_plugin = glob.glob('plugin/*.cpp')
 libobj_plugin.remove('plugin/test.cpp')
 libobj += libobj_plugin
 
-libobj += glob.glob('metadata/*.cpp')
-libobj += glob.glob('metadata/detail/*.cpp')
+libobj += glob.glob('plugin/metadata/*.cpp')
+libobj += glob.glob('plugin/metadata/detail/*.cpp')
 
 libobj_syswrap = glob.glob('syswrap/*.cpp')
 if env['SYS_KQUEUE'] == 0:
