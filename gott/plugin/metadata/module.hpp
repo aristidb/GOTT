@@ -58,7 +58,7 @@ public:
   /**
    * The module's unique identifier.
    */
-  GOTT_EXPORT QID module_id() const;
+  QID module_id() const;
 
   /**
    * The types a module might have.
@@ -68,7 +68,7 @@ public:
   /**
    * The type of the module.
    */
-  GOTT_EXPORT module_type_t module_type() const;
+  module_type_t module_type() const;
 
   /**
    * The file where the plugin resides.
@@ -81,13 +81,12 @@ public:
   /**
    * Check whether the metadata is valid. Thread-safe.
    */
-  GOTT_EXPORT bool is_valid() const;
+  bool is_valid() const;
 
 private:
   string file_path_;
 };
 
-GOTT_EXPORT
 void enumerate_modules_p(
     boost::function<void (module const &)> const &callback,
     boost::optional<QID const &> const &module_id,

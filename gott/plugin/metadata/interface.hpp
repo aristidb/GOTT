@@ -56,7 +56,6 @@ private:
   QID interface_id_;
 };
 
-GOTT_EXPORT
 void enumerate_interfaces_p(
     boost::function<void (interface const &)> const &callback,
     boost::optional<QID const &> const &interface_id,

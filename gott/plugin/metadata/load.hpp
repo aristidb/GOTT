@@ -46,10 +46,8 @@ namespace gott {
 
 namespace metadata {
 
-GOTT_EXPORT
 void load_core();
 
-GOTT_EXPORT
 void load_standard();
 
 class transaction;

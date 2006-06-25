@@ -69,20 +69,15 @@ public:
   /**
    * The plugin's unique identifier.
    */
-  GOTT_EXPORT
   QID plugin_id() const;
 
-  GOTT_EXPORT
   bool supports_interface(interface const &) const;
 
-  GOTT_EXPORT
   bool supports_interface_id(QID const &) const;
 
-  GOTT_EXPORT
   void enumerate_supported_interfaces(
       boost::function<void (interface const &)> const &callback) const;
 
-  GOTT_EXPORT
   plugin_priority priority() const;
 
   /**
@@ -114,7 +109,6 @@ private:
  * \param load_standard_metadata Call load_standard_metadata() first.
  * \see enumerate_plugin
  */
-GOTT_EXPORT
 void enumerate_plugins_p(
     boost::function<void (plugin const &)> const &callback,
     boost::optional<QID const &> const &plugin_id,
