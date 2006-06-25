@@ -429,6 +429,20 @@ void object::test<19>(int) {
 
 template<> template<>
 void object::test<20>(int) {
+  std::istringstream data("foo\n   #x\n bar");
+  parse(data);
+  B(); D();
+    N("foo");
+    C("x", true);
+    D();
+      N("bar");
+    U();
+  U(); E();
+  ensure_equals(range(ev), range(xp));
+}
+
+template<> template<>
+void object::test<21>(int) {
   std::istringstream data("\"");
   try {
     parse(data);
@@ -440,7 +454,7 @@ void object::test<20>(int) {
 }
 
 template<> template<>
-void object::test<21>(int) {
+void object::test<22>(int) {
   std::istringstream data("x (");
   try {
     parse(data);
@@ -454,7 +468,7 @@ void object::test<21>(int) {
 // TODO: add non-TDL input tests
 
 template<> template<>
-void object::test<22>(int) {
+void object::test<23>(int) {
   no_test();
 }
 
