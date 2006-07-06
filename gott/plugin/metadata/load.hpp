@@ -70,4 +70,8 @@ void update_interface_resource(
 
 }}
 
+#else
+
+#error "GAH"
+
 #endif

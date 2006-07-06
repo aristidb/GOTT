@@ -93,4 +93,8 @@ private:
 
 }}
 
+#else
+
+#error "GAH"
+
 #endif
