@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#define EXPLICITLY_LOAD_METADATA_INTERNALS
 #include "load.hpp"
 #include "transaction.hpp"
 #include "plugin.hpp"

@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#define EXPLICITLY_LOAD_METADATA_INTERNALS
 #include "interface.hpp"
 #include "detail/database.hpp"
 #include "detail/tables.hpp"

@@ -35,38 +35,50 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifdef EXPLICITLY_LOAD_METADATA_INTERNALS
+#ifndef GOTT_PLUGIN_METADATA_MANAGER_HPP
+#define GOTT_PLUGIN_METADATA_MANAGER_HPP
 
-#include <gott/visibility.hpp>
-#include <iosfwd>
+#include <gott/string/string.hpp>
+#include <boost/scoped_ptr.hpp>
 
-namespace gott {
-  class string;
+namespace gott { namespace plugin {
 
-namespace metadata {
+enum resource_kind { interface_resource, plugin_resource, module_resource };
 
-void load_core();
+/**
+ * A locking, thread-safe metadata manager for GOTT plugins. Only one instance
+ * of this object must be active at a time. Objects of this class are used when
+ * loading plugins and modules. If you do any changes to the metadata database,
+ * you must call metadata_manager::commit() in order to apply them.
+ */
+class metadata_manager {
+public:
+  GOTT_EXPORT
+  metadata_manager();
 
-void load_standard();
+  GOTT_EXPORT
+  ~metadata_manager();
 
-class transaction;
+  GOTT_EXPORT
+  void commit();
 
-namespace detail {
-void update_module_resource(
-    std::istream &stream,
-    gott::string const &resource,
-    transaction &tr);
+  GOTT_EXPORT
+  void remove_resource(gott::string const &resource);
+  
+  GOTT_EXPORT
+  void update_resource(
+      std::istream &stream,
+      string const &resource,
+      resource_kind kind);
 
-void update_plugin_resource(
-    std::istream &stream,
-    gott::string const &resource,
-    transaction &tr);
+public:
+  void load_core();
+  void load_standard();
 
-void update_interface_resource(
-    std::istream &stream,
-    gott::string const &resource,
-    transaction &tr);
-}
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
+};
 
 }}
 

@@ -35,8 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_METADATA_TRANSACTION_HPP
-#define GOTT_METADATA_TRANSACTION_HPP
+#ifdef EXPLICITLY_LOAD_METADATA_INTERNALS
 
 #include "module.hpp"
 #include "plugin.hpp"

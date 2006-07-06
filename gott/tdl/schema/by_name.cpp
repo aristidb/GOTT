@@ -41,7 +41,7 @@
 #include <gott/string/string.hpp>
 #include <gott/string/atom.hpp>
 #include <gott/plugin.hpp>
-#include <gott/plugin/metadata/load.hpp>
+#include <gott/plugin/metadata_manager.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
@@ -61,7 +61,10 @@ namespace {
 
 rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
     vector<rule_t> const &c) {
-  gott::metadata::load_standard();
+  gott::plugin::metadata_manager man;
+  man.load_standard();
+  man.commit();
+
   boost::mutex::scoped_lock lock(mutex);
 
   if (all_handles.count(s) == 0) {

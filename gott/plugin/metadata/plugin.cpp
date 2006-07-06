@@ -35,10 +35,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#define EXPLICITLY_LOAD_METADATA_INTERNALS
+#include "load.hpp"
 #include "plugin.hpp"
 #include "module.hpp"
 #include "interface.hpp"
-#include "load.hpp"
 #include "detail/validate.hpp"
 #include "detail/database.hpp"
 #include "detail/tables.hpp"

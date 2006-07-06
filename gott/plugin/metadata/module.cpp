@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#define EXPLICITLY_LOAD_METADATA_INTERNALS
 #include "module.hpp"
 #include "load.hpp"
 #include "detail/validate.hpp"
