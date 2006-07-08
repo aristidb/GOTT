@@ -88,7 +88,7 @@ env = Environment(
   ENV = os.environ, # FIXME: security hole?
   CPPDEFINES = [('BOOST_PARAMETER_MAX_ARITY', 6)],
   SHCCFLAGS = ['-DBUILDING_DLL'],
-  CPPPATH=['#/..', '#/../ext/rtl', '${BOOST_INCLUDE}'], 
+  CPPPATH=['#/..', '${BOOST_INCLUDE}'], 
   LIBPATH=libdirs + ['${BOOST_LIB}'])
 env.Help(opts.GenerateHelpText(env))
 

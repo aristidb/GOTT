@@ -39,10 +39,6 @@
 #include "descriptor.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/optional/optional.hpp>
-#include "metadata/module.hpp"
-#include "metadata/plugin.hpp"
-#include <algorithm>
-#include <vector>
 
 using gott::plugin::selector;
 
@@ -94,83 +90,10 @@ selector selector::operator&&(selector const &o) const {
   return selector(n);
 }
 
-namespace {
-template<class T>
-struct push_back_t {
-  push_back_t(T &container) : container(container) {}
-  T &container;
-  void operator() (typename T::value_type const &x) {
-    container.push_back(x);
-  }
-};
-
-template<class T>
-push_back_t<T> push_back(T &container) {
-  return push_back_t<T>(container);
-}
-}
-
 std::pair<
   gott::plugin::plugin_descriptor,
   gott::plugin::module_descriptor
 >
 selector::get() const {
-  using namespace gott::metadata;
-  using std::vector;
-
-  vector<metadata::plugin> plugins;
-  if (p->plugin_id)
-    if (p->interface_id)
-      enumerate_plugins(
-          push_back(plugins),
-          tags::plugin_id = p->plugin_id.get(),
-          tags::interface_id = p->interface_id.get());
-    else
-      enumerate_plugins(
-          push_back(plugins),
-          tags::plugin_id = p->plugin_id.get());
-  else if (p->interface_id)
-    enumerate_plugins(
-        push_back(plugins),
-        tags::interface_id = p->interface_id.get());
-  else
-    enumerate_plugins(push_back(plugins));
-
-  vector<metadata::module> modules;
-  if (p->module_id) {
-    enumerate_modules(
-        push_back(modules),
-        tags::module_id = p->module_id.get());
-    if (p->plugin_id || p->interface_id) { // filter
-      vector<metadata::module> old_modules;
-      old_modules.swap(modules);
-      vector<metadata::module> plugin_modules;
-      for (vector<metadata::plugin>::const_iterator it = plugins.begin();
-          it != plugins.end();
-          ++it)
-        plugin_modules.push_back(it->enclosing_module());
-      for (vector<metadata::module>::const_iterator it = plugin_modules.begin();
-          it != plugin_modules.end();
-          ++it)
-        for (vector<metadata::module>::const_iterator jt = old_modules.begin();
-            jt != old_modules.end();
-            ++jt)
-          if (it->file_path() == jt->file_path())
-            modules.push_back(*it);
-    }
-  } else {
-    for (vector<metadata::plugin>::const_iterator it = plugins.begin();
-        it != plugins.end();
-        ++it)
-      modules.push_back(it->enclosing_module());
-  }
-
-  return
-    std::make_pair(
-        plugin_descriptor(
-          plugins.empty() ? string() : plugins[0].symbol()
-        ),
-        module_descriptor(
-          modules.empty() ? string() : modules[0].file_path()
-        ));
+  throw gott::internal_error("reimplement metadata!");
 }

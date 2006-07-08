@@ -36,9 +36,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "metadata_manager.hpp"
-#define EXPLICITLY_LOAD_METADATA_INTERNALS
-#include "metadata/transaction.hpp"
-#include "metadata/load.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
@@ -63,25 +60,22 @@ namespace {
 class metadata_manager::impl {
 public:
   impl() : lock(mutex) {}
-  metadata::transaction transaction;
   boost::recursive_mutex::scoped_lock lock;
 };
 
 metadata_manager::metadata_manager() : p(new impl) {
-  ++recursion;
-  if (!allow_recur && recursion > 1)
+  if (!allow_recur && recursion > 0)
     throw gott::internal_error("multiple metadata_manager objects");
+  ++recursion;
 }
 metadata_manager::~metadata_manager() { --recursion; }
 
 void metadata_manager::commit() {
   ALLOW_RECUR;
-  p->transaction.commit();
 }
 
-void metadata_manager::remove_resource(gott::string const &resource) {
+void metadata_manager::remove_resource(gott::string const &/*resource*/) {
   ALLOW_RECUR;
-  p->transaction.remove_resource(resource);
 }
 
 void metadata_manager::update_resource(
@@ -89,16 +83,12 @@ void metadata_manager::update_resource(
     gott::string const &resource,
     resource_kind kind) {
   ALLOW_RECUR;
-  p->transaction.update_resource(stream, resource,
-      metadata::resource_kind(kind));
 }
 
 void metadata_manager::load_core() {
   ALLOW_RECUR;
-  metadata::load_core();
 }
 
 void metadata_manager::load_standard() {
   ALLOW_RECUR;
-  metadata::load_standard();
 }
