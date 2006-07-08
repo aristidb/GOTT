@@ -141,8 +141,7 @@ selector::get() const {
     enumerate_modules(
         push_back(modules),
         tags::module_id = p->module_id.get());
-#if 0
-    if (p->plugin_id || p->interface_id_id) { // filter
+    if (p->plugin_id || p->interface_id) { // filter
       vector<metadata::module> old_modules;
       old_modules.swap(modules);
       vector<metadata::module> plugin_modules;
@@ -156,10 +155,9 @@ selector::get() const {
         for (vector<metadata::module>::const_iterator jt = old_modules.begin();
             jt != old_modules.end();
             ++jt)
-          if (it->get_handle() == jt->get_handle())
+          if (it->file_path() == jt->file_path())
             modules.push_back(*it);
     }
-#endif
   } else {
     for (vector<metadata::plugin>::const_iterator it = plugins.begin();
         it != plugins.end();
