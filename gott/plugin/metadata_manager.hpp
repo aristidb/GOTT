@@ -94,26 +94,32 @@ public:
 
 public: //internal
   /**
+   * \internal
+   * \name Internal methods
+   * \{
+   */
+
+  /**
+   * \internal
    * Load built-in core metadata. This is the metadata required for reading
    * metadata from files.
-   * \internal
    */
   void load_core();
 
   /**
-   * Load metadata from standard places.
    * \internal
+   * Load metadata from standard places.
    */
   void load_standard();
 
   /**
+   * \internal
    * Enumerate at least all plugins which fulfill at least one of the given 
    * criteria.
    * \param callback Enumeration callback. Return false if you need no more.
    * \param plugin_id Criterium: plugin-id.
    * \param interface_id Criterium: interface_id.
    * \param module_id Criterium: module_id.
-   * \internal
    */
   void enum_plugins(
       boost::function<bool (plugin_descriptor const &)> const &callback,
@@ -122,19 +128,21 @@ public: //internal
       boost::optional<QID> const &module_id);
 
   /**
+   * \internal
    * Enumerate at least all modules which fulfill at least one of the given 
    * criteria.
    * \param callback Enumeration callback. Return false if you need no more.
    * \param plugin_id Criterium: plugin-id.
    * \param interface_id Criterium: interface_id.
    * \param module_id Criterium: module_id.
-   * \internal
    */
   void enum_modules(
       boost::function<bool (module_descriptor const &)> const &callback,
       boost::optional<QID> const &plugin_id,
       boost::optional<QID> const &interface_id,
       boost::optional<QID> const &module_id);
+
+  //\}
 
 
 private:
