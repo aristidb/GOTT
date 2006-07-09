@@ -1,3 +1,5 @@
+modules
+
 module-id gott::notify_fs::kqueue
 file-path notify_fs/libnotify_kqueue.so
 module-type dynamic-native

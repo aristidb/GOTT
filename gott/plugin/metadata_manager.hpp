@@ -39,11 +39,15 @@
 #define GOTT_PLUGIN_METADATA_MANAGER_HPP
 
 #include <gott/string/string.hpp>
+#include <gott/string/qid.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/optional.hpp>
+#include <boost/function.hpp>
 
 namespace gott { namespace plugin {
 
-enum resource_kind { interface_resource, plugin_resource, module_resource };
+class plugin_descriptor;
+class module_descriptor;
 
 /**
  * A locking, thread-safe metadata manager for GOTT plugins. Only one instance
@@ -53,27 +57,57 @@ enum resource_kind { interface_resource, plugin_resource, module_resource };
  */
 class metadata_manager {
 public:
+  /**
+   * Constructor. There can not be more than one metadata_manager at a time.
+   */
   GOTT_EXPORT
   metadata_manager();
 
+  /**
+   * Destructor. Does not commit any changes to the database so be sure to do
+   * this yourself.
+   */
   GOTT_EXPORT
   ~metadata_manager();
 
+  /**
+   * Commits all changes to the database.
+   */
   GOTT_EXPORT
   void commit();
 
+  /**
+   * Remove all data associated with the resource. The identifier should be a
+   * file name. The file will not be deleted or accessed in any way.
+   * \param resource The resource to remove.
+   */
   GOTT_EXPORT
   void remove_resource(gott::string const &resource);
-  
-  GOTT_EXPORT
-  void update_resource(
-      std::istream &stream,
-      string const &resource,
-      resource_kind kind);
 
-public:
+  /**
+   * Update or add a resource.
+   * \param stream The physical resource.
+   * \param resource The name of the resource.
+   */
+  GOTT_EXPORT
+  void update_resource(std::istream &stream, string const &resource);
+
+public: //internal
   void load_core();
   void load_standard();
+
+  void enum_plugins(
+      boost::function<bool (plugin_descriptor const &)> const &callback,
+      boost::optional<QID> const &plugin_id,
+      boost::optional<QID> const &interface_id,
+      boost::optional<QID> const &module_id);
+
+  void enum_modules(
+      boost::function<bool (module_descriptor const &)> const &callback,
+      boost::optional<QID> const &plugin_id,
+      boost::optional<QID> const &interface_id,
+      boost::optional<QID> const &module_id);
+
 
 private:
   class impl;

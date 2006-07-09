@@ -37,6 +37,7 @@
 
 #include "selector.hpp"
 #include "descriptor.hpp"
+#include "metadata_manager.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/optional/optional.hpp>
 
@@ -95,5 +96,6 @@ std::pair<
   gott::plugin::module_descriptor
 >
 selector::get() const {
+  metadata_manager man;
   throw gott::internal_error("reimplement metadata!");
 }

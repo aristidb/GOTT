@@ -40,6 +40,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 using gott::plugin::metadata_manager;
+using gott::string;
 
 namespace {
   boost::recursive_mutex mutex;
@@ -74,14 +75,11 @@ void metadata_manager::commit() {
   ALLOW_RECUR;
 }
 
-void metadata_manager::remove_resource(gott::string const &/*resource*/) {
+void metadata_manager::remove_resource(string const &) {
   ALLOW_RECUR;
 }
 
-void metadata_manager::update_resource(
-    std::istream &stream,
-    gott::string const &resource,
-    resource_kind kind) {
+void metadata_manager::update_resource(std::istream &, string const &) {
   ALLOW_RECUR;
 }
 
