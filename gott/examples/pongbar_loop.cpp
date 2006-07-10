@@ -7,8 +7,6 @@
 // GOTT.
 // This is an example and as such commented differently than say our APIs.
 
-#include <gott/events/main_loop_factory.hpp>
-#include <gott/events/loop_requirement.hpp>
 #include <gott/events/main_loop.hpp>
 #include <gott/events/timer_manager.hpp>
 #include <gott/events/quit_manager.hpp>
@@ -22,9 +20,7 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace gott::events;
 using namespace boost::lambda;
-using namespace boost::posix_time;
 
 // OK here we have the abstract type for the "bar" concept. Not much spectacular
 // stuff here.
@@ -149,17 +145,19 @@ int main() {
   
   // Draw the initial state.
   d.redraw();
+
+  using namespace gott::events;
+  using namespace gott::plugin;
   
   // We need two features: timer_manager and quit_manager. Get a fitting
-  // main_loop.
-  main_loop_factory loop_gen;
-  loop_gen.try_add(feature<timer_manager>() && feature<quit_manager>());
-
-  // Main_loops are plugins, usually. And here: always.
-  gott::plugin::plugin_handle<main_loop> loop(loop_gen.get());
+  // main_loop. Main_loops are plugins, usually. And here: always.
+  plugin_handle<main_loop> loop(
+      with_feature<timer_manager>() && with_feature<quit_manager>());
   
   // With a timer manager, we can add timers.
   timer_manager &tm = loop->feature<timer_manager>();
+
+  using namespace boost::posix_time;
 
   // (Visible) Bar 1: Let the token advance every 80 ms. The ", true" ensures
   // that the timer continues. This is "dirty" Boost.Lambda "magic".

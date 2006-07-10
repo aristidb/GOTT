@@ -41,5 +41,5 @@ Import('env')
 
 SConscript(dirs = ['loops'])
 
-env.Program('auto_loop', 'auto_loop_test.cpp')
+#env.Program('auto_loop', 'auto_loop_test.cpp')
 #env.Program('mq_loop', 'mq_loop_test.cpp')

@@ -53,6 +53,8 @@ namespace events {
  */
 class GOTT_EXPORT main_loop : public gott::plugin::plugin_base {
 public:
+  static QID const qid;
+
   /// Constructor.
   main_loop();
   /// Pure virtual destructor.

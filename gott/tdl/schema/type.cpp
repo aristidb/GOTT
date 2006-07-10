@@ -37,4 +37,6 @@
 
 #include "type.hpp"
 
+gott::QID const tdl::schema::type::qid("tdl::schema::type");
+
 tdl::schema::type::~type() {}

@@ -40,6 +40,7 @@
 
 #include "plugin_base.hpp"
 #include "module.hpp"
+#include "selector.hpp"
 #include <boost/optional/optional.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -67,28 +68,35 @@ private:
   boost::scoped_ptr<impl> p;
 };   
 
-template<class ConcretePlugin>
+template<class Interface>
 class plugin_handle : public plugin_handle_base {
 public:
+  plugin_handle()
+    : plugin_handle_base(with_interface<Interface>()),
+      p(cast(get_base())) {
+    if (!p) fail_interface();
+  }
+
   plugin_handle(selector const &sel)
-  : plugin_handle_base(sel), p(cast(get_base())) {
+    : plugin_handle_base(sel && with_interface<Interface>()),
+      p(cast(get_base())) {
     if (!p) fail_interface();
   }
 
   ~plugin_handle() {}
 
-  ConcretePlugin &operator*() { return *p; }
-  ConcretePlugin const &operator*() const { return *p; }
-  ConcretePlugin *operator->() { return p; }
-  ConcretePlugin const *operator->() const { return p; }
-  ConcretePlugin *get() { return p; }
-  ConcretePlugin const *get() const { return p; }
+  Interface &operator*() { return *p; }
+  Interface const &operator*() const { return *p; }
+  Interface *operator->() { return p; }
+  Interface const *operator->() const { return p; }
+  Interface *get() { return p; }
+  Interface const *get() const { return p; }
 
 private:
-  ConcretePlugin *p;
+  Interface *p;
 
-  static ConcretePlugin *cast(plugin_base *base) {
-    return static_cast<ConcretePlugin *>(base);
+  static Interface *cast(plugin_base *base) {
+    return static_cast<Interface *>(base);
   }
 };
 

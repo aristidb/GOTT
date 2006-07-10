@@ -69,7 +69,6 @@ for root, dirs, _ in os.walk('tdl'):
 libobj += tdl_source_files
 
 libobj_events = glob.glob('events/*.cpp')
-libobj_events.remove('events/auto_loop_test.cpp')
 libobj_events.remove('events/mq_loop_test.cpp')
 libobj += libobj_events
 

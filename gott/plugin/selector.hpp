@@ -56,6 +56,7 @@ public:
   GOTT_EXPORT static selector with_plugin_id(QID const &plugin_id);
   GOTT_EXPORT static selector with_interface_id(QID const &interface_id);
   GOTT_EXPORT static selector with_module_id(QID const &module_id);
+  GOTT_EXPORT static selector with_feature_id(QID const &feature_id);
 
   GOTT_EXPORT selector operator&&(selector const &other) const;
 
@@ -73,8 +74,22 @@ inline selector with_interface_id(QID const &interface_id) {
   return selector::with_interface_id(interface_id);
 }
 
+template<class T>
+inline selector with_interface() {
+  return with_interface_id(T::qid);
+}
+
 inline selector with_module_id(QID const &module_id) {
   return selector::with_module_id(module_id);
+}
+
+inline selector with_feature_id(QID const &feature_id) {
+  return selector::with_feature_id(feature_id);
+}
+
+template<class T>
+inline selector with_feature() {
+  return with_feature_id(T::qid);
 }
 
 }}

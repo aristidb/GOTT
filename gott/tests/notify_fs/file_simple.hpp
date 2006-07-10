@@ -39,8 +39,6 @@
 #include <cxxtest/TestSuite.h>
 
 #include <gott/events/main_loop.hpp>
-#include <gott/events/main_loop_factory.hpp>
-#include <gott/events/loop_requirement.hpp>
 #include <gott/notify_fs/notification_engine.hpp>
 #include <gott/notify_fs/watch.hpp>
 #include <gott/plugin.hpp>
@@ -62,9 +60,7 @@ class notify_fs_file_simple_test : public CxxTest::TestSuite
 
 public:
   static gott::plugin::selector which_main_loop() {
-    gott::events::main_loop_factory fact;
-    fact.try_add(gott::events::feature<gott::notify_fs::notification_engine>());
-    return fact.get();
+    return gott::plugin::with_feature<gott::notify_fs::notification_engine>();
   }
 
   notify_fs_file_simple_test() : loop(which_main_loop()) {}

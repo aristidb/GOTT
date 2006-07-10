@@ -40,6 +40,7 @@
 #include "metadata_manager.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/optional/optional.hpp>
+#include <set>
 
 using gott::plugin::selector;
 
@@ -48,6 +49,7 @@ public:
   boost::optional<QID> plugin_id;
   boost::optional<QID> interface_id;
   boost::optional<QID> module_id;
+  std::set<QID> features;
 };
 
 selector::selector(impl *p) : p(p) {}
@@ -71,6 +73,12 @@ selector selector::with_module_id(QID const &module_id) {
   return selector(p);
 }
 
+selector selector::with_feature_id(QID const &feature_id) {
+  impl *p = new impl;
+  p->features.insert(feature_id);
+  return selector(p);
+}
+
 selector selector::operator&&(selector const &o) const {
   impl *n = new impl(*p);
   if (o.p->plugin_id) { 
@@ -88,6 +96,7 @@ selector selector::operator&&(selector const &o) const {
       throw user_error("contradictory selector");
     n->module_id = o.p->module_id;
   }
+  n->features.insert(o.p->features.begin(), o.p->features.end());
   return selector(n);
 }
 

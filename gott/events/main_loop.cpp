@@ -40,6 +40,8 @@
 
 using gott::events::main_loop;
 
+gott::QID const main_loop::qid("gott::events::main_loop");
+
 class main_loop::impl {
 public:
   sigc::signal0<void> on_destroy;

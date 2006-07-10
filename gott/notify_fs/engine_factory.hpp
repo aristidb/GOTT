@@ -39,6 +39,7 @@
 #define GOTT_NOTIFY_FS_ENGINE_FACTORY_HPP
 
 #include <gott/plugin/plugin_base.hpp>
+#include <gott/string/qid.hpp>
 
 namespace gott { 
 
@@ -50,6 +51,8 @@ class notification_engine;
 
 class GOTT_EXPORT engine_factory : public plugin::plugin_base {
 public:
+  static QID const qid;
+  virtual ~engine_factory() = 0;
   virtual notification_engine *alloc(events::main_loop &m) const = 0;
 };
 

@@ -37,8 +37,6 @@
 
 #include "watch.hpp"
 #include "notification_engine.hpp"
-#include <gott/events/main_loop_factory.hpp>
-#include <gott/events/loop_requirement.hpp>
 #include <gott/events/main_loop.hpp>
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/quit_manager.hpp>
@@ -53,6 +51,7 @@
 
 using namespace gott::notify_fs;
 using namespace gott::events;
+using namespace gott::plugin;
 using namespace boost::lambda;
 
 void output(event const &ev, int context) {
@@ -70,10 +69,8 @@ bool blink() {
 }
 
 int main() {
-  main_loop_factory gen;
-  gen.try_add(feature<notification_engine>() && feature<timer_manager>() &&
-        feature<quit_manager>());
-  gott::plugin::plugin_handle<main_loop> loop(gen.get());
+  plugin_handle<main_loop> loop(
+      with_feature<timer_manager>() && with_feature<quit_manager>());
 
   watch w;
   try {

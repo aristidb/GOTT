@@ -40,11 +40,13 @@
 
 #include "rule.hpp"
 #include <gott/plugin/plugin_base.hpp>
+#include <gott/string/qid.hpp>
 
 namespace tdl { namespace schema {
 
 class GOTT_EXPORT type : public gott::plugin::plugin_base {
 public:
+  static gott::QID const qid;
   virtual abstract_rule get_abstract() const = 0;
   virtual ~type() = 0;
 };
