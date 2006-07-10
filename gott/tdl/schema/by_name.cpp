@@ -61,9 +61,11 @@ namespace {
 
 rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
     vector<rule_t> const &c) {
-  gott::plugin::metadata_manager man;
-  man.load_standard();
-  man.commit();
+  {
+    gott::plugin::metadata_manager man;
+    man.load_standard();
+    man.commit();
+  }
 
   boost::mutex::scoped_lock lock(mutex);
 
