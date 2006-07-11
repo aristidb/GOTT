@@ -42,6 +42,7 @@
 #include <boost/optional/optional.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/if.hpp>
+#include <boost/lambda/bind.hpp>
 #include <set>
 
 using gott::plugin::selector;
@@ -114,7 +115,7 @@ selector::get_plugin() const {
   metadata_manager man;
   plugin_descriptor plg("");
   module_descriptor mod("");
-
+#if 0
   using namespace boost::lambda;
   man.enum_plugins(
       if_then_else_return(
@@ -124,7 +125,7 @@ selector::get_plugin() const {
       p->plugin_id,
       p->interface_id,
       p->features);
-
+#endif
   return std::make_pair(plg, mod);
 }
 
@@ -138,12 +139,18 @@ gott::plugin::module_descriptor selector::get_module() const {
   module_descriptor result("");
 
   using namespace boost::lambda;
-  man.enum_modules(
-      if_then_else_return(
-        p->module_id == _2,
+
+  if (p->module_id)
+    man.enum_modules(
+        if_then_else_return(
+          p->module_id.get() == bind(&module_information::module_id, _2),
+          (var(result) = _1, false),
+          true),
+        p->module_id);
+  else
+    man.enum_modules(
         (var(result) = _1, false),
-        true),
-      p->module_id);
-  
+        p->module_id);
+
   return result;
 }

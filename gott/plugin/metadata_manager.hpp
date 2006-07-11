@@ -47,8 +47,11 @@
 
 namespace gott { namespace plugin {
 
-class plugin_descriptor;
-class module_descriptor;
+struct plugin_descriptor;
+struct module_descriptor;
+
+struct plugin_information;
+struct module_information;
 
 /**
  * A locking, thread-safe metadata manager for GOTT plugins. Only one instance
@@ -128,9 +131,7 @@ public: //internal
         bool (
           plugin_descriptor const &plugin_descriptor,
           module_descriptor const &enclosing_module,
-          boost::optional<QID> const &plugin_id,
-          boost::optional<QID> const &interface_id,
-          std::vector<QID> const &features
+          plugin_information const &info
         )
       > const &callback,
       boost::optional<QID> const &plugin_id,
@@ -148,7 +149,7 @@ public: //internal
       boost::function<
         bool (
           module_descriptor const &descriptor,
-          boost::optional<QID> const &module_id
+          module_information const &info
         )
       > const &callback,
       boost::optional<QID> const &module_id) const;

@@ -39,6 +39,8 @@
 #define GOTT_PLUGIN_DESCRIPTOR_HPP
 
 #include <gott/string/string.hpp>
+#include <gott/string/qid.hpp>
+#include <set>
 
 namespace gott { namespace plugin {
 
@@ -50,6 +52,17 @@ struct module_descriptor {
 struct plugin_descriptor {
   plugin_descriptor(string const &symbol) : symbol(symbol) {}
   string symbol;
+};
+
+struct plugin_information {
+  QID plugin_id;
+  QID enclosing_module;
+  std::set<QID> interfaces;
+  std::set<QID> features;
+};
+
+struct module_information {
+  QID module_id;
 };
 
 }}
