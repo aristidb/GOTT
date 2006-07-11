@@ -53,7 +53,7 @@ public:
 };
 
 plugin_handle_base::plugin_handle_base(selector const &sel)
-: p(new impl(sel.get())) {}
+: p(new impl(sel.get_plugin())) {}
 
 plugin_handle_base::~plugin_handle_base() {}
 

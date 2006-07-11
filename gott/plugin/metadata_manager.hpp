@@ -43,6 +43,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/optional.hpp>
 #include <boost/function.hpp>
+#include <vector>
 
 namespace gott { namespace plugin {
 
@@ -52,8 +53,9 @@ class module_descriptor;
 /**
  * A locking, thread-safe metadata manager for GOTT plugins. Only one instance
  * of this object must be active at a time. Objects of this class are used when
- * loading plugins and modules. If you do any changes to the metadata database,
- * you must call metadata_manager::commit() in order to apply them.
+ * loading plugins and modules. If you do any changes (calling non-const methods
+ * except metadata:manager::commit()) to the metadata database, you must call
+ * metadata_manager::commit() in order to apply them.
  */
 class metadata_manager {
 public:
@@ -119,28 +121,37 @@ public: //internal
    * \param callback Enumeration callback. Return false if you need no more.
    * \param plugin_id Criterium: plugin-id.
    * \param interface_id Criterium: interface_id.
-   * \param module_id Criterium: module_id.
+   * \param features Criterium: features.
    */
   void enum_plugins(
-      boost::function<bool (plugin_descriptor const &)> const &callback,
+      boost::function<
+        bool (
+          plugin_descriptor const &plugin_descriptor,
+          module_descriptor const &enclosing_module,
+          boost::optional<QID> const &plugin_id,
+          boost::optional<QID> const &interface_id,
+          std::vector<QID> const &features
+        )
+      > const &callback,
       boost::optional<QID> const &plugin_id,
       boost::optional<QID> const &interface_id,
-      boost::optional<QID> const &module_id);
+      std::vector<QID> const &features) const;
 
   /**
    * \internal
    * Enumerate at least all modules which fulfill at least one of the given 
    * criteria.
    * \param callback Enumeration callback. Return false if you need no more.
-   * \param plugin_id Criterium: plugin-id.
-   * \param interface_id Criterium: interface_id.
    * \param module_id Criterium: module_id.
    */
   void enum_modules(
-      boost::function<bool (module_descriptor const &)> const &callback,
-      boost::optional<QID> const &plugin_id,
-      boost::optional<QID> const &interface_id,
-      boost::optional<QID> const &module_id);
+      boost::function<
+        bool (
+          module_descriptor const &descriptor,
+          boost::optional<QID> const &module_id
+        )
+      > const &callback,
+      boost::optional<QID> const &module_id) const;
 
   //\}
 

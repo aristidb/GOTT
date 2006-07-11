@@ -40,6 +40,8 @@
 #include "metadata_manager.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/optional/optional.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/if.hpp>
 #include <set>
 
 using gott::plugin::selector;
@@ -104,7 +106,44 @@ std::pair<
   gott::plugin::plugin_descriptor,
   gott::plugin::module_descriptor
 >
-selector::get() const {
+selector::get_plugin() const {
+  if (p->module_id)
+    throw gott::system_error(
+        "loading plugins by module-id is not supported");
+
   metadata_manager man;
-  throw gott::internal_error("reimplement metadata!");
+  plugin_descriptor plg("");
+  module_descriptor mod("");
+
+  using namespace boost::lambda;
+  man.enum_plugins(
+      if_then_else_return(
+        p->plugin_id == _3 && p->interface_id == _4 && p->features == _5,
+        (var(plg) = _1, var(mod) = _2, false),
+        true),
+      p->plugin_id,
+      p->interface_id,
+      p->features);
+
+  return std::make_pair(plg, mod);
+}
+
+gott::plugin::module_descriptor selector::get_module() const {
+  if (p->plugin_id || p->interface_id || !p->features.empty())
+    throw gott::system_error(
+        "loading modules by plugin-id, interface-id or feature "
+        "is not supported");
+
+  metadata_manager man;
+  module_descriptor result("");
+
+  using namespace boost::lambda;
+  man.enum_modules(
+      if_then_else_return(
+        p->module_id == _2,
+        (var(result) = _1, false),
+        true),
+      p->module_id);
+  
+  return result;
 }
