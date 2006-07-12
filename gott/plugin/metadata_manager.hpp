@@ -43,7 +43,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/optional.hpp>
 #include <boost/function.hpp>
-#include <vector>
+#include <set>
 
 namespace gott { namespace plugin {
 
@@ -136,7 +136,7 @@ public: //internal
       > const &callback,
       boost::optional<QID> const &plugin_id,
       boost::optional<QID> const &interface_id,
-      std::vector<QID> const &features) const;
+      std::set<QID> const &features) const;
 
   /**
    * \internal

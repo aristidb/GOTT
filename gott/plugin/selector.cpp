@@ -44,6 +44,7 @@
 #include <boost/lambda/if.hpp>
 #include <boost/lambda/bind.hpp>
 #include <set>
+#include <algorithm>
 
 using gott::plugin::selector;
 
@@ -53,6 +54,25 @@ public:
   boost::optional<QID> interface_id;
   boost::optional<QID> module_id;
   std::set<QID> features;
+
+  bool check_plugin(plugin_information const &x) const {
+    if (plugin_id && x.plugin_id != plugin_id.get())
+      return false;
+    if (interface_id && x.interfaces.count(interface_id.get()) == 0)
+      return false;
+    if (module_id && x.enclosing_module != module_id.get())
+      return false;
+    if (!std::includes(x.features.begin(), x.features.end(),
+          features.begin(), features.end()))
+      return false;
+    return true;
+  }
+
+  bool check_module (module_information const &x) const {
+    if (module_id && x.module_id != module_id.get())
+      return false;
+    return true;
+  }
 };
 
 selector::selector(impl *p) : p(p) {}
@@ -115,17 +135,18 @@ selector::get_plugin() const {
   metadata_manager man;
   plugin_descriptor plg("");
   module_descriptor mod("");
-#if 0
+
   using namespace boost::lambda;
+
   man.enum_plugins(
       if_then_else_return(
-        p->plugin_id == _3 && p->interface_id == _4 && p->features == _5,
+        bind(&impl::check_plugin, p.get(), _3),
         (var(plg) = _1, var(mod) = _2, false),
         true),
       p->plugin_id,
       p->interface_id,
       p->features);
-#endif
+
   return std::make_pair(plg, mod);
 }
 
@@ -140,17 +161,12 @@ gott::plugin::module_descriptor selector::get_module() const {
 
   using namespace boost::lambda;
 
-  if (p->module_id)
-    man.enum_modules(
-        if_then_else_return(
-          p->module_id.get() == bind(&module_information::module_id, _2),
-          (var(result) = _1, false),
-          true),
-        p->module_id);
-  else
-    man.enum_modules(
+  man.enum_modules(
+      if_then_else_return(
+        bind(&impl::check_module, p.get(), _2),
         (var(result) = _1, false),
-        p->module_id);
+        true),
+      p->module_id);
 
   return result;
 }
