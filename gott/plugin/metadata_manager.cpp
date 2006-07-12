@@ -201,7 +201,7 @@ void metadata_manager::add_core_tdl_schema(
   std::set<QID> features;
 
   add_plugin(
-      plugin_descriptor("plugin_schema_any", tdl_builtins),
+      plugin_descriptor("plugin_schema_" + type, tdl_builtins),
       plugin_information(
         "tdl::schema::" + type,
         "tdl::builtins",

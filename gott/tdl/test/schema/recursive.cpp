@@ -88,7 +88,7 @@ void object::test<1>(int n) {
   std::ostringstream data;
   for (int i = 0; i < n; ++i)
     data << i << '\n';
-  //run_test(gott::string(data.str(), gott::ascii));
+  run_test(gott::string(data.str(), gott::ascii));
   nd_list ndl;
   for (int i = 0; i < n; ++i)
     ndl.push_back(S(Xany(i)));
