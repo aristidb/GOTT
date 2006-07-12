@@ -87,7 +87,7 @@ public:
    * \param resource The resource to remove.
    */
   GOTT_EXPORT
-  void remove_resource(gott::string const &resource);
+  void remove_resource(string const &resource);
 
   /**
    * Update or add a resource.
@@ -177,7 +177,7 @@ public: //internal
   void add_plugin(
       plugin_descriptor const &desc,
       plugin_information const &info,
-      gott::string const &resource);
+      string const &resource);
 
   /**
    * \internal
@@ -189,11 +189,13 @@ public: //internal
   void add_module(
       module_descriptor const &desc,
       module_information const &info,
-      gott::string const &resource);
+      string const &resource);
 
   //\}
 
 private:
+  void add_core_tdl_schema(string const &type, module_descriptor const &x);
+
   class impl;
   boost::scoped_ptr<impl> p;
 };

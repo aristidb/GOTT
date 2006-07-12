@@ -130,6 +130,9 @@ selector::get_plugin() const {
         "loading plugins by module-id is not supported");
 
   metadata_manager man;
+  man.load_standard();
+  man.commit();
+
   plugin_descriptor result;
 
   using namespace boost::lambda;
@@ -156,6 +159,9 @@ gott::plugin::module_descriptor selector::get_module() const {
         "is not supported");
 
   metadata_manager man;
+  man.load_standard();
+  man.commit();
+
   module_descriptor result;
 
   using namespace boost::lambda;

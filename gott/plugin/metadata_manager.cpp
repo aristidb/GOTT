@@ -39,6 +39,7 @@
 #include "descriptor.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/assign/list_of.hpp>
 #include <vector>
 #include <set>
 
@@ -173,10 +174,46 @@ void metadata_manager::update_resource(std::istream &, string const &) {
 
 void metadata_manager::load_core() {
   ALLOW_RECUR;
+  static bool loaded;
+
+  if (!loaded) {
+    module_descriptor tdl_builtins("tdl/libtdl_builtins.so");
+    add_module(tdl_builtins, module_information("tdl::builtins"), "core");
+
+    add_core_tdl_schema("any", tdl_builtins);
+    add_core_tdl_schema("document", tdl_builtins);
+    add_core_tdl_schema("follow", tdl_builtins);
+    add_core_tdl_schema("list", tdl_builtins);
+    add_core_tdl_schema("named", tdl_builtins);
+    add_core_tdl_schema("ordered", tdl_builtins);
+    add_core_tdl_schema("node", tdl_builtins);
+    add_core_tdl_schema("unordered", tdl_builtins);
+    add_core_tdl_schema("tree", tdl_builtins);
+    loaded = true;
+  }
+}
+
+void metadata_manager::add_core_tdl_schema(
+    string const &type, module_descriptor const &tdl_builtins) {
+  std::set<QID> interfaces;
+  interfaces.insert("tdl::schema::type");
+
+  std::set<QID> features;
+
+  add_plugin(
+      plugin_descriptor("plugin_schema_any", tdl_builtins),
+      plugin_information(
+        "tdl::schema::" + type,
+        "tdl::builtins",
+        interfaces,
+        features
+        ),
+      "core");
 }
 
 void metadata_manager::load_standard() {
   ALLOW_RECUR;
+  load_core();
 }
 
 void metadata_manager::enum_plugins(
@@ -202,7 +239,7 @@ void metadata_manager::enum_modules(
         module_information const &info
       )
     > const &callback,
-    boost::optional<QID> const &module_id) const {
+    boost::optional<QID> const &/*module_id*/) const {
   for (vector<whole_module>::iterator it = modules.begin();
       it != modules.end();
       ++it)

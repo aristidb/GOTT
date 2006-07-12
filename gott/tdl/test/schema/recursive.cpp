@@ -60,7 +60,8 @@ struct recursive : tut::schema_basic {
   recursive() {
     grammar = rule_one("tdl::schema::document", rule_t(&rec));
     rec = 
-      rule("tdl::schema::ordered", rule_attr_t(rule_attr_t::simple, false), list_of
+      rule("tdl::schema::ordered", rule_attr_t(rule_attr_t::simple, false),
+          list_of
         (rule("tdl::schema::node", rule_attr_t(rule_attr_t::simple, true, 
             new stru::repatch_integer())))
         (rule_one("tdl::schema::list", rule_attr_t(rule_attr_t::simple, false),
@@ -87,7 +88,7 @@ void object::test<1>(int n) {
   std::ostringstream data;
   for (int i = 0; i < n; ++i)
     data << i << '\n';
-  run_test(gott::string(data.str(), gott::ascii));
+  //run_test(gott::string(data.str(), gott::ascii));
   nd_list ndl;
   for (int i = 0; i < n; ++i)
     ndl.push_back(S(Xany(i)));
