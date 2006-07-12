@@ -45,16 +45,43 @@
 namespace gott { namespace plugin {
 
 struct module_descriptor {
-  module_descriptor(string const &file_path) : file_path(file_path) {}
+  module_descriptor() {}
+
+  explicit module_descriptor(string const &file_path)
+    : file_path(file_path) {}
   string file_path;
 };
 
+inline bool operator==(module_descriptor const &l, module_descriptor const &r) {
+  return l.file_path == r.file_path;
+}
+
 struct plugin_descriptor {
-  plugin_descriptor(string const &symbol) : symbol(symbol) {}
+  plugin_descriptor() {}
+
+  explicit plugin_descriptor(string const &sym, module_descriptor const &mod)
+    : symbol(sym), enclosing_module(mod) {}
   string symbol;
+  module_descriptor enclosing_module;
 };
 
+inline bool operator==(plugin_descriptor const &l, plugin_descriptor const &r) {
+  return l.symbol == r.symbol && l.enclosing_module == r.enclosing_module;
+}
+
 struct plugin_information {
+  plugin_information() {}
+
+  explicit plugin_information(
+      QID const &plugin_id,
+      QID const &enclosing_module,
+      std::set<QID> const &interfaces,
+      std::set<QID> const &features)
+    : plugin_id(plugin_id),
+    enclosing_module(enclosing_module),
+    interfaces(interfaces),
+    features(features) {}
+
   QID plugin_id;
   QID enclosing_module;
   std::set<QID> interfaces;
@@ -62,6 +89,11 @@ struct plugin_information {
 };
 
 struct module_information {
+  module_information() {}
+
+  explicit module_information(QID const &module_id)
+    : module_id(module_id) {}
+
   QID module_id;
 };
 

@@ -45,8 +45,8 @@ using namespace gott::plugin;
 
 class plugin_handle_base::impl {
 public:
-  impl(std::pair<plugin_descriptor, module_descriptor> const &desc)
-  : mod(desc.second), p(mod.load_plugin(desc.first)) {}
+  impl(plugin_descriptor const &desc)
+  : mod(desc.enclosing_module), p(mod.load_plugin(desc)) {}
 
   module mod;
   boost::scoped_ptr<plugin_base> p;

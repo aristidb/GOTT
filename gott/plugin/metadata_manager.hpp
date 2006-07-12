@@ -130,7 +130,6 @@ public: //internal
       boost::function<
         bool (
           plugin_descriptor const &plugin_descriptor,
-          module_descriptor const &enclosing_module,
           plugin_information const &info
         )
       > const &callback,
@@ -154,8 +153,45 @@ public: //internal
       > const &callback,
       boost::optional<QID> const &module_id) const;
 
-  //\}
+  /**
+   * \internal
+   * Remove a plugin from the database, e.g. if it could not be loaded.
+   * \param descriptor The plugin to be removed.
+   */
+  void remove_plugin(plugin_descriptor const &descriptor);
 
+  /**
+   * \internal
+   * Remove a module from the database, e.g. if it could not be loaded.
+   * \param descriptor The module to be removed.
+   */
+  void remove_module(module_descriptor const &descriptor);
+
+  /**
+   * \internal
+   * Add a plugin to the database.
+   * \param desc Identifying information about the plugin.
+   * \param info Extra information about the plugin.
+   * \param resource The resource.
+   */
+  void add_plugin(
+      plugin_descriptor const &desc,
+      plugin_information const &info,
+      gott::string const &resource);
+
+  /**
+   * \internal
+   * Add a module to the database.
+   * \param desc Identifying information about the module.
+   * \param info Extra information about the module.
+   * \param resource The resource.
+   */
+  void add_module(
+      module_descriptor const &desc,
+      module_information const &info,
+      gott::string const &resource);
+
+  //\}
 
 private:
   class impl;

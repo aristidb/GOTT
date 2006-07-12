@@ -123,31 +123,27 @@ selector selector::operator&&(selector const &o) const {
   return selector(n);
 }
 
-std::pair<
-  gott::plugin::plugin_descriptor,
-  gott::plugin::module_descriptor
->
+gott::plugin::plugin_descriptor
 selector::get_plugin() const {
   if (p->module_id)
     throw gott::system_error(
         "loading plugins by module-id is not supported");
 
   metadata_manager man;
-  plugin_descriptor plg("");
-  module_descriptor mod("");
+  plugin_descriptor result;
 
   using namespace boost::lambda;
 
   man.enum_plugins(
       if_then_else_return(
-        bind(&impl::check_plugin, p.get(), _3),
-        (var(plg) = _1, var(mod) = _2, false),
+        bind(&impl::check_plugin, p.get(), _2),
+        (var(result) = _1, false),
         true),
       p->plugin_id,
       p->interface_id,
       p->features);
 
-  return std::make_pair(plg, mod);
+  return result;
 }
 
 gott::plugin::module_descriptor selector::get_module() const {
@@ -157,7 +153,7 @@ gott::plugin::module_descriptor selector::get_module() const {
         "is not supported");
 
   metadata_manager man;
-  module_descriptor result("");
+  module_descriptor result;
 
   using namespace boost::lambda;
 

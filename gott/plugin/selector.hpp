@@ -49,7 +49,7 @@ class module_descriptor;
 
 class selector {
 public:
-  std::pair<plugin_descriptor, module_descriptor> get_plugin() const;
+  plugin_descriptor get_plugin() const;
   module_descriptor get_module() const;
 
   GOTT_EXPORT ~selector();
