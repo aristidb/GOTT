@@ -185,10 +185,14 @@ void metadata_manager::enum_plugins(
         plugin_descriptor const &plugin_descriptor,
         plugin_information const &info
       ) > const &callback,
-      boost::optional<QID> const &plugin_id,
-      boost::optional<QID> const &interface_id,
-      std::set<QID> const &features) const {
-  ALLOW_RECUR;
+      boost::optional<QID> const &/*plugin_id*/,
+      boost::optional<QID> const &/*interface_id*/,
+      std::set<QID> const &/*features*/) const {
+  for (vector<whole_plugin>::iterator it = plugins.begin();
+      it != plugins.end();
+      ++it)
+    if (!callback(it->descriptor, it->information))
+      break;
 }
 
 void metadata_manager::enum_modules(
@@ -199,7 +203,11 @@ void metadata_manager::enum_modules(
       )
     > const &callback,
     boost::optional<QID> const &module_id) const {
-  ALLOW_RECUR;
+  for (vector<whole_module>::iterator it = modules.begin();
+      it != modules.end();
+      ++it)
+    if (!callback(it->descriptor, it->information))
+      break;
 }
 
 void metadata_manager::remove_plugin(plugin_descriptor const &descriptor) {

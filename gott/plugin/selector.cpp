@@ -143,6 +143,9 @@ selector::get_plugin() const {
       p->interface_id,
       p->features);
 
+  if (result == plugin_descriptor())
+    throw gott::system_error("could not find plugin");
+
   return result;
 }
 
@@ -163,6 +166,9 @@ gott::plugin::module_descriptor selector::get_module() const {
         (var(result) = _1, false),
         true),
       p->module_id);
+
+  if (result == module_descriptor())
+    throw gott::system_error("could not find module");
 
   return result;
 }
