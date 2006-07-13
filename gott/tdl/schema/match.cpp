@@ -142,6 +142,13 @@ match::match(rule_t const &rf, structure::revocable_structure &p)
 match::~match() {}
 
 void match::add(rule_t const &f) {
+#ifdef VERBOSE
+  try {
+    std::cout << "adding " << f.attributes().tags().at(0) << std::endl;
+  } catch (...) {
+    std::cout << "adding something" << std::endl;
+  }
+#endif
   shared_ptr<writable_structure> struc = p->direct_structure_non_base();
 
   if (structure::repatcher const *r = f.attributes().repatcher())

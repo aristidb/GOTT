@@ -58,8 +58,11 @@ match_unordered::match_unordered(rule_attr_t const &a, vector<rule_t> const &r,
 
   pos = children.begin();
 
-  if (pos != children.end())
+  if (pos != children.end()) {
+    while (pos->slot.expectation() == item::nothing)
+      pos = children.erase(pos);
     matcher().add(pos->generator);
+  }
 }
 
 match_unordered::~match_unordered() {
@@ -73,6 +76,9 @@ bool match_unordered::play(ev::child_succeed const &) {
 
   if (!children.empty()) {
     pos = children.begin();
+    while (pos->slot.expectation() == item::nothing)
+      pos = children.erase(pos);
+
     matcher().pos().forget(last);
     last = matcher().pos().current();
     matcher().add(pos->generator);
@@ -84,15 +90,16 @@ bool match_unordered::play(ev::child_succeed const &) {
 bool match_unordered::play(ev::child_fail const &) {
   matcher().pos().seek(last);
   bool happy = pos->slot.expectation() != need;
-  if (++pos == children.end())
+  if (++pos == children.end()) {
+    children.clear();
     if (happy) {
-      children.erase(pos);
       pos = --children.end();
       return true;
     } else {
       all_happy = false;
       return false;
     }
+  }
   matcher().add(pos->generator);
   return true;
 }
