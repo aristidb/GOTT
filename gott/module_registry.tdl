@@ -8,10 +8,6 @@ module-id gott::notify_fs::inotify
 file-path notify_fs/libnotify_inotify.so
 module-type dynamic-native
 
-module-id tdl::builtins
-file-path tdl/libtdl_builtins.so
-module-type dynamic-native
-
 module-id gott::configuration
 file-path configuration/libconfig.so
 module-type dynamic-native

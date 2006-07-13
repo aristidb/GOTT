@@ -11,57 +11,6 @@ has-interface gott::notify_fs::engine_factory
 enclosing-module gott::notify_fs::inotify
 symbol inotify_plugin
 
-# tdl
-plugin-id tdl::schema::any
-has-interface tdl::schema::type
-enclosing-module tdl::builtins
-symbol plugin_schema_any
-
-plugin-id tdl::schema::document
-has-interface tdl::schema::type
-enclosing-module tdl::builtins
-symbol plugin_schema_document
-
-plugin-id tdl::schema::follow
-has-interface tdl::schema::type
-enclosing-module tdl::builtins
-symbol plugin_schema_follow
-
-plugin-id tdl::schema::list
-has-interface tdl::schema::type
-enclosing-module tdl::builtins
-symbol plugin_schema_list
-
-plugin-id tdl::schema::named
-has-interface tdl::schema::type
-enclosing-module tdl::builtins
-symbol plugin_schema_named
-
-plugin-id tdl::schema::ordered
-has-interface tdl::schema::type
-enclosing-module tdl::builtins
-symbol plugin_schema_ordered
-
-plugin-id tdl::schema::node
-has-interface tdl::schema::type
-enclosing-module tdl::builtins
-symbol plugin_schema_node
-
-plugin-id tdl::schema::unordered
-has-interface tdl::schema::type
-enclosing-module tdl::builtins
-symbol plugin_schema_unordered
-
-plugin-id tdl::schema::tree
-has-interface tdl::schema::type
-enclosing-module tdl::builtins
-symbol plugin_schema_tree
-
-plugin-id gott::config::tdl_element
-has-interface tdl::schema::type
-enclosing-module gott::configuration
-symbol plugin_tdl
-
 # main_loop
 plugin-id gott::events::select_loop
 has-interface gott::events::main_loop
