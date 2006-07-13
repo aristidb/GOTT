@@ -1,5 +1,3 @@
-plugins
-
 # notify_fs
 plugin-id gott::notify_fs::kqueue_factory
 has-interface gott::notify_fs::engine_factory

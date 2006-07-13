@@ -200,6 +200,10 @@ private:
   boost::scoped_ptr<impl> p;
 };
 
+namespace detail {
+  void load_tdl_resource(metadata_manager &, std::istream &, string const &);
+}
+
 }}
 
 #endif

@@ -42,6 +42,7 @@
 #include <boost/assign/list_of.hpp>
 #include <vector>
 #include <set>
+#include <fstream>
 
 using namespace gott::plugin;
 using gott::string;
@@ -162,14 +163,22 @@ void metadata_manager::commit() {
 
   plugins.insert(plugins.end(), p->add_plugins.begin(), p->add_plugins.end());
   modules.insert(modules.end(), p->add_modules.begin(), p->add_modules.end());
+
+  p->remove_resources.clear();
+  p->remove_plugins.clear();
+  p->remove_modules.clear();
+  p->add_plugins.clear();
+  p->add_modules.clear();
 }
 
 void metadata_manager::remove_resource(string const &resource) {
   p->remove_resources.insert(resource);
 }
 
-void metadata_manager::update_resource(std::istream &, string const &) {
+void metadata_manager::update_resource(std::istream &s, string const &res) {
   ALLOW_RECUR;
+  remove_resource(res);
+  detail::load_tdl_resource(*this, s, res);
 }
 
 void metadata_manager::load_core() {
@@ -206,14 +215,31 @@ void metadata_manager::add_core_tdl_schema(
         "tdl::schema::" + type,
         "tdl::builtins",
         interfaces,
-        features
+        features,
+        plugin_information::normal
         ),
       "core");
 }
 
 void metadata_manager::load_standard() {
   ALLOW_RECUR;
-  load_core();
+
+  metadata_manager man2;
+  man2.load_core();
+  man2.commit();
+
+  static bool loaded;
+  if (!loaded) {
+    loaded = true;
+    {
+      std::ifstream plugins("./plugin_registry.tdl");
+      update_resource(plugins, "./plugin_registry.tdl");
+    }
+    {
+      std::ifstream modules("./module_registry.tdl");
+      update_resource(modules, "./module_registry.tdl");
+    }
+  }
 }
 
 void metadata_manager::enum_plugins(

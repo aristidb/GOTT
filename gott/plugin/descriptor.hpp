@@ -72,20 +72,25 @@ inline bool operator==(plugin_descriptor const &l, plugin_descriptor const &r) {
 struct plugin_information {
   plugin_information() {}
 
+  enum priority_t { low, normal, high };
+
   explicit plugin_information(
       QID const &plugin_id,
       QID const &enclosing_module,
       std::set<QID> const &interfaces,
-      std::set<QID> const &features)
+      std::set<QID> const &features,
+      priority_t priority)
     : plugin_id(plugin_id),
     enclosing_module(enclosing_module),
     interfaces(interfaces),
-    features(features) {}
+    features(features),
+    priority(priority) {}
 
   QID plugin_id;
   QID enclosing_module;
   std::set<QID> interfaces;
   std::set<QID> features;
+  priority_t priority;
 };
 
 struct module_information {
