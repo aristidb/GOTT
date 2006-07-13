@@ -37,7 +37,7 @@
 
 #include "pattern.hpp"
 
-namespace graphics = gott::graphics;;
+namespace graphics = gott::graphics;
 using graphics::pattern;
 
 pattern::~pattern() {}

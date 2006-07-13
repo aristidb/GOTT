@@ -116,4 +116,4 @@ namespace {
 
 ev::token const &ev::get(ev::token_t const &t) {
   return apply_visitor(token_visitor(), t);
-};
+}

@@ -120,7 +120,7 @@ void timer_manager::add_periodic_timer_overdraw(
   pxtime::time_duration next = monotonic_now() + interval;
   periodic_helper helper = { next, interval, callback, wait };
   add_monotonic_timer(next, helper, wait);
-};
+}
 
 pxtime::time_duration timer_manager::monotonic_now() const {
   return monotonic_clock();

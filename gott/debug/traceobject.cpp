@@ -46,12 +46,12 @@ traceobject::traceobject(std::string function,
                                              activefunc)));
   activefunc = tracedfuncs[tracedfuncs.size() - 1];
   activefunc->parent->children.push_back(activefunc);
-};
+}
   
 traceobject::~traceobject() {
   // ASSERT(activefunc->parent)
   activefunc->duration = std::clock() - activefunc->start;
   activefunc = activefunc->parent;
-};
+}
 
 }}}

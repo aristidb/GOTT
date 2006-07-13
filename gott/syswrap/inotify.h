@@ -19,8 +19,9 @@ struct inotify_event {
 	__s32		wd;		/* watch descriptor */
 	__u32		mask;		/* watch mask */
 	__u32		cookie;		/* cookie to synchronize two events */
-	__u32		len;		/* length (including nulls) of name */
-	char		name[0];	/* stub for possible name */
+	__u32 	len;		/* length (including nulls) of name */
+	__extension__
+	char		name[];	/* stub for possible name */
 };
 
 /* the following are legal, implemented events that user-space can watch for */

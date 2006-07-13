@@ -171,6 +171,6 @@ namespace tut
       not_passed.clear();
     }    
   };
-};
+}
 
 #endif
