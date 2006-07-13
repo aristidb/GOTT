@@ -82,7 +82,7 @@ selector selector::with_plugin_id(QID const &plugin_id) {
   impl *p = new impl;
   p->plugin_id = plugin_id;
   return selector(p);
-};
+}
 
 selector selector::with_interface_id(QID const &interface_id) {
   impl *p = new impl;
