@@ -62,9 +62,12 @@ public:
       return false;
     if (module_id && x.enclosing_module != module_id.get())
       return false;
+    //TODO/missing
+#if 0
     if (!std::includes(x.features.begin(), x.features.end(),
           features.begin(), features.end()))
       return false;
+#endif
     return true;
   }
 

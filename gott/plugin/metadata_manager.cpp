@@ -161,8 +161,20 @@ void metadata_manager::commit() {
       else
         ++jt;
 
-  plugins.insert(plugins.end(), p->add_plugins.begin(), p->add_plugins.end());
   modules.insert(modules.end(), p->add_modules.begin(), p->add_modules.end());
+
+  for (vector<whole_plugin>::iterator it = p->add_plugins.begin();
+      it != p->add_plugins.end();
+      ++it)
+    for (vector<whole_module>::iterator jt = modules.begin();
+        jt != modules.end();
+        ++jt)
+      if (jt->information.module_id == it->information.enclosing_module) {
+        it->descriptor.enclosing_module = jt->descriptor;
+        break;
+      }
+  
+  plugins.insert(plugins.end(), p->add_plugins.begin(), p->add_plugins.end());
 
   p->remove_resources.clear();
   p->remove_plugins.clear();
