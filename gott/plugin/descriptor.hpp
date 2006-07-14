@@ -70,9 +70,9 @@ inline bool operator==(plugin_descriptor const &l, plugin_descriptor const &r) {
 }
 
 struct plugin_information {
-  plugin_information() {}
-
   enum priority_t { low, normal, high, N_PRIORITY };
+
+  plugin_information() : priority(normal) {}
 
   explicit plugin_information(
       QID const &plugin_id,

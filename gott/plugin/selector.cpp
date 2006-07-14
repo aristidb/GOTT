@@ -139,7 +139,7 @@ selector::get_plugin() const {
   plugin_descriptor result;
 
   using namespace boost::lambda;
-
+//FIXME, seems not to work
   for (int prio = plugin_information::N_PRIORITY - 1;
       prio >= 0;
       --prio)
