@@ -39,6 +39,7 @@
 #include "selector.hpp"
 #include "descriptor.hpp"
 #include "plugin_base.hpp"
+#include "metadata_manager.hpp"
 #include <gott/exceptions.hpp>
 
 using namespace gott::plugin;
@@ -50,10 +51,27 @@ public:
 
   module mod;
   boost::scoped_ptr<plugin_base> p;
+
+  static bool init(boost::scoped_ptr<impl> &p, selector const &sel) {
+    plugin_descriptor desc = sel.get_plugin();
+    try {
+      p.reset(new impl(desc));
+    } catch (gott::system_error&) {
+      // remove this plugin, it could not be loaded!
+      metadata_manager man;
+      man.remove_plugin(desc);
+      man.commit();
+      return false;
+    }
+    return true;
+  }
 };
 
 plugin_handle_base::plugin_handle_base(selector const &sel)
-: p(new impl(sel.get_plugin())) {}
+: p() {
+  while (!impl::init(p, sel))
+    ;
+}
 
 plugin_handle_base::~plugin_handle_base() {}
 
