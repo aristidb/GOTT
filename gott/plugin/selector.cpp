@@ -137,14 +137,18 @@ selector::get_plugin() const {
 
   using namespace boost::lambda;
 
-  man.enum_plugins(
-      if_then_else_return(
-        bind(&impl::check_plugin, p.get(), _2),
-        (var(result) = _1, false),
-        true),
-      p->plugin_id,
-      p->interface_id,
-      p->features);
+  for (int prio = plugin_information::N_PRIORITY - 1;
+      prio >= 0;
+      --prio)
+    if (man.enum_plugins(
+          if_then_else_return(
+            bind(&impl::check_plugin, p.get(), _2),
+            (var(result) = _1, false), true),
+          p->plugin_id,
+          p->interface_id,
+          p->features,
+          plugin_information::priority_t(prio)))
+      break;
 
   if (result == plugin_descriptor())
     throw gott::system_error("could not find plugin");

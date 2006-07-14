@@ -242,7 +242,7 @@ void metadata_manager::load_standard() {
   }
 }
 
-void metadata_manager::enum_plugins(
+bool metadata_manager::enum_plugins(
     boost::function<
       bool (
         plugin_descriptor const &plugin_descriptor,
@@ -250,15 +250,20 @@ void metadata_manager::enum_plugins(
       ) > const &callback,
       boost::optional<QID> const &/*plugin_id*/,
       boost::optional<QID> const &/*interface_id*/,
-      std::set<QID> const &/*features*/) const {
+      std::set<QID> const &/*features*/,
+      plugin_information::priority_t prio) const {
   for (vector<whole_plugin>::iterator it = plugins.begin();
       it != plugins.end();
-      ++it)
+      ++it) {
+    if (it->information.priority == prio)
+      continue;
     if (!callback(it->descriptor, it->information))
-      break;
+      return true;
+  }
+  return false;
 }
 
-void metadata_manager::enum_modules(
+bool metadata_manager::enum_modules(
     boost::function<
       bool (
         module_descriptor const &descriptor,
@@ -270,7 +275,8 @@ void metadata_manager::enum_modules(
       it != modules.end();
       ++it)
     if (!callback(it->descriptor, it->information))
-      break;
+      return true;
+  return false;
 }
 
 void metadata_manager::remove_plugin(plugin_descriptor const &descriptor) {

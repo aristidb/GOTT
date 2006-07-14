@@ -38,6 +38,7 @@
 #ifndef GOTT_PLUGIN_METADATA_MANAGER_HPP
 #define GOTT_PLUGIN_METADATA_MANAGER_HPP
 
+#include "descriptor.hpp"
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -125,8 +126,9 @@ public: //internal
    * \param plugin_id Criterium: plugin-id.
    * \param interface_id Criterium: interface_id.
    * \param features Criterium: features.
+   * \param prio Enforced criterium: priority.
    */
-  void enum_plugins(
+  bool enum_plugins(
       boost::function<
         bool (
           plugin_descriptor const &plugin_descriptor,
@@ -135,7 +137,8 @@ public: //internal
       > const &callback,
       boost::optional<QID> const &plugin_id,
       boost::optional<QID> const &interface_id,
-      std::set<QID> const &features) const;
+      std::set<QID> const &features,
+      plugin_information::priority_t prio) const;
 
   /**
    * \internal
@@ -144,7 +147,7 @@ public: //internal
    * \param callback Enumeration callback. Return false if you need no more.
    * \param module_id Criterium: module_id.
    */
-  void enum_modules(
+  bool enum_modules(
       boost::function<
         bool (
           module_descriptor const &descriptor,
