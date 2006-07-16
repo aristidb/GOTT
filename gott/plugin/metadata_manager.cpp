@@ -267,7 +267,7 @@ bool metadata_manager::enum_plugins(
   for (vector<whole_plugin>::iterator it = plugins.begin();
       it != plugins.end();
       ++it) {
-    if (it->information.priority == prio)
+    if (it->information.priority != prio)
       continue;
     if (!callback(it->descriptor, it->information))
       return true;
