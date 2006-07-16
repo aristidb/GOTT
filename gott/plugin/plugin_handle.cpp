@@ -58,6 +58,7 @@ public:
       p.reset(new impl(desc));
     } catch (gott::system_error&) {
       // remove this plugin, it could not be loaded!
+      // TODO: log?
       metadata_manager man;
       man.remove_plugin(desc);
       man.commit();

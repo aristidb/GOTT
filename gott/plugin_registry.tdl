@@ -1,29 +1,41 @@
 # notify_fs
-plugin-id gott::notify_fs::kqueue_factory
-has-interface gott::notify_fs::engine_factory
+plugin gott::notify_fs::kqueue_factory
+interface gott::notify_fs::engine_factory
 enclosing-module gott::notify_fs::kqueue
 symbol kqueue_plugin
 
-plugin-id gott::notify_fs::inotify_factory
-has-interface gott::notify_fs::engine_factory
+plugin gott::notify_fs::inotify_factory
+interface gott::notify_fs::engine_factory
 enclosing-module gott::notify_fs::inotify
 symbol inotify_plugin
 
 # main_loop
-plugin-id gott::events::select_loop
-has-interface gott::events::main_loop
+plugin gott::events::select_loop
+interface gott::events::main_loop
 enclosing-module gott::events::select_loop
 symbol plugin
+feature gott::events::fd_manager
+feature gott::events::timer_manager
+feature gott::events::inprocess_message_manager
+feature gott::events::signal_manager
 
-plugin-id gott::events::kqueue_loop
-has-interface gott::events::main_loop
+plugin gott::events::kqueue_loop
+interface gott::events::main_loop
 enclosing-module gott::events::kqueue_loop
 symbol plugin
 priority high
+feature gott::events::fd_manager
+feature gott::events::timer_manager
+feature gott::events::inprocess_message_manager
+feature gott::events::signal_manager
 
-plugin-id gott::events::epoll_loop
-has-interface gott::events::main_loop
+plugin gott::events::epoll_loop
+interface gott::events::main_loop
 enclosing-module gott::events::epoll_loop
 symbol plugin
 priority high
+feature gott::events::fd_manager
+feature gott::events::timer_manager
+feature gott::events::inprocess_message_manager
+feature gott::events::signal_manager
 

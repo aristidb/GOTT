@@ -77,25 +77,27 @@ struct adapter : writable_structure {
   }
 
   void end() {
-    if (Tag == "module") {
+    if (Tag == "$module") {
       manager.add_module(module_desc, module_info, resource);
       module_desc = module_descriptor();
       module_info = module_information();
-    } else if (Tag == "plugin") {
+    } else if (Tag == "$plugin") {
       manager.add_plugin(plugin_desc, plugin_info, resource);
       plugin_desc = plugin_descriptor();
       plugin_info = plugin_information();
-    } else if (Tag == "plugin-id")
+    } else if (Tag == "plugin")
       plugin_info.plugin_id = _str();
     else if (Tag == "enclosing-module")
       plugin_info.enclosing_module = _str();
-    else if (Tag == "has-interface")
+    else if (Tag == "interface")
       plugin_info.interfaces.insert(_str());
+    else if (Tag == "feature")
+      plugin_info.features.insert(_str());
     else if (Tag == "priority")
       plugin_info.priority = Xany_cast<plugin_information::priority_t>(Data);
     else if (Tag == "symbol")
       plugin_desc.symbol = _str();
-    else if (Tag == "module-id")
+    else if (Tag == "module")
       module_info.module_id = _str();
     else if (Tag == "file-path")
       module_desc.file_path = _str();
@@ -142,14 +144,14 @@ void gott::plugin::detail::load_tdl_resource(
       named (priority), enumeration $ low, normal, high
    */
   rule_t const plugin_schema =
-    rule("tdl::schema::ordered", rule_attr(tag = "plugin", outer = list()),
+    rule("tdl::schema::ordered", rule_attr(tag = "$plugin", outer = list()),
         boost::assign::list_of
-        (rule_one("tdl::schema::named", rule_attr(tag = "plugin-id"),
+        (rule_one("tdl::schema::named", rule_attr(tag = "plugin"),
                   inode))
         (rule("tdl::schema::unordered", rule_attr(coat = false),
           boost::assign::list_of
           (rule_one("tdl::schema::named",
-                    rule_attr(tag = "has-interface"),
+                    rule_attr(tag = "interface"),
                     inode))
           (rule_one("tdl::schema::named", rule_attr(tag = "enclosing-module"),
                     inode))
@@ -165,7 +167,11 @@ void gott::plugin::detail::load_tdl_resource(
                           (string("low"))
                           (string("normal"))
                           (string("high"))
-                          .operator vector<string>()))))))));
+                          .operator vector<string>())))))
+          
+          (rule_one("tdl::schema::named",
+                    rule_attr(tag = "feature", outer = list()),
+                    inode)))));
 
   /*
   ordered
@@ -176,9 +182,9 @@ void gott::plugin::detail::load_tdl_resource(
       :list named (depend-on), node
    */
   rule_t const module_schema =
-    rule("tdl::schema::ordered", rule_attr(tag = "module", outer = list()),
+    rule("tdl::schema::ordered", rule_attr(tag = "$module", outer = list()),
         boost::assign::list_of
-        (rule_one("tdl::schema::named", rule_attr(tag = "module-id"),
+        (rule_one("tdl::schema::named", rule_attr(tag = "module"),
                   inode))
         (rule("tdl::schema::unordered", rule_attr(coat = false),
           boost::assign::list_of
