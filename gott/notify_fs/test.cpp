@@ -70,7 +70,8 @@ bool blink() {
 
 int main() {
   plugin_handle<main_loop> loop(
-      with_feature<timer_manager>() && with_feature<quit_manager>());
+      with_feature<timer_manager>() && with_feature<quit_manager>() &&
+      with_feature<notification_engine>());
 
   watch w;
   try {
