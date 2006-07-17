@@ -129,11 +129,11 @@ def CheckOptimization(context):
 
 def CheckDebug(context):
 	context.Message('Checking if compiler supports gcc-style debug flags... ')
-	lastCCFLAGS = context.env['CCFLAGS'][:]
-	context.env.Append(CCFLAGS = ['-g'])
+	last = prepare(context.env,
+			CCFLAGS = ['-g'])
 	result = context.TryCompile("void func() {}\n", '.cpp')
 	if not result:
-		context.env.Replace(CCFLAGS = lastCCFLAGS)
+		context.env.Replace(**last)
 	context.Result(result)
 	return result
 
@@ -152,6 +152,12 @@ def CheckBoostDateTimeCanNanosec(context):
 	context.Result(result)
 	return result
 
+def CheckBoostLib(context,lib):
+	blib = "boost_" + lib + context.env['BOOST_LIBSUFFIX']
+	if not  context.CheckLib(blib,language = 'c++'):
+		print 'Boost',lib,' library is not installed: ', blib
+
+
 print 'Configuration...'
 Import('env')
 tests =	{
@@ -162,6 +168,7 @@ tests =	{
 	'Optimization': CheckOptimization,
 	'Debug': CheckDebug,
 	'PkgConfigPkg': CheckPkgConfigPkg,
+	'BoostLib':CheckBoostLib,
 	'BoostDateTimeCanNanosec': CheckBoostDateTimeCanNanosec,
 	'TemplateRepo': CheckTemplateRepo
 }
@@ -184,21 +191,16 @@ if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 	Exit(1)
 
 
-def checkboostlib(conf,lib):
-	blib = "boost_" + lib + conf.env['BOOST_LIBSUFFIX']
-	if not  conf.CheckLib(blib,language = 'c++'):
-		print 'Boost',lib,' library is not installed: ', blib
 
-boostlibs = Split("thread date_time filesystem")
+boostlibs =	[
+	'thread', 
+	'date_time', 
+	'filesystem',
+#	'program_options',
+	]
 
 for l in boostlibs:
-	checkboostlib(conf,l)
-
-
-#boost_popt_lib = 'boost_program_options' + conf.env['BOOST_LIBSUFFIX']
-#if not conf.CheckLib(boost_popt_lib, language = 'c++'):
-#	print 'Boost date_time library is not installed:', boost_date_time_lib
-#	Exit(1)
+	CheckBoostLib(conf,l) # XXX: wont work as method?!
 
 
 #conf.BoostDateTimeCanNanosec()
