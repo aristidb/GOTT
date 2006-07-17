@@ -1,3 +1,4 @@
+# vim:ts=4:sw=4:noexpandtab:filetype=python:
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
 #
@@ -39,88 +40,90 @@
 def AddSysOpts(env):
 	dict = env.Dictionary()
 	for k, v in dict.iteritems():
-		if k[:4] == 'SYS_' and v == 1:
+		if k.startswith('SYS_') and v == 1:
 			env.Append(CPPDEFINES = ['BUILD_' + k[4:]])
+
+def prepare(env,**kw):
+	last={}
+	for i in kw.keys():
+		last[i]=env[i][:]
+	env.Append(**kw)
+	return last
 
 def CheckLinkerAsNeeded(context):
 	context.Message('Checking if linker supports --as-needed flag... ')
 
-	lastLinkFlags = context.env['LINKFLAGS'][:]
-	context.env.Append(LINKFLAGS = ['-Wl,--as-needed'])
+	last= prepare(context.env,
+			LINKFLAGS = ['-Wl,--as-needed'])
 
 	result = context.TryLink("int main() { }\n", '.cpp')
 	if not result:
-		context.env.Replace(LINKFLAGS = lastLinkFlags)
+		context.env.Replace(**last)
 	context.Result(result)
 	return result
 
 def CheckLinkerExportDynamic(context):
 	context.Message('Checking if linker supports -E flag...')
 
-	lastLinkFlags = context.env['LINKFLAGS'][:]
-	context.env.Append(LINKFLAGS = ['-Wl,-E'])
+	last = prepare(context.env,
+			LINKFLAGS = ['-Wl,-E'])
 
 	result = context.TryLink("int main() { }\n", '.cpp')
 	if not result:
-		context.env.Replace(LINKFLAGS = lastLinkFlags)
+		context.env.Replace(**last)
 	context.Result(result)
 	return result
 
 def CheckCompilerVisibility(context):
 	context.Message('Checking if compiler supports visibility attributes... ')
-	lastCPPDEF = context.env['CPPDEFINES'][:]
-	lastCCFLAGS = context.env['CCFLAGS'][:]
-	
-	context.env.Append(CPPDEFINES = ['HAS_VISIBILITY'])
-	context.env.Append(CCFLAGS = '-fvisibility=hidden')
+	last = prepare(context.env,
+			CPPDEFINES = ['HAS_VISIBILITY'],
+			CCFLAGS = '-fvisibility=hidden')
 
 	result = context.TryCompile("int global __attribute__((visibility(\"default\")));\n", '.cpp')
 	if not result:
-		context.env.Replace(CCFLAGS = lastCCFLAGS)
-		context.env.Replace(CPPDEFINES = lastCPPDEF)
+		context.env.Replace(**last)
 	context.Result(result)
 	return result
 
 def CheckTemplateRepo(context):
 	context.Message('Checking if compiler supports -frepo...')
-	lastCXXFLAGS = context.env['CCFLAGS'][:]
-	lastLINKFLAGS = context.env['LINKFLAGS'][:]
-
-	context.env.Append(CXXFLAGS = ['-frepo'])
-	context.env.Append(LINKFLAGS = ['-frepo'])
+	last = prepare(context.env,
+			CXXFLAGS = ['-frepo'],
+			LINKFLAGS = ['-frepo'])
 
 	result = context.TryCompile("int var;", '.cpp')
 	if not result:
-		context.env.Replace(CXXFLAGS = lastCXXFLAGS)
-		context.env.Replace(LINKFLAGS = lastLINKFLAGS)
+		context.env.Replace(**last)
 	context.Result(result)
 	return result
 
 def CheckWarnings(context):
 	context.Message('Checking if compiler supports gcc-style warnings... ')
-	lastCCFLAGS = context.env['CCFLAGS'][:]
-
-	context.env.Append(CCFLAGS = Split('-Wall -W')) # stripped -Werror because of libsigc++'s hide
+	last = prepare(context.env,
+			CCFLAGS = Split('-Wall -W')) # stripped -Werror because of libsigc++'s hide
 
 	result = context.TryCompile("int global;\n", '.cpp')
 	if not result:
-		context.env.Replace(CCFLAGS = lastCCFLAGS)
+		context.env.Replace(**last)
 	context.Result(result)
 	return result
 
 def CheckOptimization(context):
 	context.Message('Checking if compiler supports gcc-style optimization levels (if necessary)... ')
-	lastCCFLAGS = context.env['CCFLAGS'][:]
-
+	
 	if context.env['OPTIMIZATION'] == 'full':
 		level = ['-O3']
 	elif context.env['OPTIMIZATION'] == 'some':
 		level = ['-O2']
-
-	context.env.Append(CCFLAGS = level)
+	
+	last = prepare(context.env,
+			CCFLAGS = level)
+	
 	result = context.TryLink("#ifdef __OPTIMIZE__\nint main() {}\n#endif\n", '.cpp')
+	
 	if not result:
-		context.env.Replace(CCFLAGS = lastCCFLAGS)
+		context.env.Replace(**last)
 	context.Result(result)
 	return result
 
@@ -180,25 +183,23 @@ if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 	print 'Boost headers are not installed'
 	Exit(1)
 
-boost_thread_lib = 'boost_thread' + conf.env['BOOST_LIBSUFFIX']
-if not conf.CheckLib(boost_thread_lib, language = 'c++'):
-	print 'Boost threading library is not installed:', boost_thread_lib
-	Exit(1)
 
-boost_date_time_lib = 'boost_date_time' + conf.env['BOOST_LIBSUFFIX']
-if not conf.CheckLib(boost_date_time_lib, language = 'c++'):
-	print 'Boost date_time library is not installed:', boost_date_time_lib
-	Exit(1)
+def checkboostlib(conf,lib):
+	blib = "boost_" + lib + conf.env['BOOST_LIBSUFFIX']
+	if not  conf.CheckLib(blib,language = 'c++'):
+		print 'Boost',lib,' library is not installed: ', blib
+
+boostlibs = Split("thread date_time filesystem")
+
+for l in boostlibs:
+	checkboostlib(conf,l)
+
 
 #boost_popt_lib = 'boost_program_options' + conf.env['BOOST_LIBSUFFIX']
 #if not conf.CheckLib(boost_popt_lib, language = 'c++'):
 #	print 'Boost date_time library is not installed:', boost_date_time_lib
 #	Exit(1)
 
-boost_fs_lib = 'boost_filesystem' + conf.env['BOOST_LIBSUFFIX']
-if not conf.CheckLib(boost_fs_lib, language = 'c++'):
-	print 'Boost filesystem library is not installed:', boost_fs_lib
-	Exit(1)
 
 #conf.BoostDateTimeCanNanosec()
 
