@@ -118,7 +118,7 @@ private:
           &notify_fs_file_simple_test::on_event,
           this,
           var(encountered)));
-    boost::thread thrd(boost::bind(&helper, fun));
+    boost::thread thrd(bind(&helper, fun));
     loop->run();
     TS_ASSERT_EQUALS(encountered, 1);
     thrd.join();
