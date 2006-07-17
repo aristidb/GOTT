@@ -42,11 +42,14 @@
 #include <boost/assign/list_of.hpp>
 #include <vector>
 #include <set>
+#include <map>
 #include <fstream>
 
 using namespace gott::plugin;
 using gott::string;
+using gott::QID;
 using std::vector;
+using std::map;
 
 namespace {
   // protect all data
@@ -92,6 +95,19 @@ namespace {
   //TODO safer, faster implementation
   vector<whole_plugin> plugins;
   vector<whole_module> modules;
+
+  // some features are artificial... keep track
+  struct complex_feature {
+    typedef std::vector<std::set<gott::QID> > fsets_t;
+
+    complex_feature(fsets_t const &feature_sets, string const &resource)
+      : feature_sets(feature_sets),
+      resource(resource) {}
+    
+    fsets_t feature_sets;
+    string resource;
+  };
+  map<QID, complex_feature> complex_features;
 
   // some metadata_manager methods allow another metadata_manager to be active
   // at the same time in the same thread (in an indirectly invoked methods)
@@ -147,6 +163,15 @@ void metadata_manager::commit() {
     if (p->remove_resources.count(it->resource) > 0)
       it = modules.erase(it);
     else
+      ++it;
+
+  // - removing features from removed resources
+  for (map<QID, complex_feature>::iterator it = complex_features.begin();
+      it != complex_features.end();)
+    if (p->remove_resources.count(it->second.resource) > 0) {
+      complex_features.erase(it++);
+      //TODO: remove from plugin_information
+    } else
       ++it;
 
   // directly removing modules
