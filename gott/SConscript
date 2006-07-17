@@ -52,21 +52,21 @@ libobj += glob.glob('plugin/metadata/detail/*.cpp')
 
 libobj_syswrap = glob.glob('syswrap/*.cpp')
 if env['SYS_KQUEUE'] == 0:
-  libobj_syswrap.remove('syswrap/kqueue_bsd.cpp')
+	libobj_syswrap.remove('syswrap/kqueue_bsd.cpp')
 if env['SYS_EPOLL'] == 0:
-  libobj_syswrap.remove('syswrap/epoll_linux.cpp')
+	libobj_syswrap.remove('syswrap/epoll_linux.cpp')
 if env['SYS_INOTIFY'] == 0:
-  libobj_syswrap.remove('syswrap/inotify_linux.cpp')
+	libobj_syswrap.remove('syswrap/inotify_linux.cpp')
 libobj_syswrap.remove('syswrap/test.cpp')
 libobj += libobj_syswrap
 
 tdl_source_files = []
 for root, dirs, _ in os.walk('tdl'):
-        if 'test' in dirs:
-                dirs.remove('test')
-        if 'types' in dirs:
-                dirs.remove('types')
-        tdl_source_files += glob.glob(root + '/*.cpp')
+	if 'test' in dirs:
+		dirs.remove('test')
+	if 'types' in dirs:
+		dirs.remove('types')
+		tdl_source_files += glob.glob(root + '/*.cpp')
 libobj += tdl_source_files
 
 libobj_events = glob.glob('events/*.cpp')
