@@ -81,8 +81,7 @@ using namespace gott::plugin;
 
 int main() {
   // Find the first plugin which supports the interface and load it.
-  plugin_handle<my::simple_action> handle(
-    find_plugin_metadata(tags::interface = "my::simple_action"));
+  plugin_handle<my::simple_action> handle;
   handle->do_it();
 }
 \endcode
@@ -110,15 +109,15 @@ Put this into a shared library of its own, suppose it is saved to
 /home/max/hello.so, then we need to add the following metadata to
 module_metadata.tdl:
 \verbatim
-module-id my::hello::container
+module my::hello::container
 module-type dynamic-native # it's a shared library
 file-path /home/max/hello.so
 \endverbatim
 
 And we need to add the following lines to plugin_metadata.tdl:
 \verbatim
-plugin-id my::hello::plugin
-has-interface my::simple_action
+plugin my::hello::plugin
+interface my::simple_action
 enclosing-module my::hello::container
 symbol the_plugin
 \endverbatim
@@ -129,6 +128,8 @@ Hello world!
 </verbatim>
 
 \subsection more_action But I want more action!
+
+\note THE ABOVE SECTION DOES NOT APPLY, THERE IS NO REPLACEMENT FUNCTIONALITY YET
 
 OK, we'll do that. You want more action? I'll give you more action<b>s</b>!
 First, we change the application like this:

@@ -42,8 +42,3 @@ using gott::plugin::plugin_base;
 using gott::QID;
 
 plugin_base::~plugin_base() {}
-
-void plugin_base::add_hook(QID const &, hook const &) {
-  throw gott::user_error("no hooks supported");
-}
-

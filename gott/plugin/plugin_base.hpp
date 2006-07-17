@@ -46,12 +46,10 @@ namespace plugin {
 
 class system_configuration;
 class plugin_configuration;
-class hook;
 
 class GOTT_EXPORT plugin_base {
 public:
   virtual ~plugin_base() = 0;
-  virtual void add_hook(QID const &point, hook const &extension);
 };
 
 }}

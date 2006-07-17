@@ -49,8 +49,11 @@ using gott::string;
 using std::vector;
 
 namespace {
+  // protect all data
   boost::recursive_mutex mutex;
 
+  // need to store plugin_descriptor, plugin_information and the resource
+  // for each plugin
   struct whole_plugin {
     whole_plugin() {}
 
@@ -67,6 +70,8 @@ namespace {
     string resource;
   };
 
+  // need to store module_descriptor, module_information and the resource
+  // for each module
   struct whole_module {
     whole_module() {}
 
@@ -83,10 +88,14 @@ namespace {
     string resource;
   };
 
+  // just store all plugins and modules
   //TODO safer, faster implementation
   vector<whole_plugin> plugins;
   vector<whole_module> modules;
 
+  // some metadata_manager methods allow another metadata_manager to be active
+  // at the same time in the same thread (in an indirectly invoked methods)
+  // => the above lines help implementing this
   bool allow_recur = false;
   unsigned long recursion = 0;
 
@@ -106,6 +115,7 @@ public:
   impl() : lock(mutex) {}
   boost::recursive_mutex::scoped_lock lock;
 
+  // task list for next commit
   std::set<string> remove_resources;
   vector<plugin_descriptor> remove_plugins;
   vector<module_descriptor> remove_modules;
@@ -114,6 +124,7 @@ public:
 };
 
 metadata_manager::metadata_manager() : p(new impl) {
+  // check if there are more than one metadata_manager objects at once
   if (!allow_recur && recursion > 0)
     throw gott::internal_error("multiple metadata_manager objects");
   ++recursion;
@@ -121,6 +132,8 @@ metadata_manager::metadata_manager() : p(new impl) {
 metadata_manager::~metadata_manager() { --recursion; }
 
 void metadata_manager::commit() {
+  // removing resources:
+  // - removing plugins from removed resources
   for (vector<whole_plugin>::iterator it = plugins.begin();
       it != plugins.end();)
     if (p->remove_resources.count(it->resource) > 0)
@@ -128,6 +141,7 @@ void metadata_manager::commit() {
     else
       ++it;
 
+  // - removing modules from removed resources
   for (vector<whole_module>::iterator it = modules.begin();
       it != modules.end();)
     if (p->remove_resources.count(it->resource) > 0)
@@ -135,6 +149,7 @@ void metadata_manager::commit() {
     else
       ++it;
 
+  // directly removing modules
   for (vector<module_descriptor>::iterator it = p->remove_modules.begin();
       it != p->remove_modules.end();
       ++it)
@@ -151,6 +166,7 @@ void metadata_manager::commit() {
       } else
         ++jt;
 
+  // directly removing plugins
   for (vector<plugin_descriptor>::iterator it = p->remove_plugins.begin();
       it != p->remove_plugins.end();
       ++it)
@@ -161,8 +177,10 @@ void metadata_manager::commit() {
       else
         ++jt;
 
+  // adding new modules
   modules.insert(modules.end(), p->add_modules.begin(), p->add_modules.end());
 
+  // patching new plugins' module_descriptor entries
   for (vector<whole_plugin>::iterator it = p->add_plugins.begin();
       it != p->add_plugins.end();
       ++it)
@@ -174,8 +192,10 @@ void metadata_manager::commit() {
         break;
       }
   
+  // adding new and patched plugins
   plugins.insert(plugins.end(), p->add_plugins.begin(), p->add_plugins.end());
 
+  // clear task lists
   p->remove_resources.clear();
   p->remove_plugins.clear();
   p->remove_modules.clear();
@@ -198,6 +218,7 @@ void metadata_manager::load_core() {
   static bool loaded;
 
   if (!loaded) {
+    // just add the metadata necessary for reading metadata from files
     module_descriptor tdl_builtins("tdl/libtdl_builtins.so");
     add_module(tdl_builtins, module_information("tdl::builtins"), "core");
 
@@ -236,6 +257,7 @@ void metadata_manager::add_core_tdl_schema(
 void metadata_manager::load_standard() {
   ALLOW_RECUR;
 
+  // ensure we CAN read the metadata from files
   metadata_manager man2;
   man2.load_core();
   man2.commit();
@@ -243,6 +265,7 @@ void metadata_manager::load_standard() {
   static bool loaded;
   if (!loaded) {
     loaded = true;
+    // now read them
     {
       std::ifstream plugins("./plugin_registry.tdl");
       update_resource(plugins, "./plugin_registry.tdl");
@@ -264,6 +287,8 @@ bool metadata_manager::enum_plugins(
       boost::optional<QID> const &/*interface_id*/,
       std::set<QID> const &/*features*/,
       plugin_information::priority_t prio) const {
+  // send all (yeah that's ok) plugins with the correct priority to the callback
+  // - until the callback returns false
   for (vector<whole_plugin>::iterator it = plugins.begin();
       it != plugins.end();
       ++it) {
@@ -283,6 +308,8 @@ bool metadata_manager::enum_modules(
       )
     > const &callback,
     boost::optional<QID> const &/*module_id*/) const {
+  // send all (still ok) modules to the callback - until the callback returns
+  // false
   for (vector<whole_module>::iterator it = modules.begin();
       it != modules.end();
       ++it)
