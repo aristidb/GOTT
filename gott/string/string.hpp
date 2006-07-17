@@ -295,8 +295,9 @@ public:
   /**
    * Assign from another string.
    */
-  GOTT_LOCAL void operator=(string other) {
+  GOTT_LOCAL string &operator=(string other) {
     other.swap(*this);
+    return *this;
   }
 
   /**

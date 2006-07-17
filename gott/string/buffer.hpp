@@ -135,8 +135,9 @@ public:
   /**
    * Assign another buffers contents to this buffer.
    */
-  void operator=(string_buffer const &b) {
+  string_buffer &operator=(string_buffer const &b) {
     string_buffer(b).swap(*this);
+    return *this;
   }
 
   /**
