@@ -66,7 +66,7 @@ for root, dirs, _ in os.walk('tdl'):
 		dirs.remove('test')
 	if 'types' in dirs:
 		dirs.remove('types')
-		tdl_source_files += glob.glob(root + '/*.cpp')
+	tdl_source_files += glob.glob(root + '/*.cpp')
 libobj += tdl_source_files
 
 libobj_events = glob.glob('events/*.cpp')
