@@ -48,8 +48,8 @@ def ScanDir(path):
 	files = dircache.listdir(path)
 	for file in files:
 		mode = os.stat(path+'/'+file)[stat.ST_MODE]
-	if stat.S_ISDIR(mode):
-		codefiles += ScanDir(file)
+		if stat.S_ISDIR(mode):
+			codefiles += ScanDir(file)
 	return codefiles
 
 codefiles = ScanDir('.')
