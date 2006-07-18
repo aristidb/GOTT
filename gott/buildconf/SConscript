@@ -152,26 +152,31 @@ def CheckBoostDateTimeCanNanosec(context):
 	context.Result(result)
 	return result
 
-def CheckBoostLib(context,lib):
+def CheckBoostLib(context,lib,fatal=False):
 	blib = "boost_" + lib + context.env['BOOST_LIBSUFFIX']
+	result = context.CheckLib(blib,language = 'c++')
 	if not  context.CheckLib(blib,language = 'c++'):
 		print 'Boost',lib,' library is not installed: ', blib
+	if not result and fatal:
+		sys.Exit(1)
+	return result
 
+CheckBoostLib.notest = True
 
 print 'Configuration...'
 Import('env')
-tests =	{
-	'LinkerAsNeeded': CheckLinkerAsNeeded,
-	'LinkerExportDynamic': CheckLinkerExportDynamic,
-	'CompilerVisibility': CheckCompilerVisibility,
-	'Warnings': CheckWarnings,
-	'Optimization': CheckOptimization,
-	'Debug': CheckDebug,
-	'PkgConfigPkg': CheckPkgConfigPkg,
-	'BoostLib':CheckBoostLib,
-	'BoostDateTimeCanNanosec': CheckBoostDateTimeCanNanosec,
-	'TemplateRepo': CheckTemplateRepo
-}
+
+tests={}
+
+l=locals()
+
+for i in dir():# checking 
+	if i.startswith("Check"):
+		# print "Found",i
+		a=l[i]
+		if hasattr(a,"notest"): continue
+		tests[i[5:]]=a
+del l
 
 conf = Configure(env, custom_tests = tests)
 AddSysOpts(conf.env)
@@ -198,9 +203,8 @@ boostlibs =	[
 	'filesystem',
 #	'program_options',
 	]
-
-for l in boostlibs:
-	CheckBoostLib(conf,l) # XXX: wont work as method?!
+for i in boostlibs:
+	CheckBoostLib(conf,i)
 
 
 #conf.BoostDateTimeCanNanosec()
