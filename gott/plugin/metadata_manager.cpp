@@ -44,12 +44,14 @@
 #include <set>
 #include <map>
 #include <fstream>
+#include <algorithm>
 
 using namespace gott::plugin;
 using gott::string;
 using gott::QID;
 using std::vector;
 using std::map;
+using std::set;
 
 namespace {
   // protect all data
@@ -98,7 +100,7 @@ namespace {
 
   // some features are artificial... keep track
   struct complex_feature {
-    typedef std::vector<std::set<gott::QID> > fsets_t;
+    typedef vector<set<QID> > fsets_t;
 
     complex_feature(fsets_t const &feature_sets, string const &resource)
       : feature_sets(feature_sets),
@@ -132,7 +134,7 @@ public:
   boost::recursive_mutex::scoped_lock lock;
 
   // task list for next commit
-  std::set<string> remove_resources;
+  set<string> remove_resources;
   vector<plugin_descriptor> remove_plugins;
   vector<module_descriptor> remove_modules;
   vector<whole_plugin> add_plugins;
@@ -170,7 +172,21 @@ void metadata_manager::commit() {
       it != complex_features.end();)
     if (p->remove_resources.count(it->second.resource) > 0) {
       complex_features.erase(it++);
-      //TODO: remove from plugin_information
+
+      // also remove from all plugin_information records
+      for (vector<whole_plugin>::iterator jt = plugins.begin();
+          jt != plugins.end();
+          ++jt) {
+        typedef map<QID, bool> fmap_t;
+        fmap_t &features_ = jt->information.features;
+        std::pair<fmap_t::iterator, fmap_t::iterator> frange =
+          features_.equal_range(it->first);
+        while (frange.first != frange.second)
+          if (frange.first->second)
+            features_.erase(frange.first++);
+          else
+            ++frange.first;
+      }
     } else
       ++it;
 
@@ -262,10 +278,10 @@ void metadata_manager::load_core() {
 
 void metadata_manager::add_core_tdl_schema(
     string const &type, module_descriptor const &tdl_builtins) {
-  std::set<QID> interfaces;
+  set<QID> interfaces;
   interfaces.insert("tdl::schema::type");
 
-  std::set<QID> features;
+  map<QID, bool> features;
 
   add_plugin(
       plugin_descriptor("plugin_schema_" + type, tdl_builtins),
@@ -310,7 +326,7 @@ bool metadata_manager::enum_plugins(
       ) > const &callback,
       boost::optional<QID> const &/*plugin_id*/,
       boost::optional<QID> const &/*interface_id*/,
-      std::set<QID> const &/*features*/,
+      set<QID> const &/*features*/,
       plugin_information::priority_t prio) const {
   // send all (yeah that's ok) plugins with the correct priority to the callback
   // - until the callback returns false

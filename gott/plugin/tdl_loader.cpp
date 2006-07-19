@@ -92,7 +92,7 @@ struct adapter : writable_structure {
     else if (Tag == "interface")
       plugin_info.interfaces.insert(_str());
     else if (Tag == "feature")
-      plugin_info.features.insert(_str());
+      plugin_info.features.insert(std::pair<gott::QID, bool>(_str(), false));
     else if (Tag == "priority")
       plugin_info.priority = Xany_cast<plugin_information::priority_t>(Data);
     else if (Tag == "symbol")

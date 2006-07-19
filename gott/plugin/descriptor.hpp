@@ -41,6 +41,7 @@
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
 #include <set>
+#include <map>
 
 namespace gott { namespace plugin {
 
@@ -136,7 +137,7 @@ struct plugin_information {
       QID const &plugin_id,
       QID const &enclosing_module,
       std::set<QID> const &interfaces,
-      std::set<QID> const &features,
+      std::map<QID, bool> const &features,
       priority_t priority)
     : plugin_id(plugin_id),
     enclosing_module(enclosing_module),
@@ -153,8 +154,12 @@ struct plugin_information {
   ///  The IDs of the plugin's supported interfaces.
   std::set<QID> interfaces;
 
-  ///  The IDs of the plugin's supported features.
-  std::set<QID> features;
+  /**
+   * The IDs of the plugin's supported features.
+   * The associated boolean indicates whether this is a native
+   * or deduced feature.
+   */
+  std::map<QID, bool> features;
 
   /// The priority of the plugin.
   priority_t priority;
