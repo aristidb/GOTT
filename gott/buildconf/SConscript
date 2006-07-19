@@ -155,7 +155,7 @@ def CheckBoostDateTimeCanNanosec(context):
 def CheckBoostLib(context,lib,fatal=False):
 	blib = "boost_" + lib + context.env['BOOST_LIBSUFFIX']
 	result = context.CheckLib(blib,language = 'c++')
-	if not  context.CheckLib(blib,language = 'c++'):
+	if not result:
 		print 'Boost',lib,' library is not installed: ', blib
 	if not result and fatal:
 		sys.Exit(1)
@@ -200,7 +200,7 @@ if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 boostlibs =	[
 	'thread', 
 	'date_time', 
-	'filesystem',
+#	'filesystem',
 #	'program_options',
 	]
 for i in boostlibs:
