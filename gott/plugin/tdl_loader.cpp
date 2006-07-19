@@ -45,7 +45,16 @@
 #include <gott/string/qid.hpp>
 #include <boost/assign/list_of.hpp>
 #include <vector>
+#include <set>
 #include <stack>
+
+//#define VERBOSE
+
+#ifdef VERBOSE
+#include <gott/tdl/structure/container.hpp>
+#include <gott/tdl/structure/print.hpp>
+#include <iostream>
+#endif
 
 using std::vector;
 using namespace tdl::schema;
@@ -72,6 +81,8 @@ struct adapter : writable_structure {
   plugin_information plugin_info;
   module_descriptor module_desc;
   module_information module_info;
+  gott::QID feature_desc;
+  std::vector<std::set<gott::QID> > feature_info;
 
   void begin(tdl::source_position const &) {
   }
@@ -85,6 +96,10 @@ struct adapter : writable_structure {
       manager.add_plugin(plugin_desc, plugin_info, resource);
       plugin_desc = plugin_descriptor();
       plugin_info = plugin_information();
+    } else if (Tag == "$deduced-feature") {
+      manager.add_deduced_feature(feature_desc, feature_info, resource);
+      feature_desc = gott::QID();
+      feature_info.clear();
     } else if (Tag == "plugin")
       plugin_info.plugin_id = _str();
     else if (Tag == "enclosing-module")
@@ -101,6 +116,10 @@ struct adapter : writable_structure {
       module_info.module_id = _str();
     else if (Tag == "file-path")
       module_desc.file_path = _str();
+    else if (Tag == "deduced-feature")
+      feature_desc = _str();
+    else if (Tag == "feature-set-item")
+      feature_info.back().insert(_str());
     // TODO/missing:
     // - module-type
     // - depend-on
@@ -119,6 +138,8 @@ struct adapter : writable_structure {
   void add_tag(gott::string const &x) {
     higher_tags.push(Tag);
     Tag = x;
+    if (Tag == "feature-set")
+      feature_info.push_back(std::set<gott::QID>());
   }
 
   gott::string _str() const {
@@ -201,16 +222,43 @@ void gott::plugin::detail::load_tdl_resource(
                     rule_attr(tag = "depend-on", outer = list()),
                     inode)))));
 
+  rule_t const deduced_feature_schema =
+    rule("tdl::schema::ordered",
+        rule_attr(tag = "$deduced-feature", outer = list()),
+        boost::assign::list_of
+        (rule_one("tdl::schema::named", rule_attr(tag = "deduced-feature"),
+                  inode))
+        (rule_one("tdl::schema::named",
+                  rule_attr(
+                    tag = "feature-set",
+                    user = Xany("-"),
+                    outer = list()),
+                  rule_one("tdl::schema::list", rule_attr(coat = false),
+                    rule("tdl::schema::node",
+                      rule_attr(tag = "feature-set-item", outer = list()))))));
+
   rule_t const document_schema =
     rule_one("tdl::schema::document", rule_attr(coat = false),
         rule("tdl::schema::unordered", rule_attr(coat = false),
-          boost::assign::list_of(module_schema) (plugin_schema)));
+          boost::assign::list_of
+          (module_schema)
+          (plugin_schema)
+          (deduced_feature_schema)));
 
   adapter out(manager, resource);
+#ifndef VERBOSE
   revocable_adapter adapter(out);
+#else
+  container cont;
+  revocable_adapter adapter(cont);
+#endif
 
   try {
     match(document_schema, adapter).parse(stream);
+#ifdef VERBOSE
+    std::cout << resource << ":\n" << cont << std::endl;
+    cont.copy_to(out);
+#endif
   } catch (tdl::tdl_error &) {
     throw gott::system_error("could not load resource " + resource);
   }

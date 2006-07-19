@@ -165,6 +165,19 @@ struct plugin_information {
   priority_t priority;
 };
 
+template<class T, class U>
+bool feature_includes(T map1, T map2, U set1, U set2) {
+  while (map1 != map2 && set1 != set2)
+    if (*set1 < map1->first)
+      return false;
+    else if(map1->first < *set1)
+      ++map1;
+    else
+      ++map1, ++set1;
+
+  return set1 == set2;
+}
+
 /**
  * Extra information for modules.
  */

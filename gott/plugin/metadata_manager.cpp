@@ -99,17 +99,22 @@ namespace {
   vector<whole_module> modules;
 
   // some features are artificial... keep track
-  struct complex_feature {
+  struct deduced_feature {
     typedef vector<set<QID> > fsets_t;
 
-    complex_feature(fsets_t const &feature_sets, string const &resource)
-      : feature_sets(feature_sets),
+    deduced_feature(
+        QID const &descriptor,
+        fsets_t const &feature_sets,
+        string const &resource)
+      : descriptor(descriptor),
+      feature_sets(feature_sets),
       resource(resource) {}
     
+    QID descriptor;
     fsets_t feature_sets;
     string resource;
   };
-  map<QID, complex_feature> complex_features;
+  vector<deduced_feature> deduced_features;
 
   // some metadata_manager methods allow another metadata_manager to be active
   // at the same time in the same thread (in an indirectly invoked methods)
@@ -139,6 +144,7 @@ public:
   vector<module_descriptor> remove_modules;
   vector<whole_plugin> add_plugins;
   vector<whole_module> add_modules;
+  vector<deduced_feature> add_features;
 };
 
 metadata_manager::metadata_manager() : p(new impl) {
@@ -168,10 +174,10 @@ void metadata_manager::commit() {
       ++it;
 
   // - removing features from removed resources
-  for (map<QID, complex_feature>::iterator it = complex_features.begin();
-      it != complex_features.end();)
-    if (p->remove_resources.count(it->second.resource) > 0) {
-      complex_features.erase(it++);
+  for (vector<deduced_feature>::iterator it = deduced_features.begin();
+      it != deduced_features.end();)
+    if (p->remove_resources.count(it->resource) > 0) {
+      it = deduced_features.erase(it);
 
       // also remove from all plugin_information records
       for (vector<whole_plugin>::iterator jt = plugins.begin();
@@ -180,7 +186,7 @@ void metadata_manager::commit() {
         typedef map<QID, bool> fmap_t;
         fmap_t &features_ = jt->information.features;
         std::pair<fmap_t::iterator, fmap_t::iterator> frange =
-          features_.equal_range(it->first);
+          features_.equal_range(it->descriptor);
         while (frange.first != frange.second)
           if (frange.first->second)
             features_.erase(frange.first++);
@@ -218,6 +224,10 @@ void metadata_manager::commit() {
       else
         ++jt;
 
+  // adding new features
+  deduced_features.insert(deduced_features.end(), p->add_features.begin(),
+      p->add_features.end());
+
   // adding new modules
   modules.insert(modules.end(), p->add_modules.begin(), p->add_modules.end());
 
@@ -236,12 +246,39 @@ void metadata_manager::commit() {
   // adding new and patched plugins
   plugins.insert(plugins.end(), p->add_plugins.begin(), p->add_plugins.end());
 
+  // now add deduced features to all plugins
+  bool done_something = true;
+  while (done_something) {
+    done_something = false;
+    for (vector<deduced_feature>::iterator it = deduced_features.begin();
+        it != deduced_features.end();
+        ++it)
+      for (vector<whole_plugin>::iterator xt = plugins.begin();
+          xt != plugins.end();
+          ++xt) {
+        if (xt->information.features.count(it->descriptor) > 0)
+          continue;
+        for (vector<set<QID> >::iterator jt = it->feature_sets.begin();
+            jt != it->feature_sets.end();
+            ++jt)
+          if (feature_includes(
+                xt->information.features.begin(),
+                xt->information.features.end(),
+                jt->begin(), jt->end())) {
+            xt->information.features.insert(
+                map<QID, bool>::value_type(it->descriptor, true));
+            done_something = true;
+          }
+      }
+  }
+
   // clear task lists
   p->remove_resources.clear();
   p->remove_plugins.clear();
   p->remove_modules.clear();
   p->add_plugins.clear();
   p->add_modules.clear();
+  p->add_features.clear();
 }
 
 void metadata_manager::remove_resource(string const &resource) {
@@ -315,6 +352,10 @@ void metadata_manager::load_standard() {
       std::ifstream modules("./module_registry.tdl");
       update_resource(modules, "./module_registry.tdl");
     }
+    {
+      std::ifstream deduced_features("./deduced_features.tdl");
+      update_resource(deduced_features, "./deduced_features.tdl");
+    }
   }
 }
 
@@ -380,3 +421,11 @@ void metadata_manager::add_module(
     string const &resource) {
   p->add_modules.push_back(whole_module(desc, info, resource));
 }
+
+void metadata_manager::add_deduced_feature(
+    QID const &desc,
+    vector<set<QID> > const &info,
+    string const &resource) {
+  p->add_features.push_back(deduced_feature(desc, info, resource));
+}
+

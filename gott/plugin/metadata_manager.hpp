@@ -44,6 +44,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/optional.hpp>
 #include <boost/function.hpp>
+#include <vector>
 #include <set>
 
 namespace gott { namespace plugin {
@@ -192,6 +193,18 @@ public: //internal
   void add_module(
       module_descriptor const &desc,
       module_information const &info,
+      string const &resource);
+
+  /**
+   * \internal
+   * Add a deduced feature to the database.
+   * \param desc Indentifier of the feature.
+   * \param info Deduction information.
+   * \param resource The resource.
+   */
+  void add_deduced_feature(
+      QID const &desc,
+      std::vector<std::set<QID> > const &info,
       string const &resource);
 
   //\}
