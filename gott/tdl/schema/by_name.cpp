@@ -70,8 +70,7 @@ rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
   boost::mutex::scoped_lock lock(mutex);
 
   if (all_handles.count(s) == 0) {
-    plugin_handle<type> * handle(new plugin_handle<type>(
-          with_plugin_id(s) && with_interface_id("tdl::schema::type")));
+    plugin_handle<type> * handle(new plugin_handle<type>(with_plugin_id(s)));
 
     all_handles.insert(map_t::value_type(s, handle));
   }
