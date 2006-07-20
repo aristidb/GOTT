@@ -176,24 +176,9 @@ void metadata_manager::commit() {
   // - removing features from removed resources
   for (vector<deduced_feature>::iterator it = deduced_features.begin();
       it != deduced_features.end();)
-    if (p->remove_resources.count(it->resource) > 0) {
+    if (p->remove_resources.count(it->resource) > 0)
       it = deduced_features.erase(it);
-
-      // also remove from all plugin_information records
-      for (vector<whole_plugin>::iterator jt = plugins.begin();
-          jt != plugins.end();
-          ++jt) {
-        typedef map<QID, bool> fmap_t;
-        fmap_t &features_ = jt->information.features;
-        std::pair<fmap_t::iterator, fmap_t::iterator> frange =
-          features_.equal_range(it->descriptor);
-        while (frange.first != frange.second)
-          if (frange.first->second)
-            features_.erase(frange.first++);
-          else
-            ++frange.first;
-      }
-    } else
+    else
       ++it;
 
   // directly removing modules
@@ -245,6 +230,17 @@ void metadata_manager::commit() {
   
   // adding new and patched plugins
   plugins.insert(plugins.end(), p->add_plugins.begin(), p->add_plugins.end());
+
+  // remove all deduced features from all plugins
+  for (vector<whole_plugin>::iterator it = plugins.begin(); it != plugins.end(); ++it) {
+    map<QID, bool> &features = it->information.features;
+    map<QID, bool>::iterator jt = features.begin();
+    while (jt != features.end())
+      if (jt->second)
+        features.erase(jt++);
+      else
+        ++jt;
+  }
 
   // now add deduced features to all plugins
   bool done_something = true;
