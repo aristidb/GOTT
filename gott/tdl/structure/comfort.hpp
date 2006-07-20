@@ -38,7 +38,7 @@
 #ifndef GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 #define GOTT_UTIL_TDL_STRUCTURE_COMFORT_HPP
 
-#include <gott/xany/xany.hpp>
+#include <gott/xany.hpp>
 #include <gott/visibility.hpp>
 #include <vector>
 

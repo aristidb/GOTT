@@ -39,7 +39,7 @@
 #include "../repatcher_by_name.hpp"
 #include <gott/tdl/exceptions.hpp>
 #include <gott/range_algo.hpp>
-#include <gott/xany/xany.hpp>
+#include <gott/xany.hpp>
 
 namespace structure = tdl::structure;
 using structure::repatch_enumeration;

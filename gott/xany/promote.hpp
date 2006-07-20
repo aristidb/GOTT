@@ -35,6 +35,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_XANY_INTERNAL
+#error "Rather include <gott/xany.hpp>"
+#else
 #ifndef GOTT_UTIL_XANY_PROMOTE_HPP
 #define GOTT_UTIL_XANY_PROMOTE_HPP
 
@@ -138,4 +141,5 @@ GOTT_XANY_DECLARE_PROMOTER(string_buffer, string);
 
 }}
 
+#endif
 #endif

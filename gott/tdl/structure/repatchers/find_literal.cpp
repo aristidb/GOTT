@@ -38,7 +38,7 @@
 #include "find_literal.hpp"
 #include "../repatcher_by_name.hpp"
 #include <gott/tdl/exceptions.hpp>
-#include <gott/xany/xany.hpp>
+#include <gott/xany.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/optional.hpp>
 

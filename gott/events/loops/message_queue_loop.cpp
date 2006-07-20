@@ -37,7 +37,7 @@
 
 #include "message_queue_loop.hpp"
 #include <gott/thread/message_queue.hpp>
-#include <gott/xany/xany.hpp>
+#include <gott/xany.hpp>
 #include <time.h>
 
 using gott::events::message_queue_loop;

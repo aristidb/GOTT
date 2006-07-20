@@ -60,7 +60,7 @@ using std::vector;
 using namespace tdl::schema;
 using namespace tdl::structure;
 using namespace gott::plugin;
-using namespace gott::xany;
+
 
 namespace {
 // this class makes a hell lot of assumptions:
@@ -73,7 +73,7 @@ struct adapter : writable_structure {
   metadata_manager &manager;
   gott::string resource;
 
-  Xany Data;
+  gott::Xany Data;
   gott::string Tag;
   std::stack<gott::string> higher_tags;
 
@@ -109,7 +109,8 @@ struct adapter : writable_structure {
     else if (Tag == "feature")
       plugin_info.features.insert(std::pair<gott::QID, bool>(_str(), false));
     else if (Tag == "priority")
-      plugin_info.priority = Xany_cast<plugin_information::priority_t>(Data);
+      plugin_info.priority =
+        gott::Xany_cast<plugin_information::priority_t>(Data);
     else if (Tag == "symbol")
       plugin_desc.symbol = _str();
     else if (Tag == "module")
@@ -128,10 +129,10 @@ struct adapter : writable_structure {
       higher_tags.pop();
     } else
       Tag = gott::string();
-    Data = Xany();
+    Data = gott::Xany();
   }
 
-  void data(Xany const &x) {
+  void data(gott::Xany const &x) {
     Data = x;
   }
 
@@ -143,7 +144,7 @@ struct adapter : writable_structure {
   }
 
   gott::string _str() const {
-    return Xany_cast<gott::string>(Data);
+    return gott::Xany_cast<gott::string>(Data);
   }
 };
 }

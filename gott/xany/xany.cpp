@@ -35,9 +35,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#define GOTT_XANY_INTERNAL
 #include "xany.hpp"
 
-using namespace std;
 using namespace gott::xany;
 
 operations_base::~operations_base() {}

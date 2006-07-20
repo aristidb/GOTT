@@ -35,6 +35,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_XANY_INTERNAL
+#error "Rather include <gott/xany.hpp>"
+#else
 #ifndef GOTT_XANY_OPERATIONS_HPP
 #define GOTT_XANY_OPERATIONS_HPP
 
@@ -131,4 +134,5 @@ struct operations :
 
 }}
 
+#endif
 #endif

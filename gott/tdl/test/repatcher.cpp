@@ -50,7 +50,8 @@
 
 using namespace tdl::structure;
 using tdl::source_position;
-using namespace gott::xany;
+using gott::Xany;
+
 using boost::scoped_ptr;
 
 namespace tut {

@@ -35,6 +35,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_XANY_INTERNAL
+#error "Rather include <gott/xany.hpp>"
+#else
 #ifndef GOTT_XANY_SPELL_HPP
 #define GOTT_XANY_SPELL_HPP
 
@@ -53,4 +56,5 @@ inline std::type_info const &spell() {
 
 }}
 
+#endif
 #endif

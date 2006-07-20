@@ -39,7 +39,7 @@
 #define GOTT_UTIL_TDL_STRUC_STRUC_H
 
 #include <gott/visibility.hpp>
-#include <gott/xany/xany.hpp>
+#include <gott/xany.hpp>
 
 namespace gott {
 class string;

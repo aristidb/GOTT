@@ -35,6 +35,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_XANY_INTERNAL
+#error "Rather include <gott/xany.hpp>"
+#else
 #ifndef GOTT_XANY_TAGGED_BASE_HPP
 #define GOTT_XANY_TAGGED_BASE_HPP
 
@@ -75,4 +78,5 @@ std::ostream &operator<<(std::ostream &os, tagged_base<T> const &v) {
 
 }}
 
+#endif
 #endif

@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,38 +35,16 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_XANY_INTERNAL
-#error "Rather include <gott/xany.hpp>"
-#else
-#ifndef GOTT_XANY_OPERATIONS_BASE_HPP
-#define GOTT_XANY_OPERATIONS_BASE_HPP
+#ifndef GOTT_XANY_HPP
+#define GOTT_XANY_HPP
 
-#include <gott/visibility.hpp>
+#define GOTT_XANY_INTERNAL
+#include "xany/xany.hpp"
 
-namespace gott { namespace xany {
+namespace gott {
+  using xany::Xany;
+  using xany::Xany_cast;
+  using xany::Xany_cast_ref;
+}
 
-/**
- * Dummy basetype for "typeless operations".
- *
- * Example usage:
- * @code
- * Xany v(4);
- * std::cout << v;
- * @endcode
- * Which is behind the scenes:
- * @code
- * dynamic_cast<printable&>(v.get_operations()).print(std::cout, v);
- * @endcode
- */
-struct operations_base {
-  GOTT_EXPORT virtual ~operations_base() = 0;
-};
-
-template<class T> struct operations;
-
-template<> struct operations<void> : operations_base {};
-
-}}
-
-#endif
 #endif

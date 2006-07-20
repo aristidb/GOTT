@@ -35,6 +35,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_XANY_INTERNAL
+#error "Rather include <gott/xany.hpp>"
+#else
 #ifndef GOTT_XANY_XANY_HPP
 #define GOTT_XANY_XANY_HPP
 
@@ -241,4 +244,5 @@ T Xany_cast(Xany const &p) {
 
 #include "operations.hpp" // depends on Xany
 
+#endif
 #endif

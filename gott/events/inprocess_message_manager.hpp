@@ -39,7 +39,7 @@
 #define GOTT_EVENTS_INPROCESS_MESSAGE_MANAGER_HPP
 
 #include <gott/string/qid.hpp>
-#include <gott/xany/xany.hpp>
+#include <gott/xany.hpp>
 #include <boost/noncopyable.hpp>
 #include <sigc++/signal.h>
 
