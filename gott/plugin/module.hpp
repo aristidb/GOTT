@@ -40,7 +40,6 @@
 
 #include <gott/visibility.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace gott {
   class string;
@@ -51,7 +50,7 @@ class module_descriptor;
 class plugin_descriptor;
 class plugin_base;
 
-class module : boost::noncopyable {
+class module {
 public:
   GOTT_EXPORT module(module_descriptor const &which);
   GOTT_EXPORT ~module();
