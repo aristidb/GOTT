@@ -39,6 +39,7 @@
 #include "plugin_base.hpp"
 #include "descriptor.hpp"
 #include "plugin_builder.hpp"
+#include "metadata_manager.hpp"
 #include <boost/scoped_array.hpp>
 #include <gott/string/string.hpp>
 #include <gott/exceptions.hpp>
@@ -58,7 +59,17 @@ private:
 public:
   impl(module_descriptor const &which)
   : handle(0) {
-    //FIXME: load dependencies
+    // load dependencies
+    {
+      metadata_manager man;
+      module_information const &info = man.module_extra(which);
+      std::vector<module_descriptor> const &d = info.dependencies;
+      for (std::vector<module_descriptor>::const_iterator it = d.begin();
+          it != d.end();
+          ++it)
+        dependencies.push_back(module(*it));
+    }
+    // load module
     handle = get_handle(which);
   }
 

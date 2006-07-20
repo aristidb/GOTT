@@ -83,14 +83,17 @@ namespace {
     whole_module(
         module_descriptor const &descriptor,
         module_information const &information,
-        string const &resource)
+        string const &resource,
+        vector<QID> const &raw_dependencies = vector<QID>())
       : descriptor(descriptor),
       information(information),
-      resource(resource) {}
+      resource(resource),
+      raw_dependencies(raw_dependencies) {}
 
     module_descriptor descriptor;
     module_information information;
     string resource;
+    vector<QID> raw_dependencies;
   };
 
   // just store all plugins and modules
@@ -115,22 +118,6 @@ namespace {
     string resource;
   };
   vector<deduced_feature> deduced_features;
-
-  // some metadata_manager methods allow another metadata_manager to be active
-  // at the same time in the same thread (in an indirectly invoked methods)
-  // => the above lines help implementing this
-  bool allow_recur = false;
-  unsigned long recursion = 0;
-
-  class scoped_allow_recur {
-  public:
-    scoped_allow_recur() : virgin(!allow_recur) { allow_recur = true; }
-    ~scoped_allow_recur() { if (virgin) allow_recur = false; }
-  private:
-    bool virgin;
-  };
-
-#define ALLOW_RECUR scoped_allow_recur MAY_RECUR; (void)MAY_RECUR
 }
 
 class metadata_manager::impl {
@@ -147,13 +134,8 @@ public:
   vector<deduced_feature> add_features;
 };
 
-metadata_manager::metadata_manager() : p(new impl) {
-  // check if there are more than one metadata_manager objects at once
-  if (!allow_recur && recursion > 0)
-    throw gott::internal_error("multiple metadata_manager objects");
-  ++recursion;
-}
-metadata_manager::~metadata_manager() { --recursion; }
+metadata_manager::metadata_manager() : p(new impl) {}
+metadata_manager::~metadata_manager() {}
 
 void metadata_manager::commit() {
   // removing resources:
@@ -216,6 +198,23 @@ void metadata_manager::commit() {
   // adding new modules
   modules.insert(modules.end(), p->add_modules.begin(), p->add_modules.end());
 
+  // patching modules' dependencies
+  for (vector<whole_module>::iterator it = modules.begin();
+      it != modules.end();
+      ++it) {
+    for (vector<QID>::iterator jt = it->raw_dependencies.begin();
+        jt != it->raw_dependencies.end();
+        ++jt)
+      for (vector<whole_module>::iterator xt = modules.begin();
+          xt != modules.end();
+          ++xt)
+        if (*jt == xt->information.module_id) {
+          it->information.dependencies.push_back(xt->descriptor);
+          break;
+        }
+    vector<QID>().swap(it->raw_dependencies);
+  }
+
   // patching new plugins' module_descriptor entries
   for (vector<whole_plugin>::iterator it = p->add_plugins.begin();
       it != p->add_plugins.end();
@@ -232,7 +231,8 @@ void metadata_manager::commit() {
   plugins.insert(plugins.end(), p->add_plugins.begin(), p->add_plugins.end());
 
   // remove all deduced features from all plugins
-  for (vector<whole_plugin>::iterator it = plugins.begin(); it != plugins.end(); ++it) {
+  for (vector<whole_plugin>::iterator it = plugins.begin(); it != plugins.end();
+      ++it) {
     map<QID, bool> &features = it->information.features;
     map<QID, bool>::iterator jt = features.begin();
     while (jt != features.end())
@@ -282,19 +282,21 @@ void metadata_manager::remove_resource(string const &resource) {
 }
 
 void metadata_manager::update_resource(std::istream &s, string const &res) {
-  ALLOW_RECUR;
   remove_resource(res);
   detail::load_tdl_resource(*this, s, res);
 }
 
 void metadata_manager::load_core() {
-  ALLOW_RECUR;
   static bool loaded;
 
   if (!loaded) {
     // just add the metadata necessary for reading metadata from files
     module_descriptor tdl_builtins("tdl/libtdl_builtins.so");
-    add_module(tdl_builtins, module_information("tdl::builtins"), "core");
+    add_module(
+        tdl_builtins,
+        module_information("tdl::builtins"),
+        vector<QID>(),
+        "core");
 
     add_core_tdl_schema("any", tdl_builtins);
     add_core_tdl_schema("document", tdl_builtins);
@@ -329,8 +331,6 @@ void metadata_manager::add_core_tdl_schema(
 }
 
 void metadata_manager::load_standard() {
-  ALLOW_RECUR;
-
   // ensure we CAN read the metadata from files
   metadata_manager man2;
   man2.load_core();
@@ -396,6 +396,24 @@ bool metadata_manager::enum_modules(
   return false;
 }
 
+module_information const &metadata_manager::module_extra(
+    module_descriptor const &descriptor) const {
+  for (vector<whole_module>::iterator it = modules.begin(); it != modules.end();
+      ++it)
+    if (it->descriptor == descriptor)
+      return it->information;
+  throw gott::system_error("module information not found");
+}
+
+plugin_information const &metadata_manager::plugin_extra(
+    plugin_descriptor const &descriptor) const {
+  for (vector<whole_plugin>::iterator it = plugins.begin(); it != plugins.end();
+      ++it)
+    if (it->descriptor == descriptor)
+      return it->information;
+  throw gott::system_error("module information not found");
+}
+
 void metadata_manager::remove_plugin(plugin_descriptor const &descriptor) {
   p->remove_plugins.push_back(descriptor);
 }
@@ -414,8 +432,9 @@ void metadata_manager::add_plugin(
 void metadata_manager::add_module(
     module_descriptor const &desc,
     module_information const &info,
+    vector<QID> const &dependencies,
     string const &resource) {
-  p->add_modules.push_back(whole_module(desc, info, resource));
+  p->add_modules.push_back(whole_module(desc, info, resource, dependencies));
 }
 
 void metadata_manager::add_deduced_feature(

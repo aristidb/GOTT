@@ -79,8 +79,11 @@ struct adapter : writable_structure {
 
   plugin_descriptor plugin_desc;
   plugin_information plugin_info;
+
   module_descriptor module_desc;
   module_information module_info;
+  std::vector<gott::QID> module_dep;
+
   gott::QID feature_desc;
   std::vector<std::set<gott::QID> > feature_info;
 
@@ -89,9 +92,10 @@ struct adapter : writable_structure {
 
   void end() {
     if (Tag == "$module") {
-      manager.add_module(module_desc, module_info, resource);
+      manager.add_module(module_desc, module_info, module_dep, resource);
       module_desc = module_descriptor();
       module_info = module_information();
+      module_dep.clear();
     } else if (Tag == "$plugin") {
       manager.add_plugin(plugin_desc, plugin_info, resource);
       plugin_desc = plugin_descriptor();
@@ -115,6 +119,8 @@ struct adapter : writable_structure {
       plugin_desc.symbol = _str();
     else if (Tag == "module")
       module_info.module_id = _str();
+    else if (Tag == "depend-on")
+      module_dep.push_back(_str());
     else if (Tag == "file-path")
       module_desc.file_path = _str();
     else if (Tag == "deduced-feature")
@@ -123,7 +129,6 @@ struct adapter : writable_structure {
       feature_info.back().insert(_str());
     // TODO/missing:
     // - module-type
-    // - depend-on
     if (!higher_tags.empty()) {
       Tag = higher_tags.top();
       higher_tags.pop();

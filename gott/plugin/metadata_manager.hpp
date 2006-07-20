@@ -99,6 +99,18 @@ public:
   GOTT_EXPORT
   void update_resource(std::istream &stream, string const &resource);
 
+  /**
+   * Get extra information for a module.
+   */
+  GOTT_EXPORT
+  module_information const &module_extra(module_descriptor const &) const;
+
+  /**
+   * Get extra information for a plugin.
+   */
+  GOTT_EXPORT
+  plugin_information const &plugin_extra(plugin_descriptor const &) const;
+
 public: //internal
   /**
    * \internal
@@ -193,6 +205,7 @@ public: //internal
   void add_module(
       module_descriptor const &desc,
       module_information const &info,
+      std::vector<QID> const &dependencies,
       string const &resource);
 
   /**

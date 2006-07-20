@@ -42,6 +42,7 @@
 #include <gott/string/qid.hpp>
 #include <set>
 #include <map>
+#include <vector>
 
 namespace gott { namespace plugin {
 
@@ -189,11 +190,18 @@ struct module_information {
    * Constructor.
    * \param module_id The ID of the module.
    */
-  explicit module_information(QID const &module_id)
-    : module_id(module_id) {}
+  explicit module_information(
+      QID const &module_id,
+      std::vector<module_descriptor> const &dependencies =
+        std::vector<module_descriptor>())
+    : module_id(module_id),
+    dependencies(dependencies) {}
 
   /// The ID of the module.
   QID module_id;
+
+  /// The dependencies of the module.
+  std::vector<module_descriptor> dependencies;
 };
 
 }}
