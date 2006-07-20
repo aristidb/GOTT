@@ -1,3 +1,10 @@
+# tdl
+
+plugin gott::config::tdl_element
+interface tdl::schema::type
+enclosing-module gott::configuration
+symbol plugin_tdl
+
 # notify_fs
 plugin gott::notify_fs::kqueue_factory
 interface gott::notify_fs::engine_factory
