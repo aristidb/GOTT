@@ -88,6 +88,7 @@ env = Environment(
   options = opts,
   ENV = os.environ, # FIXME: security hole?
   CPPDEFINES = [('BOOST_PARAMETER_MAX_ARITY', 6)],
+  CCFLAGS = [],
   SHCCFLAGS = ['-DBUILDING_DLL'],
   CPPPATH=['#/..', '${BOOST_INCLUDE}'], 
   LIBPATH=libdirs + ['${BOOST_LIB}'])
@@ -109,6 +110,16 @@ Export('env')
 
 conf = SConscript('buildconf/SConscript')
 env = conf.Finish()
+
+# now make a 'env' for static libraries
+staticCCFLAGS = env['CCFLAGS'][:]
+if staticCCFLAGS.count('-fvisibility=hidden') > 0:
+	staticCCFLAGS.remove('-fvisibility=hidden')
+staticCPPDEFINES = env['CPPDEFINES'][:]
+if staticCPPDEFINES.count('HAS_VISIBILITY') > 0:
+	staticCPPDEFINES.remove('HAS_VISIBILITY')
+static_env = env.Copy(CCFLAGS = staticCCFLAGS, CPPDEFINES = staticCPPDEFINES)
+Export('static_env')
 
 dirs = [
 '.',
