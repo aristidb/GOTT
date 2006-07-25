@@ -194,7 +194,7 @@ AddSysOpts(conf.env)
 
 conf.LinkerAsNeeded()
 conf.LinkerExportDynamic()
-conf.LinkerUndefinedDynamic()
+#conf.LinkerUndefinedDynamic() - for OS X?
 #conf.TemplateRepo()
 if conf.env['OPTIMIZATION'] != 'none':
 	conf.Optimization()
@@ -206,8 +206,6 @@ if conf.env['DEBUG']:
 if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 	print 'Boost headers are not installed'
 	Exit(1)
-
-
 
 boostlibs =	[
 	'thread', 
