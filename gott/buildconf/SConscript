@@ -75,6 +75,16 @@ def CheckLinkerExportDynamic(context):
 	context.Result(result)
 	return result
 
+def CheckLinkerUndefinedDynamic(context):#TODO: actually fail somewhere!
+	context.Message('Checking if MAC OS X linker supports undefined dynamic symbols...')
+	last = prepare(context.env,
+			LINKFLAGS = ['-Wl,-undefined,dynamic_lookup'])
+	result = context.TryLink("int main() { }\n", '.cpp')
+	if not result:
+		context.env.Replace(**last)
+	context.Result(result)
+	return result
+
 def CheckCompilerVisibility(context):
 	context.Message('Checking if compiler supports visibility attributes... ')
 	last = prepare(context.env,
@@ -184,6 +194,7 @@ AddSysOpts(conf.env)
 
 conf.LinkerAsNeeded()
 conf.LinkerExportDynamic()
+conf.LinkerUndefinedDynamic()
 #conf.TemplateRepo()
 if conf.env['OPTIMIZATION'] != 'none':
 	conf.Optimization()
