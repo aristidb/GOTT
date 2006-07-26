@@ -39,6 +39,7 @@
 import glob
 
 Import('env')
+Import('plugin_env')
 
-env.SharedLibrary('config', glob.glob('*.cpp'), LIBS = [], SHLIBSUFFIX = '.plugin')
+plugin_env.SharedLibrary('config', glob.glob('*.cpp'))
 env.Program('config_test', glob.glob('test/*.cpp'))

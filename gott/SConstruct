@@ -121,6 +121,10 @@ if staticCPPDEFINES.count('HAS_VISIBILITY') > 0:
 static_env = env.Copy(CCFLAGS = staticCCFLAGS, CPPDEFINES = staticCPPDEFINES)
 Export('static_env')
 
+# another one for plugins
+plugin_env = env.Copy(LIBS = [], SHLIBPREFIX='', SHLIBSUFFIX='.plugin')
+Export('plugin_env')
+
 dirs = [
 '.',
 'thread',

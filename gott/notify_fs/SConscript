@@ -39,11 +39,12 @@
 
 import glob
 Import('env')
+Import('plugin_env')
 
 if env['SYS_INOTIFY'] == 1:
-  env.SharedLibrary('notify_inotify', glob.glob('inotify/*.cpp'), LIBS = [], SHLIBSUFFIX = '.plugin')
+  plugin_env.SharedLibrary('notify_inotify', glob.glob('inotify/*.cpp'))
 
 if env['SYS_KQUEUE'] == 1:
-  env.SharedLibrary('notify_kqueue', glob.glob('kqueue/*.cpp'), LIBS = [], SHLIBSUFFIX = '.plugin')
+  plugin_env.SharedLibrary('notify_kqueue', glob.glob('kqueue/*.cpp'))
 
 env.Program('test', 'test.cpp')
