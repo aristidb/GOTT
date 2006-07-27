@@ -54,7 +54,6 @@ public:
 private:
   unsigned level;
   enum { fresh, titled, used } level_state;
-  bool fresh_level;
 
   item::expect expectation() const;
   bool play(ev::node const &);

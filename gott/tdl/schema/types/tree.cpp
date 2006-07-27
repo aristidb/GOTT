@@ -50,7 +50,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     tdl::schema::concrete_type<match_tree>)
 
 match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match &m)
-: item(a, m), level(0), fresh_level(true) {
+: item(a, m), level(0), level_state(fresh) {
   assert(c.empty());
 }
 
