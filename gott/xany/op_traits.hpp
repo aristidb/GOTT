@@ -40,6 +40,7 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_fundamental.hpp>
+#include <boost/smart_ptr.hpp>
 
 namespace gott { namespace xany {
 
@@ -61,6 +62,12 @@ struct default_op_traits<T, true> {
 
 template<class T>
 struct op_traits : default_op_traits<T> {
+};
+
+template<class T>
+struct op_traits<boost::shared_ptr<T> > {
+  typedef boost::mpl::true_ equality_comparable;
+  typedef boost::mpl::false_ printable;
 };
 
 template<>
