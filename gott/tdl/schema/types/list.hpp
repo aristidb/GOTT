@@ -54,7 +54,7 @@ public:
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &s);
 
 private:
-  rule_t const &sub;
+  rule_t sub;
   positioning::id last;
   slotcfg cfg;
   bool cancelled;
