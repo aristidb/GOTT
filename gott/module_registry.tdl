@@ -1,3 +1,7 @@
+module tdl::schema_lang
+file-path tdl/tdl_schema_lang.plugin
+module-type dynamic-native
+
 module gott::notify_fs::kqueue
 file-path notify_fs/notify_kqueue.plugin
 module-type dynamic-native

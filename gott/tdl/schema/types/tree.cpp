@@ -40,6 +40,7 @@
 #include "../type.hpp"
 #include <gott/plugin/plugin_builder.hpp>
 #include <cassert>
+#include <iostream>//FIXME
 
 using tdl::schema::match_tree;
 using tdl::schema::item;
@@ -73,6 +74,7 @@ item::expect match_tree::expectation() const {
 }
 
 bool match_tree::play(ev::node const &n) {
+  std::cout << "tree::node " << n.get_data() << std::endl;
   if (expectation() == nothing)
     return false;
   if (level > 0 && level_state == titled) {
@@ -85,6 +87,7 @@ bool match_tree::play(ev::node const &n) {
 }
 
 bool match_tree::play(ev::down const &) {
+  std::cout << "tree::down" << std::endl;
   ++level;
   level_state = fresh;
   matcher().direct_structure().begin(matcher().where_out());
@@ -92,6 +95,8 @@ bool match_tree::play(ev::down const &) {
 }
 
 bool match_tree::play(ev::up const &) {
+  //FIXME: do not eat them all, greed is bad for your health!
+  std::cout << "tree::up" << std::endl;
   if (level == 0)
     return false;
   --level;

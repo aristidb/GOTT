@@ -73,6 +73,12 @@ public:
       slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
   : c(cc), t(l), u(x), r(rr), i(I), o(O) {}
 
+  explicit rule_attr_t(std::vector<gott::string> const &l, bool cc,
+      gott::xany::Xany const &x,
+      boost::shared_ptr<structure::repatcher const> const &rr,
+      slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
+  : c(cc), t(l), u(x), r(rr), i(I), o(O) {}
+
   rule_attr_t(rule_attr_t const &o_)
   : c(o_.c), t(o_.t), u(o_.u), r(o_.r), i(o_.i), o(o_.o) {}
 
