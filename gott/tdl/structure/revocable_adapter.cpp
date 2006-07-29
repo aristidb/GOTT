@@ -40,6 +40,12 @@
 #include <vector>
 #include <set>
 
+//#define VERBOSE
+
+#ifdef VERBOSE
+#include <iostream>
+#endif
+
 using tdl::source_position;
 using tdl::structure::revocable_adapter;
 using tdl::structure::revocable_structure;
@@ -117,13 +123,34 @@ revocable_structure::pth revocable_adapter::point() {
   if (p->blocking == nowhere)
     p->blocking = p->pos;
   p->active.insert(p->pos);
+#ifdef VERBOSE
+  std::cout << "point! " << p->pos << std::endl;
+#endif
   return p->pos;
 }
 
 void revocable_adapter::revert(pth pp) {
+#ifdef VERBOSE
+  std::cout << "revert! " << pp << std::endl;
+#endif
   size_t pp_blocked_size = pp - p->blocking;
-  if (pp_blocked_size < p->blocked.size())
-    p->blocked.erase(p->blocked.begin() + pp_blocked_size, p->blocked.end());
+  if (pp_blocked_size < p->blocked.size()) {
+    std::vector<entry>::iterator begin = p->blocked.begin() + pp_blocked_size;
+    std::vector<entry>::iterator end = p->blocked.end();
+#ifdef VERBOSE
+    for (std::vector<entry>::iterator it = begin; it != end; ++it) {
+      std::cout << "removing output: ";
+      switch (it->type) {
+      case entry::begin: std::cout << "begin"; break;
+      case entry::end: std::cout << "end"; break;
+      case entry::add_tag: std::cout << "add_tag"; break;
+      case entry::data: std::cout << "data"; break;
+      }
+      std::cout << std::endl;
+    }
+#endif
+    p->blocked.erase(begin, end);
+  }
   p->pos = pp;
 }
 

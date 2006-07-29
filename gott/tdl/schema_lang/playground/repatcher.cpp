@@ -10,11 +10,11 @@ struct rep_acc : tdl::structure::writable_structure {
   typedef boost::shared_ptr<tdl::structure::repatcher> repp;
 
   void begin(tdl::source_position const &) {
-    std::cout << "<rep> {\n" << std::flush;
+    std::cout << "<rep> [\n" << std::flush;
   }
 
   void end() {
-    std::cout << "<rep> }\n" << std::flush;
+    std::cout << "<rep> ]\n" << std::flush;
   }
 
   void add_tag(gott::string const &s) {
