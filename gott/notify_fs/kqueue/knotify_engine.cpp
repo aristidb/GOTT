@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 #include <gott/notify_fs/kqueue/knotify_engine.hpp>
 #include <gott/notify_fs/watch.hpp>
 #include <gott/notify_fs/event.hpp>

@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 #ifndef GOTT_UI_X11_INPUT_HPP_INCLUDED
 #define GOTT_UI_X11_INPUT_HPP_INCLUDED
 

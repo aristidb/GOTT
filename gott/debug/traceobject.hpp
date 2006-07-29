@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 // Debug Trace
 //
 // Copyright (C) 2004 Philipp Matthias Schaefer

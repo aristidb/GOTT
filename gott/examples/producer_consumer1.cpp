@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 #include <gott/thread/message_queue.hpp>
 #include <boost/thread/thread.hpp>
 #include <fstream>

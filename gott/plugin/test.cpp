@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 #include "plugin.hpp"
 #include "module_metadata.hpp"
 #include <iostream>

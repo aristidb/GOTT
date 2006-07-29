@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 // TODO: DECIDE: DELETE THIS FILE?
 #if 0
 // Copyright (C) 2004-2005 by Andreas Pokorny andreas.pokorny@gmail.com

@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 // This program emits a number of animated bars on the console.
 // The concept is built around the single "output line". Animation is done by
 // redrawing as often as necessary.

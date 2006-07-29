@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 #include <gott/string/string.hpp>
 #include <gott/string/buffer.hpp>
 #include <gott/string/iterator.hpp>

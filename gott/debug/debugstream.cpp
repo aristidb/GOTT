@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
    Copyright (C) 2005 by Rüdiger Sonderfeld <kingruedi@c-plusplus.de>
    Content: A stream for debug output

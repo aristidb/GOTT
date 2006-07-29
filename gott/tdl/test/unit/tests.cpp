@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 // Copyright (C) 2004-2005 by Aristid Breitkreuz (aribrei@arcor.de)
 // Content: TDL Testing
 // Authors: Aristid Breitkreuz
