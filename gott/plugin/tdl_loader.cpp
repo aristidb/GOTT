@@ -41,6 +41,7 @@
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
+#include <gott/tdl/structure/repatchable_adapter.hpp>
 #include <gott/tdl/structure/repatchers/enumeration.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <gott/string/qid.hpp>
@@ -254,11 +255,12 @@ void gott::plugin::detail::load_tdl_resource(
 
   adapter out(manager, resource);
 #ifndef VERBOSE
-  revocable_adapter adapter(out);
+  repatchable_adapter adapter2(out);
 #else
   container cont;
-  revocable_adapter adapter(cont);
+  repatchable_adapter adapter2(cont);
 #endif
+  revocable_adapter adapter(adapter2);
 
   try {
     match(document_schema, adapter).parse(stream);

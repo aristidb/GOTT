@@ -89,7 +89,7 @@ public:
 
   gott::xany::Xany const &user() const { return u; }
 
-  structure::repatcher const *repatcher() const { return r.get(); }
+  boost::shared_ptr<structure::repatcher const> repatcher() const { return r; }
 
   bool operator==(rule_attr_t const &o) const {
     return c == o.c && range(t) == range(o.t) && u == o.u && r == o.r;

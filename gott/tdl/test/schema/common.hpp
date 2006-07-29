@@ -44,6 +44,7 @@
 #include <gott/tdl/structure/comfort.hpp>
 #include <gott/tdl/structure/print.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
+#include <gott/tdl/structure/repatchable_adapter.hpp>
 #include <gott/string/string.hpp>
 #include <gott/string/stl.hpp>
 #include <gott/tut/tut.h>
@@ -51,13 +52,14 @@
 namespace tut {
 struct schema_basic {
   tdl::structure::container tree, xp;
+  tdl::structure::repatchable_adapter r2tree;
   tdl::structure::revocable_adapter rtree;
   tdl::schema::match match;
   tdl::schema::rule_t grammar;
   gott::string rest;
-  schema_basic() : rtree(tree), match(rtree) {}
+  schema_basic() : r2tree(tree), rtree(r2tree), match(rtree) {}
   schema_basic(tdl::schema::rule_t const &r) 
-    : rtree(tree), match(rtree), grammar(r) {}
+    : r2tree(tree), rtree(r2tree), match(rtree), grammar(r) {}
   void run_test(gott::string const &input) {
     match.add(grammar);
     std::istringstream stream(gott::to_string(input));

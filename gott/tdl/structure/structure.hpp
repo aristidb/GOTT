@@ -41,6 +41,7 @@
 
 #include <gott/visibility.hpp>
 #include <gott/xany.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace gott {
 class string;
@@ -82,10 +83,18 @@ public:
   GOTT_EXPORT virtual ~writable_structure() = 0;
 };
 
+class repatcher;
+
+class repatchable_structure : public writable_structure {
+public:
+  virtual void add_repatcher(boost::shared_ptr<repatcher const> const &) = 0;
+  virtual void remove_repatcher(boost::shared_ptr<repatcher const> const &) = 0;
+};
+
 /**
  * The interface for revocable (backtracking) structures.
  */
-class revocable_structure : public writable_structure {
+class revocable_structure : public repatchable_structure {
 public:
   /// The time-point as used by a backtracking-aware structure writer.
   typedef std::ptrdiff_t pth;
@@ -104,7 +113,7 @@ public:
 
   /**
    * "Destroy" a time-point.
-   * \param pt The time point to get rid of.
+   * \param pt The time-point to get rid of.
    */
   virtual void get_rid_of(pth pt) = 0;
 

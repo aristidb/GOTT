@@ -36,13 +36,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_UTIL_TDL_STRUCTURE_REPATCH_HPP
-#define GOTT_UTIL_TDL_STRUCTURE_REPATCH_HPP
+#ifndef GOTT_TDL_STRUCTURE_REPATCH_HPP
+#define GOTT_TDL_STRUCTURE_REPATCH_HPP
 
 #include "structure.hpp"
 #include <vector>
 #include <boost/noncopyable.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/optional/optional_fwd.hpp>
 
 namespace tdl {
 namespace structure {

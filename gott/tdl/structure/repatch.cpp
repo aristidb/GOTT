@@ -40,13 +40,9 @@
 #include "../exceptions.hpp"
 #include <gott/range_algo.hpp>
 #include <boost/bind.hpp>
+#include <boost/optional.hpp>
 
-namespace structure = tdl::structure;
-using structure::repatcher;
-using structure::writable_structure;
-using structure::simple_repatcher_context;
-using structure::repatch_nothing;
-using structure::repatcher_chain;
+using namespace tdl::structure;
 
 repatcher::repatcher() {}
 repatcher::~repatcher() {}

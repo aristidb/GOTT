@@ -41,6 +41,7 @@
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/structure/container.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
+#include <gott/tdl/structure/repatchable_adapter.hpp>
 #include <gott/tdl/structure/print.hpp>
 #include <boost/assign/list_of.hpp>
 #include <iostream>
@@ -77,8 +78,9 @@ int main() {
                   ))))));
 
   structure::container out;
-  structure::revocable_adapter r(out);
-  match m(conf, r);
+  structure::repatchable_adapter r1(out);
+  structure::revocable_adapter r2(r1);
+  match m(conf, r2);
   m.parse(std::cin);
   std::cout << out << '\n';
 }

@@ -64,20 +64,24 @@ public:
   }
 
   void end_structure() {
+    if (attrib.repatcher())
+      cont->out_structure().remove_repatcher(attrib.repatcher());
     if (attrib.coat())
-      cont->direct_structure().end();
+      cont->out_structure().end();
   }
 
 private:
   void add_tags() {
     for (std::vector<string>::const_iterator it = attrib.tags().begin();
          it != attrib.tags().end(); ++it)
-      cont->direct_structure().add_tag(*it);
+      cont->out_structure().add_tag(*it);
   }
 
   void start_structure(source_position const &w) {
+    if (attrib.repatcher())
+      cont->out_structure().add_repatcher(attrib.repatcher());
     if (attrib.coat())
-      cont->direct_structure().begin(w);
+      cont->out_structure().begin(w);
   }
 };
 

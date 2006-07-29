@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2004-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,36 +36,69 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "node.hpp"
-#include "../event.hpp"
-#include "../type.hpp"
-#include <gott/plugin/plugin_builder.hpp>
+#include "repatchable_adapter.hpp"
+#include <gott/tdl/structure/repatch.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+#ifndef NDEBUG
+#include <vector>
 #include <cassert>
+#endif
 
-namespace schema = tdl::schema;
-namespace ev = tdl::schema::ev;
-using schema::item;
-using schema::match_node;
+using namespace tdl::structure;
 
-GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
-    plugin_schema_node,
-    schema::concrete_type<match_node>)
+class repatchable_adapter::impl {
+public:
+  writable_structure &out;
+  boost::ptr_vector<writable_structure> indirections;
+  std::vector<boost::shared_ptr<repatcher const> > tracker;
 
-match_node::match_node(rule_attr_t const &a, std::vector<rule_t> const &r, 
-    match &m)
-: happy_once(a, m) {
-  assert(r.empty());
+  writable_structure &current() {
+    if (indirections.empty())
+      return out;
+    else
+      return indirections.back();
+  }
+
+  impl(writable_structure &out) : out(out) {}
+};
+
+repatchable_adapter::repatchable_adapter(writable_structure &out)
+  : p(new impl(out)) {}
+repatchable_adapter::~repatchable_adapter() {}
+
+void repatchable_adapter::begin(tdl::source_position const &w) {
+  p->current().begin(w);
 }
 
-bool match_node::play(ev::node const &n) {
-  if (expectation() != need)
-    return false;
-
-  matcher().out_structure().data(gott::xany::Xany(n.get_data()));
-  be_happy();
-  return true;
+void repatchable_adapter::end() {
+  p->current().end();
 }
 
-gott::string match_node::name() const {
-  return gott::string("tdl::schema::node");
+void repatchable_adapter::add_tag(gott::string const &s) {
+  p->current().add_tag(s);
+}
+
+void repatchable_adapter::data(gott::Xany const &x) {
+  p->current().data(x);
+}
+
+void repatchable_adapter::add_repatcher(
+    boost::shared_ptr<repatcher const> const &x) {
+  p->tracker.push_back(x);
+  writable_structure &old = p->current();
+  writable_structure *fresh = x->deferred_write(old);
+  p->indirections.push_back(fresh);
+}
+
+void repatchable_adapter::remove_repatcher(
+    boost::shared_ptr<repatcher const> const &x) {
+#ifndef NDEBUG
+  assert(!p->tracker.empty());
+  assert(p->tracker.back() == x);
+#else
+  (void)x;
+#endif
+  p->tracker.pop_back();
+  assert(!p->indirections.empty());
+  p->indirections.pop_back();
 }

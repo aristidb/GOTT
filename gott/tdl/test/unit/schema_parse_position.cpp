@@ -52,6 +52,11 @@ struct ignore_struct : tdl::structure::revocable_structure {
   void end() {}
   void add_tag(gott::string const &) {}
 
+  void add_repatcher(
+      boost::shared_ptr<tdl::structure::repatcher const> const &) {}
+  void remove_repatcher(
+      boost::shared_ptr<tdl::structure::repatcher const> const &) {}
+
   pth point() { return pth(); }
   void revert(pth) {}
   void get_rid_of(pth) {}

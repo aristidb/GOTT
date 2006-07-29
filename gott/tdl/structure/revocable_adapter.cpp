@@ -37,7 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "revocable_adapter.hpp"
+#include <gott/tdl/structure/repatch.hpp>
 #include <gott/tdl/source_position.hpp>
+#include <boost/optional.hpp>
+#include <algorithm>
 #include <vector>
 #include <set>
 
@@ -48,25 +51,43 @@
 #endif
 
 using tdl::source_position;
-using tdl::structure::revocable_adapter;
-using tdl::structure::revocable_structure;
-using tdl::structure::writable_structure;
-using gott::xany::Xany;
+using namespace tdl::structure;
+using gott::Xany;
 using gott::string;
 
 namespace {
 struct entry {
-  enum type_t { begin, end, add_tag, data } type;
+  enum type_t { begin, end, add_tag, data, add_repatcher, remove_repatcher };
+
+  type_t type;
   Xany param;
   source_position where;
+
   entry(type_t t, Xany p = Xany()) : type(t), param(p) {}
   entry(type_t t, source_position const &w) : type(t), where(w) {}
-  void play(writable_structure &o) {
+
+  void play(repatchable_structure &o) {
     switch (type) {
-    case begin: o.begin(where); break;
-    case end: o.end(); break;
-    case add_tag: o.add_tag(gott::xany::Xany_cast<string>(param)); break;
-    case data: o.data(param); break;
+    case begin:
+      o.begin(where);
+      break;
+    case end:
+      o.end();
+      break;
+    case add_tag:
+      o.add_tag(gott::Xany_cast<string>(param));
+      break;
+    case data:
+      o.data(param);
+      break;
+    case add_repatcher:
+      o.add_repatcher(
+          gott::Xany_cast<boost::shared_ptr<repatcher const> >(param));
+      break;
+    case remove_repatcher:
+      o.remove_repatcher(
+          gott::Xany_cast<boost::shared_ptr<repatcher const> >(param));
+      break;
     }
   }
 };
@@ -76,15 +97,15 @@ const revocable_structure::pth nowhere = -1;
 
 class revocable_adapter::impl {
 public:
-  writable_structure &out;
+  repatchable_structure &out;
   pth pos;
   pth blocking;
   std::vector<entry> blocked;
   std::set<int> active;
-  impl(writable_structure &o) : out(o), pos(0), blocking(nowhere) {}
+  impl(repatchable_structure &o) : out(o), pos(0), blocking(nowhere) {}
 };
 
-revocable_adapter::revocable_adapter(writable_structure &out) 
+revocable_adapter::revocable_adapter(repatchable_structure &out) 
 : p(new impl(out)) {}
 revocable_adapter::~revocable_adapter() {}
 
@@ -120,6 +141,24 @@ void revocable_adapter::data(Xany const &x) {
   ++p->pos;
 }
 
+void revocable_adapter::add_repatcher(
+    boost::shared_ptr<repatcher const> const &x) {
+  if (p->blocking == nowhere)
+    p->out.add_repatcher(x);
+else
+    p->blocked.push_back(entry(entry::add_repatcher, Xany(x)));
+  ++p->pos;
+}
+
+void revocable_adapter::remove_repatcher(
+    boost::shared_ptr<repatcher const> const &x) {
+  if (p->blocking == nowhere)
+    p->out.remove_repatcher(x);
+  else 
+    p->blocked.push_back(entry(entry::remove_repatcher, Xany(x)));
+  ++p->pos;
+}
+
 revocable_structure::pth revocable_adapter::point() {
   if (p->blocking == nowhere)
     p->blocking = p->pos;
@@ -146,6 +185,8 @@ void revocable_adapter::revert(pth pp) {
       case entry::end: std::cout << "end"; break;
       case entry::add_tag: std::cout << "add_tag"; break;
       case entry::data: std::cout << "data"; break;
+      case entry::add_repatcher: std::cout << "add_repatcher"; break;
+      case entry::remove_repatcher: std::cout << "remove_repatcher"; break;
       }
       std::cout << std::endl;
     }

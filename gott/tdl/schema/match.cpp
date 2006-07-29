@@ -78,7 +78,6 @@ public:
 
   void handle_tevent(ev::token_t const &);
   void handle_event(ev::event const &, bool token);
-  bool try_play(ev::event const &, item &r);
   bool handle_item(ev::event const &, bool token);
   void inject_item(ev::token const &, source_position const &);
 
@@ -109,21 +108,15 @@ public:
 
   structure::revocable_structure &base_struc;
 
-  shared_ptr<writable_structure> direct_structure_non_base();
-  
   positioning pos;
 
   match &ref;
 
   struct entry {
     shared_ptr<item> the_item;
-    shared_ptr<writable_structure> structure;
 
     entry() {}
     entry(item *r) : the_item(r) {}
-
-    entry(item *r, shared_ptr<writable_structure> const &s) 
-    : the_item(r), structure(s) {}
   };
 
   typedef std::vector<entry> Stack;
@@ -150,14 +143,8 @@ void match::add(rule_t const &f) {
     std::cout << "adding something" << std::endl;
   }
 #endif
-  shared_ptr<writable_structure> struc = p->direct_structure_non_base();
-
-  if (structure::repatcher const *r = f.attributes().repatcher())
-    struc.reset(r->deferred_write(struc ? *struc : p->base_struc));
-
   int current = p->parse.size();
   p->parse.push_back(impl::entry());
-  p->parse[current].structure = struc;
 
   item *the_item = f.get(*this);
   assert(the_item != 0);
@@ -166,14 +153,7 @@ void match::add(rule_t const &f) {
   p->parse[current].the_item.reset(the_item);
 }
 
-structure::revocable_structure &match::revocable_structure() const {
-  return p->base_struc;
-}
-
-structure::writable_structure &match::direct_structure() const {
-  shared_ptr<writable_structure> s = p->direct_structure_non_base();
-  if (s)
-    return *s;
+structure::revocable_structure &match::out_structure() const {
   return p->base_struc;
 }
 
@@ -219,12 +199,6 @@ void match::end_parse() {
 void match::comment(string const &, bool) {}
 
 // Implementation
-
-shared_ptr<writable_structure> match::impl::direct_structure_non_base() {
-  if (parse.empty()) 
-    return shared_ptr<writable_structure>();
-  return parse.back().structure;
-}
 
 template<class T>
 void match::impl::handle_token(T const &e) {
@@ -274,22 +248,12 @@ bool match::impl::handle_item(ev::event const &event, bool token) {
   std::cout << '{' << std::endl;
   struct close { ~close() { std::cout << '}' << std::endl; } } _x; (void)_x;
 #endif
-  if (try_play(event, *parse.back().the_item)) {
+  if (event.safe_play(*parse.back().the_item)) {
     if (token) pos.consume();
     return consume_event(token);
   } else {
     if (token) pos.pass();
     return pass_event(token);
-  }
-}
-
-bool match::impl::try_play(ev::event const &event, item &current) {
-  try {
-    return event.play(current);
-  } catch (tdl_error const &e) {
-    if (e.module() != "TDL Structure repatcher")
-      throw;
-    return false;
   }
 }
 

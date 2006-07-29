@@ -101,15 +101,9 @@ public:
   void add(rule_t const &rf) GOTT_EXPORT;
 
   /**
-   * Return a reference to the tree the engine writes to.
+   * Return a reference to the structure the engine writes to.
    */
-  structure::revocable_structure &revocable_structure() const GOTT_EXPORT;
-
-  /**
-   * Return a reference to the current wrapped structure the engine directly
-   * writes to.
-   */
-  structure::writable_structure &direct_structure() const GOTT_EXPORT;
+  structure::revocable_structure &out_structure() const GOTT_EXPORT;
 
   /**
    * Return the schema parsers current source_position. If not backtracking

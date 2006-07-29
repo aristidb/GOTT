@@ -66,6 +66,8 @@ public:
    */
   virtual bool play(item &r) const = 0;
 
+  bool safe_play(item &) const;
+
   /**
    * @internal
    * Print the event to a stream.

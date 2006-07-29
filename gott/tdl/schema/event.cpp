@@ -39,11 +39,22 @@
 #include "event.hpp"
 #include "match.hpp"
 #include "item.hpp"
+#include <gott/tdl/exceptions.hpp>
 
 namespace ev = tdl::schema::ev;
 using tdl::schema::item;
 using std::ostream;
 using boost::static_visitor;
+
+bool ev::event::safe_play(item &current) const {
+  try {
+    return play(current);
+  } catch (tdl_error const &e) {
+    if (e.module() != "TDL Structure repatcher")
+      throw;
+    return false;
+  }
+}
 
 ev::event::~event() {}
 

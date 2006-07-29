@@ -336,7 +336,7 @@ void metadata_manager::load_standard() {
   metadata_manager man2;
   man2.load_core();
   man2.commit();
-
+#if 0
   static bool loaded;
   if (!loaded) {
     loaded = true;
@@ -354,6 +354,7 @@ void metadata_manager::load_standard() {
       update_resource(deduced_features, "./deduced_features.tdl");
     }
   }
+#endif
 }
 
 bool metadata_manager::enum_plugins(

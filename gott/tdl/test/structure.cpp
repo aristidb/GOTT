@@ -40,6 +40,7 @@
 #include <gott/tdl/structure/structure.hpp>
 #include <gott/tdl/structure/container.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
+#include <gott/tdl/structure/repatchable_adapter.hpp>
 #include <gott/tdl/structure/comfort.hpp>
 #include <gott/tdl/structure/print.hpp>
 #include <gott/tut/tut.h>
@@ -87,7 +88,8 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   stru::container p1, p2;
-  stru::revocable_adapter a(p1);
+  stru::repatchable_adapter aa(p1);
+  stru::revocable_adapter a(aa);
   stru::revocable_structure &w = a;
   w.begin(source_position());
     w.begin(source_position());

@@ -55,9 +55,9 @@ class revocable_adapter : public revocable_structure, boost::noncopyable {
 public:
   /**
    * Constructor.
-   * \param out The writable_structure to write to.
+   * \param out The structure to write to.
    */
-  GOTT_EXPORT revocable_adapter(writable_structure &out);
+  GOTT_EXPORT revocable_adapter(repatchable_structure &out);
 
   /// Destructor.
   GOTT_EXPORT ~revocable_adapter();
@@ -67,6 +67,9 @@ private:
   void end();
   void add_tag(gott::string const &);
   void data(gott::xany::Xany const &);
+
+  void add_repatcher(boost::shared_ptr<repatcher const> const &);
+  void remove_repatcher(boost::shared_ptr<repatcher const> const &);
 
   pth point();
   void revert(pth);

@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2004-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,36 +36,34 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "node.hpp"
-#include "../event.hpp"
-#include "../type.hpp"
-#include <gott/plugin/plugin_builder.hpp>
-#include <cassert>
+#ifndef GOTT_TDL_STRUCTURE_REPATCHABLE_ADAPTER_HPP
+#define GOTT_TDL_STRUCTURE_REPATCHABLE_ADAPTER_HPP
 
-namespace schema = tdl::schema;
-namespace ev = tdl::schema::ev;
-using schema::item;
-using schema::match_node;
+#include "structure.hpp"
+#include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 
-GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
-    plugin_schema_node,
-    schema::concrete_type<match_node>)
+namespace tdl { namespace structure { 
 
-match_node::match_node(rule_attr_t const &a, std::vector<rule_t> const &r, 
-    match &m)
-: happy_once(a, m) {
-  assert(r.empty());
-}
+class repatchable_adapter : public repatchable_structure {
+public:
+  GOTT_EXPORT repatchable_adapter(writable_structure &);
+  GOTT_EXPORT ~repatchable_adapter();
 
-bool match_node::play(ev::node const &n) {
-  if (expectation() != need)
-    return false;
+private:
+  void begin(tdl::source_position const &);
+  void end();
+  void add_tag(gott::string const &);
+  void data(gott::Xany const &);
 
-  matcher().out_structure().data(gott::xany::Xany(n.get_data()));
-  be_happy();
-  return true;
-}
+  void add_repatcher(boost::shared_ptr<repatcher const> const &);
+  void remove_repatcher(boost::shared_ptr<repatcher const> const &);
 
-gott::string match_node::name() const {
-  return gott::string("tdl::schema::node");
-}
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
+};
+
+}}
+
+#endif
