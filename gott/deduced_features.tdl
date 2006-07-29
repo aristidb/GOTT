@@ -1,0 +1,5 @@
+deduced-feature gott::events::quit_manager
+- gott::events::signal_manager, gott::events::inprocess_message_manager
+
+deduced-feature gott::notify_fs::notification_engine
+- gott::events::fd_manager
