@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -42,16 +42,12 @@
 
 using namespace boost::assign;
 
-namespace schema = tdl::schema;
+using namespace tdl::schema;
 namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
-using schema::slotcfg;
 
 using namespace stru::cf;
-using schema::rule;
-using schema::rule_one;
-typedef schema::rule_attr_t RA;
 typedef stru::repatch_integer I;
 
 namespace {
@@ -61,14 +57,15 @@ struct schema_ffxy : tut::schema_basic {
       rule_one("tdl::schema::document",
         rule_one("tdl::schema::ordered",
           rule_one("tdl::schema::follow",
-            rule("tdl::schema::ordered", RA(), list_of
-              (rule_one("tdl::schema::follow", RA("o"),
+            rule("tdl::schema::ordered", rule_attr(), list_of
+              (rule_one("tdl::schema::follow", rule_attr("o"),
                 rule("tdl::schema::follow", 
-                  RA(std::vector<string>(1, "xy"), true, Xany(), 0,
-                     slotcfg(), slotcfg(slotcfg::list)),
+                  rule_attr("xy", outer = slotcfg(slotcfg::list)),
                   list_of
-                    (rule("tdl::schema::node", RA("int1", true, new I())))
-                    (rule("tdl::schema::node", RA("int2", true, new I()))))))
+                    (rule("tdl::schema::node",
+                          rule_attr("int1", repatcher = new I())))
+                    (rule("tdl::schema::node",
+                          rule_attr("int2", repatcher = new I()))))))
               (rule("tdl::schema::node"))))))) {}
 
   void run(string prefix, int n) {

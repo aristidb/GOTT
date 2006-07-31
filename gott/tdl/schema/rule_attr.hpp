@@ -127,7 +127,7 @@ BOOST_PARAMETER_KEYWORD(tg, inner)
 BOOST_PARAMETER_KEYWORD(tg, outer)
 
 typedef boost::parameter::parameters<
-  tg::tags,
+  tg::tag,
   tg::coat,
   tg::user,
   tg::repatcher,

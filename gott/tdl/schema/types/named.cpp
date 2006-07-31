@@ -96,9 +96,9 @@ match_named::match_named(rule_attr_t const &a, vector<rule_t> const &s,match &m)
 : happy_once(a, m), 
   tag(get_id(a)),
   rewritten(
-      rule("tdl::schema::follow", rule_attr_t(rule_attr_t::simple, false), list_of 
-        (rule("tdl::schema::node", rule_attr_t(rule_attr_t::simple, false, 
-          get_repatcher(tag))))
+      rule("tdl::schema::follow", rule_attr(coat = false), list_of 
+        (rule("tdl::schema::node",
+              rule_attr(coat = false, repatcher = get_repatcher(tag))))
         (s[0]))) {
   assert(s.size() == 1);
   matcher().add(rewritten);

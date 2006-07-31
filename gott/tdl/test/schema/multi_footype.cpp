@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -68,7 +68,7 @@ struct schema_multi_footype : tut::schema_basic {
                 tag = "plugin-data",
                 outer = list())))))
         (rule_one("tdl::schema::named", rule_attr(tag = "sum"),
-          rule_one("tdl::schema::list", RA(RA::simple, false),
+          rule_one("tdl::schema::list", rule_attr(coat = false),
             rule("tdl::schema::node", 
               rule_attr(
                 tag = "sum-data",

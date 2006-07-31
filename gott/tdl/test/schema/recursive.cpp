@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -44,15 +44,12 @@
 
 using namespace boost::assign;
 
-namespace schema = tdl::schema;
+using namespace tdl::schema;
 namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
 
 using namespace stru::cf;
-using schema::slotcfg;
-using schema::rule_t;
-using schema::rule_attr_t;
 
 namespace {
 struct recursive : tut::schema_basic {
@@ -61,14 +58,13 @@ struct recursive : tut::schema_basic {
   recursive() {
     grammar = rule_one("tdl::schema::document", rule_t(&rec));
     rec = 
-      rule("tdl::schema::ordered", rule_attr_t(rule_attr_t::simple, false),
+      rule("tdl::schema::ordered", rule_attr(coat = false),
           list_of
-        (rule("tdl::schema::node", rule_attr_t(rule_attr_t::simple, true, 
-            new stru::repatch_integer())))
-        (rule_one("tdl::schema::list", rule_attr_t(rule_attr_t::simple, false),
+        (rule("tdl::schema::node",
+              rule_attr(repatcher = new stru::repatch_integer())))
+        (rule_one("tdl::schema::list", rule_attr(coat = false),
            rule_one("tdl::schema::ordered", 
-                rule_attr_t(std::vector<string>(), false, Xany(), 0,
-                  slotcfg(), slotcfg(slotcfg::optional)),
+                rule_attr(outer = slotcfg(slotcfg::optional)),
                 rule_t(&rec)))));
   }
 };

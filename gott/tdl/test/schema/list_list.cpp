@@ -55,7 +55,7 @@ struct schema_multi_footype : tut::schema_basic {
       rule("tdl::schema::ordered", rule_attr(), boost::assign::list_of
         (rule_one("tdl::schema::list", rule_attr_t("s"),
           rule_one("tdl::schema::list", 
-            rule_attr("t" outer = list()),
+            rule_attr("t", outer = list()),
             rule("tdl::schema::node",
               rule_attr("ii",
                 repatcher = new stru::repatch_integer(),

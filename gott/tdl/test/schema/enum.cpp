@@ -43,15 +43,13 @@
 using boost::assign::list_of;
 using std::vector;
 
-namespace schema = tdl::schema;
+using namespace tdl::schema;
 namespace stru = tdl::structure;
 using gott::string;
 using gott::xany::Xany;
 
 using stru::cf::S;
 using stru::cf::C;
-using schema::rule_attr_t;
-using schema::rule_t;
 using stru::repatch_enumeration;
 
 namespace {
@@ -60,7 +58,7 @@ struct schema_enumeration : tut::schema_basic {
   : tut::schema_basic(
     rule_one("tdl::schema::document",
       rule("tdl::schema::node", rule_attr(
-          schema::repatcher =
+          repatcher =
              new repatch_enumeration(
                list_of(string("first"))(string("second"))(string("third")).
                  operator vector<string>())))))
