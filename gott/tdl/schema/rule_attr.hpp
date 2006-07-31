@@ -91,20 +91,17 @@ public:
   : c(o_.c), t(o_.t), u(o_.u), r(o_.r), i(o_.i), o(o_.o) {}
 
   bool coat() const { return c; }
-
   std::vector<gott::string> const &tags() const { return t; }
-
   gott::xany::Xany const &user() const { return u; }
-
   boost::shared_ptr<structure::repatcher const> repatcher() const { return r; }
-
-  bool operator==(rule_attr_t const &o) const {
-    return c == o.c && range(t) == range(o.t) && u == o.u && r == o.r;
-  }
-
+  boost::shared_ptr<structure::repatcher const> repatcher2() const { return r2;}
   slotcfg const &inner() const { return i; }
-
   slotcfg const &outer() const { return o; }
+
+  bool operator==(rule_attr_t const &x) const {
+    return c == x.c && range(t) == range(x.t) && u == x.u && r == x.r &&
+      r2 == x.r2;
+  }
 
 private:
   bool c;
@@ -162,8 +159,6 @@ rule_attr_t rule_attr_with_named_params(Args const &args) {
         args[repatcher2 | static_cast<structure::repatcher *>(0)])
   );
 }
-
-GOTT_EXPORT std::ostream &operator<<(std::ostream &s, rule_attr_t const &a);
 
 }}
 

@@ -64,8 +64,8 @@ public:
   }
 
   void end_structure() {
-    if (attrib.repatcher())
-      cont->out_structure().remove_repatcher(attrib.repatcher());
+    if (attrib.repatcher2())
+      cont->out_structure().remove_repatcher(attrib.repatcher2());
     if (attrib.coat())
       cont->out_structure().end();
   }
@@ -78,8 +78,8 @@ private:
   }
 
   void start_structure(source_position const &w) {
-    if (attrib.repatcher())
-      cont->out_structure().add_repatcher(attrib.repatcher());
+    if (attrib.repatcher2())
+      cont->out_structure().add_repatcher(attrib.repatcher2());
     if (attrib.coat())
       cont->out_structure().begin(w);
   }
@@ -139,11 +139,3 @@ string item::long_name() const {
   return string(range(out), string::concatenate);
 }
 
-std::ostream &schema::operator<<(std::ostream &s, rule_attr_t const &a) {
-  s << '(' << (a.coat() ? "coat" : "flat");
-  s << ",tags:" << range(a.tags());
-  if (dynamic_cast<gott::xany::printable const *>(&a.user().get_operations()))
-    s << ",user:" << a.user();
-  s << ",repatcher:" << a.repatcher() << ')';
-  return s;
-}
