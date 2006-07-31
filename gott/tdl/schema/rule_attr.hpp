@@ -58,27 +58,34 @@ class rule_attr_t {
 public:
   enum simple_tag { simple };
   rule_attr_t(simple_tag = simple, bool cc = true, 
-      structure::repatcher const *rr = 0) 
+      boost::shared_ptr<structure::repatcher const> const &rr =
+        boost::shared_ptr<structure::repatcher const>()) 
   : c(cc), r(rr) {}
 
   explicit rule_attr_t(std::vector<gott::string> const &l, bool cc = true, 
-      structure::repatcher const *rr = 0)
+      boost::shared_ptr<structure::repatcher const> const &rr =
+        boost::shared_ptr<structure::repatcher const>())
   : c(cc), t(l), r(rr) {}
 
   explicit rule_attr_t(gott::string const &s, bool cc = true, 
-      structure::repatcher const *rr = 0)
+      boost::shared_ptr<structure::repatcher const> const &rr =
+        boost::shared_ptr<structure::repatcher const>())
   : c(cc), t(1, s), r(rr) {}
 
   explicit rule_attr_t(std::vector<gott::string> const &l, bool cc,
-      gott::xany::Xany const &x, structure::repatcher const *rr = 0,
+      gott::xany::Xany const &x,
+      boost::shared_ptr<structure::repatcher const> const &rr =
+        boost::shared_ptr<structure::repatcher const>(),
       slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
   : c(cc), t(l), u(x), r(rr), i(I), o(O) {}
 
   explicit rule_attr_t(std::vector<gott::string> const &l, bool cc,
       gott::xany::Xany const &x,
       boost::shared_ptr<structure::repatcher const> const &rr,
-      slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg())
-  : c(cc), t(l), u(x), r(rr), i(I), o(O) {}
+      slotcfg const &I = slotcfg(), slotcfg const &O = slotcfg(),
+      boost::shared_ptr<structure::repatcher const> const &rr2 =
+        boost::shared_ptr<structure::repatcher const>())
+  : c(cc), t(l), u(x), r(rr), r2(rr2), i(I), o(O) {}
 
   rule_attr_t(rule_attr_t const &o_)
   : c(o_.c), t(o_.t), u(o_.u), r(o_.r), i(o_.i), o(o_.o) {}
@@ -103,7 +110,7 @@ private:
   bool c;
   std::vector<gott::string> t;
   gott::xany::Xany u;
-  boost::shared_ptr<structure::repatcher const> r;
+  boost::shared_ptr<structure::repatcher const> r, r2;
   slotcfg i;
   slotcfg o;
 };
@@ -115,16 +122,23 @@ BOOST_PARAMETER_KEYWORD(tg, tags)
 BOOST_PARAMETER_KEYWORD(tg, coat)
 BOOST_PARAMETER_KEYWORD(tg, user)
 BOOST_PARAMETER_KEYWORD(tg, repatcher)
+BOOST_PARAMETER_KEYWORD(tg, repatcher2)
 BOOST_PARAMETER_KEYWORD(tg, inner)
 BOOST_PARAMETER_KEYWORD(tg, outer)
 
 typedef boost::parameter::parameters<
-  tg::tags, tg::coat, tg::user, tg::repatcher, tg::inner, tg::outer
+  tg::tags,
+  tg::coat,
+  tg::user,
+  tg::repatcher,
+  tg::repatcher2,
+  tg::inner,
+  tg::outer
 > rule_attr_params;
 
 }
 
-BOOST_PARAMETER_FUN(rule_attr_t, rule_attr, 0, 6, rule_attr_params);
+BOOST_PARAMETER_FUN(rule_attr_t, rule_attr, 0, 7, rule_attr_params);
 
 template<class Args>
 rule_attr_t rule_attr_with_named_params(Args const &args) {
@@ -140,9 +154,12 @@ rule_attr_t rule_attr_with_named_params(Args const &args) {
       args[tags | combine_strip()(args[tag | ""])],
       args[coat | true],
       args[user | gott::xany::Xany()],
-      args[repatcher | static_cast<structure::repatcher *>(0)],
+      boost::shared_ptr<structure::repatcher const>(
+        args[repatcher | static_cast<structure::repatcher *>(0)]),
       args[inner | slotcfg()],
-      args[outer | slotcfg()]
+      args[outer | slotcfg()],
+      boost::shared_ptr<structure::repatcher const>(
+        args[repatcher2 | static_cast<structure::repatcher *>(0)])
   );
 }
 

@@ -46,7 +46,7 @@ using gott::xany::Xany;
 using gott::string;
 using stru::cf::S;
 using stru::cf::C;
-using schema::rule_attr_t;
+using schema::rule_attr;
 
 namespace {
 struct schema_literal : tut::schema_basic {
@@ -54,8 +54,10 @@ struct schema_literal : tut::schema_basic {
   : tut::schema_basic(
       rule_one("tdl::schema::document",
         rule("tdl::schema::node", 
-          rule_attr_t("foobar", true, 
-            new stru::repatch_enumeration(std::vector<string>(1, "foobar"))))))
+          rule_attr(
+            schema::tag = "foobar",
+            schema::repatcher =
+             new stru::repatch_enumeration(std::vector<string>(1, "foobar"))))))
   {}
 };
 }

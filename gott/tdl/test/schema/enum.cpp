@@ -59,7 +59,8 @@ struct schema_enumeration : tut::schema_basic {
   schema_enumeration() 
   : tut::schema_basic(
     rule_one("tdl::schema::document",
-      rule("tdl::schema::node", rule_attr_t(std::vector<string>(), true, Xany(),
+      rule("tdl::schema::node", rule_attr(
+          schema::repatcher =
              new repatch_enumeration(
                list_of(string("first"))(string("second"))(string("third")).
                  operator vector<string>())))))

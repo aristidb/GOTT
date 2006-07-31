@@ -52,16 +52,15 @@ struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() 
   : tut::schema_basic(
     rule_one("tdl::schema::document",
-      rule("tdl::schema::ordered", rule_attr_t(), boost::assign::list_of
+      rule("tdl::schema::ordered", rule_attr(), boost::assign::list_of
         (rule_one("tdl::schema::list", rule_attr_t("s"),
           rule_one("tdl::schema::list", 
-            rule_attr_t(std::vector<string>(1, "t"), true, Xany(), 0,
-              slotcfg(), slotcfg(slotcfg::list)),
+            rule_attr("t" outer = list()),
             rule("tdl::schema::node",
-              rule_attr_t(std::vector<string>(1, "ii"), true, Xany(), 
-                new stru::repatch_integer(),
-                slotcfg(), slotcfg(slotcfg::list))))))
-        (rule("tdl::schema::node", rule_attr_t("xx")))))) {}
+              rule_attr("ii",
+                repatcher = new stru::repatch_integer(),
+                outer = slotcfg(slotcfg::list))))))
+        (rule("tdl::schema::node", rule_attr("xx")))))) {}
 };
 }
 

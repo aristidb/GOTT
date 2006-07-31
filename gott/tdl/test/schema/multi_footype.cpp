@@ -43,42 +43,41 @@
 
 using namespace boost::assign;
 
-namespace schema = tdl::schema;
+using namespace tdl::schema;
 namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
 using namespace stru::cf;
-using schema::slotcfg;
-using schema::rule_t;
-typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_multi_footype : tut::schema_basic {
   rule_t multi, footype;
 
   schema_multi_footype() 
-  : tut::schema_basic(rule_one("tdl::schema::document", RA("--doc--"), 
+  : tut::schema_basic(rule_one("tdl::schema::document", rule_attr("--doc--"), 
         rule_t(&footype))) {
-    footype = rule_one("tdl::schema::named", schema::rule_attr(schema::tag = "a"),
+    footype = rule_one("tdl::schema::named", rule_attr(tag = "a"),
         rule_t(&multi));
 
     multi =
-      rule("tdl::schema::unordered", RA("--unordered--"), list_of
-        (rule_one("tdl::schema::named", schema::rule_attr(schema::tag = "plugin"), 
+      rule("tdl::schema::unordered", rule_attr("--unordered--"), list_of
+        (rule_one("tdl::schema::named", rule_attr(tag = "plugin"), 
+          rule_one("tdl::schema::list", rule_attr(coat = false),
+            rule("tdl::schema::node", 
+              rule_attr(
+                tag = "plugin-data",
+                outer = list())))))
+        (rule_one("tdl::schema::named", rule_attr(tag = "sum"),
           rule_one("tdl::schema::list", RA(RA::simple, false),
             rule("tdl::schema::node", 
-              RA(std::vector<string>(1, "plugin-data"), true, Xany(), 0,
-                slotcfg(), slotcfg(slotcfg::list))))))
-        (rule_one("tdl::schema::named", schema::rule_attr(schema::tag = "sum"),
-          rule_one("tdl::schema::list", RA(RA::simple, false),
-            rule("tdl::schema::node", 
-              RA(std::vector<string>(1, "sum-data"), true, Xany(),
-                 new stru::repatch_integer(),
-                 slotcfg(), slotcfg(slotcfg::some))))))
+              rule_attr(
+                tag = "sum-data",
+                repatcher = new stru::repatch_integer(),
+                outer = some())))))
         (rule("tdl::schema::node", 
-          RA(std::vector<string>(1, "--other--"), true, Xany(), 
-             new stru::repatch_integer(),
-             slotcfg(), slotcfg(slotcfg::some)))));
+          rule_attr("--other--", 
+            repatcher = new stru::repatch_integer(),
+            outer = slotcfg(slotcfg::some)))));
   }
 };
 }

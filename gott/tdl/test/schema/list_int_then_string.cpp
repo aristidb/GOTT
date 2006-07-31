@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -42,8 +42,8 @@
 #include <boost/assign/list_of.hpp>
 
 using namespace boost::assign;
+using namespace tdl::schema;
 
-namespace schema = tdl::schema;
 namespace stru = tdl::structure;
 using gott::xany::Xany;
 
@@ -51,22 +51,18 @@ using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
 
-typedef schema::rule_attr_t RA;
-using schema::rule_t;
-using schema::slotcfg;
-
 namespace {
 struct schema_list_int_then_string : tut::schema_basic {
   schema_list_int_then_string() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document", RA(),
-        rule("tdl::schema::ordered", RA("ord"), list_of
-          (rule_one("tdl::schema::list", RA("tdl::schema::list"),
+      rule_one("tdl::schema::document", rule_attr(),
+        rule("tdl::schema::ordered", rule_attr("ord"), list_of
+          (rule_one("tdl::schema::list", rule_attr("tdl::schema::list"),
             rule("tdl::schema::node", 
-              RA(std::vector<gott::string>(1, "int"), true, Xany(),
-                new stru::repatch_integer(),
-                slotcfg(), slotcfg(slotcfg::list)))))
-          (rule("tdl::schema::node", RA("string")))))) {}
+              rule_attr("int",
+                repatcher = new stru::repatch_integer(),
+                outer = slotcfg(slotcfg::list)))))
+          (rule("tdl::schema::node", rule_attr("string")))))) {}
 };
 }
 

@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -42,19 +42,15 @@
 
 using namespace boost::assign;
 
-namespace schema = tdl::schema;
+using namespace tdl::schema;
 namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
 using namespace stru::cf;
-using schema::rule_t;
-using schema::slotcfg;
-typedef schema::rule_attr_t RA;
 typedef stru::repatch_enumeration E;
 typedef std::vector<gott::string> VN;
 #define L(i) \
-  RA(std::vector<string>(1, #i), true, Xany(), new E(VN(1,#i)), \
-     slotcfg(), slotcfg(slotcfg::optional))
+  rule_attr(#i, repatcher = new E(VN(1,#i)), outer = slotcfg(slotcfg::optional))
 
 namespace {
 
@@ -62,11 +58,11 @@ struct schema_multi_follow : tut::schema_basic {
   schema_multi_follow() 
   : tut::schema_basic(
       rule_one("tdl::schema::document",
-        rule("tdl::schema::follow", RA("outer"),  list_of
-          (rule("tdl::schema::follow", RA("inner1"), list_of
+        rule("tdl::schema::follow", rule_attr("outer"),  list_of
+          (rule("tdl::schema::follow", rule_attr("inner1"), list_of
             (rule("tdl::schema::node", L(1)))
             (rule("tdl::schema::node", L(2)))))
-          (rule("tdl::schema::follow", RA("inner2"), list_of
+          (rule("tdl::schema::follow", rule_attr("inner2"), list_of
             (rule("tdl::schema::node", L(3)))
             (rule("tdl::schema::node", L(4)))))))) {}
 };

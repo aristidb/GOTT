@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -41,27 +41,24 @@
 #include <gott/tdl/structure/repatchers/integer.hpp>
 #include <boost/assign/list_of.hpp>
 
-namespace schema = tdl::schema;
+using namespace tdl::schema;
 namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
 
 using stru::cf::S;
 using stru::cf::C;
-using schema::rule;
-using schema::rule_one;
-using schema::slotcfg;
-typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_unordered_list_integer_string : tut::schema_basic {
   schema_unordered_list_integer_string()
   : tut::schema_basic(
       rule_one("tdl::schema::document",
-        rule("tdl::schema::unordered", RA(), boost::assign::list_of
+        rule("tdl::schema::unordered", rule_attr(), boost::assign::list_of
           (rule("tdl::schema::node",
-            RA(std::vector<string>(),true,Xany(),new stru::repatch_integer(),
-               slotcfg(), slotcfg(slotcfg::list))))
+            rule_attr(
+              repatcher = new stru::repatch_integer(),
+              outer = slotcfg(slotcfg::list))))
           (rule("tdl::schema::node"))))) {}
 };
 }

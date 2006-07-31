@@ -59,8 +59,14 @@ struct schema_follow_integer_integer : tut::schema_basic {
   : tut::schema_basic(
       rule_one("tdl::schema::document", RA("doc"),
         rule("tdl::schema::follow", RA("foll"), list_of
-          (rule("tdl::schema::node", RA("int1", true, new I())))
-          (rule("tdl::schema::node", RA("int2", true, new I())))))) {}
+          (rule("tdl::schema::node",
+                schema::rule_attr(
+                  schema::tag = "int1", 
+                  schema::repatcher = new I())))
+          (rule("tdl::schema::node",
+                schema::rule_attr(
+                  schema::tag = "int2", 
+                  schema::repatcher = new I())))))) {}
 };
 }
 

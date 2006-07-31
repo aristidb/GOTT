@@ -39,16 +39,12 @@
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
 
-namespace schema = tdl::schema;
+using namespace tdl::schema;
 namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
 
 using namespace stru::cf;
-using schema::slotcfg;
-using schema::rule_t;
-
-typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_list_string : tut::schema_basic {
@@ -57,8 +53,7 @@ struct schema_list_string : tut::schema_basic {
       rule_one("tdl::schema::document",
         rule_one("tdl::schema::list",
           rule("tdl::schema::node",
-            RA(std::vector<string>(1, "el"), true, Xany(), 0, 
-               slotcfg(), slotcfg(slotcfg::list)))))) {}
+            rule_attr("el", outer = slotcfg(slotcfg::list)))))) {}
 };
 }
 

@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -40,7 +40,7 @@
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>
 
-namespace schema = tdl::schema;
+using namespace tdl::schema;
 namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
@@ -48,10 +48,6 @@ using gott::string;
 using stru::cf::S;
 using stru::cf::C;
 using stru::cf::M;
-using schema::slotcfg;
-using schema::rule_t;
-
-typedef schema::rule_attr_t RA;
 
 namespace {
 struct schema_one_int : tut::schema_basic {
@@ -60,9 +56,9 @@ struct schema_one_int : tut::schema_basic {
       rule_one("tdl::schema::document", 
          rule_one("tdl::schema::list",
            rule("tdl::schema::node",
-             RA(std::vector<string>(1, "el"), true, Xany(), 
-                new stru::repatch_integer(), 
-                slotcfg(), slotcfg(slotcfg::one)))))) {}
+             rule_attr("el",
+                repatcher = new stru::repatch_integer(), 
+                outer = slotcfg(slotcfg::one)))))) {}
 };
 }
 
