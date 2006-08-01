@@ -63,11 +63,14 @@ public:
     add_tags();
   }
 
-  void end_structure() {
-    if (attrib.repatcher())
-      cont->out_structure().remove_repatcher(attrib.repatcher());
+  ~impl() {
     if (attrib.repatcher2())
       cont->out_structure().remove_repatcher2(attrib.repatcher2());
+    if (attrib.repatcher())
+      cont->out_structure().remove_repatcher(attrib.repatcher());
+  }
+
+  void end_structure() {
     if (attrib.coat())
       cont->out_structure().end();
   }
@@ -90,14 +93,13 @@ private:
 };
 
 item::item(rule_attr_t const &a, match &m) 
-: pimpl(new impl(m, a, m.where_out())) {
-}
+: pimpl(new impl(m, a, m.where_out())) {}
+
+item::~item() {}
 
 void item::finish() {
   pimpl->end_structure();
 }
-
-item::~item() {}
 
 rule_attr_t const &item::attributes() const { return pimpl->attrib; }
 match &item::matcher() { return *pimpl->cont; }
