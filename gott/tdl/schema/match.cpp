@@ -68,7 +68,7 @@ using structure::writable_structure;
 
 class match::impl {
 public:
-  impl(structure::revocable_structure &p, match &r)
+  impl(structure::repatchable_structure &p, match &r)
   : base_struc(p), pos(base_struc), ref(r) {}
 
   template<class T>
@@ -106,7 +106,7 @@ public:
 
   ::boost::optional<deferred_miss> miss;
 
-  structure::revocable_structure &base_struc;
+  structure::repatchable_structure &base_struc;
 
   positioning pos;
 
@@ -125,10 +125,10 @@ public:
   ::boost::optional<source_position> overwrite_where;
 };
 
-match::match(structure::revocable_structure &p) 
+match::match(structure::repatchable_structure &p) 
 : p(new impl(p, *this)) {}
 
-match::match(rule_t const &rf, structure::revocable_structure &p)
+match::match(rule_t const &rf, structure::repatchable_structure &p)
 : p(new impl(p, *this)) {
   add(rf);
 }
@@ -153,7 +153,7 @@ void match::add(rule_t const &f) {
   p->parse[current].the_item.reset(the_item);
 }
 
-structure::revocable_structure &match::out_structure() const {
+structure::repatchable_structure &match::out_structure() const {
   return p->base_struc;
 }
 

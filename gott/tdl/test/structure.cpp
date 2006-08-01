@@ -88,7 +88,7 @@ void object::test<2>(int) {
 template<> template<>
 void object::test<3>(int) {
   stru::container p1, p2;
-  stru::repatchable_adapter aa(p1);
+  stru::repatchable_adapter2 aa(p1);
   stru::revocable_adapter a(aa);
   stru::revocable_structure &w = a;
   w.begin(source_position());

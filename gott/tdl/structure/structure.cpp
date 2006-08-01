@@ -43,3 +43,5 @@ namespace s = tdl::structure;
 s::writable_structure::~writable_structure() {}
 s::copyable_structure::~copyable_structure() {}
 s::revocable_structure::~revocable_structure() {}
+s::repatchable_structure::~repatchable_structure() {}
+s::repatchable_structure2::~repatchable_structure2() {}

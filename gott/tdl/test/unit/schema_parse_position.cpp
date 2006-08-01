@@ -46,7 +46,7 @@
 #include <gott/string/string.hpp>
 
 namespace {
-struct ignore_struct : tdl::structure::revocable_structure {
+struct ignore_struct : tdl::structure::repatchable_structure {
   void data(gott::xany::Xany const &) {}
   void begin(tdl::source_position const &) {}
   void end() {}
@@ -55,6 +55,11 @@ struct ignore_struct : tdl::structure::revocable_structure {
   void add_repatcher(
       boost::shared_ptr<tdl::structure::repatcher const> const &) {}
   void remove_repatcher(
+      boost::shared_ptr<tdl::structure::repatcher const> const &) {}
+
+  void add_repatcher2(
+      boost::shared_ptr<tdl::structure::repatcher const> const &) {}
+  void remove_repatcher2(
       boost::shared_ptr<tdl::structure::repatcher const> const &) {}
 
   pth point() { return pth(); }

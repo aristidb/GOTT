@@ -78,9 +78,10 @@ int main() {
                   ))))));
 
   structure::container out;
-  structure::repatchable_adapter r1(out);
+  structure::repatchable_adapter2 r1(out);
   structure::revocable_adapter r2(r1);
-  match m(conf, r2);
+  structure::repatchable_adapter r3(r2);
+  match m(conf, r3);
   m.parse(std::cin);
   std::cout << out << '\n';
 }

@@ -46,9 +46,10 @@
 
 using namespace tdl::structure;
 
-class repatchable_adapter::impl {
+template<class T>
+class tdl::structure::repatchable_adapter_impl {
 public:
-  writable_structure &out;
+  T &out;
   boost::ptr_vector<writable_structure> indirections;
   std::vector<boost::shared_ptr<repatcher const> > tracker;
 
@@ -59,10 +60,27 @@ public:
       return indirections.back();
   }
 
-  impl(writable_structure &out) : out(out) {}
+  void add(boost::shared_ptr<repatcher const> const &x) {
+    tracker.push_back(x);
+    indirections.push_back(x->deferred_write(current()));
+  }
+
+  void remove(boost::shared_ptr<repatcher const> const &x) {
+    #ifndef NDEBUG
+    assert(!tracker.empty());
+    assert(tracker.back() == x);
+    #else
+    (void)x;
+    #endif
+    tracker.pop_back();
+    assert(!indirections.empty());
+    indirections.pop_back();
+  }
+
+  repatchable_adapter_impl(T &out) : out(out) {}
 };
 
-repatchable_adapter::repatchable_adapter(writable_structure &out)
+repatchable_adapter::repatchable_adapter(revocable_structure &out)
   : p(new impl(out)) {}
 repatchable_adapter::~repatchable_adapter() {}
 
@@ -84,21 +102,62 @@ void repatchable_adapter::data(gott::Xany const &x) {
 
 void repatchable_adapter::add_repatcher(
     boost::shared_ptr<repatcher const> const &x) {
-  p->tracker.push_back(x);
-  writable_structure &old = p->current();
-  writable_structure *fresh = x->deferred_write(old);
-  p->indirections.push_back(fresh);
+  p->add(x);
 }
 
 void repatchable_adapter::remove_repatcher(
     boost::shared_ptr<repatcher const> const &x) {
-#ifndef NDEBUG
-  assert(!p->tracker.empty());
-  assert(p->tracker.back() == x);
-#else
-  (void)x;
-#endif
-  p->tracker.pop_back();
-  assert(!p->indirections.empty());
-  p->indirections.pop_back();
+  p->remove(x);
+}
+
+void repatchable_adapter::add_repatcher2(
+    boost::shared_ptr<repatcher const> const &x) {
+  p->out.add_repatcher2(x);
+}
+
+void repatchable_adapter::remove_repatcher2(
+    boost::shared_ptr<repatcher const> const &x) {
+  p->out.remove_repatcher2(x);
+}
+
+revocable_structure::pth repatchable_adapter::point() {
+  return p->out.point();
+}
+
+void repatchable_adapter::revert(pth x) {
+  p->out.revert(x);
+}
+
+void repatchable_adapter::get_rid_of(pth x) {
+  p->out.get_rid_of(x);
+}
+
+repatchable_adapter2::repatchable_adapter2(writable_structure &out)
+  : p(new impl(out)) {}
+repatchable_adapter2::~repatchable_adapter2() {}
+
+void repatchable_adapter2::begin(tdl::source_position const &w) {
+  p->current().begin(w);
+}
+
+void repatchable_adapter2::end() {
+  p->current().end();
+}
+
+void repatchable_adapter2::add_tag(gott::string const &s) {
+  p->current().add_tag(s);
+}
+
+void repatchable_adapter2::data(gott::Xany const &x) {
+  p->current().data(x);
+}
+
+void repatchable_adapter2::add_repatcher2(
+    boost::shared_ptr<repatcher const> const &x) {
+  p->add(x);
+}
+
+void repatchable_adapter2::remove_repatcher2(
+    boost::shared_ptr<repatcher const> const &x) {
+  p->remove(x);
 }

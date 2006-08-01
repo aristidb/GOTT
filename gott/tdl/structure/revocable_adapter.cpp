@@ -39,6 +39,7 @@
 #include "revocable_adapter.hpp"
 #include <gott/tdl/structure/repatch.hpp>
 #include <gott/tdl/source_position.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/optional.hpp>
 #include <algorithm>
 #include <vector>
@@ -57,7 +58,7 @@ using gott::string;
 
 namespace {
 struct entry {
-  enum type_t { begin, end, add_tag, data, add_repatcher, remove_repatcher };
+  enum type_t { begin, end, add_tag, data, add_repatcher2, remove_repatcher2 };
 
   type_t type;
   Xany param;
@@ -66,7 +67,7 @@ struct entry {
   entry(type_t t, Xany p = Xany()) : type(t), param(p) {}
   entry(type_t t, source_position const &w) : type(t), where(w) {}
 
-  void play(repatchable_structure &o) {
+  void play(repatchable_structure2 &o) {
     switch (type) {
     case begin:
       o.begin(where);
@@ -80,12 +81,12 @@ struct entry {
     case data:
       o.data(param);
       break;
-    case add_repatcher:
-      o.add_repatcher(
+    case add_repatcher2:
+      o.add_repatcher2(
           gott::Xany_cast<boost::shared_ptr<repatcher const> >(param));
       break;
-    case remove_repatcher:
-      o.remove_repatcher(
+    case remove_repatcher2:
+      o.remove_repatcher2(
           gott::Xany_cast<boost::shared_ptr<repatcher const> >(param));
       break;
     }
@@ -97,15 +98,17 @@ const revocable_structure::pth nowhere = -1;
 
 class revocable_adapter::impl {
 public:
-  repatchable_structure &out;
+  repatchable_structure2 &out;
   pth pos;
   pth blocking;
   std::vector<entry> blocked;
   std::set<int> active;
-  impl(repatchable_structure &o) : out(o), pos(0), blocking(nowhere) {}
+
+  impl(repatchable_structure2 &o)
+    : out(o), pos(0), blocking(nowhere) {}
 };
 
-revocable_adapter::revocable_adapter(repatchable_structure &out) 
+revocable_adapter::revocable_adapter(repatchable_structure2 &out) 
 : p(new impl(out)) {}
 revocable_adapter::~revocable_adapter() {}
 
@@ -141,21 +144,21 @@ void revocable_adapter::data(Xany const &x) {
   ++p->pos;
 }
 
-void revocable_adapter::add_repatcher(
+void revocable_adapter::add_repatcher2(
     boost::shared_ptr<repatcher const> const &x) {
   if (p->blocking == nowhere)
-    p->out.add_repatcher(x);
-else
-    p->blocked.push_back(entry(entry::add_repatcher, Xany(x)));
+    p->out.add_repatcher2(x);
+  else
+    p->blocked.push_back(entry(entry::add_repatcher2, Xany(x)));
   ++p->pos;
 }
 
-void revocable_adapter::remove_repatcher(
+void revocable_adapter::remove_repatcher2(
     boost::shared_ptr<repatcher const> const &x) {
   if (p->blocking == nowhere)
-    p->out.remove_repatcher(x);
+    p->out.remove_repatcher2(x);
   else 
-    p->blocked.push_back(entry(entry::remove_repatcher, Xany(x)));
+    p->blocked.push_back(entry(entry::remove_repatcher2, Xany(x)));
   ++p->pos;
 }
 

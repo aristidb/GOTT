@@ -57,7 +57,7 @@ public:
    * Constructor.
    * \param out The structure to write to.
    */
-  GOTT_EXPORT revocable_adapter(repatchable_structure &out);
+  GOTT_EXPORT revocable_adapter(repatchable_structure2 &out);
 
   /// Destructor.
   GOTT_EXPORT ~revocable_adapter();
@@ -68,8 +68,8 @@ private:
   void add_tag(gott::string const &);
   void data(gott::xany::Xany const &);
 
-  void add_repatcher(boost::shared_ptr<repatcher const> const &);
-  void remove_repatcher(boost::shared_ptr<repatcher const> const &);
+  void add_repatcher2(boost::shared_ptr<repatcher const> const &);
+  void remove_repatcher2(boost::shared_ptr<repatcher const> const &);
 
   pth point();
   void revert(pth);

@@ -43,11 +43,13 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace tdl { namespace structure { 
+namespace tdl { namespace structure {
+
+template<class T> class repatchable_adapter_impl;
 
 class repatchable_adapter : public repatchable_structure {
 public:
-  GOTT_EXPORT repatchable_adapter(writable_structure &);
+  GOTT_EXPORT repatchable_adapter(revocable_structure &);
   GOTT_EXPORT ~repatchable_adapter();
 
 private:
@@ -59,8 +61,34 @@ private:
   void add_repatcher(boost::shared_ptr<repatcher const> const &);
   void remove_repatcher(boost::shared_ptr<repatcher const> const &);
 
+  void add_repatcher2(boost::shared_ptr<repatcher const> const &);
+  void remove_repatcher2(boost::shared_ptr<repatcher const> const &);
+
+  pth point();
+  void revert(pth);
+  void get_rid_of(pth);
+
 private:
-  class impl;
+  typedef repatchable_adapter_impl<revocable_structure> impl;
+  boost::scoped_ptr<impl> p;
+};
+
+class repatchable_adapter2 : public repatchable_structure2 {
+public:
+  GOTT_EXPORT repatchable_adapter2(writable_structure &);
+  GOTT_EXPORT ~repatchable_adapter2();
+
+private:
+  void begin(tdl::source_position const &);
+  void end();
+  void add_tag(gott::string const &);
+  void data(gott::Xany const &);
+
+  void add_repatcher2(boost::shared_ptr<repatcher const> const &);
+  void remove_repatcher2(boost::shared_ptr<repatcher const> const &);
+
+private:
+  typedef repatchable_adapter_impl<writable_structure> impl;
   boost::scoped_ptr<impl> p;
 };
 

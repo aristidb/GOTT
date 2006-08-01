@@ -85,16 +85,17 @@ public:
 
 class repatcher;
 
-class repatchable_structure : public writable_structure {
+class repatchable_structure2 : public writable_structure {
 public:
-  virtual void add_repatcher(boost::shared_ptr<repatcher const> const &) = 0;
-  virtual void remove_repatcher(boost::shared_ptr<repatcher const> const &) = 0;
+  virtual void add_repatcher2(boost::shared_ptr<repatcher const> const &) = 0;
+  virtual void remove_repatcher2(boost::shared_ptr<repatcher const> const &) =0;
+  GOTT_EXPORT virtual ~repatchable_structure2() = 0;
 };
 
 /**
  * The interface for revocable (backtracking) structures.
  */
-class revocable_structure : public repatchable_structure {
+class revocable_structure : public repatchable_structure2 {
 public:
   /// The time-point as used by a backtracking-aware structure writer.
   typedef std::ptrdiff_t pth;
@@ -118,6 +119,13 @@ public:
   virtual void get_rid_of(pth pt) = 0;
 
   GOTT_EXPORT virtual ~revocable_structure() = 0;
+};
+
+class repatchable_structure : public revocable_structure {
+public:
+  virtual void add_repatcher(boost::shared_ptr<repatcher const> const &) = 0;
+  virtual void remove_repatcher(boost::shared_ptr<repatcher const> const &) =0;
+  GOTT_EXPORT virtual ~repatchable_structure() = 0;
 };
 
 /**

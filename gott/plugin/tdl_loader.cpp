@@ -255,12 +255,13 @@ void gott::plugin::detail::load_tdl_resource(
 
   adapter out(manager, resource);
 #ifndef VERBOSE
-  repatchable_adapter adapter2(out);
+  repatchable_adapter2 adapter2(out);
 #else
   container cont;
-  repatchable_adapter adapter2(cont);
+  repatchable_adapter2 adapter2(cont);
 #endif
-  revocable_adapter adapter(adapter2);
+  revocable_adapter adapterX(adapter2);
+  repatchable_adapter adapter(adapterX);
 
   try {
     match(document_schema, adapter).parse(stream);

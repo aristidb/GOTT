@@ -52,14 +52,15 @@
 namespace tut {
 struct schema_basic {
   tdl::structure::container tree, xp;
-  tdl::structure::repatchable_adapter r2tree;
-  tdl::structure::revocable_adapter rtree;
+  tdl::structure::repatchable_adapter2 r2tree;
+  tdl::structure::revocable_adapter rtree_;
+  tdl::structure::repatchable_adapter rtree;
   tdl::schema::match match;
   tdl::schema::rule_t grammar;
   gott::string rest;
-  schema_basic() : r2tree(tree), rtree(r2tree), match(rtree) {}
+  schema_basic() : r2tree(tree), rtree_(r2tree), rtree(rtree_), match(rtree) {}
   schema_basic(tdl::schema::rule_t const &r) 
-    : r2tree(tree), rtree(r2tree), match(rtree), grammar(r) {}
+    : r2tree(tree), rtree_(r2tree), rtree(rtree_), match(rtree), grammar(r) {}
   void run_test(gott::string const &input) {
     match.add(grammar);
     std::istringstream stream(gott::to_string(input));

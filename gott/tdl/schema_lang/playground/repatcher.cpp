@@ -33,8 +33,9 @@ struct rep_acc : tdl::structure::writable_structure {
 
 int main() {
   rep_acc acc_r;
-  tdl::structure::repatchable_adapter helper2(acc_r);
-  tdl::structure::revocable_adapter helper(helper2);
+  tdl::structure::repatchable_adapter2 helper3(acc_r);
+  tdl::structure::revocable_adapter helper2(helper3);
+  tdl::structure::repatchable_adapter helper(helper2);
   using namespace tdl::schema;
   match m_r(
       rule_one("tdl::schema::document", rule_attr(tag = "doc"),
@@ -46,13 +47,14 @@ int main() {
   else
     std::cout << typeid(*acc_r.rep).name() << std::endl;
   tdl::structure::container out;
-  tdl::structure::repatchable_adapter helper4(out);
-  tdl::structure::revocable_adapter helper3(helper4);
+  tdl::structure::repatchable_adapter2 helper6(out);
+  tdl::structure::revocable_adapter helper5(helper6);
+  tdl::structure::repatchable_adapter helper4(helper5);
   match m(
       rule_one("tdl::schema::document",
         rule_attr(tag = "doc", repatcher = acc_r.rep),
         rule("tdl::schema::node", rule_attr(tag = "E"))),
-      helper3);
+      helper4);
   m.parse(std::cin);
   std::cout << out << std::endl;
 }

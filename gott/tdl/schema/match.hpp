@@ -81,7 +81,7 @@ public:
    * Constructs a new match object writing to a tree/something.
    * \param tree The tree to write to.
    */
-  match(structure::revocable_structure &tree) GOTT_EXPORT;
+  match(structure::repatchable_structure &tree) GOTT_EXPORT;
 
   /**
    * Constructs a new match object writing to a tree/something matching a 
@@ -90,7 +90,7 @@ public:
    * \param tree The tree to write to.
    */
   GOTT_EXPORT
-  match(rule_t const &rf, structure::revocable_structure &tree);
+  match(rule_t const &rf, structure::repatchable_structure &tree);
 
   ~match() GOTT_EXPORT;
 
@@ -103,7 +103,7 @@ public:
   /**
    * Return a reference to the structure the engine writes to.
    */
-  structure::revocable_structure &out_structure() const GOTT_EXPORT;
+  structure::repatchable_structure &out_structure() const GOTT_EXPORT;
 
   /**
    * Return the schema parsers current source_position. If not backtracking
