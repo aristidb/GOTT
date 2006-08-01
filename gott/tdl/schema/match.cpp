@@ -46,13 +46,14 @@
 #include "../structure/repatch.hpp"
 #include <gott/range_algo.hpp>
 #include <gott/string/stl.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <cassert>
 
-//#define VERBOSE
+#define VERBOSE
 
 #ifdef VERBOSE
 #include <iostream>
@@ -112,14 +113,7 @@ public:
 
   match &ref;
 
-  struct entry {
-    shared_ptr<item> the_item;
-
-    entry() {}
-    entry(item *r) : the_item(r) {}
-  };
-
-  typedef std::vector<entry> Stack;
+  typedef boost::ptr_vector<boost::nullable<item> > Stack;
   Stack parse;
 
   ::boost::optional<source_position> overwrite_where;
@@ -144,13 +138,13 @@ void match::add(rule_t const &f) {
   }
 #endif
   int current = p->parse.size();
-  p->parse.push_back(impl::entry());
+  p->parse.push_back(0);
 
   item *the_item = f.get(*this);
   assert(the_item != 0);
   assert(the_item->attributes() == f.attributes());
 
-  p->parse[current].the_item.reset(the_item);
+  p->parse.replace(current, the_item);
 }
 
 structure::repatchable_structure &match::out_structure() const {
@@ -241,14 +235,14 @@ void match::impl::handle_event(ev::event const &event, bool token) {
 
 bool match::impl::handle_item(ev::event const &event, bool token) {
 #ifdef VERBOSE
-  item &x = *parse.back().the_item;
+  item &x = parse.back();
   std::cout << x.name();
   if (!x.attributes().tags().empty())
     std::cout << '(' << x.attributes().tags()[0] << ')';
   std::cout << '{' << std::endl;
   struct close { ~close() { std::cout << '}' << std::endl; } } _x; (void)_x;
 #endif
-  if (event.safe_play(*parse.back().the_item)) {
+  if (event.safe_play(parse.back())) {
     if (token) pos.consume();
     return consume_event(token);
   } else {
@@ -261,7 +255,7 @@ bool match::impl::consume_event(bool) {
 #ifdef VERBOSE
   std::cout << "consume" << std::endl;
 #endif
-  if (parse.back().the_item->expectation() == item::nothing)
+  if (parse.back().expectation() == item::nothing)
     succeed_item();
   return true;
 }
@@ -270,7 +264,7 @@ bool match::impl::pass_event(bool) {
 #ifdef VERBOSE
   std::cout << "pass" << std::endl;
 #endif
-  if (parse.back().the_item->expectation() == item::need) {
+  if (parse.back().expectation() == item::need) {
     fail_item();
     return true;
   } else {
@@ -280,7 +274,7 @@ bool match::impl::pass_event(bool) {
 }
 
 void match::impl::succeed_item() {
-  parse.back().the_item->finish();
+  parse.back().finish();
   parse.pop_back();
 
   if (!parse.empty())
@@ -309,10 +303,10 @@ void match::impl::real_parental_requirement() {
   if (it == parse.begin())
     fail_all();
   while (--it != parse.begin())
-    if (it->the_item->miss_events(*miss->event, miss->count)) {
+    if (it->miss_events(*miss->event, miss->count)) {
 #ifdef VERBOSE
-      std::cout << "  @ " << it->the_item->name();
-      rule_attr_t x = it->the_item->attributes();
+      std::cout << "  @ " << it->name();
+      rule_attr_t x = it->attributes();
       if (!x.tags().empty())
         std::cout << '(' << x.tags()[0] << ')';
       std::cout << std::endl;
