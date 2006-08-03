@@ -169,7 +169,7 @@ def CheckBoostLib(context,lib,fatal=False):
 	if not result:
 		print 'Boost',lib,' library is not installed: ', blib
 	if not result and fatal:
-		sys.Exit(1)
+		Exit(1)
 	return result
 
 CheckBoostLib.notest = True
@@ -214,7 +214,7 @@ boostlibs =	[
 #	'program_options',
 	]
 for i in boostlibs:
-	CheckBoostLib(conf,i)
+	CheckBoostLib(conf,i,1)
 
 
 #conf.BoostDateTimeCanNanosec()
