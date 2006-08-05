@@ -39,9 +39,13 @@
 #include "repatchable_adapter.hpp"
 #include <gott/tdl/structure/repatch.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#ifndef NDEBUG
 #include <vector>
 #include <cassert>
+
+//#define VERBOSE
+
+#ifdef VERBOSE
+#include <iostream>
 #endif
 
 using namespace tdl::structure;
@@ -85,28 +89,49 @@ repatchable_adapter::repatchable_adapter(revocable_structure &out)
 repatchable_adapter::~repatchable_adapter() {}
 
 void repatchable_adapter::begin(tdl::source_position const &w) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter:" << this << ">:begin" << std::endl;
+#endif
   p->current().begin(w);
 }
 
 void repatchable_adapter::end() {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter:" << this << ">:end" << std::endl;
+#endif
   p->current().end();
 }
 
 void repatchable_adapter::add_tag(gott::string const &s) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter:" << this << ">:add_tag " << s
+    << std::endl;
+#endif
   p->current().add_tag(s);
 }
 
 void repatchable_adapter::data(gott::Xany const &x) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter:" << this << ">:data " << x << std::endl;
+#endif
   p->current().data(x);
 }
 
 void repatchable_adapter::add_repatcher(
     boost::shared_ptr<repatcher const> const &x) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter:" << this << ">:add_repatcher " <<
+    x.get() << std::endl;
+#endif
   p->add(x);
 }
 
 void repatchable_adapter::remove_repatcher(
     boost::shared_ptr<repatcher const> const &x) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter:" << this << ">:remove_repatcher " <<
+    x.get() << std::endl;
+#endif
   p->remove(x);
 }
 
@@ -137,27 +162,48 @@ repatchable_adapter2::repatchable_adapter2(writable_structure &out)
 repatchable_adapter2::~repatchable_adapter2() {}
 
 void repatchable_adapter2::begin(tdl::source_position const &w) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter2:" << this << ">:begin" << std::endl;
+#endif
   p->current().begin(w);
 }
 
 void repatchable_adapter2::end() {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter2:" << this << ">:end" << std::endl;
+#endif
   p->current().end();
 }
 
 void repatchable_adapter2::add_tag(gott::string const &s) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter2:" << this << ">:add_tag " << s <<
+    std::endl;
+#endif
   p->current().add_tag(s);
 }
 
 void repatchable_adapter2::data(gott::Xany const &x) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter2:" << this << ">:data " << x << std::endl;
+#endif
   p->current().data(x);
 }
 
 void repatchable_adapter2::add_repatcher2(
     boost::shared_ptr<repatcher const> const &x) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter2:" << this << ">:add_repatcher2 " <<
+    x.get() << std::endl;
+#endif
   p->add(x);
 }
 
 void repatchable_adapter2::remove_repatcher2(
     boost::shared_ptr<repatcher const> const &x) {
+#ifdef VERBOSE
+  std::cout << "<repatchable_adapter2:" << this << ">:remove_repatcher2 " <<
+    x.get() << std::endl;
+#endif
   p->remove(x);
 }

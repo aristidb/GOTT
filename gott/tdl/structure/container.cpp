@@ -43,6 +43,12 @@
 #include <boost/lambda/bind.hpp>
 #include <gott/range_algo.hpp>
 
+//#define VERBOSE
+
+#ifdef VERBOSE
+#include <iostream>
+#endif
+
 using gott::string;
 using gott::xany::Xany;
 using tdl::structure::container;
@@ -96,22 +102,34 @@ void container::swap(container &x) {
 }
 
 void container::begin(source_position const &w) {
+#ifdef VERBOSE
+  std::cout << "<container:" << this << ">::begin" << std::endl;
+#endif
   p->parents.push(p->current);
   p->current->children.push_back(impl::node(w));
   p->current = &p->current->children.back();
 }
 
 void container::end() {
-  p->current = p->parents.top();
+#ifdef VERBOSE
+  std::cout << "<container:" << this << ">::end" << std::endl;
+#endif
+   p->current = p->parents.top();
   p->parents.pop();
 }
 
 void container::add_tag(string const &s) {
-  p->current->tags.push_back(s);
+#ifdef VERBOSE
+  std::cout << "<container:" << this << ">::add_tag " << s << std::endl;
+#endif
+   p->current->tags.push_back(s);
 }
 
 void container::data(Xany const &data) {
-  p->current->data = data;
+#ifdef VERBOSE
+  std::cout << "<container:" << this << ">::data " << data << std::endl;
+#endif
+   p->current->data = data;
 }
 
 void container::copy_to(writable_structure &w) const {

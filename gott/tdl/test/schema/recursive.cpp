@@ -64,7 +64,7 @@ struct recursive : tut::schema_basic {
               rule_attr(repatcher = new stru::repatch_integer())))
         (rule_one("tdl::schema::list", rule_attr(coat = false),
            rule_one("tdl::schema::ordered", 
-                rule_attr(outer = slotcfg(slotcfg::optional)),
+                rule_attr(outer = slotcfg(slotcfg::optional), coat = false),
                 rule_t(&rec)))));
   }
 };

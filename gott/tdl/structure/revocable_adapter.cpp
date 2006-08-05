@@ -113,6 +113,9 @@ revocable_adapter::revocable_adapter(repatchable_structure2 &out)
 revocable_adapter::~revocable_adapter() {}
 
 void revocable_adapter::begin(source_position const &w) {
+#ifdef VERBOSE
+  std::cout << "<revocable_adapter:" << this << ">:begin" << std::endl;
+#endif
   if (p->blocking == nowhere)
     p->out.begin(w);
   else
@@ -121,6 +124,9 @@ void revocable_adapter::begin(source_position const &w) {
 }
 
 void revocable_adapter::end() {
+#ifdef VERBOSE
+  std::cout << "<revocable_adapter:" << this << ">:end" << std::endl;
+#endif
   if (p->blocking == nowhere)
     p->out.end();
   else
@@ -129,6 +135,9 @@ void revocable_adapter::end() {
 }
 
 void revocable_adapter::add_tag(string const &t) {
+#ifdef VERBOSE
+  std::cout << "<revocable_adapter:" << this << ">:add_tag " << t << std::endl;
+#endif
   if (p->blocking == nowhere)
     p->out.add_tag(t);
   else
@@ -137,6 +146,9 @@ void revocable_adapter::add_tag(string const &t) {
 }
 
 void revocable_adapter::data(Xany const &x) {
+#ifdef VERBOSE
+  std::cout << "<revocable_adapter:" << this << ">:data " << x << std::endl;
+#endif
   if (p->blocking == nowhere)
     p->out.data(x);
   else
@@ -146,6 +158,10 @@ void revocable_adapter::data(Xany const &x) {
 
 void revocable_adapter::add_repatcher2(
     boost::shared_ptr<repatcher const> const &x) {
+#ifdef VERBOSE
+  std::cout << "<revocable_adapter:" << this << ">:add_repatcher2 " <<
+    x.get() << std::endl;
+#endif
   if (p->blocking == nowhere)
     p->out.add_repatcher2(x);
   else
@@ -155,6 +171,10 @@ void revocable_adapter::add_repatcher2(
 
 void revocable_adapter::remove_repatcher2(
     boost::shared_ptr<repatcher const> const &x) {
+#ifdef VERBOSE
+  std::cout << "<revocable_adapter:" << this << ">:remove_repatcher2 " <<
+    x.get() << std::endl;
+#endif
   if (p->blocking == nowhere)
     p->out.remove_repatcher2(x);
   else 
@@ -163,43 +183,34 @@ void revocable_adapter::remove_repatcher2(
 }
 
 revocable_structure::pth revocable_adapter::point() {
+#ifdef VERBOSE
+  std::cout << "<revocable_adapter:" << this << ">:point " << p->pos <<
+    std::endl;
+#endif
   if (p->blocking == nowhere)
     p->blocking = p->pos;
   p->active.insert(p->pos);
-#ifdef VERBOSE
-  std::cout << "point! " << p->pos << std::endl;
-#endif
   return p->pos;
 }
 
 void revocable_adapter::revert(pth pp) {
 #ifdef VERBOSE
-  std::cout << "revert! " << pp << std::endl;
+  std::cout << "<revocable_adapter:" << this << ">:revert " << pp << std::endl;
 #endif
   size_t pp_blocked_size = pp - p->blocking;
   if (pp_blocked_size < p->blocked.size()) {
     std::vector<entry>::iterator begin = p->blocked.begin() + pp_blocked_size;
     std::vector<entry>::iterator end = p->blocked.end();
-#ifdef VERBOSE
-    for (std::vector<entry>::iterator it = begin; it != end; ++it) {
-      std::cout << "removing output: ";
-      switch (it->type) {
-      case entry::begin: std::cout << "begin"; break;
-      case entry::end: std::cout << "end"; break;
-      case entry::add_tag: std::cout << "add_tag"; break;
-      case entry::data: std::cout << "data"; break;
-      case entry::add_repatcher: std::cout << "add_repatcher"; break;
-      case entry::remove_repatcher: std::cout << "remove_repatcher"; break;
-      }
-      std::cout << std::endl;
-    }
-#endif
     p->blocked.erase(begin, end);
   }
   p->pos = pp;
 }
 
 void revocable_adapter::get_rid_of(pth pp) {
+#ifdef VERBOSE
+  std::cout << "<revocable_adapter:" << this << ">:get_rid_of " << pp <<
+    std::endl;
+#endif
   p->active.erase(pp);
   if (p->active.empty()) {
     p->blocking = nowhere;
