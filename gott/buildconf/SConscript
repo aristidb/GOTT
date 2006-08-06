@@ -88,8 +88,7 @@ def CheckLinkerUndefinedDynamic(context):#TODO: actually fail somewhere!
 def CheckCompilerVisibility(context):
 	context.Message('Checking if compiler supports visibility attributes... ')
 	last = prepare(context.env,
-			CPPDEFINES = ['HAS_VISIBILITY'],
-			CCFLAGS = ['-fvisibility=hidden'])
+			SHCXXFLAGS = ['-fvisibility=hidden','-DHAS_VISIBILITY']) # will work fine for for gcc, and since the others dont support it doesnt matter
 
 	result = context.TryCompile("int global __attribute__((visibility(\"default\")));\n", '.cpp')
 	if not result:
@@ -209,11 +208,12 @@ if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 
 if not conf.env['DEBUG_BUILD_CMD']:
 	e=conf.env
-	e['CXXCOMSTR']    = 'c++/st $SOURCE'
-	e['SHCXXCOMSTR']  = 'c++/dy $SOURCE'
-	e['LD_STR']       = '$TARGET <| $SOURCES'
-	e['LINKCOMSTR']   = 'exec / $LD_STR'
-	e['SHLINKCOMSTR'] = 'lib/dy $LD_STR'
+	e['CXXCOMSTR']		= 'c++/st $SOURCE'
+	e['SHCXXCOMSTR']	= 'c++/dy $SOURCE'
+	e['LD_STR']			= '$TARGET <| $SOURCES'
+	e['LINKCOMSTR']		= 'exec / $LD_STR'
+	e['SHLINKCOMSTR']	= 'lib/dy $LD_STR'
+	e['LDMODULECOMSTR'] = 'plugin $LS_STR'
 
 boostlibs =	[
 	'thread', 

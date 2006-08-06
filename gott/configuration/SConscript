@@ -39,7 +39,6 @@
 import glob
 
 Import('env')
-Import('plugin_env')
 
-plugin_env.SharedLibrary('config', glob.glob('*.cpp'))
+env.LoadableModule('config', glob.glob('*.cpp'))
 env.Program('config_test', glob.glob('test/*.cpp'))

@@ -92,7 +92,11 @@ env = Environment(
   CCFLAGS = [],
   SHCCFLAGS = ['-DBUILDING_DLL'],
   CPPPATH=['#/..', '${BOOST_INCLUDE}'], 
-  LIBPATH=libdirs + ['${BOOST_LIB}'])
+  LIBPATH=libdirs + ['${BOOST_LIB}'],
+  LDMODULEPREFIX="",
+  LDMODULESUFFIX=".plugin",
+  LDMODULECOM="$SHLINK -o $TARGET $SHLINKFLAGS  $SOURCES",
+  )
 env.Help(opts.GenerateHelpText(env))
 
 if env['RELEASE'] == 1:
@@ -111,20 +115,6 @@ Export('env')
 
 conf = SConscript('buildconf/SConscript')
 env = conf.Finish()
-
-# now make a 'env' for static libraries
-staticCCFLAGS = env['CCFLAGS'][:]
-if staticCCFLAGS.count('-fvisibility=hidden') > 0:
-	staticCCFLAGS.remove('-fvisibility=hidden')
-staticCPPDEFINES = env['CPPDEFINES'][:]
-if staticCPPDEFINES.count('HAS_VISIBILITY') > 0:
-	staticCPPDEFINES.remove('HAS_VISIBILITY')
-static_env = env.Copy(CCFLAGS = staticCCFLAGS, CPPDEFINES = staticCPPDEFINES)
-Export('static_env')
-
-# another one for plugins
-plugin_env = env.Copy(LIBS = [], SHLIBPREFIX='', SHLIBSUFFIX='.plugin')
-Export('plugin_env')
 
 dirs = [
 '.',

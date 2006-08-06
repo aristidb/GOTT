@@ -36,11 +36,11 @@
 #
 # ***** END LICENSE BLOCK *****
 
-Import('plugin_env')
+Import('env')
 
-plugin_env.SharedLibrary('select_loop', 'select_loop.cpp')
-if plugin_env['SYS_EPOLL']:
-	plugin_env.SharedLibrary('epoll_loop', 'epoll_loop.cpp')
-if plugin_env['SYS_KQUEUE']:
-	plugin_env.SharedLibrary('kqueue_loop', 'kqueue_loop.cpp')
-plugin_env.SharedLibrary('message_queue_loop', 'message_queue_loop.cpp')
+env.LoadableModule('select_loop', 'select_loop.cpp')
+if env['SYS_EPOLL']:
+	env.LoadableModule('epoll_loop', 'epoll_loop.cpp')
+if env['SYS_KQUEUE']:
+	env.LoadableModule('kqueue_loop', 'kqueue_loop.cpp')
+env.LoadableModule('message_queue_loop', 'message_queue_loop.cpp')

@@ -40,19 +40,17 @@ import os
 import glob
 
 Import('env')
-Import('static_env')
-Import('plugin_env')
 
 simple_sources = glob.glob('parse/*.cpp') + glob.glob('write/*.cpp')
 simple_sources += ['exceptions.cpp', '../exceptions.cpp']
 simple_sources += glob.glob('../string/*.cpp')
-static_env.StaticLibrary('tdl_simple', simple_sources, LIBS = [])
+env.StaticLibrary('tdl_simple', simple_sources, LIBS = [])
 
 builtin_sources = glob.glob('schema/types/*.cpp')
-plugin_env.SharedLibrary('tdl_builtins', builtin_sources)
+env.LoadableModule('tdl_builtins', builtin_sources)
 
 lang_sources = glob.glob('schema_lang/types/*.cpp')
-plugin_env.SharedLibrary('tdl_schema_lang', lang_sources)
+env.LoadableModule('tdl_schema_lang', lang_sources)
 
 module_test_obj = [
     'test/test_tut.cpp', 
