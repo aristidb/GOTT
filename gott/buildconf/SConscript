@@ -207,6 +207,14 @@ if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 	print 'Boost headers are not installed'
 	Exit(1)
 
+if not conf.env['DEBUG_BUILD_CMD']:
+	e=conf.env
+	e['CXXCOMSTR']    = 'c++/st $SOURCE'
+	e['SHCXXCOMSTR']  = 'c++/dy $SOURCE'
+	e['LD_STR']       = '$TARGET <| $SOURCES'
+	e['LINKCOMSTR']   = 'exec / $LD_STR'
+	e['SHLINKCOMSTR'] = 'lib/dy $LD_STR'
+
 boostlibs =	[
 	'thread', 
 	'date_time', 
