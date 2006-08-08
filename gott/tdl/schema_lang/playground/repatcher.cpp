@@ -24,7 +24,7 @@ struct rep_acc : tdl::structure::writable_structure {
   }
 
   void data(gott::Xany const &x) {
-    std::cout << "<rep> $\n" << std::flush;
+    std::cout << "<rep> $ " << x.type().name() << std::endl;
     rep = gott::Xany_cast<repp>(x);
   }
 

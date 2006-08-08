@@ -91,17 +91,17 @@ writable_structure *
 repatcher_chain::deferred_write(writable_structure &s) const {
   struct context : public writable_structure {
     boost::ptr_vector<writable_structure> out;
-    context(boost::ptr_vector<repatcher> const &el, writable_structure &target)
-    : out(el.size()) {
+    context(boost::ptr_vector<repatcher> const &el, writable_structure &target) {
+      out.reserve(el.size());
       int i = el.size() - 1;
       out.push_back(el[i].deferred_write(target));
       while (--i >= 0)
-        out.insert(out.begin(), el[i].deferred_write(out[0]));
+        out.push_back(el[i].deferred_write(out.back()));
     }
-    void begin(source_position const &w) { out[0].begin(w); }
-    void end() { out[0].end(); }
-    void data(gott::xany::Xany const &x) { out[0].data(x); }
-    void add_tag(gott::string const &s) { out[0].add_tag(s); }
+    void begin(source_position const &w) { out.back().begin(w); }
+    void end() { out.back().end(); }
+    void data(gott::xany::Xany const &x) { out.back().data(x); }
+    void add_tag(gott::string const &s) { out.back().add_tag(s); }
   };
   if (el.empty())
     return repatch_nothing().deferred_write(s);
