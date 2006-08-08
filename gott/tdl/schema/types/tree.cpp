@@ -74,7 +74,7 @@ item::expect match_tree::expectation() const {
 }
 
 bool match_tree::play(ev::node const &n) {
-  if (expectation() == nothing)
+  if (level == 0 &&  level_state != fresh)
     return false;
   if (level > 0 && level_state == titled) {
     matcher().out_structure().end();
