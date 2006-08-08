@@ -211,9 +211,10 @@ if not conf.env['DEBUG_BUILD_CMD']:
 	e['CXXCOMSTR']		= 'c++/st $SOURCE'
 	e['SHCXXCOMSTR']	= 'c++/dy $SOURCE'
 	e['LD_STR']			= '$TARGET <| $SOURCES'
-	e['LINKCOMSTR']		= 'exec / $LD_STR'
+	e['LINKCOMSTR']		= 'exec/ $LD_STR'
 	e['SHLINKCOMSTR']	= 'lib/dy $LD_STR'
-	e['LDMODULECOMSTR'] = 'plugin $LS_STR'
+	e['ARCOMSTR']		= 'lib/st $LD_STR'
+	e['LDMODULECOMSTR'] = 'plugin $LD_STR'
 
 boostlibs =	[
 	'thread', 
