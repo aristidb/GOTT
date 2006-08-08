@@ -103,5 +103,8 @@ repatcher_chain::deferred_write(writable_structure &s) const {
     void data(gott::xany::Xany const &x) { out[0].data(x); }
     void add_tag(gott::string const &s) { out[0].add_tag(s); }
   };
-  return new context(el, s);
+  if (el.empty())
+    return repatch_nothing().deferred_write(s);
+  else
+    return new context(el, s);
 }

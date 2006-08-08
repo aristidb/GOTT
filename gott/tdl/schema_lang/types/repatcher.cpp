@@ -110,7 +110,7 @@ public:
   : happy_once(attr, ref) {
     ref.add(
       rule_one("tdl::schema::list",
-        rule_attr(repatcher = new repatcher_maker),
+        rule_attr(repatcher2 = new repatcher_maker),
         rule("tdl::schema::tree", rule_attr(outer = list()))));
     (void)children; //TODO: check that there are _no_ children
   }
