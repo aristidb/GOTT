@@ -120,7 +120,7 @@ def CheckWarnings(context):
 	return result
 
 def CheckOptimization(context):
-	context.Message('Checking if compiler supports gcc-style optimization levels (if necessary)... ')
+	context.Message('Checking if compiler supports gcc-style optimization levels (' + context.env['OPTIMIZATION'] + ')... ')
 	
 	if context.env['OPTIMIZATION'] == 'full':
 		level = '-O3'
