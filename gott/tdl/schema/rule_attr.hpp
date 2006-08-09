@@ -87,9 +87,6 @@ public:
         boost::shared_ptr<structure::repatcher const>())
   : c(cc), t(l), u(x), r(rr), r2(rr2), i(I), o(O) {}
 
-  rule_attr_t(rule_attr_t const &o_)
-  : c(o_.c), t(o_.t), u(o_.u), r(o_.r), i(o_.i), o(o_.o) {}
-
   bool coat() const { return c; }
   std::vector<gott::string> const &tags() const { return t; }
   gott::xany::Xany const &user() const { return u; }

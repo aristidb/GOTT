@@ -136,6 +136,16 @@ void object::test<7>(int) {
 
 template<> template<>
 void object::test<8>(int) {
+  try {
+    run_test("mD\n zz");
+    fail("wrong label");
+  } catch (tdl::tdl_error const &m) {
+    ensure_equals(m.module(), "TDL Schema matcher");
+  }
+}
+
+template<> template<>
+void object::test<9>(int) {
   no_test();
 }
 

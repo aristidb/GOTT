@@ -85,10 +85,12 @@ class repatcher_maker : public structure::concrete_repatcher<repatcher_maker> {
       }
 
       void data(gott::xany::Xany const &x) {
+        std::cout << "repatcher_maker/data:" << x << std::endl;
         getter->data(x);
       }
 
       void add_tag(gott::string const &x) {
+        std::cout << "repatcher_maker/tag:" << x << std::endl;
         getter->add_tag(x);
       }
 
@@ -110,8 +112,8 @@ public:
   : happy_once(attr, ref) {
     ref.add(
       rule_one("tdl::schema::list",
-        rule_attr(repatcher = new repatcher_maker),
-        rule("tdl::schema::tree", rule_attr(outer = list()))));
+        rule_attr(repatcher2 = new repatcher_maker, tag = "LIST"),
+        rule("tdl::schema::tree", rule_attr(outer = list(), tag = "TREE"))));
     (void)children; //TODO: check that there are _no_ children
   }
 
