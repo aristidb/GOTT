@@ -41,15 +41,15 @@ import glob
 
 Import('env')
 
-simple_sources = glob.glob('parse/*.cpp') + glob.glob('write/*.cpp')
+simple_sources = env.Glob('parse/*.cpp') + glob.glob('write/*.cpp')
 simple_sources += ['exceptions.cpp', '../exceptions.cpp']
-simple_sources += glob.glob('../string/*.cpp')
+simple_sources += env.Glob('../string/*.cpp')
 env.StaticLibrary('tdl_simple', simple_sources, LIBS = [])
 
-builtin_sources = glob.glob('schema/types/*.cpp')
+builtin_sources = env.Glob('schema/types/*.cpp')
 env.LoadableModule('tdl_builtins', builtin_sources)
 
-lang_sources = glob.glob('schema_lang/types/*.cpp')
+lang_sources = env.Glob('schema_lang/types/*.cpp')
 env.LoadableModule('tdl_schema_lang', lang_sources)
 
 module_test_obj = [
@@ -59,11 +59,11 @@ module_test_obj = [
     'test/structure.cpp',
     'test/repatcher.cpp',
     'test/writer.cpp'
-  ] + glob.glob('test/schema/*.cpp')
+  ] + env.Glob('test/schema/*.cpp')
 
 env.Program('module_test', module_test_obj)
 
-unit_test_obj = glob.glob('test/unit/*.cpp')
+unit_test_obj = env.Glob('test/unit/*.cpp')
 env.Program('unit_test', unit_test_obj)
 
 SConscript(dirs = 'schema_lang')

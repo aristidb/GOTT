@@ -41,10 +41,10 @@ import glob
 Import('env')
 
 ## Now in gott_fundamentals
-#env.SharedLibrary('string', glob.glob('*.cpp'))
+#env.SharedLibrary('string', env.Glob('*.cpp'))
 #env = env.Copy()
 #env.Append(LIBS = ['string'])
 #
 #Export('env')
 
-env.Program('string_test', glob.glob('test/*.cpp'))
+env.Program('string_test', env.Glob('test/*.cpp'))

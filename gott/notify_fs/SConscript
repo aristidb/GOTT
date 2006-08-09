@@ -41,9 +41,9 @@ import glob
 Import('env')
 
 if env['SYS_INOTIFY'] == 1:
-  env.LoadableModule('notify_inotify', glob.glob('inotify/*.cpp'))
+  env.LoadableModule('notify_inotify', env.Glob('inotify/*.cpp'))
 
 if env['SYS_KQUEUE'] == 1:
-  env.LoadableModule('notify_kqueue', glob.glob('kqueue/*.cpp'))
+  env.LoadableModule('notify_kqueue', env.Glob('kqueue/*.cpp'))
 
 env.Program('test', 'test.cpp')

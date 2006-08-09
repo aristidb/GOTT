@@ -38,27 +38,14 @@
 
 Import('env')
 
-import dircache
-import glob
-import os
-import stat
 
-def ScanDir(path):
-	codefiles = glob.glob(path + '/*.hpp')
-	files = dircache.listdir(path)
-	for file in files:
-		mode = os.stat(path+'/'+file)[stat.ST_MODE]
-		if stat.S_ISDIR(mode):
-			codefiles += ScanDir(file)
-	return codefiles
-
-codefiles = ScanDir('.')
+codefiles = env.Glob("*/*.hpp")
 
 ## FIXME: call string (relative path, call to python)
 test_env = env.Copy()
 test_env.Command('unit_test.cpp', codefiles,
 'python ../ext/cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCES')
-test_env.Append(CPPPATH = ['../../ext/cxxtest', '..'])
+test_env.Append(CPPPATH = ['#/../ext/cxxtest', '#'])
 test_env.Program('unit_test.cpp')
 
 ## Should Scons run unit_test?

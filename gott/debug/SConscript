@@ -39,4 +39,4 @@
 import glob
 
 Import('env')
-env.Program('test', glob.glob('*.cpp'))
+env.Program('test', env.Glob('*.cpp'))

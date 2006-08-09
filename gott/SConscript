@@ -40,17 +40,17 @@ import glob
 import os
 Import('env')
 
-libobj = glob.glob('string/*.cpp')
+libobj = env.Glob('string/*.cpp')
 libobj += ['exceptions.cpp', 'xany/xany.cpp']
 
-libobj_plugin = glob.glob('plugin/*.cpp')
+libobj_plugin = env.Glob('plugin/*.cpp')
 libobj_plugin.remove('plugin/test.cpp')
 libobj += libobj_plugin
 
-libobj += glob.glob('plugin/metadata/*.cpp')
-libobj += glob.glob('plugin/metadata/detail/*.cpp')
+libobj += env.Glob('plugin/metadata/*.cpp')
+libobj += env.Glob('plugin/metadata/detail/*.cpp')
 
-libobj_syswrap = glob.glob('syswrap/*.cpp')
+libobj_syswrap = env.Glob('syswrap/*.cpp')
 if env['SYS_KQUEUE'] == 0:
 	libobj_syswrap.remove('syswrap/kqueue_bsd.cpp')
 if env['SYS_EPOLL'] == 0:
@@ -61,21 +61,27 @@ libobj_syswrap.remove('syswrap/test.cpp')
 libobj += libobj_syswrap
 
 tdl_source_files = []
-for root, dirs, _ in os.walk('tdl'):
-	if 'test' in dirs:
-		dirs.remove('test')
-	if 'types' in dirs:
-		dirs.remove('types')
-	if 'playground' in dirs:
-		dirs.remove('playground')
-	tdl_source_files += glob.glob(root + '/*.cpp')
+
+tdl_dirs= [
+'.',
+'schema',
+'schema_lang',
+'parse',
+'write',
+'structure',
+'structure/repatchers',
+]
+for x in tdl_dirs:
+	tdl_source_files += env.Glob("tdl/" + x + '/*.cpp')
+
+
 libobj += tdl_source_files
 
-libobj_events = glob.glob('events/*.cpp')
+libobj_events = env.Glob('events/*.cpp')
 libobj_events.remove('events/mq_loop_test.cpp')
 libobj += libobj_events
 
-libobj_notify_fs = glob.glob('notify_fs/*.cpp')
+libobj_notify_fs = env.Glob('notify_fs/*.cpp')
 libobj_notify_fs.remove('notify_fs/test.cpp')
 libobj += libobj_notify_fs
 
@@ -85,7 +91,7 @@ env2.SharedLibrary('gott_core', libobj)
 env = env.Copy()
 env.Append(LIBS = ['gott_core'])
 
-libobj_graphics = glob.glob('graphics/*.cpp')
+libobj_graphics = env.Glob('graphics/*.cpp')
 env.SharedLibrary('gott_graphics', libobj_graphics)
 env = env.Copy()
 env.Append(LIBS = ['gott_graphics'])

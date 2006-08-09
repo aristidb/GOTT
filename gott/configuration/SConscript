@@ -40,5 +40,5 @@ import glob
 
 Import('env')
 
-env.LoadableModule('config', glob.glob('*.cpp'))
-env.Program('config_test', glob.glob('test/*.cpp'))
+env.LoadableModule('config', env.Glob('*.cpp'))
+env.Program('config_test', env.Glob('test/*.cpp'))

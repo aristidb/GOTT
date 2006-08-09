@@ -38,6 +38,7 @@
 
 import os
 import sys
+import buildconf.Glob
 
 platform = ARGUMENTS.get('OS', str(Platform()))
 platform2 = sys.platform
@@ -71,6 +72,8 @@ opts.Add(EnumOption('OPTIMIZATION', 'Optimization level', 'default',
                     allowed_values=('default', 'none', 'some', 'full')))
 opts.Add(BoolOption('HIDE_SYMBOLS', 'Hide unused symbols', 1))
 
+opts.Add('BUILD_TO',"Set the build target path",".")
+
 opts.Add(PathOption('BOOST_INCLUDE', 'Include directory of boost', '/usr/include'))
 opts.Add(PathOption('BOOST_LIB', 'Library directory of boost', '/usr/lib'))
 opts.Add('BOOST_LIBSUFFIX', 'Library suffix of boost', '')
@@ -81,10 +84,6 @@ opts.Add(BoolOption('SYS_EPOLL', 'Whether to use epoll(4)', 0))
 
 libdirs_pre = open('libdirs.txt').readlines()
 
-libdirs = []
-for x in libdirs_pre:
-	libdirs += ['#/' + x[0:-1]]
-
 env = Environment(
   options = opts,
   ENV = os.environ, # FIXME: security hole?
@@ -92,7 +91,7 @@ env = Environment(
   CCFLAGS = [],
   SHCCFLAGS = ['-DBUILDING_DLL'],
   CPPPATH=['#/..', '${BOOST_INCLUDE}'], 
-  LIBPATH=libdirs + ['${BOOST_LIB}'],
+  LIBPATH=['#/$BUILD_TO/', '$BUILD_TO/',  '${BOOST_LIB}'],
   LDMODULEPREFIX="",
   LDMODULESUFFIX=".plugin",
   LDMODULECOM="$SHLINK -o $TARGET $SHLINKFLAGS  $SOURCES",
@@ -133,8 +132,21 @@ dirs = [
 'properties',
 #'ui',
 'examples',
-'tests'
+'tests',
 ]
 
-for x in dirs:
-  SConscript(dirs = x)
+metadata = [
+#'./plugin/testregistry.tdl',
+'plugin_registry.tdl',
+'module_registry.tdl',
+'deduced_features.tdl',
+'setup_libpath.sh',
+]
+
+if env['BUILD_TO']=='.':
+	for x in dirs:
+		SConscript(dirs = x)
+else:
+	env.Install( dir="$BUILD_TO", source=metadata)
+	for x in dirs:
+		SConscript(dirs = x,build_dir= env['BUILD_TO'] + "/" + x,duplicate=0)
