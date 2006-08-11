@@ -69,6 +69,8 @@ public:
    */
   virtual void begin(source_position const &) = 0;
 
+  void begin();
+
   /**
    * End a node.
    */

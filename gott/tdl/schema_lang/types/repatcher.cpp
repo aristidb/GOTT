@@ -40,9 +40,9 @@
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/item.hpp>
-#include <gott/tdl/schema/happy_once.hpp>
 #include <gott/tdl/schema/type.hpp>
 #include <gott/tdl/schema/rule_attr.hpp>
+#include <gott/tdl/schema/event.hpp>
 #include <gott/tdl/structure/repatch.hpp>
 #include <gott/tdl/structure/repatcher_by_name.hpp>
 #include <boost/shared_ptr.hpp>
@@ -53,82 +53,46 @@ namespace structure = tdl::structure;
 using structure::writable_structure;
 
 namespace {
-class repatcher_maker : public structure::concrete_repatcher<repatcher_maker> {
-  writable_structure *deferred_write(writable_structure &target) const {
-    class context : public writable_structure {
-    public:
-      context(writable_structure &target)
-      : target(target),
-        getter(structure::repatcher_by_name().chain_alloc()),
-        level(0) {}
-
-    private:
-      void begin(tdl::source_position const &w) {
-        last_position = w;
-        if (level++ > 0)
-          getter->begin(w);
-        std::cout << "repatcher_maker/begin:" << level << std::endl;
-      }
-
-      void end() {
-        std::cout << "repatcher_maker/end:" << level << std::endl;
-        if (--level > 0)
-          getter->end();
-        else {
-          target.begin(last_position);
-            target.add_tag("repatcher");
-            target.data(gott::Xany(boost::shared_ptr<structure::repatcher>(
-                    getter->result_alloc())));
-          target.end();
-          getter.reset(structure::repatcher_by_name().chain_alloc());
-        }
-      }
-
-      void data(gott::xany::Xany const &x) {
-        std::cout << "repatcher_maker/data:" << x << std::endl;
-        getter->data(x);
-      }
-
-      void add_tag(gott::string const &x) {
-        std::cout << "repatcher_maker/tag:" << x << std::endl;
-        getter->add_tag(x);
-      }
-
-      writable_structure &target;
-      boost::scoped_ptr<structure::repatcher_getter> getter;
-      unsigned long level;
-      tdl::source_position last_position;
-    };
-    return new context(target);
-  }
-};
-
-class matcher : public happy_once {
+class xmatcher : public item {
 public:
-  matcher(
+  xmatcher(
       rule_attr_t const &attr,
       std::vector<rule_t> const &children,
       match &ref)
-  : happy_once(attr, ref) {
-    ref.add(
-      rule_one("tdl::schema::list",
-        rule_attr(repatcher2 = new repatcher_maker, tag = "LIST"),
-        rule("tdl::schema::tree", rule_attr(outer = list(), tag = "TREE"))));
+  : item(attr, ref),
+  getter(structure::repatcher_by_name().chain_alloc()) {
     (void)children; //TODO: check that there are _no_ children
   }
 
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
   { return true; }
 
-  bool play(ev::child_succeed const &) {
-    be_happy();
+private:
+  ~xmatcher() {
+    matcher().out_structure().begin(matcher().where_out());
+    matcher().out_structure().data(gott::Xany(
+          boost::shared_ptr<structure::repatcher>(
+            getter->result_alloc())));
+    matcher().out_structure().end();
+  }
+  
+  bool play(ev::node const &n) {
+    getter->begin();
+    getter->data(gott::Xany(n.get_data()));
+    getter->end();
     return true;
+  }
+
+  item::expect expectation() const {
+    return maybe;
   }
 
   gott::string name() const {
     return gott::string("tdl::schema_lang::repatcher");
   }
+
+  boost::scoped_ptr<structure::repatcher_getter> getter;
 };
 }
 
-GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin_lang_repatcher, concrete_type<matcher>)
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin_lang_repatcher, concrete_type<xmatcher>)
