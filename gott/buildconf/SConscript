@@ -208,14 +208,14 @@ if not conf.CheckCXXHeader('boost/config.hpp', '<>'):
 
 if not conf.env['DEBUG_BUILD_CMD']:
 	e=conf.env
-	e['CXXCOMSTR']		= 'c++/st  $TARGET'
-	e['SHCXXCOMSTR']	= 'c++/dy  $TARGET'
+	e['CXXCOMSTR']		= "c++/st $TARGET"
+	e['SHCXXCOMSTR']	= 'c++/dy $TARGET'
 	e['LD_STR']			= '$TARGET'
-	e['LINKCOMSTR']		= 'exe     $LD_STR'
-	e['SHLINKCOMSTR']	= 'lib/dy  $LD_STR'
-	e['ARCOMSTR']		= 'lib/st  $LD_STR'
-	e['LDMODULECOMSTR'] = 'plugin  $LD_STR'
-	e['INSTALLSTR']		= 'install $TARGET'
+	e['LINKCOMSTR']		= 'execut $LD_STR'
+	e['SHLINKCOMSTR']	= 'lib/dy $LD_STR'
+	e['ARCOMSTR']		= 'lib/st $LD_STR'
+	e['LDMODULECOMSTR'] = 'plugin $LD_STR'
+	e['INSTALLSTR']		= 'instal $TARGET'
 
 boostlibs =	[
 	'thread', 
