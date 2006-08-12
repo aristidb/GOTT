@@ -151,6 +151,7 @@ void epoll_loop::add_fd(int fd, unsigned mask,
 
   epoll_event ev;
   ev.events = 0;
+  // TODO: check if this is really good
   if (mask & fd_manager::read)
     ev.events |= EPOLLIN | EPOLLPRI;
   if (mask & fd_manager::write)
@@ -207,6 +208,7 @@ void epoll_loop::run() {
         if (it != p->fd_map.end()) {
           impl::fd_entry &e = it->second;
           unsigned mask = 0;
+          // TODO: check this, too
           if (event[i].events & (EPOLLIN | EPOLLPRI))
             mask |= fd_manager::read;
           if (event[i].events & EPOLLOUT)
