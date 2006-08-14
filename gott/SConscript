@@ -47,9 +47,6 @@ libobj_plugin = env.Glob('plugin/*.cpp')
 libobj_plugin.remove('plugin/test.cpp')
 libobj += libobj_plugin
 
-libobj += env.Glob('plugin/metadata/*.cpp')
-libobj += env.Glob('plugin/metadata/detail/*.cpp')
-
 libobj_syswrap = env.Glob('syswrap/*.cpp')
 if env['SYS_KQUEUE'] == 0:
 	libobj_syswrap.remove('syswrap/kqueue_bsd.cpp')
@@ -74,22 +71,27 @@ tdl_dirs= [
 for x in tdl_dirs:
 	tdl_source_files += env.Glob("tdl/" + x + '/*.cpp')
 
-
 libobj += tdl_source_files
-
-libobj_events = env.Glob('events/*.cpp')
-libobj_events.remove('events/mq_loop_test.cpp')
-libobj += libobj_events
-
-libobj_notify_fs = env.Glob('notify_fs/*.cpp')
-libobj_notify_fs.remove('notify_fs/test.cpp')
-libobj += libobj_notify_fs
 
 env2 = env.Copy()
 env2.Append(LIBS = ['dl'])
 env2.SharedLibrary('gott_core', libobj)
 env = env.Copy()
 env.Append(LIBS = ['gott_core'])
+
+libobj_system = []
+
+libobj_events = env.Glob('events/*.cpp')
+libobj_events.remove('events/mq_loop_test.cpp')
+libobj_system += libobj_events
+
+libobj_notify_fs = env.Glob('notify_fs/*.cpp')
+libobj_notify_fs.remove('notify_fs/test.cpp')
+libobj_system += libobj_notify_fs
+
+env.SharedLibrary('gott_system', libobj_system)
+env = env.Copy()
+env.Append(LIBS = ['gott_system'])
 
 libobj_graphics = env.Glob('graphics/*.cpp')
 env.SharedLibrary('gott_graphics', libobj_graphics)
