@@ -46,7 +46,6 @@
 #include <gott/tdl/structure/repatch.hpp>
 #include <gott/tdl/structure/repatcher_by_name.hpp>
 #include <boost/shared_ptr.hpp>
-#include <iostream>//FIXME
 
 using namespace tdl::schema;
 namespace structure = tdl::structure;
@@ -61,6 +60,20 @@ public:
       match &ref)
   : item(attr, ref),
   getter(structure::repatcher_by_name().chain_alloc()) {
+    //TODO: future concept:
+    //unordered(list):
+    //  <integer>
+    //  <throw-away>
+    //  <enumeration>
+    //    list: node
+    //  <find-literal>
+    //    unordered
+    //      enumeration $ start, end, whole, substring
+    //      node
+    //  <substring>
+    //    ordered
+    //      : left, integer
+    //      : right, integer
     (void)children; //TODO: check that there are _no_ children
   }
 
@@ -91,6 +104,7 @@ private:
     return gott::string("tdl::schema_lang::repatcher");
   }
 
+  rule_t param;
   boost::scoped_ptr<structure::repatcher_getter> getter;
 };
 }
