@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,82 +36,42 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_PLUGIN_PLUGIN_HANDLE_HPP
-#define GOTT_BASE_PLUGIN_PLUGIN_HANDLE_HPP
-
-#include "plugin_base.hpp"
-#include "module.hpp"
-#include "selector.hpp"
+#include "multi_plugin.hpp"
+#include "error.hpp"
 #include "descriptor.hpp"
-#include <boost/optional/optional.hpp>
-#include <boost/scoped_ptr.hpp>
+#include "metadata_manager.hpp"
+#include <boost/lambda/bind.hpp>
 
-namespace gott {
-class string;
+using gott::plugin::multi_plugin;
 
-namespace plugin {
+void multi_plugin::update() {
+  std::vector<plugin_descriptor> old;
+  old.swap(current);
+  std::vector<plugin_descriptor> fresh = current = sel.all_plugins();
 
-class selector;
-class plugin_descriptor;
-
-class plugin_handle_base {
-public:
-  GOTT_EXPORT
-  plugin_handle_base(selector const &sel);
-
-  GOTT_EXPORT
-  plugin_handle_base(plugin_descriptor const &desc);
+  typedef std::vector<plugin_descriptor>::iterator iterator;
   
-  ~plugin_handle_base() GOTT_EXPORT;
-
-  plugin_base *get_base() const GOTT_EXPORT;
-
-protected:
-  void fail_interface(string const &which) GOTT_EXPORT;
-
-private:
-  class impl;
-  boost::scoped_ptr<impl> p;
-};   
-
-template<class Interface>
-class plugin_handle : public plugin_handle_base {
-public:
-  plugin_handle()
-    : plugin_handle_base(with_interface<Interface>()),
-      p(cast(get_base())) {
-    if (!p) fail_interface();
+  for (iterator it = old.begin(); it != old.end(); ++it)
+    for (iterator jt = fresh.begin(); jt != fresh.end(); ++jt)
+      if (*it == *jt) {
+        old.erase(it);
+        fresh.erase(jt);
+      }
+  for (iterator it = old.begin(); it != old.end(); ++it)
+    if (!remove(*it))
+      current.push_back(*it);
+  for (iterator it = fresh.begin(); it != fresh.end(); ++it) {
+    try {
+      add(*it);
+    } catch (failed_load const &e) {
+      if (e.kind() != "plugin" || e.which() != it->to_string())
+        throw;
+    }
   }
+}
 
-  plugin_handle(selector const &sel)
-    : plugin_handle_base(sel && with_interface<Interface>()),
-      p(cast(get_base())) {
-    if (!p) fail_interface(sel.to_string());
-  }
-
-  plugin_handle(plugin_descriptor const &desc)
-    : plugin_handle_base(desc),
-      p(cast(get_base())) {
-    if (!p) fail_interface(desc.to_string());
-  }
-
-  ~plugin_handle() {}
-
-  Interface &operator*() { return *p; }
-  Interface const &operator*() const { return *p; }
-  Interface *operator->() { return p; }
-  Interface const *operator->() const { return p; }
-  Interface *get() { return p; }
-  Interface const *get() const { return p; }
-
-private:
-  Interface *p;
-
-  static Interface *cast(plugin_base *base) {
-    return static_cast<Interface *>(base);
-  }
-};
-
-}}
-
-#endif
+void multi_plugin::inscribe() {
+  metadata_manager man;
+  conn = man.on_update().connect(
+      boost::lambda::bind(&multi_plugin::update, this));
+}

@@ -119,6 +119,8 @@ namespace {
     string resource;
   };
   vector<deduced_feature> deduced_features;
+
+  sigc::signal0<void> on_update_;
 }
 
 class metadata_manager::impl {
@@ -276,7 +278,12 @@ void metadata_manager::commit() {
   p->add_plugins.clear();
   p->add_modules.clear();
   p->add_features.clear();
+
+  // call callback
+  on_update().emit();
 }
+
+sigc::signal0<void> &metadata_manager::on_update() { return on_update_; }
 
 void metadata_manager::remove_resource(string const &resource) {
   p->remove_resources.insert(resource);

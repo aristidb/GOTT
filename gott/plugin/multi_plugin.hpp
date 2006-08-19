@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005-2006
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,80 +36,56 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_BASE_PLUGIN_PLUGIN_HANDLE_HPP
-#define GOTT_BASE_PLUGIN_PLUGIN_HANDLE_HPP
+#ifndef GOTT_PLUGIN_MULTI_PLUGIN_HPP
+#define GOTT_PLUGIN_MULTI_PLUGIN_HPP
 
-#include "plugin_base.hpp"
-#include "module.hpp"
-#include "selector.hpp"
-#include "descriptor.hpp"
-#include <boost/optional/optional.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <gott/plugin/selector.hpp>
+#include <boost/function.hpp>
+#include <sigc++/connection.h>
+#include <boost/noncopyable.hpp>
 
-namespace gott {
-class string;
+namespace gott { namespace plugin {
 
-namespace plugin {
+namespace detail { 
+  bool do_not_accept(plugin_descriptor const &) { return false; }
+}
 
-class selector;
-class plugin_descriptor;
-
-class plugin_handle_base {
+/**
+ * Use all plugins with given criteria.
+ */
+class multi_plugin : boost::noncopyable {
 public:
-  GOTT_EXPORT
-  plugin_handle_base(selector const &sel);
+  typedef boost::function<void (plugin_descriptor const &)> add_callback_t;
+  typedef boost::function<bool (plugin_descriptor const &)> remove_callback_t;
 
-  GOTT_EXPORT
-  plugin_handle_base(plugin_descriptor const &desc);
-  
-  ~plugin_handle_base() GOTT_EXPORT;
+  multi_plugin(
+      selector const &selector_,
+      add_callback_t const &add_callback)
+  : sel(selector_), add(add_callback), remove(detail::do_not_accept) {
+    update();
+    inscribe();
+  }
 
-  plugin_base *get_base() const GOTT_EXPORT;
+  multi_plugin(
+      selector const &selector_,
+      add_callback_t const &add_callback,
+      remove_callback_t const &remove_callback)
+  : sel(selector_), add(add_callback), remove(remove_callback) {
+    update();
+    inscribe();
+  }
 
-protected:
-  void fail_interface(string const &which) GOTT_EXPORT;
+  ~multi_plugin() { conn.disconnect(); }
 
 private:
-  class impl;
-  boost::scoped_ptr<impl> p;
-};   
+  GOTT_EXPORT void update();
+  GOTT_EXPORT void inscribe();
 
-template<class Interface>
-class plugin_handle : public plugin_handle_base {
-public:
-  plugin_handle()
-    : plugin_handle_base(with_interface<Interface>()),
-      p(cast(get_base())) {
-    if (!p) fail_interface();
-  }
-
-  plugin_handle(selector const &sel)
-    : plugin_handle_base(sel && with_interface<Interface>()),
-      p(cast(get_base())) {
-    if (!p) fail_interface(sel.to_string());
-  }
-
-  plugin_handle(plugin_descriptor const &desc)
-    : plugin_handle_base(desc),
-      p(cast(get_base())) {
-    if (!p) fail_interface(desc.to_string());
-  }
-
-  ~plugin_handle() {}
-
-  Interface &operator*() { return *p; }
-  Interface const &operator*() const { return *p; }
-  Interface *operator->() { return p; }
-  Interface const *operator->() const { return p; }
-  Interface *get() { return p; }
-  Interface const *get() const { return p; }
-
-private:
-  Interface *p;
-
-  static Interface *cast(plugin_base *base) {
-    return static_cast<Interface *>(base);
-  }
+  std::vector<plugin_descriptor> current;
+  selector sel;
+  add_callback_t add;
+  remove_callback_t remove;
+  sigc::connection conn;
 };
 
 }}

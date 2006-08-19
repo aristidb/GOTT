@@ -36,69 +36,31 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_SELECTOR_HPP
-#define GOTT_PLUGIN_SELECTOR_HPP
+#include "error.hpp"
+#include <gott/string/string.hpp>
 
-#include <gott/string/qid.hpp>
-#include <boost/shared_ptr.hpp>
-#include <vector>
-#include <utility>
+using gott::plugin::failed_load;
 
-namespace gott { namespace plugin {
-
-class plugin_descriptor;
-class module_descriptor;
-
-class selector {
+class failed_load::impl {
 public:
-  plugin_descriptor get_plugin() const;
-  module_descriptor get_module() const;
+  string kind;
+  string which;
+  string reason;
 
-  std::vector<plugin_descriptor> all_plugins() const;
-
-  GOTT_EXPORT ~selector();
-
-  GOTT_EXPORT static selector with_plugin_id(QID const &plugin_id);
-  GOTT_EXPORT static selector with_interface_id(QID const &interface_id);
-  GOTT_EXPORT static selector with_module_id(QID const &module_id);
-  GOTT_EXPORT static selector with_feature_id(QID const &feature_id);
-
-  GOTT_EXPORT selector operator&&(selector const &other) const;
-
-  GOTT_EXPORT string to_string() const;
-
-private:
-  class impl;
-  boost::shared_ptr<impl const> p;
-  explicit selector(impl *);
+  impl(string const &k, string const &w, string const &r)
+    : kind(k), which(w), reason(r) {}
 };
 
-inline selector with_plugin_id(QID const &plugin_id) {
-  return selector::with_plugin_id(plugin_id);
-}
+failed_load::failed_load(
+    string const &kind,
+    string const &which,
+    string const &reason) 
+  : system_error("could not load " + kind + " " + which + ": " + reason),
+    p(new impl(kind, which, reason)) {}
+failed_load::~failed_load() throw() {}
+failed_load::failed_load(failed_load const &o)
+  : system_error(*this), p(new impl(*o.p)) {}
 
-inline selector with_interface_id(QID const &interface_id) {
-  return selector::with_interface_id(interface_id);
-}
-
-template<class T>
-inline selector with_interface() {
-  return with_interface_id(T::qid);
-}
-
-inline selector with_module_id(QID const &module_id) {
-  return selector::with_module_id(module_id);
-}
-
-inline selector with_feature_id(QID const &feature_id) {
-  return selector::with_feature_id(feature_id);
-}
-
-template<class T>
-inline selector with_feature() {
-  return with_feature_id(T::qid);
-}
-
-}}
-
-#endif
+gott::string const &failed_load::kind() const { return p->kind; }
+gott::string const &failed_load::which() const { return p->which; }
+gott::string const &failed_load::reason() const { return p->reason; }

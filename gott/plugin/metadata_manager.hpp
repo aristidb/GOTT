@@ -45,6 +45,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/optional.hpp>
 #include <boost/function.hpp>
+#include <sigc++/signal.h>
 #include <vector>
 #include <set>
 
@@ -118,6 +119,12 @@ public: //internal
    * \name Internal methods
    * \{
    */
+
+  /**
+   * \internal
+   * Signal emitted whenever a commit is complete.
+   */
+  sigc::signal0<void> &on_update();
 
   /**
    * \internal

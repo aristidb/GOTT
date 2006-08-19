@@ -41,7 +41,7 @@
 #include "descriptor.hpp"
 #include "plugin_base.hpp"
 #include "metadata_manager.hpp"
-#include <gott/exceptions.hpp>
+#include "error.hpp"
 
 using namespace gott::plugin;
 
@@ -69,10 +69,21 @@ public:
   }
 };
 
-plugin_handle_base::plugin_handle_base(selector const &sel)
-: p() {
-  while (!impl::init(p, sel))
-    ;
+plugin_handle_base::plugin_handle_base(selector const &sel) {
+  if (!impl::init(p, sel))
+    try {
+      while (!impl::init(p, sel))
+        ;
+    } catch (failed_load&) {
+      throw failed_load("plugin", sel.to_string(), "invalid plugins only");
+    }
+}
+
+plugin_handle_base::plugin_handle_base(plugin_descriptor const &desc)
+try
+: p(new impl(desc)) {}
+catch (gott::system_error&) {
+  throw failed_load("plugin", desc.to_string(),"invalid plugin");
 }
 
 plugin_handle_base::~plugin_handle_base() {}
@@ -81,8 +92,10 @@ plugin_base *plugin_handle_base::get_base() const {
   return p->p.get();
 }
 
-void plugin_handle_base::fail_interface() {
-  throw gott::system_error(
+void plugin_handle_base::fail_interface(string const &which) {
+  throw failed_load(
+      "plugin",
+      which,
       "plugin does not support requested interface");
 }
 

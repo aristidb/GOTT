@@ -39,6 +39,7 @@
 #include "selector.hpp"
 #include "descriptor.hpp"
 #include "metadata_manager.hpp"
+#include "error.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -127,7 +128,9 @@ selector selector::operator&&(selector const &o) const {
 gott::plugin::plugin_descriptor
 selector::get_plugin() const {
   if (p->module_id)
-    throw gott::system_error(
+    throw failed_load(
+        "plugin",
+        to_string(),
         "loading plugins by module-id is not supported");
 
   metadata_manager man;
@@ -137,7 +140,7 @@ selector::get_plugin() const {
   plugin_descriptor result;
 
   using namespace boost::lambda;
-//FIXME, seems not to work
+
   for (int prio = plugin_information::N_PRIORITY - 1;
       prio >= 0;
       --prio)
@@ -152,14 +155,50 @@ selector::get_plugin() const {
       break;
 
   if (result == plugin_descriptor())
-    throw gott::system_error("could not find plugin");
+    throw failed_load("plugin", to_string(), "not found");
+
+  return result;
+}
+
+std::vector<gott::plugin::plugin_descriptor>
+selector::all_plugins() const {
+  if (p->module_id)
+    throw failed_load(
+        "plugin",
+        to_string(),
+        "loading plugins by module-id is not supported");
+
+  metadata_manager man;
+  man.load_standard();
+  man.commit();
+
+  std::vector<plugin_descriptor> result;
+
+  using namespace boost::lambda;
+
+  for (int prio = plugin_information::N_PRIORITY - 1;
+      prio >= 0;
+      --prio)
+    man.enum_plugins(
+        (
+        if_then(
+          bind(&impl::check_plugin, p.get(), _2),
+          bind(&std::vector<plugin_descriptor>::push_back, &result, _1)),
+        true
+        ),
+        p->plugin_id,
+        p->interface_id,
+        p->features,
+        plugin_information::priority_t(prio));
 
   return result;
 }
 
 gott::plugin::module_descriptor selector::get_module() const {
   if (p->plugin_id || p->interface_id || !p->features.empty())
-    throw gott::system_error(
+    throw failed_load(
+        "module",
+        to_string(),
         "loading modules by plugin-id, interface-id or feature "
         "is not supported");
 
@@ -179,7 +218,28 @@ gott::plugin::module_descriptor selector::get_module() const {
       p->module_id);
 
   if (result == module_descriptor())
-    throw gott::system_error("could not find module");
+    throw failed_load("module", to_string(), "not found");
 
   return result;
+}
+
+gott::string selector::to_string() const {
+  string_buffer result;
+  if (p->module_id)
+    result = "module-id " + p->module_id->get_string();
+  if (p->plugin_id) {
+    if (result.size()) result += " and ";
+    result += "plugin-id " + p->plugin_id->get_string();
+  }
+  if (p->interface_id) {
+    if (result.size()) result += " and ";
+    result += "interface-id " + p->interface_id->get_string();
+  }
+  for (std::set<QID>::const_iterator it = p->features.begin();
+      it != p->features.end();
+      ++it) {
+    if (result.size()) result += " and ";
+    result += "feature " + it->get_string();
+  }
+  return "with " + result;
 }
