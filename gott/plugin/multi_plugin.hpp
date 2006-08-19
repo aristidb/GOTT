@@ -47,7 +47,7 @@
 namespace gott { namespace plugin {
 
 namespace detail { 
-  bool do_not_accept(plugin_descriptor const &) { return false; }
+ inline bool do_not_accept(plugin_descriptor const &) { return false; }
 }
 
 /**

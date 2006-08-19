@@ -44,7 +44,7 @@
 #include "selector.hpp"
 #include "descriptor.hpp"
 #include <boost/optional/optional.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace gott {
 class string;
@@ -71,7 +71,7 @@ protected:
 
 private:
   class impl;
-  boost::scoped_ptr<impl> p;
+  boost::shared_ptr<impl const> p;
 };   
 
 template<class Interface>

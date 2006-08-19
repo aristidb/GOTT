@@ -39,12 +39,14 @@
 #include "by_name.hpp"
 #include "rule.hpp"
 #include "type.hpp"
+#include <gott/tdl/exceptions.hpp>
 #include <gott/string/string.hpp>
 #include <gott/string/atom.hpp>
 #include <gott/plugin.hpp>
 #include <gott/plugin/metadata_manager.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/utility/in_place_factory.hpp>
 #include <map>
 
 using namespace tdl::schema;
@@ -55,9 +57,23 @@ using std::vector;
 namespace {
   // those are NEVER unloaded because they depend on "us" and this leads to a
   // deadly circular reference or something
-  typedef std::map<gott::atom, plugin_handle<type> * > map_t;
+  typedef std::map<gott::atom, plugin_handle<type> > map_t;
   map_t all_handles;
+  boost::optional<multi_plugin> book_keeper;
   boost::mutex mutex;
+
+  void do_add(plugin_descriptor const &desc) {
+    metadata_manager man;
+    all_handles.insert(map_t::value_type(
+          man.plugin_extra(desc).plugin_id,
+          plugin_handle<type>(desc)));
+  }
+
+  void init() {
+    book_keeper = boost::in_place(
+        with_interface<type>(),
+        multi_plugin::add_callback_t(&do_add));
+  }
 }
 
 rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
@@ -70,15 +86,15 @@ rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
 
   boost::mutex::scoped_lock lock(mutex);
 
-  if (all_handles.count(s) == 0) {
-    plugin_handle<type> * handle(new plugin_handle<type>(with_plugin_id(s)));
+  if (!book_keeper) init();
 
-    all_handles.insert(map_t::value_type(s, handle));
-  }
+  map_t::iterator it = all_handles.find(s);
 
-  plugin_handle<type> * handle = all_handles.find(s)->second;
-  type &type = *handle->get();
-  abstract_rule abstract = type.get_abstract();
+  if (it == all_handles.end())
+    throw tdl::tdl_error("TDL Schema", "type not found");
+
+  plugin_handle<type> &handle = it->second;
+  abstract_rule abstract = handle->get_abstract();
 
   return rule_t(abstract, a, c);
 }

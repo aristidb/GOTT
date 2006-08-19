@@ -53,7 +53,7 @@ public:
   module mod;
   boost::scoped_ptr<plugin_base> p;
 
-  static bool init(boost::scoped_ptr<impl> &p, selector const &sel) {
+  static bool init(boost::shared_ptr<impl const> &p, selector const &sel) {
     plugin_descriptor desc = sel.get_plugin();
     try {
       p.reset(new impl(desc));

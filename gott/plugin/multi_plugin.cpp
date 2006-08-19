@@ -41,26 +41,35 @@
 #include "descriptor.hpp"
 #include "metadata_manager.hpp"
 #include <boost/lambda/bind.hpp>
+#include <vector>
+#include <list>
 
 using gott::plugin::multi_plugin;
 
 void multi_plugin::update() {
-  std::vector<plugin_descriptor> old;
-  old.swap(current);
-  std::vector<plugin_descriptor> fresh = current = sel.all_plugins();
-
-  typedef std::vector<plugin_descriptor>::iterator iterator;
+  typedef std::list<plugin_descriptor> list;
+  typedef std::vector<plugin_descriptor> vector;
   
-  for (iterator it = old.begin(); it != old.end(); ++it)
-    for (iterator jt = fresh.begin(); jt != fresh.end(); ++jt)
+  list old(current.begin(), current.end());
+  current = sel.all_plugins();
+  list fresh(current.begin(), current.end());
+
+  for (list::iterator it = old.begin(); it != old.end(); ++it)
+    for (list::iterator jt = fresh.begin(); jt != fresh.end(); ++jt)
       if (*it == *jt) {
-        old.erase(it);
+        it = old.erase(it);
+        if (old.begin() != it)
+          --it;
         fresh.erase(jt);
+        break;
       }
-  for (iterator it = old.begin(); it != old.end(); ++it)
+
+  for (list::iterator it = old.begin(); it != old.end(); ++it) {
     if (!remove(*it))
       current.push_back(*it);
-  for (iterator it = fresh.begin(); it != fresh.end(); ++it) {
+  }
+
+  for (list::iterator it = fresh.begin(); it != fresh.end(); ++it) {
     try {
       add(*it);
     } catch (failed_load const &e) {

@@ -141,6 +141,13 @@ metadata_manager::metadata_manager() : p(new impl) {}
 metadata_manager::~metadata_manager() {}
 
 void metadata_manager::commit() {
+  if (p->remove_resources.empty() && p->remove_plugins.empty() &&
+      p->remove_modules.empty() && p->add_plugins.empty() &&
+      p->add_modules.empty() && p->add_features.empty()) {
+    // this is an empty commit
+    return;
+  }
+
   // removing resources:
   // - removing plugins from removed resources
   for (vector<whole_plugin>::iterator it = plugins.begin();

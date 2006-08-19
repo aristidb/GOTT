@@ -41,6 +41,7 @@
 
 #include <gott/plugin/plugin_base.hpp>
 #include <gott/plugin/plugin_handle.hpp>
+#include <gott/plugin/multi_plugin.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <gott/plugin/selector.hpp>
 
