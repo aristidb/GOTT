@@ -41,6 +41,9 @@
 
 #include "item.hpp"
 #include <boost/function.hpp>
+#include <boost/variant/variant.hpp>
+#include <boost/optional.hpp>
+#include <utility>
 
 namespace tdl {
 namespace schema {
@@ -119,48 +122,60 @@ public:
   /**
    * Initialize a slotcfg object accepting one child.
    */
-  slotcfg() GOTT_EXPORT;
+  slotcfg() : m(one), count(0) {}
 
   /// Constructor.
-  slotcfg(simple_mode) GOTT_EXPORT;
+  slotcfg(simple_mode m)
+    : m(m), count(0) {}
 
   /// Constructor.
-  slotcfg(sized_mode, std::size_t) GOTT_EXPORT;
+  slotcfg(sized_mode m, std::size_t n)
+    : m(m), type(n), count(0) {}
 
   /// Constructor.
-  slotcfg(range_mode, std::size_t, std::size_t) GOTT_EXPORT;
+  slotcfg(range_mode m, std::size_t a, std::size_t b)
+    : m(m), type(std::pair<std::size_t, std::size_t>(a, b)), count(0) {}
 
   /// Constructor.
-  slotcfg(function_mode, callback const &) GOTT_EXPORT;
+  slotcfg(function_mode m, callback const &c)
+    : m(m), type(c), count(0) {}
 
   /// Copy-Constructor.
-  slotcfg(slotcfg const &) GOTT_EXPORT;
-
-  /// Destructor.
-  ~slotcfg() GOTT_EXPORT;
-
-  void operator=(slotcfg const &o) GOTT_EXPORT;
+  slotcfg(slotcfg const &o)
+    : m(o.m), type(o.type), count(o.count) {}
 
   /// Whether the object accepts 0 children.
   bool prefix_optional() const GOTT_EXPORT;
   /// A variant of the object that does not accept 0 children.
   slotcfg no_optional() const GOTT_EXPORT;
   /// The mode the object is in.
-  mode get_mode() const GOTT_EXPORT;
-
-  bool operator==(slotcfg const &o) const GOTT_EXPORT;
+  mode get_mode() const { return m; }
 
   /// Add an element.
-  void add() GOTT_EXPORT;
+  void add() { ++count; }
   /// Cancel a sequence.
-  void cancel() GOTT_EXPORT;
+  void cancel();
   /// Accept or not.
   item::expect expectation() const GOTT_EXPORT;
 
 private:
-  class impl;
-  boost::scoped_ptr<impl> p;
+  mode m;
+
+  typedef
+    boost::variant<
+      size_t,
+      std::pair<std::size_t, std::size_t>,
+      callback
+    >
+  type_t;
+
+  type_t type;
+
+  enum { cancelled = size_t(-1) };
+  size_t count;
 };
+
+inline void slotcfg::cancel() { count = cancelled; }
 
 namespace {
 inline slotcfg one() { return slotcfg(); }

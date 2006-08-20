@@ -55,7 +55,7 @@ match_document::match_document(rule_attr_t const &a,
 
 schema::rule_t match_document::deflatten(std::vector<rule_t> const &children) {
   if (children.size() == 1)
-    if (children[0].attributes().outer() == one())
+    if (children[0].attributes().outer().get_mode() == slotcfg::one)
       return children[0];
     else
       return rule("tdl::schema::list", rule_attr(coat = false), children);

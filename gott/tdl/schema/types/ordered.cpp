@@ -63,7 +63,7 @@ std::vector<schema::rule_t> match_ordered::deflatten(
     std::vector<rule_t> const &in) {
   std::vector<rule_t> out(in.size());
   for (std::size_t i = 0; i < in.size(); ++i) {
-    if (in[i].attributes().outer() == one())
+    if (in[i].attributes().outer().get_mode() == slotcfg::one)
       out[i] = in[i];
     else
       out[i] = rule_one("tdl::schema::list", rule_attr(coat = false), in[i]);
