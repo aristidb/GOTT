@@ -74,34 +74,56 @@ private:
   boost::shared_ptr<impl const> p;
 };   
 
+/**
+ * Handle class for plugins.
+ * \param Interface The plugin's interface.
+ */
 template<class Interface>
 class plugin_handle : public plugin_handle_base {
 public:
+  /**
+   * Constructor. Find a plugin with the correct interface.
+   */
   plugin_handle()
     : plugin_handle_base(with_interface<Interface>()),
       p(cast(get_base())) {
     if (!p) fail_interface();
   }
 
+  /**
+   * Constructor. Find a plugin that has the correct interface AND matches
+   * a given selector.
+   * \param sel The selector to match.
+   */
   plugin_handle(selector const &sel)
     : plugin_handle_base(sel && with_interface<Interface>()),
       p(cast(get_base())) {
     if (!p) fail_interface(sel.to_string());
   }
 
+  /**
+   * Constructor. Just load a given plugin.
+   */
   plugin_handle(plugin_descriptor const &desc)
     : plugin_handle_base(desc),
       p(cast(get_base())) {
     if (!p) fail_interface(desc.to_string());
   }
 
+  /// Destructor.
   ~plugin_handle() {}
 
+  /// Use the plugin.
   Interface &operator*() { return *p; }
+  /// Use the plugin.
   Interface const &operator*() const { return *p; }
+  /// Use the plugin.
   Interface *operator->() { return p; }
+  /// Use the plugin.
   Interface const *operator->() const { return p; }
+  /// Use the plugin.
   Interface *get() { return p; }
+  /// Use the plugin.
   Interface const *get() const { return p; }
 
 private:

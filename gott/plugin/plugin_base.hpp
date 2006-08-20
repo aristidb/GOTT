@@ -48,8 +48,12 @@ namespace plugin {
 class system_configuration;
 class plugin_configuration;
 
+/**
+ * Abstract base class for all plugins.
+ */
 class GOTT_EXPORT plugin_base {
 public:
+  /// Pure virtual destructor.
   virtual ~plugin_base() = 0;
 };
 

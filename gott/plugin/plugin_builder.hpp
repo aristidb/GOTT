@@ -47,6 +47,11 @@ class plugin_base;
 
 typedef plugin_base *(plugin_builder)();
 
+/**
+ * Builder for a simple plugin.
+ * \param symbol The identifier for the plugin.
+ * \param type The class of the plugin.
+ */
 #define GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(symbol, type) \
   extern "C" GOTT_EXPORT gott::plugin::plugin_base * symbol() { \
     return new type; \

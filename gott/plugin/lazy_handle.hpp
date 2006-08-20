@@ -36,51 +36,42 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_MODULE_HPP
-#define GOTT_PLUGIN_MODULE_HPP
+#ifndef GOTT_PLUGIN_LAZY_HANDLE_HPP
+#define GOTT_PLUGIN_LAZY_HANDLE_HPP
 
-#include <gott/visibility.hpp>
-#include <boost/shared_ptr.hpp>
+#include "plugin_handle.hpp"
+#include "descriptor.hpp"
+#include "selector.hpp"
+#include <boost/variant/variant.hpp>
+#include <boost/variant/get.hpp>
 
-namespace gott {
-  class string;
+namespace gott { namespace plugin {
 
-namespace plugin {
-
-class module_descriptor;
-class plugin_descriptor;
-class plugin_base;
-
-/**
- * User abstraction for a (run-time) loadable module.
- */
-class module {
+template<class T>
+class lazy_handle {
 public:
-  /**
-   * Constructor. Loads the specified module.
-   * \param which Which module to load.
-   */
-  GOTT_EXPORT module(module_descriptor const &which);
+  lazy_handle(plugin_descriptor const &x) : data(x) {}
+  lazy_handle(selector const &x) : data(x) {}
 
-  /// Destructor.
-  GOTT_EXPORT ~module();
-
-  /**
-   * Load some entity from the module.
-   * \param symbol The module-wide identifier of the entity. This should be the
-   *               C symbol identifier.
-   */
-  GOTT_EXPORT void *entity(gott::string const &symbol);
-
-  /**
-   * Load a plugin from the module. Use plugin_handle.
-   * \param which Which plugin to load.
-   */
-  GOTT_EXPORT plugin_base *load_plugin(plugin_descriptor const &which);
+  T *get() { return get_impl(); }
+  T const *get() const { return get_impl(); }
+  T *operator*() { return get_impl(); }
+  T const *operator*() const { return get_impl(); }
+  T *operator->() const { return get_impl(); }
 
 private:
-  class impl;
-  boost::shared_ptr<impl> p;
+  T *get_impl() const {
+    switch (data.which()) {
+    case 1:
+      data = plugin_handle<T>(boost::get<plugin_descriptor>(data));
+      break;
+    case 2:
+      data = plugin_handle<T>(boost::get<selector>(data));
+      break;
+    }
+    return boost::get<plugin_handle<T> >(data).get();
+  }
+  mutable boost::variant<plugin_handle<T>, plugin_descriptor, selector> data;
 };
 
 }}

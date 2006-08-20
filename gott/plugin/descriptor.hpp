@@ -66,6 +66,7 @@ struct module_descriptor {
   /// The path of the module file.
   string file_path;
 
+  /// Produce a unique string representation of the descriptor.
   string to_string() const {
     return "module in " + file_path;
   }
@@ -103,6 +104,7 @@ struct plugin_descriptor {
   /// The descriptor of the plugin's module.
   module_descriptor enclosing_module;
 
+  /// Produce a unique string representation of the descriptor.
   string to_string() const {
     return "plugin with symbol " + symbol + 
       " in " + enclosing_module.to_string();

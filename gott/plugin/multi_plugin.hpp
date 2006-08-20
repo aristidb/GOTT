@@ -55,30 +55,54 @@ namespace detail {
  */
 class multi_plugin : boost::noncopyable {
 public:
+  /**
+   * Callback type for added plugins. Gets as parameter a descriptor for the
+   * added plugin.
+   */
   typedef boost::function<void (plugin_descriptor const &)> add_callback_t;
+
+  /**
+   * Callback type for removed plugins. Gets as parameter a descriptor for the
+   * plugin to unload / remove. Return whether the plugin could be unloaded.
+   */
   typedef boost::function<bool (plugin_descriptor const &)> remove_callback_t;
 
+  /**
+   * Constructor. No unloading. Immediately add plugins.
+   * \param selector_ All plugins for this multi_plugin must match this
+   *                  selector.
+   * \param add_callback Callback called whenever a new matching plugin is
+   *                  found.
+   */
   multi_plugin(
       selector const &selector_,
       add_callback_t const &add_callback)
   : sel(selector_), add(add_callback), remove(detail::do_not_accept) {
-    update();
     inscribe();
   }
 
-  multi_plugin(
+  /**
+   * Constructor. Immediately add plugins.
+   * \param selector_ All plugins for this multi_plugin must match this
+   *                  selector.
+   * \param add_callback Callback called whenever a new matching plugin is
+   *                  found.
+   * \param remove_callback Callback called whenever a previously matching
+   *                  plugin is no longer valid.
+   */
+   multi_plugin(
       selector const &selector_,
       add_callback_t const &add_callback,
       remove_callback_t const &remove_callback)
   : sel(selector_), add(add_callback), remove(remove_callback) {
-    update();
     inscribe();
   }
 
+  /// Destructor.
   ~multi_plugin() { conn.disconnect(); }
 
 private:
-  GOTT_EXPORT void update();
+  void update();
   GOTT_EXPORT void inscribe();
 
   std::vector<plugin_descriptor> current;

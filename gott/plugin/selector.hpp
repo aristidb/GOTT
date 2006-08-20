@@ -49,22 +49,63 @@ namespace gott { namespace plugin {
 class plugin_descriptor;
 class module_descriptor;
 
+/**
+ * Select plugins.
+ */
 class selector {
 public:
+  /**
+   * \internal
+   * Get a single matching plugin.
+   */
   plugin_descriptor get_plugin() const;
+
+  /**
+   * \internal
+   * Get a single matching module.
+   */
   module_descriptor get_module() const;
 
+  /**
+   * \internal
+   * Get all matching plugins.
+   */
   std::vector<plugin_descriptor> all_plugins() const;
 
+  /// Destructor.
   GOTT_EXPORT ~selector();
 
+  /**
+   * \internal
+   * Match plugin-id.
+   */
   GOTT_EXPORT static selector with_plugin_id(QID const &plugin_id);
+
+  /**
+   * \internal
+   * Match interface-id.
+   */
   GOTT_EXPORT static selector with_interface_id(QID const &interface_id);
+
+  /**
+   * \internal
+   * Match module-id.
+   */
   GOTT_EXPORT static selector with_module_id(QID const &module_id);
+
+  /**
+   * \internal
+   * Match feature-id.
+   */
   GOTT_EXPORT static selector with_feature_id(QID const &feature_id);
 
+  /**
+   * Combine two matchers to form a new matcher to match only if both
+   * matchers would have matched.
+   */
   GOTT_EXPORT selector operator&&(selector const &other) const;
 
+  /// Construct a comprehensive string representation of the selector.
   GOTT_EXPORT string to_string() const;
 
 private:
@@ -73,27 +114,33 @@ private:
   explicit selector(impl *);
 };
 
+/// Match plugin-id.
 inline selector with_plugin_id(QID const &plugin_id) {
   return selector::with_plugin_id(plugin_id);
 }
 
+/// Match interface-id.
 inline selector with_interface_id(QID const &interface_id) {
   return selector::with_interface_id(interface_id);
 }
 
+/// Match interface.
 template<class T>
 inline selector with_interface() {
   return with_interface_id(T::qid);
 }
 
+/// Match module-id.
 inline selector with_module_id(QID const &module_id) {
   return selector::with_module_id(module_id);
 }
 
+/// Match feature-id.
 inline selector with_feature_id(QID const &feature_id) {
   return selector::with_feature_id(feature_id);
 }
 
+/// Match feature.
 template<class T>
 inline selector with_feature() {
   return with_feature_id(T::qid);
