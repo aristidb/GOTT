@@ -82,6 +82,8 @@ opts.Add(BoolOption('SYS_KQUEUE', 'Whether to use kqueue(2)', 0))
 opts.Add(BoolOption('SYS_INOTIFY', 'Whether to use inotify', 0))
 opts.Add(BoolOption('SYS_EPOLL', 'Whether to use epoll(4)', 0))
 
+opts.Add(BoolOption('CONF_OSX_LINKER', 'Whether OS X specific linker settings should be set', 0))
+
 libdirs_pre = open('libdirs.txt').readlines()
 
 env = Environment(
