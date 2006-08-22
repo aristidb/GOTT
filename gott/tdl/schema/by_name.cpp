@@ -45,7 +45,7 @@
 #include <gott/plugin.hpp>
 #include <gott/plugin/lazy_handle.hpp>
 #include <gott/plugin/metadata_manager.hpp>
-#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/once.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/in_place_factory.hpp>
@@ -62,11 +62,11 @@ namespace {
   typedef std::map<gott::atom, lazy_handle<type> > map_t;
   map_t all_handles;
   boost::optional<multi_plugin> book_keeper;
-  boost::recursive_mutex mutex;
+  boost::mutex mutex;
   boost::once_flag init_flag = BOOST_ONCE_INIT;
 
   void do_add(plugin_descriptor const &desc) {
-    boost::recursive_mutex::scoped_lock lock(mutex);
+    boost::mutex::scoped_lock lock(mutex);
     metadata_manager man;
     all_handles.insert(map_t::value_type(
           man.plugin_extra(desc).plugin_id,
@@ -82,19 +82,29 @@ namespace {
 
 rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
     vector<rule_t> const &c) {
-  {
+  boost::mutex::scoped_lock lock(mutex);
+
+  map_t::iterator it = all_handles.find(s);
+
+  if (it == all_handles.end()) {
+    lock.unlock();
+
     metadata_manager man;
     man.load_standard();
     man.commit();
-  }
-  boost::call_once(&init, init_flag);
-  boost::recursive_mutex::scoped_lock lock(mutex);
 
-  map_t::iterator it = all_handles.find(s);
-  if (it == all_handles.end())
-    throw tdl::tdl_error("TDL Schema", "type not found");
+    boost::call_once(&init, init_flag);
+
+    lock.lock();
+
+    it = all_handles.find(s);
+    if (it == all_handles.end())
+      throw tdl::tdl_error("TDL Schema", "type not found");
+  }
+
   lazy_handle<type> &handle = it->second;
   abstract_rule abstract = handle->get_abstract();
+  lock.unlock();
 
   return rule_t(abstract, a, c);
 }
