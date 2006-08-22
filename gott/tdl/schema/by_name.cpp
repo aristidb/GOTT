@@ -57,9 +57,7 @@ using gott::string;
 using std::vector;
 
 namespace {
-  // those are NEVER unloaded because they depend on "us" and this leads to a
-  // deadly circular reference or something
-  typedef std::map<gott::atom, lazy_handle<type> > map_t;
+  typedef std::map<gott::atom, lazy_handle<type> *> map_t;
   map_t all_handles;
   boost::optional<multi_plugin> book_keeper;
   boost::mutex mutex;
@@ -70,7 +68,7 @@ namespace {
     metadata_manager man;
     all_handles.insert(map_t::value_type(
           man.plugin_extra(desc).plugin_id,
-          lazy_handle<type>(desc)));
+          new lazy_handle<type>(desc)));
   }
 
   void init() {
@@ -102,7 +100,7 @@ rule_t tdl::schema::get_by_name(string const &s, rule_attr_t const &a,
       throw tdl::tdl_error("TDL Schema", "type not found");
   }
 
-  lazy_handle<type> &handle = it->second;
+  lazy_handle<type> &handle = *it->second;
   abstract_rule abstract = handle->get_abstract();
   lock.unlock();
 
