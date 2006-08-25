@@ -184,8 +184,10 @@ AddSysOpts(conf.env)
 conf.LinkerAsNeeded()
 conf.LinkerExportDynamic()
 if conf.env['CONF_OSX_LINKER'] != 0:
-	conf.env.ENV['MACOSX_DEPLOYMENT_TARGET'] = '10.3'
+	print "I am the MAC"
+	conf.env['ENV']['MACOSX_DEPLOYMENT_TARGET'] = '10.3'
 	conf.env.Append(LINKFLAGS = ['-Wl,-undefined,dynamic_lookup'])
+	conf.env.Append(SHLINKFLAGS = ['-Wl,-undefined,dynamic_lookup'])
 if conf.env['OPTIMIZATION'] != 'none':
 	conf.Optimization()
 conf.Warnings()
