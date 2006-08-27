@@ -256,11 +256,15 @@ namespace events {
     }
   }
 
+  bool kqueue_loop::running() const {
+    return p->running && p->wait > 0;
+  }
+
   void kqueue_loop::run() {
     p->running = true;
     enum { EVENTS_N=64 };
     struct kevent event_list[EVENTS_N];
-    while(p->running && p->wait > 0) {
+    while(running()) {
       timespec tm;
       bool has_timers_mem = has_timers();
       if (has_timers_mem) {

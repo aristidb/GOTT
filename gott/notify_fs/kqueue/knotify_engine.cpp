@@ -1,9 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-#include <gott/notify_fs/kqueue/knotify_engine.hpp>
-#include <gott/notify_fs/watch.hpp>
-#include <gott/notify_fs/event.hpp>
-#include <gott/events/kqueue_loop.hpp>
-#include <gott/syswrap/scoped_unix_file.hpp>
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -24,8 +19,8 @@
  * Portions created by the Initial Developer are Copyright (C) 2005
  * the Initial Developer. All Rights Reserved.
  *
- * Contributor(s):
- *  Rüdiger Sonderfeld <kingruedi@c-plusplus.de>
+ * Contributor(s): Rüdiger Sonderfeld <kingruedi@c-plusplus.de>
+ *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -40,10 +35,28 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
-
+#include <gott/notify_fs/kqueue/knotify_engine.hpp>
+#include <gott/notify_fs/engine_factory.hpp>
+#include <gott/notify_fs/notification_engine.hpp>
+#include <gott/notify_fs/watch.hpp>
+#include <gott/notify_fs/event.hpp>
+#include <gott/events/loops/kqueue_loop.hpp>
+#include <gott/syswrap/scoped_unix_file.hpp>
 #include <gott/syswrap/open_unix.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/bind.hpp>
+#include <gott/plugin.hpp>
+
+namespace {
+  struct knotify_factory : gott::notify_fs::engine_factory {
+    gott::notify_fs::notification_engine *alloc(gott::events::main_loop &loop) const {
+      return new gott::notify_fs::knotify_engine(loop);
+    }
+  };
+}
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(kqueue_plugin, knotify_factory)
+
 
 namespace gott {
 namespace notify_fs {
@@ -115,7 +128,12 @@ which are unsupported
       c_path.get()[path.size()] = '\0';
       std::copy(path.as_utf8().begin(), path.as_utf8().end(), c_path.get());
 
-      fd.reset(open_unix(c_path.get(), O_RDONLY));
+      try {
+	fd.reset(open_unix(c_path.get(), O_RDONLY));
+      }
+      catch(gott::system_error const&) {
+	throw gott::notify_fs::watch_installation_failure(path);
+      }
 
       kq->watch_fd(fd.access(), events,
 		   boost::bind(&knotify_engine::kqueue_watch::notify, this,

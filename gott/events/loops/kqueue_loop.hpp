@@ -39,11 +39,11 @@
 #ifndef GOTT_EVENTS_KQUEUE_LOOP_HPP
 #define GOTT_EVENTS_KQUEUE_LOOP_HPP
 
-#include "main_loop.hpp"
-#include "fd_manager.hpp"
-#include "timer_manager.hpp"
-#include "selfpipe_message_manager.hpp"
-#include "signal_manager.hpp"
+#include "../main_loop.hpp"
+#include "../fd_manager.hpp"
+#include "../timer_manager.hpp"
+#include "../selfpipe_message_manager.hpp"
+#include "../signal_manager.hpp"
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
@@ -84,6 +84,8 @@ class GOTT_EXPORT kqueue_loop
  private:
   GOTT_LOCAL void add_waitable();
   GOTT_LOCAL void remove_waitable();
+
+  GOTT_LOCAL bool running() const; //TODO
 
  private:
   GOTT_LOCAL void add_fd(int fd, unsigned mask,
