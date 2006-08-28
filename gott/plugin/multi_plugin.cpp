@@ -75,6 +75,11 @@ void multi_plugin::update() {
     } catch (failed_load const &e) {
       if (e.kind() != "plugin" || e.which() != it->to_string())
         throw;
+      conn.block();
+      metadata_manager man;
+      man.remove_plugin(*it);
+      man.commit();
+      conn.unblock();
     }
   }
 }
