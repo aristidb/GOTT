@@ -161,7 +161,7 @@ private:
   
   void end_change(annotated_pointer p) {
     storage.finish_pointer(p.first);
-    delete static_cast<write_lock *>(p.second);
+    delete static_cast<change_lock *>(p.second);
     notifier.notify(this);
   }
   
