@@ -42,7 +42,6 @@
 #include "plugin_base.hpp"
 #include "metadata_manager.hpp"
 #include "error.hpp"
-#include<iostream>//FIXME
 
 using namespace gott::plugin;
 
@@ -55,10 +54,8 @@ public:
   boost::scoped_ptr<plugin_base> p;
 
   static bool init(boost::shared_ptr<impl const> &p, selector const &sel) {
-    std::cerr << "Plugin: trying " << sel.to_string() << std::endl;
     plugin_descriptor desc = sel.get_plugin();
     try {
-      std::cerr << "... found " << desc.to_string() << std::endl;
       p.reset(new impl(desc));
     } catch (gott::system_error&) {
       // remove this plugin, it could not be loaded!

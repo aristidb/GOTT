@@ -47,7 +47,6 @@
 #include <gott/syswrap/dl_unix.hpp>
 #include <gott/syswrap/function_cast.hpp>
 #include <vector>
-#include<iostream>//FIXME
 
 using gott::plugin::module;
 using gott::plugin::plugin_base;
@@ -76,7 +75,6 @@ public:
   }
 
   static void *get_handle(module_descriptor const &which) {
-    std::cerr << "loading module " << which.to_string() << std::endl;
     return dlopen_unix(
         boost::scoped_array<char>(which.file_path.c_string_alloc()).get(),
         RTLD_LAZY | RTLD_GLOBAL);
@@ -92,7 +90,6 @@ public:
   }
 
   void *entity(gott::string const &symbol) {
-    std::cerr << "loading entity " << symbol << std::endl;
     return dlsym_unix(handle,
         boost::scoped_array<char>(symbol.c_string_alloc()).get());
   }
