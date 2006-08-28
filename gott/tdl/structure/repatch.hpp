@@ -41,9 +41,11 @@
 
 #include "structure.hpp"
 #include <vector>
+#include <map>
 #include <boost/noncopyable.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/optional/optional_fwd.hpp>
+#include <boost/function.hpp>
 
 namespace tdl {
 namespace structure {
@@ -98,6 +100,19 @@ public:
 private:
   boost::ptr_vector<repatcher> el;
 };
+
+class GOTT_EXPORT repatcher_getter : public writable_structure {
+public:
+  repatcher_getter();
+  ~repatcher_getter();
+  /**
+   * Allocate a repatcher of the promised type with the given arguments.
+   * Only call this once!
+   */
+  virtual repatcher *result_alloc() const = 0;
+};
+
+GOTT_EXPORT repatcher_getter *repatcher_by_name();
 
 }}
 

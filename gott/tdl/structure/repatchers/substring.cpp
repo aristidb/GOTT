@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "substring.hpp"
-#include "../repatcher_by_name.hpp"
+#include "../repatch.hpp"
 #include <gott/exceptions.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <boost/optional.hpp>
@@ -140,5 +140,5 @@ void repatch_substring::reg() {
     }
     static repatcher_getter *alloc() { return new getter; }
   };
-  repatcher_by_name().add("substring", &getter::alloc);
+  //repatcher_by_name().add("substring", &getter::alloc);
 }

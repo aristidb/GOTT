@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "enumeration.hpp"
-#include "../repatcher_by_name.hpp"
+#include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <gott/xany.hpp>
@@ -105,5 +105,5 @@ void repatch_enumeration::reg() {
     }
     static repatcher_getter *alloc() { return new getter; }
   };
-  repatcher_by_name().add("enumeration", &getter::alloc);
+  //repatcher_by_name().add("enumeration", &getter::alloc);
 }

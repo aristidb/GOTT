@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "find_literal.hpp"
-#include "../repatcher_by_name.hpp"
+#include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
 #include <gott/xany.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -128,5 +128,5 @@ void repatch_find_literal::reg() {
     }
     static repatcher_getter *alloc() { return new getter; }
   };
-  repatcher_by_name().add("find-literal", &getter::alloc);
+  //repatcher_by_name().add("find-literal", &getter::alloc);
 }

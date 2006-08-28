@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "integer.hpp"
-#include "../repatcher_by_name.hpp"
+#include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
 #include <cctype>
 
@@ -114,5 +114,5 @@ void repatch_integer::reg() {
     repatcher *result_alloc() const { return new repatch_integer(); }
     static repatcher_getter *alloc() { return new getter; }
   };
-  repatcher_by_name().add("integer", &getter::alloc);
+  //repatcher_by_name().add("integer", &getter::alloc);
 }

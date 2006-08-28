@@ -42,7 +42,6 @@
 #include <gott/plugin/plugin_builder.hpp>
 #include <gott/string/string.hpp>
 #include <gott/tdl/structure/repatch.hpp>
-#include <gott/tdl/structure/repatcher_by_name.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <cassert>

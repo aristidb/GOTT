@@ -37,7 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "throw_away.hpp"
-#include "../repatcher_by_name.hpp"
+#include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
 
 using gott::string;
@@ -73,5 +73,5 @@ void repatch_throw_away::reg() {
     repatcher *result_alloc() const { return new repatch_throw_away(); }
     static repatcher_getter *alloc() { return new getter; }
   };
-  repatcher_by_name().add("throw-away", &getter::alloc);
+  //repatcher_by_name().add("throw-away", &getter::alloc);
 }

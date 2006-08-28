@@ -41,7 +41,7 @@
 #include "substring.hpp"
 #include "find_literal.hpp"
 #include "throw_away.hpp"
-#include "../repatcher_by_name.hpp"
+#include "../repatch.hpp"
 #include "../repatch.hpp"
 
 namespace {

@@ -38,7 +38,6 @@
 
 #include <gott/tdl/source_position.hpp>
 #include <gott/tdl/structure/repatch.hpp>
-#include <gott/tdl/structure/repatcher_by_name.hpp>
 #include <gott/tdl/structure/repatchers/find_literal.hpp>
 #include <gott/tdl/structure/repatchers/substring.hpp>
 #include <gott/tdl/structure/repatchers/integer.hpp>

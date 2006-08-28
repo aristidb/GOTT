@@ -44,7 +44,6 @@
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/event.hpp>
 #include <gott/tdl/structure/repatch.hpp>
-#include <gott/tdl/structure/repatcher_by_name.hpp>
 #include <boost/shared_ptr.hpp>
 
 using namespace tdl::schema;
