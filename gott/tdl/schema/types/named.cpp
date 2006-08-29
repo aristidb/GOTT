@@ -76,7 +76,7 @@ static string get_id(rule_attr_t const &a) {
 
 static tdl::structure::repatcher *get_repatcher(string const &tag) {
   boost::scoped_ptr<tdl::structure::repatcher_getter> getter(
-      tdl::structure::repatcher_by_name().chain_alloc());
+      tdl::structure::repatcher_by_name());
   tdl::structure::writable_structure &param = *getter;
   tdl::source_position w_;
   param.begin(w_);

@@ -69,6 +69,7 @@ public:
    */
   virtual void begin(source_position const &) = 0;
 
+  GOTT_EXPORT
   void begin();
 
   /**

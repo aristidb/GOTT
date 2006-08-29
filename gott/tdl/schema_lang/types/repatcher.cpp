@@ -58,7 +58,7 @@ public:
       std::vector<rule_t> const &children,
       match &ref)
   : item(attr, ref),
-  getter(structure::repatcher_by_name().chain_alloc()) {
+  getter(structure::repatcher_by_name()) {
     //TODO: future concept:
     //unordered(list):
     //  <integer>

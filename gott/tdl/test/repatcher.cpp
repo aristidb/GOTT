@@ -36,7 +36,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <gott/tdl/source_position.hpp>
 #include <gott/tdl/structure/repatch.hpp>
 #include <gott/tdl/structure/repatchers/find_literal.hpp>
 #include <gott/tdl/structure/repatchers/substring.hpp>
@@ -49,7 +48,6 @@
 #include <boost/scoped_ptr.hpp>
 
 using namespace tdl::structure;
-using tdl::source_position;
 using gott::Xany;
 
 using boost::scoped_ptr;
@@ -82,7 +80,7 @@ void object::test<1>(int) {
   direct_print out(o);
   scoped_ptr<repatcher> re(strip_paren());
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
-  ind->begin(source_position());
+  ind->begin();
   ind->data(Xany("(hallo)"));
   ind->end();
   ensure_equals(o.str(), "hallo");
@@ -94,7 +92,7 @@ void object::test<2>(int) {
   direct_print out(o);
   scoped_ptr<repatcher> re(strip_paren());
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
-  ind->begin(source_position());
+  ind->begin();
   try {
     ind->data(Xany("(hallo"));
   } catch (tdl::tdl_error const &e) {
@@ -106,14 +104,18 @@ void object::test<2>(int) {
 
 template<> template<>
 void object::test<3>(int) {
-  scoped_ptr<repatcher_getter> re_g(repatcher_by_name().get_alloc("integer"));
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
+  re_g->begin();
+  re_g->data(Xany("integer"));
+  re_g->begin(); re_g->end();
+  re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
   direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
 
-  ind->begin(source_position());
+  ind->begin();
   ind->data(Xany("-000044"));
   ind->end();
 
@@ -122,21 +124,25 @@ void object::test<3>(int) {
 
 template<> template<>
 void object::test<4>(int) {
-  scoped_ptr<repatcher_getter> re_g(
-      repatcher_by_name().get_alloc("enumeration"));
-  re_g->begin(source_position()); re_g->data(Xany("v1")); re_g->end();
-  re_g->begin(source_position()); re_g->data(Xany("v2")); re_g->end();
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
+  re_g->begin();
+  re_g->data(Xany("enumeration"));
+  re_g->begin();
+  re_g->begin(); re_g->data(Xany("v1")); re_g->end();
+  re_g->begin(); re_g->data(Xany("v2")); re_g->end();
+  re_g->end();
+  re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
   direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
 
-  ind->begin(source_position());
-    ind->begin(source_position());
+  ind->begin();
+    ind->begin();
       ind->data(Xany("v1"));
     ind->end();
-    ind->begin(source_position());
+    ind->begin();
       ind->data(Xany("v2"));
     ind->end();
   ind->end();
@@ -146,21 +152,26 @@ void object::test<4>(int) {
 
 template<> template<>
 void object::test<5>(int) {
-  scoped_ptr<repatcher_getter> re_g(repatcher_by_name().get_alloc("substring"));
-  re_g->begin(source_position());
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
+  re_g->begin();
+  re_g->data(Xany("substring"));
+  re_g->begin();
+  re_g->begin();
     re_g->add_tag("left");
     re_g->data(Xany(2));
   re_g->end();
-  re_g->begin(source_position());
+  re_g->begin();
     re_g->data(Xany(3));
     re_g->add_tag("right");
+  re_g->end();
+  re_g->end();
   re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
   direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
-  ind->begin(source_position());
+  ind->begin();
     ind->data(Xany("123456789"));
   ind->end();
 
@@ -169,23 +180,27 @@ void object::test<5>(int) {
 
 template<> template<>
 void object::test<6>(int) {
-  scoped_ptr<repatcher_getter> re_g(
-      repatcher_by_name().get_alloc("find-literal"));
-  re_g->begin(source_position()); re_g->data(Xany("foo")); re_g->end();
-  re_g->begin(source_position()); re_g->data(Xany(repatch_find_literal::type::end)); re_g->end();
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
+  re_g->begin();
+  re_g->data(Xany("find-literal"));
+  re_g->begin();
+  re_g->begin(); re_g->data(Xany("foo")); re_g->end();
+  re_g->begin(); re_g->data(Xany(repatch_find_literal::type::end)); re_g->end();
+  re_g->end();
+  re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
   direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
-  ind->begin(source_position()); 
-  ind->begin(source_position()); ind->data(Xany("barfoo")); ind->end();
+  ind->begin(); 
+  ind->begin(); ind->data(Xany("barfoo")); ind->end();
   ind->end();
   ensure_equals(stream.str(), "    barfoo");
 
   bool expected_failure = false;
-  ind->begin(source_position());
-    ind->begin(source_position());
+  ind->begin();
+    ind->begin();
       try {
         ind->data(Xany("foobar")); 
       } catch (tdl::tdl_error const &e) {
@@ -201,30 +216,30 @@ void object::test<6>(int) {
 
 template<> template<>
 void object::test<7>(int) {
-  scoped_ptr<repatcher_getter> re_g(repatcher_by_name().chain_alloc());
-  re_g->begin(source_position());
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
+  re_g->begin();
     re_g->data(Xany("substring"));
-    re_g->begin(source_position());
-      re_g->begin(source_position());
+    re_g->begin();
+      re_g->begin();
         re_g->add_tag("left");
         re_g->data(Xany(1));
       re_g->end();
-      re_g->begin(source_position());
+      re_g->begin();
         re_g->add_tag("right");
         re_g->data(Xany(0));
       re_g->end();
     re_g->end();
   re_g->end();
-  re_g->begin(source_position());
+  re_g->begin();
     re_g->data(Xany("integer"));
-    re_g->begin(source_position()); re_g->end();
+    re_g->begin(); re_g->end();
   re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
   std::ostringstream stream;
   direct_print out(stream);
   scoped_ptr<writable_structure> ind(re->deferred_write(out));
-  ind->begin(source_position());
+  ind->begin();
     ind->data(Xany("x077"));
   ind->end();
 
