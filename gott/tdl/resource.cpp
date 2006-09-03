@@ -37,16 +37,32 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "resource.hpp"
+#include <boost/thread/once.hpp>
+#include <boost/thread/mutex.hpp>
 
+using tdl::resource;
 using tdl::detail::generic_callback;
 using gott::atom;
 
-void tdl::detail::list_resources(atom const &kind, generic_callback const &cb) {
-  ;
+namespace {
+  typedef boost::mutex mutex_t;
+  typedef mutex_t::scoped_lock scoped_lock;
+  mutex_t mutex;
 }
 
-void tdl::detail::find_resource(atom const &id, atom const &kind,
+resource::~resource() {}
+
+void resource::list_impl(atom const &kind, generic_callback const &cb) {
+  scoped_lock lock(mutex);
+}
+
+void resource::find_impl(
+    atom const &id,
+    atom const &kind,
     generic_callback const &cb) {
-  ;
+  scoped_lock lock(mutex);
 }
 
+void resource::add(resource &res) {
+  scoped_lock lock(mutex);
+}

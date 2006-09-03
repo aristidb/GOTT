@@ -46,13 +46,6 @@ namespace tdl {
 
 namespace detail {
   typedef boost::function<void (void*)> generic_callback;
-  GOTT_EXPORT
-  void list_resources(gott::atom const &kind, generic_callback const &callback);
-  GOTT_EXPORT
-  void find_resource(gott::atom const &id, gott::atom const &kind, 
-      generic_callback const &callback);
-  
-  void add_resource(gott::atom const &id, void *resource);
 
   template<class T, class U>
   struct callback_helper {
@@ -66,17 +59,35 @@ namespace detail {
   };
 }
 
-template<class T, class U>
-void list_resources(U callback) {
-  return detail::list_resources(T::kind,
-      detail::callback_helper<T, U>(callback));
-}
+class resource {
+public:
+  virtual gott::atom get_kind() const = 0;
+  virtual gott::atom get_id() const = 0;
+  virtual ~resource;
 
-template<class T, class U>
-void find_resource(gott::atom const &id, U callback) {
-  return detail::find_resource(id, T::kind,
-      detail::callback_helper<T, U>(callback));
-}
+public:
+  template<class T, class U>
+  static void list(U callback) {
+    list_impl(T::kind, detail::callback_helper<T, U>(callback));
+  }
+
+  template<class T, class U>
+  static void find(gott::atom const &id, U callback) {
+    find_impl(id, T::kind, detail::callback_helper<T, U>(callback));
+  }
+
+private:
+  GOTT_EXPORT static void list_impl(
+      gott::atom const &kind,
+      detail::generic_callback const &callback);
+
+  GOTT_EXPORT static void find_impl(
+      gott::atom const &id,
+      gott::atom const &kind,
+      detail::generic_callback const &callback);
+
+  static void add(resource &res);
+};
 
 };
 
