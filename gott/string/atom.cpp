@@ -37,7 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "atom.hpp"
-#include <map>
+#include <map> // TODO: use hash map
+#include <boost/functional/hash.hpp>
 
 using gott::atom;
 using gott::string;
@@ -55,3 +56,7 @@ static string *atomize(string const &n) {
 
 atom::atom(string const &n) : rep(atomize(n)) {}
 
+size_t gott::hash_value(atom const &a) {
+  boost::hash<string *>  hash;
+  return hash(a.rep);
+}

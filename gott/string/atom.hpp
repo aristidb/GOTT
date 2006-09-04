@@ -78,6 +78,7 @@ public:
 
 private:
   string *rep;
+  friend size_t hash_value(atom const &);
 };
 
 /**
@@ -99,6 +100,8 @@ inline bool operator>=(atom const &a, atom const &b) {
 inline std::ostream &operator<<(std::ostream &os, atom const &x) {
   return os << x.get_string();
 }
+
+size_t hash_value(atom const &a);
 
 }
 
