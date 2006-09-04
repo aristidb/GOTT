@@ -37,32 +37,103 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "resource.hpp"
+#include "exceptions.hpp"
+#include <gott/plugin/metadata_manager.hpp>
 #include <boost/thread/once.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/sequenced_index.hpp>
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/mem_fun.hpp>
 
 using tdl::resource;
 using tdl::detail::generic_callback;
 using gott::atom;
+using namespace boost::multi_index;
 
 namespace {
   typedef boost::mutex mutex_t;
   typedef mutex_t::scoped_lock scoped_lock;
   mutex_t mutex;
+
+  struct by_id {};
+  struct by_kind {};
+
+  typedef multi_index_container<
+    resource *,
+    indexed_by<
+      sequenced<>,
+      hashed_unique<
+        tag<by_id>,
+        const_mem_fun<resource, atom, &resource::get_id>
+      >,
+      hashed_non_unique<
+        tag<by_kind>,
+        const_mem_fun<resource, atom, &resource::get_kind> 
+      >
+    >
+  > resource_set;
+
+  resource_set all_resources;
+
+  boost::once_flag init_flag = BOOST_ONCE_INIT;
+
+  void init2();
+  
+  void init(scoped_lock &lock) {
+    lock.unlock();
+
+    gott::plugin::metadata_manager man;
+    man.load_standard();
+    man.commit();
+
+    boost::call_once(&init2, init_flag);
+
+    lock.lock();
+  }
 }
 
 resource::~resource() {}
 
-void resource::list_impl(atom const &kind, generic_callback const &cb) {
+void resource::list_impl(atom const &kind, generic_callback const &callback) {
   scoped_lock lock(mutex);
+  typedef resource_set::index<by_kind>::type idx_t;
+  idx_t &idx = all_resources.get<by_kind>();
+  std::pair<idx_t::iterator, idx_t::iterator> range = idx.equal_range(kind);
+  if (range.first == range.second) {
+    init(lock);
+    range = idx.equal_range(kind);
+  }
+  for (; range.first != range.second; ++range.first)
+    callback(*range.first);
 }
 
 void resource::find_impl(
     atom const &id,
     atom const &kind,
-    generic_callback const &cb) {
+    generic_callback const &callback) {
   scoped_lock lock(mutex);
+  typedef resource_set::index<by_id>::type idx_t;
+  idx_t &idx = all_resources.get<by_id>();
+  idx_t::iterator it = idx.find(id);
+  if (it == idx.end()) {
+    init(lock);
+    it = idx.find(id);
+    if (it == idx.end())
+      throw tdl_error("TDL resource loader", "resource not found");
+  }
+  resource *res = *it;
+  if (res->get_kind() != kind)
+    throw tdl_error("TDL resource loader", "resource has wrong type");
+  callback(res);
 }
 
-void resource::add(resource &res) {
+void resource::add(resource *res) {
   scoped_lock lock(mutex);
+  all_resources.push_back(res);
+}
+
+namespace {
+  void init2() {
+  }
 }

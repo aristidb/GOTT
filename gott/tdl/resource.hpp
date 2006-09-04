@@ -44,8 +44,10 @@
 
 namespace tdl {
 
+class resource;
+
 namespace detail {
-  typedef boost::function<void (void*)> generic_callback;
+  typedef boost::function<void (resource *)> generic_callback;
 
   template<class T, class U>
   struct callback_helper {
@@ -53,7 +55,7 @@ namespace detail {
 
     callback_helper(U callback) : impl(callback) {}
 
-    void operator() (void *ptr) {
+    void operator() (resource *ptr) {
       impl(static_cast<T*>(ptr));
     }
   };
@@ -63,7 +65,7 @@ class resource {
 public:
   virtual gott::atom get_kind() const = 0;
   virtual gott::atom get_id() const = 0;
-  virtual ~resource;
+  virtual ~resource();
 
 public:
   template<class T, class U>
@@ -86,7 +88,7 @@ private:
       gott::atom const &kind,
       detail::generic_callback const &callback);
 
-  static void add(resource &res);
+  static void add(resource *res);
 };
 
 };
