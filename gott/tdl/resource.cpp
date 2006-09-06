@@ -39,12 +39,16 @@
 #include "resource.hpp"
 #include "exceptions.hpp"
 #include <gott/plugin/metadata_manager.hpp>
+#include <gott/plugin/multi_plugin.hpp>
+#include <gott/plugin/plugin_handle.hpp>
+#include <gott/plugin/descriptor.hpp>
 #include <boost/thread/once.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
+#include <vector>
 
 using tdl::resource;
 using tdl::detail::generic_callback;
@@ -93,6 +97,8 @@ namespace {
   }
 }
 
+gott::QID const resource::qid("tdl::resource");
+
 resource::~resource() {}
 
 void resource::list_impl(atom const &kind, generic_callback const &callback) {
@@ -128,12 +134,21 @@ void resource::find_impl(
   callback(res);
 }
 
-void resource::add(resource *res) {
-  scoped_lock lock(mutex);
-  all_resources.push_back(res);
-}
-
 namespace {
+  gott::plugin::multi_plugin *keeper;
+  std::vector<gott::plugin::plugin_handle<resource> *> plugins;
+
+  struct add_helper {
+    void operator() (gott::plugin::plugin_descriptor const &desc) const {
+      scoped_lock lock(mutex);
+      plugins.push_back(new gott::plugin::plugin_handle<resource>(desc));
+      all_resources.push_back(plugins.back()->get());
+    }
+  };
+
   void init2() {
+    keeper = new gott::plugin::multi_plugin(
+        gott::plugin::with_interface<resource>(),
+        add_helper());
   }
 }

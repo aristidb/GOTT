@@ -40,7 +40,9 @@
 #define GOTT_TDL_RESOURCE_HPP
 
 #include <gott/string/atom.hpp>
+#include <gott/string/qid.hpp>
 #include <boost/function.hpp>
+#include <gott/plugin/plugin_base.hpp>
 
 namespace tdl {
 
@@ -61,11 +63,13 @@ namespace detail {
   };
 }
 
-class resource {
+class resource : public gott::plugin::plugin_base {
 public:
   virtual gott::atom get_kind() const = 0;
   virtual gott::atom get_id() const = 0;
   virtual ~resource();
+
+  static gott::QID const qid;
 
 public:
   template<class T, class U>
@@ -87,8 +91,6 @@ private:
       gott::atom const &id,
       gott::atom const &kind,
       detail::generic_callback const &callback);
-
-  static void add(resource *res);
 };
 
 };
