@@ -50,6 +50,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_ordered,
     schema::concrete_type<match_ordered>)
 
+gott::atom const match_ordered::id("tdl::schema::ordered");
+
 match_ordered::match_ordered(rule_attr_t const &a, std::vector<rule_t> const&r,
                              match  &m)
 : happy_once(a, m), subrules(deflatten(r)), pos(subrules.begin()) {

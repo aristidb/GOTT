@@ -43,6 +43,7 @@
 #include "../parse_position.hpp"
 #include "../happy_once.hpp"
 #include "../rule.hpp"
+#include <gott/string/atom.hpp>
 
 namespace tdl {
 namespace schema {
@@ -55,6 +56,8 @@ public:
   ~match_any();
 
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
+
+  static gott::atom const id;
 
 private:
   std::vector<rule_t> v;

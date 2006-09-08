@@ -51,15 +51,14 @@ namespace schema {
 
 class match_named : public happy_once {
 public:
-  static GOTT_EXPORT
-  rule_attr_t attributes(gott::string const &s, bool cc = true);
-  
   match_named(rule_attr_t const &, std::vector<rule_t> const &, match &);
 
   ~match_named();
 
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
   { return false; }
+
+  static gott::atom const id;
 
 private:
   gott::string name() const;

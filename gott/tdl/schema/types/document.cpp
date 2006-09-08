@@ -49,6 +49,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_document,
     schema::concrete_type<match_document>)
 
+gott::atom const match_document::id("tdl::schema::document");
+
 match_document::match_document(rule_attr_t const &a, 
     std::vector<rule_t> const &sr, match &m)
 : happy_once(a, m), sub(deflatten(sr)), state(first) {}

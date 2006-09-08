@@ -62,9 +62,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_named,
     schema::concrete_type<match_named>)
 
-rule_attr_t match_named::attributes(string const &s, bool cc) {
-  return rule_attr_t(vector<string>(1, s), cc, Xany(s));
-}
+gott::atom const match_named::id("tdl::schema::named");
 
 static string get_id(rule_attr_t const &a) {
   if (a.user().empty() && a.tags().empty())

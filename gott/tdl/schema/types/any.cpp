@@ -49,6 +49,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_any,
     schema::concrete_type<match_any>)
 
+gott::atom const match_any::id("tdl::schema::any");
+
 match_any::match_any(rule_attr_t const &a, std::vector<rule_t> const &vv, match &m) 
 : happy_once(a, m), v(vv), pos(v.begin()) {
   if (pos != v.end()) {

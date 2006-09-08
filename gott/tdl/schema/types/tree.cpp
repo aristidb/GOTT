@@ -50,6 +50,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_tree,
     tdl::schema::concrete_type<match_tree>)
 
+gott::atom const match_tree::id("tdl::schema::tree");
+
 match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match &m)
 : item(a, m), level(0), level_state(fresh) {
   assert(c.empty());

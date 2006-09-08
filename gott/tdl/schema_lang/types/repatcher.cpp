@@ -79,6 +79,8 @@ public:
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
   { return true; }
 
+  static gott::atom const id;
+
 private:
   ~xmatcher() {
     matcher().out_structure().begin(matcher().where_out());
@@ -109,3 +111,6 @@ private:
 }
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin_lang_repatcher, concrete_type<xmatcher>)
+
+gott::atom const xmatcher::id("tdl::schema_lang::repatcher");
+

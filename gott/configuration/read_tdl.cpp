@@ -70,6 +70,8 @@ public:
       std::vector<tdl::schema::rule_t> const &)
   { return true; }
 
+  static gott::atom id;
+
 private:
   bool play(tdl::schema::ev::down const &);
   bool play(tdl::schema::ev::up const &);
@@ -91,6 +93,8 @@ private:
 }
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin_tdl, schema::concrete_type<match_config_tdl>)
+
+gott::atom match_config_tdl::id("gott::config::tdl_element");
 
 match_config_tdl::match_config_tdl(schema::rule_attr_t const &ra, 
     std::vector<schema::rule_t> const &o_children, 

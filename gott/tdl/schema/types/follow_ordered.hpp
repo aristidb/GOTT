@@ -44,6 +44,7 @@
 #include "../slot.hpp"
 #include "../parse_position.hpp"
 #include "../rule_attr.hpp"
+#include <gott/string/atom.hpp>
 
 namespace tdl {
 namespace schema {
@@ -54,6 +55,8 @@ public:
   ~match_follow_ordered();
 
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
+
+  static gott::atom const id;
   
 private:
   struct active_element {

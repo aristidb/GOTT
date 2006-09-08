@@ -52,6 +52,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_unordered,
     schema::concrete_type<match_unordered>)
 
+gott::atom const match_unordered::id("tdl::schema::unordered");
+
 match_unordered::match_unordered(rule_attr_t const &a, vector<rule_t> const &r,
     match &m) 
 : item(a, m), last(m.pos().current()), all_happy(true) {

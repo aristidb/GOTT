@@ -50,6 +50,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_follow,
     schema::concrete_type<match_follow_ordered>)
 
+gott::atom const match_follow_ordered::id("tdl::schema::follow");
+
 match_follow_ordered::match_follow_ordered(rule_attr_t const &a, 
                                            std::vector<rule_t> const &c, 
                                            match &m)

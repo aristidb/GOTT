@@ -38,6 +38,8 @@
 
 #include "type.hpp"
 
-gott::QID const tdl::schema::type::qid("tdl::schema::type");
+using tdl::schema::type;
 
-tdl::schema::type::~type() {}
+gott::atom const type::kind("tdl::schema::type");
+
+type::~type() {}

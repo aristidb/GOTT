@@ -329,14 +329,14 @@ void metadata_manager::load_core() {
 void metadata_manager::add_core_tdl_schema(
     string const &type, module_descriptor const &tdl_builtins) {
   set<QID> interfaces;
-  interfaces.insert("tdl::schema::type");
+  interfaces.insert("tdl::resource");
 
   map<QID, bool> features;
 
   add_plugin(
       plugin_descriptor("plugin_schema_" + type, tdl_builtins),
       plugin_information(
-        "tdl::schema::" + type,
+        "",
         "tdl::builtins",
         interfaces,
         features,

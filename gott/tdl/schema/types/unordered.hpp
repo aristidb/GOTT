@@ -44,22 +44,27 @@
 #include "../parse_position.hpp"
 #include "../slot.hpp"
 #include "../rule_attr.hpp"
+#include <gott/string/atom.hpp>
 
 namespace tdl {
 namespace schema {
 
 class match_unordered : public item {
+private:
   struct element {
     rule_t generator;
     slotcfg slot;
 
     element(rule_t const &g) : generator(g), slot(g.attributes().outer()) {}
   };
+
 public:
   match_unordered(rule_attr_t const &, std::vector<rule_t> const &, match &);
   ~match_unordered();
 
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
+
+  static gott::atom const id;
 
 private:
   typedef std::vector<element> list_t;

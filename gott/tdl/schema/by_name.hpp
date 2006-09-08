@@ -40,11 +40,8 @@
 #define GOTT_UTIL_TDL_SCHEMA_BY_NAME_HPP
 
 #include <gott/visibility.hpp>
+#include <gott/string/atom.hpp>
 #include <vector>
-
-namespace gott {
-class string;
-}
 
 namespace tdl {
 namespace schema {
@@ -52,7 +49,7 @@ namespace schema {
 class rule_t;
 class rule_attr_t;
 
-rule_t get_by_name(gott::string const &name, rule_attr_t const &att,
+rule_t get_by_name(gott::atom const &name, rule_attr_t const &att,
     std::vector<rule_t> const &children);
 
 }}

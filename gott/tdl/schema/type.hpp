@@ -40,16 +40,19 @@
 #define GOTT_TDL_SCHEMA_TYPE_HPP
 
 #include "rule.hpp"
+#include "../resource.hpp"
 #include <gott/plugin/plugin_base.hpp>
 #include <gott/string/qid.hpp>
 
 namespace tdl { namespace schema {
 
-class GOTT_EXPORT type : public gott::plugin::plugin_base {
+class GOTT_EXPORT type : public tdl::resource {
 public:
-  static gott::QID const qid;
+  gott::atom get_kind() const { return kind; }
   virtual abstract_rule get_abstract() const = 0;
   virtual ~type() = 0;
+
+  static gott::atom const kind;
 };
 
 template<class T>
@@ -57,6 +60,8 @@ class concrete_type : public type {
   abstract_rule get_abstract() const {
     return abstract_rule(&construct_item<T>, &T::accept_empty);
   }
+
+  gott::atom get_id() const { return T::id; }
 };
 
 }}

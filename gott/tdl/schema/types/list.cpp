@@ -52,6 +52,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_list,
     schema::concrete_type<match_list>)
 
+gott::atom const match_list::id("tdl::schema::list");
+
 match_list::match_list(rule_attr_t const &a, std::vector<rule_t> const &r, match &m)
 : item(a, m), sub(r[0]), cfg(r[0].attributes().outer()), cancelled(false) {
   assert(r.size() == 1);

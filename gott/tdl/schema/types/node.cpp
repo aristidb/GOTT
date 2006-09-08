@@ -51,6 +51,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_node,
     schema::concrete_type<match_node>)
 
+gott::atom const match_node::id("tdl::schema::node");
+
 match_node::match_node(rule_attr_t const &a, std::vector<rule_t> const &r, 
     match &m)
 : happy_once(a, m) {
