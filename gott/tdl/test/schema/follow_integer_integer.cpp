@@ -57,13 +57,13 @@ namespace {
 struct schema_follow_integer_integer : tut::schema_basic {
   schema_follow_integer_integer() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document", RA("doc"),
-        rule("tdl::schema::follow", RA("foll"), list_of
-          (rule("tdl::schema::node",
+      rule_one("document", RA("doc"),
+        rule("follow", RA("foll"), list_of
+          (rule("node",
                 schema::rule_attr(
                   schema::tag = "int1", 
                   schema::repatcher = new I())))
-          (rule("tdl::schema::node",
+          (rule("node",
                 schema::rule_attr(
                   schema::tag = "int2", 
                   schema::repatcher = new I())))))) {}

@@ -54,19 +54,19 @@ namespace {
 struct schema_ffxy : tut::schema_basic {
   schema_ffxy() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document",
-        rule_one("tdl::schema::ordered",
-          rule_one("tdl::schema::follow",
-            rule("tdl::schema::ordered", rule_attr(), list_of
-              (rule_one("tdl::schema::follow", rule_attr("o"),
-                rule("tdl::schema::follow", 
+      rule_one("document",
+        rule_one("ordered",
+          rule_one("follow",
+            rule("ordered", rule_attr(), list_of
+              (rule_one("follow", rule_attr("o"),
+                rule("follow", 
                   rule_attr("xy", outer = slotcfg(slotcfg::list)),
                   list_of
-                    (rule("tdl::schema::node",
+                    (rule("node",
                           rule_attr("int1", repatcher = new I())))
-                    (rule("tdl::schema::node",
+                    (rule("node",
                           rule_attr("int2", repatcher = new I()))))))
-              (rule("tdl::schema::node"))))))) {}
+              (rule("node"))))))) {}
 
   void run(string prefix, int n) {
     string test_data = prefix;

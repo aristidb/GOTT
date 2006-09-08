@@ -50,7 +50,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_ordered,
     schema::concrete_type<match_ordered>)
 
-gott::atom const match_ordered::id("tdl::schema::ordered");
+gott::atom const match_ordered::id("ordered");
 
 match_ordered::match_ordered(rule_attr_t const &a, std::vector<rule_t> const&r,
                              match  &m)
@@ -68,7 +68,7 @@ std::vector<schema::rule_t> match_ordered::deflatten(
     if (in[i].attributes().outer().get_mode() == slotcfg::one)
       out[i] = in[i];
     else
-      out[i] = rule_one("tdl::schema::list", rule_attr(coat = false), in[i]);
+      out[i] = rule_one("list", rule_attr(coat = false), in[i]);
   }
   return out;
 }
@@ -93,5 +93,5 @@ bool match_ordered::accept_empty(rule_attr_t const &,
 }
 
 gott::string match_ordered::name() const {
-  return gott::string("tdl::schema::ordered");
+  return gott::string("ordered");
 }

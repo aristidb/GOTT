@@ -56,14 +56,14 @@ struct recursive : tut::schema_basic {
   rule_t rec;
   
   recursive() {
-    grammar = rule_one("tdl::schema::document", rule_t(&rec));
+    grammar = rule_one("document", rule_t(&rec));
     rec = 
-      rule("tdl::schema::ordered", rule_attr(coat = false),
+      rule("ordered", rule_attr(coat = false),
           list_of
-        (rule("tdl::schema::node",
+        (rule("node",
               rule_attr(repatcher = new stru::repatch_integer())))
-        (rule_one("tdl::schema::list", rule_attr(coat = false),
-           rule_one("tdl::schema::ordered", 
+        (rule_one("list", rule_attr(coat = false),
+           rule_one("ordered", 
                 rule_attr(outer = slotcfg(slotcfg::optional), coat = false),
                 rule_t(&rec)))));
   }

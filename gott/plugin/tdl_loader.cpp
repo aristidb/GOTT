@@ -161,7 +161,7 @@ void gott::plugin::detail::load_tdl_resource(
     std::istream &stream,
     string const &resource) {
 
-  rule_t const inode = rule("tdl::schema::node", rule_attr(coat = false));
+  rule_t const inode = rule("node", rule_attr(coat = false));
   
   /*
   ordered
@@ -173,22 +173,22 @@ void gott::plugin::detail::load_tdl_resource(
       named (priority), enumeration $ low, normal, high
    */
   rule_t const plugin_schema =
-    rule("tdl::schema::ordered", rule_attr(tag = "$plugin", outer = list()),
+    rule("ordered", rule_attr(tag = "$plugin", outer = list()),
         boost::assign::list_of
-        (rule_one("tdl::schema::named", rule_attr(tag = "plugin"),
+        (rule_one("named", rule_attr(tag = "plugin"),
                   inode))
-        (rule("tdl::schema::unordered", rule_attr(coat = false),
+        (rule("unordered", rule_attr(coat = false),
           boost::assign::list_of
-          (rule_one("tdl::schema::named",
+          (rule_one("named",
                     rule_attr(tag = "interface"),
                     inode))
-          (rule_one("tdl::schema::named", rule_attr(tag = "enclosing-module"),
+          (rule_one("named", rule_attr(tag = "enclosing-module"),
                     inode))
-          (rule_one("tdl::schema::named", rule_attr(tag = "symbol"),
+          (rule_one("named", rule_attr(tag = "symbol"),
                     inode))
-          (rule_one("tdl::schema::named",
+          (rule_one("named",
                     rule_attr(tag = "priority", outer = optional()),
-                    rule("tdl::schema::node",
+                    rule("node",
                       rule_attr(
                         coat = false,
                         tdl::schema::repatcher = new repatch_enumeration(
@@ -198,7 +198,7 @@ void gott::plugin::detail::load_tdl_resource(
                           (string("high"))
                           .operator vector<string>())))))
           
-          (rule_one("tdl::schema::named",
+          (rule_one("named",
                     rule_attr(tag = "feature", outer = list()),
                     inode)))));
 
@@ -211,43 +211,43 @@ void gott::plugin::detail::load_tdl_resource(
       :list named (depend-on), node
    */
   rule_t const module_schema =
-    rule("tdl::schema::ordered", rule_attr(tag = "$module", outer = list()),
+    rule("ordered", rule_attr(tag = "$module", outer = list()),
         boost::assign::list_of
-        (rule_one("tdl::schema::named", rule_attr(tag = "module"),
+        (rule_one("named", rule_attr(tag = "module"),
                   inode))
-        (rule("tdl::schema::unordered", rule_attr(coat = false),
+        (rule("unordered", rule_attr(coat = false),
           boost::assign::list_of
-          (rule_one("tdl::schema::named", rule_attr(tag = "file-path"),
+          (rule_one("named", rule_attr(tag = "file-path"),
                     inode))
-          (rule_one("tdl::schema::named", rule_attr(tag = "module-type"),
-                    rule("tdl::schema::node", rule_attr(
+          (rule_one("named", rule_attr(tag = "module-type"),
+                    rule("node", rule_attr(
                       coat = false,
                       tdl::schema::repatcher = new repatch_enumeration(
                         boost::assign::list_of
                         (string("dynamic-native"))
                         .operator std::vector<string>())))))
-          (rule_one("tdl::schema::named",
+          (rule_one("named",
                     rule_attr(tag = "depend-on", outer = list()),
                     inode)))));
 
   rule_t const deduced_feature_schema =
-    rule("tdl::schema::ordered",
+    rule("ordered",
         rule_attr(tag = "$deduced-feature", outer = list()),
         boost::assign::list_of
-        (rule_one("tdl::schema::named", rule_attr(tag = "deduced-feature"),
+        (rule_one("named", rule_attr(tag = "deduced-feature"),
                   inode))
-        (rule_one("tdl::schema::named",
+        (rule_one("named",
                   rule_attr(
                     tag = "feature-set",
                     user = Xany("-"),
                     outer = list()),
-                  rule_one("tdl::schema::list", rule_attr(coat = false),
-                    rule("tdl::schema::node",
+                  rule_one("list", rule_attr(coat = false),
+                    rule("node",
                       rule_attr(tag = "feature-set-item", outer = list()))))));
 
   rule_t const document_schema =
-    rule_one("tdl::schema::document", rule_attr(coat = false),
-        rule("tdl::schema::unordered", rule_attr(coat = false),
+    rule_one("document", rule_attr(coat = false),
+        rule("unordered", rule_attr(coat = false),
           boost::assign::list_of
           (module_schema)
           (plugin_schema)

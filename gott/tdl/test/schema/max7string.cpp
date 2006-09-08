@@ -52,9 +52,9 @@ namespace {
 struct schema_max7string : tut::schema_basic {
   schema_max7string() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document", 
-        rule_one("tdl::schema::ordered",
-           rule("tdl::schema::node",
+      rule_one("document", 
+        rule_one("ordered",
+           rule("node",
              rule_attr("el", 
                 outer = slotcfg(slotcfg::maximum, 7)))))) {}
 };

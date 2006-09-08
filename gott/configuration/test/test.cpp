@@ -64,17 +64,17 @@ int main() {
     ;
   
   rule_t conf = 
-    rule_one("tdl::schema::document",
-      rule("tdl::schema::list", rule_attr(tag = "container"),
+    rule_one("document",
+      rule("list", rule_attr(tag = "container"),
         list_of(rule("gott::config::tdl_element", 
             rule_attr(outer = list(), tag = "element"),
             list_of
-            (rule("tdl::schema::node", 
+            (rule("node", 
                   rule_attr(tag = "conf::int", 
                     repatcher = new structure::repatch_integer())))
-            (rule("tdl::schema::node", rule_attr(tag = "conf::string")))
-            (rule("tdl::schema::list", rule_attr(tag = "get::more::stuff"),
-                  list_of(rule("tdl::schema::node", rule_attr(outer = list())))
+            (rule("node", rule_attr(tag = "conf::string")))
+            (rule("list", rule_attr(tag = "get::more::stuff"),
+                  list_of(rule("node", rule_attr(outer = list())))
                   ))))));
 
   structure::container out;

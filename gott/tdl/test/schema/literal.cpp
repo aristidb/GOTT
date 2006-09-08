@@ -52,8 +52,8 @@ namespace {
 struct schema_literal : tut::schema_basic {
   schema_literal() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document",
-        rule("tdl::schema::node", 
+      rule_one("document",
+        rule("node", 
           rule_attr(
             schema::tag = "foobar",
             schema::repatcher =

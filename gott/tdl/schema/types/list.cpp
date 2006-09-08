@@ -52,7 +52,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_list,
     schema::concrete_type<match_list>)
 
-gott::atom const match_list::id("tdl::schema::list");
+gott::atom const match_list::id("list");
 
 match_list::match_list(rule_attr_t const &a, std::vector<rule_t> const &r, match &m)
 : item(a, m), sub(r[0]), cfg(r[0].attributes().outer()), cancelled(false) {
@@ -106,7 +106,7 @@ item::expect match_list::expectation() const {
 }
 
 gott::string match_list::name() const {
-  return gott::string("tdl::schema::list");
+  return gott::string("list");
 }
 
 bool match_list::accept_empty(rule_attr_t const &, std::vector<rule_t> const &c) {

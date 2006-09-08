@@ -57,13 +57,13 @@ namespace {
 struct schema_ordered_integer_string : tut::schema_basic {
   schema_ordered_integer_string() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document",
-        rule("tdl::schema::ordered", RA(),
+      rule_one("document",
+        rule("ordered", RA(),
           list_of
-          (rule("tdl::schema::node",
+          (rule("node",
                 schema::rule_attr(
                   schema::repatcher = new stru::repatch_integer())))
-          (rule("tdl::schema::node", RA()))))) {}
+          (rule("node", RA()))))) {}
 };
 }
 

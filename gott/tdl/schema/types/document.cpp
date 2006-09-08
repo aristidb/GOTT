@@ -49,7 +49,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_document,
     schema::concrete_type<match_document>)
 
-gott::atom const match_document::id("tdl::schema::document");
+gott::atom const match_document::id("document");
 
 match_document::match_document(rule_attr_t const &a, 
     std::vector<rule_t> const &sr, match &m)
@@ -60,8 +60,8 @@ schema::rule_t match_document::deflatten(std::vector<rule_t> const &children) {
     if (children[0].attributes().outer().get_mode() == slotcfg::one)
       return children[0];
     else
-      return rule("tdl::schema::list", rule_attr(coat = false), children);
-  return rule("tdl::schema::ordered", rule_attr(coat = false), children);
+      return rule("list", rule_attr(coat = false), children);
+  return rule("ordered", rule_attr(coat = false), children);
 }
 
 bool match_document::play(ev::begin_parse const &) {
@@ -100,5 +100,5 @@ bool match_document::play(ev::child_succeed const &) {
 }
 
 gott::string match_document::name() const {
-  return gott::string("tdl::schema::document");
+  return gott::string("document");
 }

@@ -50,7 +50,7 @@ using schema::rule;
 namespace {
 struct schema_tree : tut::schema_basic {
   schema_tree() 
-  : tut::schema_basic(rule_one("tdl::schema::document", rule("tdl::schema::tree")))
+  : tut::schema_basic(rule_one("document", rule("tree")))
   {}
 };
 }

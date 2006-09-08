@@ -49,8 +49,8 @@ namespace {
 struct schema_string : tut::schema_basic {
   schema_string() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document", schema::rule_attr_t("doc"),
-        rule("tdl::schema::node", schema::rule_attr_t()))) {}
+      rule_one("document", schema::rule_attr_t("doc"),
+        rule("node", schema::rule_attr_t()))) {}
 };
 }
 

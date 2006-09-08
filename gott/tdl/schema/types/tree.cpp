@@ -50,7 +50,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_tree,
     tdl::schema::concrete_type<match_tree>)
 
-gott::atom const match_tree::id("tdl::schema::tree");
+gott::atom const match_tree::id("tree");
 
 match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match &m)
 : item(a, m), level(0), level_state(fresh) {
@@ -58,7 +58,7 @@ match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match
 }
 
 gott::string match_tree::name() const {
-  return gott::string("tdl::schema::tree");
+  return gott::string("tree");
 }
 
 item::expect match_tree::expectation() const {

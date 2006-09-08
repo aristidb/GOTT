@@ -38,7 +38,7 @@ int main() {
   tdl::structure::repatchable_adapter helper(helper2);
   using namespace tdl::schema;
   match m_r(
-      rule_one("tdl::schema::document", rule_attr(tag = "doc"),
+      rule_one("document", rule_attr(tag = "doc"),
         rule("tdl::schema_lang::repatcher", rule_attr(tag = "R"))),
       helper);
   m_r.parse(std::cin);
@@ -51,9 +51,9 @@ int main() {
   tdl::structure::revocable_adapter helper5(helper6);
   tdl::structure::repatchable_adapter helper4(helper5);
   match m(
-      rule_one("tdl::schema::document",
+      rule_one("document",
         rule_attr(tag = "doc", repatcher = acc_r.rep),
-        rule("tdl::schema::node", rule_attr(tag = "E"))),
+        rule("node", rule_attr(tag = "E"))),
       helper4);
   m.parse(std::cin);
   std::cout << out << std::endl;

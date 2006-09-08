@@ -51,16 +51,16 @@ namespace {
 struct schema_multi_footype : tut::schema_basic {
   schema_multi_footype() 
   : tut::schema_basic(
-    rule_one("tdl::schema::document",
-      rule("tdl::schema::ordered", rule_attr(), boost::assign::list_of
-        (rule_one("tdl::schema::list", rule_attr_t("s"),
-          rule_one("tdl::schema::list", 
+    rule_one("document",
+      rule("ordered", rule_attr(), boost::assign::list_of
+        (rule_one("list", rule_attr_t("s"),
+          rule_one("list", 
             rule_attr("t", outer = list()),
-            rule("tdl::schema::node",
+            rule("node",
               rule_attr("ii",
                 repatcher = new stru::repatch_integer(),
                 outer = slotcfg(slotcfg::list))))))
-        (rule("tdl::schema::node", rule_attr("xx")))))) {}
+        (rule("node", rule_attr("xx")))))) {}
 };
 }
 

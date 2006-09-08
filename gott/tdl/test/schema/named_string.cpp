@@ -51,9 +51,9 @@ namespace {
 struct schema_named_string : tut::schema_basic {
   schema_named_string() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document", rule_attr(schema:: tag = "doc"),
-        rule_one("tdl::schema::named", rule_attr(schema::tag = "ND"),
-          rule("tdl::schema::node", rule_attr(schema::tag = "S"))))) {}
+      rule_one("document", rule_attr(schema:: tag = "doc"),
+        rule_one("named", rule_attr(schema::tag = "ND"),
+          rule("node", rule_attr(schema::tag = "S"))))) {}
 };
 }
 

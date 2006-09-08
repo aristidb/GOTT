@@ -51,7 +51,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_node,
     schema::concrete_type<match_node>)
 
-gott::atom const match_node::id("tdl::schema::node");
+gott::atom const match_node::id("node");
 
 match_node::match_node(rule_attr_t const &a, std::vector<rule_t> const &r, 
     match &m)
@@ -69,5 +69,5 @@ bool match_node::play(ev::node const &n) {
 }
 
 gott::string match_node::name() const {
-  return gott::string("tdl::schema::node");
+  return gott::string("node");
 }

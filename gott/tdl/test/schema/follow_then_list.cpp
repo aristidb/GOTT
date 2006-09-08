@@ -53,10 +53,10 @@ namespace {
 struct schema_follow_then_list : tut::schema_basic {
   schema_follow_then_list() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document", rule_attr("doc"),
-        rule("tdl::schema::follow", rule_attr("foll"), boost::assign::list_of
-          (rule("tdl::schema::node", rule_attr("s")))
-          (rule("tdl::schema::node", 
+      rule_one("document", rule_attr("doc"),
+        rule("follow", rule_attr("foll"), boost::assign::list_of
+          (rule("node", rule_attr("s")))
+          (rule("node", 
             rule_attr("i",
               repatcher = new stru::repatch_integer(),
               outer = slotcfg(slotcfg::list))))))) {}

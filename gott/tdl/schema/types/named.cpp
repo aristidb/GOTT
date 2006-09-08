@@ -62,7 +62,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_named,
     schema::concrete_type<match_named>)
 
-gott::atom const match_named::id("tdl::schema::named");
+gott::atom const match_named::id("named");
 
 static string get_id(rule_attr_t const &a) {
   if (a.user().empty() && a.tags().empty())
@@ -93,8 +93,8 @@ match_named::match_named(rule_attr_t const &a, vector<rule_t> const &s,match &m)
 : happy_once(a, m), 
   tag(get_id(a)),
   rewritten(
-      rule("tdl::schema::follow", rule_attr(coat = false), list_of 
-        (rule("tdl::schema::node",
+      rule("follow", rule_attr(coat = false), list_of 
+        (rule("node",
               rule_attr(coat = false, repatcher = get_repatcher(tag))))
         (s[0]))) {
   assert(s.size() == 1);
@@ -109,5 +109,5 @@ bool match_named::play(ev::child_succeed const &) {
 }
 
 gott::string match_named::name() const {
-  return gott::string("tdl::schema::named");
+  return gott::string("named");
 }

@@ -55,27 +55,27 @@ namespace {
 struct schema_any : tut::schema_basic {
   schema_any()
   : tut::schema_basic(
-      rule_one("tdl::schema::document",
-         rule("tdl::schema::any", rule_attr(),
+      rule_one("document",
+         rule("any", rule_attr(),
            list_of
-           (rule("tdl::schema::follow", rule_attr(), 
+           (rule("follow", rule_attr(), 
              list_of
-             (rule("tdl::schema::node",
+             (rule("node",
                    rule_attr("int3", repatcher = new repatch_integer())))
-             (rule("tdl::schema::node",
+             (rule("node",
                    rule_attr("int4", repatcher = new repatch_integer())))))
-           (rule("tdl::schema::ordered", rule_attr(),
+           (rule("ordered", rule_attr(),
              list_of
-             (rule("tdl::schema::node",
+             (rule("node",
                    rule_attr("int", repatcher = new repatch_integer())))
-             (rule("tdl::schema::node", rule_attr("string")))))
-           (rule("tdl::schema::ordered", rule_attr(),
+             (rule("node", rule_attr("string")))))
+           (rule("ordered", rule_attr(),
              list_of
-             (rule("tdl::schema::node", rule_attr("string_1")))
-             (rule("tdl::schema::node", rule_attr("string_2")))))
-           (rule("tdl::schema::node",
+             (rule("node", rule_attr("string_1")))
+             (rule("node", rule_attr("string_2")))))
+           (rule("node",
                  rule_attr("int2", repatcher = new repatch_integer())))
-           (rule("tdl::schema::node", rule_attr("string2"))))))
+           (rule("node", rule_attr("string2"))))))
   {}
 };
 }
@@ -170,7 +170,7 @@ void object::test<9>(int) {
   c.push_back(S(Xany(4), "int3"));
   c.push_back(S(Xany(5), "int4"));
   C(C(M(c))).write_to(xp);
-  ensure_equals("tdl::schema::follow", tree, xp);
+  ensure_equals("follow", tree, xp);
 }
 
 template<> template<>

@@ -57,14 +57,14 @@ namespace {
 struct schema_multi_follow : tut::schema_basic {
   schema_multi_follow() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document",
-        rule("tdl::schema::follow", rule_attr("outer"),  list_of
-          (rule("tdl::schema::follow", rule_attr("inner1"), list_of
-            (rule("tdl::schema::node", L(1)))
-            (rule("tdl::schema::node", L(2)))))
-          (rule("tdl::schema::follow", rule_attr("inner2"), list_of
-            (rule("tdl::schema::node", L(3)))
-            (rule("tdl::schema::node", L(4)))))))) {}
+      rule_one("document",
+        rule("follow", rule_attr("outer"),  list_of
+          (rule("follow", rule_attr("inner1"), list_of
+            (rule("node", L(1)))
+            (rule("node", L(2)))))
+          (rule("follow", rule_attr("inner2"), list_of
+            (rule("node", L(3)))
+            (rule("node", L(4)))))))) {}
 };
 }
 

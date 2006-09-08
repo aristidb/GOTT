@@ -54,27 +54,27 @@ struct schema_multi_footype : tut::schema_basic {
   rule_t multi, footype;
 
   schema_multi_footype() 
-  : tut::schema_basic(rule_one("tdl::schema::document", rule_attr("--doc--"), 
+  : tut::schema_basic(rule_one("document", rule_attr("--doc--"), 
         rule_t(&footype))) {
-    footype = rule_one("tdl::schema::named", rule_attr(tag = "a"),
+    footype = rule_one("named", rule_attr(tag = "a"),
         rule_t(&multi));
 
     multi =
-      rule("tdl::schema::unordered", rule_attr("--unordered--"), list_of
-        (rule_one("tdl::schema::named", rule_attr(tag = "plugin"), 
-          rule_one("tdl::schema::list", rule_attr(coat = false),
-            rule("tdl::schema::node", 
+      rule("unordered", rule_attr("--unordered--"), list_of
+        (rule_one("named", rule_attr(tag = "plugin"), 
+          rule_one("list", rule_attr(coat = false),
+            rule("node", 
               rule_attr(
                 tag = "plugin-data",
                 outer = list())))))
-        (rule_one("tdl::schema::named", rule_attr(tag = "sum"),
-          rule_one("tdl::schema::list", rule_attr(coat = false),
-            rule("tdl::schema::node", 
+        (rule_one("named", rule_attr(tag = "sum"),
+          rule_one("list", rule_attr(coat = false),
+            rule("node", 
               rule_attr(
                 tag = "sum-data",
                 repatcher = new stru::repatch_integer(),
                 outer = some())))))
-        (rule("tdl::schema::node", 
+        (rule("node", 
           rule_attr("--other--", 
             repatcher = new stru::repatch_integer(),
             outer = slotcfg(slotcfg::some)))));

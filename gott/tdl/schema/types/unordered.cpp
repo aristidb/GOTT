@@ -52,7 +52,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_unordered,
     schema::concrete_type<match_unordered>)
 
-gott::atom const match_unordered::id("tdl::schema::unordered");
+gott::atom const match_unordered::id("unordered");
 
 match_unordered::match_unordered(rule_attr_t const &a, vector<rule_t> const &r,
     match &m) 
@@ -124,5 +124,5 @@ bool match_unordered::accept_empty(rule_attr_t const &,
 }
 
 gott::string match_unordered::name() const {
-  return gott::string("tdl::schema::unordered");
+  return gott::string("unordered");
 }

@@ -52,9 +52,9 @@ namespace {
 struct schema_some_string : tut::schema_basic {
   schema_some_string()
   : tut::schema_basic(
-      rule_one("tdl::schema::document", rule_attr(),
-        rule_one("tdl::schema::list", rule_attr(),
-          rule("tdl::schema::node", 
+      rule_one("document", rule_attr(),
+        rule_one("list", rule_attr(),
+          rule("node", 
             rule_attr("el", outer = slotcfg(slotcfg::some)))))) {}
 };
 }

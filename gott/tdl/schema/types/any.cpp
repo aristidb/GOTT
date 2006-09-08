@@ -49,7 +49,7 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_any,
     schema::concrete_type<match_any>)
 
-gott::atom const match_any::id("tdl::schema::any");
+gott::atom const match_any::id("any");
 
 match_any::match_any(rule_attr_t const &a, std::vector<rule_t> const &vv, match &m) 
 : happy_once(a, m), v(vv), pos(v.begin()) {
@@ -90,5 +90,5 @@ bool match_any::accept_empty(rule_attr_t const &, std::vector<rule_t> const &cho
 }
 
 gott::string match_any::name() const {
-  return gott::string("tdl::schema::any");
+  return gott::string("any");
 }

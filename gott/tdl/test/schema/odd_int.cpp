@@ -57,9 +57,9 @@ namespace {
 struct schema_odd_int : tut::schema_basic {
   schema_odd_int() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document",
-         rule_one("tdl::schema::list",
-           rule("tdl::schema::node",
+      rule_one("document",
+         rule_one("list",
+           rule("node",
              rule_attr("el", 
                 repatcher = new stru::repatch_integer(), 
                 outer = slotcfg(slotcfg::function, odd)))))) {}

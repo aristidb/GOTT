@@ -75,8 +75,8 @@ struct test_base {
 
   test_base() 
   : match(no_stru), pos(match.pos()), parse(match) {
-    match.add(tdl::schema::rule_one("tdl::schema::document", tdl::schema::rule_attr_t(), 
-     tdl::schema::rule("tdl::schema::node", tdl::schema::rule_attr_t())));
+    match.add(tdl::schema::rule_one("document", tdl::schema::rule_attr_t(), 
+     tdl::schema::rule("node", tdl::schema::rule_attr_t())));
   }
 };
 

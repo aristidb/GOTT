@@ -53,15 +53,15 @@ namespace {
 struct schema_unordered_foo_integer_string : tut::schema_basic {
   schema_unordered_foo_integer_string() 
   : tut::schema_basic(
-      rule_one("tdl::schema::document",
-        rule("tdl::schema::unordered", rule_attr(), boost::assign::list_of
-          (rule("tdl::schema::node", 
+      rule_one("document",
+        rule("unordered", rule_attr(), boost::assign::list_of
+          (rule("node", 
                 rule_attr("foo",
                   repatcher = new stru::repatch_enumeration(
                     std::vector<string>(1,"foo")))))
-          (rule("tdl::schema::node",
+          (rule("node",
                 rule_attr(repatcher = new stru::repatch_integer())))
-          (rule("tdl::schema::node", rule_attr()))))) {}
+          (rule("node", rule_attr()))))) {}
 };
 }
 
