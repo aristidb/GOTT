@@ -322,6 +322,13 @@ void metadata_manager::load_core() {
     add_core_tdl_schema("node", tdl_builtins);
     add_core_tdl_schema("unordered", tdl_builtins);
     add_core_tdl_schema("tree", tdl_builtins);
+
+    add_core_tdl_repatcher("enumeration", tdl_builtins);
+    add_core_tdl_repatcher("find_literal", tdl_builtins);
+    add_core_tdl_repatcher("integer", tdl_builtins);
+    add_core_tdl_repatcher("substring", tdl_builtins);
+    add_core_tdl_repatcher("throw_away", tdl_builtins);
+
     loaded = true;
   }
 }
@@ -335,6 +342,25 @@ void metadata_manager::add_core_tdl_schema(
 
   add_plugin(
       plugin_descriptor("plugin_schema_" + type, tdl_builtins),
+      plugin_information(
+        "",
+        "tdl::builtins",
+        interfaces,
+        features,
+        plugin_information::normal
+        ),
+      "core");
+}
+
+void metadata_manager::add_core_tdl_repatcher(
+    string const &type, module_descriptor const &tdl_builtins) {
+  set<QID> interfaces;
+  interfaces.insert("tdl::resource");
+
+  map<QID, bool> features;
+
+  add_plugin(
+      plugin_descriptor("plugin_repatcher_" + type, tdl_builtins),
       plugin_information(
         "",
         "tdl::builtins",

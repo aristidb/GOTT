@@ -36,15 +36,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "substring.hpp"
 #include "../repatch.hpp"
 #include <gott/exceptions.hpp>
 #include <gott/tdl/exceptions.hpp>
+#include <gott/plugin/plugin_builder.hpp>
 #include <boost/optional.hpp>
 #include <boost/none.hpp>
 
-using tdl::structure::repatch_substring;
-using tdl::structure::writable_structure;
+using namespace tdl::structure;
+using tdl::tdl_error;
+using tdl::source_position;
+
+namespace {
+
+class repatch_substring 
+: public concrete_repatcher<repatch_substring> {
+public:
+  repatch_substring(long left, long right);
+  ~repatch_substring();
+  writable_structure *deferred_write(writable_structure &) const;
+private:
+  long left, right;
+};
+
+}
 
 repatch_substring::repatch_substring(long l, long r) : left(l), right(r) {
   if (left < 0)
@@ -82,7 +97,8 @@ writable_structure *repatch_substring::deferred_write(
   return new context(target, left, right);
 }
 
-void repatch_substring::reg() {
+namespace {
+class factory : public repatcher_getter_factory {
   struct getter : public repatcher_getter {
     getter() : pos(outer) {}
     enum { outer, inner, p_left, p_right } pos;
@@ -138,7 +154,14 @@ void repatch_substring::reg() {
     repatcher *result_alloc() const {
       return new repatch_substring(left, right);
     }
-    static repatcher_getter *alloc() { return new getter; }
   };
-  //repatcher_by_name().add("substring", &getter::alloc);
+public:
+  factory() {}
+  gott::atom get_id() const { return gott::atom("substring"); }
+  repatcher_getter *alloc() const { return new getter; }
+};
 }
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_repatcher_substring,
+    factory)

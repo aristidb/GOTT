@@ -36,17 +36,36 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "find_literal.hpp"
 #include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
 #include <gott/xany.hpp>
+#include <gott/plugin/plugin_builder.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/optional.hpp>
 
 using gott::string;
-using tdl::structure::repatch_find_literal;
-using tdl::structure::writable_structure;
+using namespace tdl::structure;
+using tdl::tdl_error;
+using tdl::source_position;
 namespace algo = boost::algorithm;
+
+namespace {
+
+class repatch_find_literal 
+: public concrete_repatcher<repatch_find_literal> {
+public:
+  struct type {
+    enum location { start, end, whole, substring };
+  };
+  repatch_find_literal(type::location, gott::string const &);
+  ~repatch_find_literal();
+  writable_structure *deferred_write(writable_structure &) const;
+private:
+  type::location loc;
+  gott::string literal;
+};
+
+}
 
 repatch_find_literal::repatch_find_literal(type::location l, string const &s)
 : loc(l), literal(s) {}
@@ -91,13 +110,16 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
   return new context(loc, literal, target);
 }
 
-void repatch_find_literal::reg() {
+namespace {
+class factory : public repatcher_getter_factory {
   struct getter : public repatcher_getter {
+    typedef repatch_find_literal::type::location location;
+
     getter() : pos(outer) {}
     enum { outer, inner, p_left, p_right } pos;
-    boost::optional<type::location> loc;
+    boost::optional<location> loc;
     boost::optional<string> literal;
-    bool has_loc, has_literal;
+
     void begin(source_position const &) {
       if (pos != outer) fail();
       pos = inner;
@@ -107,9 +129,9 @@ void repatch_find_literal::reg() {
       pos = outer;
     }
     void data(gott::xany::Xany const &x) {
-      if (x.compatible<type::location>()) {
+      if (x.compatible<location>()) {
         if (loc) fail();
-        loc = gott::xany::Xany_cast<type::location>(x);
+        loc = gott::xany::Xany_cast<location>(x);
        } else if (x.compatible<string>()) {
         if (literal) fail();
         literal = gott::xany::Xany_cast<string>(x);
@@ -126,7 +148,14 @@ void repatch_find_literal::reg() {
         fail();
       return new repatch_find_literal(*loc, *literal);
     }
-    static repatcher_getter *alloc() { return new getter; }
   };
-  //repatcher_by_name().add("find-literal", &getter::alloc);
+public:
+  factory() {}
+  gott::atom get_id() const { return gott::atom("find-literal"); }
+  repatcher_getter *alloc() const { return new getter; }
+};
 }
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_repatcher_find_literal,
+    factory)

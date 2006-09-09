@@ -37,10 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include <gott/tdl/structure/repatch.hpp>
-#include <gott/tdl/structure/repatchers/find_literal.hpp>
-#include <gott/tdl/structure/repatchers/substring.hpp>
-#include <gott/tdl/structure/repatchers/integer.hpp>
-#include <gott/tdl/structure/repatchers/enumeration.hpp>
 #include <gott/tdl/structure/print.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <gott/tut/tut.h>
@@ -63,13 +59,36 @@ namespace {
 tut::tf stru("repatcher");
 
 repatcher *strip_paren() {
-  repatcher_chain *result = new repatcher_chain;
-  result->push_back(
-      repatch_find_literal(repatch_find_literal::type::start, "("));
-  result->push_back(
-      repatch_find_literal(repatch_find_literal::type::end, ")"));
-  result->push_back(repatch_substring(1, -1));
-  return result;
+  boost::scoped_ptr<repatcher_getter> rg(repatcher_by_name());
+  rg->begin();
+    rg->data(Xany("find-literal"));
+    rg->begin();
+      rg->begin(); rg->data(Xany(0)); rg->end(); // start
+      rg->begin(); rg->data(Xany("(")); rg->end();
+    rg->end();
+  rg->end();
+  rg->begin();
+    rg->data(Xany("find-literal"));
+    rg->begin();
+      rg->begin(); rg->data(Xany(1)); rg->end(); // end
+      rg->begin(); rg->data(Xany(")")); rg->end();
+    rg->end();
+  rg->end();
+  rg->begin();
+    rg->data(Xany("substring"));
+    rg->begin();
+      rg->begin();
+        rg->add_tag("left");
+        rg->data(Xany(1));
+      rg->end();
+      rg->begin();
+        rg->add_tag("right");
+        rg->data(Xany(-1));
+      rg->end();
+    rg->end();
+  rg->end();
+  
+  return rg->result_alloc();
 }
 }
 
@@ -154,17 +173,17 @@ template<> template<>
 void object::test<5>(int) {
   scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
   re_g->begin();
-  re_g->data(Xany("substring"));
-  re_g->begin();
-  re_g->begin();
-    re_g->add_tag("left");
-    re_g->data(Xany(2));
-  re_g->end();
-  re_g->begin();
-    re_g->data(Xany(3));
-    re_g->add_tag("right");
-  re_g->end();
-  re_g->end();
+    re_g->data(Xany("substring"));
+    re_g->begin();
+      re_g->begin();
+        re_g->add_tag("left");
+        re_g->data(Xany(2));
+      re_g->end();
+      re_g->begin();
+        re_g->data(Xany(3));
+        re_g->add_tag("right");
+      re_g->end();
+    re_g->end();
   re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
 
@@ -182,11 +201,15 @@ template<> template<>
 void object::test<6>(int) {
   scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
   re_g->begin();
-  re_g->data(Xany("find-literal"));
-  re_g->begin();
-  re_g->begin(); re_g->data(Xany("foo")); re_g->end();
-  re_g->begin(); re_g->data(Xany(repatch_find_literal::type::end)); re_g->end();
-  re_g->end();
+    re_g->data(Xany("find-literal"));
+    re_g->begin();
+      re_g->begin();
+        re_g->data(Xany("foo"));
+      re_g->end();
+      re_g->begin();
+        re_g->data(Xany(1)); // end
+      re_g->end();
+    re_g->end();
   re_g->end();
   scoped_ptr<repatcher> re(re_g->result_alloc());
 

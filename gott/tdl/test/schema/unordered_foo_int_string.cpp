@@ -37,8 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "common.hpp"
-#include <gott/tdl/structure/repatchers/enumeration.hpp>
-#include <gott/tdl/structure/repatchers/integer.hpp>
 #include <boost/assign/list_of.hpp>
 
 using namespace tdl::schema;
@@ -50,17 +48,35 @@ using stru::cf::S;
 using stru::cf::C;
 
 namespace {
+stru::repatcher *int_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("integer"));
+    g->begin(); g->end();
+  g->end();
+  return g->result_alloc();
+}
+
+stru::repatcher *foo_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("enumeration"));
+    g->begin();
+      g->begin(); g->data(Xany("foo")); g->end();
+    g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_unordered_foo_integer_string : tut::schema_basic {
   schema_unordered_foo_integer_string() 
   : tut::schema_basic(
       rule_one("document",
         rule("unordered", rule_attr(), boost::assign::list_of
           (rule("node", 
-                rule_attr("foo",
-                  repatcher = new stru::repatch_enumeration(
-                    std::vector<string>(1,"foo")))))
+                rule_attr("foo", repatcher = foo_r())))
           (rule("node",
-                rule_attr(repatcher = new stru::repatch_integer())))
+                rule_attr(repatcher = int_r())))
           (rule("node", rule_attr()))))) {}
 };
 }

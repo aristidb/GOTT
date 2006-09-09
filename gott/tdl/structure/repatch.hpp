@@ -40,6 +40,7 @@
 #define GOTT_TDL_STRUCTURE_REPATCH_HPP
 
 #include "structure.hpp"
+#include "../resource.hpp"
 #include <vector>
 #include <map>
 #include <boost/noncopyable.hpp>
@@ -59,6 +60,9 @@ public:
   virtual ~repatcher() = 0;
   virtual repatcher *clone() const = 0;
   virtual writable_structure *deferred_write(writable_structure &) const = 0;
+  gott::atom get_kind() const {
+    return gott::atom("tdl::structure::repatcher");
+  }
 };
 
 inline repatcher *new_clone(repatcher const &r) {
@@ -110,6 +114,17 @@ public:
    * Only call this once!
    */
   virtual repatcher *result_alloc() const = 0;
+};
+
+class GOTT_EXPORT repatcher_getter_factory : public resource {
+public:
+  repatcher_getter_factory();
+  ~repatcher_getter_factory();
+
+  static gott::atom const kind;
+  virtual repatcher_getter *alloc() const = 0;
+private:
+  gott::atom get_kind() const { return kind; }
 };
 
 GOTT_EXPORT repatcher_getter *repatcher_by_name();

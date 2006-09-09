@@ -37,7 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "common.hpp"
-#include <gott/tdl/structure/repatchers/integer.hpp>
 
 namespace schema = tdl::schema;
 namespace stru = tdl::structure;
@@ -48,15 +47,22 @@ using stru::cf::C;
 using schema::rule_attr;
 using schema::repatcher; // tag
 using schema::tag; // another tag
-typedef schema::rule_attr_t RA;
 
 namespace {
+stru::repatcher *int_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("integer"));
+    g->begin(); g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_integer : tut::schema_basic {
   schema_integer() 
   : tut::schema_basic(
       rule_one("document", 
-        rule("node", rule_attr(tag = "i", repatcher = 
-            new stru::repatch_integer()))))
+        rule("node", rule_attr(tag = "i", repatcher = int_r()))))
   {}
 };
 }

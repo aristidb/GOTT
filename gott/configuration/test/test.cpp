@@ -37,8 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include <gott/tdl/schema/rule.hpp>
-#include <gott/tdl/structure/repatchers/integer.hpp>
 #include <gott/tdl/schema/match.hpp>
+#include <gott/tdl/structure/repatch.hpp>
 #include <gott/tdl/structure/container.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/tdl/structure/repatchable_adapter.hpp>
@@ -62,6 +62,14 @@ int main() {
     "  - conf::string : an arbitrary string\n"
     "  - get::more::stuff : a list of integers\n"
     ;
+
+  boost::scoped_ptr<structure::repatcher_getter> rg(
+      structure::repatcher_by_name());
+  rg->begin();
+    rg->data(Xany("integer"));
+    rg->begin(); rg->end();
+  rg->end();
+  boost::shared_ptr<structure::repatcher const> int_r(rg->result_alloc());
   
   rule_t conf = 
     rule_one("document",
@@ -70,12 +78,10 @@ int main() {
             rule_attr(outer = list(), tag = "element"),
             list_of
             (rule("node", 
-                  rule_attr(tag = "conf::int", 
-                    repatcher = new structure::repatch_integer())))
+                  rule_attr(tag = "conf::int", repatcher = int_r)))
             (rule("node", rule_attr(tag = "conf::string")))
             (rule("list", rule_attr(tag = "get::more::stuff"),
-                  list_of(rule("node", rule_attr(outer = list())))
-                  ))))));
+                  list_of(rule("node", rule_attr(outer = list())))))))));
 
   structure::container out;
   structure::repatchable_adapter2 r1(out);

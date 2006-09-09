@@ -37,10 +37,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "common.hpp"
-#include <gott/tdl/structure/repatchers/enumeration.hpp>
-#include <boost/assign/list_of.hpp>
 
-using boost::assign::list_of;
 using std::vector;
 
 using namespace tdl::schema;
@@ -50,18 +47,25 @@ using gott::xany::Xany;
 
 using stru::cf::S;
 using stru::cf::C;
-using stru::repatch_enumeration;
 
 namespace {
+stru::repatcher *enum_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("enumeration"));
+    g->begin();
+      g->begin(); g->data(Xany("first")); g->end();
+      g->begin(); g->data(Xany("second")); g->end();
+      g->begin(); g->data(Xany("third")); g->end();
+    g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_enumeration : tut::schema_basic {
   schema_enumeration() 
   : tut::schema_basic(
-    rule_one("document",
-      rule("node", rule_attr(
-          repatcher =
-             new repatch_enumeration(
-               list_of(string("first"))(string("second"))(string("third")).
-                 operator vector<string>())))))
+    rule_one("document", rule("node", rule_attr(repatcher = enum_r()))))
   {}
 };
 }

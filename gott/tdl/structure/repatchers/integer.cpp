@@ -36,15 +36,26 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "integer.hpp"
 #include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
+#include <gott/plugin/plugin_builder.hpp>
 #include <cctype>
 
 using gott::string;
-namespace structure = tdl::structure;
-using structure::repatch_integer;
-using structure::writable_structure;
+using namespace tdl::structure;
+using tdl::tdl_error;
+using tdl::source_position;
+
+namespace {
+
+class repatch_integer : public concrete_repatcher<repatch_integer> {
+public:
+  repatch_integer();
+  ~repatch_integer();
+  writable_structure *deferred_write(writable_structure &) const;
+};
+  
+}
 
 repatch_integer::repatch_integer() {}
 repatch_integer::~repatch_integer() {}
@@ -100,7 +111,8 @@ repatch_integer::deferred_write(writable_structure &s) const {
   return new context(s);
 }
 
-void repatch_integer::reg() {
+namespace {
+class factory : public repatcher_getter_factory {
   struct getter : public repatcher_getter {
     getter() {}
     void begin(source_position const &) { fail(); }
@@ -108,11 +120,18 @@ void repatch_integer::reg() {
     void data(gott::xany::Xany const &) { fail(); }
     void add_tag(string const &) { fail(); }
     void fail() {
-      throw tdl_error("TDL Structure repatcher loader",
+      throw tdl::tdl_error("TDL Structure repatcher loader",
           "non-sensible arguments");
     }
     repatcher *result_alloc() const { return new repatch_integer(); }
-    static repatcher_getter *alloc() { return new getter; }
   };
-  //repatcher_by_name().add("integer", &getter::alloc);
+public:
+  factory() {}
+  gott::atom get_id() const { return gott::atom("integer"); }
+  repatcher_getter *alloc() const { return new getter; }
+};
 }
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_repatcher_integer,
+    factory)

@@ -36,14 +36,26 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "throw_away.hpp"
 #include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
+#include <gott/plugin/plugin_builder.hpp>
 
 using gott::string;
-namespace structure = tdl::structure;
-using structure::repatch_throw_away;
-using structure::writable_structure;
+using namespace tdl::structure;
+using tdl::tdl_error;
+using tdl::source_position;
+
+namespace {
+
+class repatch_throw_away 
+  : public concrete_repatcher<repatch_throw_away> {
+public:
+  repatch_throw_away();
+  ~repatch_throw_away();
+  writable_structure *deferred_write(writable_structure &) const;
+};
+  
+}
 
 repatch_throw_away::repatch_throw_away() {}
 repatch_throw_away::~repatch_throw_away() {}
@@ -59,7 +71,8 @@ repatch_throw_away::deferred_write(writable_structure &) const {
   return new context;
 }
 
-void repatch_throw_away::reg() {
+namespace {
+class factory : public repatcher_getter_factory {
   struct getter : public repatcher_getter {
     getter() {}
     void begin(source_position const &) { fail(); }
@@ -73,5 +86,13 @@ void repatch_throw_away::reg() {
     repatcher *result_alloc() const { return new repatch_throw_away(); }
     static repatcher_getter *alloc() { return new getter; }
   };
-  //repatcher_by_name().add("throw-away", &getter::alloc);
+public:
+  factory() {}
+  gott::atom get_id() const { return gott::atom("throw-away"); }
+  repatcher_getter *alloc() const { return new getter; }
+};
 }
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_repatcher_throw_away,
+    factory)

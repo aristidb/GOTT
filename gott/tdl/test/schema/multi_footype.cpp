@@ -38,7 +38,6 @@
 
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
-#include <gott/tdl/structure/repatchers/integer.hpp>
 #include <boost/assign/list_of.hpp>
 
 using namespace boost::assign;
@@ -50,6 +49,15 @@ using gott::string;
 using namespace stru::cf;
 
 namespace {
+stru::repatcher *int_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("integer"));
+    g->begin(); g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_multi_footype : tut::schema_basic {
   rule_t multi, footype;
 
@@ -72,11 +80,11 @@ struct schema_multi_footype : tut::schema_basic {
             rule("node", 
               rule_attr(
                 tag = "sum-data",
-                repatcher = new stru::repatch_integer(),
+                repatcher = int_r(),
                 outer = some())))))
         (rule("node", 
           rule_attr("--other--", 
-            repatcher = new stru::repatch_integer(),
+            repatcher = int_r(),
             outer = slotcfg(slotcfg::some)))));
   }
 };

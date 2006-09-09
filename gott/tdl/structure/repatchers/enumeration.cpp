@@ -36,16 +36,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "enumeration.hpp"
 #include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <gott/xany.hpp>
+#include <gott/plugin/plugin_builder.hpp>
 
-namespace structure = tdl::structure;
-using structure::repatch_enumeration;
-using structure::writable_structure;
+using namespace tdl::structure;
+using tdl::tdl_error;
+using tdl::source_position;
 using gott::string;
+
+namespace {
+
+class repatch_enumeration 
+: public concrete_repatcher<repatch_enumeration> {
+public:
+  repatch_enumeration(std::vector<gott::string> const &);
+  ~repatch_enumeration();
+  writable_structure *deferred_write(writable_structure &) const;
+private:
+  std::vector<gott::string> alternatives;
+};
+  
+}
 
 repatch_enumeration::repatch_enumeration(std::vector<string> const &x) 
 : alternatives(x) {}
@@ -78,7 +92,8 @@ repatch_enumeration::deferred_write(writable_structure &s) const {
   return new context(s, alternatives);
 }
 
-void repatch_enumeration::reg() {
+namespace {
+class factory : public repatcher_getter_factory {
   struct getter : public repatcher_getter {
     getter() : inner(false) {}
     bool inner;
@@ -103,7 +118,17 @@ void repatch_enumeration::reg() {
     repatcher *result_alloc() const {
       return new repatch_enumeration(all_strings);
     }
-    static repatcher_getter *alloc() { return new getter; }
   };
-  //repatcher_by_name().add("enumeration", &getter::alloc);
+public:
+  factory() {}
+  gott::atom get_id() const { return gott::atom("enumeration"); }
+  repatcher_getter *alloc() const {
+    return new getter;
+  }
+};
+
 }
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
+    plugin_repatcher_enumeration,
+    factory)

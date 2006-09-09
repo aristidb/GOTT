@@ -37,7 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "common.hpp"
-#include <gott/tdl/structure/repatchers/enumeration.hpp>
 #include <boost/assign/list_of.hpp>
 
 using namespace boost::assign;
@@ -47,12 +46,20 @@ namespace stru = tdl::structure;
 using gott::xany::Xany;
 using gott::string;
 using namespace stru::cf;
-typedef stru::repatch_enumeration E;
-typedef std::vector<gott::string> VN;
 #define L(i) \
-  rule_attr(#i, repatcher = new E(VN(1,#i)), outer = slotcfg(slotcfg::optional))
+  rule_attr(#i, repatcher = enum_r(#i), outer = slotcfg(slotcfg::optional))
 
 namespace {
+stru::repatcher *enum_r(gott::string const &s) {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("enumeration"));
+    g->begin();
+      g->begin(); g->data(Xany(s)); g->end();
+    g->end();
+  g->end();
+  return g->result_alloc();
+}
 
 struct schema_multi_follow : tut::schema_basic {
   schema_multi_follow() 

@@ -66,7 +66,6 @@ tdl_dirs= [
 'parse',
 'write',
 'structure',
-'structure/repatchers',
 ]
 for x in tdl_dirs:
 	tdl_source_files += env.Glob("tdl/" + x + '/*.cpp')

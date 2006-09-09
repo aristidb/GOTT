@@ -42,7 +42,7 @@
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/tdl/structure/repatchable_adapter.hpp>
-#include <gott/tdl/structure/repatchers/enumeration.hpp>
+#include <gott/tdl/structure/repatch.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/assign/list_of.hpp>
@@ -162,6 +162,24 @@ void gott::plugin::detail::load_tdl_resource(
     string const &resource) {
 
   rule_t const inode = rule("node", rule_attr(coat = false));
+
+  boost::scoped_ptr<repatcher_getter> priority_enum_g(repatcher_by_name());
+  priority_enum_g->begin();
+    priority_enum_g->data(Xany("enumeration"));
+    priority_enum_g->begin();
+      priority_enum_g->begin();
+        priority_enum_g->data(Xany("low"));
+      priority_enum_g->end();
+      priority_enum_g->begin();
+        priority_enum_g->data(Xany("normal"));
+      priority_enum_g->end();
+      priority_enum_g->begin();
+        priority_enum_g->data(Xany("high"));
+      priority_enum_g->end();
+    priority_enum_g->end();
+  priority_enum_g->end();
+  boost::shared_ptr<tdl::structure::repatcher const> priority_enum(
+      priority_enum_g->result_alloc());
   
   /*
   ordered
@@ -191,23 +209,17 @@ void gott::plugin::detail::load_tdl_resource(
                     rule("node",
                       rule_attr(
                         coat = false,
-                        tdl::schema::repatcher = new repatch_enumeration(
-                          boost::assign::list_of
-                          (string("low"))
-                          (string("normal"))
-                          (string("high"))
-                          .operator vector<string>())))))
-          
+                        tdl::schema::repatcher = priority_enum))))
           (rule_one("named",
                     rule_attr(tag = "feature", outer = list()),
                     inode)))));
-
+  
   /*
   ordered
     named (module-id), node
     unordered
       named (file-path), node
-      named (module-type), enumeration $ dynamic-native
+      # named (module-type), enumeration $ dynamic-native
       :list named (depend-on), node
    */
   rule_t const module_schema =
@@ -219,13 +231,6 @@ void gott::plugin::detail::load_tdl_resource(
           boost::assign::list_of
           (rule_one("named", rule_attr(tag = "file-path"),
                     inode))
-          (rule_one("named", rule_attr(tag = "module-type"),
-                    rule("node", rule_attr(
-                      coat = false,
-                      tdl::schema::repatcher = new repatch_enumeration(
-                        boost::assign::list_of
-                        (string("dynamic-native"))
-                        .operator std::vector<string>())))))
           (rule_one("named",
                     rule_attr(tag = "depend-on", outer = list()),
                     inode)))));

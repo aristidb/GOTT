@@ -38,7 +38,6 @@
 
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
-#include <gott/tdl/structure/repatchers/integer.hpp>
 
 namespace schema = tdl::schema;
 namespace stru = tdl::structure;
@@ -53,12 +52,21 @@ using schema::rule_attr;
 using schema::rule;
 
 namespace {
+stru::repatcher *int_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("integer"));
+    g->begin(); g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_12plus_int : tut::schema_basic {
   schema_12plus_int() 
   : tut::schema_basic(
       rule_one("document", rule("node", rule_attr(
                schema::tag = "el",
-               schema::repatcher = new stru::repatch_integer(),
+               schema::repatcher = int_r(),
                schema::outer = schema::at_least(12)))))
   {}
 };

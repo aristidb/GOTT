@@ -38,7 +38,6 @@
 
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
-#include <gott/tdl/structure/repatchers/integer.hpp>
 #include <boost/assign/list_of.hpp>
 
 using namespace tdl::schema;
@@ -50,6 +49,15 @@ using stru::cf::S;
 using stru::cf::C;
 
 namespace {
+stru::repatcher *int_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("integer"));
+    g->begin(); g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_unordered_list_integer_string : tut::schema_basic {
   schema_unordered_list_integer_string()
   : tut::schema_basic(
@@ -57,7 +65,7 @@ struct schema_unordered_list_integer_string : tut::schema_basic {
         rule("unordered", rule_attr(), boost::assign::list_of
           (rule("node",
             rule_attr(
-              repatcher = new stru::repatch_integer(),
+              repatcher = int_r(),
               outer = slotcfg(slotcfg::list))))
           (rule("node"))))) {}
 };

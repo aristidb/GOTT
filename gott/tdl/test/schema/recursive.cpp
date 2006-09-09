@@ -38,8 +38,6 @@
 
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
-#include <gott/tdl/structure/repatchers/enumeration.hpp>
-#include <gott/tdl/structure/repatchers/integer.hpp>
 #include <boost/assign/list_of.hpp>
 
 using namespace boost::assign;
@@ -52,6 +50,15 @@ using gott::string;
 using namespace stru::cf;
 
 namespace {
+stru::repatcher *int_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("integer"));
+    g->begin(); g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct recursive : tut::schema_basic {
   rule_t rec;
   
@@ -61,7 +68,7 @@ struct recursive : tut::schema_basic {
       rule("ordered", rule_attr(coat = false),
           list_of
         (rule("node",
-              rule_attr(repatcher = new stru::repatch_integer())))
+              rule_attr(repatcher = int_r())))
         (rule_one("list", rule_attr(coat = false),
            rule_one("ordered", 
                 rule_attr(outer = slotcfg(slotcfg::optional), coat = false),

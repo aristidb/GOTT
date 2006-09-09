@@ -37,7 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "common.hpp"
-#include <gott/tdl/structure/repatchers/enumeration.hpp>
 
 namespace schema = tdl::schema;
 namespace stru = tdl::structure;
@@ -49,6 +48,17 @@ using stru::cf::C;
 using schema::rule_attr;
 
 namespace {
+stru::repatcher *lit_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("enumeration"));
+    g->begin();
+      g->begin(); g->data(Xany("foobar")); g->end();
+    g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_literal : tut::schema_basic {
   schema_literal() 
   : tut::schema_basic(
@@ -56,8 +66,7 @@ struct schema_literal : tut::schema_basic {
         rule("node", 
           rule_attr(
             schema::tag = "foobar",
-            schema::repatcher =
-             new stru::repatch_enumeration(std::vector<string>(1, "foobar"))))))
+            schema::repatcher = lit_r()))))
   {}
 };
 }

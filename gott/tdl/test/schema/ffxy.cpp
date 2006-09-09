@@ -37,7 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "common.hpp"
-#include <gott/tdl/structure/repatchers/integer.hpp>
 #include <boost/assign/list_of.hpp>
 
 using namespace boost::assign;
@@ -48,9 +47,17 @@ using gott::xany::Xany;
 using gott::string;
 
 using namespace stru::cf;
-typedef stru::repatch_integer I;
 
 namespace {
+stru::repatcher *int_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("integer"));
+    g->begin(); g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_ffxy : tut::schema_basic {
   schema_ffxy() 
   : tut::schema_basic(
@@ -63,9 +70,9 @@ struct schema_ffxy : tut::schema_basic {
                   rule_attr("xy", outer = slotcfg(slotcfg::list)),
                   list_of
                     (rule("node",
-                          rule_attr("int1", repatcher = new I())))
+                          rule_attr("int1", repatcher = int_r())))
                     (rule("node",
-                          rule_attr("int2", repatcher = new I()))))))
+                          rule_attr("int2", repatcher = int_r()))))))
               (rule("node"))))))) {}
 
   void run(string prefix, int n) {

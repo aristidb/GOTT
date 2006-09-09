@@ -39,9 +39,11 @@
 #include "repatch.hpp"
 #include "../exceptions.hpp"
 #include "../source_position.hpp"
+#include "../resource.hpp"
 #include <gott/range_algo.hpp>
 #include <boost/bind.hpp>
 #include <boost/optional.hpp>
+#include <boost/ref.hpp>
 
 using namespace tdl::structure;
 using gott::string;
@@ -115,22 +117,32 @@ repatcher_chain::deferred_write(writable_structure &s) const {
 repatcher_getter::repatcher_getter() {}
 repatcher_getter::~repatcher_getter() {}
 
-repatcher_getter *tdl::structure::repatcher_by_name() {
+namespace {
+  struct receive_getter {
+    repatcher_getter *&rep;
+    void operator() (repatcher_getter_factory *factory) {
+      rep = factory->alloc();
+    }
+  };
+
   struct getter : repatcher_getter {
     getter() 
     : pos(outer), result(new repatcher_chain) {}
 
-    string what;
+    gott::atom what;
     boost::scoped_ptr<repatcher_getter> where;
     enum { outer, inner1, inner2 } pos;
     repatcher_chain *result;
     unsigned inner2_level;
 
-    repatcher_getter *one_alloc(string const &) const {
-      throw 0;
+    repatcher_getter *one_alloc(gott::atom const &id) const {
+      repatcher_getter *result;
+      receive_getter helper = { result };
+      tdl::resource::find<repatcher_getter_factory>(id, helper);
+      return result;
     }
 
-    void begin(source_position const &w) {
+    void begin(tdl::source_position const &w) {
       switch (pos) {
       case outer:
         pos = inner1; break;
@@ -158,7 +170,7 @@ repatcher_getter *tdl::structure::repatcher_by_name() {
         break;
       case inner1:
         if (what != string()) {
-          begin(source_position());
+          begin(tdl::source_position());
           end();
         }
         pos = outer; break;
@@ -181,13 +193,21 @@ repatcher_getter *tdl::structure::repatcher_by_name() {
         where->add_tag(s);
     }
     void fail() {
-      throw tdl_error("TDL Structure repatcher loader",
+      throw tdl::tdl_error("TDL Structure repatcher loader",
           "non-sensible arguments");
     }
     repatcher *result_alloc() const {
       return result;
     }
   };
+};
+
+repatcher_getter *tdl::structure::repatcher_by_name() {
   return new getter;
 }
 
+repatcher_getter_factory::repatcher_getter_factory() {}
+repatcher_getter_factory::~repatcher_getter_factory() {}
+
+gott::atom const repatcher_getter_factory::kind(
+    "tdl::structure::repatcher_getter_factory");

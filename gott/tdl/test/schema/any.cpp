@@ -37,7 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "common.hpp"
-#include <gott/tdl/structure/repatchers/integer.hpp>
 #include <gott/string/string.hpp>
 #include <boost/assign/list_of.hpp>
 
@@ -49,9 +48,17 @@ namespace stru = tdl::structure;
 using gott::string;
 using gott::xany::Xany;
 using namespace stru::cf;
-using stru::repatch_integer;
 
 namespace {
+stru::repatcher *int_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("integer"));
+    g->begin(); g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_any : tut::schema_basic {
   schema_any()
   : tut::schema_basic(
@@ -61,20 +68,20 @@ struct schema_any : tut::schema_basic {
            (rule("follow", rule_attr(), 
              list_of
              (rule("node",
-                   rule_attr("int3", repatcher = new repatch_integer())))
+                   rule_attr("int3", repatcher = int_r())))
              (rule("node",
-                   rule_attr("int4", repatcher = new repatch_integer())))))
+                   rule_attr("int4", repatcher = int_r())))))
            (rule("ordered", rule_attr(),
              list_of
              (rule("node",
-                   rule_attr("int", repatcher = new repatch_integer())))
+                   rule_attr("int", repatcher = int_r())))
              (rule("node", rule_attr("string")))))
            (rule("ordered", rule_attr(),
              list_of
              (rule("node", rule_attr("string_1")))
              (rule("node", rule_attr("string_2")))))
            (rule("node",
-                 rule_attr("int2", repatcher = new repatch_integer())))
+                 rule_attr("int2", repatcher = int_r())))
            (rule("node", rule_attr("string2"))))))
   {}
 };

@@ -232,6 +232,7 @@ public: //internal
 
 private:
   void add_core_tdl_schema(string const &type, module_descriptor const &x);
+  void add_core_tdl_repatcher(string const &type, module_descriptor const &x);
 
   class impl;
   boost::scoped_ptr<impl> p;

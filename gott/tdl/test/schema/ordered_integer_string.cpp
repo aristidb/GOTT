@@ -37,7 +37,6 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "common.hpp"
-#include <gott/tdl/structure/repatchers/integer.hpp>
 #include <boost/assign/list_of.hpp>
 
 using namespace boost::assign;
@@ -54,6 +53,15 @@ using schema::rule;
 typedef schema::rule_attr_t RA;
 
 namespace {
+stru::repatcher *int_r() {
+  boost::scoped_ptr<stru::repatcher_getter> g(stru::repatcher_by_name());
+  g->begin();
+    g->data(Xany("integer"));
+    g->begin(); g->end();
+  g->end();
+  return g->result_alloc();
+}
+
 struct schema_ordered_integer_string : tut::schema_basic {
   schema_ordered_integer_string() 
   : tut::schema_basic(
@@ -62,7 +70,7 @@ struct schema_ordered_integer_string : tut::schema_basic {
           list_of
           (rule("node",
                 schema::rule_attr(
-                  schema::repatcher = new stru::repatch_integer())))
+                  schema::repatcher = int_r())))
           (rule("node", RA()))))) {}
 };
 }
