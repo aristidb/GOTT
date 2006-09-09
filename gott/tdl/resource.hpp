@@ -63,7 +63,7 @@ namespace detail {
   };
 }
 
-class resource : public gott::plugin::plugin_base {
+class GOTT_EXPORT resource : public gott::plugin::plugin_base {
 public:
   virtual gott::atom get_kind() const = 0;
   virtual gott::atom get_id() const = 0;
@@ -73,21 +73,21 @@ public:
 
 public:
   template<class T, class U>
-  static void list(U callback) {
+  GOTT_LOCAL static void list(U callback) {
     list_impl(T::kind, detail::callback_helper<T, U>(callback));
   }
 
   template<class T, class U>
-  static void find(gott::atom const &id, U callback) {
+  GOTT_LOCAL static void find(gott::atom const &id, U callback) {
     find_impl(id, T::kind, detail::callback_helper<T, U>(callback));
   }
 
 private:
-  GOTT_EXPORT static void list_impl(
+  static void list_impl(
       gott::atom const &kind,
       detail::generic_callback const &callback);
 
-  GOTT_EXPORT static void find_impl(
+  static void find_impl(
       gott::atom const &id,
       gott::atom const &kind,
       detail::generic_callback const &callback);
