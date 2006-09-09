@@ -44,8 +44,11 @@
 using gott::atom;
 using gott::string;
 
+namespace {
+  boost::mutex mutex;
+}
+
 static string *atomize(string const &n) {
-  static boost::mutex mutex;
   boost::mutex::scoped_lock lock(mutex);
 
   static std::map<string, string *> table;
