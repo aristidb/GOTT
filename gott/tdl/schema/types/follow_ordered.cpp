@@ -36,19 +36,63 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "follow_ordered.hpp"
 #include "../event.hpp"
 #include "../type.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
+#include "../slot.hpp"
+#include "../parse_position.hpp"
+#include "../rule_attr.hpp"
+#include <gott/string/atom.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 
-namespace schema = tdl::schema;
-namespace ev = tdl::schema::ev;
-using schema::item;
-using schema::match_follow_ordered;
+using namespace tdl::schema;
+
+namespace {
+class match_follow_ordered : public item {
+public:
+  match_follow_ordered(rule_attr_t const &, std::vector<rule_t> const &,match&);
+  ~match_follow_ordered();
+
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
+
+  static gott::atom const id;
+  
+private:
+  struct active_element {
+    rule_t generator;
+    slotcfg slot;
+    bool accept_empty, rest_accept_empty;
+    
+    active_element(rule_t const &e) 
+    : generator(e), slot(e.attributes().outer()) {}
+  };
+
+  void init_accept_empty();
+  bool search_insertible() const;
+
+  typedef std::vector<active_element> container;
+  container children;
+  mutable container::iterator pos;
+  int opened;
+  bool saw_up;
+  positioning::id last;
+  bool unhappy;
+  bool no_req;
+
+  expect expectation() const;
+  bool play(ev::child_succeed const &);
+  bool play(ev::child_fail const &);
+  bool play(ev::down const &);
+  bool play(ev::up const &);
+  bool miss_events(ev::event const &, unsigned);
+  gott::string name() const;
+};
+}
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_follow,
-    schema::concrete_type<match_follow_ordered>)
+    concrete_type<match_follow_ordered>)
 
 gott::atom const match_follow_ordered::id("follow");
 

@@ -36,21 +36,55 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "unordered.hpp"
-#include <gott/range_algo.hpp>
 #include "../rule_attr.hpp"
 #include "../type.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
+#include "../parse_position.hpp"
+#include "../slot.hpp"
+#include "../rule_attr.hpp"
+#include <gott/string/atom.hpp>
 #include <gott/plugin/plugin_builder.hpp>
+#include <gott/range_algo.hpp>
 
-namespace schema = tdl::schema;
-namespace ev = tdl::schema::ev;
-using schema::item;
-using schema::match_unordered;
+using namespace tdl::schema;
 using std::vector;
+
+namespace {
+class match_unordered : public item {
+private:
+  struct element {
+    rule_t generator;
+    slotcfg slot;
+
+    element(rule_t const &g) : generator(g), slot(g.attributes().outer()) {}
+  };
+
+public:
+  match_unordered(rule_attr_t const &, std::vector<rule_t> const &, match &);
+  ~match_unordered();
+
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
+
+  static gott::atom const id;
+
+private:
+  typedef std::vector<element> list_t;
+  list_t children;
+  list_t::iterator pos;
+  positioning::id last;
+  bool all_happy;
+
+  expect expectation() const;
+  bool play(ev::child_succeed const &);
+  bool play(ev::child_fail const &);
+  gott::string name() const;
+};
+}
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_unordered,
-    schema::concrete_type<match_unordered>)
+    concrete_type<match_unordered>)
 
 gott::atom const match_unordered::id("unordered");
 

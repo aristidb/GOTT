@@ -36,25 +36,47 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "tree.hpp"
 #include "../event.hpp"
 #include "../type.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
+#include <gott/string/atom.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <cassert>
 
-using tdl::schema::match_tree;
-using tdl::schema::item;
-namespace ev = tdl::schema::ev;
+using namespace tdl::schema;
+
+namespace {
+class match_tree : public item {
+public:
+  match_tree(rule_attr_t const &, std::vector<rule_t> const &, match &);
+
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
+  { return false; }
+
+  static gott::atom const id;
+  
+private:
+  unsigned level;
+  enum { fresh, titled, used } level_state;
+
+  item::expect expectation() const;
+  bool play(ev::node const &);
+  bool play(ev::down const &);
+  bool play(ev::up const &);
+  gott::string name() const;
+};
+}
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_tree,
-    tdl::schema::concrete_type<match_tree>)
+    concrete_type<match_tree>)
 
 gott::atom const match_tree::id("tree");
 
 match_tree::match_tree(rule_attr_t const &a, std::vector<rule_t> const &c, match &m)
 : item(a, m), level(0), level_state(fresh) {
-  assert(c.empty());
+  (void)c; assert(c.empty());
 }
 
 gott::string match_tree::name() const {

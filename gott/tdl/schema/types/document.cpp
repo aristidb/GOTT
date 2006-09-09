@@ -36,18 +36,45 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "document.hpp"
 #include "../type.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
+#include "../happy_once.hpp"
+#include <gott/string/atom.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 
-namespace schema = tdl::schema;
-namespace ev = tdl::schema::ev;
-using schema::item;
-using schema::match_document;
+using namespace tdl::schema;
+
+namespace {
+// Matcher document
+// Matches a whole tdl document that contains the given sub-type
+class match_document : public happy_once {
+public:
+  match_document(rule_attr_t const &, std::vector<rule_t> const &, match &);
+
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &)
+  { return false; }
+
+  static gott::atom const id;
+
+private:
+  static rule_t deflatten(std::vector<rule_t> const &children);
+
+  rule_t sub;
+  enum { first, begun_parse, opened, closed } state;
+
+  bool play(ev::begin_parse const &);
+  bool play(ev::down const &);
+  bool play(ev::up const &);
+  bool play(ev::end_parse const &);
+  bool play(ev::child_succeed const &);
+  gott::string name() const;
+};
+}
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_document,
-    schema::concrete_type<match_document>)
+    concrete_type<match_document>)
 
 gott::atom const match_document::id("document");
 
@@ -55,7 +82,7 @@ match_document::match_document(rule_attr_t const &a,
     std::vector<rule_t> const &sr, match &m)
 : happy_once(a, m), sub(deflatten(sr)), state(first) {}
 
-schema::rule_t match_document::deflatten(std::vector<rule_t> const &children) {
+rule_t match_document::deflatten(std::vector<rule_t> const &children) {
   if (children.size() == 1)
     if (children[0].attributes().outer().get_mode() == slotcfg::one)
       return children[0];

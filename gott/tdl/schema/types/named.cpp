@@ -36,9 +36,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "named.hpp"
 #include "../event.hpp"
 #include "../type.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
+#include "../rule_attr.hpp"
+#include "../happy_once.hpp"
 #include <gott/plugin/plugin_builder.hpp>
 #include <gott/string/string.hpp>
 #include <gott/tdl/structure/repatch.hpp>
@@ -51,16 +54,32 @@ using gott::string;
 using gott::xany::Xany;
 using gott::xany::Xany_cast;
 
-namespace schema = tdl::schema;
-namespace ev = tdl::schema::ev;
-using schema::item;
-using schema::rule_attr_t;
-using schema::match_named;
+using namespace tdl::schema;
 using namespace boost::assign;
+
+namespace {
+class match_named : public happy_once {
+public:
+  match_named(rule_attr_t const &, std::vector<rule_t> const &, match &);
+
+  ~match_named();
+
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
+  { return false; }
+
+  static gott::atom const id;
+
+private:
+  gott::string name() const;
+  gott::string tag;
+  rule_t rewritten;
+  bool play(ev::child_succeed const &);
+};
+}
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_named,
-    schema::concrete_type<match_named>)
+    concrete_type<match_named>)
 
 gott::atom const match_named::id("named");
 

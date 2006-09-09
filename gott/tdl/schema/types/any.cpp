@@ -36,18 +36,42 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "any.hpp"
+#include "../match.hpp"
+#include "../parse_position.hpp"
+#include "../happy_once.hpp"
+#include "../rule.hpp"
 #include "../type.hpp"
+#include <gott/string/atom.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 
-namespace schema = tdl::schema;
-namespace ev = schema::ev;
-using schema::match_any;
-using schema::item;
+using namespace tdl::schema;
+
+namespace {
+// Matcher any
+// Matches the first applicable of an arbitrary number of rule_ts.
+class match_any : public happy_once {
+public:
+  match_any(rule_attr_t const &, std::vector<rule_t> const &, match &);
+  ~match_any();
+
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
+
+  static gott::atom const id;
+
+private:
+  std::vector<rule_t> v;
+  std::vector<rule_t>::iterator pos;
+  positioning::id begin;
+
+  bool play(ev::child_fail const &);
+  bool play(ev::child_succeed const &);
+  gott::string name() const;
+};
+}
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_any,
-    schema::concrete_type<match_any>)
+    concrete_type<match_any>)
 
 gott::atom const match_any::id("any");
 

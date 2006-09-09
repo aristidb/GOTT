@@ -36,19 +36,40 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "ordered.hpp"
 #include "../rule.hpp"
 #include "../type.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
+#include "../happy_once.hpp"
+#include <gott/string/atom.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 
-namespace schema = tdl::schema;
-namespace ev = tdl::schema::ev;
-using schema::item;
-using schema::match_ordered;
+using namespace tdl::schema;
+
+namespace {
+class match_ordered : public happy_once {
+public:
+  match_ordered(rule_attr_t const &, std::vector<rule_t> const &, match &);
+  ~match_ordered();
+
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
+
+  static gott::atom const id;
+
+private:
+  static std::vector<rule_t> deflatten(std::vector<rule_t> const &);
+
+  std::vector<rule_t> subrules;
+  std::vector<rule_t>::iterator pos;
+
+  bool play(ev::child_succeed const &);
+  gott::string name() const;
+};
+}
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_ordered,
-    schema::concrete_type<match_ordered>)
+    concrete_type<match_ordered>)
 
 gott::atom const match_ordered::id("ordered");
 
@@ -61,7 +82,7 @@ match_ordered::match_ordered(rule_attr_t const &a, std::vector<rule_t> const&r,
     be_happy();
 }
 
-std::vector<schema::rule_t> match_ordered::deflatten(
+std::vector<rule_t> match_ordered::deflatten(
     std::vector<rule_t> const &in) {
   std::vector<rule_t> out(in.size());
   for (std::size_t i = 0; i < in.size(); ++i) {

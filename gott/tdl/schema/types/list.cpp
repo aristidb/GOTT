@@ -36,21 +36,47 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "list.hpp"
 #include "../rule_attr.hpp"
 #include "../type.hpp"
+#include "../match.hpp"
+#include "../rule.hpp"
+#include "../slot.hpp"
+#include "../parse_position.hpp"
+#include <gott/string/atom.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <cassert>
 
-namespace schema = tdl::schema;
-namespace ev = tdl::schema::ev;
-using schema::item;
-using schema::slotcfg;
-using schema::match_list;
+using namespace tdl::schema;
+
+namespace {
+class match_list : public item {
+public:
+  match_list(rule_attr_t const &, std::vector<rule_t> const &, match &);
+  ~match_list();
+
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &s);
+
+  static gott::atom const id;
+
+private:
+  rule_t sub;
+  positioning::id last;
+  slotcfg cfg;
+  bool cancelled;
+
+  expect expectation() const;
+  bool play(ev::child_fail const &);
+  bool play(ev::child_succeed const &);
+  gott::string name() const;
+
+  bool full();
+  bool empty();
+};
+}
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(
     plugin_schema_list,
-    schema::concrete_type<match_list>)
+    concrete_type<match_list>)
 
 gott::atom const match_list::id("list");
 
