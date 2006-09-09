@@ -39,11 +39,15 @@
 #include "atom.hpp"
 #include <map> // TODO: use hash map
 #include <boost/functional/hash.hpp>
+#include <boost/thread/mutex.hpp>
 
 using gott::atom;
 using gott::string;
 
 static string *atomize(string const &n) {
+  static boost::mutex mutex;
+  boost::mutex::scoped_lock lock(mutex);
+
   static std::map<string, string *> table;
   std::map<string, string *>::iterator it = table.find(n);
   if (it == table.end()) {
