@@ -49,8 +49,21 @@
 using namespace tdl::schema;
 namespace structure = tdl::structure;
 using structure::writable_structure;
+using structure::repatcher_getter_factory;
 
 namespace {
+
+struct make_rep_schema {
+  std::vector<rule_t> &out;
+
+  void operator() (repatcher_getter_factory const *rgf) const {
+    out.push_back(
+        rule_one("named",
+          rule_attr(tag = rgf->get_id().get_string(), outer = list()),
+          rgf->parameter_schema()));
+  }
+};
+
 class xmatcher : public item {
 public:
   xmatcher(
@@ -59,21 +72,12 @@ public:
       match &ref)
   : item(attr, ref),
   getter(structure::repatcher_by_name()) {
-    //TODO: future concept:
-    //unordered(list):
-    //  <integer>
-    //  <throw-away>
-    //  <enumeration>
-    //    list: node
-    //  <find-literal>
-    //    unordered
-    //      enumeration $ start, end, whole, substring
-    //      node
-    //  <substring>
-    //    ordered
-    //      : left, integer
-    //      : right, integer
     (void)children; //TODO: check that there are _no_ children
+
+    std::vector<rule_t> inner;
+    make_rep_schema helper = { inner };
+    tdl::resource::list<repatcher_getter_factory>(helper);
+    ref.add(rule("unordered", rule_attr(), inner));
   }
 
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
@@ -83,18 +87,13 @@ public:
 
 private:
   ~xmatcher() {
+#if 0
     matcher().out_structure().begin(matcher().where_out());
     matcher().out_structure().data(gott::Xany(
           boost::shared_ptr<structure::repatcher>(
             getter->result_alloc())));
     matcher().out_structure().end();
-  }
-  
-  bool play(ev::node const &n) {
-    getter->begin();
-    getter->data(gott::Xany(n.get_data()));
-    getter->end();
-    return true;
+#endif
   }
 
   item::expect expectation() const {

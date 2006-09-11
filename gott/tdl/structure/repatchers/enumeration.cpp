@@ -37,6 +37,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "../repatch.hpp"
+#include <gott/tdl/schema/rule.hpp>
+#include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <gott/range_algo.hpp>
 #include <gott/xany.hpp>
@@ -124,6 +126,11 @@ public:
   gott::atom get_id() const { return gott::atom("enumeration"); }
   repatcher_getter *alloc() const {
     return new getter;
+  }
+  tdl::schema::rule_t parameter_schema() const {
+    using namespace tdl::schema;
+    return rule_one("list", rule_attr(),
+        rule("node", rule_attr(outer = some())));
   }
 };
 

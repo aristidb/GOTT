@@ -49,6 +49,9 @@
 #include <boost/function.hpp>
 
 namespace tdl {
+
+namespace schema { class rule_t; }
+
 namespace structure {
 
 /**
@@ -123,6 +126,7 @@ public:
 
   static gott::atom const kind;
   virtual repatcher_getter *alloc() const = 0;
+  virtual schema::rule_t parameter_schema() const = 0;
 private:
   gott::atom get_kind() const { return kind; }
 };

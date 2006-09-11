@@ -39,9 +39,11 @@
 #include "../repatch.hpp"
 #include <gott/exceptions.hpp>
 #include <gott/tdl/exceptions.hpp>
+#include <gott/tdl/schema/rule.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <boost/optional.hpp>
 #include <boost/none.hpp>
+#include <boost/assign/list_of.hpp>
 
 using namespace tdl::structure;
 using tdl::tdl_error;
@@ -159,6 +161,24 @@ public:
   factory() {}
   gott::atom get_id() const { return gott::atom("substring"); }
   repatcher_getter *alloc() const { return new getter; }
+  tdl::schema::rule_t parameter_schema() const {
+    boost::shared_ptr<repatcher const> r;
+    {
+      boost::scoped_ptr<repatcher_getter> g(repatcher_by_name());
+      g->begin();
+        g->data(gott::Xany("integer"));
+        g->begin(); g->end();
+      g->end();
+      r.reset(g->result_alloc());
+    }
+    using namespace tdl::schema;
+    return rule("ordered", rule_attr(),
+        boost::assign::list_of
+        (rule("node", 
+              rule_attr(tag = "left", tdl::schema::repatcher = r)))
+        (rule("node",
+              rule_attr(tag = "right", tdl::schema::repatcher = r))));
+  }
 };
 }
 

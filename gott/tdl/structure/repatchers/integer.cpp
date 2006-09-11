@@ -38,6 +38,7 @@
 
 #include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
+#include <gott/tdl/schema/rule.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <cctype>
 
@@ -129,6 +130,9 @@ public:
   factory() {}
   gott::atom get_id() const { return gott::atom("integer"); }
   repatcher_getter *alloc() const { return new getter; }
+  tdl::schema::rule_t parameter_schema() const {
+    return tdl::schema::rule("ordered");
+  }
 };
 }
 

@@ -43,7 +43,7 @@
 #include <gott/plugin/plugin_handle.hpp>
 #include <gott/plugin/descriptor.hpp>
 #include <boost/thread/once.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
@@ -56,7 +56,7 @@ using gott::atom;
 using namespace boost::multi_index;
 
 namespace {
-  typedef boost::mutex mutex_t;
+  typedef boost::recursive_mutex mutex_t;
   typedef mutex_t::scoped_lock scoped_lock;
   mutex_t mutex;
 

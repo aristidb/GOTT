@@ -37,11 +37,14 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "../repatch.hpp"
+#include <gott/tdl/schema/rule.hpp>
+#include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <gott/xany.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/optional.hpp>
+#include <boost/assign/list_of.hpp>
 
 using gott::string;
 using namespace tdl::structure;
@@ -149,10 +152,30 @@ class factory : public repatcher_getter_factory {
       return new repatch_find_literal(*loc, *literal);
     }
   };
+
 public:
   factory() {}
   gott::atom get_id() const { return gott::atom("find-literal"); }
   repatcher_getter *alloc() const { return new getter; }
+
+  tdl::schema::rule_t parameter_schema() const {
+    using gott::Xany;
+    boost::scoped_ptr<repatcher_getter> g(repatcher_by_name());
+    g->begin();
+      g->data(Xany("enumeration"));
+      g->begin();
+        g->begin(); g->data(Xany("start")); g->end();
+        g->begin(); g->data(Xany("end")); g->end();
+        g->begin(); g->data(Xany("whole")); g->end();
+        g->begin(); g->data(Xany("substring")); g->end();
+      g->end();
+    g->end();
+    using namespace tdl::schema;
+    return rule("unordered", rule_attr(),
+        boost::assign::list_of
+        (rule("node", rule_attr(tdl::schema::repatcher = g->result_alloc())))
+        (rule("node")));
+  }
 };
 }
 

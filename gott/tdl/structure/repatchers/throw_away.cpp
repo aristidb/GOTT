@@ -38,6 +38,7 @@
 
 #include "../repatch.hpp"
 #include <gott/tdl/exceptions.hpp>
+#include <gott/tdl/schema/rule.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 
 using gott::string;
@@ -90,6 +91,9 @@ public:
   factory() {}
   gott::atom get_id() const { return gott::atom("throw-away"); }
   repatcher_getter *alloc() const { return new getter; }
+  tdl::schema::rule_t parameter_schema() const {
+    return tdl::schema::rule("ordered");
+  }
 };
 }
 
