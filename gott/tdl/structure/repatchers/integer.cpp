@@ -96,14 +96,15 @@ repatch_integer::deferred_write(writable_structure &s) const {
           return false;
       }
   
-      if (!std::isdigit(*rng.begin()))
-        return false;
-    
 //    if (*it == L'0' && it[1] == L'x')
 //      return is_hex(it + 2, s.end(), v, sign)
 
-      for (; !rng.empty() && std::isdigit(*rng.begin()); ++rng.begin())
+      for (; !rng.empty() && std::isdigit(*rng.begin()); ++rng.begin()) {
         val = val * 10 + (*rng.begin() - '0');
+      }
+
+      if (!rng.empty())
+        return false;
 
       val *= sign;
       return true;
