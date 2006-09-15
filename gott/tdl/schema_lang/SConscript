@@ -38,4 +38,4 @@
 
 Import('env')
 
-env.Program('playground/repatcher.cpp')
+env.Program('playground/test_repatcher.cpp')

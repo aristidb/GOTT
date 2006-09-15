@@ -63,9 +63,6 @@ public:
   virtual ~repatcher() = 0;
   virtual repatcher *clone() const = 0;
   virtual writable_structure *deferred_write(writable_structure &) const = 0;
-  gott::atom get_kind() const {
-    return gott::atom("tdl::structure::repatcher");
-  }
 };
 
 inline repatcher *new_clone(repatcher const &r) {

@@ -39,17 +39,19 @@
 #include <gott/plugin.hpp>
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
-#include <gott/tdl/schema/item.hpp>
+#include <gott/tdl/schema/happy_once.hpp>
 #include <gott/tdl/schema/type.hpp>
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/event.hpp>
 #include <gott/tdl/structure/repatch.hpp>
 #include <boost/shared_ptr.hpp>
+#include <iostream> //FIXME
 
 using namespace tdl::schema;
 namespace structure = tdl::structure;
 using structure::writable_structure;
 using structure::repatcher_getter_factory;
+using structure::repatcher_getter;
 
 namespace {
 
@@ -64,20 +66,54 @@ struct make_rep_schema {
   }
 };
 
-class xmatcher : public item {
+struct rep_rep : structure::concrete_repatcher<rep_rep> {
+  rep_rep(repatcher_getter *helper) : helper(helper) {}
+
+  repatcher_getter *helper;
+
+  writable_structure *deferred_write(writable_structure &) const {
+    struct context : writable_structure {
+      context(repatcher_getter *helper) : helper(helper) {}
+
+      repatcher_getter *helper;
+
+      void begin(tdl::source_position const &w) {
+        helper->begin(w);
+      }
+
+      void end() {
+        helper->end();
+      }
+
+      void add_tag(gott::string const &s) {
+        helper->add_tag(s);
+      }
+
+      void data(gott::Xany const &d) {
+        helper->data(d);
+      }
+    };
+
+    return new context(helper);
+  }
+};
+
+class xmatcher : public happy_once {
 public:
   xmatcher(
       rule_attr_t const &attr,
       std::vector<rule_t> const &children,
       match &ref)
-  : item(attr, ref),
-  getter(structure::repatcher_by_name()) {
+  :     happy_once(attr, ref),
+        getter(structure::repatcher_by_name()) {
     (void)children; //TODO: check that there are _no_ children
 
     std::vector<rule_t> inner;
     make_rep_schema helper = { inner };
     tdl::resource::list<repatcher_getter_factory>(helper);
-    ref.add(rule("unordered", rule_attr(), inner));
+    ref.add(rule("unordered",
+          rule_attr(coat = false, repatcher2 = new rep_rep(getter.get())),
+          inner));
   }
 
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
@@ -86,26 +122,22 @@ public:
   static gott::atom const id;
 
 private:
-  ~xmatcher() {
-#if 0
+  bool play(ev::child_succeed const &) {
     matcher().out_structure().begin(matcher().where_out());
     matcher().out_structure().data(gott::Xany(
           boost::shared_ptr<structure::repatcher>(
             getter->result_alloc())));
     matcher().out_structure().end();
-#endif
-  }
-
-  item::expect expectation() const {
-    return maybe;
+    be_happy();
+    return true;
   }
 
   gott::string name() const {
-    return gott::string("tdl::schema_lang::repatcher");
+    return id.get_string();
   }
 
   rule_t param;
-  boost::scoped_ptr<structure::repatcher_getter> getter;
+  boost::scoped_ptr<repatcher_getter> getter;
 };
 }
 

@@ -189,7 +189,9 @@ namespace {
       }
     }
     void add_tag(string const &s) {
-      if (pos == inner2)
+      if (pos == inner1)
+        what = s;
+      else if (pos == inner2)
         where->add_tag(s);
     }
     void fail() {
