@@ -108,9 +108,13 @@ public:
    * Decrement the position by a full character step. Prefix variant.
    */
   utf8_iterator &operator--() {
-    while (*current >= 0x80 && *current < 0xC0)
+    uutf8_t const *next = current;
+    while (*next >= 0x80 && *next < 0xC0)
+      --next;
+    if (*next >= 0xC0)
+      current = next - 1;
+    else
       --current;
-    --current;
     return *this;
   }
 
