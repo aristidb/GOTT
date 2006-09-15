@@ -85,7 +85,7 @@ namespace {
   void init2();
   
   void init(scoped_lock &lock) {
-    lock.unlock();
+    if (lock.locked()) lock.unlock();
 
     gott::plugin::metadata_manager man;
     man.load_standard();
@@ -102,14 +102,13 @@ gott::QID const resource::qid("tdl::resource");
 resource::~resource() {}
 
 void resource::list_impl(atom const &kind, generic_callback const &callback) {
-  scoped_lock lock(mutex);
+  scoped_lock lock(mutex, false);
+  init(lock);
+
   typedef resource_set::index<by_kind>::type idx_t;
   idx_t &idx = all_resources.get<by_kind>();
+
   std::pair<idx_t::iterator, idx_t::iterator> range = idx.equal_range(kind);
-  if (range.first == range.second) {
-    init(lock);
-    range = idx.equal_range(kind);
-  }
   for (; range.first != range.second; ++range.first)
     callback(*range.first);
 }
@@ -120,14 +119,17 @@ void resource::find_impl(
     generic_callback const &callback) {
   scoped_lock lock(mutex);
   typedef resource_set::index<by_id>::type idx_t;
+
   idx_t &idx = all_resources.get<by_id>();
   idx_t::iterator it = idx.find(id);
+
   if (it == idx.end()) {
     init(lock);
     it = idx.find(id);
     if (it == idx.end())
       throw tdl_error("TDL resource loader", "resource not found");
   }
+
   resource *res = *it;
   if (res->get_kind() != kind)
     throw tdl_error("TDL resource loader", "resource has wrong type");
