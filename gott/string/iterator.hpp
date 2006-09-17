@@ -108,13 +108,15 @@ public:
    * Decrement the position by a full character step. Prefix variant.
    */
   utf8_iterator &operator--() {
-    uutf8_t const *next = current;
+    uutf8_t const *next = --current;
     while (*next >= 0x80 && *next < 0xC0)
       --next;
-    if (*next >= 0xC0)
+    std::ptrdiff_t diff = current - next;
+    if (*next >= 0xF8 || diff > 3) // invalid
+      return *this;
+    if ((*next >= 0xF0 && diff == 3) || (*next >= 0xF0 && diff == 2) ||
+        (*next >= 0xE0 && diff == 1) || (*next >= 0xC0 && diff == 0))
       current = next - 1;
-    else
-      --current;
     return *this;
   }
 
