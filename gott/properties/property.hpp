@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -41,7 +41,7 @@
 
 #include <utility>
 #include <algorithm>
-#include <sigc++/signal.h>
+#include <boost/signal.hpp>
 
 namespace gott {
 namespace properties {
@@ -345,7 +345,7 @@ public:
    * Return a signal emitted whenever the value of the property changes.
    * \return A reference to the signal.
    */
-  virtual sigc::signal0<void> &on_change() = 0;
+  virtual boost::signal<void ()> &on_change() = 0;
 };
 
 }}

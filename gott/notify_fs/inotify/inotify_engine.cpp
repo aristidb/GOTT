@@ -107,7 +107,7 @@ struct inotify_factory : engine_factory {
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(inotify_plugin, inotify_factory)
 
-typedef sigc::signal1<void, gott::notify_fs::event const &> sgnl;
+typedef boost::signal<void (gott::notify_fs::event const &)> sgnl;
 
 boost::int32_t inotify_engine::get_watch(
     inotify_engine &eng, 
@@ -187,7 +187,7 @@ void inotify_engine::notify() {
       name = gott::string(pevent->name, gott::utf8);
     
     event ev = { context, mask, cookie, name };
-    ev.context.on_fire().emit(ev);
+    ev.context.on_fire()(ev);
   }
 }
 

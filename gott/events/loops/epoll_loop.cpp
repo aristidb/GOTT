@@ -53,6 +53,7 @@
 #include <boost/cstdint.hpp>
 #include <climits>
 #include <cmath>
+#include <iostream> //FIXME
 
 using gott::events::epoll_loop;
 
@@ -86,7 +87,7 @@ public:
   };
   std::map<int, entry> file_descriptors;
 
-  sigc::signal0<void> on_idle;
+  boost::signal<void ()> on_idle;
 
   boost::optional<selfpipe_message_manager> message_mgr;
   boost::optional<standard_signal_manager> sig_mgr;
@@ -105,7 +106,7 @@ epoll_loop::epoll_loop()
   p(new impl()) {}
 
 epoll_loop::~epoll_loop() {
-  on_destroy().emit();
+  on_destroy()();
 }
 
 void epoll_loop::quit_local() {
@@ -116,7 +117,7 @@ bool epoll_loop::running() const {
   return p->running && p->wait > 0;
 }
 
-sigc::signal0<void> &epoll_loop::on_idle() {
+boost::signal<void ()> &epoll_loop::on_idle() {
   return p->on_idle;
 }
 
@@ -194,7 +195,9 @@ void epoll_loop::run() {
         timeout = -1;
     }
 
-    p->on_idle.emit();
+    std::cerr << "on idle {\n";
+    p->on_idle();
+    std::cerr << "}\n";
     
     if (!running())
       break;

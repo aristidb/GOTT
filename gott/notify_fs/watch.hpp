@@ -43,7 +43,7 @@
 #include <gott/visibility.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <sigc++/signal.h>
+#include <boost/signal.hpp>
 #include <gott/exceptions.hpp>
 
 namespace gott {
@@ -69,12 +69,12 @@ public:
       bool wait = true);
   GOTT_EXPORT void close();
 
-  sigc::signal1<void, event const &> on_fire() const {
+  boost::signal<void (event const &)> &on_fire() {
     return fire;
   }
 
 private:
-  sigc::signal1<void, event const &> fire;
+  boost::signal<void (event const &)> fire;
   boost::scoped_ptr<watch_implementation> p;
 };
 

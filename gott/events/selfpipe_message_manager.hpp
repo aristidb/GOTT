@@ -51,9 +51,9 @@ public:
   selfpipe_message_manager(fd_manager *fdm);
   ~selfpipe_message_manager();
 
-  void send(gott::xany::Xany const &) throw();
+  void send(gott::Xany const &) throw();
 
-  sigc::signal1<void, gott::xany::Xany const &> &on_receive();
+  boost::signal<void (gott::Xany const &)> &on_receive();
 
 private:
   class impl;

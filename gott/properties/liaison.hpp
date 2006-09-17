@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -40,7 +40,7 @@
 #define GOTT_UTIL_PROPERTIES_LIAISON_HPP
 
 #include "property.hpp"
-#include <sigc++/connection.h>
+#include <boost/signals/connection.hpp>
 #include <boost/lambda/bind.hpp>
 
 namespace gott {
@@ -66,11 +66,6 @@ public:
     conversion(c)
   {} 
   
-  ~liaison() {
-    left_to_right.disconnect();
-    right_to_left.disconnect();
-  }
-
   void block(bool should_block = true) {
     left_to_right.block(should_block);
     right_to_left.block(should_block);
@@ -83,8 +78,8 @@ public:
 private:
   notifying_property<Type> &left;
   notifying_property<Type> &right;
-  sigc::connection left_to_right;
-  sigc::connection right_to_left;
+  boost::signals::scoped_connection left_to_right;
+  boost::signals::scoped_connection right_to_left;
   Conversion conversion;
 
   void left_changed() {

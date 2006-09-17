@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,22 +36,21 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include "translation_property.hpp"
 #include "verify.hpp"
 #include "property.hpp"
 #include "concrete_property.hpp"
-#include "sigc_notification.hpp"
 #include "external_storage.hpp"
 #include "liaison.hpp"
 #include "triggered_copy.hpp"
-#include "translation_property.hpp"
+#include "signal_notification.hpp"
 #include <gott/string/string.hpp>
 #include <gott/string/buffer.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/function.hpp>
 #include <iostream>
-#include <sigc++/bind.h>
-#include <sigc++/hide.h>
-#include <sigc++/connection.h>
+#include <boost/lambda/bind.hpp>
+#include <boost/signals/connection.hpp>
 
 using namespace gott;
 using namespace gott::properties;
@@ -118,8 +117,8 @@ int main() {
   concrete_property<concrete_property<int> > x(p);
   cout << x.read()->get() << endl;
   
-  concrete_property<string_buffer, sigc_notification> w;
-  sigc::connection c = w.on_change().connect(sigc::bind(&test_observe, &w));
+  concrete_property<string_buffer, signal_notification> w;
+  boost::signals::connection c = w.on_change().connect(bind(&test_observe, &w));
   c.block();
   w.set(string("Hallo"));
   c.unblock();
@@ -155,7 +154,7 @@ int main() {
   streamed.set(7);
 
   // Liaisons and verifications
-  concrete_property<string, sigc_notification> s1, s2;
+  concrete_property<string, signal_notification> s1, s2;
   {
     liaison<string, my_conversion> l(s1, s2);
     s1.set("Hello, ");
@@ -165,7 +164,7 @@ int main() {
   s2.set("muhkuh");
   cout << s1.get() << s2.get() << endl;
 
-  concrete_property<int, sigc_notification> sv;
+  concrete_property<int, signal_notification> sv;
   {
   verify<int, check_range<int>, enforce_value<int> > 
     ver(sv, check_range<int>(0, 10));
@@ -174,11 +173,11 @@ int main() {
   cout << sv.get() << ' ';
 
   verify<int, check_range<int>, enforce_value<int>, 
-      sigc::signal1<void, property<int> const &> > 
+      boost::signal<void (property<int> const &)> > 
     ver(sv, check_range<int>(-5, 5));
   concrete_property<int> second;
   // Now this makes second be a copy of sv but always valid!
-  ver.on_correct().connect(sigc::hide(triggered_copy<int>(sv, second)));
+  ver.on_correct().connect(bind(triggered_copy<int>(sv, second)));
   sv.set(-22);
   cout << second.get() << endl;
 }

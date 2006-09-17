@@ -42,14 +42,14 @@
 #include <boost/bind.hpp>
 
 using gott::events::selfpipe_message_manager;
-using gott::xany::Xany;
+using gott::Xany;
 
 class selfpipe_message_manager::impl {
 public:
   impl(fd_manager *fdm) : fdm(fdm) {}
   fd_manager *fdm;
   int selfpipe[2];
-  sigc::signal1<void, Xany const &> on_receive_;
+  boost::signal<void (Xany const &)> on_receive_;
 };
 
 selfpipe_message_manager::selfpipe_message_manager(fd_manager *fdm)
@@ -65,7 +65,7 @@ selfpipe_message_manager::~selfpipe_message_manager() {
   close(p->selfpipe[1]);
 }
 
-sigc::signal1<void, Xany const &> &selfpipe_message_manager::on_receive() {
+boost::signal<void (Xany const &)> &selfpipe_message_manager::on_receive() {
   return p->on_receive_;
 }
 
@@ -74,7 +74,7 @@ void selfpipe_message_manager::notify_in() {
   read_unix(p->selfpipe[0], data);
   Xany value;
   value.recreate(data[0]);
-  p->on_receive_.emit(value);
+  p->on_receive_(value);
 }
 
 void selfpipe_message_manager::send(Xany const &value) throw() {

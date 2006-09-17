@@ -41,7 +41,7 @@
 
 #include <gott/plugin/selector.hpp>
 #include <boost/function.hpp>
-#include <sigc++/connection.h>
+#include <boost/signals/connection.hpp>
 #include <boost/noncopyable.hpp>
 
 namespace gott { namespace plugin {
@@ -98,9 +98,6 @@ public:
     inscribe();
   }
 
-  /// Destructor.
-  ~multi_plugin() { conn.disconnect(); }
-
 private:
   void update();
   GOTT_EXPORT void inscribe();
@@ -109,7 +106,7 @@ private:
   selector sel;
   add_callback_t add;
   remove_callback_t remove;
-  sigc::connection conn;
+  boost::signals::scoped_connection conn;
 };
 
 }}

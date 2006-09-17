@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,27 +36,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_UTIL_PROPERTIES_SIGC_NOTIFICATION_HPP
-#define GOTT_UTIL_PROPERTIES_SIGC_NOTIFICATION_HPP
+#ifndef GOTT_PROPERTIES_SIGNAL_NOTIFICATION_HPP
+#define GOTT_PROPERTIES_SIGNAL_NOTIFICATION_HPP
 
-#include <sigc++/signal.h>
-#include "policy.hpp"
+#include <boost/signal.hpp>
 
-namespace gott {
-namespace properties {
+namespace gott { namespace properties {
 
-struct sigc_notification {
-  sigc::signal0<void> on_change_signal;
+class signal_notification {
+public:
+  signal_notification() {}
+  signal_notification(signal_notification const &) {}
 
-  void notify(void *) const {
-    on_change_signal.emit();
+  void notify(void *) {
+    on_change();
   }
 
-  sigc::signal0<void> &get_on_change(void *) {
-    return on_change_signal;
+  boost::signal<void ()> &get_on_change(void *) {
+    return on_change;
   }
 
   enum { has_signal = true };
+
+private:
+  boost::signal<void ()> on_change;
 };
 
 }}

@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -41,6 +41,7 @@
 
 #include "property.hpp"
 #include "translate.hpp"
+#include "policy.hpp"
 
 namespace gott {
 namespace properties {
@@ -139,7 +140,7 @@ public:
       translation_p t = translation_policy()) 
   : delegate(b, t), on_change_signal(b.on_change()) {}
 
-  sigc::signal0<void> on_change() { return on_change_signal; }
+  boost::signal<void ()> &on_change() { return on_change_signal; }
 
 private:
   annotated_const_pointer begin_read() { return delegate.begin_read(); }
@@ -151,7 +152,7 @@ private:
   void end_change(annotated_pointer p) { delegate.end_change(p); }
 
   translation_property<OldType, NewType, Translation> delegate;
-  sigc::signal0<void> &on_change_signal;
+  boost::signal<void ()> &on_change_signal;
 };
 
 }}

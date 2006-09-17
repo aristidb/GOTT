@@ -62,17 +62,17 @@ private:
   GOTT_LOCAL void run();
   GOTT_LOCAL bool running() const;
   GOTT_LOCAL void quit_local();
-  GOTT_LOCAL sigc::signal0<void> &on_idle();
+  GOTT_LOCAL boost::signal<void ()> &on_idle();
 
   GOTT_LOCAL void add_waitable();
   GOTT_LOCAL void remove_waitable();
 
 private:
   GOTT_LOCAL
-  void send(gott::xany::Xany const &) throw();
+  void send(gott::Xany const &) throw();
 
   GOTT_LOCAL
-  sigc::signal1<void, gott::xany::Xany const &> &on_receive();
+  boost::signal<void (gott::Xany const &)> &on_receive();
 
 private:
   GOTT_LOCAL void *do_feature(QID const &);

@@ -43,7 +43,7 @@
 #include <gott/string/qid.hpp>
 #include <gott/exceptions.hpp>
 #include <gott/plugin/plugin_base.hpp>
-#include <sigc++/signal.h>
+#include <boost/signal.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace gott {
@@ -78,7 +78,7 @@ public:
    * block. Also, this signal is guaranteed to be emitted after <b>all</b>
    * timers have been handled.
    */
-  virtual sigc::signal0<void> &on_idle() = 0;
+  virtual boost::signal<void ()> &on_idle() = 0;
 
   /**
    * Add an object to the list of objects the main_loop should wait for.
@@ -154,7 +154,7 @@ public:
   }
 
 public:
-  sigc::signal0<void> &on_destroy();
+  boost::signal<void ()> &on_destroy();
   void *&feature_data(QID const &id);
 
 protected:

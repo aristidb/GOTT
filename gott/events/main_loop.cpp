@@ -45,14 +45,14 @@ gott::QID const main_loop::qid("gott::events::main_loop");
 
 class main_loop::impl {
 public:
-  sigc::signal0<void> on_destroy;
+  boost::signal<void ()> on_destroy;
   std::map<gott::QID, void *> feature_data;
 };
 
 main_loop::main_loop() : p(new impl) {}
 main_loop::~main_loop() {}
 
-sigc::signal0<void> &main_loop::on_destroy() {
+boost::signal<void ()> &main_loop::on_destroy() {
   return p->on_destroy;
 }
 

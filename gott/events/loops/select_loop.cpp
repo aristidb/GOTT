@@ -133,7 +133,7 @@ void select_loop::run(){
     } else
       t = 0;
     
-    on_idle().emit();
+    on_idle()();
 
     if (!running())
       return;
@@ -212,7 +212,7 @@ bool select_loop::running() const {
 }
 
 select_loop::~select_loop() {
-  on_destroy().emit();
+  on_destroy()();
   for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end();
       it!=e;
       ++it)  {

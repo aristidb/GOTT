@@ -41,7 +41,7 @@
 
 #include <gott/visibility.hpp>
 #include <gott/string/qid.hpp>
-#include <sigc++/signal.h>
+#include <boost/signal.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -66,7 +66,7 @@ public:
    * associated to a single main_loop or signal_manager - or a 
    * user_error will be thrown.
    */
-  virtual sigc::signal1<void, int> &on_signal(int sig) = 0;
+  virtual boost::signal<void (int)> &on_signal(int sig) = 0;
 
 public:
   static signal_manager *get_for(main_loop &) { return 0; }
@@ -77,8 +77,7 @@ public:
  */
 class GOTT_EXPORT standard_signal_manager :
   public signal_manager,
-  boost::noncopyable,
-  public sigc::trackable {
+  boost::noncopyable {
 public:
   /**
    * Constructor.
@@ -88,7 +87,7 @@ public:
   /// Destructor.
   ~standard_signal_manager();
 
-  sigc::signal1<void, int> &on_signal(int sig);
+  boost::signal<void (int)> &on_signal(int sig);
 
 private:
   static void register_signal(

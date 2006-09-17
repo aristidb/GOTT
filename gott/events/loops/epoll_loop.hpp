@@ -68,7 +68,7 @@ public:
 private:
   GOTT_LOCAL void run();
   GOTT_LOCAL void quit_local();
-  GOTT_LOCAL sigc::signal0<void> &on_idle();
+  GOTT_LOCAL boost::signal<void ()> &on_idle();
 
   GOTT_LOCAL void add_waitable();
   GOTT_LOCAL void remove_waitable();

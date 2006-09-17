@@ -212,6 +212,7 @@ if not conf.env['DEBUG_BUILD_CMD']:
 boostlibs =	[
 	'thread', 
 	'date_time', 
+	'signals',
 #	'filesystem',
 #	'program_options',
 	]
@@ -225,12 +226,5 @@ conf.CheckLib('rt')
 
 if conf.CheckCHeader('unistd.h', '<>'):
 	conf.env.Append(CPPDEFINES = 'HAS_UNISTD_H')
-
-if not conf.PkgConfigPkg('sigc++-2.0'):
-	print "sigc++-2.0 not found. If you have installed sigc++-2.0 check pkg-config setup."
-	Exit(1)
-
-conf.env.ParseConfig('pkg-config --cflags sigc++-2.0')
-conf.env.ParseConfig('pkg-config --libs sigc++-2.0')
 
 Return('conf')

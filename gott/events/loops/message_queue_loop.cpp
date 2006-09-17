@@ -49,23 +49,23 @@ public:
   impl() : running(false), wait(0) {}
 
   bool running;
-  gott::thread::message_queue<gott::xany::Xany> queue;
-  sigc::signal1<void, gott::xany::Xany const &> on_receive_;
-  sigc::signal0<void> on_idle_;
+  gott::thread::message_queue<gott::Xany> queue;
+  boost::signal<void (gott::Xany const &)> on_receive_;
+  boost::signal<void ()> on_idle_;
   int wait;
 };
 
 message_queue_loop::message_queue_loop() : p(new impl) {}
 
 message_queue_loop::~message_queue_loop() {
-  on_destroy().emit();
+  on_destroy()();
 }
 
-sigc::signal0<void> &message_queue_loop::on_idle() {
+boost::signal<void ()> &message_queue_loop::on_idle() {
   return p->on_idle_;
 }
 
-sigc::signal1<void, gott::xany::Xany const &> &message_queue_loop::on_receive(){
+boost::signal<void (gott::Xany const &)> &message_queue_loop::on_receive() {
   return p->on_receive_;
 }
 
@@ -88,8 +88,8 @@ bool message_queue_loop::running() const {
 void message_queue_loop::run() {
   p->running = true;
   while (running()) {
-    p->on_receive_.emit(p->queue.pop());
-    p->on_idle_.emit();
+    p->on_receive_(p->queue.pop());
+    p->on_idle_();
   }
   p->running = false;
 }

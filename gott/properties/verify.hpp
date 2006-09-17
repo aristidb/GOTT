@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -40,8 +40,9 @@
 #define GOTT_UTIL_PROPERTIES_VERIFY_HPP
 
 #include "property.hpp"
-#include <sigc++/connection.h>
+#include <boost/signals/connection.hpp>
 #include <boost/lambda/bind.hpp>
+#include <boost/none.hpp>
 
 namespace gott {
 namespace properties {
@@ -56,28 +57,46 @@ template<
 >
 class verify {
 public:
-  verify(notifying_property<Type> &p, 
-      Check c = Check(), 
-      OnFailure f = OnFailure(),
-      OnCorrect k = OnCorrect())
-  : prop(p), check(c), failure(f), correct(k),
-    change(prop.on_change().connect(
-          boost::lambda::bind(&verify::action, this))) {}
+  typedef notifying_property<Type> property_type;
+
+  // 000
+  verify(property_type &p) : prop(p) { bind(); }
+  // 100
+  verify(property_type &p, Check c) : prop(p), check(c) { bind(); }
+  // 110
+  verify(property_type &p, Check c, OnFailure f) 
+    : prop(p), check(c), failure(f) { bind(); }
+  // 010
+  verify(property_type &p, boost::none_t, OnFailure f)
+    : prop(p), failure(f) { bind(); }
+  // 111
+  verify(property_type &p, Check c, OnFailure f, OnCorrect k)
+    : prop(p), check(c), failure(f), correct(k) { bind(); }
+  // 011
+  verify(property_type &p, boost::none_t, OnFailure f, OnCorrect k)
+    : prop(p), failure(f), correct(k) { bind(); }
+  // 001
+  verify(property_type &p, boost::none_t, boost::none_t, OnCorrect k)
+    : prop(p), correct(k) { bind(); }
+  // 101
+  verify(property_type &p, Check c, boost::none_t, OnCorrect k)
+    : prop(p), check(c), correct(k) { bind(); }
+  
+  void bind() {
+    change = prop.on_change().connect(
+        boost::lambda::bind(&verify::action, this));
+  }
 
   OnCorrect &on_correct() { return correct; }
 
   OnFailure &on_failure() { return failure; }
-
-  ~verify() {
-    change.disconnect();
-  }
 
 private:
   notifying_property<Type> &prop;
   Check check;
   OnFailure failure;
   OnCorrect correct;
-  sigc::connection change;
+  boost::signals::scoped_connection change;
 
   void action() {
     typename Check::context con = typename Check::context();

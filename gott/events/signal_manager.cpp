@@ -41,8 +41,12 @@
 #include "inprocess_message_manager.hpp"
 #include <gott/exceptions.hpp>
 #include <gott/xany/tagged_base.hpp>
-#include <signal.h>
+#include <boost/signal.hpp>
+#include <boost/signals/connection.hpp>
+#include <boost/bind.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
 #include <map>
+#include <signal.h>
 
 using namespace gott::events;
 using gott::xany::Xany;
@@ -58,27 +62,28 @@ public:
   impl(sigsafe_message_manager *mm) : message_manager(mm) {}
 
   sigsafe_message_manager *message_manager;
-  typedef std::map<int, sigc::signal1<void, int> > handler_map_t;
+  boost::signals::scoped_connection mm_conn;
+  typedef boost::ptr_map<int, boost::signal<void (int)> > handler_map_t;
   handler_map_t handlers;
 };
 
 standard_signal_manager::standard_signal_manager(sigsafe_message_manager *mm)
 : p(new impl(mm)) {
-  p->message_manager->on_receive().connect(
-      sigc::mem_fun(this, &standard_signal_manager::receive_message));
+  p->mm_conn = p->message_manager->on_receive().connect(
+      boost::bind(&standard_signal_manager::receive_message, this, _1));
 }
 
 standard_signal_manager::~standard_signal_manager() {
   unregister_all(this);
 }
 
-sigc::signal1<void, int> &standard_signal_manager::on_signal(int sig) {
+boost::signal<void (int)> &standard_signal_manager::on_signal(int sig) {
   impl::handler_map_t::iterator pos = p->handlers.find(sig);
   if (pos == p->handlers.end()) {
     register_signal(sig, this);
-    return p->handlers[sig];
+    pos = p->handlers.insert(sig, new boost::signal<void (int)>).first;
   }
-  return pos->second;
+  return *pos;
 }
 
 namespace {
@@ -135,6 +140,6 @@ void standard_signal_manager::immediate_action(int sig) {
 void standard_signal_manager::receive_message(Xany const &m) {
   if (m.compatible<signal_msg>()) {
     int sig = xany::Xany_cast<signal_msg>(m).get();
-    p->handlers[sig].emit(sig);
+    p->handlers[sig](sig);
   }
 }

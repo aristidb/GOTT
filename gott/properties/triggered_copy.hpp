@@ -56,6 +56,8 @@ public:
     destination.set(source.get());
   }
 
+  typedef void result_type;
+
 private:
   property<Type> &source;
   property<Type> &destination;
