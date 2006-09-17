@@ -95,7 +95,7 @@ env = Environment(
   CPPPATH=['#/..', '${BOOST_INCLUDE}'], 
   LIBPATH=['#/$BUILD_TO/', '$BUILD_TO/',  '${BOOST_LIB}'],
   LDMODULEPREFIX="",
-  LDMODULESUFFIX=".plugin",
+  LDMODULESUFFIX=".dll",
   LDMODULECOM="$SHLINK -o $TARGET $SHLINKFLAGS  $SOURCES",
   )
 env.Help(opts.GenerateHelpText(env))

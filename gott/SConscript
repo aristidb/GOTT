@@ -40,21 +40,27 @@ import glob
 import os
 Import('env')
 
+def rmv(list, prefix, element):
+	if (prefix + "\\" + element) in list:
+		list.remove(prefix + "\\" + element)
+	else:
+		list.remove(prefix + "/" + element)
+
 libobj = env.Glob('string/*.cpp')
 libobj += ['exceptions.cpp', 'xany/xany.cpp']
 
 libobj_plugin = env.Glob('plugin/*.cpp')
-libobj_plugin.remove('plugin/test.cpp')
+rmv(libobj_plugin, 'plugin', 'test.cpp')
 libobj += libobj_plugin
 
 libobj_syswrap = env.Glob('syswrap/*.cpp')
 if env['SYS_KQUEUE'] == 0:
-	libobj_syswrap.remove('syswrap/kqueue_bsd.cpp')
+	rmv(libobj_syswrap, 'syswrap', 'kqueue_bsd.cpp')
 if env['SYS_EPOLL'] == 0:
-	libobj_syswrap.remove('syswrap/epoll_linux.cpp')
+	rmv(libobj_syswrap, 'syswrap', 'epoll_linux.cpp')
 if env['SYS_INOTIFY'] == 0:
-	libobj_syswrap.remove('syswrap/inotify_linux.cpp')
-libobj_syswrap.remove('syswrap/test.cpp')
+	rmv(libobj_syswrap, 'syswrap', 'inotify_linux.cpp')
+rmv(libobj_syswrap, 'syswrap', 'test.cpp')
 libobj += libobj_syswrap
 
 tdl_source_files = []
@@ -81,11 +87,11 @@ env.Append(LIBS = ['gott_core'])
 libobj_system = []
 
 libobj_events = env.Glob('events/*.cpp')
-libobj_events.remove('events/mq_loop_test.cpp')
+rmv(libobj_events, 'events', 'mq_loop_test.cpp')
 libobj_system += libobj_events
 
 libobj_notify_fs = env.Glob('notify_fs/*.cpp')
-libobj_notify_fs.remove('notify_fs/test.cpp')
+rmv(libobj_notify_fs, 'notify_fs', 'test.cpp')
 libobj_system += libobj_notify_fs
 
 env.SharedLibrary('gott_system', libobj_system)

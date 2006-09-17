@@ -156,7 +156,7 @@ public:
   virtual bool miss_events(ev::event const &, unsigned);
 
   /// @internal
-  void finish() GOTT_LOCAL;
+  GOTT_LOCAL void finish();
 
   virtual ~item() = 0;
 
@@ -164,7 +164,7 @@ public:
   /**
    * Get the attributes associated with this rule_t.
    */
-  rule_attr_t const &attributes() const GOTT_EXPORT;
+  GOTT_EXPORT rule_attr_t const &attributes() const;
 
 protected:
   match &matcher();
@@ -177,7 +177,7 @@ private:
   class impl;
   boost::scoped_ptr<impl> pimpl;
 
-  item() GOTT_LOCAL;
+  GOTT_LOCAL item();
 };
 
 }}

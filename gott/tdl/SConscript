@@ -43,7 +43,7 @@ Import('env')
 simple_sources = env.Glob('parse/*.cpp') + env.Glob('write/*.cpp')
 simple_sources += ['exceptions.cpp', '../exceptions.cpp']
 simple_sources += env.Glob('../string/*.cpp')
-env.StaticLibrary('tdl_simple', simple_sources, LIBS = [])
+#env.StaticLibrary('tdl_simple', simple_sources, LIBS = [])
 
 builtin_sources = env.Glob('schema/types/*.cpp')
 builtin_sources += env.Glob('structure/repatchers/*.cpp')

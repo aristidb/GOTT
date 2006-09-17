@@ -145,9 +145,9 @@ public:
     : m(o.m), type(o.type), count(o.count) {}
 
   /// Whether the object accepts 0 children.
-  bool prefix_optional() const GOTT_EXPORT;
+  GOTT_EXPORT bool prefix_optional() const;
   /// A variant of the object that does not accept 0 children.
-  slotcfg no_optional() const GOTT_EXPORT;
+  GOTT_EXPORT slotcfg no_optional() const;
   /// The mode the object is in.
   mode get_mode() const { return m; }
 
@@ -156,7 +156,7 @@ public:
   /// Cancel a sequence.
   void cancel();
   /// Accept or not.
-  item::expect expectation() const GOTT_EXPORT;
+  GOTT_EXPORT item::expect expectation() const;
 
 private:
   mode m;
