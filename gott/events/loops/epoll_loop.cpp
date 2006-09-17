@@ -53,7 +53,6 @@
 #include <boost/cstdint.hpp>
 #include <climits>
 #include <cmath>
-#include <iostream> //FIXME
 
 using gott::events::epoll_loop;
 
@@ -195,9 +194,7 @@ void epoll_loop::run() {
         timeout = -1;
     }
 
-    std::cerr << "on idle {\n";
     p->on_idle();
-    std::cerr << "}\n";
     
     if (!running())
       break;
