@@ -81,7 +81,7 @@ public:
    * Constructs a new match object writing to a tree/something.
    * \param tree The tree to write to.
    */
-  match(structure::repatchable_structure &tree) GOTT_EXPORT;
+  GOTT_EXPORT match(structure::repatchable_structure &tree);
 
   /**
    * Constructs a new match object writing to a tree/something matching a 
@@ -92,18 +92,18 @@ public:
   GOTT_EXPORT
   match(rule_t const &rf, structure::repatchable_structure &tree);
 
-  ~match() GOTT_EXPORT;
+  GOTT_EXPORT ~match();
 
   /**
    * Tells the engine to match next a item specified by a rule_t-factory.
    * \param rf The rule_t-factory specifying the to-be-added rule_t.
    */
-  void add(rule_t const &rf) GOTT_EXPORT;
+  GOTT_EXPORT void add(rule_t const &rf);
 
   /**
    * Return a reference to the structure the engine writes to.
    */
-  structure::repatchable_structure &out_structure() const GOTT_EXPORT;
+  GOTT_EXPORT structure::repatchable_structure &out_structure() const;
 
   /**
    * Return the schema parsers current source_position. If not backtracking
@@ -111,18 +111,18 @@ public:
    * of simple::parser::where() when the current memorized data was actually
    * read.
    */
-  source_position const &where_out() const GOTT_EXPORT;
+  GOTT_EXPORT source_position const &where_out() const;
 
 public:
   /**
    * Return a reference to the back-tracking and book-keeping sub-engine.
    */
-  positioning &pos() const GOTT_EXPORT;
+  GOTT_EXPORT positioning &pos() const;
 
   /**
    * Tell the current rule_ts that tokens are still to be read.
    */
-  void parental_requirement(ev::event const &, unsigned) GOTT_EXPORT;
+  GOTT_EXPORT void parental_requirement(ev::event const &, unsigned);
 
 private:
   void begin_parse();

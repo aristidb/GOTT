@@ -99,8 +99,9 @@ private:
   boost::shared_ptr<impl const> p;
 };
 
+GOTT_EXPORT
 rule_t rule(gott::string const &name, rule_attr_t const &a = rule_attr_t(), 
-    std::vector<rule_t> const &c = std::vector<rule_t>()) GOTT_EXPORT;
+    std::vector<rule_t> const &c = std::vector<rule_t>());
 
 inline
 rule_t rule_one(gott::string const &name, rule_attr_t const &a,rule_t const&c) {

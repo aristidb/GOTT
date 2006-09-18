@@ -40,6 +40,7 @@
 #include <gott/string/string.hpp>
 
 using gott::plugin::failed_load;
+using gott::string;
 
 class failed_load::impl {
 public:

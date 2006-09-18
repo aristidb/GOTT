@@ -120,7 +120,7 @@ public:
   void print(std::ostream &s) const;
   event *clone() const { return new node(*this); }
 
-  gott::string const &get_data() const GOTT_EXPORT;
+  gott::string const &get_data() const;
     // get the data of this node-event
 };
 

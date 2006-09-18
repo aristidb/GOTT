@@ -164,7 +164,7 @@ public:
   /**
    * Get the attributes associated with this rule_t.
    */
-  GOTT_EXPORT rule_attr_t const &attributes() const;
+  rule_attr_t const &attributes() const;
 
 protected:
   match &matcher();
