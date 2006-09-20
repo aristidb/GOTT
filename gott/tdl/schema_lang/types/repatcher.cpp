@@ -45,7 +45,6 @@
 #include <gott/tdl/schema/event.hpp>
 #include <gott/tdl/structure/repatch.hpp>
 #include <boost/shared_ptr.hpp>
-#include <iostream> //FIXME
 
 using namespace tdl::schema;
 namespace structure = tdl::structure;
@@ -125,7 +124,7 @@ private:
   bool play(ev::child_succeed const &) {
     matcher().out_structure().begin(matcher().where_out());
     matcher().out_structure().data(gott::Xany(
-          boost::shared_ptr<structure::repatcher>(
+          static_cast<void*>( //FIXME (baaad but works)
             getter->result_alloc())));
     matcher().out_structure().end();
     be_happy();
