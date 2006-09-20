@@ -86,7 +86,7 @@ void multi_plugin::update() {
 
 void multi_plugin::inscribe() {
   metadata_manager man;
-  update();
   conn = man.on_update().connect(
       boost::lambda::bind(&multi_plugin::update, this));
+  update();
 }
