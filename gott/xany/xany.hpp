@@ -141,11 +141,7 @@ public:
   }
 
   bool type_equals(Xany const &o) const {
-#ifdef BUG_FIXED_GCC_TEMPLATE_TYPEINFO
     return spelled_type() == o.spelled_type();
-#else
-    return type() == o.type();
-#endif
   }
 
   /**
@@ -153,13 +149,8 @@ public:
    */
   template<class T>
   bool compatible() const {
-#ifdef BUG_FIXED_GCC_TEMPLATE_TYPEINFO
     std::type_info const &desire = spell<typename promote<T>::type>();
     std::type_info const &actual = spelled_type();
-#else
-    std::type_info const &desire = typeid(typename promote<T>::type);
-    std::type_info const &actual = type();
-#endif
     return desire == actual;
   }
 
