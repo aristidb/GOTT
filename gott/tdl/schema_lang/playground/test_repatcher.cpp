@@ -8,9 +8,9 @@
 #include <gott/tdl/structure/print.hpp>
 #include <iostream>
 
-namespace stru = tdl::structure;
+struct rep_acc : tdl::structure::writable_structure {
+  typedef boost::shared_ptr<tdl::structure::repatcher> repp;
 
-struct rep_acc : stru::writable_structure {
   void begin(tdl::source_position const &) {
   }
 
@@ -21,17 +21,17 @@ struct rep_acc : stru::writable_structure {
   }
 
   void data(gott::Xany const &x) {
-    rep.reset(static_cast<stru::repatcher*>(gott::Xany_cast<void*>(x)));
+    rep = gott::Xany_cast<repp>(x);
   }
 
-  boost::shared_ptr<stru::repatcher> rep;
+  repp rep;
 };
 
 int main() {
   rep_acc acc_r;
-  stru::repatchable_adapter2 helper3(acc_r);
-  stru::revocable_adapter helper2(helper3);
-  stru::repatchable_adapter helper(helper2);
+  tdl::structure::repatchable_adapter2 helper3(acc_r);
+  tdl::structure::revocable_adapter helper2(helper3);
+  tdl::structure::repatchable_adapter helper(helper2);
   using namespace tdl::schema;
   match m_r(
       rule_one("document", rule_attr(tag = "doc"),
@@ -42,10 +42,10 @@ int main() {
     std::cout << "no repatcher" << std::endl;
   else
     std::cout << typeid(*acc_r.rep).name() << std::endl;
-  stru::container out;
-  stru::repatchable_adapter2 helper6(out);
-  stru::revocable_adapter helper5(helper6);
-  stru::repatchable_adapter helper4(helper5);
+  tdl::structure::container out;
+  tdl::structure::repatchable_adapter2 helper6(out);
+  tdl::structure::revocable_adapter helper5(helper6);
+  tdl::structure::repatchable_adapter helper4(helper5);
   match m(
       rule_one("document",
         rule_attr(tag = "doc", repatcher = acc_r.rep),
