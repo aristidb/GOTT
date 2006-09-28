@@ -118,7 +118,7 @@ def CheckOptimization(context):
 		level = '-O2'
 	
 	last = prepare(context.env,
-			CCFLAGS = [level])
+			CXXFLAGS = [level], LINKFLAGS = [level])
 	
 	result = context.TryLink("#ifdef __OPTIMIZE__\nint main() {}\n#endif\n", '.cpp')
 	
@@ -181,6 +181,13 @@ del l
 conf = Configure(env, custom_tests = tests)
 AddSysOpts(conf.env)
 
+if conf.CheckCHeader('unistd.h', '<>'):
+	conf.env.Append(CPPDEFINES = 'HAS_UNISTD_H')
+
+if conf.CheckCHeader('pthread.h', '<>'):
+	conf.env.Append(CXXFLAGS = '-pthread')
+	conf.env.Append(LINKFLAGS = '-pthread')
+
 conf.LinkerAsNeeded()
 conf.LinkerExportDynamic()
 if conf.env['CONF_OSX_LINKER'] != 0:
@@ -223,8 +230,5 @@ for i in boostlibs:
 #conf.BoostDateTimeCanNanosec()
 
 conf.CheckLib('rt')
-
-if conf.CheckCHeader('unistd.h', '<>'):
-	conf.env.Append(CPPDEFINES = 'HAS_UNISTD_H')
 
 Return('conf')
