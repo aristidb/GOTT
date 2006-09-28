@@ -57,7 +57,8 @@ def CheckLinkerAsNeeded(context):
 	last= prepare(context.env,
 			LINKFLAGS = ['-Wl,--as-needed'])
 
-	result = context.TryLink("int main() { }\n", '.cpp')
+	result = context.TryLink("#if defined(__GNUC__) && (__GNUC__ < 3 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))\n#error \"Incompatible\"\nint main() {}\n",
+							 '.cpp')
 	if not result:
 		context.env.Replace(**last)
 	context.Result(result)
@@ -181,12 +182,14 @@ del l
 conf = Configure(env, custom_tests = tests)
 AddSysOpts(conf.env)
 
+conf.env.Append(SHCXXFLAGS = ['-DBUILDING_DLL'])
+
 if conf.CheckCHeader('unistd.h', '<>'):
 	conf.env.Append(CPPDEFINES = 'HAS_UNISTD_H')
 
 if conf.CheckCHeader('pthread.h', '<>'):
-	conf.env.Append(CXXFLAGS = '-pthread')
-	conf.env.Append(LINKFLAGS = '-pthread')
+	conf.env.Append(CXXFLAGS = ['-pthread'])
+	conf.env.Append(LINKFLAGS = ['-pthread'])
 
 conf.LinkerAsNeeded()
 conf.LinkerExportDynamic()
