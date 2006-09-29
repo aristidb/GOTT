@@ -57,8 +57,8 @@ def CheckLinkerAsNeeded(context):
 	last= prepare(context.env,
 			LINKFLAGS = ['-Wl,--as-needed'])
 
-	result = context.TryLink("#if defined(__GNUC__) && (__GNUC__ < 3 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))\n#error \"Incompatible\"\nint main() {}\n",
-							 '.cpp')
+	result = context.TryLink("int main() {}", '.cpp')
+
 	if not result:
 		context.env.Replace(**last)
 	context.Result(result)
@@ -70,18 +70,24 @@ def CheckLinkerExportDynamic(context):
 	last = prepare(context.env,
 			LINKFLAGS = ['-Wl,-E'])
 
-	result = context.TryLink("int main() { }\n", '.cpp')
+	result = context.TryLink("int main() {}\n", '.cpp')
 	if not result:
 		context.env.Replace(**last)
 	context.Result(result)
 	return result
 
 def CheckCompilerVisibility(context):
-	context.Message('Checking if compiler supports visibility attributes... ')
+	context.Message('Checking if compiler properly supports visibility attributes... ')
 	last = prepare(context.env,
+			CXXFLAGS =   ['-fvisibility=hidden','-DHAS_VISIBILITY'],
 			SHCXXFLAGS = ['-fvisibility=hidden','-DHAS_VISIBILITY']) # will work fine for for gcc, and since the others dont support it doesnt matter
 
-	result = context.TryCompile("int global __attribute__((visibility(\"default\")));\n", '.cpp')
+	result = context.TryCompile("""
+#if defined(__GNUC__) && (__GNUC__ < 3 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
+#error "Incompatible"
+#endif
+int global __attribute__((visibility("default")));
+""", '.cpp')
 	if not result:
 		context.env.Replace(**last)
 	context.Result(result)
