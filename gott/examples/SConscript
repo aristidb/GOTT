@@ -38,4 +38,5 @@
 
 Import('env')
 env.Program('producer_consumer1', 'producer_consumer1.cpp')
+env.Program('throttled_yes', 'throttled_yes.cpp')
 env.Program('pongbar_loop', 'pongbar_loop.cpp')
