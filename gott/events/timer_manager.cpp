@@ -106,7 +106,9 @@ struct timer_manager::periodic_helper {
   boost::function<bool (unsigned)> callback;
   bool wait;
   void operator()(timer_manager &man) {
-    unsigned overdraw = (man.monotonic_now() - when).ticks() / interval.ticks();
+    unsigned overdraw = 0;
+    if (interval.ticks() != 0)
+      overdraw = (man.monotonic_now() - when).ticks() / interval.ticks();
     if (callback(overdraw)) {
       when += interval * (1 + overdraw);
       man.add_monotonic_timer(when, *this, wait);
@@ -195,6 +197,7 @@ void standard_timer_manager::do_time_action(
   // Handle timers
   if (handle) {
     { // handle deadline_timers
+      std::queue<deadline_timer> pending;
       while (!p->scheduled_deadline.empty()) {
         deadline_timer current = p->scheduled_deadline.top();
 
@@ -204,11 +207,17 @@ void standard_timer_manager::do_time_action(
         if (current.must_wait())
           p->loop->remove_waitable();
         p->scheduled_deadline.pop();
-        current.emit(*this);
+
+        pending.push(current);
         ++no_handled;
+      }
+      while (!pending.empty()) {
+        pending.front().emit(*this);
+        pending.pop();
       }
     }
     { // handle monotonic_timers
+      std::queue<monotonic_timer> pending;
       while (!p->scheduled_monotonic.empty()) {
         monotonic_timer current = p->scheduled_monotonic.top();
 
@@ -218,8 +227,13 @@ void standard_timer_manager::do_time_action(
         if (current.must_wait())
           p->loop->remove_waitable();
         p->scheduled_monotonic.pop();
-        current.emit(*this);
+
+        pending.push(current);
         ++no_handled;
+      }
+      while (!pending.empty()) {
+        pending.front().emit(*this);
+        pending.pop();
       }
     }
   }
