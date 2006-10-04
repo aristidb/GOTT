@@ -1,8 +1,9 @@
-import glob
+#import glob
 
-Import('env')
-env.SharedLibrary('x11', glob.glob('*.cpp') )
-env.Append(LIBS = ['x11'])
-
-SConscript(dirs = ['test'] )
+#Import('env')
+#env.Append(LIBS = ['base_ui'])
+#env.SharedLibrary('x11', glob.glob('*.cpp') )
+#env.Append(LIBS = ['x11'])
+#
+#SConscript(dirs = ['test'] )
 

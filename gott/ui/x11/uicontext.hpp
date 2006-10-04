@@ -40,9 +40,12 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include <X11/X.h>
+#include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gott/ui/uicontext_base.hpp>
 #include <gott/ui/window_base.hpp>
+#include <gott/events/fd_manager.hpp>
+#include <gott/events/main_loop.hpp>
 
 namespace gott{namespace ui{namespace x11{
 
@@ -56,6 +59,7 @@ class window;
  */
 class GOTT_EXPORT uicontext : public uicontext_base {
   private:
+    events::main_loop & loop_;
     std::vector<gott::ui::x11::window*> windows_;
     Display * display_;
     int screen_; 
@@ -74,7 +78,7 @@ class GOTT_EXPORT uicontext : public uicontext_base {
      * If you omit the connection parameter, the default Display will be used to 
      * connect to the server.
      */
-    uicontext( const char * connection = 0 );
+    uicontext( events::main_loop & loop, const char * connection = 0 );
 
     /**
      * \returns xlibs file descriptor to use in the select_loop main loop class

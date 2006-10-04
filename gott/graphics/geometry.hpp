@@ -1,7 +1,5 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-#ifndef GOTT_UI_UICONTEXT_BASE_HPP_INCLUDED
-#define GOTT_UI_UICONTEXT_BASE_HPP_INCLUDED
-
+#ifndef GOTT_UTIL_GEOMETRY_HPP_INCLUDED
+#define GOTT_UTIL_GEOMETRY_HPP_INCLUDED
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -15,7 +13,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is a user interface abstraction library.
+ * The Original Code is a set of geometry classes.
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
@@ -39,59 +37,76 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <gott/visibility.hpp>
-#include <gott/ui/input.hpp>
-#include <gott/ui/window_base.hpp>
 
-namespace gott{ namespace ui{
+#include <gott/visibility.hpp>
+#include <cstddef>
+
+// move into subdir if this file grows to much 
+namespace gott{
 
 /**
- * \brief Base class for all user interface contexts. 
- * These classes will gather and dispatch system events to the 
- * responsible windows and organize the communication with the 
- * system. Every window must have an uicontext, thus they will 
- * register themselves with a matching uicontext.
-*/
-class GOTT_EXPORT uicontext_base {
-  protected:
-    gott::ui::key_state keys_;
-    gott::ui::mouse_state mouse_;
-
-  public:
-
-    /**
-     * \name window registration
-     */
-    //\{
-    /**
-     * \brief registers a window in the event dispatching system of the context.
-     * Should be called by every window_base implementation right after 
-     * successful construction.
-     */
-    virtual void register_window( window_base * ref ) = 0;
-    /**
-     * \brief removes a window from the event dispatching system of the context.
-     * Should be called by every window_base implementation right before 
-     * destruction. After that all incoming events to this window shall be 
-     * droped.
-     */
-    virtual void remove_window( window_base *ref ) = 0;
-    //\}
-
-
-    /**
-     * \brief terminate the context.
-     * A call to this method ends this user interface session, and might also 
-     * quit the current application if no other control loop is running. 
-     */
-    virtual void quit() = 0;
-
-
-    gott::ui::key_state const& get_key_state() const;
-    gott::ui::mouse_state const& get_mouse_state() const;
-    virtual ~uicontext_base() = 0;
+ * \brief Small coordinate structure.
+ */
+struct coord
+{
+  coord() : x(0), y(0) {}
+  coord( int x_, int y_ ) : x(x_), y(y_){}
+  int x, y;
+  inline coord& operator +=(coord const& r)  { x+=r.x;y+=r.y; return *this; }
 };
-}}
+
+inline coord operator +(coord const& l, coord const& r)  { 
+  coord t(l); 
+  t += r; 
+  return t; 
+}
+
+/** 
+ * \brief Small rectangle structure
+ */
+struct rect 
+{
+  long left, top; 
+  size_t width, height;
+  rect( long l, long t, size_t w, size_t h) 
+  : left(l), top(t), width(w), height(h) {}
+
+  rect() 
+  : left(0), top(0), width(1), height(1) {}
+
+  /**
+   * \returns true if coordinate is inside the rectangle.
+   */
+  inline bool is_inside( coord const& c ) const{
+    return c.x >= left && c.x <= left + long(width)  
+      &&  c.y >= top && c.y <= top + long(height);
+  }
+
+  /**
+   * \brief Turns *this into a rectangle containing *this and other
+   */
+  GOTT_EXPORT void add_region( rect const& other );
+
+  /**
+   * \brief Turns *this into a rectangle containing parts of *this that are not in other
+   */
+  GOTT_EXPORT void subtract_region( rect const& other );
+
+
+  /**
+   * \see add_region
+   */
+  inline rect &operator+=(rect const &other) {
+    add_region(other);
+    return *this;
+  }
+};
+
+inline rect operator+(rect r1, rect const &r2) { return r1 += r2; }
+inline bool operator== ( rect const& l, rect const& r) { return l.left==r.left && l.top == r.top && l.width==r.width && l.height == r.height;} 
+inline bool operator!= ( rect const& l, rect const& r) { return !(l==r);}
+
+}
 
 #endif
 

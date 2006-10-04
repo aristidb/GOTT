@@ -47,7 +47,7 @@
 #include <gott/ui/x11/uicontext.hpp>
 #include <gott/properties/concrete_property.hpp>
 #include <gott/properties/external_storage.hpp>
-#include <gott/properties/sigc_notification.hpp>
+#include <gott/properties/signal_notification.hpp>
 
 namespace gott{namespace ui{namespace x11{
 namespace detail { struct agg_buffer; }
@@ -59,13 +59,11 @@ namespace detail { struct agg_buffer; }
 class GOTT_EXPORT window : public gott::ui::window_base {
   private:
     friend class uicontext;
-    gott::properties::concrete_property<rect,gott::properties::sigc_notification,gott::properties::external_storage<rect> > region_;
-    gott::properties::concrete_property<gott::string,gott::properties::sigc_notification,gott::properties::external_storage<gott::string> > title_;
-    gott::properties::concrete_property<bool,gott::properties::sigc_notification,gott::properties::external_storage<bool> > visibility_;
-    gott::properties::concrete_property<flags_type,gott::properties::sigc_notification,gott::properties::external_storage<flags_type> > flags_;
+    gott::properties::concrete_property<rect,gott::properties::signal_notification,gott::properties::external_storage<rect> > region_;
+    gott::properties::concrete_property<gott::string,gott::properties::signal_notification,gott::properties::external_storage<gott::string> > title_;
+    gott::properties::concrete_property<bool,gott::properties::signal_notification,gott::properties::external_storage<bool> > visibility_;
+    gott::properties::concrete_property<flags_type,gott::properties::signal_notification,gott::properties::external_storage<flags_type> > flags_;
     Window handle;
-
-    gott::ui::x11::detail::agg_buffer* impl;
 
     rect last_region, invalid_area;
     bool mapped_state;
@@ -126,12 +124,6 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     void invalidate_area( rect const& region );
 
 
-
-    void blit_buffer( coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format );
-    void blit_rect( rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format  );
-
-    agg::rendering_buffer const& screen_buffer() const;
-    agg::rendering_buffer & screen_buffer();
 
 
     /**

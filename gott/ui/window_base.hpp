@@ -40,14 +40,12 @@
 
 #include <bitset>
 #include <gott/visibility.hpp>
-#include <sigc++/signal.h>
 #include <gott/properties/property.hpp>
 #include <gott/string/string.hpp>
 #include <gott/graphics/geometry.hpp>
 #include <gott/ui/input.hpp>
 
 // rendering system!
-#include <agg_rendering_buffer.h>
 
 namespace gott{namespace ui{
 class uicontext_base;
@@ -128,15 +126,15 @@ struct GOTT_LOCAL pixel_format {
 class GOTT_EXPORT window_base {
   private:
     uicontext_base *context; 
-    sigc::signal2<void, agg::rendering_buffer&, rect const&> draw_;
-    sigc::signal1<void, rect const&> configure_
+    //boost::signal2<void, agg::rendering_buffer&, rect const&> draw_;
+    boost::signal1<void, rect const&> configure_
       , resize_
       , move_;
-    sigc::signal0<void> focus_enter_
+    boost::signal0<void> focus_enter_
        , focus_leave_
        , close_;
-    sigc::signal1<void,mouse_event const& > mouse_;
-    sigc::signal1<void,gott::ui::key_event const& > key_;
+    boost::signal1<void,mouse_event const& > mouse_;
+    boost::signal1<void,gott::ui::key_event const& > key_;
 
   public:
 
@@ -150,24 +148,24 @@ class GOTT_EXPORT window_base {
      * A correct slot only makes changes in the rectangular region defined by the 
      * second parameter.
      */
-    sigc::signal2<void, agg::rendering_buffer&, rect const&>& on_draw();
+    //boost::signal2<void, agg::rendering_buffer&, rect const&>& on_draw();
     /// Both resize and move events will be handled by this signal
-    sigc::signal1<void, rect const&>& on_configure();
+    boost::signal1<void, rect const&>& on_configure();
     /**
      * Only those events that do change the size of the window will 
      * emit this signal.
      */
-    sigc::signal1<void, rect const&>& on_resize();
+    boost::signal1<void, rect const&>& on_resize();
     /**
      * Only move events will emit this signal.
      */
-    sigc::signal1<void, rect const&>& on_move();
-    sigc::signal0<void>& on_focus_enter();
+    boost::signal1<void, rect const&>& on_move();
+    boost::signal0<void>& on_focus_enter();
     /// This event is emitted right before the window gets closed
-    sigc::signal0<void>& on_close();
-    sigc::signal0<void>& on_focus_leave();
-    sigc::signal1<void,mouse_event const & > & on_mouse();
-    sigc::signal1<void,key_event const&>& on_key();
+    boost::signal0<void>& on_close();
+    boost::signal0<void>& on_focus_leave();
+    boost::signal1<void,mouse_event const & > & on_mouse();
+    boost::signal1<void,key_event const&>& on_key();
     //\}
 
     typedef std::bitset<14> flags_type;
@@ -298,18 +296,18 @@ class GOTT_EXPORT window_base {
     /**
      * \brief copy the contents of the buffer onto screen 
      */
-    virtual void blit_buffer( coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32 ) = 0;
+    //virtual void blit_buffer( coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32 ) = 0;
 
     /**
      * \brief copy the contents described by source, from buffer to screen.
      */
-    virtual void blit_rect( rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32 ) = 0;
+    //virtual void blit_rect( rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32 ) = 0;
 
     /**
      * \brief returns the screen buffer
      */
-    virtual agg::rendering_buffer const& screen_buffer() const = 0;
-    virtual agg::rendering_buffer & screen_buffer() = 0;
+    /*virtual agg::rendering_buffer const& screen_buffer() const = 0;
+    virtual agg::rendering_buffer & screen_buffer() = 0;*/
     //\}
 
 

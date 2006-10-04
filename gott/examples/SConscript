@@ -40,3 +40,8 @@ Import('env')
 env.Program('producer_consumer1', 'producer_consumer1.cpp')
 env.Program('throttled_yes', 'throttled_yes.cpp')
 env.Program('pongbar_loop', 'pongbar_loop.cpp')
+
+x11examples = env.Copy()
+x11examples.Append( LIBS=['base_ui', 'x11_ui'])
+x11examples.Append( LIBPATH=['ui'])
+x11examples.Program('just_windows', 'just_windows.cpp' )

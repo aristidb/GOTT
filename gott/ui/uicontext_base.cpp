@@ -38,7 +38,7 @@
 #include <gott/ui/uicontext_base.hpp>
 
 
-namespace gott{namespace ui{namespace x11{
+namespace gott{namespace ui{
 
 gott::ui::key_state const& uicontext_base::get_key_state() const{
   return keys_;
@@ -50,5 +50,5 @@ gott::ui::mouse_state const& uicontext_base::get_mouse_state() const{
 
 uicontext_base::~uicontext_base(){}
 
-}}}
+}}
 

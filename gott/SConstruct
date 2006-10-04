@@ -130,7 +130,7 @@ dirs = [
 'graphics',
 'notify_fs',
 'properties',
-#'ui',
+'ui',
 'examples',
 'tests',
 ]

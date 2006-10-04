@@ -45,7 +45,6 @@
 #include <boost/lambda/bind.hpp> 
 #include <boost/lambda/construct.hpp> 
 #include <gott/ui/x11/window.hpp> 
-#include <gott/ui/x11/agg_detail.hpp> 
 
 namespace gott{namespace ui{namespace x11{
 namespace {
@@ -78,7 +77,6 @@ window::window( uicontext& app, rect const& position, string const& title, std::
         , bind(&window::set_window_type, this,_1) )
       ) 
   , handle(0)
-  , impl(0)
   , invalid_area(0,0,0,0)
   , mapped_state(false)
   , win_flags(0)
@@ -88,7 +86,7 @@ window::window( uicontext& app, rect const& position, string const& title, std::
   ::Window root_window = RootWindow( context->get_display(), context->get_screen() );
   context->register_window( this );
 
-  std::pair<Visual *, int> vis_info = detail::pick_visual( context->get_display(), context->get_screen() );
+  std::pair<Visual *, int> vis_info = std::pair<Visual*,int>(0,0);//detail::pick_visual( context->get_display(), context->get_screen() );
   {
     XSetWindowAttributes	attributes;
     unsigned int attributes_mask =  CWBorderPixel | CWColormap | CWEventMask ;
@@ -145,8 +143,6 @@ window::window( uicontext& app, rect const& position, string const& title, std::
   ///////////////
 
   // not exception safe!
-  impl = new detail::agg_buffer( context->get_display(), context->get_screen(), handle, vis_info.first, vis_info.second );
-  impl->resize_buffer( position );
 
   flags_.set( flags );
 
@@ -211,7 +207,7 @@ rect window::get_region() const{
  */
 void window::handle_sys_resize( rect const& region ){
   if( region != last_region ) {
-    impl->resize_buffer( region );
+    // resize 
     if( region.width != last_region.width || region.height != last_region.height )
       invalidate_area(rect ( 0,0, region.width, region.height ) );
     last_region = region;
@@ -383,19 +379,7 @@ void window::set_size_hints(){
 }
 
 void window::update_region( rect const& region ){
-  if( needs_update() ) {
-    invalid_area.subtract_region( region );
-    on_draw().emit( screen_buffer(), region );
-  }
-  if( region.left == 0 
-      && region.top == 0  
-      && region.width == impl->buffer.width()
-      && region.height == impl->buffer.height() ) {
-    impl->update_window();
-  }
-  else {
-    impl->update_rect( region );
-  }
+  
 }
 
 uicontext* window::get_uicontext(){
@@ -412,22 +396,6 @@ void window::invalidate_area( rect const& region ){
   invalid_area.add_region(region);
 }
 
-
-void window::blit_buffer( coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format ) {
-  impl->blit_buffer(destination,buffer,buf_format);
-}
-void window::blit_rect( rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format  ) {
-  impl->blit_rect(source, destination, buffer, buf_format );
-}
-
-agg::rendering_buffer const& window::screen_buffer() const{
-  return impl->buffer;
-}
-
-agg::rendering_buffer & window::screen_buffer(){
-  return impl->buffer;
-}
-
 Window window::get_handle() const{
   return handle;
 }
@@ -438,7 +406,6 @@ void window::change_property( Atom property, Atom type, int format, unsigned cha
 
 window::~window()
 {
-  delete impl;
 }
 
 

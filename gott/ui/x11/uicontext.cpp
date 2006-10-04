@@ -39,23 +39,42 @@
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
+#include <boost/bind.hpp>
 #include <gott/ui/x11/uicontext.hpp>
 #include <gott/ui/x11/input.hpp>
 #include <gott/graphics/geometry.hpp>
 #include <gott/ui/x11/window.hpp>
+#include <gott/events/fd_manager.hpp>
+
 
 namespace gott{namespace ui{namespace x11{
 
-uicontext::uicontext( const char * connection ) 
-  : display_( XOpenDisplay(connection) ) {
- if(display_ == 0) 
-   throw std::runtime_error("Could not open the x11 connection");
+uicontext::uicontext( events::main_loop & loop,  const char * connection ) 
+  : loop_(loop), display_( XOpenDisplay(connection) ) 
+{
+  if(display_ == 0) 
+    throw system_error("Could not open the x11 connection");
 
- screen_ = DefaultScreen( display_ );
+  screen_ = DefaultScreen( display_ );
 
- protocols_atom_ = XInternAtom( display_, "WM_PROTOCOLS", false );
- if( protocols_atom_ == None )
-   throw std::runtime_error("Could not create atoms");
+  protocols_atom_ = XInternAtom( display_, "WM_PROTOCOLS", false );
+  if( protocols_atom_ == None )
+    throw system_error("Could not create atoms");
+
+  try { 
+    loop.feature<events::fd_manager>().add_fd( 
+        ConnectionNumber( display_)
+        , events::fd_manager::read
+        , boost::bind( &uicontext::process_read, this ) 
+        );
+  }
+  catch(std::exception &e ) {
+    XCloseDisplay(display_);
+    throw e;
+  }catch(...) {
+    XCloseDisplay(display_);
+    throw system_error("Unknown exception caught");
+  }
 
 }
 
@@ -122,21 +141,21 @@ void uicontext::process_event( window* win, XEvent& e ) {
       {
         mouse_.set_primary_position( coord( e.xmotion.x, e.xmotion.y ) );
         mouse_event ev( coord(e.xmotion.x, e.xmotion.y), coord(0,0) );
-        win->on_mouse().emit( ev );
+        win->on_mouse()( ev );
         break;
       }
     case ButtonPress:
       {
         mouse_.set_button( e.xbutton.button, true );
         mouse_event ev( mouse_event::Press, e.xbutton.button, mouse_.get_primary_position(), mouse_.get_secondary_position());
-        win->on_mouse().emit( ev );
+        win->on_mouse()( ev );
         break;
       }
     case ButtonRelease:
       {
         mouse_.set_button( e.xbutton.button, false );
         mouse_event ev( mouse_event::Release, e.xbutton.button, mouse_.get_primary_position(), mouse_.get_secondary_position() );
-        win->on_mouse().emit( ev );
+        win->on_mouse()( ev );
         break;
       }
     case MapNotify: 
@@ -155,7 +174,7 @@ void uicontext::process_event( window* win, XEvent& e ) {
 
         keys_.set(c);
         if ( win && win->flags().get()[window_flags::KeyEvents] )
-          win->on_key().emit( key_event( c, key_event::Press ) );
+          win->on_key()( key_event( c, key_event::Press ) );
         break;
       }
 
@@ -166,7 +185,7 @@ void uicontext::process_event( window* win, XEvent& e ) {
 
         keys_.unset(c);
         if ( win && win->flags().get()[window_flags::KeyEvents] )
-          win->on_key().emit( key_event( c, key_event::Press ) );
+          win->on_key()( key_event( c, key_event::Press ) );
         break;
       }
     case ConfigureNotify:
@@ -176,22 +195,22 @@ void uicontext::process_event( window* win, XEvent& e ) {
               , e.xconfigure.y
               , e.xconfigure.width 
               , e.xconfigure.height );
-       
+
         bool move = old.left != current.left && old.top != current.top;
         bool resize = old.width != current.width && old.height != current.height;
         win->handle_sys_resize( current );
 
         if( move || resize )
-          win->on_configure().emit( current );
+          win->on_configure()( current );
         if( move )
-          win->on_move().emit( current );
+          win->on_move()( current );
         if( resize )
-          win->on_resize().emit( current );
+          win->on_resize()( current );
 
         if( win->needs_update() ) {
           rect inv(0,0,0,0);
           std::swap( inv, win->invalid_area );
-          win->on_draw().emit( win->screen_buffer(), inv );
+          //win->on_draw()( win->screen_buffer(), inv );
         }
         break;
       }
@@ -257,7 +276,7 @@ void uicontext::process_read(){
     if( win->needs_update() ) {
       rect inv(0,0,0,0);
       std::swap( inv, win->invalid_area );
-      win->on_draw().emit( win->screen_buffer(), inv );
+      //win->on_draw().emit( win->screen_buffer(), inv );
       win->update_region( inv );
       XSync( display_, 0 );
     }
@@ -269,6 +288,7 @@ void uicontext::process_exception(){
 }
 
 uicontext::~uicontext() {
+  XCloseDisplay(display_);
 }
 
 }}}

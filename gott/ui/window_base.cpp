@@ -42,47 +42,43 @@ namespace gott{namespace ui{
 window_base::~window_base()
 {}
 
-sigc::signal2<void, agg::rendering_buffer&, rect const&> & window_base::on_draw()
-{
-  return draw_;
-}
 
-sigc::signal1<void, rect const&> & window_base::on_configure()
+boost::signal1<void, rect const&> & window_base::on_configure()
 {
   return configure_;
 }
 
-sigc::signal1<void, rect const&> & window_base::on_resize()
+boost::signal1<void, rect const&> & window_base::on_resize()
 {
   return resize_;
 }
 
-sigc::signal1<void, rect const&> & window_base::on_move()
+boost::signal1<void, rect const&> & window_base::on_move()
 {
   return move_;
 }
 
-sigc::signal0<void> & window_base::on_focus_enter()
+boost::signal0<void> & window_base::on_focus_enter()
 {
   return focus_enter_;
 }
 
-sigc::signal0<void> & window_base::on_close()
+boost::signal0<void> & window_base::on_close()
 {
   return close_;
 }
 
-sigc::signal0<void> & window_base::on_focus_leave()
+boost::signal0<void> & window_base::on_focus_leave()
 {
   return focus_leave_;
 }
 
-sigc::signal1<void,mouse_event const&> & window_base::on_mouse()
+boost::signal1<void,mouse_event const&> & window_base::on_mouse()
 {
   return mouse_;
 }
 
-sigc::signal1<void,key_event const&> & window_base::on_key()
+boost::signal1<void,key_event const&> & window_base::on_key()
 {
   return key_;
 }
