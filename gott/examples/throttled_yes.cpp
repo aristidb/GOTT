@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 #include <gott/plugin.hpp>
 #include <gott/events/main_loop.hpp>
 #include <gott/events/timer_manager.hpp>

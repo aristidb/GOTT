@@ -1,5 +1,11 @@
 deduced-feature gott::events::quit_manager
 - gott::events::signal_manager, gott::events::inprocess_message_manager
 
+deduced-feature gott::ui::x11
+- gott::events::fd_manager
+
+deduced-feature gott::ui
+- gott::ui::x11
+
 deduced-feature gott::notify_fs::notification_engine
 - gott::events::fd_manager
