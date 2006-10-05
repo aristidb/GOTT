@@ -86,7 +86,7 @@ window::window( uicontext& app, rect const& position, string const& title, std::
   ::Window root_window = RootWindow( context->get_display(), context->get_screen() );
   context->register_window( this );
 
-  std::pair<Visual *, int> vis_info = std::pair<Visual*,int>(0,0);//detail::pick_visual( context->get_display(), context->get_screen() );
+  std::pair<Visual *, int> vis_info = std::pair<Visual*,int>(DefaultVisual(context->get_display(),context->get_screen()),DefaultDepth(context->get_display(), context->get_screen()));//detail::pick_visual( context->get_display(), context->get_screen() );
   {
     XSetWindowAttributes	attributes;
     unsigned int attributes_mask =  CWBorderPixel | CWColormap | CWEventMask ;
