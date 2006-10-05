@@ -239,5 +239,6 @@ for i in boostlibs:
 #conf.BoostDateTimeCanNanosec()
 
 conf.CheckLib('rt')
+conf.CheckLib('X11')
 
 Return('conf')

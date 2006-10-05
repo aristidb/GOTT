@@ -97,13 +97,11 @@ env.SharedLibrary('gott_graphics', libobj_graphics)
 env = env.Copy()
 env.Append(LIBS = ['gott_graphics'])
 
-env.SharedLibrary('base_ui', glob.glob('ui/*.cpp'))
-
-ui_libs = env.Copy()
-ui_libs.Append(LIBS=['base_ui', 'X11'])
-ui_libs.SharedLibrary('x11_ui', glob.glob('ui/x11/*.cpp'))
-
-#
+libobj_ui = env.Glob('ui/*.cpp')
+libobj_ui += env.Glob('ui/x11/*.cpp')
+env.SharedLibrary('gott_ui', libobj_ui)
+env = env.Copy()
+env.Append(LIBS = ['gott_ui'])
 
 Export('env')
 
