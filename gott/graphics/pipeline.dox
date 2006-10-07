@@ -1,0 +1,113 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is A Non-immediate Graphics Library.
+ *
+ * The Initial Developer of the Original Code is
+ * Andreas Pokorny (andreas.pokorny@gmail.com).
+ * Portions created by the Initial Developer are Copyright (C) 2005
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *  Andreas Pokorny (andreas.pokorny@gmail.com)
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+/**
+  \page graphics_pipeline Graphics Drawing System
+
+  First of all, before we start: 
+  I am not yet sure how the widgets provide their "view" parts. One 
+  possiblitty would be to let the window have a complete tree of all 
+  combined "view" parts of 
+  all widgets. Then the widgets degrade to their behavioural aspects
+  refering to their graphical representation using pointers into the 
+  complete tree. 
+
+  Or one has the common tree of widgets, each of them having a "view"
+  part to explore. 
+  
+  "Right now i am in favor of the first variant." (6.10.2006 a.p.)
+  
+  Pipeline is connected to a window using a factory class 
+  which helps setting up the details of the window
+  and provides a pipeline object. 
+  e.g.: Antigrain/X11 requires a visual that matches the pixelformat
+  of the antigrain pipeline and must try to make use of mit-XShm, 
+  while Opengl/X11 needs to find a visual that provides OpenGL hardware
+  acceleration. But OpenGL/FB will not think about visuals at all.  
+
+  So this connection between window and pipeline requires a unique interface
+  for every ui_context type, which will be implemented for every pipeline 
+  implementation.
+
+  \code 
+  class pipeline
+  {
+    public:
+      // pipeline domain, is explained below
+      qid domain_of_pipeline();
+
+      // pipelines should be able to receive all ui related events
+      // so X11 or all? pipelines probably define methods like:
+      void update_display( region const& ); ///< pipeline should update these screen regions, because x11 made them reappear
+      void resize( region const& ); ///< pipeline should redraw mostly everything becaue the window size changed..
+
+      // every pipeline will need to know if widgets changed their
+      // graphical representation
+      void invalidate( graphics::object * );
+      // or maybe
+      void invalidate( qid_or_graphics_object_path * path_to_invalid_object );
+
+
+  };
+  \endcode 
+
+  A graphics::object is a node class, which provides means to iterate on a tree. 
+  The tree is constructed by the theme loader. Our widget types do have a qid that 
+  name the graphical representation of each widget. The theme loader will search 
+  for that qid in different places using the domain information provided by the 
+  pipeline object. That domain define the name of the draw model. We might have 
+  names like:
+   - gott::vector_graphics: antigrain cairo opengl directGraphics
+   - gott::text_mode: curses conio vt100.. 
+   - gott::3d_vector_graphics: variants of the hardware accelerated pipelines that 
+      support 3D eyecandy 
+   - gott::ajax: restrictive variants of gott::vector_graphics piplines, maybe not required
+      as special domain name
+
+  The theme loader now knows which themes can be used at all. Gott will provide a 
+  working set of graphics::object subtrees for every default widget. The other
+  themes found inside the system will override the subtrees of Gott. The application
+  may also provide additional replacement subtrees. Furthermore the applcation
+  or themes might even provide different widget names/qids, which have their
+  own unique graphics representation. Finally the user of has the option to install
+  themes in his home directory. For example she could define color themes which 
+  redefine the default colors of all his gott application, be redefining the qids
+  referencing default colors. 
+
+
+ */

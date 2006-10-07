@@ -1,0 +1,40 @@
+/**
+\page graphics_outline Discussion material concerning the proposed XD Rendermodel
+
+\section intro Introduction
+Designing a rendering system is non trivial. The solution space is multi dimensional.
+Even in gott there are several particularly overlapping sets of requirements, and views
+onto that problem domain. 
+This document first tries to capture some of the higher level requirements. 
+(A more detailed document to display all requirements should be added in the future)
+After that a roadmap towards a flexible rendering model is given. 
+This includes a proposal for 
+
+
+
+\section reqs Unordered and incomplete List of Requirements
+\li draw simple 2d primitives, rounded rects, lines and bitmaps onto screen 
+\li create vector pdf or ps documents from scene description
+\li provide a complete affine transformation system 
+\li clipping
+\li integrate a 3d rendering model/scene description into the render model
+
+
+\section problem What is so problematic?
+We have been discussing this system over and over again, in the recent years. 
+Up to know we only have vague idea on how the system should look like. Especially
+the interface gives us constant headaches, at least the author of this document
+is clueless.
+We have seen cairo, antigrain and arthur. 
+
+Questions like, what render flags are required? 
+
+\section solution Solution to the problem
+
+Do not provide an API, but define a render model. 
+Define the way ui scene information is transfered to the display device. 
+Later we still can think about providing one or several render apis. 
+
+\ref graphics_pipeline
+
+*/
