@@ -188,5 +188,8 @@
   So we need a bidirectional connection between graphics::object and the behavior
   of the widget. 
 
+  \note Not every graphics::object has a widget. Only some nodes in the tree have 
+  that kind of behavior part. ("I need a name for that behavior thing :)" )
+
 
  */
