@@ -202,9 +202,10 @@
 
   \subsection Requirements:
    - RQ1 - tree path support: It must be easy to find a child object using a path datastructure
-   - RQ2 - reference to a widget behavior: 
-   - RQ3 - grant access to child objects:
-   - RQ4 - Naming support: 
+   - RQ2 - optional reference to a widget behavior: controls the subnodes relevant for the concept of the widget
+   - RQ3 - optional reference to a theme behavior: controls special subnodes defined by the theme.. 
+   - RQ4 - grant access to child objects:
+   - RQ5 - Naming support: 
       This one is a bit more complex. So lets approach this requirement from a different point
       of view. A Label widget has a text property that holds the current text, this property
       should be a text graphics::object stored inside the graphics::object subtree. To refer 
