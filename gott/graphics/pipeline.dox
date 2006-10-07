@@ -39,6 +39,9 @@
 /**
   \page graphics_pipeline Graphics Drawing System
 
+
+  \section graphics_pipeline_comment Comment
+
   First of all, before we start: 
   I am not yet sure how the widgets provide their "view" parts. One 
   possiblitty would be to let the window have a complete tree of all 
@@ -51,7 +54,35 @@
   part to explore. 
   
   "Right now i am in favor of the first variant." (6.10.2006 a.p.)
-  
+ 
+  \section graphics_pipeline_intro Intro
+
+  This document describes the set of pipeline classes, which are responsible
+  to display the different widgets and windows on screen. Widgets never draw
+  themselves by using some kind of API, neother do the graphics::object 
+  draw themselves. The pipeline could be implemented as:
+  \code
+  void mystupidpipeline::update_display( region const& ) 
+  {
+    for_each( 
+      graphics_objects.tree_df_begin()
+      , graphics_objects.tree_df_end()
+      , bind(&mystupidpipeline::draw_object,this) 
+      ); 
+  }
+  void mystupidpipeline::draw_object( graphics::object & object )
+  {
+    // .. dispatch type of object and draw or skip object
+  }
+  \endcode
+
+  Better pipelines are able to look at subtrees as a whole and cache drawing results
+  and may do whatever makes drawing faster. For example Antigrain/* piplenes might 
+  have several instantiated rasterizers with different span generators and path 
+  transformators, and thus will be able to pick one depending on the path of graphics::objects
+  traversed. 
+
+  \section graphics_pipeline_embedding Embedding the pipeline into the System
   Pipeline is connected to a window using a factory class 
   which helps setting up the details of the window
   and provides a pipeline object. 
@@ -60,9 +91,9 @@
   while Opengl/X11 needs to find a visual that provides OpenGL hardware
   acceleration. But OpenGL/FB will not think about visuals at all.  
 
-  So this connection between window and pipeline requires a unique interface
-  for every ui_context type, which will be implemented for every pipeline 
-  implementation.
+  So this factory class, which defines a connection between window and 
+  pipeline requires a unique interface for every ui_context type, which 
+  will be implemented for every pipeline implementation.
 
   \code 
   class pipeline
@@ -86,6 +117,8 @@
   };
   \endcode 
 
+  \section graphics_themes_outline Themes and graphics::object
+
   A graphics::object is a node class, which provides means to iterate on a tree. 
   The tree is constructed by the theme loader. Our widget types do have a qid that 
   name the graphical representation of each widget. The theme loader will search 
@@ -108,6 +141,10 @@
   themes in his home directory. For example she could define color themes which 
   redefine the default colors of all his gott application, be redefining the qids
   referencing default colors. 
+
+  \section graphics_objects_discussion Discussion about graphics objects tree 
+  We now have to define the layout of our graphics object tree. There are several 
+  possiblities for each of the rander model domains. Suggestions are welcome. 
 
 
  */
