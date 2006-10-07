@@ -42,71 +42,33 @@
 
   \section graphics_pipeline_comment Comment
 
-  First of all, before we start: 
-  I am not yet sure how the widgets provide their "view" parts. One 
-  possiblitty would be to let the window have a complete tree of all 
-  combined "view" parts of 
-  all widgets. Then the widgets degrade to their behavioural aspects
-  refering to their graphical representation using pointers into the 
-  complete tree. 
+  1. First of all, before we start: 
+    I am not yet sure how the widgets provide their "view" parts. One 
+    possibility would be to let the window have a complete tree of all 
+    combined "view" parts, so called graphics::objects, of 
+    all widgets. Then the widgets degrade to their behavior aspects while
+    refering to their graphical representation using pointers into the 
+    complete tree. 
 
-  Or one has the common tree of widgets, each of them having a "view"
-  part to explore. 
+    Or one has the common tree of widgets, each of them having a "view"
+    part to explore.
   
-  "Right now i am in favor of the first variant." (6.10.2006 a.p.)
+    "Right now i am in favor of the first variant." (6.10.2006 a.p.)
+
+  2. Rename Pipeline: This might be misleading, maybe call it "drawer" or "renderer"
+
  
   \section graphics_pipeline_intro Intro
 
-  This document describes the set of pipeline classes, which are responsible
+  This document describes the concept of the pipeline class, which is responsible
   to display the different widgets and windows on screen. Widgets never draw
   themselves by using some kind of API, neither do the graphics::object 
-  draw themselves. The pipeline could be implemented as:
-  \code
-  void mystupidpipeline::update_display( region const& ) 
-  {
-    for_each( 
-      graphics_objects.tree_df_begin()
-      , graphics_objects.tree_df_end()
-      , bind(&mystupidpipeline::draw_object,this) 
-      ); 
-  }
-  void mystupidpipeline::draw_object( graphics::object & object )
-  {
-    // .. dispatch type of object and draw or skip object
-  }
-  \endcode
+  draw themselves. 
 
-  Better pipelines are able to look at subtrees as a whole and cache drawing results
-  and may do whatever makes drawing faster. For example Antigrain/* pipelines might 
-  have several instantiated rasterizers with different span generators and path 
-  transformators, and thus will be able to pick one depending on the path of graphics::objects
-  traversed. 
- 
-  We do not define the inner workings of a pipeline, the inner workings of a pipeline
-  is defined by the render method used. So OpenGL defines the GL pipeline,
-  Antigrain define the Antigrain pipeline. These two pipeliens will have completely diverging
-  implementations, since Antigrain thinks in paths and scanlines while GL thinks in 
-  triangles, shaders, textures and buffers. ("I also belive that we will have different
-  GL pipelines, depending on the extensions supported. E.g. one with GL-1.5 features and 
-  one with GL-2.1 features.. ")
-
-  The results of the pipelines should just match as far as possible.
-
-  \section graphics_pipeline_embedding Embedding the pipeline into the System
-  Pipeline is connected to a window using a factory class 
-  which helps setting up the details of the window
-  and provides a pipeline object. 
-  e.g.: Antigrain/X11 requires a visual that matches the pixelformat
-  of the antigrain pipeline and must try to make use of mit-XShm, 
-  while Opengl/X11 needs to find a visual that provides OpenGL hardware
-  acceleration. But OpenGL/FB will not think about visuals at all.  
-
-  So this factory class, which defines a connection between window and 
-  pipeline requires a unique interface for every ui_context type, which 
-  will be implemented for every pipeline implementation.
+  This is the current planing state of the the pipeline:
 
   \code 
-  class pipeline
+  concept pipeline
   {
     public:
       // pipeline domain, is explained below
@@ -122,47 +84,136 @@
       void invalidate( graphics::object * );
       // or maybe
       void invalidate( qid_or_graphics_object_path * path_to_invalid_object );
-
-
   };
   \endcode 
 
-  \note Maybe we should make the pipeline a kind of "owner" or controller of the 
+  That domain defines the name of the draw model. We might have 
+  names like:
+   - qid"gott::vector_graphics": antigrain cairo opengl directGraphics
+   - qid"gott::text_mode": curses conio vt100.. 
+   - qid"gott::3d_vector_graphics": variants of the vector_graphics pipelines with hardware 
+      acceleration that support 3D eyecandy, that implies that 3D information is stored 
+      in graphics::object, but the display still happens on a 2D or pesudo 3D screen. 
+   - qid"gott::ajax": restrictive variants of gott::vector_graphics piplines, maybe not required
+      as special domain name
+   - qid"gott::exploreable_3d_graphics": somtime around 2010 we will implement that beast :), as 
+      soon as better input devices exist
+
+
+  Drawing might happen inside update_display, or might be triggered by a different event,
+  this all depends on the environment the pipeline was written for. 
+
+  The update_display of a pipeline could be implemented as:
+  \code
+  void mystupidpipeline::update_display( region const& ) 
+  {
+    for_each( 
+      graphics_objects.tree_df_begin()
+      , graphics_objects.tree_df_end()
+      , bind(&mystupidpipeline::draw_object,this) 
+      ); 
+  }
+  void mystupidpipeline::draw_object( graphics::object & object )
+  {
+    // .. dispatch type of object and draw or skip object
+  }
+  \endcode
+
+  Better pipelines should look at subtrees as a whole and cache drawing results
+  and should do whatever makes drawing faster. For example an Antigrain/* pipeline might 
+  have several instantiated rasterizers with different span generators and path 
+  transformators, would pick one depending on the path of graphics::objects
+  traversed. 
+ 
+  We do not define the inner operation of a pipeline, the inner operation of a pipeline
+  is defined by the render method used. So OpenGL defines the GL pipeline,
+  Antigrain define the Antigrain pipeline. These two pipeliens will have completely diverging
+  implementations, since Antigrain thinks in paths and scanlines while GL thinks in 
+  triangles, shaders, textures and buffers. ("I also belive that we will have different
+  GL pipelines, depending on the extensions supported, luckily we have to the power to decide 
+  during runtime which pipeline fits best")
+
+  The results of the pipelines provide  should just match as far as possible.
+
+  \section graphics_pipeline_embedding Embedding the pipeline into the System
+  Pipeline is connected to a window using a factory class 
+  which helps setting up the details of the window
+  and provides a pipeline object. 
+
+  Example Use cases:
+   - Antigrain/X11 requires a visual that matches the pixelformat
+     of the antigrain pipeline and must try to make use of mit-XShm, 
+   - Opengl/X11 needs to find a visual that provides OpenGL hardware
+     acceleration and the Window to construct an opengl context.
+   - OpenGL/FB might not have any requirements at all.  
+
+  So this factory class, which defines a connection between window and 
+  pipeline requires a unique interface for every ui_context type, which 
+  will be implemented for every pipeline implementation.
+
+  Eg. for X11 pipelines
+  \code
+  concept X11Pipeline : pipeline
+  { 
+    concept X11PipelineFactory  
+    {
+    public: 
+      XVisual get_visual( Window x11WindowHandle, Display * displayHandle, int screen );
+
+      pipeline* construct_pipeline( Window x11WindowHandle, Display * displayHandle );
+    };
+  };
+  \endcode
+
+    \note Maybe we should make the pipeline a kind of "owner" or controller of the 
   graphics::objects. That way we could allow the pipelines to attach information
   to the graphics::object tree, e.g. for caches or precalculations, like triangulation.
 
 
-  \section graphics_themes_outline Themes and graphics::object
+  \section graphics_themes_outline Themes 
 
-  A graphics::object is a node class, which provides means to iterate on a tree. 
-  The tree is constructed by the theme loader. Our widget types do have a qid that 
-  name the graphical representation of each widget. The theme loader will search 
-  for that qid in different places using the domain information provided by the 
-  pipeline object. That domain define the name of the draw model. We might have 
-  names like:
-   - gott::vector_graphics: antigrain cairo opengl directGraphics
-   - gott::text_mode: curses conio vt100.. 
-   - gott::3d_vector_graphics: variants of the vector_graphics pipelines with hardware 
-      acceleration that support 3D eyecandy, that implies that 3D information is stored 
-      in graphics::object, but the display still happens on a 2D or pesudo 3D screen. 
-   - gott::ajax: restrictive variants of gott::vector_graphics piplines, maybe not required
-      as special domain name
-   - gott::exploreable_3d_graphis: somtime around 2010 we will implement that beast :), as 
-      soon as better input devices exist
+  For every supported widget type, themes define a declarative 
+  and/or an active part. The first part
+  defines the static view of the widgets, and is assembled using the previously 
+  mentioned graphics::object. While the active or dynamic aspect of a theme must be 
+  able to modify the graphics::objects it defined and react on events, similar
+  to the behavior aspect of widgets. 
 
-  The theme loader now knows which themes can be used at all. Gott will provide a 
-  working set of graphics::object subtrees for every default widget. The other
-  themes found inside the system will override the subtrees of Gott. The application
+  Every widget type has a qid that names the graphical representation of the widget. 
+  The theme loader will search for that qid in different places using the domain 
+  information provided by the pipeline object. It will only search in theme files
+  which are defined for that domain.
+
+  Gott will provide a working set of graphics::object subtrees, and simple dynamic theme behaviors
+  for every default widget. The other
+  themes found inside the system will override the subtrees and theme behaviors of Gott. 
+  The application
   may also provide additional replacement subtrees. Furthermore the applcation
   or themes might even provide different widget names/qids, which have their
-  own unique graphics representation. Finally the user of gott has the option to install
+  own unique graphic representation. Finally the user of gott has the option to install
   themes in his home directory. For example she could define color themes which 
-  redefine the default colors of all his gott application, be redefining the qids
+  redefine the default colors of all her gott application, be redefining the qids
   referencing default colors. 
+
 
   \section graphics_objects_discussion Discussion about graphics objects tree 
   We now have to define the layout of our graphics object tree. There are several 
   possiblities for each of the render model domains. Suggestions are welcome. 
+
+  \subsection Requirements:
+   - RQ1 - tree path support: It must be easy to find a child object using a path datastructure
+   - RQ2 - reference to a widget behavior: 
+   - RQ3 - grant access to child objects:
+   - RQ4 - Naming support: 
+      This one is a bit more complex. So lets approach this requirement from a different point
+      of view. A Label widget has a text property that holds the current text, this property
+      should be a text graphics::object stored inside the graphics::object subtree. To refer 
+      to the graphics::object a name unique inside the subtree is required. 
+      The themes which also change the dynamic aspects of widgets will require that 
+      feature too. For example if a theme wants to have a blinking rectangle everytime the 
+      mouse crosses a button, the dynamic aspect of the themed widget must be able to refer
+      to the rectangle defined inside the graphics::objects of the button. 
+ 
 
   \subsection graphics_objects_discussion_vector First two cents
 
@@ -190,6 +241,8 @@
 
   \note Not every graphics::object has a widget. Only some nodes in the tree have 
   that kind of behavior part. ("I need a name for that behavior thing :)" )
+
+
 
 
  */
