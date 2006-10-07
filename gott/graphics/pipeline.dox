@@ -81,6 +81,16 @@
   have several instantiated rasterizers with different span generators and path 
   transformators, and thus will be able to pick one depending on the path of graphics::objects
   traversed. 
+ 
+  We do not define the inner workings of a pipeline, the inner workings of a pipeline
+  is defined by the render method used. So OpenGL defines the GL pipeline,
+  Antigrain define the Antigrain pipeline. These two pipeliens will have completely diverging
+  implementations, since Antigrain thinks in paths and scanlines while GL thinks in 
+  triangles, shaders, textures and buffers. ("I also belive that we will have different
+  GL pipelines, depending on the extensions supported. E.g. one with GL-1.5 features and 
+  one with GL-2.1 features.. ")
+
+  The results of the pipelines should just match as far as possible.
 
   \section graphics_pipeline_embedding Embedding the pipeline into the System
   Pipeline is connected to a window using a factory class 
@@ -117,6 +127,11 @@
   };
   \endcode 
 
+  \note Maybe we should make the pipeline a kind of "owner" or controller of the 
+  graphics::objects. That way we could allow the pipelines to attach information
+  to the graphics::object tree, e.g. for caches or precalculations, like triangulation.
+
+
   \section graphics_themes_outline Themes and graphics::object
 
   A graphics::object is a node class, which provides means to iterate on a tree. 
@@ -129,7 +144,7 @@
    - gott::text_mode: curses conio vt100.. 
    - gott::3d_vector_graphics: variants of the vector_graphics pipelines with hardware 
       acceleration that support 3D eyecandy, that implies that 3D information is stored 
-      graphics::object, but the display still happens on a 2D or pesudo 3D screen. 
+      in graphics::object, but the display still happens on a 2D or pesudo 3D screen. 
    - gott::ajax: restrictive variants of gott::vector_graphics piplines, maybe not required
       as special domain name
    - gott::exploreable_3d_graphis: somtime around 2010 we will implement that beast :), as 
@@ -140,14 +155,38 @@
   themes found inside the system will override the subtrees of Gott. The application
   may also provide additional replacement subtrees. Furthermore the applcation
   or themes might even provide different widget names/qids, which have their
-  own unique graphics representation. Finally the user of has the option to install
+  own unique graphics representation. Finally the user of gott has the option to install
   themes in his home directory. For example she could define color themes which 
   redefine the default colors of all his gott application, be redefining the qids
   referencing default colors. 
 
   \section graphics_objects_discussion Discussion about graphics objects tree 
   We now have to define the layout of our graphics object tree. There are several 
-  possiblities for each of the rander model domains. Suggestions are welcome. 
+  possiblities for each of the render model domains. Suggestions are welcome. 
+
+  \subsection graphics_objects_discussion_vector First two cents
+
+  \code
+  class object
+  {
+    boost::ptr_vector<object> childs;
+    typedef std::vector<int> path; // path using indices .. hmm
+    Xany pipeline_data;
+  };
+  \endcode
+
+  \subsection graphics_objects_discussion_ur_turn Your turn!
+
+
+  \section event_forwarding Events forwarded to widgets
+
+  The pipeline must know the position of each leaf graphic::object on screen. 
+  To be able to forward events to the behavior part of the widget. These things
+  have to be evaluated inside the pipeline, because each pipeline API has 
+  different means to fulfill that requirement.
+
+  So we need a bidirectional connection between graphics::object and the behavior
+  of the widget. 
 
 
  */
