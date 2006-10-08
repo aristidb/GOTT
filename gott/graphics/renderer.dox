@@ -55,7 +55,6 @@
   
     "Right now i am in favor of the first variant." (6.10.2006 a.p.)
 
- 
   \section graphics_renderer_intro Intro
 
   This document describes the concept of the renderer class, which is responsible
@@ -87,8 +86,8 @@
 
   That domain defines the name of the draw model. We might have 
   names like:
-   - "gott::vector_graphics": antigrain cairo opengl directGraphics
-   - "gott::text_mode": curses conio vt100.. 
+   - "gott::vector_graphics": antigrain, cairo, opengl, directGraphics
+   - "gott::text_mode": curses, conio, vt100.. 
    - "gott::3d_vector_graphics": variants of the vector_graphics renderers with hardware 
       acceleration that support 3D eyecandy, that implies that 3D information is stored 
       in graphics::object, but the display still happens on a 2D or pesudo 3D screen. 
@@ -97,6 +96,10 @@
    - "gott::exploreable_3d_graphics": sometime around 2010 we will implement that beast :), as 
       soon as better input devices exist
 
+  possibly:
+   - "gott::input": mouse and keyboard input
+   - "gott::audio": sound
+   - "gott::video": synchronised sound and quickly changing graphics
 
   Drawing might happen inside update_display, or might be triggered by a different event,
   this all depends on the environment the renderer was written for. 

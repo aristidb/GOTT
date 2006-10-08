@@ -18,6 +18,7 @@ This includes a proposal for
 \li provide a complete affine transformation system 
 \li clipping
 \li integrate a 3d rendering model/scene description into the render model
+\li display videos
 
 
 \section problem What is so problematic?
