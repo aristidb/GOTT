@@ -37,10 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 
 /**
-  \page graphics_pipeline Graphics Drawing System
+  \page graphics_renderer Graphics Drawing System
 
 
-  \section graphics_pipeline_comment Comment
+  \section graphics_renderer_comment Comment
 
   1. First of all, before we start: 
     I am not yet sure how the widgets provide their "view" parts. One 
@@ -55,31 +55,29 @@
   
     "Right now i am in favor of the first variant." (6.10.2006 a.p.)
 
-  2. Rename Pipeline: This might be misleading, maybe call it "drawer" or "renderer"
-
  
-  \section graphics_pipeline_intro Intro
+  \section graphics_renderer_intro Intro
 
-  This document describes the concept of the pipeline class, which is responsible
+  This document describes the concept of the renderer class, which is responsible
   to display the different widgets and windows on screen. Widgets never draw
   themselves by using some kind of API, neither do the graphics::object 
   draw themselves. 
 
-  This is the current planing state of the the pipeline:
+  This is the current planing state of the the renderer:
 
   \code 
-  concept pipeline
+  concept renderer
   {
     public:
-      // pipeline domain, is explained below
-      qid domain_of_pipeline();
+      // renderer domain, is explained below
+      qid domain_of_renderer();
 
-      // pipelines should be able to receive all ui related events
-      // so X11 or all? pipelines probably define methods like:
-      void update_display( region const& ); ///< pipeline should update these screen regions, because x11 made them reappear
-      void resize( region const& ); ///< pipeline should redraw mostly everything becaue the window size changed..
+      // renderers should be able to receive all ui related events
+      // so X11 or all? renderers probably define methods like:
+      void update_display( region const& ); ///< renderer should update these screen regions, because x11 made them reappear
+      void resize( region const& ); ///< renderer should redraw mostly everything becaue the window size changed..
 
-      // every pipeline will need to know if widgets changed their
+      // every renderer will need to know if widgets changed their
       // graphical representation
       void invalidate( graphics::object * );
       // or maybe
@@ -91,82 +89,82 @@
   names like:
    - "gott::vector_graphics": antigrain cairo opengl directGraphics
    - "gott::text_mode": curses conio vt100.. 
-   - "gott::3d_vector_graphics": variants of the vector_graphics pipelines with hardware 
+   - "gott::3d_vector_graphics": variants of the vector_graphics renderers with hardware 
       acceleration that support 3D eyecandy, that implies that 3D information is stored 
       in graphics::object, but the display still happens on a 2D or pesudo 3D screen. 
-   - "gott::ajax": restrictive variants of gott::vector_graphics piplines, maybe not required
+   - "gott::ajax": restrictive variants of gott::vector_graphics renderers, maybe not required
       as special domain name
    - "gott::exploreable_3d_graphics": sometime around 2010 we will implement that beast :), as 
       soon as better input devices exist
 
 
   Drawing might happen inside update_display, or might be triggered by a different event,
-  this all depends on the environment the pipeline was written for. 
+  this all depends on the environment the renderer was written for. 
 
-  The update_display of a pipeline could be implemented as:
+  The update_display of a renderer could be implemented as:
   \code
-  void mystupidpipeline::update_display( region const& ) 
+  void mystupidrenderer::update_display( region const& ) 
   {
     for_each( 
       graphics_objects.tree_df_begin()
       , graphics_objects.tree_df_end()
-      , bind(&mystupidpipeline::draw_object,this) 
+      , bind(&mystupidrenderer::draw_object,this) 
       ); 
   }
-  void mystupidpipeline::draw_object( graphics::object & object )
+  void mystupidrenderer::draw_object( graphics::object & object )
   {
     // .. dispatch type of object and draw or skip object
   }
   \endcode
 
-  Better pipelines should look at subtrees as a whole and cache drawing results
-  and should do whatever makes drawing faster. For example an Antigrain/* pipeline might 
+  Better renderers should look at subtrees as a whole and cache drawing results
+  and should do whatever makes drawing faster. For example an Antigrain/* renderer might 
   have several instantiated rasterizers with different span generators and path 
   transformators, would pick one depending on the path of graphics::objects
   traversed. 
  
-  We do not define the inner operation of a pipeline, the inner operation of a pipeline
-  is defined by the render method used. So OpenGL defines the GL pipeline,
-  Antigrain define the Antigrain pipeline. These two pipeliens will have completely diverging
+  We do not define the inner operation of a renderer, the inner operation of a renderer
+  is defined by the render method used. So OpenGL defines the GL renderer,
+  Antigrain define the Antigrain renderer. These two renderers will have completely diverging
   implementations, since Antigrain thinks in paths and scanlines while GL thinks in 
   triangles, shaders, textures and buffers. ("I also belive that we will have different
-  GL pipelines, depending on the extensions supported, luckily we have to the power to decide 
-  during runtime which pipeline fits best")
+  GL renderers, depending on the extensions supported, luckily we have to the power to decide 
+  during runtime which renderer fits best")
 
-  The results of the pipelines should just match as far as possible.
+  The results of the renderers should just match as far as possible.
 
-  \section graphics_pipeline_embedding Embedding the pipeline into the System
-  Pipeline is connected to a window using a factory class 
+  \section graphics_renderer_embedding Embedding the renderer into the System
+  Renderer is connected to a window using a factory class 
   which helps setting up the details of the window
-  and provides a pipeline object. 
+  and provides a renderer object. 
 
   Example Use cases:
    - Antigrain/X11 requires a visual that matches the pixelformat
-     of the antigrain pipeline and must try to make use of mit-XShm, 
+     of the antigrain renderer and must try to make use of mit-XShm, 
    - Opengl/X11 needs to find a visual that provides OpenGL hardware
      acceleration and the Window to construct an opengl context.
    - OpenGL/FB might not have any requirements at all.  
 
   So this factory class, which defines a connection between window and 
-  pipeline requires a unique interface for every ui_context type, which 
-  will be implemented for every pipeline implementation.
+  renderer requires a unique interface for every ui_context type, which 
+  will be implemented for every renderer implementation.
 
-  Eg. for X11 pipelines
+  Eg. for X11 renderers
   \code
-  concept X11Pipeline : pipeline
+  concept X11Renderer : renderer
   { 
-    concept X11PipelineFactory  
+    concept X11RendererFactory  
     {
     public: 
       XVisual get_visual( Window x11WindowHandle, Display * displayHandle, int screen );
 
-      pipeline* construct_pipeline( Window x11WindowHandle, Display * displayHandle );
+      renderer* construct_renderer( Window x11WindowHandle, Display * displayHandle );
     };
   };
   \endcode
 
-    \note Maybe we should make the pipeline a kind of "owner" or controller of the 
-  graphics::objects. That way we could allow the pipelines to attach information
+    \note Maybe we should make the renderer a kind of "owner" or controller of the 
+  graphics::objects. That way we could allow the renderers to attach information
   to the graphics::object tree, e.g. for caches or precalculations, like triangulation.
 
 
@@ -181,7 +179,7 @@
 
   Every widget type has a qid that names the graphical representation of the widget. 
   The theme loader will search for that qid in different places using the domain 
-  information provided by the pipeline object. It will only search in theme files
+  information provided by the renderer object. It will only search in theme files
   which are defined for that domain.
 
   Gott will provide a working set of graphics::object subtrees, and simple dynamic theme behaviors
@@ -217,7 +215,7 @@
       feature too. For example if a theme wants to have a blinking rectangle everytime the 
       mouse crosses a button, the dynamic aspect of the themed widget must be able to refer
       to the rectangle defined inside the graphics::objects of the button. 
-   - RQ6 - Make pipeline relevant data attachable to each object node. Or only specific nodes?
+   - RQ6 - Make renderer relevant data attachable to each object node. Or only specific nodes?
    - RQ7 - object reference support:
       To allow the user or theme writers to change general aspects of themes, and maybe to reuse existing nodes it
       should be possible to refer to certain objects in the tree. E.g. one could have named color nodes. 
@@ -229,7 +227,7 @@
   This is a first rough design attempt based on the requirement above.
 
   The object base class: 
-    - pipeline_data RQ6
+    - renderer_data RQ6
     - path RQ1
 
     \code
@@ -238,7 +236,7 @@
     {
       typedef std::vector<int> path; 
 
-      Xany pipeline_data; //< maintained by the pipeline
+      Xany renderer_data; //< maintained by the renderer
       virtual ~object();
     };
     }
@@ -296,9 +294,9 @@
 
   \section event_forwarding Events forwarded to widgets
 
-  The pipeline must know the position of each leaf graphic::object on screen. 
+  The renderer must know the position of each leaf graphic::object on screen. 
   To be able to forward events to the behavior part of the widget. These things
-  have to be evaluated inside the pipeline, because each pipeline API has 
+  have to be evaluated inside the renderer, because each renderer API has 
   different means to fulfill that requirement.
 
   So we need a bidirectional connection between graphics::object and the behavior
