@@ -103,6 +103,11 @@ env.SharedLibrary('gott_ui', libobj_ui)
 env = env.Copy()
 env.Append(LIBS = ['gott_ui'])
 
+libobj_hci = env.Glob('hci/*.cpp')
+env.SharedLibrary('gott_hci', libobj_hci)
+env = env.Copy()
+env.Append(LIBS = ['gott_hci'])
+
 Export('env')
 
 env.Program('thunk_test', 'thunk.cpp')
