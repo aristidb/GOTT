@@ -218,11 +218,15 @@
       mouse crosses a button, the dynamic aspect of the themed widget must be able to refer
       to the rectangle defined inside the graphics::objects of the button. 
    - RQ6 - Make pipeline relevant data attachable to each object node. Or only specific nodes?
+   - RQ7 - object reference support:
+      To allow the user or theme writers to change general aspects of themes, and maybe to reuse existing nodes it
+      should be possible to refer to certain objects in the tree. E.g. one could have named color nodes. 
+      At this point the tree might turn into a dag. 
  
 
   \subsection graphics_objects_discussion_vector First two cents
 
-  This is a first rough design attempt based on RQ1-RQ6. 
+  This is a first rough design attempt based on the requirement above.
 
   The object base class: 
     - pipeline_data RQ6
@@ -253,7 +257,7 @@
     \endcode
 
   The widget_subtree class is a subtree node, which is connected to a widget and theme behavior. 
-   - The class combine RQ3 and RQ2 under the assumption that both references are always required 
+   - The class combines RQ3 and RQ2 under the assumption that both references are always required 
      at the same point in the tree
    - The widget_subtree also defines a qid namespace for its named subnodes, one could store a 
      gperf generated perfect minimal hash function inside widget_subtree during compilation time
@@ -271,13 +275,21 @@
     }
     \endcode
 
-  Then for each rendering domain there could be a namespace
+
+  The object_reference class fullfills RQ7. 
+
     \code
-    namespace vector_graphics{
-      // ...
+    namespace graphics{
+    class object_reference : public object
+    {
+      qid reference;
+      object * resolved_reference;
+    };
     }
     \endcode
 
+  We could now start to define object classes that define properties provided 
+  by widgets, like text, toggle states, scalar values.... 
 
   \subsection graphics_objects_discussion_ur_turn Your turn!
 
