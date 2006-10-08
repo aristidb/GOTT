@@ -47,9 +47,11 @@ namespace gott { namespace hci {
 class GOTT_EXPORT container_object : public object {
 public:
   object *find(path_type const &path);
+  object *find_named(string const &name);
 
 private:
-  boost::ptr_vector<object> children;
+  typedef boost::ptr_vector<object> container;
+  container children;
 };
 
 }}

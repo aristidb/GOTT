@@ -57,12 +57,14 @@ public:
   /**
    * Get a pointer to a domain-specific representation for this object or 0 if
    * not applicable.
+   * \return A pointer to the representation.
    */
   virtual void *domain_specific(QID const &domain) = 0;
 
   /**
    * Get a pointer to a domain-specific representation for this object or 0 if
    * not applicable.
+   * \return A pointer to the representation.
    */
   template<class Domain>
   GOTT_LOCAL Domain *domain_specific() {

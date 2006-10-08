@@ -40,9 +40,19 @@
 
 using gott::hci::container_object;
 using gott::hci::object;
+using gott::string;
 
 object *container_object::find(object::path_type const &path) {
   path_type::const_reference index = path[0];
   path_type subpath(path.begin() + 1, path.end());
   return children[index].find(subpath);
+}
+
+object *container_object::find_named(string const &name) {
+  for (container::const_iterator it = children.begin(); it != children.end();
+      ++it) {
+    object *result = it->find_named(name);
+    if (result)
+      return result;
+  }
 }
