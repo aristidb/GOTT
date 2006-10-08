@@ -131,7 +131,7 @@
   is defined by the render method used. So OpenGL defines the GL renderer,
   Antigrain define the Antigrain renderer. These two renderers will have completely diverging
   implementations, since Antigrain thinks in paths and scanlines while GL thinks in 
-  triangles, shaders, textures and buffers. ("I also belive that we will have different
+  triangles, shaders, textures and buffers. ("I also believe that we will have different
   GL renderers, depending on the extensions supported, luckily we have to the power to decide 
   during runtime which renderer fits best")
 
@@ -142,7 +142,7 @@
   which helps setting up the details of the window
   and provides a renderer object. 
 
-  Example Use cases:
+  Example use cases:
    - Antigrain/X11 requires a visual that matches the pixelformat
      of the antigrain renderer and must try to make use of mit-XShm, 
    - Opengl/X11 needs to find a visual that provides OpenGL hardware
@@ -153,7 +153,7 @@
   renderer requires a unique interface for every ui_context type, which 
   will be implemented for every renderer implementation.
 
-  Eg. for X11 renderers
+  E.g. for X11 renderers
   \code
   concept X11Renderer : renderer
   { 
