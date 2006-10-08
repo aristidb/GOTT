@@ -55,32 +55,33 @@
   
     "Right now i am in favor of the first variant." (6.10.2006 a.p.)
 
-  \section graphics_renderer_intro Intro
+  \section graphics_renderer_intro Introduction
 
   This document describes the concept of the renderer class, which is responsible
-  to display the different widgets and windows on screen. Widgets never draw
+  for displaying the different widgets and windows on screen. Widgets never draw
   themselves by using some kind of API, neither do the graphics::object 
-  draw themselves. 
+  draw themselves. The renderer rather examines the situation himself. 
 
-  This is the current planing state of the the renderer:
+  This is the current planning state of the the renderer:
 
   \code 
   concept renderer
   {
     public:
       // renderer domain, is explained below
-      qid domain_of_renderer();
+      QID render_domain();
 
       // renderers should be able to receive all ui related events
       // so X11 or all? renderers probably define methods like:
       void update_display( region const& ); ///< renderer should update these screen regions, because x11 made them reappear
       void resize( region const& ); ///< renderer should redraw mostly everything becaue the window size changed..
+        // COMMENT: this also affects the top-level graphics::object doesn't it? this (above) method does not seem adequate
 
       // every renderer will need to know if widgets changed their
       // graphical representation
       void invalidate( graphics::object * );
       // or maybe
-      void invalidate( qid_or_graphics_object_path * path_to_invalid_object );
+      void invalidate( QID_or_graphics_object_path * path_to_invalid_object );
   };
   \endcode 
 
@@ -180,8 +181,8 @@
   able to modify the graphics::objects it defined and react on events, similar
   to the behavior aspect of widgets. 
 
-  Every widget type has a qid that names the graphical representation of the widget. 
-  The theme loader will search for that qid in different places using the domain 
+  Every widget type has a QID that names the graphical representation of the widget. 
+  The theme loader will search for that QID in different places using the domain 
   information provided by the renderer object. It will only search in theme files
   which are defined for that domain.
 
@@ -190,10 +191,10 @@
   themes found inside the system will override the subtrees and theme behaviors of Gott. 
   The application
   may also provide additional replacement subtrees. Furthermore the applcation
-  or themes might even provide different widget names/qids, which have their
+  or themes might even provide different widget names/QIDs, which have their
   own unique graphic representation. Finally the user of gott has the option to install
   themes in his home directory. For example she could define color themes which 
-  redefine the default colors of all her gott application, be redefining the qids
+  redefine the default colors of all her gott application, be redefining the QIDs
   referencing default colors. 
 
 
@@ -260,7 +261,7 @@
   The widget_subtree class is a subtree node, which is connected to a widget and theme behavior. 
    - The class combines RQ3 and RQ2 under the assumption that both references are always required 
      at the same point in the tree
-   - The widget_subtree also defines a qid namespace for its named subnodes, one could store a 
+   - The widget_subtree also defines a QID namespace for its named subnodes, one could store a 
      gperf generated perfect minimal hash function inside widget_subtree during compilation time
      of the theme ( or gott respectively ), to easily access all named nodes. 
 
@@ -271,7 +272,7 @@
       ui::widget * widget;
       ui::theme::behavior * theme_behavior;
 
-      object * get_node( qid & node_id );
+      object * get_node( QID & node_id ); // FIXME: const-reference?
     };
     }
     \endcode
@@ -283,7 +284,7 @@
     namespace graphics{
     class object_reference : public object
     {
-      qid reference;
+      QID reference;
       object * resolved_reference;
     };
     }
@@ -292,12 +293,16 @@
   We could now start to define object classes that define properties provided 
   by widgets, like text, toggle states, scalar values.... 
 
-  \subsection graphics_objects_discussion_ur_turn Your turn!
+  \subsection graphics_objects_discussion_your_turn Your turn!
 
+  - Requirements should probably not have numbers but names.
+  - This whole system just cries for input + audio + video integration, doesn't it?
+  - How should Z-order be handled?
+  - Could tooltips etc. be implemented by means of higher-than-the-clipping Z-order?
 
   \section event_forwarding Events forwarded to widgets
 
-  The renderer must know the position of each leaf graphic::object on screen. 
+  The renderer must know the position of each leaf graphics::object on screen. 
   To be able to forward events to the behavior part of the widget. These things
   have to be evaluated inside the renderer, because each renderer API has 
   different means to fulfill that requirement.
