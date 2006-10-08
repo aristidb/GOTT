@@ -36,14 +36,42 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "named_object.hpp"
+#include "container.hpp"
 
-using gott::hci::named_object;
+using gott::hci::container;
 using gott::hci::object;
 using gott::string;
 
-object *named_object::find_named(string const &name_) {
-  if (name_ == name().get())
-    return this;
-  return false;
+object *container::find(object::path_type const &path) {
+  path_type::const_reference index = path[0];
+  path_type subpath(path.begin() + 1, path.end());
+  return children[index].find(subpath);
+}
+
+object *container::find_named(string const &name) {
+  for (vector::iterator it = children.begin(); it != children.end(); ++it) {
+    object *result = it->find_named(name);
+    if (result)
+      return result;
+  }
+  return 0;
+}
+
+void container::depth_first(
+    boost::function<bool (path_type const &, object *)> const &callback,
+    size_type max_depth,
+    path_type const &prepend) {
+  if (!callback(prepend, this))
+    return;
+
+  if (max_depth != 0) {
+    if (max_depth != npos)
+      --max_depth;
+    path_type newprepend(prepend.begin(), prepend.end());
+    newprepend.push_back(npos);
+    for (vector::iterator it = children.begin(); it != children.end(); ++it){
+      newprepend.back() = (it - children.begin());
+      it->depth_first(callback, max_depth, newprepend);
+    }
+  }
 }

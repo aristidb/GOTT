@@ -36,42 +36,27 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "container_object.hpp"
+#ifndef GOTT_HCI_WITH_NAME_HPP
+#define GOTT_HCI_WITH_NAME_HPP
 
-using gott::hci::container_object;
-using gott::hci::object;
-using gott::string;
+#include "object.hpp"
+#include <gott/properties/property.hpp>
 
-object *container_object::find(object::path_type const &path) {
-  path_type::const_reference index = path[0];
-  path_type subpath(path.begin() + 1, path.end());
-  return children[index].find(subpath);
-}
+namespace gott { namespace hci {
 
-object *container_object::find_named(string const &name) {
-  for (container::iterator it = children.begin(); it != children.end(); ++it) {
-    object *result = it->find_named(name);
-    if (result)
-      return result;
-  }
-  return 0;
-}
+/**
+ * A non-container object with a name.
+ */
+class GOTT_EXPORT with_name : public object {
+public:
+  /**
+   * The name of this object.
+   */
+  virtual properties::property<string> &name() = 0;
 
-void container_object::depth_first(
-    boost::function<bool (path_type const &, object *)> const &callback,
-    size_type max_depth,
-    path_type const &prepend) {
-  if (!callback(prepend, this))
-    return;
+  object *find_named(string const &name);
+};
 
-  if (max_depth != 0) {
-    if (max_depth != npos)
-      --max_depth;
-    path_type newprepend(prepend.begin(), prepend.end());
-    newprepend.push_back(npos);
-    for (container::iterator it = children.begin(); it != children.end(); ++it){
-      newprepend.back() = (it - children.begin());
-      it->depth_first(callback, max_depth, newprepend);
-    }
-  }
-}
+}}
+
+#endif

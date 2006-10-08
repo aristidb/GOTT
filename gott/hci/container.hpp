@@ -36,8 +36,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_HCI_CONTAINER_OBJECT_HPP
-#define GOTT_HCI_CONTAINER_OBJECT_HPP
+#ifndef GOTT_HCI_CONTAINER_HPP
+#define GOTT_HCI_CONTAINER_HPP
 
 #include "object.hpp"
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -47,7 +47,7 @@ namespace gott { namespace hci {
 /**
  * Container object. Contains an array of objects.
  */
-class GOTT_EXPORT container_object : public object {
+class GOTT_EXPORT container : public object {
 public:
   object *find(path_type const &path);
   object *find_named(string const &name);
@@ -56,9 +56,21 @@ public:
     size_type max_depth = npos,
     path_type const &prepend = path_type());
 
+  /**
+   * Add an object to the back of this container. Ownership of the object will
+   * be claimed.
+   * \param child The object to add.
+   */
+  void add(object *child);
+
+  /**
+   * Get the size of this container.
+   */
+  GOTT_LOCAL size_type size() const { return children.size(); }
+
 private:
-  typedef boost::ptr_vector<object> container;
-  container children;
+  typedef boost::ptr_vector<object> vector;
+  vector children;
 };
 
 }}

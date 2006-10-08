@@ -36,27 +36,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_HCI_NAMED_OBJECT
-#define GOTT_HCI_NAMED_OBJECT
+#include "with_name.hpp"
 
-#include "object.hpp"
-#include <gott/properties/property.hpp>
+using gott::hci::with_name;
+using gott::hci::object;
+using gott::string;
 
-namespace gott { namespace hci {
-
-/**
- * A non-container object with a name.
- */
-class GOTT_EXPORT named_object : public object {
-public:
-  /**
-   * The name of this object.
-   */
-  virtual properties::property<string> &name() = 0;
-
-  object *find_named(string const &name);
-};
-
-}}
-
-#endif
+object *with_name::find_named(string const &name_) {
+  if (name_ == name().get())
+    return this;
+  return false;
+}
