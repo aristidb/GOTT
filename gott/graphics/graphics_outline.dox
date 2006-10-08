@@ -35,6 +35,6 @@ Do not provide an API, but define a render model.
 Define the way ui scene information is transfered to the display device. 
 Later we still can think about providing one or several render apis. 
 
-\ref graphics_pipeline
+\ref graphics_renderer
 
 */

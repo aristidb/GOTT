@@ -39,9 +39,9 @@
 namespace gott{ namespace graphics{
 
   /**
-   * For details look at \ref graphics_pipeline documentaton.
+   * For details look at \ref graphics_renderer documentaton.
    */
-class pipeline
+class renderer
 {
   public:
     void update_display( region const& ); 
@@ -49,7 +49,7 @@ class pipeline
 
     void invalidate( graphics::object * );
     //
-    ~pipeline();
+    ~renderer();
 };
 
 }}
