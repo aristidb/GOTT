@@ -42,6 +42,9 @@ using gott::hci::with_name;
 using gott::hci::object;
 using gott::string;
 
+with_name::with_name() {}
+with_name::~with_name() {}
+
 object *with_name::find_named(string const &name_) {
   if (name_ == name().get())
     return this;

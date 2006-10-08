@@ -43,8 +43,12 @@ using gott::string;
 
 object::~object() {}
 
-object *object::find(path_type const &path) {
-  if (path.empty())
+void *object::domain_specific(QID const &) {
+  return 0;
+}
+
+object *object::find(path_type const &path, size_type offset) {
+  if (path.size() <= offset)
     return this;
   else
     return 0;

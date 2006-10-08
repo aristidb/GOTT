@@ -42,10 +42,16 @@ using gott::hci::container;
 using gott::hci::object;
 using gott::string;
 
-object *container::find(object::path_type const &path) {
-  path_type::const_reference index = path[0];
-  path_type subpath(path.begin() + 1, path.end());
-  return children[index].find(subpath);
+container::container() {}
+container::~container() {}
+
+object *container::find(object::path_type const &path, size_type offset) {
+  if (path.size() <= offset)
+    return this;
+  size_type index = path[offset];
+  if (index >= children.size())
+    return 0;
+  return children[index].find(path, offset + 1);
 }
 
 object *container::find_named(string const &name) {

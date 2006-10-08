@@ -49,6 +49,11 @@ namespace gott { namespace hci {
  */
 class GOTT_EXPORT with_name : public object {
 public:
+  /// Constructor.
+  with_name();
+  /// Destructor.
+  ~with_name();
+
   /**
    * The name of this object.
    */

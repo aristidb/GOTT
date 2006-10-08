@@ -39,9 +39,18 @@
 #include "reference.hpp"
 
 using gott::hci::reference;
+using gott::hci::object;
 
 reference::~reference() {}
 
 void *reference::domain_specific(QID const &domain) {
   return referee->domain_specific(domain);
+}
+
+object *reference::find(path_type const &path, size_type offset) {
+  if (path.size() <= offset)
+    return this;
+  if (path[offset] == 0)
+    return referee;
+  return 0;
 }

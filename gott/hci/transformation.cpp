@@ -36,46 +36,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_HCI_CONTAINER_HPP
-#define GOTT_HCI_CONTAINER_HPP
+#include "transformation.hpp"
 
-#include "object.hpp"
-#include <boost/ptr_container/ptr_vector.hpp>
+using gott::hci::transformation;
 
-namespace gott { namespace hci {
-
-/**
- * Container object. Contains an array of objects.
- */
-class GOTT_EXPORT container : public object {
-public:
-  container();
-  ~container();
-
-  object *find(path_type const &path, size_type offset = 0);
-  object *find_named(string const &name);
-  void depth_first(
-    boost::function<bool (path_type const &, object *)> const &callback,
-    size_type max_depth = npos,
-    path_type const &prepend = path_type());
-
-  /**
-   * Add an object to the back of this container. Ownership of the object will
-   * be claimed.
-   * \param child The object to add.
-   */
-  void add(object *child);
-
-  /**
-   * Get the size of this container.
-   */
-  GOTT_LOCAL size_type size() const { return children.size(); }
-
-private:
-  typedef boost::ptr_vector<object> vector;
-  vector children;
-};
-
-}}
-
-#endif
+transformation::transformation() {}
+transformation::~transformation() {}

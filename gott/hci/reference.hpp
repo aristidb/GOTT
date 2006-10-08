@@ -45,8 +45,13 @@ namespace gott { namespace hci {
 
 class GOTT_EXPORT reference : public object {
 public:
+  /**
+   * Constructor.
+   * \param referee The object to refer to.
+   */
   GOTT_LOCAL reference(object *referee) : referee(referee) {}
 
+  /// Destructor.
   ~reference();
 
   /**
@@ -60,6 +65,8 @@ public:
   GOTT_LOCAL object const *get() const { return referee; }
 
   void *domain_specific(QID const &domain);
+
+  object *find(path_type const &path, size_type offset);
 
 private:
   object *referee;

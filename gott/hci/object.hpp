@@ -64,7 +64,7 @@ public:
    * not applicable.
    * \return A pointer to the representation.
    */
-  virtual void *domain_specific(QID const &domain) = 0;
+  virtual void *domain_specific(QID const &domain);
 
   /**
    * Get a pointer to a domain-specific representation for this object or 0 if
@@ -89,9 +89,10 @@ public:
   /**
    * Find an object with specified path.
    * \param path The path to find.
+   * \param offset The number of path elements to ignore.
    * \return The found object or 0.
    */
-  virtual object *find(path_type const &path);
+  virtual object *find(path_type const &path, size_type offset = 0);
 
   /**
    * Find an object with specified path.
@@ -144,6 +145,9 @@ public:
     boost::function<bool (path_type const &, object *)> helper(callback);
     return const_cast<object *>(this)->depth_first(helper, max_depth, prepend);
   }
+
+  /// Constructor.
+  object();
 
   /// Pure virtual destructor.
   virtual ~object() = 0;
