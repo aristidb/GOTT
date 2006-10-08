@@ -40,9 +40,7 @@
 namespace gott{
 /**
  * Cast a symbol address to a function pointer. 
- * \endcode
  * \param handle the address of the symbol
- * \param FType a 
  * \return a function pointer
  */
 template<typename FType>

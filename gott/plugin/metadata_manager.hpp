@@ -208,6 +208,8 @@ public: //internal
    * Add a module to the database.
    * \param desc Identifying information about the module.
    * \param info Extra information about the module.
+   * \param dependencies The dependencies as QIDs (will be patched to 
+   *             descriptors on commit).
    * \param resource The resource.
    */
   void add_module(

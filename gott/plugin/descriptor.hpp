@@ -92,7 +92,7 @@ struct plugin_descriptor {
 
   /**
    * Constructor.
-   * \param symbol The symbol identifying the plugin inside its module.
+   * \param sym The symbol identifying the plugin inside its module.
    * \param mod The descriptor of the plugin's module.
    */
   explicit plugin_descriptor(string const &sym, module_descriptor const &mod)
@@ -201,6 +201,7 @@ struct module_information {
   /**
    * Constructor.
    * \param module_id The ID of the module.
+   * \param dependencies Dependencies of the module.
    */
   explicit module_information(
       QID const &module_id,

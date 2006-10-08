@@ -123,9 +123,9 @@ symbol the_plugin
 \endverbatim
 
 Hope you can figure it out. You should see something like this on your screen:
-<verbatim>
+\verbatim
 Hello world!
-</verbatim>
+\endverbatim
 
 \subsection more_action But I want more action!
 
