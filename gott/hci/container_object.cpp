@@ -56,3 +56,20 @@ object *container_object::find_named(string const &name) {
       return result;
   }
 }
+
+void enumerate_paths(
+    boost::function<void (path_type const &)> const &callback,
+    size_type max_depth = npos,
+    path_type const &prepend = path_type()) {
+  callback(prepend);
+
+  path_type newprepend(prepend.begin(), prepend.end());
+  newprepend.push_back(npos);
+
+  if (max_depth != 0)
+    for (container::const_iterator it = children.begin(); it != children.end();
+        ++it) {
+      newprepend.back() = (it - children.begin());
+      it->enumerate_paths(callback, max_depth - 1, newprepend);
+    }
+}

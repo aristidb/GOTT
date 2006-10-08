@@ -53,3 +53,10 @@ object *object::find(object::path_type const &path) {
 object *object::find_named(string const &name) {
   return 0;
 }
+
+void object::enumerate_paths(
+    boost::function<void (path_type const &)> const &callback,
+    size_type max_depth = npos,
+    path_type const &prepend = path_type()) const {
+  callback(prepend);
+}

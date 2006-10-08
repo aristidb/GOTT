@@ -48,6 +48,10 @@ class GOTT_EXPORT container_object : public object {
 public:
   object *find(path_type const &path);
   object *find_named(string const &name);
+  void enumerate_paths(
+    boost::function<void (path_type const &)> const &callback,
+    size_type max_depth = npos,
+    path_type const &prepend = path_type());
 
 private:
   typedef boost::ptr_vector<object> container;

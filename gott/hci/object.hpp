@@ -41,6 +41,7 @@
 
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
+#include <boost/function.hpp>
 #include <vector>
 
 namespace gott { namespace hci {
@@ -52,6 +53,8 @@ class GOTT_EXPORT object {
 public:
   /// Path type for sub-objects.
   typedef std::vector<int> path_type;
+  typedef path_type::size_type size_type;
+  static const size_type npos = -1;
 
 public:
   /**
@@ -84,6 +87,15 @@ public:
    * \return The found object or 0.
    */
   virtual object *find_named(string const &name);
+
+  /**
+   * Enumerate all paths. Depth-first.
+   * \param max_depth The maximum depth to search.
+   */
+  virtual void enumerate_paths(
+    boost::function<void (path_type const &)> const &callback,
+    size_type max_depth = npos,
+    path_type const &prepend = path_type()) const;
 
   /// Pure virtual destructor.
   virtual ~object() = 0;
