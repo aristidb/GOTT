@@ -43,20 +43,20 @@ using gott::string;
 
 object::~object() {}
 
-object *object::find(object::path_type const &path) {
+object *object::find(path_type const &path) {
   if (path.empty())
     return this;
   else
     return 0;
 }
 
-object *object::find_named(string const &name) {
+object *object::find_named(string const &) {
   return 0;
 }
 
 void object::enumerate_paths(
     boost::function<void (path_type const &)> const &callback,
-    size_type max_depth = npos,
-    path_type const &prepend = path_type()) const {
+    size_type,
+    path_type const &prepend) const {
   callback(prepend);
 }

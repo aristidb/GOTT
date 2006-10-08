@@ -49,27 +49,31 @@ object *container_object::find(object::path_type const &path) {
 }
 
 object *container_object::find_named(string const &name) {
-  for (container::const_iterator it = children.begin(); it != children.end();
+  for (container::iterator it = children.begin(); it != children.end();
       ++it) {
     object *result = it->find_named(name);
     if (result)
       return result;
   }
+  return 0;
 }
 
-void enumerate_paths(
+void container_object::enumerate_paths(
     boost::function<void (path_type const &)> const &callback,
-    size_type max_depth = npos,
-    path_type const &prepend = path_type()) {
+    size_type max_depth,
+    path_type const &prepend) {
   callback(prepend);
 
   path_type newprepend(prepend.begin(), prepend.end());
   newprepend.push_back(npos);
 
-  if (max_depth != 0)
+  if (max_depth != 0) {
+    if (max_depth != npos)
+      --max_depth;
     for (container::const_iterator it = children.begin(); it != children.end();
         ++it) {
       newprepend.back() = (it - children.begin());
-      it->enumerate_paths(callback, max_depth - 1, newprepend);
+      it->enumerate_paths(callback, max_depth, newprepend);
     }
+  }
 }
