@@ -89,14 +89,14 @@
 
   That domain defines the name of the draw model. We might have 
   names like:
-   - qid"gott::vector_graphics": antigrain cairo opengl directGraphics
-   - qid"gott::text_mode": curses conio vt100.. 
-   - qid"gott::3d_vector_graphics": variants of the vector_graphics pipelines with hardware 
+   - "gott::vector_graphics": antigrain cairo opengl directGraphics
+   - "gott::text_mode": curses conio vt100.. 
+   - "gott::3d_vector_graphics": variants of the vector_graphics pipelines with hardware 
       acceleration that support 3D eyecandy, that implies that 3D information is stored 
       in graphics::object, but the display still happens on a 2D or pesudo 3D screen. 
-   - qid"gott::ajax": restrictive variants of gott::vector_graphics piplines, maybe not required
+   - "gott::ajax": restrictive variants of gott::vector_graphics piplines, maybe not required
       as special domain name
-   - qid"gott::exploreable_3d_graphics": somtime around 2010 we will implement that beast :), as 
+   - "gott::exploreable_3d_graphics": somtime around 2010 we will implement that beast :), as 
       soon as better input devices exist
 
 
