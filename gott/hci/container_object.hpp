@@ -44,6 +44,9 @@
 
 namespace gott { namespace hci {
 
+/**
+ * Container object. Contains an array of objects.
+ */
 class GOTT_EXPORT container_object : public object {
 public:
   object *find(path_type const &path);

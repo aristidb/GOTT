@@ -53,8 +53,10 @@ class GOTT_EXPORT object {
 public:
   /// Path type for sub-objects.
   typedef std::vector<int> path_type;
+  /// Size type sufficient for path depths.
   typedef path_type::size_type size_type;
-  static const size_type npos = -1;
+  /// Special value for specifying lack (or infinite) of size value.
+  static const size_type npos = size_type(-1);
 
 public:
   /**
@@ -75,11 +77,30 @@ public:
   }
 
   /**
+   * Get a pointer to a domain-specific representation for this object or 0 if
+   * not applicable.
+   * \return A pointer to the representation.
+   */
+  template<class Domain>
+  GOTT_LOCAL Domain const *domain_specific() const {
+    return const_cast<object *>(this)->domain_specific<Domain>();
+  }
+
+  /**
    * Find an object with specified path.
    * \param path The path to find.
    * \return The found object or 0.
    */
   virtual object *find(path_type const &path);
+
+  /**
+   * Find an object with specified path.
+   * \param path The path to find.
+   * \return The found object or 0.
+   */
+  GOTT_LOCAL inline object const *find(path_type const &path) const {
+    return const_cast<object *>(this)->find(path);
+  }
 
   /**
    * Find an object with a name.
@@ -89,8 +110,19 @@ public:
   virtual object *find_named(string const &name);
 
   /**
+   * Find an object with a name.
+   * \param name The name of the object to find.
+   * \return The found object or 0.
+   */
+  GOTT_LOCAL inline object const *find_named(string const &name) const {
+    return const_cast<object *>(this)->find_named(name);
+  }
+
+  /**
    * Enumerate all paths. Depth-first.
+   * \param callback The callback to call for each path.
    * \param max_depth The maximum depth to search.
+   * \param prepend The path to prepend to each path sent to the callback.
    */
   virtual void enumerate_paths(
     boost::function<void (path_type const &)> const &callback,
