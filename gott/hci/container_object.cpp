@@ -36,57 +36,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_HCI_OBJECT_HPP
-#define GOTT_HCI_OBJECT_HPP
+#include "container_object.hpp"
 
-#include <gott/string/string.hpp>
-#include <gott/string/qid.hpp>
-#include <vector>
+using gott::hci::container_object;
+using gott::hci::object;
 
-namespace gott { namespace hci {
-
-/**
- * An HCI object.
- */
-class GOTT_EXPORT object {
-public:
-  /// Path type for sub-objects.
-  typedef std::vector<int> path_type;
-
-public:
-  /**
-   * Get a pointer to a domain-specific representation for this object or 0 if
-   * not applicable.
-   */
-  virtual void *domain_specific(QID const &domain) = 0;
-
-  /**
-   * Get a pointer to a domain-specific representation for this object or 0 if
-   * not applicable.
-   */
-  template<class Domain>
-  GOTT_LOCAL Domain *domain_specific() {
-    return static_cast<Domain *>(domain_specific(Domain::qid));
-  }
-
-  /**
-   * Find an object with specified path.
-   * \param path The path to find.
-   * \return The found object or 0.
-   */
-  virtual object *find(path_type const &path);
-
-  /**
-   * Find an object with a name.
-   * \param name The name of the object to find.
-   * \return The found object or 0.
-   */
-  virtual object *find_named(string const &name);
-
-  /// Pure virtual destructor.
-  virtual ~object() = 0;
-};
-
-}}
-
-#endif
+object *container_object::find(object::path_type const &path) {
+  path_type::const_reference index = path[0];
+  path_type subpath(path.begin() + 1, path.end());
+  return children[index].find(subpath);
+}

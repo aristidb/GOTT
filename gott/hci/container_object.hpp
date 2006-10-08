@@ -36,55 +36,20 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_HCI_OBJECT_HPP
-#define GOTT_HCI_OBJECT_HPP
+#ifndef GOTT_HCI_CONTAINER_OBJECT_HPP
+#define GOTT_HCI_CONTAINER_OBJECT_HPP
 
-#include <gott/string/string.hpp>
-#include <gott/string/qid.hpp>
-#include <vector>
+#include "object.hpp"
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace gott { namespace hci {
 
-/**
- * An HCI object.
- */
-class GOTT_EXPORT object {
+class GOTT_EXPORT container_object : public object {
 public:
-  /// Path type for sub-objects.
-  typedef std::vector<int> path_type;
+  object *find(path_type const &path);
 
-public:
-  /**
-   * Get a pointer to a domain-specific representation for this object or 0 if
-   * not applicable.
-   */
-  virtual void *domain_specific(QID const &domain) = 0;
-
-  /**
-   * Get a pointer to a domain-specific representation for this object or 0 if
-   * not applicable.
-   */
-  template<class Domain>
-  GOTT_LOCAL Domain *domain_specific() {
-    return static_cast<Domain *>(domain_specific(Domain::qid));
-  }
-
-  /**
-   * Find an object with specified path.
-   * \param path The path to find.
-   * \return The found object or 0.
-   */
-  virtual object *find(path_type const &path);
-
-  /**
-   * Find an object with a name.
-   * \param name The name of the object to find.
-   * \return The found object or 0.
-   */
-  virtual object *find_named(string const &name);
-
-  /// Pure virtual destructor.
-  virtual ~object() = 0;
+private:
+  boost::ptr_vector<object> children;
 };
 
 }}
