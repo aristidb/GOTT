@@ -43,6 +43,9 @@
 
 namespace gott {
 
+/**
+ * Qualified IDentifier. DO NOT USE for dynamically generated identifiers.
+ */
 class QID : public atom {
 public:
   QID() : atom() {}
