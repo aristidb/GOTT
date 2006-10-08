@@ -124,10 +124,10 @@ public:
    * \param max_depth The maximum depth to search.
    * \param prepend The path to prepend to each path sent to the callback.
    */
-  virtual void enumerate_paths(
-    boost::function<void (path_type const &)> const &callback,
+  virtual void depth_first(
+    boost::function<bool (path_type const &, object *)> const &callback,
     size_type max_depth = npos,
-    path_type const &prepend = path_type()) const;
+    path_type const &prepend = path_type());
 
   /// Pure virtual destructor.
   virtual ~object() = 0;
