@@ -72,6 +72,7 @@ void test_container_1() {
   CHECK(++o.depth_first_begin() != o.depth_first_end());
   CHECK((++o.depth_first_begin()).get_path() == object::path_type(1));
   CHECK(++++o.depth_first_begin() == o.depth_first_end());
+  CHECK(++o.depth_first_begin(0) == o.depth_first_end());
   std::cout << "==> container 1... good: " << good_count << 
               ", bad: " << bad_count << std::endl;
 }

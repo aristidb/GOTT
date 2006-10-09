@@ -155,10 +155,21 @@ public:
     return const_cast<object *>(this)->depth_first(helper, max_depth, prepend);
   }
 
+  /**
+   * Get number of first child.
+   * \param current Store the number of the first child.
+   * \return Whether there is a first child at all.
+   */
   virtual bool first_child(path_element &current) const;
+
+  /**
+   * Get number of next child.
+   * \param current Number of child, will be changed.
+   * \return Whether there is a next child at all.
+   */
   virtual bool next_child(path_element &current) const;
 
-private:
+public:
   template<class Type>
   class GOTT_LOCAL basic_df_iterator
     : public boost::iterator_facade <
@@ -193,7 +204,7 @@ private:
 
     void increment() {
       path_element no;
-      if (path.size() < max_depth && !current->first_child(no)) {
+      if (path.size() >= max_depth || !current->first_child(no)) {
         do {
           if (path.empty()) {
             current = 0;
@@ -223,11 +234,10 @@ public:
   typedef basic_df_iterator<object> df_iterator;
   typedef basic_df_iterator<object const> const_df_iterator;
 
-  GOTT_LOCAL
-  df_iterator depth_first_begin(size_type max_depth = npos) {
+  GOTT_LOCAL df_iterator depth_first_begin(size_type max_depth = npos) {
     return df_iterator(this, max_depth);
   }
-  df_iterator depth_first_end() {
+  GOTT_LOCAL df_iterator depth_first_end() {
     return df_iterator(this);
   }
 };
