@@ -296,6 +296,7 @@
   \subsection graphics_objects_discussion_your_turn Your turn!
 
   - This whole system just cries for input + audio + video integration, doesn't it?
+    Yes and this part just has not been written yet.. especially input handling yields lots of questions.. 
   - How should Z-order be handled?
   - Could tooltips etc. be implemented by means of higher-than-the-clipping Z-order?
 
