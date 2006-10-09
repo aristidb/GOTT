@@ -36,40 +36,23 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "object.hpp"
+#include <gott/hci/object.hpp>
+#include <iostream>
 
-using gott::hci::object;
-using gott::string;
+using namespace gott::hci;
 
-object::object() {}
-object::~object() {}
+#define CHECK(x) do { \
+    if (!(x)) \
+      std::cout << "Failed at line " << __LINE__ << std::endl; \
+    else \
+      std::cout << '.' << std::flush; \
+  } while (0)
 
-void *object::domain_specific(QID const &) {
-  return 0;
-}
-
-object *object::find(path_type const &path, size_type offset) {
-  if (path.size() <= offset)
-    return this;
-  else
-    return 0;
-}
-
-object *object::find_named(string const &) {
-  return 0;
-}
-
-void object::depth_first(
-    boost::function<bool (path_type const &, object *)> const &callback,
-    size_type,
-    path_type const &prepend) {
-  callback(prepend, this);
-}
-
-bool object::first_child(path_element &) const {
-  return false;
-}
-
-bool object::next_child(path_element &) const {
-  return false;
+int main() {
+  gott::hci::object o;
+  CHECK(++o.depth_first_begin() == o.depth_first_end());
+  CHECK(o.depth_first_begin() != o.depth_first_end());
+  CHECK(o.depth_first_begin() == o.depth_first_begin());
+  CHECK(o.depth_first_end() == o.depth_first_end());
+  std::cout << std::endl;
 }

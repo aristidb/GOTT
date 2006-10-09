@@ -65,8 +65,8 @@ public:
   /// Constructor.
   object();
 
-  /// Pure virtual destructor.
-  virtual ~object() = 0;
+  /// Virtual destructor.
+  virtual ~object();
 
   /**
    * Get a pointer to a domain-specific representation for this object or 0 if
@@ -168,7 +168,10 @@ private:
       > {
   public:
     basic_df_iterator() : root(0),current(0) {}
-    basic_df_iterator(Type *root) : root(root), current(root) {}
+    basic_df_iterator(Type *root)
+      : root(root), current(0) {}
+    basic_df_iterator(Type *root, size_type max_depth)
+      : root(root), current(root), max_depth(max_depth) {}
 
   private:
     friend class boost::iterator_core_access;
@@ -180,10 +183,12 @@ private:
 
     void increment() {
       path_element no;
-      if (!current->first_child(no)) {
+      if (path.size() < max_depth && !current->first_child(no)) {
         do {
-          if (path.empty())
+          if (path.empty()) {
+            current = 0;
             return;
+          }
           no = path.back();
           path.pop_back();
           current = root->find(path);
@@ -201,6 +206,7 @@ private:
     Type *root;
     Type *current;
     path_type path;
+    size_type max_depth;
   };
 
 public:
@@ -208,16 +214,12 @@ public:
   typedef basic_df_iterator<object const> const_df_iterator;
 
   GOTT_LOCAL
-  df_iterator depth_first_begin(
-      boost::function<bool (path_type const &, object const *)> predicate,
-      size_type max_depth = npos) {
-    return df_iterator(this);
-  }
-  GOTT_LOCAL
   df_iterator depth_first_begin(size_type max_depth = npos) {
+    return df_iterator(this, max_depth);
+  }
+  df_iterator depth_first_end() {
     return df_iterator(this);
   }
-  df_iterator depth_first_end();
 };
 
 }}
