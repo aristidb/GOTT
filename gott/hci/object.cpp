@@ -64,3 +64,11 @@ void object::depth_first(
     path_type const &prepend) {
   callback(prepend, this);
 }
+
+bool object::first_child(path_element &) const {
+  return false;
+}
+
+bool object::next_child(path_element &) const {
+  return false;
+}

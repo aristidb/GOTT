@@ -68,6 +68,8 @@ public:
 
   object *find(path_type const &path, size_type offset);
 
+  bool first_child(path_element &) const;
+
 private:
   object *referee;
 };
