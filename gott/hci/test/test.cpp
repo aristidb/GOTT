@@ -36,23 +36,46 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include <gott/hci/container.hpp>
 #include <gott/hci/object.hpp>
 #include <iostream>
 
 using namespace gott::hci;
 
 #define CHECK(x) do { \
-    if (!(x)) \
-      std::cout << "Failed at line " << __LINE__ << std::endl; \
-    else \
-      std::cout << '.' << std::flush; \
+    if (!(x)) { \
+      ++bad_count; \
+      std::cout << "\"" #x "\" failed at line " << __LINE__ << std::endl;\
+    } else { \
+      ++good_count; \
+    } \
   } while (0)
 
-int main() {
-  gott::hci::object o;
+void test_object_1() {
+  int good_count = 0, bad_count = 0;
+  object o;
   CHECK(++o.depth_first_begin() == o.depth_first_end());
   CHECK(o.depth_first_begin() != o.depth_first_end());
   CHECK(o.depth_first_begin() == o.depth_first_begin());
   CHECK(o.depth_first_end() == o.depth_first_end());
-  std::cout << std::endl;
+  CHECK(&o == &*o.depth_first_begin());
+  CHECK(o.depth_first_begin().get_path().empty());
+  std::cout << "==> object 1... good: " << good_count << 
+              ", bad: " << bad_count << std::endl;
+}
+
+void test_container_1() {
+  int good_count = 0, bad_count = 0;
+  container o;
+  object *o2 = new object;
+  o.add(o2);
+  CHECK(++o.depth_first_begin() != o.depth_first_end());
+  CHECK(++++o.depth_first_begin() == o.depth_first_end());
+  std::cout << "==> container 1... good: " << good_count << 
+              ", bad: " << bad_count << std::endl;
+}
+
+int main() {
+  test_object_1();
+  test_container_1();
 }

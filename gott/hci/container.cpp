@@ -45,6 +45,10 @@ using gott::string;
 container::container() {}
 container::~container() {}
 
+void container::add(object *child) {
+  children.push_back(child);
+}
+
 object *container::find(object::path_type const &path, size_type offset) {
   if (path.size() <= offset)
     return this;

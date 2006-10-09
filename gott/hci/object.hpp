@@ -166,12 +166,22 @@ private:
         Type,
         boost::forward_traversal_tag
       > {
-  public:
-    basic_df_iterator() : root(0),current(0) {}
+  private:
+    friend class object;
     basic_df_iterator(Type *root)
       : root(root), current(0) {}
     basic_df_iterator(Type *root, size_type max_depth)
       : root(root), current(root), max_depth(max_depth) {}
+
+    template<class Other>
+    basic_df_iterator(basic_df_iterator<Other> const &o)
+      : root(o.root), current(o.current), path(o.path), max_depth(o.max_depth)
+    {}
+
+  public:
+    path_type const &get_path() const {
+      return path;
+    }
 
   private:
     friend class boost::iterator_core_access;
@@ -183,7 +193,7 @@ private:
 
     void increment() {
       path_element no;
-      if (path.size() < max_depth && !current->first_child(no)) {
+      if (path.size() < max_depth || !current->first_child(no)) {
         do {
           if (path.empty()) {
             current = 0;
