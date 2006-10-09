@@ -193,7 +193,7 @@ private:
 
     void increment() {
       path_element no;
-      if (path.size() < max_depth || !current->first_child(no)) {
+      if (path.size() < max_depth && !current->first_child(no)) {
         do {
           if (path.empty()) {
             current = 0;
