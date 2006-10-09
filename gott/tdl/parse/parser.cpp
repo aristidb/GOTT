@@ -42,6 +42,7 @@
 #include <gott/string/string.hpp>
 #include <gott/string/buffer.hpp>
 #include <gott/string/convert.hpp>
+#include <gott/range_algo.hpp>
 
 using std::istream;
 using gott::string;
@@ -261,6 +262,12 @@ void exec_parse::block() {
   do {
     if (!read_line())
       break;
+
+    {
+      string::utf8_range r = current_line.as_utf8();
+      if (find(r, '\t') != r.end())
+        throw tdl::tdl_error("TDL parser", "spurious tabulator in block");
+     }
     
     ln.start_line();
     
@@ -370,8 +377,11 @@ string exec_parse::read_string(string::utf8_range &unread) {
     return read_paren(unread);
 
   string::utf8_range::value_type start = unread.begin();
-  while (unread.filled() && !border(*unread.begin()))
+  while (unread.filled() && !border(*unread.begin())) {
+    if (*unread.begin() == '\t')
+      throw tdl::tdl_error("TDL parser", "spurious tabulator");
     ++unread.Begin;
+  }
   
   ln.add_char(unread.begin() - start);
 
