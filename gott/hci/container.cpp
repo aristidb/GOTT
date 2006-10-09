@@ -48,7 +48,7 @@ container::~container() {}
 object *container::find(object::path_type const &path, size_type offset) {
   if (path.size() <= offset)
     return this;
-  size_type index = path[offset];
+  path_element index = path[offset];
   if (index >= children.size())
     return 0;
   return children[index].find(path, offset + 1);
@@ -80,4 +80,13 @@ void container::depth_first(
       it->depth_first(callback, max_depth, newprepend);
     }
   }
+}
+
+bool container::first_child(path_element &current) const {
+  current = 0;
+  return !children.empty();
+}
+
+bool container::next_child(path_element &current) const {
+  return ++current < children.size();
 }

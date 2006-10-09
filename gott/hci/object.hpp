@@ -42,6 +42,7 @@
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/function.hpp>
+#include <boost/iterator/iterator_facade.hpp>
 #include <vector>
 
 namespace gott { namespace hci {
@@ -51,14 +52,22 @@ namespace gott { namespace hci {
  */
 class GOTT_EXPORT object {
 public:
+  /// Path element type.
+  typedef unsigned short path_element;
   /// Path type for sub-objects.
-  typedef std::vector<int> path_type;
+  typedef std::vector<path_element> path_type;
   /// Size type sufficient for path depths.
   typedef path_type::size_type size_type;
   /// Special value for specifying lack (or infinite) of size value.
   static const size_type npos = size_type(-1);
 
 public:
+  /// Constructor.
+  object();
+
+  /// Pure virtual destructor.
+  virtual ~object() = 0;
+
   /**
    * Get a pointer to a domain-specific representation for this object or 0 if
    * not applicable.
@@ -146,11 +155,69 @@ public:
     return const_cast<object *>(this)->depth_first(helper, max_depth, prepend);
   }
 
-  /// Constructor.
-  object();
+  virtual bool first_child(path_element &current) const;
+  virtual bool next_child(path_element &current) const;
 
-  /// Pure virtual destructor.
-  virtual ~object() = 0;
+private:
+  template<class Type>
+  class GOTT_LOCAL basic_df_iterator
+    : public boost::iterator_facade <
+        basic_df_iterator<Type>,
+        Type,
+        boost::forward_traversal_tag
+      > {
+  public:
+    basic_df_iterator() : root(0),current(0) {}
+    basic_df_iterator(Type *root) : root(root), current(root) {}
+
+  private:
+    friend class boost::iterator_core_access;
+
+    bool equal(basic_df_iterator const &other) const {
+      return root == other.root && current == other.current &&
+        path == other.path;
+    }
+
+    void increment() {
+      path_element no;
+      if (!current->first_child(no)) {
+        do {
+          if (path.empty())
+            return;
+          no = path.back();
+          path.pop_back();
+          current = root->find(path);
+        } while (!current->next_child(no));
+      }
+      path.push_back(no);
+      current = current->find(path, path.size() - 1);
+    }
+
+    Type &dereference() const {
+      return *current;
+    }
+
+  private:
+    Type *root;
+    Type *current;
+    path_type path;
+  };
+
+public:
+  typedef basic_df_iterator<object> df_iterator;
+  typedef basic_df_iterator<object const> const_df_iterator;
+
+  GOTT_LOCAL
+  df_iterator depth_first_begin(
+      boost::function<bool (path_type const &, object const *)> predicate,
+      size_type max_depth = npos) {
+    return df_iterator(this);
+  }
+  GOTT_LOCAL
+  df_iterator depth_first_begin(size_type max_depth = npos) {
+    return df_iterator(this);
+  }
+  df_iterator depth_first_end();
 };
 
 }}

@@ -59,6 +59,9 @@ public:
     size_type max_depth = npos,
     path_type const &prepend = path_type());
 
+  bool first_child(path_element &) const;
+  bool next_child(path_element &) const;
+
   /**
    * Add an object to the back of this container. Ownership of the object will
    * be claimed.
