@@ -51,6 +51,8 @@ using namespace gott::hci;
     } \
   } while (0)
 
+#define INFO(x) std::cout << #x " = " << (x) << std::endl
+
 void test_object_1() {
   int good_count = 0, bad_count = 0;
   object o;
@@ -78,6 +80,10 @@ void test_container_1() {
 }
 
 int main() {
+  std::cout << "TESTS:\n";
   test_object_1();
   test_container_1();
+  std::cout << "INFO:\n";
+  INFO(sizeof(object));
+  INFO(sizeof(container));
 }
