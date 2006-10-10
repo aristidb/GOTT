@@ -131,6 +131,7 @@ dirs = [
 'notify_fs',
 'properties',
 'ui',
+'hci',
 'examples',
 'tests',
 ]

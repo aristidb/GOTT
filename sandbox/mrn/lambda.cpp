@@ -2,13 +2,11 @@
 
 struct null_type;
 
-struct lambda_base {};
-
 template<int i>
 struct placeholder_t {};
 
 template<>
-struct placeholder_t<1> : lambda_base {
+struct placeholder_t<1> {
   template<class A1, class A2>
     struct sig {
       typedef null_type reference;
@@ -63,7 +61,7 @@ struct plus_sig<null_type, null_type> {
 };
 
 template<class X1, class X2>
-struct plus_t : lambda_base {
+struct plus_t {
   plus_t(X1 const &x1, X2 const &x2) : x1(x1), x2(x2) {}
 
   template<class A1, class A2>

@@ -42,6 +42,7 @@
 #include <gott/string/string.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/function.hpp>
+#include <boost/iterator/iterator_facade.hpp>
 #include <vector>
 
 namespace gott { namespace hci {
@@ -51,14 +52,22 @@ namespace gott { namespace hci {
  */
 class GOTT_EXPORT object {
 public:
+  /// Path element type.
+  typedef unsigned short path_element;
   /// Path type for sub-objects.
-  typedef std::vector<int> path_type;
+  typedef std::vector<path_element> path_type;
   /// Size type sufficient for path depths.
   typedef path_type::size_type size_type;
   /// Special value for specifying lack (or infinite) of size value.
   static const size_type npos = size_type(-1);
 
 public:
+  /// Constructor.
+  object();
+
+  /// Virtual destructor.
+  virtual ~object();
+
   /**
    * Get a pointer to a domain-specific representation for this object or 0 if
    * not applicable.
@@ -146,11 +155,91 @@ public:
     return const_cast<object *>(this)->depth_first(helper, max_depth, prepend);
   }
 
-  /// Constructor.
-  object();
+  /**
+   * Get number of first child.
+   * \param current Store the number of the first child.
+   * \return Whether there is a first child at all.
+   */
+  virtual bool first_child(path_element &current) const;
 
-  /// Pure virtual destructor.
-  virtual ~object() = 0;
+  /**
+   * Get number of next child.
+   * \param current Number of child, will be changed.
+   * \return Whether there is a next child at all.
+   */
+  virtual bool next_child(path_element &current) const;
+
+public:
+  template<class Type>
+  class GOTT_LOCAL basic_df_iterator
+    : public boost::iterator_facade <
+        basic_df_iterator<Type>,
+        Type,
+        boost::forward_traversal_tag
+      > {
+  private:
+    friend class object;
+    basic_df_iterator(Type *root)
+      : root(root), current(0) {}
+    basic_df_iterator(Type *root, size_type max_depth)
+      : root(root), current(root), max_depth(max_depth) {}
+
+    template<class Other>
+    basic_df_iterator(basic_df_iterator<Other> const &o)
+      : root(o.root), current(o.current), path(o.path), max_depth(o.max_depth)
+    {}
+
+  public:
+    path_type const &get_path() const {
+      return path;
+    }
+
+  private:
+    friend class boost::iterator_core_access;
+
+    bool equal(basic_df_iterator const &other) const {
+      return root == other.root && current == other.current &&
+        path == other.path;
+    }
+
+    void increment() {
+      path_element no;
+      if (path.size() >= max_depth || !current->first_child(no)) {
+        do {
+          if (path.empty()) {
+            current = 0;
+            return;
+          }
+          no = path.back();
+          path.pop_back();
+          current = root->find(path);
+        } while (!current->next_child(no));
+      }
+      path.push_back(no);
+      current = current->find(path, path.size() - 1);
+    }
+
+    Type &dereference() const {
+      return *current;
+    }
+
+  private:
+    Type *root;
+    Type *current;
+    path_type path;
+    size_type max_depth;
+  };
+
+public:
+  typedef basic_df_iterator<object> df_iterator;
+  typedef basic_df_iterator<object const> const_df_iterator;
+
+  GOTT_LOCAL df_iterator depth_first_begin(size_type max_depth = npos) {
+    return df_iterator(this, max_depth);
+  }
+  GOTT_LOCAL df_iterator depth_first_end() {
+    return df_iterator(this);
+  }
 };
 
 }}

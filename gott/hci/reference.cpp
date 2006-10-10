@@ -54,3 +54,8 @@ object *reference::find(path_type const &path, size_type offset) {
     return referee;
   return 0;
 }
+
+bool reference::first_child(path_element &current) const {
+  current = 0;
+  return true;
+}
