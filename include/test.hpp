@@ -38,8 +38,6 @@ struct test_info {
   void (*function)();
 };
 
-
-
 class test_failure {
 public:
   test_failure(test_string const &message, char const *file, unsigned line)
@@ -132,10 +130,6 @@ inline void check_equals(T const &a, U const &b,
     }\
     namespace name
 
-
-
-
-
 #define equals(a, b) \
   check_equals(a, b, "not equal: " #a " and " #b, __FILE__, __LINE__)
 #define throws(x, t, w) \
@@ -157,6 +151,5 @@ inline void check_equals(T const &a, U const &b,
 			fail("throwed " #t, __FILE__, __LINE__); \
 		} \
 	} while (0)
-
 
 #endif
