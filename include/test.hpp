@@ -132,10 +132,10 @@ inline void check_equals(T const &a, U const &b,
 #define PTEST(name) \
   static void BOOST_PP_CAT(test_, __LINE__) (); \
   static test_info BOOST_PP_CAT(reg_, __LINE__) \
-    (tests(), #name, __FILE__, __LINE__, test_group(), &BOOST_PP_CAT(test_, __LINE__)); \
+    (tests(), name, __FILE__, __LINE__, test_group(), &BOOST_PP_CAT(test_, __LINE__)); \
   static void BOOST_PP_CAT(test_, __LINE__) ()
 
-#define TEST(name) PTEST(name)
+#define TEST(name) PTEST(#name)
 
 #define TESTSOON_GEN_TUPLE2SEQ_PROCESS2(x, y) \
   ((x, y)) \
@@ -152,7 +152,7 @@ inline void check_equals(T const &a, U const &b,
   BOOST_PP_CAT(TESTSOON_GEN_TUPLE2SEQ_PROCESS x, _ELIM)
 
 #define TESTSOON_PARAM_CHANGES(x) \
-  ((0, ~)) \
+  ((0, BOOST_PP_SEQ_ELEM(0, TESTSOON_PARAM_INITIAL))) \
   BOOST_PP_SEQ_FOR_EACH( \
     TESTSOON_PARAM_EXPAND, \
     ~, \
@@ -166,7 +166,8 @@ inline void check_equals(T const &a, U const &b,
 
 #define TESTSOON_PARAM__name(x) ((0, x))
 
-#define TESTSOON_PARAM_INITIAL (~)
+#define TESTSOON_PARAM_INITIAL \
+  ("")
 
 #define TESTSOON_PARAM_COMBINE(s, state, x) \
   BOOST_PP_SEQ_REPLACE( \

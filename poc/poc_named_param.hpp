@@ -3,6 +3,7 @@
 #include <boost/preprocessor/seq/fold_left.hpp>
 #include <boost/preprocessor/seq/replace.hpp>
 #include <boost/preprocessor/seq/to_tuple.hpp>
+#include <boost/preprocessor/seq/elem.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 
 #define TESTSOON_GEN_TUPLE2SEQ_PROCESS2(x, y) \
@@ -20,7 +21,7 @@
   BOOST_PP_CAT(TESTSOON_GEN_TUPLE2SEQ_PROCESS x, _ELIM)
 
 #define TESTSOON_PARAM_CHANGES(x) \
-  ((0, 0)) \
+  ((0, BOOST_PP_SEQ_ELEM(0, TESTSOON_PARAM_INITIAL))) \
   BOOST_PP_SEQ_FOR_EACH( \
     TESTSOON_PARAM_EXPAND, \
     ~, \
@@ -36,7 +37,8 @@
 #define TESTSOON_PARAM__extra(x) ((1, x))
 #define TESTSOON_PARAM__foo(x) ((2, x))
 
-#define TESTSOON_PARAM_INITIAL (0) (0) (0)
+#define TESTSOON_PARAM_INITIAL \
+  (1) (1) (1)
 
 #define TESTSOON_PARAM_COMBINE(s, state, x) \
   BOOST_PP_SEQ_REPLACE( \

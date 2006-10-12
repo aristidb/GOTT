@@ -5,5 +5,8 @@
 TEST() {
 }
 
-XTEST((name, dummy) (name, foo)) {
+XTEST((name, "dummy") (name, "foo")) {
+}
+
+XTEST() {
 }
