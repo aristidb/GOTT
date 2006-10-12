@@ -8,13 +8,17 @@
 #include <boost/preprocessor/seq/to_tuple.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 
-struct test_info;
-
 #ifndef NO_STDLIB
 #include <string>
 #include <list>
 #include <iostream>
+#endif
 
+namespace test_soon {
+
+struct test_info;
+
+#ifndef NO_STDLIB
 typedef std::string test_string;
 typedef std::list<test_info> test_info_list;
 #endif
@@ -97,18 +101,18 @@ inline void test_holder::add(test_info const &info) {
   tests.push_back(info);
 }
 
-static inline test_string test_group() { return std::string("/"); }
-
 extern test_holder &tests();
 
 inline bool operator<(test_info const &a, test_info const &b) {
   return a.function < b.function;
 }
 
+///@internal
 inline void fail(char const *msg, char const *file, unsigned line) {
 	throw test_failure(msg, file, line);
 }
 
+///@internal
 template<class T, class U>
 inline void check_equals(T const &a, U const &b,
                          char const *msg, char const *file, unsigned line) {
@@ -116,100 +120,154 @@ inline void check_equals(T const &a, U const &b,
     fail(msg, file, line);
 }
 
-#define TEST_REGISTRY test_holder &tests() { static test_holder t; return t; }
+/**
+ * Add this macro to exactly one source file to ensure proper instantiation.
+ */
+#define TEST_REGISTRY \
+  namespace test_soon { \
+    test_holder &tests() { \
+      static test_holder t; \
+      return t; \
+    } \
+  }
 
+/**
+ * Declare a test group.
+ * Test groups are nestable.
+ */
 #define TEST_GROUP(name) \
     namespace BOOST_PP_CAT(name, _helper) { \
-      static test_string upper_test_group() { return test_group(); } \
+      static ::test_soon::test_string upper_test_group() { return test_group(); } \
     } \
     namespace name { \
-      static test_string test_group() { \
+      static ::test_soon::test_string test_group() { \
         return BOOST_PP_CAT(name, _helper)::upper_test_group() + (#name "/"); \
       }\
     }\
     namespace name
 
+/**
+ * Declare a test (positional).
+ * \param name The name of the test (quoted).
+ */
 #define PTEST(name) \
   static void BOOST_PP_CAT(test_, __LINE__) (); \
-  static test_info BOOST_PP_CAT(reg_, __LINE__) \
-    (tests(), name, __FILE__, __LINE__, test_group(), &BOOST_PP_CAT(test_, __LINE__)); \
+  static ::test_soon::test_info BOOST_PP_CAT(reg_, __LINE__) \
+    (::test_soon::tests(), name, __FILE__, __LINE__, test_group(), &BOOST_PP_CAT(test_, __LINE__)); \
   static void BOOST_PP_CAT(test_, __LINE__) ()
 
+/**
+ * Declare a test (optional name only).
+ * \param name The name of the test (not quoted).
+ */
 #define TEST(name) PTEST(#name)
 
-#define TESTSOON_GEN_TUPLE2SEQ_PROCESS2(x, y) \
+#ifndef IN_DOXYGEN
+
+#define TEST_SOON_GEN_TUPLE2SEQ_PROCESS2(x, y) \
   ((x, y)) \
-  TESTSOON_GEN_TUPLE2SEQ_PROCESS
+  TEST_SOON_GEN_TUPLE2SEQ_PROCESS
 
-#define TESTSOON_GEN_TUPLE2SEQ_PROCESS(x, y) \
+#define TEST_SOON_GEN_TUPLE2SEQ_PROCESS(x, y) \
   ((x, y)) \
-  TESTSOON_GEN_TUPLE2SEQ_PROCESS2
+  TEST_SOON_GEN_TUPLE2SEQ_PROCESS2
 
-#define TESTSOON_GEN_TUPLE2SEQ_PROCESS_ELIM
-#define TESTSOON_GEN_TUPLE2SEQ_PROCESS2_ELIM
+#define TEST_SOON_GEN_TUPLE2SEQ_PROCESS_ELIM
+#define TEST_SOON_GEN_TUPLE2SEQ_PROCESS2_ELIM
 
-#define TESTSOON_GEN_TUPLE2SEQ(x) \
-  BOOST_PP_CAT(TESTSOON_GEN_TUPLE2SEQ_PROCESS x, _ELIM)
+#define TEST_SOON_GEN_TUPLE2SEQ(x) \
+  BOOST_PP_CAT(TEST_SOON_GEN_TUPLE2SEQ_PROCESS x, _ELIM)
 
-#define TESTSOON_PARAM_CHANGES(x) \
-  ((0, BOOST_PP_SEQ_ELEM(0, TESTSOON_PARAM_INITIAL))) \
+#define TEST_SOON_PARAM_CHANGES(x) \
+  ((0, BOOST_PP_SEQ_ELEM(0, TEST_SOON_PARAM_INITIAL))) \
   BOOST_PP_SEQ_FOR_EACH( \
-    TESTSOON_PARAM_EXPAND, \
+    TEST_SOON_PARAM_EXPAND, \
     ~, \
-    TESTSOON_GEN_TUPLE2SEQ(x))
+    TEST_SOON_GEN_TUPLE2SEQ(x))
 
-#define TESTSOON_PARAM_EXPAND(r, d, e) \
-  TESTSOON_PARAM_EXPAND2 e
+#define TEST_SOON_PARAM_EXPAND(r, d, e) \
+  TEST_SOON_PARAM_EXPAND2 e
 
-#define TESTSOON_PARAM_EXPAND2(x, y) \
-  BOOST_PP_CAT(TESTSOON_PARAM__, x)(y)
+#define TEST_SOON_PARAM_EXPAND2(x, y) \
+  BOOST_PP_CAT(TEST_SOON_PARAM__, x)(y)
 
-#define TESTSOON_PARAM__name(x) ((0, x))
+#define TEST_SOON_PARAM__name(x) ((0, x))
 
-#define TESTSOON_PARAM_INITIAL \
+#define TEST_SOON_PARAM_INITIAL \
   ("")
 
-#define TESTSOON_PARAM_COMBINE(s, state, x) \
+#define TEST_SOON_PARAM_COMBINE(s, state, x) \
   BOOST_PP_SEQ_REPLACE( \
     state, \
     BOOST_PP_TUPLE_ELEM(2, 0, x), \
     BOOST_PP_TUPLE_ELEM(2, 1, x))
 
-#define TESTSOON_PARAM_INVOKE2(x) \
+#define TEST_SOON_PARAM_INVOKE2(x) \
   BOOST_PP_SEQ_TO_TUPLE( \
     BOOST_PP_SEQ_FOLD_LEFT( \
-      TESTSOON_PARAM_COMBINE, \
-      TESTSOON_PARAM_INITIAL, \
-      TESTSOON_PARAM_CHANGES(x)))
+      TEST_SOON_PARAM_COMBINE, \
+      TEST_SOON_PARAM_INITIAL, \
+      TEST_SOON_PARAM_CHANGES(x)))
 
-#define TESTSOON_PARAM_INVOKEx(x) \
+#define TEST_SOON_PARAM_INVOKEx(x) \
   PTEST x
 
-#define TESTSOON_PARAM_INVOKE(x) \
-  TESTSOON_PARAM_INVOKEx(TESTSOON_PARAM_INVOKE2(x))
+#define TEST_SOON_PARAM_INVOKE(x) \
+  TEST_SOON_PARAM_INVOKEx(TEST_SOON_PARAM_INVOKE2(x))
 
-#define XTEST(x) TESTSOON_PARAM_INVOKE(x)
+#endif //IN_DOXY
 
+/**
+ * Declare a test (named parameters).
+ * \param name The name of the test (quoted).
+ */
+#define XTEST(named_parameter_sequence) \
+  TEST_SOON_PARAM_INVOKE(named_parameter_sequence)
+
+/**
+ * Check whether two values are equal.
+ * If both values are not equal, the test will fail.
+ * \param a Some value.
+ * \param b Another value.
+ */
 #define equals(a, b) \
-  check_equals(a, b, "not equal: " #a " and " #b, __FILE__, __LINE__)
+  ::test_soon::check_equals(a, b, "not equal: " #a " and " #b, __FILE__, __LINE__)
+
+/**
+ * Check that an expression throws.
+ * If no exception is thrown, the test will fail.
+ * \param x The expression to test.
+ * \param t The exception type to check for.
+ * \param w The expected value of caught_exception.what().
+ */
 #define throws(x, t, w) \
 	do { \
 		try { \
 			(x); \
-			fail("not throwed " #t, __FILE__, __LINE__); \
+			::test_soon::fail("not throwed " #t, __FILE__, __LINE__); \
 		} catch (t &e) { \
-			if (test_string(e.what()) != test_string((w))) \
-				fail("throwed " #t " with wrong message", __FILE__, __LINE__); \
+			if (::test_soon::test_string(e.what()) != ::test_soon::test_string((w))) \
+				::test_soon::fail("throwed " #t " with wrong message", __FILE__, __LINE__); \
 		} \
 	} while (0)
 
+/**
+ * Check that an expression does not throw.
+ * If a specified exception is thrown, the test will fail.
+ * \param x The expression to test.
+ * \param t The exception type to check for or "..." (without quotes).
+ */
 #define nothrows(x, t) \
 	do { \
 		try { \
 			(x); \
 		} catch (t) { \
-			fail("throwed " #t, __FILE__, __LINE__); \
+			::test_soon::fail("throwed " #t, __FILE__, __LINE__); \
 		} \
 	} while (0)
+
+}
+
+static inline ::test_soon::test_string test_group() { return std::string("/"); }
 
 #endif

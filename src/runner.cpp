@@ -3,6 +3,6 @@
 TEST_REGISTRY
 
 int main() {
-  default_reporter<> rep;
-  tests().run(rep);
+  test_soon::default_reporter<> rep;
+  test_soon::tests().run(rep);
 }

@@ -1,8 +1,6 @@
 #include "test.hpp"
 #include <exception>
 
-test_holder all_tests;
-
 int get_no() { return 7; }
 void foo() {}
 struct exception_type {};
