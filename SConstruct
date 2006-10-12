@@ -2,4 +2,4 @@ import glob
 Program("example",
         glob.glob("src/*.cpp"), 
         CPPPATH = [ "#include" ], 
-        CXXFLAGS = [ "-Wall", "-W", "-g" ] )
+        CXXFLAGS = [ "-Wall", "-W", "-g", "-Werror", "-pedantic" ] )

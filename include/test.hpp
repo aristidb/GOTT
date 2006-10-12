@@ -65,7 +65,8 @@ struct default_reporter : test_reporter {
         << it.file << ", "
         << it.line << ", "
         << it.group << ", "
-        << (void*)it.function << " " << state << std::endl;
+        //<< (void*)it.function << " " //DAS hier stört -pedantic 
+        << state << std::endl;
   }
   void success(test_info const &it){
     tell_test(it,"success");

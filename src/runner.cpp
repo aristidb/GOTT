@@ -1,6 +1,6 @@
 #include "test.hpp"
 
-TEST_REGISTRY;
+TEST_REGISTRY
 
 int main() {
   default_reporter<> rep;
