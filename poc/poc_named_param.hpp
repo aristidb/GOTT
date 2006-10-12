@@ -4,46 +4,68 @@
 #include <boost/preprocessor/seq/replace.hpp>
 #include <boost/preprocessor/seq/to_tuple.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
-#include <boost/preprocessor/facilities/empty.hpp>
 
-#define PROCESS2(x, y) ((x, y)) PROCESS
-#define PROCESS(x, y) ((x, y)) PROCESS2
-#define PROCESS_ELIM
-#define PROCESS2_ELIM
+#define TESTSOON_GEN_TUPLE2SEQ_PROCESS2(x, y) \
+  ((x, y)) \
+  TESTSOON_GEN_TUPLE2SEQ_PROCESS
 
-#define T2S(x) BOOST_PP_CAT(PROCESS x, _ELIM)
+#define TESTSOON_GEN_TUPLE2SEQ_PROCESS(x, y) \
+  ((x, y)) \
+  TESTSOON_GEN_TUPLE2SEQ_PROCESS2
 
-#define INSTRS(x) ((0, 0)) BOOST_PP_SEQ_FOR_EACH(EXPAND, ~, T2S(x))
+#define TESTSOON_GEN_TUPLE2SEQ_PROCESS_ELIM
+#define TESTSOON_GEN_TUPLE2SEQ_PROCESS2_ELIM
 
-#define EXPAND(r, d, e) EXPAND2 e
-#define EXPAND2(x, y) BOOST_PP_CAT(PARAM_, x)(y)
+#define TESTSOON_GEN_TUPLE2SEQ(x) \
+  BOOST_PP_CAT(TESTSOON_GEN_TUPLE2SEQ_PROCESS x, _ELIM)
 
-#define PARAM_name(x) ((0, x))
-#define PARAM_extra(x) ((1, x))
-#define PARAM_foo(x) ((2, x))
+#define TESTSOON_PARAM_CHANGES(x) \
+  ((0, 0)) \
+  BOOST_PP_SEQ_FOR_EACH( \
+    TESTSOON_PARAM_EXPAND, \
+    ~, \
+    TESTSOON_GEN_TUPLE2SEQ(x))
 
-#define INITIAL (0) (0) (0)
+#define TESTSOON_PARAM_EXPAND(r, d, e) \
+  TESTSOON_PARAM_EXPAND2 e
 
-#define COMBINE(s, state, x) \
+#define TESTSOON_PARAM_EXPAND2(x, y) \
+  BOOST_PP_CAT(TESTSOON_PARAM__, x)(y)
+
+#define TESTSOON_PARAM__name(x) ((0, x))
+#define TESTSOON_PARAM__extra(x) ((1, x))
+#define TESTSOON_PARAM__foo(x) ((2, x))
+
+#define TESTSOON_PARAM_INITIAL (0) (0) (0)
+
+#define TESTSOON_PARAM_COMBINE(s, state, x) \
   BOOST_PP_SEQ_REPLACE( \
     state, \
     BOOST_PP_TUPLE_ELEM(2, 0, x), \
     BOOST_PP_TUPLE_ELEM(2, 1, x))
 
-#define INVOKE2(x) \
+#define TESTSOON_PARAM_INVOKE2(x) \
   BOOST_PP_SEQ_TO_TUPLE( \
     BOOST_PP_SEQ_FOLD_LEFT( \
-      COMBINE, \
-      INITIAL, \
-      INSTRS(x)))
+      TESTSOON_PARAM_COMBINE, \
+      TESTSOON_PARAM_INITIAL, \
+      TESTSOON_PARAM_CHANGES(x)))
 
-#define RUN(name, extra, foo) NAME=name, EXTRA=extra, FOO=foo
+#define TESTSOON_PARAM_RUN(name, extra, foo) \
+  NAME=name, EXTRA=extra, FOO=foo
 
-#define INVOKEx(x) RUN x
-#define INVOKE(x) INVOKEx(INVOKE2(x))
+#define TESTSOON_PARAM_INVOKEx(x) \
+  TESTSOON_PARAM_RUN x
+
+#define TESTSOON_PARAM_INVOKE(x) \
+  TESTSOON_PARAM_INVOKEx(TESTSOON_PARAM_INVOKE2(x))
+
+#define INVOKE(x) TESTSOON_PARAM_INVOKE(x)
 
 INVOKE( (name, "hey") (extra, bla) (foo, bar) )
-INVOKE( (extra, "test") (name, "hallo") (foo, bar))
-INVOKE( (extra, "test") (name, "hallo"))
-INVOKE( (foo, "test") (name, "hallo"))
+INVOKE( (extra, "test") (name, "hallo") (foo, bar) )
+INVOKE( (extra, "test") (name, "hallo") )
+INVOKE( (foo, "test") (name, "hallo") )
+//INVOKE( (foo2, "test") (name, "hallo") )
+//INVOKE( (foo "test") (name, "hallo") )
 INVOKE()

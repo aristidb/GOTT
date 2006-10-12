@@ -4,3 +4,6 @@
 
 TEST() {
 }
+
+XTEST((name, dummy) (name, foo)) {
+}
