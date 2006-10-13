@@ -35,7 +35,7 @@ class test_group;
 
 class node {
 public:
-  node(test_group*);
+  node(test_group*,test_string const&);
   virtual void run(test_reporter &) const = 0;
   virtual ~node() {}
 
@@ -43,40 +43,42 @@ public:
 protected:
   test_group const *parent;
   node *next;
+  test_string const name;
 };
 
 class test_group : public node {
 public:
   test_group(test_group *parent = 0, test_string const &name = test_string())
-    : node(parent), name(name), child(0) {}
-
+    : node(parent,name), child(0) {}
+  
   void add(node *child) {
     //assume correctness of data - there is no one stops you from doing stupid stuff
     child->next = this->child;
     this->child=child;
   }
 
-  void run(test_reporter &) const {
+  void run(test_reporter & rep) const {
+    node* it = child;
+    while(it) {
+      it->run(rep);
+      it=it->next;
+    }
   }
 
-  test_string const name;
+  
   node *child;
 };
 
-inline node::node(test_group *parent=0)
-  : parent(parent), next(0) {
+inline node::node(test_group *parent=0, test_string const &name=test_string())
+  : parent(parent), next(0), name(name) {
   if (parent)
     parent->add(this);
 }
 
 class test_holder : public test_group {
 public:
-  test_holder() : test_group(0,"") {}
-  void run(test_reporter &) const;
-
-private:
-  test_info_list tests; // das kommt bald weg ;P
-  /* TEST INFO TREE HERE */
+  test_holder() : test_group(0, "") {}
+  //void run(test_reporter &) const;
 };
 
 class test_file : public test_group {
@@ -107,7 +109,7 @@ public:
 class test_failure {
 public:
   test_failure(test_string const &message, unsigned line)
-    : message(message), /*file(file),*/ line(line) {}
+    : message(message), line(line) {}
   ~test_failure() {}
   test_string message;
   unsigned line;
@@ -141,11 +143,6 @@ public:
 private:
   stream &out;
 };
-
-inline void test_holder::run(test_reporter &reporter) const {
-  for (std::list<test_info>::const_iterator it = tests.begin(); it != tests.end(); ++it)
-    it->run(reporter);
-}
 
 inline void test_info::run(test_reporter &reporter) const {
   try {
@@ -331,7 +328,7 @@ inline void check_equals(T const &a, U const &b,
 }
 
 inline ::testsoon::test_group *
-test_group(::testsoon::test_string const & = ::testsoon::test_string()) {
+test_group(::testsoon::test_string const &) {
   // TODO: file please
   return &::testsoon::tests();
 }
