@@ -27,50 +27,79 @@ typedef std::ostream testsoon_stream_class;
 #define TESTSOON_DEFAULT_STREAM std::cout
 #endif
 
+
 class test_reporter;
+
+
+class test_group;
 
 class node {
 public:
-  node(node* parent=0) : parent(parent) {}
+  node(test_group*);
   virtual void run(test_reporter &) const = 0;
   virtual ~node() {}
 
-private:
-  node* parent;
+  friend class test_group;
+protected:
+  test_group const *parent;
+  node *next;
 };
 
-
-class test_holder : node {
+class test_group : public node {
 public:
+  test_group(test_group *parent = 0, test_string const &name = test_string())
+    : node(parent), name(name), child(0) {}
+
+  void add(node *child) {
+    //assume correctness of data - there is no one stops you from doing stupid stuff
+    child->next = this->child;
+    this->child=child;
+  }
+
+  void run(test_reporter &) const {
+  }
+
+  test_string const name;
+  node *child;
+};
+
+inline node::node(test_group *parent=0)
+  : parent(parent), next(0) {
+  if (parent)
+    parent->add(this);
+}
+
+class test_holder : public test_group {
+public:
+  test_holder() : test_group(0,"") {}
   void run(test_reporter &) const;
   void add(test_info const &info);
 
 private:
-  test_info_list tests;
+  test_info_list tests; // das kommt bald weg ;P
   /* TEST INFO TREE HERE */
 };
 
-struct test_group : node {
-  void run(test_reporter &) const {
-  }
+class test_file : public test_group {
 };
 
-class test_info : node {
+
+
+class test_info : public node {
 public:
-  test_info(
-            test_holder &tests,
+  test_info(test_holder &tests,
             test_string const &name, test_string const &file, unsigned line,
             test_string const &group, void (*function)())
-    : name(name), file(file), line(line), group(group), function(function) {
+  : name(name), file(file), line(line), group(group), function(function) {
     tests.add(*this);
   }
 
   void run(test_reporter &) const;
 
-  const test_string name;
-  const test_string file;
-  const unsigned line;
-  const test_string group;
+  test_string const name;
+  test_string const file;
+  unsigned const line;
+  test_string const group;
 
   typedef void test_function_type();
   test_function_type * const function;
