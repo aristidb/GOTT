@@ -1,5 +1,5 @@
-#ifndef TEST_HPP
-#define TEST_HPP
+#ifndef TESTSOON_HPP
+#define TESTSOON_HPP
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
@@ -67,14 +67,13 @@ public:
 
   void run(test_reporter &) const;
 
-  friend bool operator<(test_info const &,test_info const &);
-  friend class default_reporter; //FIXME
-private:
-  test_string name;
-  test_string file;
-  unsigned line;
-  test_string group;
-  void (*function)();
+  const test_string name;
+  const test_string file;
+  const unsigned line;
+  const test_string group;
+
+  typedef void test_function_type();
+  test_function_type * const function;
 };
 
 
