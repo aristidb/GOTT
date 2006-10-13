@@ -1,3 +1,4 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 #ifndef TESTSOON_HPP
 #define TESTSOON_HPP
 
@@ -15,25 +16,21 @@
 
 namespace testsoon {
 
-struct test_info;
-
 #ifndef NO_STDLIB
+
 typedef std::string test_string;
-
 typedef std::ostream stream_class;
-
 #define DEFAULT_STREAM std::cout
+
 #endif
 
-
 class test_reporter;
-
-
+class test_info;
 class test_group;
 
 class node {
 public:
-  node(test_group *, test_string const &);
+  node(test_group *, test_string const &, bool = false);
   virtual void run(test_reporter &) const = 0;
   virtual ~node() {}
 
@@ -52,32 +49,37 @@ inline stream_class &operator<<(stream_class &out, node const &n) {
   return out;
 }
 
+class test_info;
+
 class test_group : public node {
 public:
   test_group(test_group *parent, test_string const &name)
     : node(parent, name), child(0) {}
   
-  void add(node *nchild) {
-    nchild->next = this->child;
-    this->child = nchild;
-  }
+  void add(node *, bool);
 
   void run(test_reporter &rep) const;
 
 private:
   node *child;
+  test_info *test;
 };
 
-inline node::node(test_group *parent=0, test_string const &name=test_string())
+inline node::node(test_group *parent=0,
+                  test_string const &name=test_string(),
+                  bool is_test)
   : parent(parent), name(name), next(0) {
   if (parent)
-    parent->add(this);
+    parent->add(this, is_test);
 }
 
 inline void node::print(stream_class &out) const {
   if (parent)
     parent->print(out);
-  out << '/' << name << '(' << typeid(*this).name() << ')';
+  out << '/' << name;
+#if 0
+  out << '(' << typeid(*this).name() << ')';
+#endif
 }
 
 class test_holder : public test_group {
@@ -89,14 +91,12 @@ public:
 class test_file : public test_group {
 };
 
-
-
 class test_info : public node {
 public:
   test_info(test_group *group,
             test_string const &name, test_string const &file, unsigned line,
             void (*function)())
-  : node(group, name), file(file), line(line), function(function) {}
+  : node(group, name, true), file(file), line(line), function(function) {}
 
   void run(test_reporter &) const;
 
@@ -106,7 +106,6 @@ public:
   typedef void test_function_type();
   test_function_type * const function;
 };
-
 
 class test_failure {
 public:
@@ -152,22 +151,35 @@ public:
     out << '.';
     out.flush();
   }
-  void failure(test_info const &it, test_failure const &fail){
-    tell_test(it,"fail");
-    out << "\treason: " << fail.message << std::endl;
+  void failure(test_info const &, test_failure const &){
+    out << "[F]";
     out.flush();
   }
 private:
   stream &out;
 };
 
+inline void test_group::add(node *nchild, bool is_test) {
+  if (is_test) {
+    test_info *ntest = static_cast<test_info *>(nchild);
+    ntest->next = test;
+    test = ntest;
+  } else {
+    nchild->next = child;
+    child = nchild;
+  }
+}
+
 inline void test_group::run(test_reporter &rep) const {
   rep.begin_group(*this);
-  node *it = child;
-  while (it) {
-    it->run(rep);
-    it = it->next;
+  if (test) {
+    rep.before_tests(*this);
+    for (node *it = test; it; it = it->next)
+      it->run(rep);
+    rep.after_tests(*this);
   }
+  for (node *it = child; it; it = it->next)
+    it->run(rep);
   rep.end_group(*this);
 }
 
