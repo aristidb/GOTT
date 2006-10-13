@@ -8,5 +8,5 @@ TEST() {
 XTEST((name, "dummy") (name, "foo")) {
 }
 
-XTEST() {
+XTEST((fixture, muh)) {
 }

@@ -25,23 +25,47 @@ typedef std::list<test_info> test_info_list;
 
 class test_reporter;
 
-struct test_holder {
-  test_info_list tests;
+class node {
+public:
+  node(node* parent=0) : parent(parent) {}
+  virtual void run(test_reporter &) const = 0;
+  virtual ~node() {}
 
-  void run(test_reporter &);
-  void add(test_info const &info);
+private:
+  node* parent;
 };
 
-struct test_info {
+
+class test_holder : node {
+public:
+  void run(test_reporter &) const;
+  void add(test_info const &info);
+
+private:
+  test_info_list tests;
+  /* TEST INFO TREE HERE */
+};
+
+struct test_group : node {
+  void run(test_reporter &) const {
+  }
+};
+
+class test_info : node {
+public:
   test_info(
             test_holder &tests,
-            char const *name, char const *file, unsigned line,
+            test_string const &name, test_string const &file, unsigned line,
             test_string const &group, void (*function)())
     : name(name), file(file), line(line), group(group), function(function) {
     tests.add(*this);
   }
-  char const *name;
-  char const *file;
+
+  void run(test_reporter &) const;
+
+public:
+  test_string name;
+  test_string file;
   unsigned line;
   test_string group;
   void (*function)();
@@ -86,14 +110,17 @@ private:
   stream &out;
 };
 
-inline void test_holder::run(test_reporter &reporter) {
-  for (std::list<test_info>::iterator it = tests.begin(); it != tests.end(); ++it) {
-    try {
-      it->function();
-      reporter.success(*it);
-    } catch (test_failure const &x) {
-      reporter.failure(*it, x);
-    }
+inline void test_holder::run(test_reporter &reporter) const {
+  for (std::list<test_info>::const_iterator it = tests.begin(); it != tests.end(); ++it)
+    it->run(reporter);
+}
+
+inline void test_info::run(test_reporter &reporter) const {
+  try {
+    function();
+    reporter.success(*this);
+  } catch (test_failure const &x) {
+    reporter.failure(*this, x);
   }
 }
 
@@ -150,7 +177,7 @@ inline void check_equals(T const &a, U const &b,
  * Declare a test (positional).
  * \param name The name of the test (quoted).
  */
-#define PTEST(name) \
+#define PTEST(name, fixture) \
   static void BOOST_PP_CAT(test_, __LINE__) (); \
   static ::test_soon::test_info BOOST_PP_CAT(reg_, __LINE__) \
     (::test_soon::tests(), name, __FILE__, __LINE__, test_group(), &BOOST_PP_CAT(test_, __LINE__)); \
@@ -160,7 +187,7 @@ inline void check_equals(T const &a, U const &b,
  * Declare a test (optional name only).
  * \param name The name of the test (not quoted).
  */
-#define TEST(name) PTEST(#name)
+#define TEST(name) PTEST(#name, (0, ~))
 
 #ifndef IN_DOXYGEN
 
@@ -189,12 +216,7 @@ inline void check_equals(T const &a, U const &b,
   TEST_SOON_PARAM_EXPAND2 e
 
 #define TEST_SOON_PARAM_EXPAND2(x, y) \
-  BOOST_PP_CAT(TEST_SOON_PARAM__, x)(y)
-
-#define TEST_SOON_PARAM__name(x) ((0, x))
-
-#define TEST_SOON_PARAM_INITIAL \
-  ("")
+  ((BOOST_PP_CAT(TEST_SOON_PARAM__, x)(y)))
 
 #define TEST_SOON_PARAM_COMBINE(s, state, x) \
   BOOST_PP_SEQ_REPLACE( \
@@ -209,11 +231,17 @@ inline void check_equals(T const &a, U const &b,
       TEST_SOON_PARAM_INITIAL, \
       TEST_SOON_PARAM_CHANGES(x)))
 
-#define TEST_SOON_PARAM_INVOKEx(x) \
-  PTEST x
-
 #define TEST_SOON_PARAM_INVOKE(x) \
   TEST_SOON_PARAM_INVOKEx(TEST_SOON_PARAM_INVOKE2(x))
+
+#define TEST_SOON_PARAM__name(x)        0, x
+#define TEST_SOON_PARAM__fixture(x)     1, (1, x)
+
+#define TEST_SOON_PARAM_INITIAL \
+  ("") ((0, ~))
+
+#define TEST_SOON_PARAM_INVOKEx(x) \
+  PTEST x
 
 #endif //IN_DOXY
 
