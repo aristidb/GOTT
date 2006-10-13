@@ -14,13 +14,17 @@
 #include <iostream>
 #endif
 
-namespace test_soon {
+namespace testsoon {
 
 struct test_info;
 
 #ifndef NO_STDLIB
 typedef std::string test_string;
 typedef std::list<test_info> test_info_list;
+
+typedef std::ostream testsoon_stream_class;
+
+#define TESTSOON_DEFAULT_STREAM std::cout
 #endif
 
 class test_reporter;
@@ -63,13 +67,16 @@ public:
 
   void run(test_reporter &) const;
 
-public:
+  friend bool operator<(test_info const &,test_info const &);
+  friend class default_reporter; //FIXME
+private:
   test_string name;
   test_string file;
   unsigned line;
   test_string group;
   void (*function)();
 };
+
 
 class test_failure {
 public:
@@ -88,9 +95,10 @@ public:
   virtual ~test_reporter() {}
 };
 
-template<class stream = std::ostream>
-struct default_reporter : test_reporter {
-  default_reporter(stream &out = std::cout) : out(out) {}
+class default_reporter : public test_reporter {
+public:
+  typedef testsoon_stream_class stream;
+  default_reporter(stream &out = TESTSOON_DEFAULT_STREAM) : out(out) {}
   void tell_test(test_info const &it, char const *state) {
     out << '"' << it.name << "\", "
         << it.file << ", "
@@ -151,7 +159,7 @@ inline void check_equals(T const &a, U const &b,
  * Add this macro to exactly one source file to ensure proper instantiation.
  */
 #define TEST_REGISTRY \
-  namespace test_soon { \
+  namespace testsoon { \
     test_holder &tests() { \
       static test_holder t; \
       return t; \
@@ -164,10 +172,10 @@ inline void check_equals(T const &a, U const &b,
  */
 #define TEST_GROUP(name) \
     namespace BOOST_PP_CAT(name, _helper) { \
-      static ::test_soon::test_string upper_test_group() { return test_group(); } \
+      static ::testsoon::test_string upper_test_group() { return test_group(); } \
     } \
     namespace name { \
-      static ::test_soon::test_string test_group() { \
+      static ::testsoon::test_string test_group() { \
         return BOOST_PP_CAT(name, _helper)::upper_test_group() + (#name "/"); \
       }\
     }\
@@ -179,8 +187,8 @@ inline void check_equals(T const &a, U const &b,
  */
 #define PTEST(name, fixture) \
   static void BOOST_PP_CAT(test_, __LINE__) (); \
-  static ::test_soon::test_info BOOST_PP_CAT(reg_, __LINE__) \
-    (::test_soon::tests(), name, __FILE__, __LINE__, test_group(), &BOOST_PP_CAT(test_, __LINE__)); \
+  static ::testsoon::test_info BOOST_PP_CAT(reg_, __LINE__) \
+    (::testsoon::tests(), name, __FILE__, __LINE__, test_group(), &BOOST_PP_CAT(test_, __LINE__)); \
   static void BOOST_PP_CAT(test_, __LINE__) ()
 
 /**
@@ -191,56 +199,56 @@ inline void check_equals(T const &a, U const &b,
 
 #ifndef IN_DOXYGEN
 
-#define TEST_SOON_GEN_TUPLE2SEQ_PROCESS2(x, y) \
+#define TESTSOON_GEN_TUPLE2SEQ_PROCESS2(x, y) \
   ((x, y)) \
-  TEST_SOON_GEN_TUPLE2SEQ_PROCESS
+  TESTSOON_GEN_TUPLE2SEQ_PROCESS
 
-#define TEST_SOON_GEN_TUPLE2SEQ_PROCESS(x, y) \
+#define TESTSOON_GEN_TUPLE2SEQ_PROCESS(x, y) \
   ((x, y)) \
-  TEST_SOON_GEN_TUPLE2SEQ_PROCESS2
+  TESTSOON_GEN_TUPLE2SEQ_PROCESS2
 
-#define TEST_SOON_GEN_TUPLE2SEQ_PROCESS_ELIM
-#define TEST_SOON_GEN_TUPLE2SEQ_PROCESS2_ELIM
+#define TESTSOON_GEN_TUPLE2SEQ_PROCESS_ELIM
+#define TESTSOON_GEN_TUPLE2SEQ_PROCESS2_ELIM
 
-#define TEST_SOON_GEN_TUPLE2SEQ(x) \
-  BOOST_PP_CAT(TEST_SOON_GEN_TUPLE2SEQ_PROCESS x, _ELIM)
+#define TESTSOON_GEN_TUPLE2SEQ(x) \
+  BOOST_PP_CAT(TESTSOON_GEN_TUPLE2SEQ_PROCESS x, _ELIM)
 
-#define TEST_SOON_PARAM_CHANGES(x) \
-  ((0, BOOST_PP_SEQ_ELEM(0, TEST_SOON_PARAM_INITIAL))) \
+#define TESTSOON_PARAM_CHANGES(x) \
+  ((0, BOOST_PP_SEQ_ELEM(0, TESTSOON_PARAM_INITIAL))) \
   BOOST_PP_SEQ_FOR_EACH( \
-    TEST_SOON_PARAM_EXPAND, \
+    TESTSOON_PARAM_EXPAND, \
     ~, \
-    TEST_SOON_GEN_TUPLE2SEQ(x))
+    TESTSOON_GEN_TUPLE2SEQ(x))
 
-#define TEST_SOON_PARAM_EXPAND(r, d, e) \
-  TEST_SOON_PARAM_EXPAND2 e
+#define TESTSOON_PARAM_EXPAND(r, d, e) \
+  TESTSOON_PARAM_EXPAND2 e
 
-#define TEST_SOON_PARAM_EXPAND2(x, y) \
-  ((BOOST_PP_CAT(TEST_SOON_PARAM__, x)(y)))
+#define TESTSOON_PARAM_EXPAND2(x, y) \
+  ((BOOST_PP_CAT(TESTSOON_PARAM__, x)(y)))
 
-#define TEST_SOON_PARAM_COMBINE(s, state, x) \
+#define TESTSOON_PARAM_COMBINE(s, state, x) \
   BOOST_PP_SEQ_REPLACE( \
     state, \
     BOOST_PP_TUPLE_ELEM(2, 0, x), \
     BOOST_PP_TUPLE_ELEM(2, 1, x))
 
-#define TEST_SOON_PARAM_INVOKE2(x) \
+#define TESTSOON_PARAM_INVOKE2(x) \
   BOOST_PP_SEQ_TO_TUPLE( \
     BOOST_PP_SEQ_FOLD_LEFT( \
-      TEST_SOON_PARAM_COMBINE, \
-      TEST_SOON_PARAM_INITIAL, \
-      TEST_SOON_PARAM_CHANGES(x)))
+      TESTSOON_PARAM_COMBINE, \
+      TESTSOON_PARAM_INITIAL, \
+      TESTSOON_PARAM_CHANGES(x)))
 
-#define TEST_SOON_PARAM_INVOKE(x) \
-  TEST_SOON_PARAM_INVOKEx(TEST_SOON_PARAM_INVOKE2(x))
+#define TESTSOON_PARAM_INVOKE(x) \
+  TESTSOON_PARAM_INVOKEx(TESTSOON_PARAM_INVOKE2(x))
 
-#define TEST_SOON_PARAM__name(x)        0, x
-#define TEST_SOON_PARAM__fixture(x)     1, (1, x)
+#define TESTSOON_PARAM__name(x)        0, x
+#define TESTSOON_PARAM__fixture(x)     1, (1, x)
 
-#define TEST_SOON_PARAM_INITIAL \
+#define TESTSOON_PARAM_INITIAL \
   ("") ((0, ~))
 
-#define TEST_SOON_PARAM_INVOKEx(x) \
+#define TESTSOON_PARAM_INVOKEx(x) \
   PTEST x
 
 #endif //IN_DOXY
@@ -250,7 +258,7 @@ inline void check_equals(T const &a, U const &b,
  * \param name The name of the test (quoted).
  */
 #define XTEST(named_parameter_sequence) \
-  TEST_SOON_PARAM_INVOKE(named_parameter_sequence)
+  TESTSOON_PARAM_INVOKE(named_parameter_sequence)
 
 /**
  * Check whether two values are equal.
@@ -259,7 +267,7 @@ inline void check_equals(T const &a, U const &b,
  * \param b Another value.
  */
 #define equals(a, b) \
-  ::test_soon::check_equals(a, b, "not equal: " #a " and " #b, __FILE__, __LINE__)
+  ::testsoon::check_equals(a, b, "not equal: " #a " and " #b, __FILE__, __LINE__)
 
 /**
  * Check that an expression throws.
@@ -272,10 +280,10 @@ inline void check_equals(T const &a, U const &b,
 	do { \
 		try { \
 			(x); \
-			::test_soon::fail("not throwed " #t, __FILE__, __LINE__); \
+			::testsoon::fail("not throwed " #t, __FILE__, __LINE__); \
 		} catch (t &e) { \
-			if (::test_soon::test_string(e.what()) != ::test_soon::test_string((w))) \
-				::test_soon::fail("throwed " #t " with wrong message", __FILE__, __LINE__); \
+			if (::testsoon::test_string(e.what()) != ::testsoon::test_string((w))) \
+				::testsoon::fail("throwed " #t " with wrong message", __FILE__, __LINE__); \
 		} \
 	} while (0)
 
@@ -290,12 +298,12 @@ inline void check_equals(T const &a, U const &b,
 		try { \
 			(x); \
 		} catch (t) { \
-			::test_soon::fail("throwed " #t, __FILE__, __LINE__); \
+			::testsoon::fail("throwed " #t, __FILE__, __LINE__); \
 		} \
 	} while (0)
 
 }
 
-static inline ::test_soon::test_string test_group() { return std::string("/"); }
+static inline ::testsoon::test_string test_group() { return std::string("/"); }
 
 #endif
