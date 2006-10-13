@@ -10,7 +10,6 @@
 
 #ifndef NO_STDLIB
 #include <string>
-#include <list>
 #include <iostream>
 #endif
 
@@ -20,11 +19,10 @@ struct test_info;
 
 #ifndef NO_STDLIB
 typedef std::string test_string;
-typedef std::list<test_info> test_info_list;
 
-typedef std::ostream testsoon_stream_class;
+typedef std::ostream stream_class;
 
-#define TESTSOON_DEFAULT_STREAM std::cout
+#define DEFAULT_STREAM std::cout
 #endif
 
 
@@ -35,44 +33,57 @@ class test_group;
 
 class node {
 public:
-  node(test_group*,test_string const&);
+  node(test_group *, test_string const &);
   virtual void run(test_reporter &) const = 0;
   virtual ~node() {}
 
-  friend class test_group;
-protected:
-  test_group const *parent;
-  node *next;
+  test_group const * const parent;
   test_string const name;
+
+  void print(stream_class &out) const;
+
+private:
+  friend class test_group;
+  node *next;
 };
+
+inline stream_class &operator<<(stream_class &out, node const &n) {
+  n.print(out);
+  return out;
+}
 
 class test_group : public node {
 public:
-  test_group(test_group *parent = 0, test_string const &name = test_string())
-    : node(parent,name), child(0) {}
+  test_group(test_group *parent, test_string const &name)
+    : node(parent, name), child(0) {}
   
-  void add(node *child) {
-    //assume correctness of data - there is no one stops you from doing stupid stuff
-    child->next = this->child;
-    this->child=child;
+  void add(node *nchild) {
+    nchild->next = this->child;
+    this->child = nchild;
   }
 
-  void run(test_reporter & rep) const {
-    node* it = child;
-    while(it) {
+  void run(test_reporter &rep) const {
+    node *it = child;
+    while (it) {
       it->run(rep);
-      it=it->next;
+      it = it->next;
     }
   }
 
-  
+private:
   node *child;
 };
 
 inline node::node(test_group *parent=0, test_string const &name=test_string())
-  : parent(parent), next(0), name(name) {
+  : parent(parent), name(name), next(0) {
   if (parent)
     parent->add(this);
+}
+
+inline void node::print(stream_class &out) const {
+  if (parent)
+    parent->print(out);
+  out << name << '/';
 }
 
 class test_holder : public test_group {
@@ -91,13 +102,10 @@ public:
   test_info(test_group *group,
             test_string const &name, test_string const &file, unsigned line,
             void (*function)())
-  : name(name), file(file), line(line), function(function) {
-    group->add(this);
-  }
+  : node(group, name), file(file), line(line), function(function) {}
 
   void run(test_reporter &) const;
 
-  test_string const name;
   test_string const file;
   unsigned const line;
 
@@ -117,6 +125,7 @@ public:
 
 class test_reporter {
 public:
+  virtual void process_group(test_group const&)=0;
   virtual void success(test_info const&)=0;
   virtual void failure(test_info const&,test_failure const&)=0;
   virtual ~test_reporter() {}
@@ -124,21 +133,25 @@ public:
 
 class default_reporter : public test_reporter {
 public:
-  typedef testsoon_stream_class stream;
-  default_reporter(stream &out = TESTSOON_DEFAULT_STREAM) : out(out) {}
+  typedef stream_class stream;
+  default_reporter(stream &out = DEFAULT_STREAM) : out(out) {}
   void tell_test(test_info const &it, char const *state) {
     out << '"' << it.name << "\", "
+        << '"' << it << "\", "
         << it.file << ", "
         << it.line << ", "
         //<< (void*)it.function << " " //DAS hier stört -pedantic 
         << state << std::endl;
+  }
+  void process_group(test_group const &group) {
+    out << group;
   }
   void success(test_info const &it){
     tell_test(it,"success");
   }
   void failure(test_info const &it, test_failure const &fail){
     tell_test(it,"fail");
-    out << "Reason: " << fail.message << std::endl;
+    out << "\treason: " << fail.message << std::endl;
   }
 private:
   stream &out;
@@ -196,7 +209,7 @@ inline void check_equals(T const &a, U const &b,
     namespace name { \
       static ::testsoon::test_group *test_group(::testsoon::test_string const &) { \
         static ::testsoon::test_group current( \
-          BOOST_PP_CAT(name, _helper)::upper_test_group()); \
+          BOOST_PP_CAT(name, _helper)::upper_test_group(), #name); \
         return &current; \
       } \
     } \
