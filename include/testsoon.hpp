@@ -73,7 +73,6 @@ class test_holder : public test_group {
 public:
   test_holder() : test_group(0,"") {}
   void run(test_reporter &) const;
-  void add(test_info const &info);
 
 private:
   test_info_list tests; // das kommt bald weg ;P
@@ -87,11 +86,11 @@ class test_file : public test_group {
 
 class test_info : public node {
 public:
-  test_info(test_holder &tests,
+  test_info(test_group *group,
             test_string const &name, test_string const &file, unsigned line,
-            test_string const &group, void (*function)())
-  : name(name), file(file), line(line), group(group), function(function) {
-    tests.add(*this);
+            void (*function)())
+  : name(name), file(file), line(line), function(function) {
+    group->add(this);
   }
 
   void run(test_reporter &) const;
@@ -99,7 +98,6 @@ public:
   test_string const name;
   test_string const file;
   unsigned const line;
-  test_string const group;
 
   typedef void test_function_type();
   test_function_type * const function;
@@ -108,11 +106,10 @@ public:
 
 class test_failure {
 public:
-  test_failure(test_string const &message, char const *file, unsigned line)
-    : message(message), file(file), line(line) {}
+  test_failure(test_string const &message, unsigned line)
+    : message(message), /*file(file),*/ line(line) {}
   ~test_failure() {}
   test_string message;
-  char const *file;
   unsigned line;
 };
 
@@ -131,7 +128,6 @@ public:
     out << '"' << it.name << "\", "
         << it.file << ", "
         << it.line << ", "
-        << it.group << ", "
         //<< (void*)it.function << " " //DAS hier stört -pedantic 
         << state << std::endl;
   }
@@ -160,10 +156,6 @@ inline void test_info::run(test_reporter &reporter) const {
   }
 }
 
-inline void test_holder::add(test_info const &info) {
-  tests.push_back(info);
-}
-
 extern test_holder &tests();
 
 inline bool operator<(test_info const &a, test_info const &b) {
@@ -171,16 +163,16 @@ inline bool operator<(test_info const &a, test_info const &b) {
 }
 
 ///@internal
-inline void fail(char const *msg, char const *file, unsigned line) {
-	throw test_failure(msg, file, line);
+inline void fail(char const *msg, unsigned line) {
+	throw test_failure(msg, line);
 }
 
 ///@internal
 template<class T, class U>
 inline void check_equals(T const &a, U const &b,
-                         char const *msg, char const *file, unsigned line) {
+                         char const *msg, unsigned line) {
   if (!(a == b))
-    fail(msg, file, line);
+    fail(msg, line);
 }
 
 /**
@@ -200,13 +192,17 @@ inline void check_equals(T const &a, U const &b,
  */
 #define TEST_GROUP(name) \
     namespace BOOST_PP_CAT(name, _helper) { \
-      static ::testsoon::test_string upper_test_group() { return test_group(); } \
+      static ::testsoon::test_group *upper_test_group() { \
+        return test_group(__FILE__); \
+      } \
     } \
     namespace name { \
-      static ::testsoon::test_string test_group() { \
-        return BOOST_PP_CAT(name, _helper)::upper_test_group() + (#name "/"); \
-      }\
-    }\
+      static ::testsoon::test_group *test_group(::testsoon::test_string const &) { \
+        static ::testsoon::test_group current( \
+          BOOST_PP_CAT(name, _helper)::upper_test_group()); \
+        return &current; \
+      } \
+    } \
     namespace name
 
 /**
@@ -216,7 +212,9 @@ inline void check_equals(T const &a, U const &b,
 #define PTEST(name, fixture) \
   static void BOOST_PP_CAT(test_, __LINE__) (); \
   static ::testsoon::test_info BOOST_PP_CAT(reg_, __LINE__) \
-    (::testsoon::tests(), name, __FILE__, __LINE__, test_group(), &BOOST_PP_CAT(test_, __LINE__)); \
+    (test_group(__FILE__), \
+    name, __FILE__, __LINE__, \
+    &BOOST_PP_CAT(test_, __LINE__)); \
   static void BOOST_PP_CAT(test_, __LINE__) ()
 
 /**
@@ -295,7 +293,7 @@ inline void check_equals(T const &a, U const &b,
  * \param b Another value.
  */
 #define equals(a, b) \
-  ::testsoon::check_equals(a, b, "not equal: " #a " and " #b, __FILE__, __LINE__)
+  ::testsoon::check_equals(a, b, "not equal: " #a " and " #b, __LINE__)
 
 /**
  * Check that an expression throws.
@@ -308,10 +306,10 @@ inline void check_equals(T const &a, U const &b,
 	do { \
 		try { \
 			(x); \
-			::testsoon::fail("not throwed " #t, __FILE__, __LINE__); \
+			::testsoon::fail("not throwed " #t, __LINE__); \
 		} catch (t &e) { \
 			if (::testsoon::test_string(e.what()) != ::testsoon::test_string((w))) \
-				::testsoon::fail("throwed " #t " with wrong message", __FILE__, __LINE__); \
+				::testsoon::fail("throwed " #t " with wrong message", __LINE__); \
 		} \
 	} while (0)
 
@@ -326,12 +324,16 @@ inline void check_equals(T const &a, U const &b,
 		try { \
 			(x); \
 		} catch (t) { \
-			::testsoon::fail("throwed " #t, __FILE__, __LINE__); \
+			::testsoon::fail("throwed " #t, __LINE__); \
 		} \
 	} while (0)
 
 }
 
-static inline ::testsoon::test_string test_group() { return std::string("/"); }
+inline ::testsoon::test_group *
+test_group(::testsoon::test_string const & = ::testsoon::test_string()) {
+  // TODO: file please
+  return &::testsoon::tests();
+}
 
 #endif
