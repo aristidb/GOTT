@@ -62,13 +62,7 @@ public:
     this->child = nchild;
   }
 
-  void run(test_reporter &rep) const {
-    node *it = child;
-    while (it) {
-      it->run(rep);
-      it = it->next;
-    }
-  }
+  void run(test_reporter &rep) const;
 
 private:
   node *child;
@@ -83,7 +77,7 @@ inline node::node(test_group *parent=0, test_string const &name=test_string())
 inline void node::print(stream_class &out) const {
   if (parent)
     parent->print(out);
-  out << name << '/';
+  out << '/' << name << '(' << typeid(*this).name() << ')';
 }
 
 class test_holder : public test_group {
@@ -125,9 +119,12 @@ public:
 
 class test_reporter {
 public:
-  virtual void process_group(test_group const&)=0;
-  virtual void success(test_info const&)=0;
-  virtual void failure(test_info const&,test_failure const&)=0;
+  virtual void begin_group(test_group const &) {}
+  virtual void end_group(test_group const &) {}
+  virtual void before_tests(test_group const &) {}
+  virtual void after_tests(test_group const &) {}
+  virtual void success(test_info const &) {}
+  virtual void failure(test_info const &, test_failure const &) = 0;
   virtual ~test_reporter() {}
 };
 
@@ -137,25 +134,42 @@ public:
   default_reporter(stream &out = DEFAULT_STREAM) : out(out) {}
   void tell_test(test_info const &it, char const *state) {
     out << '"' << it.name << "\", "
-        << '"' << it << "\", "
+        << '"' << *it.parent << "\", "
         << it.file << ", "
         << it.line << ", "
         //<< (void*)it.function << " " //DAS hier stört -pedantic 
         << state << std::endl;
   }
-  void process_group(test_group const &group) {
-    out << group;
+  void before_tests(test_group const &group) {
+    out << group << " : ";
+    out.flush();
   }
-  void success(test_info const &it){
-    tell_test(it,"success");
+  void after_tests(test_group const &) {
+    out << '\n';
+    out.flush();
+  }
+  void success(test_info const &){
+    out << '.';
+    out.flush();
   }
   void failure(test_info const &it, test_failure const &fail){
     tell_test(it,"fail");
     out << "\treason: " << fail.message << std::endl;
+    out.flush();
   }
 private:
   stream &out;
 };
+
+inline void test_group::run(test_reporter &rep) const {
+  rep.begin_group(*this);
+  node *it = child;
+  while (it) {
+    it->run(rep);
+    it = it->next;
+  }
+  rep.end_group(*this);
+}
 
 inline void test_info::run(test_reporter &reporter) const {
   try {
