@@ -1,4 +1,4 @@
-#include "test.hpp"
+#include <testsoon.hpp>
 
 TEST_REGISTRY
 

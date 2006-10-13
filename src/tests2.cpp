@@ -1,6 +1,6 @@
 // wegen ODR tests
 
-#include "test.hpp"
+#include <testsoon.hpp>
 
 TEST() {
 }

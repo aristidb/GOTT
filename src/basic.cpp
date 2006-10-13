@@ -1,4 +1,4 @@
-#include "test.hpp"
+#include <testsoon.hpp>
 #include <exception>
 
 int get_no() { return 7; }
