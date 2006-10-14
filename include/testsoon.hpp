@@ -261,15 +261,6 @@ inline void check_equals(T const &a, U const &b,
     } BOOST_PP_CAT(test_obj_, __LINE__); \
   } \
   void BOOST_PP_CAT(test_, __LINE__)::test() const
-#if 0 //old
-#define PTEST(name, fixture) \
-  static void BOOST_PP_CAT(test_, __LINE__) (); \
-  static ::testsoon::test_info BOOST_PP_CAT(reg_, __LINE__) \
-    (test_group(__FILE__), \
-    name, __FILE__, __LINE__, \
-    &BOOST_PP_CAT(test_, __LINE__)); \
-  static void BOOST_PP_CAT(test_, __LINE__) ()
-#endif
 
 /**
  * Declare a test (optional name only).
@@ -388,7 +379,7 @@ inline void check_equals(T const &a, U const &b,
 
 inline static ::testsoon::test_group *
 test_group(::testsoon::test_string const &filename) {
-  static ::testsoon::test_file file(&::testsoon::tests(), filename);
+  static ::testsoon::test_file file(&::testsoon::tests(), "(" + filename + ")");
   return &file;
 }
 
