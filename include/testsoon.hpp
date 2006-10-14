@@ -158,8 +158,8 @@ public:
     out << '.';
     out.flush();
   }
-  void failure(test_info const &, test_failure const &){
-    out << "[F]";
+  void failure(test_info const &, test_failure const &x) {
+    out << "[F=" << x.line << "]";
     out.flush();
   }
 private:
