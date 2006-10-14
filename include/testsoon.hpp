@@ -24,6 +24,8 @@ typedef std::ostream stream_class;
 
 #endif
 
+#ifndef IN_DOXYGEN
+
 class test_reporter;
 class test_info;
 class test_group;
@@ -107,6 +109,8 @@ public:
   test_function_type * const function;
 };
 
+#endif
+
 class test_failure {
 public:
   test_failure(test_string const &message, unsigned line)
@@ -159,6 +163,8 @@ private:
   stream &out;
 };
 
+#ifndef IN_DOXYGEN
+
 inline void test_group::add(node *nchild, bool is_test) {
   if (is_test) {
     test_info *ntest = static_cast<test_info *>(nchild);
@@ -198,18 +204,18 @@ inline bool operator<(test_info const &a, test_info const &b) {
   return a.function < b.function;
 }
 
-///@internal
 inline void fail(char const *msg, unsigned line) {
 	throw test_failure(msg, line);
 }
 
-///@internal
 template<class T, class U>
 inline void check_equals(T const &a, U const &b,
                          char const *msg, unsigned line) {
   if (!(a == b))
     fail(msg, line);
 }
+
+#endif
 
 /**
  * Add this macro to exactly one source file to ensure proper instantiation.
@@ -243,7 +249,7 @@ inline void check_equals(T const &a, U const &b,
 
 /**
  * Declare a test (positional).
- * \param name The name of the test (quoted).
+ * @param name The name of the test (quoted).
  */
 #define PTEST(name, fixture) \
   static void BOOST_PP_CAT(test_, __LINE__) (); \
@@ -255,7 +261,7 @@ inline void check_equals(T const &a, U const &b,
 
 /**
  * Declare a test (optional name only).
- * \param name The name of the test (not quoted).
+ * @param name The name of the test (not quoted).
  */
 #define TEST(name) PTEST(#name, (0, ~))
 
@@ -317,7 +323,7 @@ inline void check_equals(T const &a, U const &b,
 
 /**
  * Declare a test (named parameters).
- * \param name The name of the test (quoted).
+ * @param name The name of the test (quoted).
  */
 #define XTEST(named_parameter_sequence) \
   TESTSOON_PARAM_INVOKE(named_parameter_sequence)
@@ -325,8 +331,8 @@ inline void check_equals(T const &a, U const &b,
 /**
  * Check whether two values are equal.
  * If both values are not equal, the test will fail.
- * \param a Some value.
- * \param b Another value.
+ * @param a Some value.
+ * @param b Another value.
  */
 #define equals(a, b) \
   ::testsoon::check_equals(a, b, "not equal: " #a " and " #b, __LINE__)
@@ -334,9 +340,9 @@ inline void check_equals(T const &a, U const &b,
 /**
  * Check that an expression throws.
  * If no exception is thrown, the test will fail.
- * \param x The expression to test.
- * \param t The exception type to check for.
- * \param w The expected value of caught_exception.what().
+ * @param x The expression to test.
+ * @param t The exception type to check for.
+ * @param w The expected value of caught_exception.what().
  */
 #define throws(x, t, w) \
 	do { \
@@ -352,8 +358,8 @@ inline void check_equals(T const &a, U const &b,
 /**
  * Check that an expression does not throw.
  * If a specified exception is thrown, the test will fail.
- * \param x The expression to test.
- * \param t The exception type to check for or "..." (without quotes).
+ * @param x The expression to test.
+ * @param t The exception type to check for or "..." (without quotes).
  */
 #define nothrows(x, t) \
 	do { \
@@ -364,12 +370,25 @@ inline void check_equals(T const &a, U const &b,
 		} \
 	} while (0)
 
-}
+} //namespace testsoon
+
+#ifndef IN_DOXYGEN
 
 inline ::testsoon::test_group *
 test_group(::testsoon::test_string const &) {
   // TODO: file please
   return &::testsoon::tests();
 }
+
+#endif
+
+/**
+ * @mainpage
+ * Explanation here.
+ * See @ref tutorial
+ *
+ * @page tutorial Tutorial
+ * This is a tutorial.
+ */
 
 #endif
