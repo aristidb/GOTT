@@ -99,17 +99,16 @@ public:
 class test_info : public node {
 public:
   test_info(test_group *group,
-            test_string const &name, test_string const &file, unsigned line,
-            void (*function)())
-  : node(group, name, true), file(file), line(line), function(function) {}
+            test_string const &name, test_string const &file, unsigned line)
+  : node(group, name, true), file(file), line(line) {}
 
   void run(test_reporter &) const;
 
   test_string const file;
   unsigned const line;
 
-  typedef void test_function_type();
-  test_function_type * const function;
+protected:
+  virtual void test() const = 0;
 };
 
 #endif
@@ -194,7 +193,7 @@ inline void test_group::run(test_reporter &rep) const {
 
 inline void test_info::run(test_reporter &reporter) const {
   try {
-    function();
+    test();
     reporter.success(*this);
   } catch (test_failure const &x) {
     reporter.failure(*this, x);
@@ -202,10 +201,6 @@ inline void test_info::run(test_reporter &reporter) const {
 }
 
 extern test_holder &tests();
-
-inline bool operator<(test_info const &a, test_info const &b) {
-  return a.function < b.function;
-}
 
 inline void fail(char const *msg, unsigned line) {
 	throw test_failure(msg, line);
@@ -242,7 +237,8 @@ inline void check_equals(T const &a, U const &b,
       } \
     } \
     namespace name { \
-      static ::testsoon::test_group *test_group(::testsoon::test_string const &) { \
+      static ::testsoon::test_group * \
+      test_group(::testsoon::test_string const &) { \
         static ::testsoon::test_group current( \
           BOOST_PP_CAT(name, _helper)::upper_test_group(), #name); \
         return &current; \
@@ -251,9 +247,21 @@ inline void check_equals(T const &a, U const &b,
     namespace name
 
 /**
- * Declare a test (positional).
+ * Declare a test (positional). You do not want to use this directly.
  * @param name The name of the test (quoted).
  */
+#define PTEST(name, fixture) \
+  namespace { \
+    struct BOOST_PP_CAT(test_, __LINE__) \
+    : public ::testsoon::test_info { \
+      BOOST_PP_CAT(test_, __LINE__) () \
+        : ::testsoon::test_info( \
+            test_group(__FILE__), name, __FILE__, __LINE__) {} \
+      void test() const; \
+    } BOOST_PP_CAT(test_obj_, __LINE__); \
+  } \
+  void BOOST_PP_CAT(test_, __LINE__)::test() const
+#if 0 //old
 #define PTEST(name, fixture) \
   static void BOOST_PP_CAT(test_, __LINE__) (); \
   static ::testsoon::test_info BOOST_PP_CAT(reg_, __LINE__) \
@@ -261,6 +269,7 @@ inline void check_equals(T const &a, U const &b,
     name, __FILE__, __LINE__, \
     &BOOST_PP_CAT(test_, __LINE__)); \
   static void BOOST_PP_CAT(test_, __LINE__) ()
+#endif
 
 /**
  * Declare a test (optional name only).
