@@ -86,11 +86,14 @@ inline void node::print(stream_class &out) const {
 
 class test_holder : public test_group {
 public:
-  test_holder() : test_group(0, "") {}
+  test_holder() : test_group(0, test_string()) {}
   //void run(test_reporter &) const;
 };
 
 class test_file : public test_group {
+public:
+  test_file(test_group *parent, test_string const &file)
+    : test_group(parent, file) {}
 };
 
 class test_info : public node {
@@ -374,10 +377,10 @@ inline void check_equals(T const &a, U const &b,
 
 #ifndef IN_DOXYGEN
 
-inline ::testsoon::test_group *
-test_group(::testsoon::test_string const &) {
-  // TODO: file please
-  return &::testsoon::tests();
+inline static ::testsoon::test_group *
+test_group(::testsoon::test_string const &filename) {
+  static ::testsoon::test_file file(&::testsoon::tests(), filename);
+  return &file;
 }
 
 #endif
