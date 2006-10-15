@@ -62,7 +62,7 @@
   themselves by using some kind of API, neither do the graphics::object 
   draw themselves. The renderer rather examines the situation himself. 
 
-  This is the current planning state of the the renderer:
+  This is the current planning state of the renderer:
 
   \code 
   concept renderer
@@ -74,8 +74,8 @@
       // renderers should be able to receive all ui related events
       // so X11 or all? renderers probably define methods like:
       void update_display( region const& ); ///< renderer should update these screen regions, because x11 made them reappear
-      void resize( region const& ); ///< renderer should redraw mostly everything becaue the window size changed..
-        // COMMENT: this also affects the top-level graphics::object doesn't it? this (above) method does not seem adequate
+      void resize( region const& ); ///< renderer should redraw mostly everything because the window size changed..
+        // COMMENT: this also affects the top-level graphics::object doesn't it? This (above) method does not seem adequate
 
       // every renderer will need to know if widgets changed their
       // graphical representation
@@ -90,8 +90,8 @@
    - "gott::vector_graphics": antigrain, cairo, opengl, directGraphics
    - "gott::text_mode": curses, conio, vt100.. 
    - "gott::3d_vector_graphics": variants of the vector_graphics renderers with hardware 
-      acceleration that support 3D eyecandy, that implies that 3D information is stored 
-      in graphics::object, but the display still happens on a 2D or pesudo 3D screen. 
+      acceleration that support 3D eye candy, that implies that 3D information is stored 
+      in graphics::object, but the display still happens on a 2D or pseudo 3D screen. 
    - "gott::ajax": restrictive variants of gott::vector_graphics renderers, maybe not required
       as special domain name
    - "gott::exploreable_3d_graphics": sometime around 2010 we will implement that beast :), as 
@@ -143,7 +143,7 @@
   and provides a renderer object. 
 
   Example use cases:
-   - Antigrain/X11 requires a visual that matches the pixelformat
+   - Antigrain/X11 requires a visual that matches the pixel format
      of the antigrain renderer and must try to make use of mit-XShm, 
    - Opengl/X11 needs to find a visual that provides OpenGL hardware
      acceleration and the Window to construct an opengl context.
@@ -169,7 +169,7 @@
 
     \note Maybe we should make the renderer a kind of "owner" or controller of the 
   graphics::objects. That way we could allow the renderers to attach information
-  to the graphics::object tree, e.g. for caches or precalculations, like triangulation.
+  to the graphics::object tree, e.g. for caches or pre-calculations, like triangulation.
 
 
   \section graphics_themes_outline Themes 
@@ -190,7 +190,7 @@
   for every default widget. The other
   themes found inside the system will override the subtrees and theme behaviors of Gott. 
   The application
-  may also provide additional replacement subtrees. Furthermore the applcation
+  may also provide additional replacement subtrees. Furthermore the application
   or themes might even provide different widget names/QIDs, which have their
   own unique graphic representation. Finally the user of gott has the option to install
   themes in his home directory. For example she could define color themes which 
@@ -200,12 +200,12 @@
 
   \section graphics_objects_discussion Discussion about graphics objects tree 
   We now have to define the layout of our graphics object tree. There are several 
-  possiblities for each of the render model domains. Suggestions are welcome. 
+  possibilities for each of the render model domains. Suggestions are welcome. 
 
   \subsection Requirements:
-   - RQ_TreePath - tree path support: It must be easy to find a child object using a path datastructure
-   - RQ_RefWB - optional reference to a widget behavior: controls the subnodes relevant for the concept of the widget
-   - RQ_RefTB - optional reference to a theme behavior: controls special subnodes defined by the theme. It seems like
+   - RQ_TreePath - tree path support: It must be easy to find a child object using a path data structure
+   - RQ_RefWB - optional reference to a widget behavior: controls the sub nodes relevant for the concept of the widget
+   - RQ_RefTB - optional reference to a theme behavior: controls special sub nodes defined by the theme. It seems like
       that only these graphics::objects with a reference to a widget behavior have a reference to a theme behavior.
       Furthermore it might make sense to think of the widget behavior as very generic behavior, while the theme 
       behavior is much more detailed.
@@ -231,7 +231,7 @@
 
       E.g. a simple button has a text label, the content of the text label is defined
       by the widget, that way all button widgets share ( share as in really using the same instance in memory ) the same 
-      button sterotype defined by the theme, and only provide the missing text property
+      button stereotype defined by the theme, and only provide the missing text property
  
 
   \subsection graphics_objects_discussion_vector First two cents
@@ -271,7 +271,7 @@
    - The named_subtree also defines has a QID "namespace" for its named subnodes, one could store a 
      gperf generated perfect minimal hash function inside widget_stereotype during compilation time
      of the theme ( or gott respectively ), to easily access all named nodes.
-     The term namespace refers to the fact that QIDs, used to aquire nodes inside the subtree, are only unique within 
+     The term namespace refers to the fact that QIDs, used to acquire nodes inside the subtree, are only unique within 
      the known parts of the implementation of the named_subtree. E.g. some text entry field might have the named
      node "gott::entry::text", that can be accessed from the outside without the need for excessive tree searches 
      or knowledge of the subtree structure.
@@ -304,7 +304,7 @@
    - The class combines RQ_RefTB and RQ_RefWB under the assumption that both references are always required 
      at the same point in the tree
    - widget_stereotype could also fulfills RQ_Stereotype by requiring a linkage from missing properties 
-     to objects, the linkage is filled by ??? and consits of ??? 
+     to objects, the linkage is filled by ??? and consists of ??? 
 
     \code
     namespace graphics{
@@ -325,11 +325,13 @@
     subgraph cluster_0 {
       style=filled;
       node [style=filled];
+      TE [label="{TextEntry|<f0> Text:\"...\" | <f1> QID:\"gott::entry\"}"]
       B1 [label="{Buttony|<f0> Text:\"Ok\" | <f1> QID:\"gott::button\"}"]
       B2 [label="{Button|<f0> Text:\"Cancel\" | <f1> QID:\"gott::button\"}"]
       VLayout [label="{Vertical Layout|<f0> children|<f1> QID:\"gott::vertical_layout\"}"]
-      "VLayout":f0 -> B1 
-      "VLayout":f0 -> B2
+      VLayout:f0 -> TE
+      VLayout:f0 -> B1 
+      VLayout:f0 -> B2
       label="Widget Hierarchy";
       color=lightblue;
     }
