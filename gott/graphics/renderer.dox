@@ -186,67 +186,6 @@
   information provided by the renderer object. It will only search in theme files
   which are defined for that domain.
 
-\dot
-  digraph themeloading {
-    node [shape=record, fontname=Helvetica, fontsize=10];
-    subgraph cluster_0 {
-      style=filled;
-      node [style=filled];
-      B1 [label="{Buttony|<f0> Text:\"Ok\" | <f1> QID:\"gott::button\"}"]
-      B2 [label="{Button|<f0> Text:\"Cancel\" | <f1> QID:\"gott::button\"}"]
-      VLayout [label="{Vertical Layout|<f0> children|<f1> QID:\"gott::vertical_layout\"}"]
-      "VLayout":f0 -> B1 
-      "VLayout":f0 -> B2
-      label="Widget Hierarchy";
-      color=lightblue;
-    }
-
-    subgraph cluster_1 {
-      node [style=filled];
-      subgraph cluster_2 {
-        graph[ shape="ellipse"];
-        label="subtree of vercial layout"
-        GVL [label="{widget_subtree|:\"gott::vertical_layout\"}"]
-        GVLCO [label="container_object"]
-        GVL-> GVLCO;
-      }
-      subgraph cluster_3{
-        GB1 [label="{widget_subtree|:\"gott::button\"}"];
-        GB1C [label="{rounded_rect|relative_size=99%|inset=2%|filled=false}"];
-        GB1Clickable [label="{rounded_rect|relative_size=98%|inset=%2|\"gott::button::clickable_region\"|filled=true}"];
-        GB1Text [label="{single_line_text|alignment=center|\"gott::button::text\"}"];
-        GB1 -> GB1C;
-        GB1 -> GB1Clickable;
-        GB1 -> GB1Text;
-      }
-      subgraph cluster_4 {
-        GB2 [label="{widget_subtree|:\"gott::button\"}"];
-        GB2C [label="{rounded_rect|}"];
-        GB2C [label="{rounded_rect|relative_size=99%|inset=2%|filled=false}"];
-        GB2Clickable [label="{rounded_rect|relative_size=98%|inset=%2|\"gott::button::clickable_region\"|filled=true}"];
-        GB2Text [label="{single_line_text|alignment=center|\"gott::button::text\"}"];
-        GB2 -> GB2C;
-        GB2 -> GB2Clickable;
-        GB2 -> GB2Text;
-      }
-      SomeContainer -> GVL;
-      GVLCO -> GB1;
-      GVLCO -> GB2;
-      label="Graphics Object Hierarchy created by theme loader";
-      color=blue;
-    }
-    Window -> VLayout;
-    Window -> SomeContainer;
-    VLayout:f1 -> GVL[color=blue];
-    B1:f1 -> GB1[color=blue];
-    B2:f1 -> GB2[color=blue];
-    GB1Text-> B1:f0[color=red];
-    GB2Text-> B2:f0[color=red];
-
-    label="Still incorrect and incomplete ... See RQ_Stereotype below!!!!"
-  }
-\enddot
-
   Gott will provide a working set of graphics::object subtrees, and simple dynamic theme behaviors
   for every default widget. The other
   themes found inside the system will override the subtrees and theme behaviors of Gott. 
@@ -315,57 +254,37 @@
     }
     \endcode
  
-  The container_object: 
+  The container: 
    - childs are stored here (RQ_Children)
 
     \code
     namespace graphics{
-    class container_object : public object
+    class container : public object
      {
       boost::ptr_vector<object> childs;
     };
     }
     \endcode
 
-  The widget_subtree class is a subtree node, which is connected to a widget and theme behavior. 
-  Instances of these objects are used by themes to redefine "widgets". 
-   - The class combines RQ_RefTB and RQ_RefWB under the assumption that both references are always required 
-     at the same point in the tree
-   - The widget_subtree also defines a QID namespace for its named subnodes, one could store a 
-     gperf generated perfect minimal hash function inside widget_subtree during compilation time
-     of the theme ( or gott respectively ), to easily access all named nodes. 
 
+   The named_subtree class is a named graphics::container that defines a stereotype. 
+   - The named_subtree also defines has a QID "namespace" for its named subnodes, one could store a 
+     gperf generated perfect minimal hash function inside widget_stereotype during compilation time
+     of the theme ( or gott respectively ), to easily access all named nodes.
+     The term namespace refers to the fact that QIDs, used to aquire nodes inside the subtree, are only unique within 
+     the known parts of the implementation of the named_subtree. E.g. some text entry field might have the named
+     node "gott::entry::text", that can be accessed from the outside without the need for excessive tree searches 
+     or knowledge of the subtree structure.
+   - This class reflects the RQ_Stereotype requirement.
 
-    \code
-    namespace graphics{
-    class widget_subtree : public container_object
-    {
-      ui::widget * widget;
-      ui::theme::behavior * theme_behavior;
-
+   \code
+   namespace graphics {
+   class named_subtree : container {
       object * get_node( QID const& node_id );
-    };
-    }
-    \endcode
+   };
+   }
+   \endcode
 
-  Here is an example to make that class easier to understand
-  \dot
-  digraph example  {
-      rankdir = "LR";
-      node [shape=record, fontname=Helvetica, fontsize=10];
-      vbox[ label="Vertical Box\n(refered to by vertical box widget,\nretrieved by theme loader)" URL=" "];
-      vlayout[ label="vertical_layout" URL=" "];
-      rep1 [ label="Button 1" URL=" "];
-      rep2 [ label="Button 2" URL=" "];
-      rep3 [ label="Button 3" URL=" "];
-      rep4 [ label="Button 4" URL=" "];
-      vbox -> vlayout [ arrowhead="open"];
-      vlayout -> rep1 [ arrowhead="open"];
-      vlayout -> rep2 [ arrowhead="open"];
-      vlayout -> rep3 [ arrowhead="open"];
-      vlayout -> rep4 [ arrowhead="open"];
-  }
-  \enddot
 
   The object_reference class fullfills RQ_ObjRef. 
 
@@ -379,15 +298,102 @@
     }
     \endcode
 
+  The widget_stereotype class is a subtree node, which is connected to a widget and theme behavior. 
+  Instances of these objects are used by themes to redefine "widgets". widget_stereotype is an object_reference
+  because all widgets are stereotypes. 
+   - The class combines RQ_RefTB and RQ_RefWB under the assumption that both references are always required 
+     at the same point in the tree
+   - widget_stereotype could also fulfills RQ_Stereotype by requiring a linkage from missing properties 
+     to objects, the linkage is filled by ??? and consits of ??? 
+
+    \code
+    namespace graphics{
+    class widget_stereotype : public object_reference
+    {
+      ui::widget * widget;
+      ui::theme::behavior * theme_behavior;
+      stereotype_linkage linkage; 
+    };
+    }
+    \endcode
+
+  Here is an example to make that class easier to understand
+
+\dot
+  digraph themeloading {
+    node [shape=record, fontname=Helvetica, fontsize=10];
+    subgraph cluster_0 {
+      style=filled;
+      node [style=filled];
+      B1 [label="{Buttony|<f0> Text:\"Ok\" | <f1> QID:\"gott::button\"}"]
+      B2 [label="{Button|<f0> Text:\"Cancel\" | <f1> QID:\"gott::button\"}"]
+      VLayout [label="{Vertical Layout|<f0> children|<f1> QID:\"gott::vertical_layout\"}"]
+      "VLayout":f0 -> B1 
+      "VLayout":f0 -> B2
+      label="Widget Hierarchy";
+      color=lightblue;
+    }
+
+    subgraph cluster_1 {
+      node [style=filled];
+      subgraph cluster_2 {
+        graph[ shape="ellipse"];
+        label="subtree of vertical layout"
+        GVL [label="{widget_stereotype|:\"gott::vertical_layout\"}"]
+        GVLCO [label="container"]
+        GVL-> GVLCO;
+      }
+      subgraph cluster_3{
+        GB [label="{widget_stereotype|name:\"gott::button\"|{provides:|{gott:button::text|gott::button::clickable_region}}|{requires:|{gott::button::text}}|might have theme specific behaviour}"];
+        GBC [label="{rounded_rect|relative_size=99%|inset=2%|filled=false}"];
+        GBClickable [label="{rounded_rect|relative_size=98%|inset=%2|\"gott::button::clickable_region\"|filled=true}"];
+        GBText [label="{single_line_text|alignment=center|\"gott::button::text\"}"];
+        GB -> GBC;
+        GB -> GBClickable;
+        GB -> GBText;
+      }
+      subgraph cluster_4 {
+        Entry [label="{widget_stereotype|:\"gott::entry\"}"];
+        EntryC [label="{rect|}"];
+        EntryText [label="{single_line_text|alignment=center|\"gott::entry::text\"}"];
+        Entry -> EntryC -> EntryText;
+      }
+      acontainer [label="{container1|{linkage:|{<f0>\"children\"=button1,button2|...}}|<f1> reference=\"gott::vertical_layout\"}"];
+      GB1 [label="{button1|{linkage:|{<f0>\"text\"=...|...}}|<f1> reference=\"gott::button\"}"];
+      GB2 [label="{button2|{linkage:|{<f0>\"text\"=...|...}}|<f1> reference=\"gott::button\"}"];
+      acontainer:f0 -> GB1;
+      acontainer:f0 -> GB2;
+      acontainer:f1 -> GVL;
+      acontainer:f1 -> VLayout;
+      GB1:f1 -> GB;
+      GB2:f1 -> GB;
+      label="Graphics Object Hierarchy created by theme loader";
+      color=blue;
+    }
+    Window -> VLayout [label="widgets"];
+    Window -> acontainer [label="graphical representation defined by theme"];
+    VLayout:f1 -> acontainer[color=blue];
+    GB1:f0 -> B1:f0[color=green];
+    GB2:f0 -> B2:f0[color=green] ;
+    B1:f1 -> GB1[color=blue];
+    B2:f1 -> GB2[color=blue];
+  }
+\enddot
+
+
   We could now start to define object classes that define properties provided 
   by widgets, like text, toggle states, scalar values.... 
 
   \subsection graphics_objects_discussion_your_turn Your turn!
 
   - This whole system just cries for input + audio + video integration, doesn't it?
-    Yes and this part just has not been written yet.. especially input handling yields lots of questions.. 
+    -- Yes and this part just has not been written yet.. especially input handling yields lots of questions.. 
   - How should Z-order be handled?
+    -- Maybe the order of objects defines the Z-order .. not sure
   - Could tooltips etc. be implemented by means of higher-than-the-clipping Z-order?
+    -- I think they should be windows
+  - Shouldnt we leave the storing the renderer relevant data to the renderer? Then the renderer would have to 
+    maintain a second tree (or rather acyclic graph) or some effective associative container... 
 
   \section event_forwarding Events forwarded to widgets
 
