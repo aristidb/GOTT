@@ -51,8 +51,6 @@ inline stream_class &operator<<(stream_class &out, node const &n) {
   return out;
 }
 
-class test_info;
-
 class test_group : public node {
 public:
   test_group(test_group *parent, test_string const &name)
