@@ -167,13 +167,13 @@ private:
 #ifndef IN_DOXYGEN
 
 inline void test_group::add(node *nchild, bool is_test) {
-  if (is_test) {
-    test_info *ntest = static_cast<test_info *>(nchild);
-    ntest->next = test;
-    test = ntest;
+  node *&tail = *(is_test ? reinterpret_cast<node **>(&test) : &child);
+  if (!tail) {
+    tail = nchild;
   } else {
-    nchild->next = child;
-    child = nchild;
+    while (tail->next)
+      tail = tail->next;    
+    tail->next = nchild;
   }
 }
 
