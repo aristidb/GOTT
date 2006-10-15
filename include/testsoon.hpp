@@ -7,10 +7,9 @@
 #include <boost/preprocessor/seq/fold_left.hpp>
 #include <boost/preprocessor/seq/replace.hpp>
 #include <boost/preprocessor/seq/to_tuple.hpp>
+#include <boost/preprocessor/seq/enum.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/control/expr_if.hpp>
-#include <boost/preprocessor/punctuation/comma_if.hpp>
-#include <boost/preprocessor/logical/and.hpp>
 
 #ifndef NO_STDLIB
 #include <string>
@@ -253,47 +252,51 @@ inline void check_equals(T const &a, U const &b,
  * @param name The name of the test (quoted).
  * @param fixture A tuple consisting of whether to use a fixture and a fixture class.
  */
-#define PTEST(name, fixture, group_fixture) \
+#define PTEST(name, fixture, group_fixture, generator) \
   TESTSOON_PTEST1( \
     name, \
     BOOST_PP_CAT(test_, __LINE__), \
     BOOST_PP_TUPLE_ELEM(2, 0, fixture), \
     BOOST_PP_TUPLE_ELEM(2, 1, fixture), \
-    group_fixture)
+    group_fixture, \
+    BOOST_PP_TUPLE_ELEM(2, 0, generator), \
+    BOOST_PP_TUPLE_ELEM(2, 1, generator))
 
 /**
  * Declare a test (optional name only).
  * @param name The name of the test (not quoted).
  */
-#define TEST(name) PTEST(#name, (0, ~), 0)
+#define TEST(name) PTEST(#name, (0, ~), 0, (0, ~))
 
 /**
  * Declare a test with fixture.
  * @param name The name of the test (not quoted).
  * @param fixture_class The fixture class to use.
  */
-#define FTEST(name, fixture_class) PTEST(#name, (1, fixture_class), 0)
+#define FTEST(name, fixture_class) PTEST(#name, (1, fixture_class), 0, (0, ~))
 
 /**
  * Declare a test with default group fixture, named group_fixture.
  * @param name The name of the test (not quoted).
  */
-#define GFTEST(name) PTEST(#name, (0, ~), 1)
+#define GFTEST(name) PTEST(#name, (0, ~), 1, (0, ~))
 
 #ifndef IN_DOXYGEN
 
-#define TESTSOON_TEST_PARAM(has_fixture, fixture_class, has_group_fixture) \
-  BOOST_PP_EXPR_IF(has_fixture, fixture_class &fixture) \
-  BOOST_PP_COMMA_IF(BOOST_PP_AND(has_fixture, has_group_fixture)) \
-  BOOST_PP_EXPR_IF(has_group_fixture, group_fixture_t &group_fixture)
+#define TESTSOON_TEST_PARAM(has_fixture, fixture_class, has_group_fixture, has_generator, generator_class) \
+  BOOST_PP_EXPR_IF(has_fixture, (fixture_class &fixture)) \
+  BOOST_PP_EXPR_IF(has_group_fixture, (group_fixture_t &group_fixture)) \
+  BOOST_PP_EXPR_IF(has_generator, (generator_class::const_reference generator)) \
+  (int)
 
-#define TESTSOON_PTEST1(name, test_class, has_fixture, fixture_class, group_fixture) \
+#define TESTSOON_PTEST1(name, test_class, has_fixture, fixture_class, group_fixture, has_generator, generator_class) \
   TESTSOON_PTEST2( \
     name, test_class, has_fixture, fixture_class, \
-    TESTSOON_TEST_PARAM(has_fixture, fixture_class, group_fixture), \
-    group_fixture)
+    BOOST_PP_SEQ_ENUM(TESTSOON_TEST_PARAM(has_fixture, fixture_class, group_fixture, has_generator, generator_class)), \
+    group_fixture, \
+    has_generator, generator_class)
 
-#define TESTSOON_PTEST2(name, test_class, has_fixture, fixture_class, test_param, has_group_fixture) \
+#define TESTSOON_PTEST2(name, test_class, has_fixture, fixture_class, test_param, has_group_fixture, has_generator, generator_class) \
   namespace { \
     struct test_class \
     : public ::testsoon::test_info { \
@@ -302,10 +305,14 @@ inline void check_equals(T const &a, U const &b,
       void test() const { \
         BOOST_PP_EXPR_IF(has_fixture, fixture_class fixture;) \
         BOOST_PP_EXPR_IF(has_group_fixture, group_fixture_t group_fixture;) \
+        BOOST_PP_EXPR_IF(has_generator, generator_class generator;) \
         do_test( \
-          BOOST_PP_EXPR_IF(has_fixture, fixture) \
-          BOOST_PP_COMMA_IF(BOOST_PP_AND(has_fixture, has_group_fixture)) \
-          BOOST_PP_EXPR_IF(has_group_fixture, group_fixture) \
+          BOOST_PP_SEQ_ENUM( \
+            BOOST_PP_EXPR_IF(has_fixture, (fixture)) \
+            BOOST_PP_EXPR_IF(has_group_fixture, (group_fixture)) \
+            BOOST_PP_EXPR_IF(has_generator, (generator.next())) \
+            (0) \
+          ) \
         ); \
       } \
       void do_test(test_param) const; \
@@ -357,15 +364,18 @@ inline void check_equals(T const &a, U const &b,
 #define TESTSOON_PARAM_INVOKE(x) \
   TESTSOON_PARAM_INVOKEx(TESTSOON_PARAM_INVOKE2(x))
 
+
 #define TESTSOON_PARAM__name(x)           0, x
 #define TESTSOON_PARAM__n(x)              TESTSOON_PARAM__name(x)
 #define TESTSOON_PARAM__fixture(x)        1, (1, x)
 #define TESTSOON_PARAM__f(x)              TESTSOON_PARAM__fixture(x)
 #define TESTSOON_PARAM__group_fixture(x)  2, x
 #define TESTSOON_PARAM__gf(x)             TESTSOON_PARAM__group_fixture(x)
+#define TESTSOON_PARAM__generator(x)      3, (1, x)
+#define TESTSOON_PARAM__gen(x)            TESTSOON_PARAM__generator(x)
 
 #define TESTSOON_PARAM_INITIAL \
-  ("") ((0, ~)) (0)
+  ("") ((0, ~)) (0) ((0, ~))
 
 #define TESTSOON_PARAM_INVOKEx(x) \
   PTEST x
