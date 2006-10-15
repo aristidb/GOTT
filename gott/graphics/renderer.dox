@@ -243,7 +243,7 @@
     GB1Text-> B1:f0[color=red];
     GB2Text-> B2:f0[color=red];
 
-    label="Still incorrect and incomplete ... "
+    label="Still incorrect and incomplete ... See RQ_Stereotype below!!!!"
   }
 \enddot
 
@@ -285,6 +285,14 @@
       To allow the user or theme writers to change general aspects of themes, and maybe to reuse existing nodes it
       should be possible to refer to certain objects in the tree. E.g. one could have named color nodes. 
       At this point the tree might turn into a dag. 
+   - RQ_Stereotype - graphical appearance should be defined as stereotypes
+      A stereotype is an incomplete or complete description of a widget. The missing parts, can be the current
+      state of the object, and some missing graphical objects. Lets call these missing parts overloaded properties. 
+      These properties have to be provided during construction time.
+
+      E.g. a simple button has a text label, the content of the text label is defined
+      by the widget, that way all button widgets share ( share as in really using the same instance in memory ) the same 
+      button sterotype defined by the theme, and only provide the missing text property
  
 
   \subsection graphics_objects_discussion_vector First two cents
