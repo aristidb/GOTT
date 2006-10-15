@@ -206,12 +206,29 @@
       subgraph cluster_2 {
         graph[ shape="ellipse"];
         label="subtree of vercial layout"
-        GVL [label="widget_subtree"]
+        GVL [label="{widget_subtree|:\"gott::vertical_layout\"}"]
         GVLCO [label="container_object"]
         GVL-> GVLCO;
       }
-      GB1 [label="widget_subtree"];
-      GB2 [label="widget_subtree"];
+      subgraph cluster_3{
+        GB1 [label="{widget_subtree|:\"gott::button\"}"];
+        GB1C [label="{rounded_rect|relative_size=99%|inset=2%|filled=false}"];
+        GB1Clickable [label="{rounded_rect|relative_size=98%|inset=%2|\"gott::button::clickable_region\"|filled=true}"];
+        GB1Text [label="{single_line_text|alignment=center|\"gott::button::text\"}"];
+        GB1 -> GB1C;
+        GB1 -> GB1Clickable;
+        GB1 -> GB1Text;
+      }
+      subgraph cluster_4 {
+        GB2 [label="{widget_subtree|:\"gott::button\"}"];
+        GB2C [label="{rounded_rect|}"];
+        GB2C [label="{rounded_rect|relative_size=99%|inset=2%|filled=false}"];
+        GB2Clickable [label="{rounded_rect|relative_size=98%|inset=%2|\"gott::button::clickable_region\"|filled=true}"];
+        GB2Text [label="{single_line_text|alignment=center|\"gott::button::text\"}"];
+        GB2 -> GB2C;
+        GB2 -> GB2Clickable;
+        GB2 -> GB2Text;
+      }
       SomeContainer -> GVL;
       GVLCO -> GB1;
       GVLCO -> GB2;
@@ -223,6 +240,8 @@
     VLayout:f1 -> GVL[color=blue];
     B1:f1 -> GB1[color=blue];
     B2:f1 -> GB2[color=blue];
+    GB1Text-> B1:f0[color=red];
+    GB2Text-> B2:f0[color=red];
 
     label="Still incorrect and incomplete ... "
   }
