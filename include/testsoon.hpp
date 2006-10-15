@@ -8,6 +8,7 @@
 #include <boost/preprocessor/seq/replace.hpp>
 #include <boost/preprocessor/seq/to_tuple.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
+#include <boost/preprocessor/control/expr_if.hpp>
 
 #ifndef NO_STDLIB
 #include <string>
@@ -247,18 +248,14 @@ inline void check_equals(T const &a, U const &b,
 /**
  * Declare a test (positional). You do not want to use this directly.
  * @param name The name of the test (quoted).
+ * @param fixture A tuple consisting of whether to use a fixture and a fixture class.
  */
 #define PTEST(name, fixture) \
-  namespace { \
-    struct BOOST_PP_CAT(test_, __LINE__) \
-    : public ::testsoon::test_info { \
-      BOOST_PP_CAT(test_, __LINE__) () \
-        : ::testsoon::test_info( \
-            test_group(__FILE__), name, __FILE__, __LINE__) {} \
-      void test() const; \
-    } BOOST_PP_CAT(test_obj_, __LINE__); \
-  } \
-  void BOOST_PP_CAT(test_, __LINE__)::test() const
+  TESTSOON_PTEST1( \
+    name, \
+    BOOST_PP_CAT(test_, __LINE__), \
+    BOOST_PP_TUPLE_ELEM(2, 0, fixture), \
+    BOOST_PP_TUPLE_ELEM(2, 1, fixture))
 
 /**
  * Declare a test (optional name only).
@@ -266,7 +263,37 @@ inline void check_equals(T const &a, U const &b,
  */
 #define TEST(name) PTEST(#name, (0, ~))
 
+/**
+ * Declare a test with fixture.
+ * @param name The name of the test (not quoted).
+ * @param fixture_class The fixture class to use.
+ */
+#define FTEST(name, fixture_class) PTEST(#name, (1, fixture_class))
+
 #ifndef IN_DOXYGEN
+
+#define TESTSOON_PTEST1(name, test_class, has_fixture, fixture_class) \
+  TESTSOON_PTEST2( \
+    name, test_class, has_fixture, fixture_class, \
+    BOOST_PP_EXPR_IF(has_fixture, fixture_class &fixture))
+
+#define TESTSOON_PTEST2(name, test_class, has_fixture, fixture_class, test_param) \
+  namespace { \
+    struct test_class \
+    : public ::testsoon::test_info { \
+      test_class () : ::testsoon::test_info( \
+            test_group(__FILE__), name, __FILE__, __LINE__) {} \
+      void test() const { \
+        BOOST_PP_EXPR_IF(has_fixture, fixture_class fixture;) \
+        do_test( \
+          BOOST_PP_EXPR_IF(has_fixture, fixture) \
+        ); \
+      } \
+      void do_test(test_param) const; \
+    } BOOST_PP_CAT(test_obj_, __LINE__); \
+  } \
+  void test_class::do_test(test_param) const
+
 
 #define TESTSOON_GEN_TUPLE2SEQ_PROCESS2(x, y) \
   ((x, y)) \
