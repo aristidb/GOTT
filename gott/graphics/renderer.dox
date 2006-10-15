@@ -224,7 +224,7 @@
       To allow the user or theme writers to change general aspects of themes, and maybe to reuse existing nodes it
       should be possible to refer to certain objects in the tree. E.g. one could have named color nodes. 
       At this point the tree might turn into a dag. 
-   - RQ_Stereotype - graphical appearance should be defined as stereotypes
+   - RQ_Stereotype - graphical appearance should be defined as stereotypes - extension of RQ_ObjRef 
       A stereotype is an incomplete or complete description of a widget. The missing parts, can be the current
       state of the object, and some missing graphical objects. Lets call these missing parts overloaded properties. 
       These properties have to be provided during construction time.
@@ -267,19 +267,19 @@
     \endcode
 
 
-   The named_subtree class is a named graphics::container that defines a stereotype. 
-   - The named_subtree also defines has a QID "namespace" for its named subnodes, one could store a 
+   The widget_stereotype class is a named graphics::container that defines a stereotype. 
+   - The widget_stereotype also defines has a QID "namespace" for its named subnodes, one could store a 
      gperf generated perfect minimal hash function inside widget_stereotype during compilation time
      of the theme ( or gott respectively ), to easily access all named nodes.
      The term namespace refers to the fact that QIDs, used to acquire nodes inside the subtree, are only unique within 
-     the known parts of the implementation of the named_subtree. E.g. some text entry field might have the named
+     the known parts of the implementation of the widget_stereotype. E.g. some text entry field might have the named
      node "gott::entry::text", that can be accessed from the outside without the need for excessive tree searches 
      or knowledge of the subtree structure.
    - This class reflects the RQ_Stereotype requirement.
 
    \code
    namespace graphics {
-   class named_subtree : container {
+   class widget_stereotype : container {
       object * get_node( QID const& node_id );
    };
    }
@@ -298,17 +298,14 @@
     }
     \endcode
 
-  The widget_stereotype class is a subtree node, which is connected to a widget and theme behavior. 
-  Instances of these objects are used by themes to redefine "widgets". widget_stereotype is an object_reference
-  because all widgets are stereotypes. 
+  The graphics::widget class is a reference node, which connects a widget, a theme behavior and a widget_stereotype. 
    - The class combines RQ_RefTB and RQ_RefWB under the assumption that both references are always required 
      at the same point in the tree
-   - widget_stereotype could also fulfills RQ_Stereotype by requiring a linkage from missing properties 
-     to objects, the linkage is filled by ??? and consists of ??? 
+   - the graphics::widget class provide the linkage to the widget_stereotype 
 
     \code
     namespace graphics{
-    class widget_stereotype : public object_reference
+    class widget : public object_reference
     {
       ui::widget * widget;
       ui::theme::behavior * theme_behavior;
@@ -340,7 +337,6 @@
       node [style=filled];
       subgraph cluster_2 {
         graph[ shape="ellipse"];
-        label="subtree of vertical layout"
         GVL [label="{widget_stereotype|:\"gott::vertical_layout\"}"]
         GVLCO [label="container"]
         GVL-> GVLCO;
@@ -360,15 +356,17 @@
         EntryText [label="{single_line_text|alignment=center|\"gott::entry::text\"}"];
         Entry -> EntryC -> EntryText;
       }
-      acontainer [label="{container1|{linkage:|{<f0>\"children\"=button1,button2|...}}|<f1> reference=\"gott::vertical_layout\"}"];
-      GB1 [label="{button1|{linkage:|{<f0>\"text\"=...|...}}|<f1> reference=\"gott::button\"}"];
-      GB2 [label="{button2|{linkage:|{<f0>\"text\"=...|...}}|<f1> reference=\"gott::button\"}"];
+      acontainer [label="{container1|{linkage:|{<f0>\"children\"=entry1,button1,button2|...}}|<f1> reference=\"gott::vertical_layout\"}"];
+      GE1[label="{entry1|{linkage:|{<f0>\"text\"=...}}|<f1> reference=\"gott::entry\"}"];
+      GB1 [label="{button1|{linkage:|{<f0>\"text\"=...}}|<f1> reference=\"gott::button\"}"];
+      GB2 [label="{button2|{linkage:|{<f0>\"text\"=...}}|<f1> reference=\"gott::button\"}"];
+      acontainer:f0 -> GE1;
       acontainer:f0 -> GB1;
       acontainer:f0 -> GB2;
-      acontainer:f1 -> GVL;
-      acontainer:f1 -> VLayout;
-      GB1:f1 -> GB;
-      GB2:f1 -> GB;
+      acontainer:f1 -> GVL[style=dashed];
+      GE1:f1 -> Entry[style=dashed];
+      GB1:f1 -> GB [style=dashed];
+      GB2:f1 -> GB[style=dashed];
       label="Graphics Object Hierarchy created by theme loader";
       color=blue;
     }
@@ -377,6 +375,8 @@
     VLayout:f1 -> acontainer[color=blue];
     GB1:f0 -> B1:f0[color=green];
     GB2:f0 -> B2:f0[color=green] ;
+    GE1:f0 -> TE:f0[color=green] ;
+    TE:f1 -> GE1[color=blue] ;
     B1:f1 -> GB1[color=blue];
     B2:f1 -> GB2[color=blue];
   }
