@@ -9,6 +9,8 @@
 #include <boost/preprocessor/seq/to_tuple.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/control/expr_if.hpp>
+#include <boost/preprocessor/punctuation/comma_if.hpp>
+#include <boost/preprocessor/logical/and.hpp>
 
 #ifndef NO_STDLIB
 #include <string>
@@ -167,9 +169,10 @@ private:
 #ifndef IN_DOXYGEN
 
 inline void test_group::add(node *nchild, bool is_test) {
-  node *&tail = *(is_test ? reinterpret_cast<node **>(&test) : &child);
+  node **ptail = is_test ? reinterpret_cast<node **>(&test) : &child;
+  node *tail = *ptail;
   if (!tail) {
-    tail = nchild;
+    *ptail = nchild;
   } else {
     while (tail->next)
       tail = tail->next;    
@@ -250,34 +253,47 @@ inline void check_equals(T const &a, U const &b,
  * @param name The name of the test (quoted).
  * @param fixture A tuple consisting of whether to use a fixture and a fixture class.
  */
-#define PTEST(name, fixture) \
+#define PTEST(name, fixture, group_fixture) \
   TESTSOON_PTEST1( \
     name, \
     BOOST_PP_CAT(test_, __LINE__), \
     BOOST_PP_TUPLE_ELEM(2, 0, fixture), \
-    BOOST_PP_TUPLE_ELEM(2, 1, fixture))
+    BOOST_PP_TUPLE_ELEM(2, 1, fixture), \
+    group_fixture)
 
 /**
  * Declare a test (optional name only).
  * @param name The name of the test (not quoted).
  */
-#define TEST(name) PTEST(#name, (0, ~))
+#define TEST(name) PTEST(#name, (0, ~), 0)
 
 /**
  * Declare a test with fixture.
  * @param name The name of the test (not quoted).
  * @param fixture_class The fixture class to use.
  */
-#define FTEST(name, fixture_class) PTEST(#name, (1, fixture_class))
+#define FTEST(name, fixture_class) PTEST(#name, (1, fixture_class), 0)
+
+/**
+ * Declare a test with default group fixture, named group_fixture.
+ * @param name The name of the test (not quoted).
+ */
+#define GFTEST(name) PTEST(#name, (0, ~), 1)
 
 #ifndef IN_DOXYGEN
 
-#define TESTSOON_PTEST1(name, test_class, has_fixture, fixture_class) \
+#define TESTSOON_TEST_PARAM(has_fixture, fixture_class, has_group_fixture) \
+  BOOST_PP_EXPR_IF(has_fixture, fixture_class &fixture) \
+  BOOST_PP_COMMA_IF(BOOST_PP_AND(has_fixture, has_group_fixture)) \
+  BOOST_PP_EXPR_IF(has_group_fixture, group_fixture_t &group_fixture)
+
+#define TESTSOON_PTEST1(name, test_class, has_fixture, fixture_class, group_fixture) \
   TESTSOON_PTEST2( \
     name, test_class, has_fixture, fixture_class, \
-    BOOST_PP_EXPR_IF(has_fixture, fixture_class &fixture))
+    TESTSOON_TEST_PARAM(has_fixture, fixture_class, group_fixture), \
+    group_fixture)
 
-#define TESTSOON_PTEST2(name, test_class, has_fixture, fixture_class, test_param) \
+#define TESTSOON_PTEST2(name, test_class, has_fixture, fixture_class, test_param, has_group_fixture) \
   namespace { \
     struct test_class \
     : public ::testsoon::test_info { \
@@ -285,8 +301,11 @@ inline void check_equals(T const &a, U const &b,
             test_group(__FILE__), name, __FILE__, __LINE__) {} \
       void test() const { \
         BOOST_PP_EXPR_IF(has_fixture, fixture_class fixture;) \
+        BOOST_PP_EXPR_IF(has_group_fixture, group_fixture_t group_fixture;) \
         do_test( \
           BOOST_PP_EXPR_IF(has_fixture, fixture) \
+          BOOST_PP_COMMA_IF(BOOST_PP_AND(has_fixture, has_group_fixture)) \
+          BOOST_PP_EXPR_IF(has_group_fixture, group_fixture) \
         ); \
       } \
       void do_test(test_param) const; \
@@ -338,11 +357,15 @@ inline void check_equals(T const &a, U const &b,
 #define TESTSOON_PARAM_INVOKE(x) \
   TESTSOON_PARAM_INVOKEx(TESTSOON_PARAM_INVOKE2(x))
 
-#define TESTSOON_PARAM__name(x)        0, x
-#define TESTSOON_PARAM__fixture(x)     1, (1, x)
+#define TESTSOON_PARAM__name(x)           0, x
+#define TESTSOON_PARAM__n(x)              TESTSOON_PARAM__name(x)
+#define TESTSOON_PARAM__fixture(x)        1, (1, x)
+#define TESTSOON_PARAM__f(x)              TESTSOON_PARAM__fixture(x)
+#define TESTSOON_PARAM__group_fixture(x)  2, x
+#define TESTSOON_PARAM__gf(x)             TESTSOON_PARAM__group_fixture(x)
 
 #define TESTSOON_PARAM_INITIAL \
-  ("") ((0, ~))
+  ("") ((0, ~)) (0)
 
 #define TESTSOON_PARAM_INVOKEx(x) \
   PTEST x
