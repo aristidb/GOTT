@@ -217,19 +217,21 @@ inline void check_equals(T const &a, U const &b,
 
 #endif
 
-template <int len>
-struct int_generator {
-  typedef int value_type;
-  typedef const value_type &const_reference;
+template <typename Type>
+class range_generator {
+public:
+  typedef Type value_type;
+  typedef Type const &const_reference;
+
+  range_generator(const_reference a, const_reference b) : a(a), b(b) {}
 
   class iterator {
-    int v;
-    public:
-    iterator(int v=0) : v(v) {}
-    iterator(const iterator &x) : v(x.v) {}
+  public:
+    iterator(const_reference v = value_type()) : v(v) {}
+    iterator(iterator const &x) : v(x.v) {}
     
     bool operator!=(iterator const &rhs) {
-      return v!=rhs.v;
+      return v != rhs.v;
     }
 
     value_type &operator*() { return v;}
@@ -238,15 +240,23 @@ struct int_generator {
       ++v;
       return *this; 
     }
+
     iterator operator++(int) { 
       iterator tmp(*this); 
       ++*this;
       return tmp;
     }
+
+  private:
+    value_type v;
   };
 
-  iterator begin() { return iterator(0); }
-  iterator end() { return iterator(len); }
+  iterator begin() { return iterator(a); }
+  iterator end() { return iterator(b); }
+
+private:
+  value_type a;
+  value_type b;
 };
 
 

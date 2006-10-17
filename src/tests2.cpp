@@ -36,22 +36,22 @@ FTEST(, dummy_fixture) {
 
 struct group_fixture_t {};
 
-struct startgenerator {
-    int start;
-    typedef int const& const_reference;
-    ::testsoon::int_generator<10> rgen;
-    typedef ::testsoon::int_generator<10>::iterator iterator;
-    startgenerator(int i = 0) : start(i) {}
-    iterator begin() { return iterator(start); }
-    iterator end() { return rgen.end(); }
-};
+using testsoon::range_generator;
 
-XTEST((gen, (startgenerator))) {
-    equals(generator, 3);
+TEST_GROUP(_2_4) {
+
+XTEST((gen, (range_generator<int>)(2)(4))) {
+  equals(generator, 3);
 }
 
-XTEST((gen, (startgenerator)(4))) {
-    equals(generator, 4);
+}
+
+TEST_GROUP(_4_6) {
+
+XTEST((gen, (range_generator<int>)(4)(6))) {
+  equals(generator, 4);
+}
+
 }
 
 XTEST((gf, 1)) {
