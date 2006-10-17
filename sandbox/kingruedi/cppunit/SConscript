@@ -1,0 +1,8 @@
+Import('env')
+
+cppunit_env = env.Copy()
+
+cppunit_env.Append(LINKFLAGS = '-lcppunit')
+cppunit_env.Program('test', ['testrunner.cpp', 'simple-utest.cpp'])
+
+

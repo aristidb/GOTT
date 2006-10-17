@@ -1,0 +1,15 @@
+import os
+import glob
+
+Import('x11_env')
+Import('x11_shrd_env')
+Import('rlib')
+
+
+
+source_files = ['input.cpp','window.cpp','application.cpp', rlib + '.cpp']
+
+#x11_shrd_env.SharedLibrary('gottx11', source_files)
+x11_env.StaticLibrary('gottx11', source_files)
+
+
