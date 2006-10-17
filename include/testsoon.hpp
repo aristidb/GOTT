@@ -30,7 +30,8 @@ namespace testsoon {
 
 #ifndef NO_STDLIB
 
-typedef std::string string;
+using std::string;
+
 typedef std::vector<string> string_vector;
 typedef std::ostream stream_class;
 #define DEFAULT_STREAM std::cout
@@ -43,7 +44,15 @@ inline string object_to_string(T const &object) {
 }
 
 inline string object_to_string(std::type_info const &object) {
-  return object_to_string(object.name());
+  return string(object.name());
+}
+
+inline string object_to_string(char const * const object) {
+  return string(object);
+}
+
+inline string object_to_string(string const &object) {
+  return string(object);
 }
 
 #endif
