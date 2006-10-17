@@ -194,10 +194,10 @@ private:
 #ifndef IN_DOXYGEN
 
 inline void test_group::add(node *nchild, bool is_test) {
-  node **ptail = is_test ? reinterpret_cast<node **>(&test) : &child;
-  node *tail = *ptail;
+  node *tail = is_test ? test : child;
   if (!tail) {
-    *ptail = nchild;
+    if (is_test) test = static_cast<test_info *>(nchild);
+    else         child = nchild;
   } else {
     while (tail->next)
       tail = tail->next;    
