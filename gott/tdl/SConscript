@@ -53,7 +53,7 @@ lang_sources = env.Glob('schema_lang/types/*.cpp')
 env.LoadableModule('tdl_schema_lang', lang_sources)
 
 module_test_obj = [
-    'test/test_tut.cpp', 
+    'test/main.cpp', 
     'test/simple_parse.cpp', 
     'test/simple_parse_meta.cpp',
     'test/structure.cpp',

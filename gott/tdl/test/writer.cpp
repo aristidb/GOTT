@@ -40,23 +40,11 @@
 #include <gott/tdl/structure/structure.hpp>
 #include <gott/tdl/structure/container.hpp>
 #include <gott/tdl/structure/print.hpp>
-#include <gott/tut/tut.h>
 #include <sstream>
-
-namespace tut {
-struct writer_test {
-};
-
-typedef test_group<writer_test> tf;
-typedef tf::object object;
-}
+#include <testsoon.hpp>
 
 namespace {
-tut::tf wri("writer");
-}
-
-namespace tut {
-  void test(std::string const& input, std::string const& expected) {
+  void test(std::string const &input, std::string const &expected) {
     std::string new_string;
     tdl::structure::container old_interpretation;
     {
@@ -71,31 +59,25 @@ namespace tut {
       new_string = o.str();
       tdl::structure::direct_struc(o, new_interpretation);
     }
-    ensure_equals("interpretation", new_interpretation, old_interpretation);
-    ensure_equals("string", new_string, expected);
+    equals(new_interpretation, old_interpretation);
+    equals(new_string, expected);
   }
-
-#define TEST(i, x, y) \
-  template<> template<> void object::test<i>(int) { \
-    tut::test(x, y); \
-  }
-
-TEST(1, "hallo du,sau", "hallo\n  du\n  sau")
-TEST(2, "test #comment1\n  #comment2\n  foo",
-      "test #comment1\n#comment2\n  foo")
-TEST(3, "\"foo bar\"", "\"foo bar\"")
-TEST(4, "x \"y\"\"z\"", "x\n  \"y\"\"z\"")
-TEST(5, "\"x,y\"", "\"x,y\"")
-TEST(6, "(x\n y,z)", "(x\n y,z)")
-TEST(7, "\"(\"\n)", "\"(\"\n)")
-TEST(8, "`\n  x\n  y", "`\n    x\n    y")
-TEST(9, "a `\n  bar\n foo", "a\n  `\n      bar\n  foo")
-TEST(10, "`\n  a\n b", "`\n    a\n  b")
-
-// TODO: add impossible tests
-
-template<> template<> void object::test
-<11>(int) { no_test(); }
-
-
 }
+
+#define MYTEST(i, x, y) \
+  TEST(i) { \
+    test(x, y); \
+  }
+
+MYTEST(1, "hallo du,sau", "hallo\n  du\n  sau")
+MYTEST(2, "test #comment1\n  #comment2\n  foo",
+      "test #comment1\n#comment2\n  foo")
+MYTEST(3, "\"foo bar\"", "\"foo bar\"")
+MYTEST(4, "x \"y\"\"z\"", "x\n  \"y\"\"z\"")
+MYTEST(5, "\"x,y\"", "\"x,y\"")
+MYTEST(6, "(x\n y,z)", "(x\n y,z)")
+MYTEST(7, "\"(\"\n)", "\"(\"\n)")
+MYTEST(8, "`\n  x\n  y", "`\n    x\n    y")
+MYTEST(9, "a `\n  bar\n foo", "a\n  `\n      bar\n  foo")
+MYTEST(10, "`\n  a\n b", "`\n    a\n  b")
+

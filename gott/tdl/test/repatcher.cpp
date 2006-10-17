@@ -39,25 +39,16 @@
 #include <gott/tdl/structure/repatch.hpp>
 #include <gott/tdl/structure/print.hpp>
 #include <gott/tdl/exceptions.hpp>
-#include <gott/tut/tut.h>
 #include <sstream>
 #include <boost/scoped_ptr.hpp>
+#include <testsoon.hpp>
 
 using namespace tdl::structure;
 using gott::Xany;
 
 using boost::scoped_ptr;
 
-namespace tut {
-struct repatcher_test { };
-
-typedef test_group<repatcher_test> tf;
-typedef tf::object object;
-}
-
 namespace {
-tut::tf stru("repatcher");
-
 repatcher *strip_paren() {
   boost::scoped_ptr<repatcher_getter> rg(repatcher_by_name());
   rg->begin();
@@ -92,9 +83,7 @@ repatcher *strip_paren() {
 }
 }
 
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
+TEST() {
   std::ostringstream o;
   direct_print out(o);
   scoped_ptr<repatcher> re(strip_paren());
@@ -102,11 +91,10 @@ void object::test<1>(int) {
   ind->begin();
   ind->data(Xany("(hallo)"));
   ind->end();
-  ensure_equals(o.str(), "hallo");
+  equals(o.str(), "hallo");
 }
 
-template<> template<>
-void object::test<2>(int) {
+TEST() {
   std::ostringstream o;
   direct_print out(o);
   scoped_ptr<repatcher> re(strip_paren());
@@ -115,14 +103,13 @@ void object::test<2>(int) {
   try {
     ind->data(Xany("(hallo"));
   } catch (tdl::tdl_error const &e) {
-    ensure_equals(e.module(), "TDL Structure repatcher");
-    ensure_equals(o.str(), "");
+    equals(e.module(), "TDL Structure repatcher");
+    equals(o.str(), "");
   }
   ind->end();
 }
 
-template<> template<>
-void object::test<3>(int) {
+TEST() {
   scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
   re_g->begin();
   re_g->data(Xany("integer"));
@@ -138,11 +125,10 @@ void object::test<3>(int) {
   ind->data(Xany("-000044"));
   ind->end();
 
-  ensure_equals(stream.str(), "-44");
+  equals(stream.str(), "-44");
 }
 
-template<> template<>
-void object::test<4>(int) {
+TEST() {
   scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
   re_g->begin();
   re_g->data(Xany("enumeration"));
@@ -166,11 +152,10 @@ void object::test<4>(int) {
     ind->end();
   ind->end();
 
-  ensure_equals(stream.str(), "    0\n    1");
+  equals(stream.str(), "    0\n    1");
 }
 
-template<> template<>
-void object::test<5>(int) {
+TEST() {
   scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
   re_g->begin();
     re_g->data(Xany("substring"));
@@ -194,11 +179,10 @@ void object::test<5>(int) {
     ind->data(Xany("123456789"));
   ind->end();
 
-  ensure_equals(stream.str(), "3");
+  equals(stream.str(), "3");
 }
 
-template<> template<>
-void object::test<6>(int) {
+TEST() {
   scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
   re_g->begin();
     re_g->data(Xany("find-literal"));
@@ -219,7 +203,7 @@ void object::test<6>(int) {
   ind->begin(); 
   ind->begin(); ind->data(Xany("barfoo")); ind->end();
   ind->end();
-  ensure_equals(stream.str(), "    barfoo");
+  equals(stream.str(), "    barfoo");
 
   bool expected_failure = false;
   ind->begin();
@@ -227,18 +211,17 @@ void object::test<6>(int) {
       try {
         ind->data(Xany("foobar")); 
       } catch (tdl::tdl_error const &e) {
-        ensure_equals(e.module(), "TDL Structure repatcher");
+        equals(e.module(), "TDL Structure repatcher");
         expected_failure = true;
       }
     ind->end();
   ind->end();
 
   if (!expected_failure)
-    fail();
+    check(false);
 }
 
-template<> template<>
-void object::test<7>(int) {
+TEST() {
   scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
   re_g->begin();
     re_g->data(Xany("substring"));
@@ -266,13 +249,6 @@ void object::test<7>(int) {
     ind->data(Xany("x077"));
   ind->end();
 
-  ensure_equals(stream.str(), "77");
+  equals(stream.str(), "77");
 }
 
-template<> template<>
-void object::test<8>(int) {
-  no_test();
-}
-
-//...
-}

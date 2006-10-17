@@ -37,10 +37,10 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include <gott/tdl/parse/meta.hpp>
-#include <gott/tut/tut.h>
 #include <sstream>
 #include <gott/string/string.hpp>
 #include <vector>
+#include <testsoon.hpp>
 
 using std::pair;
 using std::ostream;
@@ -51,8 +51,8 @@ using gott::string;
 
 typedef pair<string, string> twostring;
 
-namespace tut {
-struct meta_basic {
+namespace {
+struct group_fixture_t {
   meta_parser parser;
   string data, rest;
   std::vector<twostring> xp, ev;
@@ -69,11 +69,13 @@ struct meta_basic {
     final_position = parser.parse(x);
     rest = gott::string(x.str().c_str() + x.tellg(), gott::utf8);
   }
-  meta_basic() { parser.set_default(boost::ref(*this)); }
+  void run_test(string const &data) {
+    this->data = data;
+    run_test();
+  }
+  group_fixture_t() { parser.set_default(boost::ref(*this)); }
 };
 
-typedef test_group<meta_basic> tf;
-typedef tf::object object;
 }
 
 namespace gott {
@@ -82,50 +84,32 @@ ostream &operator<<(ostream &o, pair<string,string> const &x) {
 }
 }
 
-namespace {
-tut::tf spmeta("simple::parse_meta");
-}
-
-namespace tut {
-
-template<> template<>
-void object::test<1>(int) {
-  data = "#?foobar qulux-dei zql";
-  run_test();
-  expect("foobar", "qulux-dei zql");
-  ensure_equals("simple meta declaration", range(ev), range(xp));
-  ensure_equals(final_position, 
+GFTEST() {
+  group_fixture.run_test("#?foobar qulux-dei zql");
+  group_fixture.expect("foobar", "qulux-dei zql");
+  equals(range(group_fixture.ev), range(group_fixture.xp));
+  equals(group_fixture.final_position, 
       source_position("", 1, 0, "foobar qulux-dei zql", 1, 0));
 }
 
-template<> template<>
-void object::test<2>(int) {
-  data = "\n\n\n\n#?real     kluft\n\n\n\n\n   \n       \n\n#?delta_x yz";
-  run_test();
-  expect("real", "kluft");
-  ensure_equals("multi-line declaration", range(ev), range(xp));
-  ensure_equals("multi-line declaration rest", rest, 
-                string("   \n       \n\n#?delta_x yz"));
-  ensure_equals(final_position,
+GFTEST() {
+  group_fixture.data = "\n\n\n\n#?real     kluft\n\n\n\n\n   \n       \n\n#?delta_x yz";
+  group_fixture.run_test();
+  group_fixture.expect("real", "kluft");
+  equals(range(group_fixture.ev), range(group_fixture.xp));
+  equals(group_fixture.rest, string("   \n       \n\n#?delta_x yz"));
+  equals(group_fixture.final_position,
       source_position("", 9, 0, "real     kluft", 5, 0));
 }
 
-template<> template<>
-void object::test<3>(int) {
-  data = "#?a\n#? b\n#\n#?c";
-  run_test();
-  expect("a");
-  expect("", "b");
-  ensure_equals("multi-line #2", range(ev), range(xp));
-  ensure_equals("multi-line #2 rest", rest, string("#\n#?c"));
-  ensure_equals(final_position,
+GFTEST() {
+  group_fixture.data = "#?a\n#? b\n#\n#?c";
+  group_fixture.run_test();
+  group_fixture.expect("a");
+  group_fixture.expect("", "b");
+  equals(range(group_fixture.ev), range(group_fixture.xp));
+  equals(group_fixture.rest, string("#\n#?c"));
+  equals(group_fixture.final_position,
       source_position("", 2, 0, " b", 2, 0));
 }
 
-template<> template<>
-void object::test<4>(int) {
-  no_test();
-}
-
-// further tests
-}

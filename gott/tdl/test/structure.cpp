@@ -43,50 +43,35 @@
 #include <gott/tdl/structure/repatchable_adapter.hpp>
 #include <gott/tdl/structure/comfort.hpp>
 #include <gott/tdl/structure/print.hpp>
-#include <gott/tut/tut.h>
 #include <sstream>
+#include <testsoon.hpp>
 
 namespace stru = tdl::structure;
 namespace cf = stru::cf;
 using gott::xany::Xany;
 using tdl::source_position;
 
-namespace tut {
-struct structure_basic { };
-
-typedef test_group<structure_basic> tf;
-typedef tf::object object;
-}
-
-namespace {
-tut::tf stru("structure");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
+TEST() {
   stru::container p1, p2;
   stru::writable_structure &w = p1;
   w.begin(source_position());
     w.data(Xany("hallo"));
   w.end();
   p1.copy_to(p2);
-  ensure_equals("simple copy", p1, p2);
+  equals(p1, p2);
 }
 
-template<> template<>
-void object::test<2>(int) {
+TEST() {
   stru::container p1, p2;
   stru::writable_structure &w = p2;
   cf::S(Xany("hallo")).write_to(p1);
   w.begin(source_position());
     w.data(Xany("hallo"));
   w.end();
-  ensure_equals("comfort vs simple", p1, p2);
+  equals(p1, p2);
 }
 
-template<> template<>
-void object::test<3>(int) {
+TEST() {
   stru::container p1, p2;
   stru::repatchable_adapter2 aa(p1);
   stru::revocable_adapter a(aa);
@@ -103,11 +88,10 @@ void object::test<3>(int) {
     w.end();
   w.end();
   cf::C(cf::S(Xany("77"))).write_to(p2);
-  ensure_equals("reverting", p1, p2);
+  equals(p1, p2);
 }
 
-template<> template<>
-void object::test<4>(int) {
+TEST() {
   stru::container p1, p2;
   stru::writable_structure &w = p1;
   w.begin(source_position());
@@ -120,11 +104,10 @@ void object::test<4>(int) {
     w.end();
   w.end();
   cf::C(cf::S(Xany("77"))).write_to(p2);
-  ensure("unequal", p1 != p2);
+  check(p1 != p2);
 }
 
-template<> template<>
-void object::test<5>(int) {
+TEST() {
   stru::container p1;
   stru::writable_structure &w = p1;
   w.begin(source_position());
@@ -140,14 +123,6 @@ void object::test<5>(int) {
   std::ostringstream strm;
   stru::direct_print o(strm);
   p1.copy_to(o);
-  ensure_equals("stringified tree", strm.str(),
-      "-\n    8899.2\n        77 : --!");
+  equals(strm.str(), "-\n    8899.2\n        77 : --!");
 }
 
-template<> template<>
-void object::test<6>(int) {
-  no_test();
-}
-
-// further tests
-}
