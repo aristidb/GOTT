@@ -45,6 +45,24 @@ FTEST(, dummy_fixture) {
 
 struct group_fixture_t {};
 
+struct startgenerator {
+    int start;
+    typedef int const& const_reference;
+    ::testsoon::int_generator<10> rgen;
+    typedef ::testsoon::int_generator<10>::iterator iterator;
+    startgenerator(int i = 0) : start(i) {}
+    iterator begin() { return iterator(start); }
+    iterator end() { return rgen.end(); }
+};
+
+XTEST((gen, startgenerator)) {
+    equals(generator, 3);
+}
+
+XTEST((gen, startgenerator) (genp, (4))) {
+    equals(generator, 4);
+}
+
 XTEST((gf, 1)) {
   equals(typeid(group_fixture), typeid(group_fixture_t));
 }
