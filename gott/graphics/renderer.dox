@@ -356,7 +356,6 @@
       color=blue;
     }
     Window -> VLayout [label="widgets"];
-    Window -> acontainer [label="graphical representation defined by theme"];
     VLayout:f1 -> GVL[style=dashed];
 
     TE:f1 -> Entry[style=dashed] ;
