@@ -33,7 +33,7 @@ typedef std::ostream stream_class;
 #define DEFAULT_STREAM std::cout
 
 template<class T>
-test_string object_to_string(T const &object) {
+inline test_string object_to_string(T const &object) {
   std::ostringstream stream;
   stream << object;
   return stream.str();
@@ -134,12 +134,15 @@ public:
 
 class test_reporter {
 public:
-  virtual void begin_group(test_group const &) {}
-  virtual void end_group(test_group const &) {}
-  virtual void before_tests(test_group const &) {}
-  virtual void after_tests(test_group const &) {}
-  virtual void success(test_info const &) {}
-  virtual void failure(test_info const &, test_failure const &) = 0;
+  virtual void begin_group(test_group const &group) { (void)group; }
+  virtual void end_group(test_group const &group) { (void)group; }
+  virtual void before_tests(test_group const &group) { (void)group; }
+  virtual void after_tests(test_group const &group) { (void)group; }
+  virtual void success(test_info const &info, test_string const &sequence_key) {
+    (void)info;
+    (void)sequence_key;
+  }
+  virtual void failure(test_info const &info, test_failure const &, test_string const &sequence_key) = 0;
   virtual ~test_reporter() {}
 };
 
@@ -163,12 +166,15 @@ public:
     out << '\n';
     out.flush();
   }
-  void success(test_info const &){
+  void success(test_info const &, test_string const &){
     out << '.';
     out.flush();
   }
-  void failure(test_info const &, test_failure const &x) {
-    out << "[F=" << x.line << "]";
+  void failure(test_info const &, test_failure const &x, test_string const &k) {
+    out << "[F=" << x.line;
+    if (k != test_string())
+      out << '<' << k << '>';
+    out << ']';
     out.flush();
   }
 private:
@@ -362,7 +368,9 @@ private:
             BOOST_PP_EQUAL(BOOST_PP_ARRAY_SIZE(generator_param), 0), \
             BOOST_PP_EMPTY(), \
             BOOST_PP_ARRAY_DATA(generator_param)); \
-        for (generator_class::iterator i = gen.begin(); i != gen.end(); ++i)) \
+        for (generator_class::iterator i = gen.begin(); i != gen.end(); ++i)) { \
+          ::testsoon::test_string key \
+            BOOST_PP_EXPR_IF(has_generator, (::testsoon::object_to_string(*i))); \
           try { \
             do_test( \
               BOOST_PP_SEQ_ENUM( \
@@ -372,10 +380,11 @@ private:
                 (0) \
               ) \
             ); \
-            reporter.success(*this); \
+            reporter.success(*this, key); \
           } catch (::testsoon::test_failure const &x) { \
-           reporter.failure(*this, x); \
+           reporter.failure(*this, x, key); \
           } \
+        } \
       } \
       void do_test(test_param) const; \
     } BOOST_PP_CAT(test_obj_, __LINE__); \
