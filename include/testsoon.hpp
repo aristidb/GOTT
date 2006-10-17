@@ -87,7 +87,6 @@ inline void node::print(stream_class &out) const {
 class test_holder : public test_group {
 public:
   test_holder() : test_group(0, test_string()) {}
-  //void run(test_reporter &) const;
 };
 
 class test_file : public test_group {
@@ -102,13 +101,9 @@ public:
             test_string const &name, test_string const &file, unsigned line)
   : node(group, name, true), file(file), line(line) {}
 
-  void run(test_reporter &) const;
-
   test_string const file;
   unsigned const line;
 
-protected:
-  virtual void test() const = 0;
 };
 
 #endif
@@ -192,15 +187,6 @@ inline void test_group::run(test_reporter &rep) const {
   rep.end_group(*this);
 }
 
-inline void test_info::run(test_reporter &reporter) const {
-  try {
-    test();
-    reporter.success(*this);
-  } catch (test_failure const &x) {
-    reporter.failure(*this, x);
-  }
-}
-
 extern test_holder &tests();
 
 inline void fail(char const *msg, unsigned line) {
@@ -215,6 +201,40 @@ inline void check_equals(T const &a, U const &b,
 }
 
 #endif
+
+template <int len>
+struct int_generator {
+  typedef int value_type;
+  typedef const value_type &const_reference;
+
+  class iterator {
+    int v;
+    public:
+    iterator(int v=0) : v(v) {}
+    iterator(const iterator &x) : v(x.v) {}
+    
+    bool operator!=(iterator const &rhs) {
+      return v!=rhs.v;
+    }
+
+    value_type &operator*() { return v;}
+
+    iterator &operator++() { 
+      ++v;
+      return *this; 
+    }
+    iterator operator++(int) { 
+      iterator tmp(*this); 
+      ++*this;
+      return tmp;
+    }
+  };
+
+  iterator begin() { return iterator(0); }
+  iterator end() { return iterator(len); }
+};
+
+
 
 /**
  * Add this macro to exactly one source file to ensure proper instantiation.
@@ -302,18 +322,25 @@ inline void check_equals(T const &a, U const &b,
     : public ::testsoon::test_info { \
       test_class () : ::testsoon::test_info( \
             test_group(__FILE__), name, __FILE__, __LINE__) {} \
-      void test() const { \
+      void run(::testsoon::test_reporter &reporter) const { \
         BOOST_PP_EXPR_IF(has_fixture, fixture_class fixture;) \
         BOOST_PP_EXPR_IF(has_group_fixture, group_fixture_t group_fixture;) \
-        BOOST_PP_EXPR_IF(has_generator, generator_class generator;) \
-        do_test( \
-          BOOST_PP_SEQ_ENUM( \
-            BOOST_PP_EXPR_IF(has_fixture, (fixture)) \
-            BOOST_PP_EXPR_IF(has_group_fixture, (group_fixture)) \
-            BOOST_PP_EXPR_IF(has_generator, (generator.next())) \
-            (0) \
-          ) \
-        ); \
+        BOOST_PP_EXPR_IF(has_generator, generator_class gen;) \
+        BOOST_PP_EXPR_IF(has_generator, \
+        for (generator_class::iterator i = gen.begin(); i != gen.end(); ++i)) \
+          try { \
+            do_test( \
+              BOOST_PP_SEQ_ENUM( \
+                BOOST_PP_EXPR_IF(has_fixture, (fixture)) \
+                BOOST_PP_EXPR_IF(has_group_fixture, (group_fixture)) \
+                BOOST_PP_EXPR_IF(has_generator, (*i)) \
+                (0) \
+              ) \
+            ); \
+            reporter.success(*this); \
+          } catch (::testsoon::test_failure const &x) { \
+           reporter.failure(*this, x); \
+          } \
       } \
       void do_test(test_param) const; \
     } BOOST_PP_CAT(test_obj_, __LINE__); \

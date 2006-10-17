@@ -8,6 +8,10 @@ TEST() {
 TEST() {
 }
 
+XTEST((generator, ::testsoon::int_generator<3>)) {
+  equals(generator, 0);
+}
+
 TEST() {
 }
 
