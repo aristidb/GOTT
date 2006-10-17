@@ -22,6 +22,8 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <vector>
+#include <typeinfo>
 #endif
 
 namespace testsoon {
@@ -29,6 +31,7 @@ namespace testsoon {
 #ifndef NO_STDLIB
 
 typedef std::string test_string;
+typedef std::vector<test_string> string_vector;
 typedef std::ostream stream_class;
 #define DEFAULT_STREAM std::cout
 
@@ -37,6 +40,10 @@ inline test_string object_to_string(T const &object) {
   std::ostringstream stream;
   stream << object;
   return stream.str();
+}
+
+inline test_string object_to_string(std::type_info const &object) {
+  return object_to_string(object.name());
 }
 
 #endif
@@ -125,11 +132,14 @@ public:
 
 class test_failure {
 public:
-  test_failure(test_string const &message, unsigned line)
-    : message(message), line(line) {}
+  test_failure(test_string const &message,
+               unsigned line,
+               string_vector const &data = string_vector())
+    : message(message), line(line), data(data) {}
   ~test_failure() {}
   test_string message;
   unsigned line;
+  string_vector data;
 };
 
 class test_reporter {
@@ -210,15 +220,27 @@ inline void test_group::run(test_reporter &rep) const {
 
 extern test_holder &tests();
 
-inline void fail(char const *msg, unsigned line) {
-	throw test_failure(msg, line);
+inline void fail(char const *msg, unsigned line, string_vector const &data = string_vector()) {
+	throw test_failure(msg, line, data);
 }
 
 template<class T, class U>
 inline void check_equals(T const &a, U const &b,
                          char const *msg, unsigned line) {
-  if (!(a == b))
-    fail(msg, line);
+  if (!(a == b)) {
+    string_vector data;
+    data.push_back(object_to_string(a));
+    data.push_back(object_to_string(b));
+    fail(msg, line, data);
+  }
+}
+
+template<class F, class T>
+inline void do_check1(F fun, T const &val, char const *msg, unsigned line) {
+  if (!fun(val)) {
+    string_vector data;
+    fail(msg, line, data);
+  }
 }
 
 #endif
@@ -502,6 +524,12 @@ private:
 			::testsoon::fail("throwed " #t, __LINE__); \
 		} \
 	} while (0)
+
+#define check(x) \
+  do { \
+    if (!(x)) \
+      ::testsoon::fail("check " #x, __LINE__); \
+  } while (0)
 
 } //namespace testsoon
 
