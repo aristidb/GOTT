@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
- * Portions created by the Initial Developer are Copyright (C) 2004-2006
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,4 +36,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <gott/tut/call.cpp>
+#include <testsoon.hpp>
+
+TEST_REGISTRY
+
+int main() {
+  using namespace testsoon;
+  default_reporter rep;
+  tests().run(rep);
+}
