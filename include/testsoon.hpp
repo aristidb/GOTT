@@ -30,19 +30,19 @@ namespace testsoon {
 
 #ifndef NO_STDLIB
 
-typedef std::string test_string;
-typedef std::vector<test_string> string_vector;
+typedef std::string string;
+typedef std::vector<string> string_vector;
 typedef std::ostream stream_class;
 #define DEFAULT_STREAM std::cout
 
 template<class T>
-inline test_string object_to_string(T const &object) {
+inline string object_to_string(T const &object) {
   std::ostringstream stream;
   stream << object;
   return stream.str();
 }
 
-inline test_string object_to_string(std::type_info const &object) {
+inline string object_to_string(std::type_info const &object) {
   return object_to_string(object.name());
 }
 
@@ -56,12 +56,12 @@ class test_group;
 
 class node {
 public:
-  node(test_group *, test_string const &, bool = false);
+  node(test_group *, string const &, bool = false);
   virtual void run(test_reporter &) const = 0;
   virtual ~node() {}
 
   test_group const * const parent;
-  test_string const name;
+  string const name;
 
   void print(stream_class &out) const;
 
@@ -77,7 +77,7 @@ inline stream_class &operator<<(stream_class &out, node const &n) {
 
 class test_group : public node {
 public:
-  test_group(test_group *parent, test_string const &name)
+  test_group(test_group *parent, string const &name)
     : node(parent, name), child(0) {}
   
   void add(node *, bool);
@@ -90,7 +90,7 @@ private:
 };
 
 inline node::node(test_group *parent=0,
-                  test_string const &name=test_string(),
+                  string const &name=string(),
                   bool is_test)
   : parent(parent), name(name), next(0) {
   if (parent)
@@ -108,22 +108,22 @@ inline void node::print(stream_class &out) const {
 
 class test_holder : public test_group {
 public:
-  test_holder() : test_group(0, test_string()) {}
+  test_holder() : test_group(0, string()) {}
 };
 
 class test_file : public test_group {
 public:
-  test_file(test_group *parent, test_string const &file)
+  test_file(test_group *parent, string const &file)
     : test_group(parent, file) {}
 };
 
 class test_info : public node {
 public:
   test_info(test_group *group,
-            test_string const &name, test_string const &file, unsigned line)
+            string const &name, string const &file, unsigned line)
   : node(group, name, true), file(file), line(line) {}
 
-  test_string const file;
+  string const file;
   unsigned const line;
 
 };
@@ -132,12 +132,12 @@ public:
 
 class test_failure {
 public:
-  test_failure(test_string const &message,
+  test_failure(string const &message,
                unsigned line,
                string_vector const &data = string_vector())
     : message(message), line(line), data(data) {}
   ~test_failure() {}
-  test_string message;
+  string message;
   unsigned line;
   string_vector data;
 };
@@ -148,11 +148,11 @@ public:
   virtual void end_group(test_group const &group) { (void)group; }
   virtual void before_tests(test_group const &group) { (void)group; }
   virtual void after_tests(test_group const &group) { (void)group; }
-  virtual void success(test_info const &info, test_string const &sequence_key) {
+  virtual void success(test_info const &info, string const &sequence_key) {
     (void)info;
     (void)sequence_key;
   }
-  virtual void failure(test_info const &info, test_failure const &, test_string const &sequence_key) = 0;
+  virtual void failure(test_info const &info, test_failure const &, string const &sequence_key) = 0;
   virtual ~test_reporter() {}
 };
 
@@ -176,13 +176,13 @@ public:
     out << '\n';
     out.flush();
   }
-  void success(test_info const &, test_string const &){
+  void success(test_info const &, string const &){
     out << '.';
     out.flush();
   }
-  void failure(test_info const &, test_failure const &x, test_string const &k) {
+  void failure(test_info const &, test_failure const &x, string const &k) {
     out << "[F=" << x.line;
-    if (k != test_string())
+    if (k != string())
       out << '<' << k << '>';
     out << ']';
     out.flush();
@@ -324,7 +324,7 @@ private:
     } \
     namespace name { \
       static ::testsoon::test_group * \
-      test_group(::testsoon::test_string const &) { \
+      test_group(::testsoon::string const &) { \
         static ::testsoon::test_group current( \
           BOOST_PP_CAT(name, _helper)::upper_test_group(), #name); \
         return &current; \
@@ -403,7 +403,7 @@ private:
             BOOST_PP_EMPTY(), \
             BOOST_PP_ARRAY_DATA(generator_param)); \
         for (generator_class::iterator i = gen.begin(); i != gen.end(); ++i)) { \
-          ::testsoon::test_string key \
+          ::testsoon::string key \
             BOOST_PP_EXPR_IF(has_generator, (::testsoon::object_to_string(*i))); \
           try { \
             do_test( \
@@ -517,7 +517,7 @@ private:
 			(x); \
 			::testsoon::fail("not throwed " #t, __LINE__); \
 		} catch (t &e) { \
-			if (::testsoon::test_string(e.what()) != ::testsoon::test_string((w))) \
+			if (::testsoon::string(e.what()) != ::testsoon::string((w))) \
 				::testsoon::fail("throwed " #t " with wrong message", __LINE__); \
 		} \
 	} while (0)
@@ -554,7 +554,7 @@ private:
 #ifndef IN_DOXYGEN
 
 inline static ::testsoon::test_group *
-test_group(::testsoon::test_string const &filename) {
+test_group(::testsoon::string const &filename) {
   static ::testsoon::test_file file(&::testsoon::tests(), "(" + filename + ")");
   return &file;
 }
