@@ -2,15 +2,6 @@
 
 #include <testsoon.hpp>
 
-TEST() {
-}
-
-TEST() {
-}
-
-XTEST((generator, ::testsoon::int_generator<3>)) {
-  equals(generator, 0);
-}
 
 TEST() {
 }
@@ -55,11 +46,11 @@ struct startgenerator {
     iterator end() { return rgen.end(); }
 };
 
-XTEST((gen, startgenerator)) {
+XTEST((gen, (startgenerator))) {
     equals(generator, 3);
 }
 
-XTEST((gen, startgenerator) (genp, (4))) {
+XTEST((gen, (startgenerator)(4))) {
     equals(generator, 4);
 }
 
