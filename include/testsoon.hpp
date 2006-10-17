@@ -239,6 +239,18 @@ template<class F, class T>
 inline void do_check1(F fun, T const &val, char const *msg, unsigned line) {
   if (!fun(val)) {
     string_vector data;
+    data.push_back(object_to_string(val));
+    fail(msg, line, data);
+  }
+}
+
+template<class F, class T, class U>
+inline void do_check2(F fun, T const &a, U const &b,
+                      char const *msg, unsigned line) {
+  if (!fun(a, b)) {
+    string_vector data;
+    data.push_back(object_to_string(a));
+    data.push_back(object_to_string(b));
     fail(msg, line, data);
   }
 }
@@ -530,6 +542,12 @@ private:
     if (!(x)) \
       ::testsoon::fail("check " #x, __LINE__); \
   } while (0)
+
+#define check1(x, a) \
+  ::testsoon::do_check1(x, a, "check1 " #x, __LINE__)
+
+#define check2(x, a, b) \
+  ::testsoon::do_check2(x, a, b, "check2 " #x, __LINE__)
 
 } //namespace testsoon
 

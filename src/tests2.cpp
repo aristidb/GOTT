@@ -1,7 +1,9 @@
 // wegen ODR tests
 
+#include <boost/lambda/lambda.hpp>
 #include <testsoon.hpp>
 
+using namespace boost::lambda;
 
 TEST() {
 }
@@ -14,9 +16,11 @@ TEST() {
 TEST_GROUP(nested) {
 
 TEST() {
+  check1(_1 > 4, 5);
 }
 
 XTEST() {
+  check1(_1 > 4, 0);
 }
 
 XTEST((name, "dummy") (name, "foo")) {
