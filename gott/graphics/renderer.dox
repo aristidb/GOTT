@@ -220,7 +220,7 @@
       These properties have to be available to the renderer while processing the graphics tree.
 
       For example the stereotype of a button might have a label. The appearance of that label is not defined by the 
-      label. It may be an image or just a text string, or both, or any other graphics::object. 
+      button. It may be an image or just a text string, or both, or any other graphics::object. 
       Usually one would have to create the graphics::object tree for every button instance, even though these trees are 
       completely identical or differ in some aspects. With the introduction of stereotypes there would be 
       only one button graphics::object tree in the whole process, and every button instance would reference 
@@ -318,10 +318,10 @@
     subgraph cluster_0 {
       style=filled;
       node [style=filled];
-      TE [label="{TextEntry|<f0> Text:\"...\" | <f1> QID:\"gott::entry\"}"]
-      B1 [label="{Buttony|<f0> Text:\"Ok\" | <f1> QID:\"gott::button\"}"]
-      B2 [label="{Button|<f0> Text:\"Cancel\" | <f1> QID:\"gott::button\"}"]
-      VLayout [label="{Vertical Layout|<f0> children|<f1> QID:\"gott::vertical_layout\"}"]
+      TE [label="{TextEntry|<f0> Text:\"...\" |{linkage:|{<f2>\"text\"=...}}| <f1> QID:\"gott::entry\"}"]
+      B1 [label="{Buttony|<f0> Text:\"Ok\" |{linkage:|{<f2>\"text\"=...}} | <f1> QID:\"gott::button\"}"]
+      B2 [label="{Button|<f0> Text:\"Cancel\" |{linkage:|{<f2>\"text\"=...}}| <f1> QID:\"gott::button\"}"]
+      VLayout [label="{Vertical Layout|<f0> children|{linkage:|{<f2>\"children\"=entry1,button1,button2|...}}|<f1> QID:\"gott::vertical_layout\"}"]
       VLayout:f0 -> TE
       VLayout:f0 -> B1 
       VLayout:f0 -> B2
@@ -352,29 +352,16 @@
         EntryText [label="{single_line_text|alignment=center|\"gott::entry::text\"}"];
         Entry -> EntryC -> EntryText;
       }
-      acontainer [label="{container1|{linkage:|{<f0>\"children\"=entry1,button1,button2|...}}|<f1> reference=\"gott::vertical_layout\"}"];
-      GE1[label="{entry1|{linkage:|{<f0>\"text\"=...}}|<f1> reference=\"gott::entry\"}"];
-      GB1 [label="{button1|{linkage:|{<f0>\"text\"=...}}|<f1> reference=\"gott::button\"}"];
-      GB2 [label="{button2|{linkage:|{<f0>\"text\"=...}}|<f1> reference=\"gott::button\"}"];
-      acontainer:f0 -> GE1;
-      acontainer:f0 -> GB1;
-      acontainer:f0 -> GB2;
-      acontainer:f1 -> GVL[style=dashed];
-      GE1:f1 -> Entry[style=dashed];
-      GB1:f1 -> GB [style=dashed];
-      GB2:f1 -> GB[style=dashed];
-      label="Graphics Object Hierarchy created by theme loader";
+      label="Graphics Objects found by theme loader";
       color=blue;
     }
     Window -> VLayout [label="widgets"];
     Window -> acontainer [label="graphical representation defined by theme"];
-    VLayout:f1 -> acontainer[color=blue];
-    GB1:f0 -> B1:f0[color=green];
-    GB2:f0 -> B2:f0[color=green] ;
-    GE1:f0 -> TE:f0[color=green] ;
-    TE:f1 -> GE1[color=blue] ;
-    B1:f1 -> GB1[color=blue];
-    B2:f1 -> GB2[color=blue];
+    VLayout:f1 -> GVL[style=dashed];
+
+    TE:f1 -> Entry[style=dashed] ;
+    B1:f1 -> GB[style=dashed];
+    B2:f1 -> GB[style=dashed];
   }
 \enddot
 
