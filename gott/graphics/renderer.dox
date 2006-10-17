@@ -39,22 +39,6 @@
 /**
   \page graphics_renderer Graphics Drawing System
 
-
-  \section graphics_renderer_comment Comment
-
-  1. First of all, before we start: 
-    I am not yet sure how the widgets provide their "view" parts. One 
-    possibility would be to let the window have a complete tree of all 
-    combined "view" parts, so called graphics::objects, of 
-    all widgets. Then the widgets degrade to their behavior aspects while
-    refering to their graphical representation using pointers into the 
-    complete tree. 
-
-    Or one has the common tree of widgets, each of them having a "view"
-    part to explore.
-  
-    "Right now i am in favor of the first variant." (6.10.2006 a.p.)
-
   \section graphics_renderer_intro Introduction
 
   This document describes the concept of the renderer class, which is responsible
@@ -125,10 +109,11 @@
   and should do whatever makes drawing faster. For example an Antigrain/* renderer might 
   have several instantiated rasterizers with different span generators and path 
   transformators, would pick one depending on the path of graphics::objects
-  traversed. 
+  traversed. There is a rasterizer called rasterizer_outline_aa, which is fast but 
+  works only for thin lines. Think lines need conv_stroke and a scanline rasterizer. 
  
   We do not define the inner operation of a renderer, the inner operation of a renderer
-  is defined by the render method used. So OpenGL defines the GL renderer,
+  is defined by the rendering methods/library used. So OpenGL defines the GL renderer,
   Antigrain define the Antigrain renderer. These two renderers will have completely diverging
   implementations, since Antigrain thinks in paths and scanlines while GL thinks in 
   triangles, shaders, textures and buffers. ("I also believe that we will have different
@@ -218,20 +203,31 @@
       The themes which also change the dynamic aspects of widgets will require that 
       feature too. For example if a theme wants to have a blinking rectangle everytime the 
       mouse crosses a button, the dynamic aspect of the themed widget must be able to refer
-      to the rectangle defined inside the graphics::objects of the button. 
+      to the rectangle defined inside the graphics::objects of the button. Without the ability to 
+      refer to certain subnodes the programmed theme behavior or widget code, would have to know 
+      the exact grapchis::objects tree structure of the widget. 
    - RQ_RendererData - Make renderer relevant data attachable to each object node. Or only specific nodes?
+      That way the renderer is able to store cached information directly to the nodes in the graphics::obeject tree, 
+      thus no second
+      complex associative container, or parallel tree structure has to be built by a caching renderer. 
    - RQ_ObjRef - object reference support:
       To allow the user or theme writers to change general aspects of themes, and maybe to reuse existing nodes it
       should be possible to refer to certain objects in the tree. E.g. one could have named color nodes. 
-      At this point the tree might turn into a dag. 
+      At this point the tree might turn into a directed acyclic graph
    - RQ_Stereotype - graphical appearance should be defined as stereotypes - extension of RQ_ObjRef 
-      A stereotype is an incomplete or complete description of a widget. The missing parts, can be the current
-      state of the object, and some missing graphical objects. Lets call these missing parts overloaded properties. 
-      These properties have to be provided during construction time.
+      A stereotype is an incomplete or complete description of a widget. The missing parts, if any, can be the current
+      state of the object or some missing graphical objects. Lets call these missing parts overloaded properties. 
+      These properties have to be available to the renderer while processing the graphics tree.
 
-      E.g. a simple button has a text label, the content of the text label is defined
-      by the widget, that way all button widgets share ( share as in really using the same instance in memory ) the same 
-      button stereotype defined by the theme, and only provide the missing text property
+      For example the stereotype of a button might have a label. The appearance of that label is not defined by the 
+      label. It may be an image or just a text string, or both, or any other graphics::object. 
+      Usually one would have to create the graphics::object tree for every button instance, even though these trees are 
+      completely identical or differ in some aspects. With the introduction of stereotypes there would be 
+      only one button graphics::object tree in the whole process, and every button instance would reference 
+      that tree. Every deviation from the stereotype can be defined as a set of overloaded properties. 
+
+      These overloaded properties will be very hard to implement directly, without another layer of indirection.
+      We have to check if that additional layer of indirection hurts the performance of the system. 
  
 
   \subsection graphics_objects_discussion_vector First two cents
