@@ -38,14 +38,14 @@
 
 #include <gott/tdl/parse/parser.hpp>
 #include <gott/tdl/exceptions.hpp>
-#include <gott/tut/tut.h>
 #include <ostream>
 #include <gott/string/string.hpp>
+#include <testsoon.hpp>
 
 using gott::string;
 
-namespace tut {
-struct spb : tdl::abstract_tdl_parser {
+namespace {
+struct group_fixture_t : tdl::abstract_tdl_parser {
   enum event_id { b, e, d, u, n, c };
   typedef std::pair<event_id, string> event;
   std::vector<event> xp, ev;
@@ -69,115 +69,91 @@ struct spb : tdl::abstract_tdl_parser {
   }
 };
 
-typedef test_group<spb> tf;
-typedef tf::object object;
-}
-
-namespace {
-tut::tf spp("simple::parse");
-}
-
-namespace tut {
-std::ostream &operator<<(std::ostream &o, tut::spb::event const &e) {
+std::ostream &operator<<(std::ostream &o, group_fixture_t::event const &e) {
   return o << "bedunc"[e.first] << e.second;
 }
 }
 
-namespace tut {
+#define B() group_fixture.B()
+#define E() group_fixture.E()
+#define D() group_fixture.D()
+#define U() group_fixture.U()
+#define N(x) group_fixture.N(x)
+#define C(x, y) group_fixture.C(x, y)
+#define CMP() equals(range(group_fixture.ev), range(group_fixture.xp))
 
-// Empty document
-template<> template<>
-void object::test<1>(int) {
+GFTEST(Empty document) {
   std::istringstream data("");
-  parse(data);
+  group_fixture.parse(data);
   B(); D(); U(); E();
-  ensure_equals("empty", range(ev), range(xp));
+  CMP();
 }
 
-// Very simple document
-template<> template<>
-void object::test<2>(int) {
+GFTEST(Very simple document) {
   std::istringstream data("hallodu");
-  parse(data);
+  group_fixture.parse(data);
   B(); D(); N("hallodu"); U(); E();
-  ensure_equals("single-word", range(ev), range(xp));
+  CMP();
 }
 
-// One-line document with more than one element
-template<> template<>
-void object::test<3>(int) {
+GFTEST(One-line document with more than one element) {
   std::istringstream data("  hallodu, foobar zulu");
-  parse(data);
+  group_fixture.parse(data);
   B(); D(); N("hallodu"); N("foobar"); D(); N("zulu"); U(); U(); E();
-  ensure_equals("multiple-word", range(ev), range(xp));
+  CMP();
 }
 
-// Empty multi-line document with funny spaces
-template<> template<>
-void object::test<4>(int) {
+GFTEST(Empty multi-line document with funny spaces) {
   std::istringstream data("\n\n          \n     \n\n\n");
-  parse(data);
+  group_fixture.parse(data);
   B(); D(); U(); E();
-  ensure_equals("quasi-empty", range(ev), range(xp));
+  CMP();
 }
 
-// Two simple documents
-template<> template<>
-void object::test<5>(int) {
+GFTEST(Two simple documents) {
   std::istringstream data("\n\n\nfoobar      \n***\n  zumwinke");
-  parse(data);
-  parse(data);
+  group_fixture.parse(data);
+  group_fixture.parse(data);
 
   B(); D(); N("foobar"); U(); E();
   B(); D(); N("zumwinke"); U(); E();
 
-  ensure_equals("dual stream #1", range(ev), range(xp));
+  CMP();
 }
 
-// Indentation
-template<> template<>
-void object::test<6>(int) {
+GFTEST(Indentation) {
   std::istringstream data("\n\n  \n       fobar\n");
-  parse(data);
+  group_fixture.parse(data);
   B(); D(); N("fobar"); U(); E();
 
-  ensure_equals("indented #1", range(ev), range(xp));
+  CMP();
 }
 
-// Indentation #2 (reduced)
-template<> template<>
-void object::test<7>(int) {
+GFTEST(Indentation #2 (reduced)) {
   std::istringstream data("\n  x");
-  parse(data);
+  group_fixture.parse(data);
   B(); D(); N("x"); U(); E();
 
-  ensure_equals("indented #2", range(ev), range(xp));
+  CMP();
 }
 
-
-// Simple comment
-template<> template<>
-void object::test<8>(int) {
+GFTEST(Simple comment) {
   std::istringstream data("\n\n#__ mycomment,\n");
-  parse(data);
+  group_fixture.parse(data);
   B(); D(); C("__ mycomment,", true); U(); E();
 
-  ensure_equals("own-line comment", range(ev), range(xp));
+  CMP();
 }
 
-// Newlined char
-template<> template<>
-void object::test<9>(int) {
+GFTEST(Newlined char) {
   std::istringstream data("\na");
-  parse(data);
+  group_fixture.parse(data);
   B(); D(); N("a"); U(); E();
 
-  ensure_equals("newlined char", range(ev), range(xp));
+  CMP();
 }
 
-// Wiki test #1
-template<> template<>
-void object::test<10>(int) {
+GFTEST(Wiki test #1) {
   std::istringstream data("\
 #?schema footype\n\
 a\n\
@@ -191,7 +167,7 @@ a\n\
     7\n\
   -2\n"
   );
-  parse(data);
+  group_fixture.parse(data);
   
   B();
     D();
@@ -209,12 +185,10 @@ a\n\
     U();
   E();
 
-  ensure_equals("wiki test #1", range(ev), range(xp));
+  CMP();
 }
 
-// Wiki test #2
-template<> template<>
-void object::test<11>(int) {
+GFTEST(Wiki test #2) {
   std::istringstream data("\
 module foo\n\
 \n\
@@ -230,7 +204,7 @@ type multi\n\
        named sum integer (> 0)\n\
        $ list integer"
   );
-  parse(data);
+  group_fixture.parse(data);
   B(); D();
     N("module"); D(); N("foo"); U();
     N("schema"); D(); N("footype"); U();
@@ -250,12 +224,10 @@ type multi\n\
     U();
   U(); E();
 
-  ensure_equals("wiki test #2", range(ev), range(xp));
+  CMP();
 }
 
-// Wiki test #3
-template<> template<>
-void object::test<12>(int) {
+GFTEST(Wiki test #3) {
   std::istringstream data("\
 #?schema songDB\n\
 TITLE:    Home\n\
@@ -272,7 +244,7 @@ TITLE:    Roses\n\
 ARTIST:   \"Kathy Mattea\"\n\
 RATING:   7\n\
 RIPPED:   T");
-  parse(data);
+  group_fixture.parse(data);
   string dataset[3][4] = {
     {"Home",  "Dixie Chicks", "9", "T"},
     {"Fly",   "Dixie Chicks", "8", "T"},
@@ -288,12 +260,10 @@ RIPPED:   T");
     }
   U(); E();
 
-  ensure_equals("wiki test #3", range(ev), range(xp));
+  CMP();
 }
 
-// Old CVS #1
-template<> template<>
-void object::test<13>(int) {
+GFTEST(Old CVS #1) {
   std::istringstream data("\
 a, b c\n\
   d #comment\n\
@@ -312,7 +282,7 @@ a `\n\
    du\n\
  pferd\n"
   );
-  parse(data);
+  group_fixture.parse(data);
   B(); D();
     N("a"); N("b"); D(); 
       N("c"); N("d"); C("comment", false); N("J");
@@ -323,19 +293,17 @@ a `\n\
     N("a"); D(); N("ahllo\n du\n"); N("pferd"); U();
   U(); E();
 
-  ensure_equals("Old CVS test #1", range(ev), range(xp));
+  CMP();
 }
 
-// Simple block test
-template<> template<>
-void object::test<14>(int) {
+GFTEST(Simple block test) {
   std::istringstream data("\
 a `\n\
   ahllo\n\
   du\n\
  pferd\n"
   );
-  parse(data);
+  group_fixture.parse(data);
   B(); D();
     N("a"); 
     D(); 
@@ -343,19 +311,17 @@ a `\n\
     U();
   U(); E();
 
-  ensure_equals("simple block", range(ev), range(xp));
+  CMP();
 }
 
-// Simple block test Variant
-template<> template<>
-void object::test<15>(int) {
+GFTEST(Simple block test Variant) {
   std::istringstream data("\
 a `\n\
    ahllo\n\
    du\n\
   pferd\n"
   );
-  parse(data);
+  group_fixture.parse(data);
   B(); D();
     N("a"); 
     D(); 
@@ -363,17 +329,16 @@ a `\n\
     U();
   U(); E();
 
-  ensure_equals("simple block var", range(ev), range(xp));
+  CMP();
 }
 
-template<> template<>
-void object::test<16>(int) {
+GFTEST() {
   std::istringstream data(
     "a b `\n"
     "  cX\n"
     "  TT\n"
     "c\n");
-  parse(data);
+  group_fixture.parse(data);
   B(); D();
     N("a");
     D();
@@ -385,25 +350,23 @@ void object::test<16>(int) {
     N("c");
   U(); E();
 
-  ensure_equals("second block", range(ev), range(xp));
+  CMP();
 }
 
-template<> template<>
-void object::test<17>(int) {
+GFTEST() {
   std::istringstream data("a, `\n  foo\n bar");
-  parse(data);
+  group_fixture.parse(data);
   B(); D();
     N("a");
     N("foo\n");
     D(); N("bar"); U();
   U(); E();
-  ensure_equals("third block", range(ev), range(xp));
+  CMP();
 }
 
-template<> template<>
-void object::test<18>(int) {
+GFTEST() {
   std::istringstream data("a `\n  foo\n bar");
-  parse(data);
+  group_fixture.parse(data);
   B(); D();
     N("a");
     D();
@@ -411,13 +374,12 @@ void object::test<18>(int) {
       N("bar");
     U();
   U(); E();
-  ensure_equals("fourth block", range(ev), range(xp));
+  CMP();
 }
 
-template<> template<>
-void object::test<19>(int) {
+GFTEST() {
   std::istringstream data("`\n  foo\n bar\n qux");
-  parse(data);
+  group_fixture.parse(data);
   B(); D();
     N("foo\n");
     D();
@@ -425,13 +387,12 @@ void object::test<19>(int) {
       N("qux");
     U();
   U(); E();
-  ensure_equals(range(ev), range(xp));
+  CMP();
 }
 
-template<> template<>
-void object::test<20>(int) {
+GFTEST() {
   std::istringstream data("foo\n   #x\n bar");
-  parse(data);
+  group_fixture.parse(data);
   B(); D();
     N("foo");
     C("x", true);
@@ -439,39 +400,28 @@ void object::test<20>(int) {
       N("bar");
     U();
   U(); E();
-  ensure_equals(range(ev), range(xp));
+  CMP();
 }
 
-template<> template<>
-void object::test<21>(int) {
+GFTEST() {
   std::istringstream data("\"");
   try {
-    parse(data);
+    group_fixture.parse(data);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL parser");
+    equals(m.module(), "TDL parser");
     return;
   }
-  fail();
+  check(!"not throwed");
 }
 
-template<> template<>
-void object::test<22>(int) {
+GFTEST() {
   std::istringstream data("x (");
   try {
-    parse(data);
+    group_fixture.parse(data);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL parser");
+    equals(m.module(), "TDL parser");
     return;
   }
-  fail();
-}
-
-// TODO: add non-TDL input tests
-
-template<> template<>
-void object::test<23>(int) {
-  no_test();
-}
-
+  check(!"not throwed");
 }
 
