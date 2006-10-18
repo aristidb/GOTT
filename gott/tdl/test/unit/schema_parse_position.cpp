@@ -42,8 +42,8 @@
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/structure/structure.hpp>
 #include <gott/tdl/parse/parser.hpp>
-#include <gott/tut/tut.h>
 #include <gott/string/string.hpp>
+#include <testsoon.hpp>
 
 namespace {
 struct ignore_struct : tdl::structure::repatchable_structure {
@@ -67,34 +67,23 @@ struct ignore_struct : tdl::structure::repatchable_structure {
   void get_rid_of(pth) {}
 };
 
-struct test_base {
+struct group_fixture_t {
   ignore_struct no_stru;
   tdl::schema::match match;
   tdl::schema::positioning &pos;
   tdl::abstract_tdl_parser &parse;
 
-  test_base() 
+  group_fixture_t() 
   : match(no_stru), pos(match.pos()), parse(match) {
     match.add(tdl::schema::rule_one("document", tdl::schema::rule_attr_t(), 
      tdl::schema::rule("node", tdl::schema::rule_attr_t())));
   }
 };
 
-typedef tut::test_group<test_base> tf;
-typedef tf::object object;
-
-tf X("schema::parse_position");
 }
 
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  parse.begin_parse();
-  ensure_equals("first token index", pos.current().first, 0);
+GFTEST(first token index) {
+  group_fixture.parse.begin_parse();
+  equals(group_fixture.pos.current().first, 0);
 }
 
-template<> template<>
-void object::test<2>(int) {
-  no_test();
-}
-}
