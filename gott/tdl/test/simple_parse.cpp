@@ -80,7 +80,7 @@ std::ostream &operator<<(std::ostream &o, group_fixture_t::event const &e) {
 #define U() group_fixture.U()
 #define N(x) group_fixture.N(x)
 #define C(x, y) group_fixture.C(x, y)
-#define CMP() equals(range(group_fixture.ev), range(group_fixture.xp))
+#define CMP() Equals(range(group_fixture.ev), range(group_fixture.xp))
 
 GFTEST(Empty document) {
   std::istringstream data("");
@@ -408,10 +408,10 @@ GFTEST() {
   try {
     group_fixture.parse(data);
   } catch (tdl::tdl_error const &m) {
-    equals(m.module(), "TDL parser");
+    Equals(m.module(), "TDL parser");
     return;
   }
-  check(!"not throwed");
+  Check(!"not throwed");
 }
 
 GFTEST() {
@@ -419,9 +419,9 @@ GFTEST() {
   try {
     group_fixture.parse(data);
   } catch (tdl::tdl_error const &m) {
-    equals(m.module(), "TDL parser");
+    Equals(m.module(), "TDL parser");
     return;
   }
-  check(!"not throwed");
+  Check(!"not throwed");
 }
 

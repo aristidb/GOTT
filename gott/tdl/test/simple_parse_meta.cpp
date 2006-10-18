@@ -87,8 +87,8 @@ ostream &operator<<(ostream &o, pair<string,string> const &x) {
 GFTEST() {
   group_fixture.run_test("#?foobar qulux-dei zql");
   group_fixture.expect("foobar", "qulux-dei zql");
-  equals(range(group_fixture.ev), range(group_fixture.xp));
-  equals(group_fixture.final_position, 
+  Equals(range(group_fixture.ev), range(group_fixture.xp));
+  Equals(group_fixture.final_position, 
       source_position("", 1, 0, "foobar qulux-dei zql", 1, 0));
 }
 
@@ -96,9 +96,9 @@ GFTEST() {
   group_fixture.data = "\n\n\n\n#?real     kluft\n\n\n\n\n   \n       \n\n#?delta_x yz";
   group_fixture.run_test();
   group_fixture.expect("real", "kluft");
-  equals(range(group_fixture.ev), range(group_fixture.xp));
-  equals(group_fixture.rest, string("   \n       \n\n#?delta_x yz"));
-  equals(group_fixture.final_position,
+  Equals(range(group_fixture.ev), range(group_fixture.xp));
+  Equals(group_fixture.rest, string("   \n       \n\n#?delta_x yz"));
+  Equals(group_fixture.final_position,
       source_position("", 9, 0, "real     kluft", 5, 0));
 }
 
@@ -107,9 +107,9 @@ GFTEST() {
   group_fixture.run_test();
   group_fixture.expect("a");
   group_fixture.expect("", "b");
-  equals(range(group_fixture.ev), range(group_fixture.xp));
-  equals(group_fixture.rest, string("#\n#?c"));
-  equals(group_fixture.final_position,
+  Equals(range(group_fixture.ev), range(group_fixture.xp));
+  Equals(group_fixture.rest, string("#\n#?c"));
+  Equals(group_fixture.final_position,
       source_position("", 2, 0, " b", 2, 0));
 }
 

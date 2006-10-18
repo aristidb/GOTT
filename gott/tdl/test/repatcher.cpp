@@ -91,7 +91,7 @@ TEST() {
   ind->begin();
   ind->data(Xany("(hallo)"));
   ind->end();
-  equals(o.str(), "hallo");
+  Equals(o.str(), "hallo");
 }
 
 TEST() {
@@ -103,8 +103,8 @@ TEST() {
   try {
     ind->data(Xany("(hallo"));
   } catch (tdl::tdl_error const &e) {
-    equals(e.module(), "TDL Structure repatcher");
-    equals(o.str(), "");
+    Equals(e.module(), "TDL Structure repatcher");
+    Equals(o.str(), "");
   }
   ind->end();
 }
@@ -125,7 +125,7 @@ TEST() {
   ind->data(Xany("-000044"));
   ind->end();
 
-  equals(stream.str(), "-44");
+  Equals(stream.str(), "-44");
 }
 
 TEST() {
@@ -152,7 +152,7 @@ TEST() {
     ind->end();
   ind->end();
 
-  equals(stream.str(), "    0\n    1");
+  Equals(stream.str(), "    0\n    1");
 }
 
 TEST() {
@@ -179,7 +179,7 @@ TEST() {
     ind->data(Xany("123456789"));
   ind->end();
 
-  equals(stream.str(), "3");
+  Equals(stream.str(), "3");
 }
 
 TEST() {
@@ -203,7 +203,7 @@ TEST() {
   ind->begin(); 
   ind->begin(); ind->data(Xany("barfoo")); ind->end();
   ind->end();
-  equals(stream.str(), "    barfoo");
+  Equals(stream.str(), "    barfoo");
 
   bool expected_failure = false;
   ind->begin();
@@ -211,14 +211,14 @@ TEST() {
       try {
         ind->data(Xany("foobar")); 
       } catch (tdl::tdl_error const &e) {
-        equals(e.module(), "TDL Structure repatcher");
+        Equals(e.module(), "TDL Structure repatcher");
         expected_failure = true;
       }
     ind->end();
   ind->end();
 
   if (!expected_failure)
-    check(false);
+    Check(false);
 }
 
 TEST() {
@@ -249,6 +249,6 @@ TEST() {
     ind->data(Xany("x077"));
   ind->end();
 
-  equals(stream.str(), "77");
+  Equals(stream.str(), "77");
 }
 

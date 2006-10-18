@@ -59,8 +59,8 @@ namespace {
       new_string = o.str();
       tdl::structure::direct_struc(o, new_interpretation);
     }
-    equals(new_interpretation, old_interpretation);
-    equals(new_string, expected);
+    Equals(new_interpretation, old_interpretation);
+    Equals(new_string, expected);
   }
 }
 

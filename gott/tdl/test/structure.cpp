@@ -58,7 +58,7 @@ TEST() {
     w.data(Xany("hallo"));
   w.end();
   p1.copy_to(p2);
-  equals(p1, p2);
+  Equals(p1, p2);
 }
 
 TEST() {
@@ -68,7 +68,7 @@ TEST() {
   w.begin(source_position());
     w.data(Xany("hallo"));
   w.end();
-  equals(p1, p2);
+  Equals(p1, p2);
 }
 
 TEST() {
@@ -88,7 +88,7 @@ TEST() {
     w.end();
   w.end();
   cf::C(cf::S(Xany("77"))).write_to(p2);
-  equals(p1, p2);
+  Equals(p1, p2);
 }
 
 TEST() {
@@ -104,7 +104,7 @@ TEST() {
     w.end();
   w.end();
   cf::C(cf::S(Xany("77"))).write_to(p2);
-  check(p1 != p2);
+  Check(p1 != p2);
 }
 
 TEST() {
@@ -123,6 +123,6 @@ TEST() {
   std::ostringstream strm;
   stru::direct_print o(strm);
   p1.copy_to(o);
-  equals(strm.str(), "-\n    8899.2\n        77 : --!");
+  Equals(strm.str(), "-\n    8899.2\n        77 : --!");
 }
 

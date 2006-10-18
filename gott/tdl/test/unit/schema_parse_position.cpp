@@ -84,6 +84,6 @@ struct group_fixture_t {
 
 GFTEST(first token index) {
   group_fixture.parse.begin_parse();
-  equals(group_fixture.pos.current().first, 0);
+  Equals(group_fixture.pos.current().first, 0);
 }
 
