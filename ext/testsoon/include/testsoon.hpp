@@ -380,7 +380,7 @@ private:
 #define TESTSOON_TEST_PARAM(has_fixture, fixture_class, has_group_fixture, has_generator, generator_class) \
   BOOST_PP_EXPR_IF(has_fixture, (fixture_class &fixture)) \
   BOOST_PP_EXPR_IF(has_group_fixture, (group_fixture_t &group_fixture)) \
-  BOOST_PP_EXPR_IF(has_generator, (generator_class::const_reference generator)) \
+  BOOST_PP_EXPR_IF(has_generator, (generator_class::const_reference value)) \
   (int)
 
 #define TESTSOON_PTEST1(name, test_class, has_fixture, fixture_class, group_fixture, has_generator, generator_seq) \
@@ -510,8 +510,10 @@ private:
  * @param a Some value.
  * @param b Another value.
  */
-#define equals(a, b) \
+#define TESTSOON_Equals(a, b) \
   ::testsoon::check_equals(a, b, "not equal: " #a " and " #b, __LINE__)
+
+#define Equals(a, b) TESTSOON_Equals(a, b)
 
 /**
  * Check that an expression throws.
@@ -520,16 +522,20 @@ private:
  * @param t The exception type to check for.
  * @param w The expected value of caught_exception.what().
  */
-#define throws(x, t, w) \
+#define TESTSOON_Throws(x, t, w) \
 	do { \
 		try { \
 			(x); \
 			::testsoon::fail("not throwed " #t, __LINE__); \
 		} catch (t &e) { \
-			if (::testsoon::string(e.what()) != ::testsoon::string((w))) \
+			if ( \
+        ::testsoon::string(w) != ::testsoon::string() && \
+        ::testsoon::string(e.what()) != ::testsoon::string((w))) \
 				::testsoon::fail("throwed " #t " with wrong message", __LINE__); \
 		} \
 	} while (0)
+
+#define Throws(x, t, w) TESTSOON_Throws(x, t, w)
 
 /**
  * Check that an expression does not throw.
@@ -537,7 +543,7 @@ private:
  * @param x The expression to test.
  * @param t The exception type to check for or "..." (without quotes).
  */
-#define nothrows(x, t) \
+#define TESTSOON_Nothrows(x, t) \
 	do { \
 		try { \
 			(x); \
@@ -546,17 +552,25 @@ private:
 		} \
 	} while (0)
 
-#define check(x) \
+#define Nothrows(x, t) TESTSOON_Nothrows(x, t)
+
+#define TESTSOON_Check(x) \
   do { \
     if (!(x)) \
       ::testsoon::fail("check " #x, __LINE__); \
   } while (0)
 
-#define check1(x, a) \
+#define Check(x) TESTSOON_Check(x)
+
+#define TESTSOON_Check1(x, a) \
   ::testsoon::do_check1(x, a, "check1 " #x, __LINE__)
 
-#define check2(x, a, b) \
+#define Check1(x, a) TESTSOON_Check1(x, a)
+
+#define TESTSOON_Check2(x, a, b) \
   ::testsoon::do_check2(x, a, b, "check2 " #x, __LINE__)
+
+#define Check2(x, a, b) TESTSOON_Check2(x, a, b)
 
 } //namespace testsoon
 
