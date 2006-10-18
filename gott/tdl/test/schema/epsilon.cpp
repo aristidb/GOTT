@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -51,66 +51,47 @@ using schema::rule_t;
 
 
 namespace {
-struct schema_epsilon : tut::schema_basic {
+struct schema_epsilon : schema_basic {
   schema_epsilon()
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", rule("node", 
            rule_attr(schema::outer = schema::exactly(0)))))
   {}
 };
+
+typedef schema_epsilon group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_epsilon> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf list_int_then_string_test("schema::epsilon");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
+GFTEST(content) {
   try {
-    run_test("77\n102342\n9");
-    fail("content");
+    group_fixture.run_test("77\n102342\n9");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<2>(int) {
-  run_test("");
-  S(Xany()).write_to(xp);
-  ensure_equals("empty", tree, xp);
+GFTEST(empty) {
+  group_fixture.run_test("");
+  S(Xany()).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(too many) {
   try {
-    run_test("1,2,3,4");
-    fail("too many");
+    group_fixture.run_test("1,2,3,4");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
+GFTEST(going down) {
   try {
-    run_test("1 2 3");
-    fail("going down");
+    group_fixture.run_test("1 2 3");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int) {
-  no_test();
-}
-
-// further tests
-}

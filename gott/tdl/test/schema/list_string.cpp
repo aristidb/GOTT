@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -47,65 +47,47 @@ using gott::string;
 using namespace stru::cf;
 
 namespace {
-struct schema_list_string : tut::schema_basic {
+struct schema_list_string : schema_basic {
   schema_list_string() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document",
         rule_one("list",
           rule("node",
             rule_attr("el", outer = slotcfg(slotcfg::list)))))) {}
 };
+
+typedef schema_list_string group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_list_string> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf list_int_then_string_test("schema::list_string");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z");
+GFTEST(alphabet) {
+  group_fixture.run_test("a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z");
   nd_list c;
   for (char ch = 'a'; ch <= 'z'; ++ch) {
     char buf[] = { ch, '\0' };
     c.push_back(S(Xany(buf), "el"));
   }
-  C(M(c)).write_to(xp);
-  ensure_equals("alphabet", tree, xp);
+  C(M(c)).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<2>(int) {
-  run_test("");
-  C(S(Xany())).write_to(xp);
-  ensure_equals("empty", tree, xp);
+GFTEST(empty) {
+  group_fixture.run_test("");
+  C(S(Xany())).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<3>(int) {
-  run_test("\"nene ich geh dann mal\"");
-  C(C(S(Xany("nene ich geh dann mal")))).write_to(xp);
+GFTEST() {
+  group_fixture.run_test("\"nene ich geh dann mal\"");
+  C(C(S(Xany("nene ich geh dann mal")))).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<4>(int) {
+GFTEST(following) {
   try {
-    run_test("a b");
-    fail("following");
+    group_fixture.run_test("a b");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int) {
-  no_test();
-}
-
-// further tests
-}

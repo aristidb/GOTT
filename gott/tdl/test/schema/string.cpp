@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -46,65 +46,46 @@ using stru::cf::S;
 using stru::cf::C;
 
 namespace {
-struct schema_string : tut::schema_basic {
+struct schema_string : schema_basic {
   schema_string() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", schema::rule_attr_t("doc"),
         rule("node", schema::rule_attr_t()))) {}
 };
+
+typedef schema_string group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_string> tf;
-typedef tf::object object;
+GFTEST(single entity) {
+  group_fixture.run_test("data");
+  C(S(Xany("data")), "doc").write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-namespace {
-  tut::tf string_test("schema::string");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("data");
-  C(S(Xany("data")), "doc").write_to(xp);
-  ensure_equals("single entity", tree, xp);
-}
-
-template<> template<>
-void object::test<2>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+		Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(overfilled #1) {
   try {
-    run_test("foo bar");
-    fail("overfilled #1");
+    group_fixture.run_test("foo bar");
+		Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
+GFTEST(overfilled #2) {
   try {
-    run_test("foo\nbar");
-    fail("overfilled #2");
+    group_fixture.run_test("foo\nbar");
+		Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int) {
-  no_test();
-}
-
-// further tests
-}

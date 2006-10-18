@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -58,93 +58,72 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_integer : tut::schema_basic {
+struct schema_integer : schema_basic {
   schema_integer() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", 
         rule("node", rule_attr(tag = "i", repatcher = int_r()))))
   {}
 };
+
+typedef schema_integer group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_integer> tf;
-typedef tf::object object;
+GFTEST(single int) {
+  group_fixture.run_test("4");
+  C(S(Xany(4), "i")).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-namespace {
-  tut::tf integer_test("schema::integer");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("4");
-  C(S(Xany(4), "i")).write_to(xp);
-  ensure_equals("single integer entity", tree, xp);
-}
-
-template<> template<>
-void object::test<2>(int) {
+GFTEST(no number) {
   try {
-    run_test("d7");
-    fail("non-integral");
+    group_fixture.run_test("d7");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
+
+GFTEST(overfilled #1) {
   try {
-    run_test("4 bar");
-    fail("overfilled #1");
+    group_fixture.run_test("4 bar");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int) {
+GFTEST(overfilled #2) {
   try {
-    run_test("4\nbar");
-    fail("overfilled #2");
+    group_fixture.run_test("4\nbar");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<6>(int) {
-  run_test("-777777");
-  C(S(Xany(-777777), "i")).write_to(xp);
-  ensure_equals("negative", tree, xp);
+GFTEST(negative) {
+  group_fixture.run_test("-777777");
+  C(S(Xany(-777777), "i")).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<7>(int) {
+GFTEST(follow) {
   try {
-    run_test("foo bar");
-    fail("overfilled #1");
+    group_fixture.run_test("foo bar");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<8>(int) {
-  no_test();
-}
-
-// further tests
-}

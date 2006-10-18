@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -59,9 +59,9 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_ordered_string_integer : tut::schema_basic {
+struct schema_ordered_string_integer : schema_basic {
   schema_ordered_string_integer()
- : tut::schema_basic(
+ : schema_basic(
       rule_one("document",
         rule("ordered", RA(), boost::assign::list_of
          (rule("node", RA()))
@@ -70,92 +70,70 @@ struct schema_ordered_string_integer : tut::schema_basic {
                  schema::tag = "i",
                  schema::repatcher = int_r())))))) {}
 };
+
+typedef schema_ordered_string_integer group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_ordered_string_integer> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf ordered_string_integer_test("schema::ordered_string_integer");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("(hallo)\n-74545656");
+GFTEST(single ordered_string_integer entity) {
+  group_fixture.run_test("(hallo)\n-74545656");
   stru::cf::nd_list c;
   c.push_back(S(Xany("(hallo)")));
   c.push_back(S(Xany(-74545656), "i"));
-  C(M(c)).write_to(xp);
-  ensure_equals("single ordered_string_integer entity", tree, xp);
+  C(M(c)).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<2>(int) {
+GFTEST(just string) {
   try {
-    run_test("d7");
-    fail("just string");
+    group_fixture.run_test("d7");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
+GFTEST(following) {
   try {
-    run_test("foo bar");
-    fail("following");
+    group_fixture.run_test("foo bar");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int) {
+GFTEST(just string #2) {
   try {
-    run_test("foo");
-    fail("just string");
+    group_fixture.run_test("foo");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<6>(int) {
+GFTEST(wrong order #1) {
   try {
-    run_test("x,4,y");
-    fail("wrong order #1");
+    group_fixture.run_test("x,4,y");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<7>(int) {
+GFTEST(wrong order #2) {
   try {
-    run_test("4,x,y");
-    fail("wrong order #2");
+    group_fixture.run_test("4,x,y");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<8>(int) {
-  no_test();
-}
-
-// further tests
-}

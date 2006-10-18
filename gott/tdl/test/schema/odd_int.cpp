@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -62,9 +62,9 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_odd_int : tut::schema_basic {
+struct schema_odd_int : schema_basic {
   schema_odd_int() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document",
          rule_one("list",
            rule("node",
@@ -72,74 +72,55 @@ struct schema_odd_int : tut::schema_basic {
                 repatcher = int_r(), 
                 outer = slotcfg(slotcfg::function, odd)))))) {}
 };
+
+typedef schema_odd_int group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_odd_int> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf list_int_then_string_test("schema::odd_int");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int n) {
+XTEST((name, "even") (gf, 1) (gen, (testsoon::range_generator<int>)(0)(10))) {
   try {
     std::ostringstream w;
-    for (int i = 0; i < n; ++i)
+    for (int i = 0; i < value; ++i)
       w << i%10 << ',' << 0 << '\n';
-    run_test(gott::string(w.str(), gott::ascii));
-    fail("even");
+    group_fixture.run_test(gott::string(w.str(), gott::ascii));
+   	Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<12>(int) {
+GFTEST(going down) {
   try {
-    run_test("1 2 3");
-    fail("going down");
+    group_fixture.run_test("1 2 3");
+		Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<13>(int) {
+GFTEST((name, "non-integer")) {
   try {
-    run_test("zzzz");
-    fail("string");
+    group_fixture.run_test("zzzz");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<14>(int t) {
-  int n = t - 14;
+XTEST((name, "odd") (gf, 1) (gen, (testsoon::range_generator<int>)(0)(10))) {
   std::ostringstream w;
-  for (int i = 0; i < n; ++i) 
+  for (int i = 0; i < value; ++i) 
     w << i << ',' << 1 << '\n';
   w << 0;
-  run_test(gott::string(w.str(), gott::ascii));
+  group_fixture.run_test(gott::string(w.str(), gott::ascii));
 
   stru::cf::nd_list c;
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < value; ++i) {
     c.push_back(S(Xany(i), "el"));
     c.push_back(S(Xany(1), "el"));
   }
   c.push_back(S(Xany(0), "el"));
-  C(M(c)).write_to(xp);
+  C(M(c)).write_to(group_fixture.xp);
 
-  ensure_equals("odd", tree, xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<22>(int) {
-  no_test();
-}
-
-}

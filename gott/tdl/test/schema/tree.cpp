@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -48,41 +48,25 @@ using schema::rule_attr;
 using schema::rule;
 
 namespace {
-struct schema_tree : tut::schema_basic {
+struct schema_tree : schema_basic {
   schema_tree() 
-  : tut::schema_basic(rule_one("document", rule("tree")))
+  : schema_basic(rule_one("document", rule("tree")))
   {}
 };
+
+typedef schema_tree group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_tree> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf integer_test("schema::tree");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
+GFTEST() {
   using namespace boost::assign;
 
-  run_test("hallo du,sau du dummes schwein");
+  group_fixture.run_test("hallo du,sau du dummes schwein");
   C(MD(Xany("hallo"), list_of
         (S(Xany("du")))
         (MD(Xany("sau"), list_of
           (MD(Xany("du"), list_of
             (MD(Xany("dummes"), list_of
-              (S(Xany("schwein"))))))))))).write_to(xp);
-  ensure_equals(tree, xp);
+              (S(Xany("schwein"))))))))))).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<2>(int) {
-  no_test();
-}
-
-// further tests
-}

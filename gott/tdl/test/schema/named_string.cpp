@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -48,106 +48,84 @@ using schema::rule_attr;
 using schema::rule_t;
 
 namespace {
-struct schema_named_string : tut::schema_basic {
+struct schema_named_string : schema_basic {
   schema_named_string() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", rule_attr(schema:: tag = "doc"),
         rule_one("named", rule_attr(schema::tag = "ND"),
           rule("node", rule_attr(schema::tag = "S"))))) {}
 };
+
+typedef schema_named_string group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_named_string> tf;
-typedef tf::object object;
+GFTEST(single follow_integer_integer entity) {
+  group_fixture.run_test("ND\n zz");
+  C(MD(Xany(), nd_list(1, S(Xany("zz"), "S")), "ND"), "doc")
+  .write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-namespace {
-  tut::tf named_string_test("schema::named_string");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("ND\n zz");
-  C(MD(Xany(), nd_list(1, S(Xany("zz"), "S")), "ND"), "doc").write_to(xp);
-  ensure_equals("single follow_integer_integer entity", tree, xp);
-}
-
-template<> template<>
-void object::test<2>(int) {
+GFTEST(just string) {
   try {
-    run_test("d7");
-    fail("just string");
+    group_fixture.run_test("d7");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
+GFTEST(non-followed string) {
   try {
-    run_test("ND,foo");
-    fail("non-followed string");
+    group_fixture.run_test("ND,foo");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int) {
+GFTEST(just one integer) {
   try {
-    run_test("4");
-    fail("just one integer");
+    group_fixture.run_test("4");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<6>(int) {
+GFTEST(nonsense) {
   try {
-    run_test("4 99,y");
-    fail("nonsense");
+    group_fixture.run_test("4 99,y");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<7>(int) {
+GFTEST(just label) {
   try {
-    run_test("ND");
-    fail("just label");
+    group_fixture.run_test("ND");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<8>(int) {
+GFTEST(wrong label) {
   try {
-    run_test("mD\n zz");
-    fail("wrong label");
+    group_fixture.run_test("mD\n zz");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<9>(int) {
-  no_test();
-}
-
-// further tests
-}

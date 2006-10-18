@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -58,90 +58,69 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_5to8int : tut::schema_basic {
+struct schema_5to8int : schema_basic {
   schema_5to8int()
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", rule("node",
           rule_attr("el",
                 repatcher = int_r(), 
                 outer = slotcfg(slotcfg::range, 5, 8)))))
   {}
 };
+
+typedef schema_5to8int group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_5to8int> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf list_int_then_string_test("schema::5to8int");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int c) {
+XTEST((n, "too few") (gf, 1) (gen, (testsoon::range_generator<int>)(0)(5))) {
   try {
     std::ostringstream w;
-    for (int i = 1; i < c; ++i) // 0-4
+    for (int i = 0; i < value; ++i) // 0-4
       w << (77 + i) << '\n';
-    run_test(gott::string(w.str(), gott::ascii));
-    fail("too few");
+    group_fixture.run_test(gott::string(w.str(), gott::ascii));
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<6>(int t) {
+XTEST((n, "in range") (gf, 1) (gen, (testsoon::range_generator<int>)(5)(9))) {
   std::ostringstream w;
-  for (int i = 1; i < t; ++i) // 5-8
+  for (int i = 0; i < value; ++i) // 5-8
     w << '\n' << -i;
-  run_test(gott::string(w.str(), gott::ascii));
+  group_fixture.run_test(gott::string(w.str(), gott::ascii));
   stru::cf::nd_list c;
-  for (int i = 1; i < t; ++i)
+  for (int i = 0; i < value; ++i)
     c.push_back(S(Xany(-i), "el"));
-  M(c).write_to(xp);
-  ensure_equals("in range", tree, xp);
+  M(c).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<10>(int c) {
+XTEST((n, "too many") (gf, 1) (gen, (testsoon::range_generator<int>)(9)(16))) {
   try {
     std::ostringstream w;
-    for (int i = 1; i < c; ++i) // 9-...
+    for (int i = 0; i < value; ++i) // 9-...
       w << (77 + i) << '\n';
-    run_test(gott::string(w.str(), gott::ascii));
-    fail("too few");
+    group_fixture.run_test(gott::string(w.str(), gott::ascii));
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<16>(int) {
+GFTEST(going down) {
   try {
-    run_test("1 2 3");
-    fail("going down");
+    group_fixture.run_test("1 2 3");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<17>(int) {
+GFTEST(string) {
   try {
-    run_test("lala");
-    fail("string");
+    group_fixture.run_test("lala");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
-}
-
-template<> template<>
-void object::test<18>(int) {
-  no_test();
-}
-
-// further tests
 }

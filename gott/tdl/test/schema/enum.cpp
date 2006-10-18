@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -62,89 +62,67 @@ stru::repatcher *enum_r() {
   return g->result_alloc();
 }
 
-struct schema_enumeration : tut::schema_basic {
+struct schema_enumeration : schema_basic {
   schema_enumeration() 
-  : tut::schema_basic(
+  : schema_basic(
     rule_one("document", rule("node", rule_attr(repatcher = enum_r()))))
   {}
 };
+
+typedef schema_enumeration group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_enumeration> tf;
-typedef tf::object object;
+GFTEST(first) {
+  group_fixture.run_test("first");
+  C(S(Xany(0))).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-namespace {
-  tut::tf enumeration_test("schema::enumeration");
+GFTEST(second) {
+  group_fixture.run_test("second");
+  C(S(Xany(1))).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("first");
-  C(S(Xany(0))).write_to(xp);
-  ensure_equals("first", tree, xp);
+GFTEST(third) {
+  group_fixture.run_test("third");
+  C(S(Xany(2))).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<2>(int) {
-  run_test("second");
-  C(S(Xany(1))).write_to(xp);
-  ensure_equals("second", tree, xp);
-}
-
-template<> template<>
-void object::test<3>(int) {
-  run_test("third");
-  C(S(Xany(2))).write_to(xp);
-  ensure_equals("third", tree, xp);
-}
-
-template<> template<>
-void object::test<4>(int) {
+GFTEST(out-of) {
   try {
-    run_test("d7");
-    fail("out-of");
+    group_fixture.run_test("d7");
+		Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+		Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<6>(int) {
+GFTEST(overfilled #1) {
   try {
-    run_test("second bar");
-    fail("overfilled #1");
+    group_fixture.run_test("second bar");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<7>(int) {
+GFTEST(overfilled #2) {
   try {
-    run_test("foo\nbar");
-    fail("overfilled #2");
+    group_fixture.run_test("foo\nbar");
+		Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<8>(int) {
-  no_test();
-}
-
-// further tests
-}

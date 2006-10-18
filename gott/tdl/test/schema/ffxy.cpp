@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -58,9 +58,9 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_ffxy : tut::schema_basic {
+struct schema_ffxy : schema_basic {
   schema_ffxy() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document",
         rule_one("ordered",
           rule_one("follow",
@@ -82,51 +82,34 @@ struct schema_ffxy : tut::schema_basic {
     run_test(test_data + "\nA");
   }
 };
+
+typedef schema_ffxy group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_ffxy> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf ffxy_test("schema::ffxy");
-}
-
-namespace tut {
-
-template<> template<>
-void object::test<1>(int n) { // test #1: no int, test #2: two int...
-  run("", n - 1);
+XTEST((gf, 1) (gen, (testsoon::range_generator<int>)(0)(10))) {
+  group_fixture.run("", value);
   nd_list ii;
   ii.push_back(S(Xany(0), "int1"));
   ii.push_back(S(Xany(1), "int2"));
 
   nd_list c;
-  for (int i = 1; i < n; ++i)
+  for (int i = 0; i < value; ++i)
     c.push_back(M(ii, "xy"));
 
   nd_list o;
   o.push_back(M(c, "o"));
   o.push_back(S(Xany("A")));
 
-  C(C(C(M(o)))).write_to(xp);
-  ensure_equals(tree, xp);
+  C(C(C(M(o)))).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<10>(int n) {
+XTEST((gf, 1) (gen, (testsoon::range_generator<int>)(0)(10))) {
   try {
-    run("55 ", n - 10);
-    fail("odd");
+    group_fixture.run("55 ", value);
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<20>(int) {
-  no_test();
-}
-
-}

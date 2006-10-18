@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -60,71 +60,51 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_3int : tut::schema_basic {
+struct schema_3int : schema_basic {
   schema_3int() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", rule("node", schema::rule_attr(
                schema::tag = "el",
                schema::repatcher = int_r(), 
                schema::outer = slotcfg(slotcfg::exactly, 3))))) {}
 };
+
+typedef schema_3int group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_3int> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf list_int_then_string_test("schema::3int");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("77\n102342\n9");
+GFTEST() {
+  group_fixture.run_test("77\n102342\n9");
   stru::cf::nd_list c;
   c.push_back(S(Xany(77), "el"));
   c.push_back(S(Xany(102342), "el"));
   c.push_back(S(Xany(9), "el"));
-  M(c).write_to(xp);
-  ensure_equals("three integers", tree, xp);
+  M(c).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<2>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(too many) {
   try {
-    run_test("1,2,3,4");
-    fail("too many");
+    group_fixture.run_test("1,2,3,4");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
+GFTEST(going down) {
   try {
-    run_test("1 2 3");
-    fail("going down");
+    group_fixture.run_test("1 2 3");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
-}
-
-template<> template<>
-void object::test<5>(int) {
-  no_test();
-}
-
-// further tests
 }

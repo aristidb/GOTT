@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -59,7 +59,7 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct recursive : tut::schema_basic {
+struct recursive : schema_basic {
   rule_t rec;
   
   recursive() {
@@ -75,35 +75,19 @@ struct recursive : tut::schema_basic {
                 rule_t(&rec)))));
   }
 };
+
+typedef recursive group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<recursive> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf recursive("schema::recursive");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int n) {
+XTEST((gf, 1)(gen, (testsoon::range_generator<int>)(1)(8))) {
   std::ostringstream data;
-  for (int i = 0; i < n; ++i)
+  for (int i = 0; i < value; ++i)
     data << i << '\n';
-  run_test(gott::string(data.str(), gott::ascii));
+  group_fixture.run_test(gott::string(data.str(), gott::ascii));
   nd_list ndl;
-  for (int i = 0; i < n; ++i)
+  for (int i = 0; i < value; ++i)
     ndl.push_back(S(Xany(i)));
-  M(ndl).write_to(xp);
-  ensure_equals(tree, xp);
+  M(ndl).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<8>(int) {
-  no_test();
-}
-
-// further tests
-}

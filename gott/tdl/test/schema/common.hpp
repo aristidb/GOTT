@@ -36,6 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include <testsoon.hpp>
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/rule_attr.hpp>
@@ -47,9 +48,8 @@
 #include <gott/tdl/structure/repatchable_adapter.hpp>
 #include <gott/string/string.hpp>
 #include <gott/string/stl.hpp>
-#include <gott/tut/tut.h>
+#include <sstream>
 
-namespace tut {
 struct schema_basic {
   tdl::structure::container tree, xp;
   tdl::structure::repatchable_adapter2 r2tree;
@@ -68,5 +68,4 @@ struct schema_basic {
     rest = gott::string(stream.str().c_str() + stream.tellg(), gott::utf8);
   }
 };
-}
 

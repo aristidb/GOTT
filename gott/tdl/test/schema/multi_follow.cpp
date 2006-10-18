@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -61,9 +61,9 @@ stru::repatcher *enum_r(gott::string const &s) {
   return g->result_alloc();
 }
 
-struct schema_multi_follow : tut::schema_basic {
+struct schema_multi_follow : schema_basic {
   schema_multi_follow() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document",
         rule("follow", rule_attr("outer"),  list_of
           (rule("follow", rule_attr("inner1"), list_of
@@ -73,22 +73,13 @@ struct schema_multi_follow : tut::schema_basic {
             (rule("node", L(3)))
             (rule("node", L(4)))))))) {}
 };
+
+typedef schema_multi_follow group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_multi_follow> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf multi_follow_test("schema::multi_follow");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int i) {
+XTEST((n, "masked") (gf, 1) (gen, (testsoon::range_generator<int>)(0x0)(0x10))){
   gott::string out;
-  unsigned mask = (i - 1) & 0xF;
+  unsigned mask = value & 0xF;
 
   if (mask & 0x1)
     out = out + "1 ";
@@ -99,7 +90,7 @@ void object::test<1>(int i) {
   if (mask & 0x8)
     out = out + "4 ";
 
-  run_test(out);
+  group_fixture.run_test(out);
 
   nd_list inner1;
   if (mask & 0x1)
@@ -118,13 +109,7 @@ void object::test<1>(int i) {
   if (inner1.empty() || !inner2.empty())
     outer.push_back(M(inner2, "inner2"));
 
-  C(M(outer, "outer")).write_to(xp);
-  ensure_equals("masked", tree, xp);
+  C(M(outer, "outer")).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<17>(int) {
-  no_test();
-}
-// further tests
-}

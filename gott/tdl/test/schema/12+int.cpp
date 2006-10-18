@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -61,86 +61,66 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_12plus_int : tut::schema_basic {
+struct schema_12plus_int : schema_basic {
   schema_12plus_int() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", rule("node", rule_attr(
                schema::tag = "el",
                schema::repatcher = int_r(),
                schema::outer = schema::at_least(12)))))
   {}
 };
+
+typedef schema_12plus_int group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_12plus_int> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf list_int_then_string_test("schema::12+int");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int n) {
+XTEST((n, "too few") (gf, 1) (gen, (testsoon::range_generator<int>)(0)(12))) {
   try {
     std::ostringstream w;
-    for (int i = 1; i < n; ++i) {
+    for (int i = 1; i < value; ++i) {
       w << i;
-      if (i < n - 1)
+      if (i < value - 1)
         w << ',';
     }
-    run_test(gott::string(w.str(), gott::ascii));
-    fail("too few");
+    group_fixture.run_test(gott::string(w.str(), gott::ascii));
+    Check(false);
   } catch(tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<12>(int) {
+GFTEST(going down) {
   try {
-    run_test("1 2 3");
-    fail("going down");
+    group_fixture.run_test("1 2 3");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<13>(int) {
+GFTEST(string) {
   try {
-    run_test("zzzz");
-    fail("string");
+    group_fixture.run_test("zzzz");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<14>(int t) {
-  int n = t - 2; // minimum: 12
-
+XTEST((n, "enough") (gf, 1) (gen, (testsoon::range_generator<int>)(12)(20))) {
   std::ostringstream w;
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < value; ++i) {
     w << i;
-    if (i < n - 1)
+    if (i < value - 1)
       w << ',';
   }
-  run_test(gott::string(w.str(), gott::ascii));
+  group_fixture.run_test(gott::string(w.str(), gott::ascii));
 
   stru::cf::nd_list c;
-  for (int i = 0; i < n; ++i)
+  for (int i = 0; i < value; ++i)
     c.push_back(S(Xany(i), "el"));
-  M(c).write_to(xp);
+  M(c).write_to(group_fixture.xp);
 
-  ensure_equals("enough", tree, xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<22>(int) {
-  no_test();
-}
-
-}

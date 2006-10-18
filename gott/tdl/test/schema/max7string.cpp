@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -49,85 +49,64 @@ using stru::cf::C;
 using stru::cf::M;
 
 namespace {
-struct schema_max7string : tut::schema_basic {
+struct schema_max7string : schema_basic {
   schema_max7string() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", 
         rule_one("ordered",
            rule("node",
              rule_attr("el", 
                 outer = slotcfg(slotcfg::maximum, 7)))))) {}
 };
+
+typedef schema_max7string group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_max7string> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf list_int_then_string_test("schema::max7string");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int t) {
-  int n = t - 1; // minimum: 0
-  
+XTEST((n, "enough") (gf, 1) (gen, (testsoon::range_generator<int>)(0)(8))) {
   std::ostringstream w;
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < value; ++i) {
     w << i;
-    if (i < n - 1)
+    if (i < value - 1)
       w << ',';
   }
-  run_test(gott::string(w.str(), gott::ascii));
+  group_fixture.run_test(gott::string(w.str(), gott::ascii));
 
   stru::cf::nd_list c;
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < value; ++i) {
     char ch[2] = {'0'+i,0};
     c.push_back(S(Xany(ch), "el"));
   }
-  C(M(c)).write_to(xp);
+  C(M(c)).write_to(group_fixture.xp);
 
-  ensure_equals("enough", tree, xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<8>(int n) {
+XTEST((n, "too many") (gf, 1) (gen, (testsoon::range_generator<int>)(8)(15))) {
   try {
     std::ostringstream w;
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < value; ++i) {
       w << i;
-      if (i < n - 1)
+      if (i < value - 1)
         w << ',';
     }
-    run_test(gott::string(w.str(), gott::ascii));
-    fail("too many");
+    group_fixture.run_test(gott::string(w.str(), gott::ascii));
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<15>(int) {
+GFTEST(going down) {
   try {
-    run_test("1 2 3");
-    fail("going down");
+    group_fixture.run_test("1 2 3");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<16>(int) {
-  run_test("zzzz");
-  C(C(S(Xany("zzzz"),"el"))).write_to(xp);
-  ensure_equals("string", tree, xp);
-}
-
-template<> template<>
-void object::test<17>(int) {
-  no_test();
-}
-
+GFTEST(string) {
+  group_fixture.run_test("zzzz");
+  C(C(S(Xany("zzzz"),"el"))).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }

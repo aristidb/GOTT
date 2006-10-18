@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -59,9 +59,9 @@ stru::repatcher *lit_r() {
   return g->result_alloc();
 }
 
-struct schema_literal : tut::schema_basic {
+struct schema_literal : schema_basic {
   schema_literal() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document",
         rule("node", 
           rule_attr(
@@ -69,69 +69,49 @@ struct schema_literal : tut::schema_basic {
             schema::repatcher = lit_r()))))
   {}
 };
+
+typedef schema_literal group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_literal> tf;
-typedef tf::object object;
+GFTEST(just foobar) {
+  group_fixture.run_test("foobar");
+  C(S(Xany(0), "foobar")).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-namespace {
-  tut::tf literal_test("schema::literal");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("foobar");
-  C(S(Xany(0), "foobar")).write_to(xp);
-  ensure_equals("single foobar entity", tree, xp);
-}
-
-template<> template<>
-void object::test<2>(int) {
+GFTEST(non-foobar) {
   try {
-    run_test("d7");
-    fail("non-foobar");
+    group_fixture.run_test("d7");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
+GFTEST(overfilled #1) {
   try {
-    run_test("foobar bar");
-    fail("overfilled #1");
+    group_fixture.run_test("foobar bar");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int) {
+GFTEST(overfilled #2) {
   try {
-    run_test("foo\nbar");
-    fail("overfilled #2");
+    group_fixture.run_test("foo\nbar");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<6>(int) {
-  no_test();
-}
-
-// further tests
-}

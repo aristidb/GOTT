@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -58,9 +58,9 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_one_int : tut::schema_basic {
+struct schema_one_int : schema_basic {
   schema_one_int() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", 
          rule_one("list",
            rule("node",
@@ -68,72 +68,52 @@ struct schema_one_int : tut::schema_basic {
                 repatcher = int_r(), 
                 outer = slotcfg(slotcfg::one)))))) {}
 };
+
+typedef schema_one_int group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_one_int> tf;
-typedef tf::object object;
+GFTEST(one int) {
+  group_fixture.run_test("1\n");
+  C(C(S(Xany(1), "el"))).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-namespace {
-  tut::tf list_int_then_string_test("schema::one_int");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("1\n");
-  C(C(S(Xany(1), "el"))).write_to(xp);
-  ensure_equals("one int", tree, xp);
-}
-
-template<> template<>
-void object::test<2>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(going down) {
   try {
-    run_test("1 2 3");
-    fail("going down");
+    group_fixture.run_test("1 2 3");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
+GFTEST(string) {
   try {
-    run_test("zzzz");
-    fail("string");
+    group_fixture.run_test("zzzz");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int t) {
-  int n = t - 3; // minimum: 2 elements
+XTEST((n, "many") (gf, 1) (gen, (testsoon::range_generator<int>)(2)(5))) {
   std::ostringstream w;
-  for (int i = 1; i <= n; ++i)
+  for (int i = 1; i <= value; ++i)
     w << i << '\n';
   try {
-    run_test(gott::string(w.str(), gott::ascii));
-    fail("many");
+    group_fixture.run_test(gott::string(w.str(), gott::ascii));
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<9>(int) {
-  no_test();
-}
-
-}

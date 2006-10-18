@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -60,9 +60,9 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_list_int_then_string : tut::schema_basic {
+struct schema_list_int_then_string : schema_basic {
   schema_list_int_then_string() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", rule_attr(),
         rule("ordered", rule_attr("ord"), list_of
           (rule_one("list", rule_attr("list"),
@@ -72,95 +72,73 @@ struct schema_list_int_then_string : tut::schema_basic {
                 outer = slotcfg(slotcfg::list)))))
           (rule("node", rule_attr("string")))))) {}
 };
+
+typedef schema_list_int_then_string group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_list_int_then_string> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf list_int_then_string_test("schema::list_int_then_string");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("4\nx");
+GFTEST(int -> string) {
+  group_fixture.run_test("4\nx");
   stru::cf::nd_list c;
   c.push_back(C(S(Xany(4), "int"), "list"));
   c.push_back(S(Xany("x"), "string"));
-  C(M(c, "ord")).write_to(xp);
-  ensure_equals("single integer, then string", tree, xp);
+  C(M(c, "ord")).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<2>(int) {
-  run_test("d7");
+GFTEST(just string) {
+  group_fixture.run_test("d7");
   stru::cf::nd_list c;
   c.push_back(S(Xany(), "list"));
   c.push_back(S(Xany("d7"), "string"));
-  C(M(c, "ord")).write_to(xp);
-  ensure_equals("just string", tree, xp);
+  C(M(c, "ord")).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
+GFTEST(follow) {
   try {
-    run_test("foo bar");
-    fail("following");
+    group_fixture.run_test("foo bar");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<5>(int) {
+GFTEST(just int) {
   try {
-    run_test("4");
-    fail("just integer");
+    group_fixture.run_test("4");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<6>(int) {
+GFTEST(too many strings) {
   try {
-    run_test("4,x,y");
-    fail("too many strings");
+    group_fixture.run_test("4,x,y");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<7>(int) {
-  run_test("4\n\n5\n6,7\n(zzz doink)");
+GFTEST(many thingies) {
+  group_fixture.run_test("4\n\n5\n6,7\n(zzz doink)");
   stru::cf::nd_list ll;
   for (int i = 4; i <= 7; ++i)
     ll.push_back(S(Xany(i), "int"));
   stru::cf::nd_list c;
   c.push_back(M(ll, "list"));
   c.push_back(S(Xany("(zzz doink)"), "string"));
-  C(M(c, "ord")).write_to(xp);
-  ensure_equals("many thingies", tree, xp);
+  C(M(c, "ord")).write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<8>(int) {
-  no_test();
-}
-
-// further tests
-}

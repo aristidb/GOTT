@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -58,9 +58,9 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_follow_then_list : tut::schema_basic {
+struct schema_follow_then_list : schema_basic {
   schema_follow_then_list() 
-  : tut::schema_basic(
+  : schema_basic(
       rule_one("document", rule_attr("doc"),
         rule("follow", rule_attr("foll"), boost::assign::list_of
           (rule("node", rule_attr("s")))
@@ -69,81 +69,60 @@ struct schema_follow_then_list : tut::schema_basic {
               repatcher = int_r(),
               outer = slotcfg(slotcfg::list))))))) {}
 };
+
+typedef schema_follow_then_list group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_follow_then_list> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf follow_then_list_test("schema::follow_then_list");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
-  run_test("4\n 5");
+GFTEST(single entity) {
+  group_fixture.run_test("4\n 5");
   stru::cf::nd_list c;
   c.push_back(S(Xany("4"), "s"));
   c.push_back(S(Xany(5), "i"));
-  C(M(c, "foll"), "doc").write_to(xp);
-  ensure_equals("single follow_then_list entity", tree, xp);
+  C(M(c, "foll"), "doc").write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<2>(int) {
-  run_test("d7");
-  C(C(S(Xany("d7"), "s"), "foll"), "doc").write_to(xp);
-  ensure_equals("just string", tree, xp);
+GFTEST(just string) {
+  group_fixture.run_test("d7");
+  C(C(S(Xany("d7"), "s"), "foll"), "doc").write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<3>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<4>(int) {
-  run_test("foo -77");
+GFTEST(followed string) {
+  group_fixture.run_test("foo -77");
   stru::cf::nd_list c;
   c.push_back(S(Xany("foo"), "s"));
   c.push_back(S(Xany(-77), "i"));
-  C(M(c, "foll"), "doc").write_to(xp);
-  ensure_equals("followed string", tree, xp);
+  C(M(c, "foll"), "doc").write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<5>(int) {
+GFTEST() {
   try {
-    run_test("4 99,y");
-    fail("stuff");
+    group_fixture.run_test("4 99,y");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<6>(int) {
-  run_test("x 1 2 3");
+GFTEST(multiple) {
+  group_fixture.run_test("x 1 2 3");
   stru::cf::nd_list c;
   c.push_back(S(Xany("x"), "s"));
   c.push_back(S(Xany(1), "i"));
   c.push_back(S(Xany(2), "i"));
   c.push_back(S(Xany(3), "i"));
-  C(M(c, "foll"), "doc").write_to(xp);
-  ensure_equals("multiple", tree, xp);
+  C(M(c, "foll"), "doc").write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<7>(int) {
-  no_test();
-}
-
-// further tests
-}

@@ -8,7 +8,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARrule_attrNTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARrule_attrNTY OF ANY KIND, either egroup_fixture.xpress or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -39,6 +39,7 @@
 #include "common.hpp"
 #include <gott/tdl/schema/slot.hpp>
 #include <boost/assign/list_of.hpp>
+#include <testsoon.hpp>
 
 using namespace boost::assign;
 
@@ -58,11 +59,11 @@ stru::repatcher *int_r() {
   return g->result_alloc();
 }
 
-struct schema_multi_footype : tut::schema_basic {
+struct schema_multi_footype : schema_basic {
   rule_t multi, footype;
 
   schema_multi_footype() 
-  : tut::schema_basic(rule_one("document", rule_attr("--doc--"), 
+  : schema_basic(rule_one("document", rule_attr("--doc--"), 
         rule_t(&footype))) {
     footype = rule_one("named", rule_attr(tag = "a"),
         rule_t(&multi));
@@ -88,43 +89,32 @@ struct schema_multi_footype : tut::schema_basic {
             outer = slotcfg(slotcfg::some)))));
   }
 };
+
+typedef schema_multi_footype group_fixture_t;
 }
 
-namespace tut {
-typedef test_group<schema_multi_footype> tf;
-typedef tf::object object;
-}
-
-namespace {
-  tut::tf multi_footype_test("schema::multi_footype");
-}
-
-namespace tut {
-template<> template<>
-void object::test<1>(int) {
+GFTEST(empty) {
   try {
-    run_test("");
-    fail("empty");
+    group_fixture.run_test("");
+    Check(false);
   } catch (tdl::tdl_error const &m) {
-    ensure_equals(m.module(), "TDL Schema matcher");
+    Equals(m.module(), "TDL Schema matcher");
   }
 }
 
-template<> template<>
-void object::test<2>(int) {
-  run_test("a\n plugin x\n sum 7\n 77");
+GFTEST(simple) {
+  group_fixture.run_test("a\n plugin x\n sum 7\n 77");
   nd_list c;
   c.push_back(MD(Xany(), nd_list(1, S(Xany("x"), "plugin-data")), "plugin"));
   c.push_back(MD(Xany(), nd_list(1, S(Xany(7), "sum-data")), "sum"));
   c.push_back(S(Xany(77), "--other--"));
   C(MD(Xany(), nd_list(1, M(c, "--unordered--")), "a"), "--doc--")
-    .write_to(xp);
-  ensure_equals("simple", tree, xp);
+    .write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<3>(int) {
-  run_test(
+GFTEST(reordered #1) {
+  group_fixture.run_test(
       "a\n"
       " 4\n"
       " sum\n"
@@ -141,13 +131,12 @@ void object::test<3>(int) {
   c.push_back(MD(Xany(), nd_list(1, S(Xany(-1220), "sum-data")), "sum"));
   c.push_back(MD(Xany(), p, "plugin"));
   C(MD(Xany(), nd_list(1, M(c, "--unordered--")), "a"), "--doc--")
-    .write_to(xp);
-  ensure_equals("reordered #1", tree, xp);
+    .write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<4>(int) {
-  run_test(
+GFTEST(reordered #2) {
+  group_fixture.run_test(
       "a\n"
       " 4,7,-9\n"
       " sum\n"
@@ -165,13 +154,12 @@ void object::test<4>(int) {
   c.push_back(MD(Xany(), nd_list(1, S(Xany(-1220), "sum-data")), "sum"));
   c.push_back(MD(Xany(), p, "plugin"));
   C(MD(Xany(), nd_list(1, M(c, "--unordered--")), "a"), "--doc--")
-    .write_to(xp);
-  ensure_equals("reordered #1", tree, xp);
+    .write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
 
-template<> template<>
-void object::test<5>(int) {
-  run_test(
+GFTEST(reordered #3) {
+  group_fixture.run_test(
       "a\n"
       " 4,7,-9\n"
       " sum\n"
@@ -193,14 +181,6 @@ void object::test<5>(int) {
   c.push_back(MD(Xany(), p, "plugin"));
   c.push_back(S(Xany(-1234), "--other--"));
   C(MD(Xany(), nd_list(1, M(c, "--unordered--")), "a"), "--doc--")
-    .write_to(xp);
-  ensure_equals("reordered #1", tree, xp);
-}
-
-template<> template<>
-void object::test<6>(int) {
-  no_test();
-}
-
-// further tests
+    .write_to(group_fixture.xp);
+  Equals(group_fixture.tree, group_fixture.xp);
 }
