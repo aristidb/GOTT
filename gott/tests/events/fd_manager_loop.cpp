@@ -37,7 +37,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <cxxtest/TestSuite.h>
+#include <testsoon.hpp>
 
 #ifdef HAS_UNISTD_H
 #include <unistd.h>
@@ -64,28 +64,24 @@
 using namespace gott;
 using namespace gott::events;
 
+namespace {
 static char const helloworld_lit[] = "Hallo Welt!";
 
-class fd_manager_loop_test : public CxxTest::TestSuite
-{
+struct group_fixture_t {
   int pipes[2];
   int reads;
   boost::optional<gott::plugin::plugin_handle<main_loop> > ploop;
 
-public:
-  void setUp() {
-    reads = 0;
+  group_fixture_t() : reads(0) {
 #ifdef HAS_UNISTD_H
     pipe_unix(pipes);
 #endif
   }
 
-  void tearDown() {
+  ~group_fixture_t() {
 #ifdef HAS_UNISTD_H
-    ploop = boost::none;
     close(pipes[0]);
     close(pipes[1]);
-    pipes[0] = pipes[1] = -1;
 #endif
   }
 
@@ -97,11 +93,11 @@ public:
       int quit,
       unsigned mask) {
     ++reads;
-    TS_ASSERT_EQUALS(mask, unsigned(fd_manager::read));
+    Equals(mask, unsigned(fd_manager::read));
     char buffer[12];
     ssize_t n = read_unix(pipes[0], buffer);
-    TS_ASSERT_LESS_THAN(0, n);
-    TS_ASSERT(gott::string(helloworld_lit) == buffer);
+    Check(0 < n);
+    Check(gott::string(helloworld_lit) == buffer);
     if (reads == quit)
       ml->quit_local();
     if (reads == cancel)
@@ -124,7 +120,7 @@ public:
       int cancel,
       int quit = -1) {
 #ifdef HAS_UNISTD_H
-    TS_ASSERT(ploop);
+    Check(ploop);
 
     main_loop *loop = ploop->get();
 
@@ -132,7 +128,7 @@ public:
         pipes[0],
         fd_manager::read,
         boost::bind(
-          &fd_manager_loop_test::read_event,
+          &group_fixture_t::read_event,
           this,
           loop,
           repeaters,
@@ -141,7 +137,7 @@ public:
           _1));
 
     boost::thread thrd(boost::bind(
-          &fd_manager_loop_test::write_thread,
+          &group_fixture_t::write_thread,
           this,
           presleep_time,
           no_initial));
@@ -151,102 +147,105 @@ public:
     int expected_total_count = std::min(cancel, quit);
     if (cancel == -1) expected_total_count = quit;
     if (quit == -1) expected_total_count = cancel;
-    TS_ASSERT_EQUALS(reads, expected_total_count);
+    Equals(reads, expected_total_count);
 
     thrd.join();
 #endif
   }
 
   void create_loop(QID const &which) {
-    TS_ASSERT_THROWS_NOTHING(
-        ploop = boost::in_place(gott::plugin::with_plugin_id(which)));
+    Nothrows(
+        ploop = boost::in_place(gott::plugin::with_plugin_id(which)),
+        gott::exception);
   }
   
   void select_loop() { create_loop("gott::events::select_loop"); }
   void epoll_loop() { create_loop("gott::events::epoll_loop"); }
   void kqueue_loop() { create_loop("gott::events::kqueue_loop"); }
-
-  void test_read1_select_loop() {
-#ifdef HAS_UNISTD_H
-    select_loop();
-    meta_reader(1, 2, boost::assign::list_of(2), 3);
-#endif
-  }
-
-  void test_read1_epoll_loop() {
-#ifdef BUILD_EPOLL
-    epoll_loop();
-    meta_reader(1, 2, boost::assign::list_of(2), 3);
-#endif
-  }
-
-  void test_read1_kqueue_loop() {
-#ifdef BUILD_KQUEUE
-    kqueue_loop();
-    meta_reader(1, 2, boost::assign::list_of(2), 3);
-#endif
-  }
-
-  void test_read2_select_loop() {
-#ifdef HAS_UNISTD_H
-    select_loop();
-    meta_reader(-1, 2, boost::assign::list_of(2), 3);
-#endif
-  }
-
-  void test_read2_epoll_loop() {
-#ifdef BUILD_EPOLL
-    epoll_loop();
-    meta_reader(-1, 2, boost::assign::list_of(2), 3);
-#endif
-  }
-
-  void test_read2_kqueue_loop() {
-#ifdef BUILD_KQUEUE
-    kqueue_loop();
-    meta_reader(-1, 2, boost::assign::list_of(2), 3);
-#endif
-  }
-
-  void test_read3_select_loop() {
-#ifdef HAS_UNISTD_H
-    select_loop();
-    meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
-#endif
-  }
-
-  void test_read3_epoll_loop() {
-#ifdef BUILD_EPOLL
-    epoll_loop();
-    meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
-#endif
-  }
-
-  void test_read3_kqueue_loop() {
-#ifdef BUILD_KQUEUE
-    kqueue_loop();
-    meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
-#endif
-  }
-
-  void test_read4_select_loop() {
-#ifdef HAS_UNISTD_H
-    select_loop();
-    meta_reader(0, 3, boost::assign::list_of(2)(3), 5);
-#endif
-  }
-
-  void test_read4_epoll_loop() {
-#ifdef BUILD_EPOLL
-    epoll_loop();
-    meta_reader(-1, 3, boost::assign::list_of(2)(3), 5);
-#endif
-  }
-
-  void test_read4_kqueue_loop() {
-#ifdef BUILD_KQUEUE
-    kqueue_loop();
-    meta_reader(-1, 3, boost::assign::list_of(2)(3), 5);
-#endif
-  }
 };
+}
+
+#ifdef HAS_UNISTD_H
+GFTEST(select) {
+  group_fixture.select_loop();
+  group_fixture.meta_reader(1, 2, boost::assign::list_of(2), 3);
+}
+#endif
+
+#ifdef BUILD_EPOLL
+GFTEST(epoll) {
+  group_fixture.epoll_loop();
+  group_fixture.meta_reader(1, 2, boost::assign::list_of(2), 3);
+}
+#endif
+
+#ifdef BUILD_KQUEUE
+GFTEST(kqueue) {
+  group_fixture.kqueue_loop();
+  group_fixture.meta_reader(1, 2, boost::assign::list_of(2), 3);
+}
+#endif
+
+#ifdef HAS_UNISTD_H
+GFTEST(select) {
+  group_fixture.select_loop();
+  group_fixture.meta_reader(-1, 2, boost::assign::list_of(2), 3);
+}
+#endif
+
+#ifdef BUILD_EPOLL
+GFTEST(epoll) {
+  group_fixture.epoll_loop();
+  group_fixture.meta_reader(-1, 2, boost::assign::list_of(2), 3);
+}
+#endif
+
+#ifdef BUILD_KQUEUE
+GFTEST(kqueue) {
+  group_fixture.kqueue_loop();
+  group_fixture.meta_reader(-1, 2, boost::assign::list_of(2), 3);
+}
+#endif
+
+#ifdef HAS_UNISTD_H
+GFTEST(select) {
+  group_fixture.select_loop();
+  group_fixture.meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
+}
+#endif
+
+#ifdef BUILD_EPOLL
+GFTEST(epoll) {
+  group_fixture.epoll_loop();
+  group_fixture.meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
+}
+#endif
+
+#ifdef BUILD_KQUEUE
+GFTEST(kqueue) {
+  group_fixture.kqueue_loop();
+  group_fixture.meta_reader(0, 2, boost::assign::list_of(2), -1, 3);
+}
+#endif
+
+#ifdef HAS_UNISTD_H
+GFTEST(select) {
+  group_fixture.select_loop();
+  group_fixture.meta_reader(0, 3, boost::assign::list_of(2)(3), 5);
+}
+#endif
+
+#ifdef BUILD_EPOLL
+GFTEST(epoll) {
+  group_fixture.epoll_loop();
+  group_fixture.meta_reader(-1, 3, boost::assign::list_of(2)(3), 5);
+}
+#endif
+
+#ifdef BUILD_KQUEUE
+GFTEST(kqueue) {
+  group_fixture.kqueue_loop();
+  group_fixture.meta_reader(-1, 3, boost::assign::list_of(2)(3), 5);
+}
+#endif
+

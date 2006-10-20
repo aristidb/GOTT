@@ -37,7 +37,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <cxxtest/TestSuite.h>
+#include <testsoon.hpp>
 
 #include <gott/events/main_loop.hpp>
 #include <gott/notify_fs/notification_engine.hpp>
@@ -55,56 +55,50 @@
 
 static char const testfile[] = "/tmp/testfile";
 
-class notify_fs_file_simple_test : public CxxTest::TestSuite
-{
+namespace {
+
+static void helper(void (*fun)()) {
+  fun();
+}
+
+static void open_file() {
+  ::open(testfile, O_RDONLY);
+}
+
+static void close_file() {
+  ::close(::open(testfile, O_RDONLY));
+}
+
+static void access_file() {
+  ::access(testfile, F_OK);
+}
+
+static void write_to_file() {
+  int fd = ::open(testfile, O_WRONLY);
+  ::write(fd, "-", 1);
+  ::close(fd);
+}
+
+static void stat_file() {
+  struct stat buf;
+  ::stat(testfile, &buf);
+}
+
+struct group_fixture_t {
   gott::plugin::plugin_handle<gott::events::main_loop> loop;
 
-public:
   static gott::plugin::selector which_main_loop() {
     return gott::plugin::with_feature<gott::notify_fs::notification_engine>();
   }
 
-  notify_fs_file_simple_test() : loop(which_main_loop()) {}
-
-  void setUp() {
+  group_fixture_t() : loop(which_main_loop()) {
     ::creat(testfile, 00777);
   }
 
-  void tearDown() {
+  ~group_fixture_t() {
     ::unlink(testfile);
   }
 
-  void test_acquire() {
-    TS_ASSERT_THROWS_NOTHING(
-        loop->feature<gott::notify_fs::notification_engine>());
-  }
-
-  void test_open() {
-    meta_test(gott::notify_fs::file_open, &open_file);
-  }
-
-  void test_close() {
-    meta_test(gott::notify_fs::file_close, &close_file);
-  }
-
-  //void test_access() {
-  //  meta_test(gott::notify_fs::file_access, &access_file);
-  //}
-
-  void test_write() {
-    meta_test(gott::notify_fs::file_modify, &write_to_file);
-  }
-
-  //void test_metadata() {
-  //  meta_test(gott::notify_fs::file_attrib, &stat_file);
-  //}
-  
-  void test_manywrite() {
-    for (int i = 0; i < 100000; ++i)
-      test_write();
-  }
-
-private:
   void meta_test(gott::notify_fs::ev_t event, void (*fun)()) {
     using namespace boost::lambda;
     if(!loop->feature<gott::notify_fs::notification_engine>().support_event
@@ -116,12 +110,12 @@ private:
         testfile,
         event);
     w.on_fire().connect(bind(
-          &notify_fs_file_simple_test::on_event,
+          &group_fixture_t::on_event,
           this,
           var(encountered)));
     boost::thread thrd(bind(&helper, fun));
     loop->run();
-    TS_ASSERT_EQUALS(encountered, 1);
+    Equals(encountered, 1);
     thrd.join();
   }
 
@@ -129,31 +123,39 @@ private:
     ++no;
     loop->quit_local();
   }
-
-  static void helper(void (*fun)()) {
-    fun();
-  }
-
-  static void open_file() {
-    ::open(testfile, O_RDONLY);
-  }
-
-  static void close_file() {
-    ::close(::open(testfile, O_RDONLY));
-  }
-
-  static void access_file() {
-    ::access(testfile, F_OK);
-  }
-
-  static void write_to_file() {
-    int fd = ::open(testfile, O_WRONLY);
-    ::write(fd, "-", 1);
-    ::close(fd);
-  }
-
-  static void stat_file() {
-    struct stat buf;
-    ::stat(testfile, &buf);
-  }
 };
+
+}
+
+GFTEST(acquire) {
+  Nothrows(
+      group_fixture.loop->feature<gott::notify_fs::notification_engine>(),
+      gott::exception);
+}
+
+GFTEST(open) {
+  group_fixture.meta_test(gott::notify_fs::file_open, &open_file);
+}
+
+GFTEST(close) {
+  group_fixture.meta_test(gott::notify_fs::file_close, &close_file);
+}
+
+GFTEST(access) {
+  Check(!"investigate");
+  group_fixture.meta_test(gott::notify_fs::file_access, &access_file);
+}
+
+GFTEST(write) {
+  group_fixture.meta_test(gott::notify_fs::file_modify, &write_to_file);
+}
+
+GFTEST(metadata) {
+  Check(!"investigate");
+  group_fixture.meta_test(gott::notify_fs::file_attrib, &stat_file);
+}
+  
+GFTEST(manywrite) {
+  for (int i = 0; i < 100000; ++i)
+    group_fixture.meta_test(gott::notify_fs::file_modify, &write_to_file);
+}

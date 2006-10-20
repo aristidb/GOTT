@@ -38,15 +38,7 @@
 
 Import('env')
 
+codefiles = ['runner.cpp'] + env.Glob("*/*.cpp")
 
-codefiles = env.Glob("*/*.hpp")
-
-## FIXME: call string (relative path, call to python)
-test_env = env.Copy()
-test_env.Command('unit_test.cpp', codefiles,
-'python ../ext/cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCES')
-test_env.Append(CPPPATH = ['#/../ext/cxxtest', '#'])
-test_env.Program('unit_test.cpp')
-
-## Should Scons run unit_test?
+env.Program('unit_test', codefiles)
 
