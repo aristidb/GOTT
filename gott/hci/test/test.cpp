@@ -36,53 +36,49 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include <testsoon.hpp>
 #include <gott/hci/container.hpp>
 #include <gott/hci/object.hpp>
 #include <iostream>
 
 using namespace gott::hci;
 
-#define CHECK(x) do { \
-    if (!(x)) { \
-      ++bad_count; \
-      std::cout << "\"" #x "\" failed at line " << __LINE__ << std::endl;\
-    } else { \
-      ++good_count; \
-    } \
-  } while (0)
+TEST_GROUP(object_tests) {
 
-#define INFO(x) std::cout << #x " = " << (x) << std::endl
-
-void test_object_1() {
-  int good_count = 0, bad_count = 0;
+TEST() {
   object o;
-  CHECK(++o.depth_first_begin() == o.depth_first_end());
-  CHECK(o.depth_first_begin() != o.depth_first_end());
-  CHECK(o.depth_first_begin() == o.depth_first_begin());
-  CHECK(o.depth_first_end() == o.depth_first_end());
-  CHECK(&o == &*o.depth_first_begin());
-  CHECK(o.depth_first_begin().get_path().empty());
-  std::cout << "==> object 1... good: " << good_count << 
-              ", bad: " << bad_count << std::endl;
+  Check(++o.depth_first_begin() == o.depth_first_end());
+  Check(o.depth_first_begin() != o.depth_first_end());
+  Check(o.depth_first_begin() == o.depth_first_begin());
+  Check(o.depth_first_end() == o.depth_first_end());
+  Equals(&o, &*o.depth_first_begin());
+  Check(o.depth_first_begin().get_path().empty());
 }
 
-void test_container_1() {
-  int good_count = 0, bad_count = 0;
+}
+
+TEST_GROUP(container_tests) {
+
+TEST() {
   container o;
   object *o2 = new object;
   o.add(o2);
-  CHECK(++o.depth_first_begin() != o.depth_first_end());
-  CHECK((++o.depth_first_begin()).get_path() == object::path_type(1));
-  CHECK(++++o.depth_first_begin() == o.depth_first_end());
-  CHECK(++o.depth_first_begin(0) == o.depth_first_end());
-  std::cout << "==> container 1... good: " << good_count << 
-              ", bad: " << bad_count << std::endl;
+  Check(++o.depth_first_begin() != o.depth_first_end());
+  Check((++o.depth_first_begin()).get_path() == object::path_type(1));
+  Check(++++o.depth_first_begin() == o.depth_first_end());
+  Check(++o.depth_first_begin(0) == o.depth_first_end());
 }
+
+}
+
+TEST_REGISTRY
+
+#define INFO(x) std::cout << #x " = " << (x) << std::endl
 
 int main() {
   std::cout << "TESTS:\n";
-  test_object_1();
-  test_container_1();
+  testsoon::default_reporter rep;
+  testsoon::tests().run(rep);
   std::cout << "INFO:\n";
   INFO(sizeof(object));
   INFO(sizeof(container));
