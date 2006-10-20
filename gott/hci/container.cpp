@@ -67,25 +67,6 @@ object *container::find_named(string const &name) {
   return 0;
 }
 
-void container::depth_first(
-    boost::function<bool (path_type const &, object *)> const &callback,
-    size_type max_depth,
-    path_type const &prepend) {
-  if (!callback(prepend, this))
-    return;
-
-  if (max_depth != 0) {
-    if (max_depth != npos)
-      --max_depth;
-    path_type newprepend(prepend.begin(), prepend.end());
-    newprepend.push_back(npos);
-    for (vector::iterator it = children.begin(); it != children.end(); ++it){
-      newprepend.back() = (it - children.begin());
-      it->depth_first(callback, max_depth, newprepend);
-    }
-  }
-}
-
 bool container::first_child(path_element &current) const {
   current = 0;
   return !children.empty();

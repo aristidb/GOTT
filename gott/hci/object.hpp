@@ -129,33 +129,6 @@ public:
   }
 
   /**
-   * Enumerate all sub-objects depth-first.
-   * \param callback The callback to call for each path. Cancel sub-tree
-   *                 traversal if it returns true.
-   * \param max_depth The maximum depth to search.
-   * \param prepend The path to prepend to each path sent to the callback.
-   */
-  virtual void depth_first(
-    boost::function<bool (path_type const &, object *)> const &callback,
-    size_type max_depth = npos,
-    path_type const &prepend = path_type());
-
-  /**
-   * Enumerate all sub-objects depth-first.
-   * \param callback The callback to call for each path. Cancel sub-tree
-   *                 traversal if it returns true.
-   * \param max_depth The maximum depth to search.
-   * \param prepend The path to prepend to each path sent to the callback.
-   */
-  GOTT_LOCAL inline void depth_first(
-      boost::function<bool (path_type const &, object const *)> const &callback,
-      size_type max_depth = npos,
-      path_type const &prepend = path_type()) const {
-    boost::function<bool (path_type const &, object *)> helper(callback);
-    return const_cast<object *>(this)->depth_first(helper, max_depth, prepend);
-  }
-
-  /**
    * Get number of first child.
    * \param current Store the number of the first child.
    * \return Whether there is a first child at all.

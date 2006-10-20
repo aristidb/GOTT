@@ -54,10 +54,6 @@ public:
 
   object *find(path_type const &path, size_type offset = 0);
   object *find_named(string const &name);
-  void depth_first(
-    boost::function<bool (path_type const &, object *)> const &callback,
-    size_type max_depth = npos,
-    path_type const &prepend = path_type());
 
   bool first_child(path_element &) const;
   bool next_child(path_element &) const;

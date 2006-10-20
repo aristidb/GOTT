@@ -59,13 +59,6 @@ object *object::find_named(string const &) {
   return 0;
 }
 
-void object::depth_first(
-    boost::function<bool (path_type const &, object *)> const &callback,
-    size_type,
-    path_type const &prepend) {
-  callback(prepend, this);
-}
-
 bool object::first_child(path_element &) const {
   return false;
 }
