@@ -78,7 +78,7 @@ GFTEST(empty) {
 
 GFTEST() {
   group_fixture.run_test("\"nene ich geh dann mal\"");
-  C(C(S(Xany("nene ich geh dann mal")))).write_to(group_fixture.xp);
+  C(C(S(Xany("nene ich geh dann mal"), "el"))).write_to(group_fixture.xp);
   Equals(group_fixture.tree, group_fixture.xp);
 }
 
