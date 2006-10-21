@@ -1,0 +1,11 @@
+workingcopydir=/home/devel/gott/net.sourceforge.gott
+host=evilhackerdu.de
+username=ftpuser
+password=ftppass
+source=NOT USED
+targetdir=changelog
+target=changelog.rss
+database=/home/devel/gott/gott.db
+rsstitle=GOTT - ChangeLog
+projectlink=http://trac.evilhackerdu.de/gott 
+webmasteremail=devel@evilhackderdu.de

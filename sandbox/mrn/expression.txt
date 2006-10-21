@@ -1,0 +1,13 @@
+<!> -- Token für Anfang oder Ende des Strings, muss nicht gematcht werden
+
+Expression ::= Relation
+Relation ::= Additive {_any(<,>,<=,>=,=,<>) Additive}
+Additive ::= Multiplicative {_any(+,-) Multiplicative}
+Multiplicative ::= Unary {_any(*,/,mod) Unary}
+Unary ::= {"-"} Primitive
+Primitive ::= "(" Expression ")"
+            | <number>
+	    | Parameter
+Parameter ::= <symbol>
+            | _any($,!,_,?)
+	    | <!>

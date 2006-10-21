@@ -1,0 +1,4 @@
+/**
+ * \namespace gott::plugin
+ * Plugin/Loadable Module Engine
+ */
