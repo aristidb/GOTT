@@ -358,7 +358,7 @@ private:
         return test_group(__FILE__); \
       } \
     } \
-    namespace name { \
+    namespace BOOST_PP_CAT(name, _testgroup) { \
       static ::testsoon::test_group * \
       test_group(::testsoon::string const &) { \
         static ::testsoon::test_group current( \
@@ -366,7 +366,7 @@ private:
         return &current; \
       } \
     } \
-    namespace name
+    namespace BOOST_PP_CAT(name, _testgroup)
 
 /**
  * Declare a test (positional). You do not want to use this directly.
@@ -614,10 +614,13 @@ test_group(::testsoon::string const &filename) {
 /**
  * @mainpage
  * Explanation here.
- * See @ref tutorial
+ * See @ref tutorial.
+ * See @ref faq.
  *
  * @page tutorial Tutorial
  * This is a tutorial.
+ *
+ * @page faq Frequently Asked Questions (FAQ)
  */
 
 #endif
