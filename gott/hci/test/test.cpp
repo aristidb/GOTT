@@ -43,7 +43,7 @@
 
 using namespace gott::hci;
 
-TEST_GROUP(object_tests) {
+TEST_GROUP(object) {
 
 TEST() {
   object o;
@@ -57,7 +57,7 @@ TEST() {
 
 }
 
-TEST_GROUP(container_tests) {
+TEST_GROUP(container) {
 
 TEST() {
   container o;
