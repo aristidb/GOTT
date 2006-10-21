@@ -47,7 +47,7 @@
 
 #ifndef NO_STDLIB
 #include <string>
-#include <iostream>
+#include <iostream>//sollte das wirklich standard sein? aber zum debuggen gut
 #include <sstream>
 #include <vector>
 #include <typeinfo>
@@ -444,7 +444,6 @@ private:
       void run(::testsoon::test_reporter &reporter) const { \
         BOOST_PP_EXPR_IF(has_fixture, fixture_class fixture;) \
         BOOST_PP_EXPR_IF(has_group_fixture, group_fixture_t group_fixture;) \
-        BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, ::testsoon::test_failure state;) \
         BOOST_PP_EXPR_IF(has_generator, \
         generator_class gen \
           BOOST_PP_IF( \
@@ -452,6 +451,7 @@ private:
             BOOST_PP_EMPTY(), \
             BOOST_PP_ARRAY_DATA(generator_param)); \
         for (generator_class::iterator i = gen.begin(); i != gen.end(); ++i)) { \
+          BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, ::testsoon::test_failure state;) \
           ::testsoon::string key \
             BOOST_PP_EXPR_IF(has_generator, (::testsoon::object_to_string(*i))); \
           BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, try {) \
@@ -464,11 +464,11 @@ private:
                 (0) \
               ) \
             ); \
-          BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, if (!state.is_failure()) { ) \
+          BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, if (!state.is_failure())) \
             reporter.success(*this, key); \
-          } BOOST_PP_IF(TESTSOON_NO_EXCEPTIONS, else, catch (::testsoon::test_failure const &state)) { \
+          BOOST_PP_IF(TESTSOON_NO_EXCEPTIONS, else, } catch (::testsoon::test_failure const &state) {) \
             reporter.failure(*this, state, key); \
-          } \
+          BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, }) \
         } \
       } \
       void do_test(test_param) const; \
@@ -542,7 +542,22 @@ private:
     TESTSOON_EXCEPTIONS, \
     throw , \
     testsoon_failure =) \
-    ::testsoon::test_failure(msg, __LINE__, data);
+    ::testsoon::test_failure(msg, __LINE__, data); \
+  BOOST_PP_EXPR_IF( \
+    TESTSOON_NO_EXCEPTIONS, \
+    return;)
+
+#define TESTSOON_ENCLOSURE(x) \
+  do { \
+    BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, ::testsoon::test_failure testsoon_failure;) \
+    x; \
+    if (testsoon_failure.is_failure()) \
+    BOOST_PP_IF(TESTSOON_EXCEPTIONS, \
+      throw testsoon_failure, \
+      return \
+      ); \
+  } while (false)
+
 
 #endif //IN_DOXY
 
@@ -560,13 +575,9 @@ private:
  * @param b Another value.
  */
 #define TESTSOON_Equals(a, b) \
-  do { \
-    BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, ::testsoon::test_failure testsoon_failure;) \
+  TESTSOON_ENCLOSURE( \
     ::testsoon::check_equals(a, b, "not equal: " #a " and " #b, __LINE__, testsoon_failure); \
-    BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, \
-      if (testsoon_failure.is_failure()) \
-        throw testsoon_failure;) \
-  } while (false)
+  )
 
 #define Equals(a, b) TESTSOON_Equals(a, b)
 
@@ -627,25 +638,16 @@ private:
 #define Check(x) TESTSOON_Check(x)
 
 #define TESTSOON_Check1(x, a) \
-  do { \
-    BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, ::testsoon::test_failure testsoon_failure;) \
+  TESTSOON_ENCLOSURE( \
     ::testsoon::do_check1(x, a, "check1 " #x, __LINE__, testsoon_failure); \
-    BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, \
-      if (testsoon_failure.is_failure()) \
-        throw testsoon_failure;) \
-  } while (false)
-
+  )
 
 #define Check1(x, a) TESTSOON_Check1(x, a)
 
 #define TESTSOON_Check2(x, a, b) \
-  do { \
-    BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, ::testsoon::test_failure testsoon_failure;) \
+  TESTSOON_ENCLOSURE( \
     ::testsoon::do_check2(x, a, b, "check2 " #x, __LINE__, testsoon_failure); \
-    BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, \
-      if (testsoon_failure.is_failure()) \
-        throw testsoon_failure;) \
-  } while (false)
+  )
 
 #define Check2(x, a, b) TESTSOON_Check2(x, a, b)
 
