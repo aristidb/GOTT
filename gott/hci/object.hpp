@@ -167,6 +167,20 @@ public:
       return path;
     }
 
+    void next_sibling() {
+      path_element no;
+      do {
+        if (path.empty()) {
+          current = 0;
+          return;
+        }
+        no = path.back();
+        path.pop_back();
+        current = root->find(path);
+      } while (!current->next_child(no));
+      go(no);
+    }
+
   private:
     friend class boost::iterator_core_access;
 
@@ -177,17 +191,15 @@ public:
 
     void increment() {
       path_element no;
-      if (path.size() >= max_depth || !current->first_child(no)) {
-        do {
-          if (path.empty()) {
-            current = 0;
-            return;
-          }
-          no = path.back();
-          path.pop_back();
-          current = root->find(path);
-        } while (!current->next_child(no));
-      }
+      if (path.size() >= max_depth)
+        next_sibling();
+      if (current->first_child(no))
+        go(no);
+      else
+        next_sibling();
+    }
+
+    void go(path_element no) {
       path.push_back(no);
       current = current->find(path, path.size() - 1);
     }
