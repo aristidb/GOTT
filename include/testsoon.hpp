@@ -227,8 +227,8 @@ public:
     out << '.';
     out.flush();
   }
-  void failure(test_info const &, test_failure const &x, string const &k) {
-    out << "[F=" << x.line;
+  void failure(test_info const &i, test_failure const &x, string const &k) {
+    out << "[F=" << i.line << '.' << x.line;
     if (k != string())
       out << '<' << k << '>';
     out << ']';
