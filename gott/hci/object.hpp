@@ -190,9 +190,9 @@ public:
     }
 
     void increment() {
-      path_element no;
       if (path.size() >= max_depth)
-        next_sibling();
+        return next_sibling();
+      path_element no;
       if (current->first_child(no))
         go(no);
       else
