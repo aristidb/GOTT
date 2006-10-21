@@ -47,7 +47,7 @@
 
 #ifndef NO_STDLIB
 #include <string>
-#include <iostream>
+#include <iostream>//sollte das wirklich standard sein? aber zum debuggen gut
 #include <sstream>
 #include <vector>
 #include <typeinfo>
@@ -82,6 +82,14 @@ inline string object_to_string(string const &object) {
   return string(object);
 }
 
+#endif
+
+#if defined(__EXCEPTIONS)
+#define TESTSOON_EXCEPTIONS 1
+#define TESTSOON_NO_EXCEPTIONS 0
+#else
+#define TESTSOON_EXCEPTIONS 0
+#define TESTSOON_NO_EXCEPTIONS 1
 #endif
 
 #ifndef IN_DOXYGEN
@@ -168,6 +176,7 @@ public:
 
 class test_failure {
 public:
+  test_failure() : line(0) {}
   test_failure(string const &message,
                unsigned line,
                string_vector const &data = string_vector())
@@ -176,6 +185,8 @@ public:
   string message;
   unsigned line;
   string_vector data;
+
+  bool is_failure() { return line; }
 };
 
 class test_reporter {
@@ -256,38 +267,38 @@ inline void test_group::run(test_reporter &rep) const {
 
 extern test_holder &tests();
 
-inline void fail(char const *msg, unsigned line, string_vector const &data = string_vector()) {
-	throw test_failure(msg, line, data);
-}
-
 template<class T, class U>
 inline void check_equals(T const &a, U const &b,
-                         char const *msg, unsigned line) {
+                         char const *msg, unsigned line,
+                         test_failure &fail) {
   if (!(a == b)) {
     string_vector data;
     data.push_back(object_to_string(a));
     data.push_back(object_to_string(b));
-    fail(msg, line, data);
+    fail = test_failure(msg, line, data);
   }
 }
 
 template<class F, class T>
-inline void do_check1(F fun, T const &val, char const *msg, unsigned line) {
+inline void do_check1(F fun, T const &val,
+                      char const *msg, unsigned line,
+                      test_failure &fail) {
   if (!fun(val)) {
     string_vector data;
     data.push_back(object_to_string(val));
-    fail(msg, line, data);
+    fail = test_failure(msg, line, data);
   }
 }
 
 template<class F, class T, class U>
 inline void do_check2(F fun, T const &a, U const &b,
-                      char const *msg, unsigned line) {
+                      char const *msg, unsigned line,
+                      test_failure &fail) {
   if (!fun(a, b)) {
     string_vector data;
     data.push_back(object_to_string(a));
     data.push_back(object_to_string(b));
-    fail(msg, line, data);
+    fail = test_failure(msg, line, data);
   }
 }
 
@@ -408,6 +419,7 @@ private:
   BOOST_PP_EXPR_IF(has_fixture, (fixture_class &fixture)) \
   BOOST_PP_EXPR_IF(has_group_fixture, (group_fixture_t &group_fixture)) \
   BOOST_PP_EXPR_IF(has_generator, (generator_class::const_reference value)) \
+  BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, (::testsoon::test_failure &testsoon_failure)) \
   (int)
 
 #define TESTSOON_PTEST1(name, test_class, has_fixture, fixture_class, group_fixture, has_generator, generator_seq) \
@@ -439,21 +451,24 @@ private:
             BOOST_PP_EMPTY(), \
             BOOST_PP_ARRAY_DATA(generator_param)); \
         for (generator_class::iterator i = gen.begin(); i != gen.end(); ++i)) { \
+          BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, ::testsoon::test_failure state;) \
           ::testsoon::string key \
             BOOST_PP_EXPR_IF(has_generator, (::testsoon::object_to_string(*i))); \
-          try { \
+          BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, try {) \
             do_test( \
               BOOST_PP_SEQ_ENUM( \
                 BOOST_PP_EXPR_IF(has_fixture, (fixture)) \
                 BOOST_PP_EXPR_IF(has_group_fixture, (group_fixture)) \
                 BOOST_PP_EXPR_IF(has_generator, (*i)) \
+                BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, (state)) \
                 (0) \
               ) \
             ); \
+          BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, if (!state.is_failure())) \
             reporter.success(*this, key); \
-          } catch (::testsoon::test_failure const &x) { \
-           reporter.failure(*this, x, key); \
-          } \
+          BOOST_PP_IF(TESTSOON_NO_EXCEPTIONS, else, } catch (::testsoon::test_failure const &state) {) \
+            reporter.failure(*this, state, key); \
+          BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, }) \
         } \
       } \
       void do_test(test_param) const; \
@@ -522,6 +537,28 @@ private:
 #define TESTSOON_PARAM_INVOKEx(x) \
   PTEST x
 
+#define TESTSOON_FAIL(msg, data) \
+  BOOST_PP_IF( \
+    TESTSOON_EXCEPTIONS, \
+    throw , \
+    testsoon_failure =) \
+    ::testsoon::test_failure(msg, __LINE__, data); \
+  BOOST_PP_EXPR_IF( \
+    TESTSOON_NO_EXCEPTIONS, \
+    return;)
+
+#define TESTSOON_ENCLOSURE(x) \
+  do { \
+    BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, ::testsoon::test_failure testsoon_failure;) \
+    x; \
+    if (testsoon_failure.is_failure()) \
+    BOOST_PP_IF(TESTSOON_EXCEPTIONS, \
+      throw testsoon_failure, \
+      return \
+      ); \
+  } while (false)
+
+
 #endif //IN_DOXY
 
 /**
@@ -538,7 +575,9 @@ private:
  * @param b Another value.
  */
 #define TESTSOON_Equals(a, b) \
-  ::testsoon::check_equals(a, b, "not equal: " #a " and " #b, __LINE__)
+  TESTSOON_ENCLOSURE( \
+    ::testsoon::check_equals(a, b, "not equal: " #a " and " #b, __LINE__, testsoon_failure); \
+  )
 
 #define Equals(a, b) TESTSOON_Equals(a, b)
 
@@ -549,18 +588,23 @@ private:
  * @param t The exception type to check for.
  * @param w The expected value of caught_exception.what().
  */
+#if TESTSOON_EXCEPTIONS
 #define TESTSOON_Throws(x, t, w) \
 	do { \
 		try { \
 			(x); \
-			::testsoon::fail("not throwed " #t, __LINE__); \
+			TESTSOON_FAIL("not throwed " #t, ::testsoon::string_vector()); \
 		} catch (t &e) { \
 			if ( \
         ::testsoon::string(w) != ::testsoon::string() && \
         ::testsoon::string(e.what()) != ::testsoon::string((w))) \
-				::testsoon::fail("throwed " #t " with wrong message", __LINE__); \
+				TESTSOON_FAIL("throwed " #t " with wrong message", ::testsoon::string_vector()); \
 		} \
 	} while (0)
+#else
+#define TESTSOON_Throws(x, t, w) \
+  TESTSOON_Check(!"Throws check without exception support")
+#endif
 
 #define Throws(x, t, w) TESTSOON_Throws(x, t, w)
 
@@ -570,32 +614,40 @@ private:
  * @param x The expression to test.
  * @param t The exception type to check for or "..." (without quotes).
  */
+#if TESTSOON_EXCEPTIONS
 #define TESTSOON_Nothrows(x, t) \
 	do { \
 		try { \
 			(x); \
 		} catch (t) { \
-			::testsoon::fail("throwed " #t, __LINE__); \
+			TESTSOON_FAIL("throwed " #t, ::testsoon::string_vector()); \
 		} \
 	} while (0)
-
+#else
+#define TESTSOON_Nothrows(x, t) \
+  TESTSOON_Check(!"Nothrows check without exception support")
+#endif
 #define Nothrows(x, t) TESTSOON_Nothrows(x, t)
 
 #define TESTSOON_Check(x) \
   do { \
     if (!(x)) \
-      ::testsoon::fail("check " #x, __LINE__); \
+      TESTSOON_FAIL("check " #x, ::testsoon::string_vector()); \
   } while (0)
 
 #define Check(x) TESTSOON_Check(x)
 
 #define TESTSOON_Check1(x, a) \
-  ::testsoon::do_check1(x, a, "check1 " #x, __LINE__)
+  TESTSOON_ENCLOSURE( \
+    ::testsoon::do_check1(x, a, "check1 " #x, __LINE__, testsoon_failure); \
+  )
 
 #define Check1(x, a) TESTSOON_Check1(x, a)
 
 #define TESTSOON_Check2(x, a, b) \
-  ::testsoon::do_check2(x, a, b, "check2 " #x, __LINE__)
+  TESTSOON_ENCLOSURE( \
+    ::testsoon::do_check2(x, a, b, "check2 " #x, __LINE__, testsoon_failure); \
+  )
 
 #define Check2(x, a, b) TESTSOON_Check2(x, a, b)
 
