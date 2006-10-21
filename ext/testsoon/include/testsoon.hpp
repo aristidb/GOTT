@@ -1,4 +1,31 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+
+/*
+  testsoon.hpp: "Test soon" testing framework.
+
+  Copyright (C) 2006 Aristid Breitkreuz and Ronny Pfannschmidt
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+  Aristid Breitkreuz aribrei@arcor.de
+  Ronny Pfannschmidt Ronny.Pfannschmidt@gmx.de
+
+*/
+
 #ifndef TESTSOON_HPP
 #define TESTSOON_HPP
 
@@ -331,7 +358,7 @@ private:
         return test_group(__FILE__); \
       } \
     } \
-    namespace name { \
+    namespace BOOST_PP_CAT(name, _testgroup) { \
       static ::testsoon::test_group * \
       test_group(::testsoon::string const &) { \
         static ::testsoon::test_group current( \
@@ -339,7 +366,7 @@ private:
         return &current; \
       } \
     } \
-    namespace name
+    namespace BOOST_PP_CAT(name, _testgroup)
 
 /**
  * Declare a test (positional). You do not want to use this directly.
@@ -587,10 +614,13 @@ test_group(::testsoon::string const &filename) {
 /**
  * @mainpage
  * Explanation here.
- * See @ref tutorial
+ * See @ref tutorial.
+ * See @ref faq.
  *
  * @page tutorial Tutorial
  * This is a tutorial.
+ *
+ * @page faq Frequently Asked Questions (FAQ)
  */
 
 #endif
