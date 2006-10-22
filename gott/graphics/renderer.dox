@@ -314,13 +314,13 @@
 
 \dot
   digraph themeloading {
-    node [shape=record, fontname=Helvetica, fontsize=10];
+    node [shape=record, fontname=Helvetica, fontsize=8];
     subgraph cluster_0 {
       style=filled;
       node [style=filled];
       TE [label="{TextEntry|<f0> Text:\"...\" |{linkage:|{<f2>\"text\"=...}}| <f1> QID:\"gott::entry\"}"]
-      B1 [label="{Buttony|<f0> Text:\"Ok\" |{linkage:|{<f2>\"text\"=...}} | <f1> QID:\"gott::button\"}"]
-      B2 [label="{Button|<f0> Text:\"Cancel\" |{linkage:|{<f2>\"text\"=...}}| <f1> QID:\"gott::button\"}"]
+      B1 [label="{Buttony|<f0> Text:\"Ok\" |{linkage:|{<f2>\"label\"=\"a_small_subtree_containing_a_text_node\"}} | <f1> QID:\"gott::button\"}"]
+      B2 [label="{Button|<f0> Text:\"Cancel\" |{linkage:|{<f2>\"text\"=\"a_small_subtree_containing_a_text_node\"}}| <f1> QID:\"gott::button\"}"]
       VLayout [label="{Vertical Layout|<f0> children|{linkage:|{<f2>\"children\"=entry1,button1,button2|...}}|<f1> QID:\"gott::vertical_layout\"}"]
       VLayout:f0 -> TE
       VLayout:f0 -> B1 
@@ -338,10 +338,10 @@
         GVL-> GVLCO;
       }
       subgraph cluster_3{
-        GB [label="{widget_stereotype|name:\"gott::button\"|{provides:|{gott:button::text|gott::button::clickable_region}}|{requires:|{gott::button::text}}|might have theme specific behaviour}"];
+        GB [label="{widget_stereotype|name:\"gott::button\"|{provides:|{label|clickable_region}}|{requires:|{label}}|might have theme specific behaviour}"];
         GBC [label="{rounded_rect|relative_size=99%|inset=2%|filled=false}"];
-        GBClickable [label="{rounded_rect|relative_size=98%|inset=%2|\"gott::button::clickable_region\"|filled=true}"];
-        GBText [label="{single_line_text|alignment=center|\"gott::button::text\"}"];
+        GBClickable [label="{rounded_rect|relative_size=98%|inset=%2|\"clickable_region\"|filled=true}"];
+        GBText [label="{object_reference|resolves \"label\" in next best linkage}"];
         GB -> GBC;
         GB -> GBClickable;
         GB -> GBText;
@@ -364,6 +364,95 @@
   }
 \enddot
 
+a_small_subtree_containing_a_text_node is a graphics::single_line_text node, it has a text property that is 
+linked to the text property of the buttons.
+
+The widget_stereotype of the button has no knowledge to the "a_small_subtree_containing_a_text_node", the button widget 
+just provides the linkage that tells the renderer or any other user of the tree that a gott::button::label has to be 
+interpreted as the "a_small_subtree_containing_a_text_node" that is stored inside the linkage.
+
+That example is incomplete. Instead of the above we should define a text_label aspect
+\dot
+  digraph aspects {
+    node [shape=record, fontname=Helvetica, fontsize=8];
+    tla [label="{gott::text_label|displays \"text\" found in current linkage}"];
+    label="Text Label, implemented by a theme";
+  }
+\enddot
+Then our button widget would tell the theme loader to load a "gott::button" and the "gott::text_label" aspect.
+The linkage of the button would then contain a link from "label" to "gott::text_label", and "text" to its own 
+text property.
+
+Now the same structure without stereotypes:
+
+\dot
+  digraph themeloading {
+    node [shape=record, fontname=Helvetica, fontsize=8];
+    subgraph cluster_0 {
+      style=filled;
+      node [style=filled];
+      TE [label="{TextEntry|<f0> Text:\"...\" | <f1> QID:\"gott::entry\"}"]
+      B1 [label="{Buttony|<f0> Text:\"Ok\" |  <f1> QID:\"gott::button\"}"]
+      B2 [label="{Button|<f0> Text:\"Cancel\" | <f1> QID:\"gott::button\"}"]
+      VLayout [label="{Vertical Layout|<f0> children|<f1> QID:\"gott::vertical_layout\"}"]
+      VLayout:f0 -> TE
+      VLayout:f0 -> B1 
+      VLayout:f0 -> B2
+      label="Widget Hierarchy";
+      color=lightblue;
+    }
+
+    subgraph cluster_1 {
+      node [style=filled];
+      subgraph cluster_2 {
+        graph[ shape="ellipse"];
+        GVL [label="{widget_graphics|:\"gott::vertical_layout\"}"]
+        GVLCO [label="container"]
+        GVL-> GVLCO;
+      }
+      subgraph cluster_3{
+        GB1 [label="{widget_graphics|name:\"gott::button\"|{provides:|{gott:button::label|gott::button::clickable_region}}|might have theme specific behaviour}"];
+        GB1C [label="{rounded_rect|relative_size=99%|inset=2%|filled=false}"];
+        GB1Clickable [label="{rounded_rect|relative_size=98%|inset=%2|\"gott::button::clickable_region\"|filled=true}"];
+        GB1Text [label="{single_line_text|alignment=center|\"gott::button::label\"|connected to a text property, displays \"Ok\"}"];
+        GB1 -> GB1C;
+        GB1 -> GB1Clickable;
+        GB1 -> GB1Text;
+      }
+      subgraph cluster_4{
+        GB2 [label="{widget_graphics|name:\"gott::button\"|{provides:|{gott:button::label|gott::button::clickable_region}}|might have theme specific behaviour}"];
+        GB2C [label="{rounded_rect|relative_size=99%|inset=2%|filled=false}"];
+        GB2Clickable [label="{rounded_rect|relative_size=98%|inset=%2|\"gott::button::clickable_region\"|filled=true}"];
+        GB2Text [label="{single_line_text|alignment=center|\"gott::button::label\"|connected to a text property, displays \"Cancel\"}"];
+        GB2 -> GB2C;
+        GB2 -> GB2Clickable;
+        GB2 -> GB2Text;
+      }
+
+      subgraph cluster_5 {
+        Entry [label="{widget_graphics|:\"gott::entry\"}"];
+        EntryC [label="{rect|}"];
+        EntryText [label="{single_line_text|alignment=center|\"gott::entry::text\"|\"Whatever the user enters\"}"];
+        Entry -> EntryC -> EntryText;
+      }
+      label="Graphics Objects found by theme loader";
+      color=blue;
+    }
+    Window -> VLayout [label="widgets"];
+    VLayout:f1 -> GVL[style=dashed];
+
+    TE:f1 -> Entry[style=dashed] ;
+    B1:f1 -> GB1[style=dashed];
+    B2:f1 -> GB2[style=dashed];
+    GVLCO -> GB1
+    GVLCO -> GB2
+    GVLCO -> Entry
+  }
+\enddot
+
+The connection between the text inside the button labels and the text property of the button widget, is 
+created during initialisation. So the Button widget uses the lookup information stored inside the widget_graphics object
+to find the right position in the tree, and adds a link to the text property. 
 
   We could now start to define object classes that define properties provided 
   by widgets, like text, toggle states, scalar values.... 
