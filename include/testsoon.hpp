@@ -153,6 +153,11 @@ inline void node::print(stream_class &out) const {
 class test_holder : public test_group {
 public:
   test_holder() : test_group(0, string()) {}
+  void run(test_reporter &rep) {
+    rep.start();
+    test_group::run(rep);
+    rep.stop();
+  }
 };
 
 class test_file : public test_group {
@@ -191,6 +196,8 @@ public:
 
 class test_reporter {
 public:
+  virtual void start() {}
+  virtual void stop() {}
   virtual void begin_group(test_group const &group) { (void)group; }
   virtual void end_group(test_group const &group) { (void)group; }
   virtual void before_tests(test_group const &group) { (void)group; }
@@ -233,6 +240,8 @@ public:
       out << '<' << k << '>';
     out << ']';
     out.flush();
+  }
+  void stop() {
   }
 private:
   stream &out;
