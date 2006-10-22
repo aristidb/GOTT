@@ -84,7 +84,7 @@ inline string object_to_string(string const &object) {
 
 #endif
 
-#if defined(__EXCEPTIONS)
+#if defined(__EXCEPTIONS) || defined(_CPPUNWIND)
 #define TESTSOON_EXCEPTIONS 1
 #define TESTSOON_NO_EXCEPTIONS 0
 #else
@@ -97,6 +97,23 @@ inline string object_to_string(string const &object) {
 class test_reporter;
 class test_info;
 class test_group;
+class test_failure;
+
+class test_reporter {
+public:
+  virtual void start() {}
+  virtual void stop() {}
+  virtual void begin_group(test_group const &group) { (void)group; }
+  virtual void end_group(test_group const &group) { (void)group; }
+  virtual void before_tests(test_group const &group) { (void)group; }
+  virtual void after_tests(test_group const &group) { (void)group; }
+  virtual void success(test_info const &info, string const &sequence_key) {
+    (void)info;
+    (void)sequence_key;
+  }
+  virtual void failure(test_info const &info, test_failure const &, string const &sequence_key) = 0;
+  virtual ~test_reporter() {}
+};
 
 class node {
 public:
@@ -174,7 +191,6 @@ public:
 
   string const file;
   unsigned const line;
-
 };
 
 #endif
@@ -192,22 +208,6 @@ public:
   string_vector data;
 
   bool is_failure() { return line; }
-};
-
-class test_reporter {
-public:
-  virtual void start() {}
-  virtual void stop() {}
-  virtual void begin_group(test_group const &group) { (void)group; }
-  virtual void end_group(test_group const &group) { (void)group; }
-  virtual void before_tests(test_group const &group) { (void)group; }
-  virtual void after_tests(test_group const &group) { (void)group; }
-  virtual void success(test_info const &info, string const &sequence_key) {
-    (void)info;
-    (void)sequence_key;
-  }
-  virtual void failure(test_info const &info, test_failure const &, string const &sequence_key) = 0;
-  virtual ~test_reporter() {}
 };
 
 class default_reporter : public test_reporter {
