@@ -1,0 +1,200 @@
+/**
+\page properties_prosa The properties library in context.
+
+\section intro What is the properties library after all?
+
+The properties library resides in the namespace gott::properties and is a
+collection of classes for abstracting the way data is stored behind a
+transparent interface. This is especially useful for API and ABI stability.
+Properties optionally support things like change notification and locking while
+maintaining their single interface. For example, say you have a window class
+(you know, the windows <i>inside</i> your computer screen) and your windows have
+a title. You could provide two methods, \c get_title() and \c set_title(), but
+this is rather... unaesthetic. We can do with less methods. With no single
+method, actually!
+\code
+gott::properties::property< gott::string > &title();
+// or
+gott::properties::property< gott::string > &title;
+\endcode
+\note
+It doesn't really matter which of the variants you choose. It's a matter of
+taste.
+
+Later, you can set the title easily:
+\code
+title.set("This is the new title.");
+\endcode
+
+\note
+gott::properties::property is an abstract base class. Initialize the reference
+with an instance of a class like gott::properties::concrete_property.
+
+\section storage Where to store the data?
+
+\subsection storage_integrated Integrated storage
+
+In many cases, you will want to just save the value of your new property in the
+object to which the property belongs. Often, it will suffice to save the value
+in the property implementation. Then, you will implement the property like this:
+\code
+class my_class {
+  my_class() : height_(4.0) {}
+  gott::properties::property<double> &height() { return height_; }
+private:
+  gott::properties::concrete_property<double> height_;
+};
+\endcode
+
+The class gott::properties::concrete_property uses policies to define itself. If
+you don't define any, the following policies are used:
+- gott::properties::no_notification, which means that you can <b>not</b> observe
+  whether the value of the property has changed.
+- <b>gott::properties::embedded_storage, which means that the value of the
+  property is saved in the concrete_property instance</b>
+- gott::properties::no_lock, which means that there is no locking of any
+  resource
+
+\subsection storage_external External storage
+
+You can store the value of the property anywhere you want, or maybe you can not
+choose. Again, you can use gott::properties::concrete_property. Just like this:
+\code
+gott::properties::concrete_property< 
+  gott::string,
+  gott::properties::no_notification,
+  gott::properties::external_storage< gott::string > >
+my_property(
+  gott::properties::external_storage< gott::string >(
+    &some_reading_function,
+    &some_writing_function
+  )
+);
+\endcode
+\note
+gott::properties::external_storage accepts getters and setters compatible with
+<a href="http://www.boost.org/doc/html/function.html">Boost.Function</a> by
+default. For some reasons you may want to use other functor types though, which
+is possible.
+
+\section access Accessing the property
+
+\subsection access_setget Using setters and getters
+
+The easiest way to access a property are the setters and getters. Well, you just
+set a property like this:
+\code
+my_property.set("value #1");
+my_property("value #2");
+\endcode
+
+And you get it like this:
+\code
+gott::string value = my_property.get();
+gott::string value2 = my_property();
+\endcode
+
+\subsection access_functors Using functors and functions
+
+Also, you can access the value of a property with functors. Examples shall show
+you how:
+\code
+using namespace boost::lambda;
+gott::properties::property< int > *p = new concrete_property< int >;
+
+p->apply_write(std::rand); // set the property to a random value
+p->apply_read(std::cout << _1 << '\n'); // print the current value (random)
+
+p->set(-7);
+p->apply_change(std::abs); // remove the sign of the value
+p->apply_change_ref(++_1 - 7); // increment the value
+std::cout << p->get() << std::endl; // prints 8
+
+delete p;
+\endcode
+While all of these examples could be easily expressed with setters and getters,
+you can always see them as an option and choose the most expressive. More
+importantly, gott::properties::property<>::apply_change() and
+gott::properties::property<>::apply_change_ref() are atomic operations, which
+means that all potential \ref locking "locking" will be in effect while the 
+functor is called.
+
+\subsection access_ref Using the references
+
+You can access the properties via special references. Using advanced C++
+features like destructors, those ensure that access on them happens
+transparently and, if possible, using the locking policy, atomically. It is
+similar in spirit to access via functors, only you can use it in more
+traditional inline style. It is advisable to use references over setters and
+getters especially if you are using objects.
+\code
+gott::properties::concrete_property< std::pair<int, int> > x =
+  std::make_pair(2, 3);
+x.change()->first = 7; // => 7, 3
+\endcode
+
+If you want to do a more complex transformation, but still atomic, you can do it
+like this:
+\code
+gott::properties::property<double> x;
+{
+  gott::properties::change_reference ref = x.change();
+  *ref = std::cos(*ref);
+}
+// x should be vaguely 1.0
+\endcode
+\attention
+Copying a reference to a property means destroying the original.
+
+As the name suggests, a change_reference is suitable for changing data. If you
+do not need to write any data or want to use const methods of the underlying
+object only, you can and should use gott::properties::property<>::read(). If you
+want to write fresh data only, you should use 
+gott::properties::property<>::write().
+\attention
+gott::properties::property<>::write() and gott::properties::write_reference
+should be used with caution when dealing with objects because the state of the
+object might either be freshly constructed or used, no guarantees.
+
+\section not Listening and observing
+
+When using a gott::properties::notifying_property, you can listen to the
+<a href="http://libsigc.sourceforge.net/">sigc++ 2.0</a> signal returned by
+gott::properties::notifying_property<>::on_change(), which is fired whenever
+the property was accessed for writing (whether the new value equals the old
+value or not).
+
+You need to declare your property like this, with the
+gott::properties::sigc_notification policy:
+\code
+gott::properties::concrete_property< int, gott::properties::sigc_notification > p;
+\endcode
+
+\subsection not_raw The direct way
+
+... is explained completely by the <a href="http://libsigc.sourceforge.net/">
+sigc++ 2.0</a> documentation, maybe the <a href="http://www.boost.org/">
+Boost</a> documentation and this example:
+\code
+void on_change(gott::properties::property<int> &p) {
+  std::cout << p() << std::endl;
+}
+...
+p.on_change().connect(boost::bind(&on_change, boost::ref(p)));
+p.set(4); // prints 4
+*p.write() += 6; // prints 10
+\endcode
+
+\subsection not_helpers Combining and translating
+
+\subsubsection not_ver Verifiers
+
+\subsubsection not_li Liaisons
+
+\subsubsection not_tra Translations
+
+\subsection not_esoteric Esoteric paths
+
+\section locking Locking
+
+*/

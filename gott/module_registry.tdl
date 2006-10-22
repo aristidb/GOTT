@@ -1,0 +1,21 @@
+module tdl::schema_lang
+file-path tdl/tdl_schema_lang.plugin
+
+module gott::notify_fs::kqueue
+file-path notify_fs/notify_kqueue.plugin
+
+module gott::notify_fs::inotify
+file-path notify_fs/notify_inotify.plugin
+
+module gott::configuration
+file-path configuration/config.plugin
+
+module gott::events::kqueue_loop
+file-path events/loops/kqueue_loop.plugin
+
+module gott::events::epoll_loop
+file-path events/loops/epoll_loop.plugin
+
+module gott::events::select_loop
+file-path events/loops/select_loop.plugin
+

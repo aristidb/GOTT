@@ -1,0 +1,119 @@
+import string, sys 
+
+def filter_flag(flags,flag):
+	nflags = []
+	for f in flags:
+		if f != flag:
+			nflags	+= [f]
+	return nflags
+
+cppdef = Split(ARGUMENTS.get('def', ''))
+cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
+cflags = Split(ARGUMENTS.get('cflags', ''))
+release = int(ARGUMENTS.get('release', 1))
+if release:
+	debug = 0
+	optimize = 'full'
+	debug = -1
+else:
+	debug = 1
+	optimize = 'none'
+
+debug = int(ARGUMENTS.get('debug', debug))
+
+if debug == 1:
+	cppdef += ['DEBUG', 'LOG_EVENTS']
+elif debug == -1:
+	cppdef += ['NDEBUG']
+
+cppdef += ['HAVE_XDAMAGE']
+## cppdef += ['HAVE_XSYNC']
+optimize = ARGUMENTS.get('optimize', optimize)
+
+rlib = ARGUMENTS.get('rlib', 'antigrain')
+
+if rlib == 'antigrain':
+	cppdef += ['USE_ANTIGRAIN']
+elif rlib == 'cairo':
+	cppdef += ['USE_CAIRO']
+  
+
+
+
+caux = ARGUMENTS.get('aux')
+cflags += Split(caux)
+
+cflagsoverride = ARGUMENTS.get('cfoverride', 0)
+if cflagsoverride:
+	cflags = cflagsoverride
+
+cflags += ['-I../../']
+env = Environment(
+  CXX = cxx, 
+  CCFLAGS = cflags, 
+  CPPPATH=['#/..'], 
+  CPPDEFINES=cppdef)
+
+
+Export('env')
+Export('optimize')
+Export('debug')
+Export('rlib')
+
+conf = SConscript('../../gott/configure/SConscript')
+env = conf.Finish()
+
+cflags = filter_flag(env['CCFLAGS'],'-fvisibility=hidden')
+env.Replace(CCFLAGS = cflags)
+
+cflags = filter_flag(env['CPPDEFINES'],'HAVE_VISIBILITY')
+env.Replace(CPPDEFINES = cflags)
+
+
+# Should this be inf configure/?
+our_libs=[]
+
+base_env = env.Copy()
+base_env.Append(LIBS='boost_signals')
+base_shrd_env = base_env.Copy()
+base_shrd_env.Append(CPPDEFINES = 'BUILDING_DLL')
+
+if rlib =='antigrain':
+	print "Using antigrain..."
+	env.ParseConfig('pkg-config --cflags  libagg')
+	env.ParseConfig('pkg-config --libs libagg')
+	env.ParseConfig('pkg-config --libs freetype2')
+	env.ParseConfig('pkg-config --cflags freetype2')
+	cflags = filter_flag(env['CCFLAGS'],'-Werror')
+	env.Replace(CCFLAGS = cflags)
+	our_libs+=['aggfontfreetype']
+else:
+	print "Using cairo..."	
+	env.ParseConfig('pkg-config --cflags cairo')
+	env.ParseConfig('pkg-config --libs cairo')
+
+x11_env = env.Copy();
+x11_env.Append(LIBS=['X11','Xdamage'])
+x11_env.Append(LIBPATH=['/usr/X11R6/lib'])
+x11_shrd_env = x11_env.Copy()
+x11_shrd_env.Append(CPPDEFINES = 'BUILDING_DLL')
+
+Export('x11_shrd_env')
+Export('x11_env')
+
+SConscript(dirs = ['x11'])
+
+
+base_source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp']
+#base_shrd_env.SharedLibrary('gottbase', base_source_files)
+base_env.StaticLibrary('gottbase', base_source_files)
+
+our_libs += ['boost_signals']
+
+our_libs += ['gottx11', 'gottbase', 'boost_signals', 'X11','Xdamage', 'Xext', 'boost_filesystem' ]
+env.Append(LIBS=our_libs)
+x11_example_files= ['test_x11.cpp']
+env.Program('test_x11', x11_example_files, LIBPATH=['./', 'x11'] )
+
+Export('env')
+SConscript(dirs = ['designer'])

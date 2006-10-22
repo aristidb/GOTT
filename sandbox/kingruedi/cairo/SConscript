@@ -1,0 +1,14 @@
+#
+#
+
+Import('env')
+
+cairo_env = env.Copy()
+
+cairo_env.ParseConfig('pkg-config cairo --libs')
+cairo_env.ParseConfig('pkg-config cairo --cflags')
+
+cairo_env.Program('1.c')
+cairo_env.Program('pattern0.c')
+cairo_env.Program('pattern1.c')
+

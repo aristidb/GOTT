@@ -1,0 +1,145 @@
+body 
+{
+  margin: 0;
+  color: #003030;
+  background-color: #ffffff;
+}
+:link { color: #bb0000; text-decoration: none;}
+:visited { color: #770000; text-decoration: none;}
+:active { color: #ff0000; text-decoration: none;}
+   
+h1 
+{
+  background-color: white;
+
+  border-bottom: 1px solid #aaaaaa;
+  text-align: center;
+  
+  font-family: "arial";
+  font-style: italic;
+  font-size: xx-large;
+  color: #770000;
+  margin: 0px;
+  padding: 10px;
+}
+
+div.navigation
+{ 
+  position: fixed;
+  top: 1em;
+  bottom: 1em;
+  width: 10em;
+  height: 100%;
+  border-right: 1px solid #aaaaaa;
+}
+
+div.menu 
+{
+  margin-top: 1em;
+  margin-left: 1em;
+  width: 7em;
+  height: auto;
+  border: 1px solid #aaaaaa;
+  background-color: #f2f5f7;
+  vertical-align: top;
+  padding: 10px;
+}
+
+div.menu p
+{ 
+  margin: 0px;
+  padding: 0px;
+}
+
+div.menu p.selected1
+{ 
+  background-color: #dbdee0;
+}
+
+div.menu p.normal2
+{
+  font-size: small;
+  padding-left: 17px;
+}
+
+div.menu p.selected2
+{ 
+  font-size: small;
+  padding-left: 17px;
+  background-color: #dbdee0;
+}
+
+div.menu p.separator
+{
+  color: #808080;
+  border-top: solid;
+  border-color: #aaaaaa;
+  border-width: 1px;
+}
+
+div.content
+{ 
+  position: absolute;
+  top: 1em;
+  left: 2em; 
+  right: 2em;
+  height: auto;
+  margin: auto;
+}
+
+
+table.form
+{
+  background-color: #aaaaaa;
+  border-spacing: 1px;
+}
+table.form td
+{
+  background-color: #f2f5f7;
+  padding: 5px;
+}
+table.form th
+{
+  background-color: #f2f5f7;
+  padding: 5px;
+}
+
+div.newsheader
+{
+  font-weight: bold;
+}
+
+div.modifiedby
+{
+  position: absolute;
+  bottom: 4em;
+  height: auto;
+  font-size: small;
+  margin-left: 10px;
+  color: #808080;
+  border-top: solid;
+  border-color: #aaaaaa;
+  border-width: 1px;
+  padding: 5px;
+}
+
+div.hostedby 
+{
+  float: right;
+  margin-right: 10px;
+}
+
+p.logentry .title
+{ 
+  font-weight: bold;
+}
+
+p.logentry .date
+{ 
+  font-style: italic;
+}
+
+pre.message
+{ 
+  font-size: small;
+}

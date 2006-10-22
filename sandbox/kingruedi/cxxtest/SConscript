@@ -1,0 +1,8 @@
+Import('env')
+
+cxxtest_env = env.Copy()
+cxxtest_env.Command('test.cpp', ['test0.hpp', 'test1.hpp'],
+		    'python ../../ext/cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCE')
+cxxtest_env.Append(CPPPATH = ['../../../ext/cxxtest', '..'])
+cxxtest_env.Program('test.cpp')
+
