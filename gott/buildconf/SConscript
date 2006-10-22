@@ -188,6 +188,9 @@ del l
 conf = Configure(env, custom_tests = tests)
 AddSysOpts(conf.env)
 
+#XXX: add a gcc check
+conf.env.Append(LINKFLAGS='-Wl,-rpath-link,$BUILD_TO')
+
 conf.env.Append(SHCXXFLAGS = ['-DBUILDING_DLL'])
 
 if conf.CheckCHeader('unistd.h', '<>'):
