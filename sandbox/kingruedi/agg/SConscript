@@ -1,0 +1,28 @@
+#
+# Based on mumiee's SCons stuff
+import string, sys 
+
+def filter_flag(flags,flag):
+	nflags = []
+	for f in flags:
+		if f != flag:
+			nflags	+= [f]
+	return nflags
+
+Import('env')
+
+agg_env = env.Copy()
+
+agg_env.ParseConfig('pkg-config --cflags  libagg')
+agg_env.ParseConfig('pkg-config --libs libagg')
+agg_env.ParseConfig('pkg-config --libs freetype2')
+agg_env.ParseConfig('pkg-config --cflags freetype2')
+cflags = filter_flag(agg_env['CCFLAGS'],'-Werror')
+agg_env.Replace(CCFLAGS = cflags)
+
+libs = ['agg', 'aggfontfreetype', 'aggplatformX11']
+    
+agg_env.Program('agg_lines.cpp', LIBS=libs)
+
+print 'polygon.cpp does not work anymore because it uses the deprecated add_poly function'
+# agg_env.Program('polygon.cpp', LIBS=libs) # fix add_poly problem

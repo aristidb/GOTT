@@ -1,0 +1,7 @@
+/**
+\namespace gott
+<b>G</b>UI <b>O</b>n <b>T</b>ransparent <b>T</b>echnology.
+This framework enables easy and extensible and c++ish development of graphical
+user interfaces. It also contains quite a few "helper" libraries which you of
+course can use independently.
+*/

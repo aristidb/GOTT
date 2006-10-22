@@ -1,0 +1,397 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is A Non-immediate Graphics Library.
+ *
+ * The Initial Developer of the Original Code is
+ * Andreas Pokorny (andreas.pokorny@gmail.com).
+ * Portions created by the Initial Developer are Copyright (C) 2005
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *  Andreas Pokorny (andreas.pokorny@gmail.com)
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+/**
+  \page graphics_renderer Graphics Drawing System
+
+  \section graphics_renderer_intro Introduction
+
+  This document describes the concept of the renderer class, which is responsible
+  for displaying the different widgets and windows on screen. Widgets never draw
+  themselves by using some kind of API, neither do the graphics::object 
+  draw themselves. The renderer rather examines the situation himself. 
+
+  This is the current planning state of the renderer:
+
+  \code 
+  concept renderer
+  {
+    public:
+      // renderer domain, is explained below
+      QID render_domain();
+
+      // renderers should be able to receive all ui related events
+      // so X11 or all? renderers probably define methods like:
+      void update_display( region const& ); ///< renderer should update these screen regions, because x11 made them reappear
+      void resize( region const& ); ///< renderer should redraw mostly everything because the window size changed..
+        // COMMENT: this also affects the top-level graphics::object doesn't it? This (above) method does not seem adequate
+
+      // every renderer will need to know if widgets changed their
+      // graphical representation
+      void invalidate( graphics::object * );
+      // or maybe
+      void invalidate( QID_or_graphics_object_path * path_to_invalid_object );
+  };
+  \endcode 
+
+  That domain defines the name of the draw model. We might have 
+  names like:
+   - "gott::vector_graphics": antigrain, cairo, opengl, directGraphics
+   - "gott::text_mode": curses, conio, vt100.. 
+   - "gott::3d_vector_graphics": variants of the vector_graphics renderers with hardware 
+      acceleration that support 3D eye candy, that implies that 3D information is stored 
+      in graphics::object, but the display still happens on a 2D or pseudo 3D screen. 
+   - "gott::ajax": restrictive variants of gott::vector_graphics renderers, maybe not required
+      as special domain name
+   - "gott::exploreable_3d_graphics": sometime around 2010 we will implement that beast :), as 
+      soon as better input devices exist
+
+  possibly:
+   - "gott::input": mouse and keyboard input
+   - "gott::audio": sound
+   - "gott::video": synchronised sound and quickly changing graphics
+
+  Drawing might happen inside update_display, or might be triggered by a different event,
+  this all depends on the environment the renderer was written for. 
+
+  The update_display of a renderer could be implemented as:
+  \code
+  void mystupidrenderer::update_display( region const& ) 
+  {
+    for_each( 
+      graphics_objects.tree_df_begin()
+      , graphics_objects.tree_df_end()
+      , bind(&mystupidrenderer::draw_object,this) 
+      ); 
+  }
+  void mystupidrenderer::draw_object( graphics::object & object )
+  {
+    // .. dispatch type of object and draw or skip object
+  }
+  \endcode
+
+  Better renderers should look at subtrees as a whole and cache drawing results
+  and should do whatever makes drawing faster. For example an Antigrain/* renderer might 
+  have several instantiated rasterizers with different span generators and path 
+  transformators, would pick one depending on the path of graphics::objects
+  traversed. There is a rasterizer called rasterizer_outline_aa, which is fast but 
+  works only for thin lines. Think lines need conv_stroke and a scanline rasterizer. 
+ 
+  We do not define the inner operation of a renderer, the inner operation of a renderer
+  is defined by the rendering methods/library used. So OpenGL defines the GL renderer,
+  Antigrain define the Antigrain renderer. These two renderers will have completely diverging
+  implementations, since Antigrain thinks in paths and scanlines while GL thinks in 
+  triangles, shaders, textures and buffers. ("I also believe that we will have different
+  GL renderers, depending on the extensions supported, luckily we have to the power to decide 
+  during runtime which renderer fits best")
+
+  The results of the renderers should just match as far as possible.
+
+  \section graphics_renderer_embedding Embedding the renderer into the System
+  Renderer is connected to a window using a factory class 
+  which helps setting up the details of the window
+  and provides a renderer object. 
+
+  Example use cases:
+   - Antigrain/X11 requires a visual that matches the pixel format
+     of the antigrain renderer and must try to make use of mit-XShm, 
+   - Opengl/X11 needs to find a visual that provides OpenGL hardware
+     acceleration and the Window to construct an opengl context.
+   - OpenGL/FB might not have any requirements at all.  
+
+  So this factory class, which defines a connection between window and 
+  renderer requires a unique interface for every ui_context type, which 
+  will be implemented for every renderer implementation.
+
+  E.g. for X11 renderers
+  \code
+  concept X11Renderer : renderer
+  { 
+    concept X11RendererFactory  
+    {
+    public: 
+      XVisual get_visual( Window x11WindowHandle, Display * displayHandle, int screen );
+
+      renderer* construct_renderer( Window x11WindowHandle, Display * displayHandle );
+    };
+  };
+  \endcode
+
+    \note Maybe we should make the renderer a kind of "owner" or controller of the 
+  graphics::objects. That way we could allow the renderers to attach information
+  to the graphics::object tree, e.g. for caches or pre-calculations, like triangulation.
+
+
+  \section graphics_themes_outline Themes 
+
+  For every supported widget type, themes define a declarative 
+  and/or an active part. The first part
+  defines the static view of the widgets, and is assembled using the previously 
+  mentioned graphics::object. While the active or dynamic aspect of a theme must be 
+  able to modify the graphics::objects it defined and react on events, similar
+  to the behavior aspect of widgets. 
+
+  Every widget type has a QID that names the graphical representation of the widget. 
+  The theme loader will search for that QID in different places using the domain 
+  information provided by the renderer object. It will only search in theme files
+  which are defined for that domain.
+
+  Gott will provide a working set of graphics::object subtrees, and simple dynamic theme behaviors
+  for every default widget. The other
+  themes found inside the system will override the subtrees and theme behaviors of Gott. 
+  The application
+  may also provide additional replacement subtrees. Furthermore the application
+  or themes might even provide different widget names/QIDs, which have their
+  own unique graphic representation. Finally the user of gott has the option to install
+  themes in his home directory. For example she could define color themes which 
+  redefine the default colors of all her gott application, be redefining the QIDs
+  referencing default colors. 
+
+
+  \section graphics_objects_discussion Discussion about graphics objects tree 
+  We now have to define the layout of our graphics object tree. There are several 
+  possibilities for each of the render model domains. Suggestions are welcome. 
+
+  \subsection Requirements:
+   - RQ_TreePath - tree path support: It must be easy to find a child object using a path data structure
+   - RQ_RefWB - optional reference to a widget behavior: controls the sub nodes relevant for the concept of the widget
+   - RQ_RefTB - optional reference to a theme behavior: controls special sub nodes defined by the theme. It seems like
+      that only these graphics::objects with a reference to a widget behavior have a reference to a theme behavior.
+      Furthermore it might make sense to think of the widget behavior as very generic behavior, while the theme 
+      behavior is much more detailed.
+   - RQ_Children - grant access to child objects:
+   - RQ_Naming - Naming support: 
+      This one is a bit more complex. So lets approach this requirement from a different point
+      of view. A Label widget has a text property that holds the current text, this property
+      should be a text graphics::object stored inside the graphics::object subtree. To refer 
+      to the graphics::object a name unique inside the subtree is required. 
+      The themes which also change the dynamic aspects of widgets will require that 
+      feature too. For example if a theme wants to have a blinking rectangle everytime the 
+      mouse crosses a button, the dynamic aspect of the themed widget must be able to refer
+      to the rectangle defined inside the graphics::objects of the button. Without the ability to 
+      refer to certain subnodes the programmed theme behavior or widget code, would have to know 
+      the exact grapchis::objects tree structure of the widget. 
+   - RQ_RendererData - Make renderer relevant data attachable to each object node. Or only specific nodes?
+      That way the renderer is able to store cached information directly to the nodes in the graphics::obeject tree, 
+      thus no second
+      complex associative container, or parallel tree structure has to be built by a caching renderer. 
+   - RQ_ObjRef - object reference support:
+      To allow the user or theme writers to change general aspects of themes, and maybe to reuse existing nodes it
+      should be possible to refer to certain objects in the tree. E.g. one could have named color nodes. 
+      At this point the tree might turn into a directed acyclic graph
+   - RQ_Stereotype - graphical appearance should be defined as stereotypes - extension of RQ_ObjRef 
+      A stereotype is an incomplete or complete description of a widget. The missing parts, if any, can be the current
+      state of the object or some missing graphical objects. Lets call these missing parts overloaded properties. 
+      These properties have to be available to the renderer while processing the graphics tree.
+
+      For example the stereotype of a button might have a label. The appearance of that label is not defined by the 
+      button. It may be an image or just a text string, or both, or any other graphics::object. 
+      Usually one would have to create the graphics::object tree for every button instance, even though these trees are 
+      completely identical or differ in some aspects. With the introduction of stereotypes there would be 
+      only one button graphics::object tree in the whole process, and every button instance would reference 
+      that tree. Every deviation from the stereotype can be defined as a set of overloaded properties. 
+
+      These overloaded properties will be very hard to implement directly, without another layer of indirection.
+      We have to check if that additional layer of indirection hurts the performance of the system. 
+ 
+
+  \subsection graphics_objects_discussion_vector First two cents
+
+  This is a first rough design attempt based on the requirement above.
+
+  The object base class: 
+    - renderer_data RQ_RendererData
+    - path RQ_TreePath
+
+    \code
+    namespace graphics{
+    class object
+    {
+      typedef std::vector<std::size_t> path; 
+
+      Xany renderer_data; //< maintained by the renderer
+      virtual ~object();
+    };
+    }
+    \endcode
+ 
+  The container: 
+   - childs are stored here (RQ_Children)
+
+    \code
+    namespace graphics{
+    class container : public object
+     {
+      boost::ptr_vector<object> childs;
+    };
+    }
+    \endcode
+
+
+   The widget_stereotype class is a named graphics::container that defines a stereotype. 
+   - The widget_stereotype also defines has a QID "namespace" for its named subnodes, one could store a 
+     gperf generated perfect minimal hash function inside widget_stereotype during compilation time
+     of the theme ( or gott respectively ), to easily access all named nodes.
+     The term namespace refers to the fact that QIDs, used to acquire nodes inside the subtree, are only unique within 
+     the known parts of the implementation of the widget_stereotype. E.g. some text entry field might have the named
+     node "gott::entry::text", that can be accessed from the outside without the need for excessive tree searches 
+     or knowledge of the subtree structure.
+   - This class reflects the RQ_Stereotype requirement.
+
+   \code
+   namespace graphics {
+   class widget_stereotype : container {
+      object * get_node( QID const& node_id );
+   };
+   }
+   \endcode
+
+
+  The object_reference class fullfills RQ_ObjRef. 
+
+    \code
+    namespace graphics{
+    class object_reference : public object
+    {
+      QID reference;
+      object * resolved_reference;
+    };
+    }
+    \endcode
+
+  The graphics::widget class is a reference node, which connects a widget, a theme behavior and a widget_stereotype. 
+   - The class combines RQ_RefTB and RQ_RefWB under the assumption that both references are always required 
+     at the same point in the tree
+   - the graphics::widget class provide the linkage to the widget_stereotype 
+
+    \code
+    namespace graphics{
+    class widget : public object_reference
+    {
+      ui::widget * widget;
+      ui::theme::behavior * theme_behavior;
+      stereotype_linkage linkage; 
+    };
+    }
+    \endcode
+
+  Here is an example to make that class easier to understand
+
+\dot
+  digraph themeloading {
+    node [shape=record, fontname=Helvetica, fontsize=10];
+    subgraph cluster_0 {
+      style=filled;
+      node [style=filled];
+      TE [label="{TextEntry|<f0> Text:\"...\" |{linkage:|{<f2>\"text\"=...}}| <f1> QID:\"gott::entry\"}"]
+      B1 [label="{Buttony|<f0> Text:\"Ok\" |{linkage:|{<f2>\"text\"=...}} | <f1> QID:\"gott::button\"}"]
+      B2 [label="{Button|<f0> Text:\"Cancel\" |{linkage:|{<f2>\"text\"=...}}| <f1> QID:\"gott::button\"}"]
+      VLayout [label="{Vertical Layout|<f0> children|{linkage:|{<f2>\"children\"=entry1,button1,button2|...}}|<f1> QID:\"gott::vertical_layout\"}"]
+      VLayout:f0 -> TE
+      VLayout:f0 -> B1 
+      VLayout:f0 -> B2
+      label="Widget Hierarchy";
+      color=lightblue;
+    }
+
+    subgraph cluster_1 {
+      node [style=filled];
+      subgraph cluster_2 {
+        graph[ shape="ellipse"];
+        GVL [label="{widget_stereotype|:\"gott::vertical_layout\"}"]
+        GVLCO [label="container"]
+        GVL-> GVLCO;
+      }
+      subgraph cluster_3{
+        GB [label="{widget_stereotype|name:\"gott::button\"|{provides:|{gott:button::text|gott::button::clickable_region}}|{requires:|{gott::button::text}}|might have theme specific behaviour}"];
+        GBC [label="{rounded_rect|relative_size=99%|inset=2%|filled=false}"];
+        GBClickable [label="{rounded_rect|relative_size=98%|inset=%2|\"gott::button::clickable_region\"|filled=true}"];
+        GBText [label="{single_line_text|alignment=center|\"gott::button::text\"}"];
+        GB -> GBC;
+        GB -> GBClickable;
+        GB -> GBText;
+      }
+      subgraph cluster_4 {
+        Entry [label="{widget_stereotype|:\"gott::entry\"}"];
+        EntryC [label="{rect|}"];
+        EntryText [label="{single_line_text|alignment=center|\"gott::entry::text\"}"];
+        Entry -> EntryC -> EntryText;
+      }
+      label="Graphics Objects found by theme loader";
+      color=blue;
+    }
+    Window -> VLayout [label="widgets"];
+    VLayout:f1 -> GVL[style=dashed];
+
+    TE:f1 -> Entry[style=dashed] ;
+    B1:f1 -> GB[style=dashed];
+    B2:f1 -> GB[style=dashed];
+  }
+\enddot
+
+
+  We could now start to define object classes that define properties provided 
+  by widgets, like text, toggle states, scalar values.... 
+
+  \subsection graphics_objects_discussion_your_turn Your turn!
+
+  - This whole system just cries for input + audio + video integration, doesn't it?
+    -- Yes and this part just has not been written yet.. especially input handling yields lots of questions.. 
+  - How should Z-order be handled?
+    -- Maybe the order of objects defines the Z-order .. not sure
+  - Could tooltips etc. be implemented by means of higher-than-the-clipping Z-order?
+    -- I think they should be windows
+  - Shouldnt we leave the storing the renderer relevant data to the renderer? Then the renderer would have to 
+    maintain a second tree (or rather acyclic graph) or some effective associative container... 
+
+  \section event_forwarding Events forwarded to widgets
+
+  The renderer must know the position of each leaf graphics::object on screen. 
+  To be able to forward events to the behavior part of the widget. These things
+  have to be evaluated inside the renderer, because each renderer API has 
+  different means to fulfill that requirement.
+
+  So we need a bidirectional connection between graphics::object and the behavior
+  of the widget. 
+
+  \note Not every graphics::object has a widget. Only some nodes in the tree have 
+  that kind of behavior part. ("I need a name for that behavior thing :)" )
+
+
+
+ */

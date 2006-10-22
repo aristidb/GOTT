@@ -1,0 +1,4 @@
+/**
+\namespace gott::ui::x11
+X11 user interface library.
+*/

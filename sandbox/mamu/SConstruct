@@ -1,0 +1,52 @@
+
+import os
+import glob 
+
+cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
+cflags = ARGUMENTS.get('cflags', ['-Wall','-W'])
+release = int(ARGUMENTS.get('release', 1))
+if release:
+	debug = 0
+	opt = ['-O3']
+else:
+	debug = 1
+debug = int(ARGUMENTS.get('debug', debug))
+opt = ARGUMENTS.get('opt', opt)
+cflags = [cflags, opt]
+if debug:
+	cflags += ['-ggdb3','-O0']
+	cppdef = ['DEBUG']
+else:
+	cppdef = ['NDEBUG']
+caux = ARGUMENTS.get('aux', '')
+cflags += [caux]
+cflagsoverride = ARGUMENTS.get('cfoverride', 0)
+if cflagsoverride:
+	cflags = cflagsoverride
+
+env = Environment(
+      LINKFLAGSFLAGS =['-ggdb3','-O0','-static'],
+		  CXX = cxx, 
+		  CCFLAGS = cflags, 
+		  CPPPATH=['#/..'], 
+		  CPPDEFINES=cppdef)
+
+Export('env')
+
+env.Program('test_point_in_contour', 'math/point_in_contour.cpp')
+env.Program('test_clockwise', 'math/clockwise.cpp')
+
+SConscript(dirs = ['x11'])
+
+source_files = ['input.cpp', 'utility.cpp', 'widget_events.cpp', 'font.cpp', 'font/pixel_glyph.cpp', 'font/vector_glyph.cpp']
+
+# env.SharedLibrary('gottbase', source_files)
+env.StaticLibrary('gottbase', source_files)
+
+
+x11_example_files= ['test_x11.cpp']
+libs=['gottx11', 'gottbase' ,'GL', 'GLU', 'X11', 'boost_signals', 'Xxf86vm', 'freetype', 'z']
+env.ParseConfig('pkg-config --cflags --libs freetype2')
+env.Program('test_x11', x11_example_files, LIBS=libs, LIBPATH=['.', 'x11/','/usr/X11R6/lib'])
+
+

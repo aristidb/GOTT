@@ -1,0 +1,23 @@
+plugin-id foo
+symbol xyz
+has-interface bar
+enclosing-module x
+
+plugin-id fox
+symbol xy
+has-interface boo
+enclosing-module x
+
+plugin-id moo
+has-interface bar
+enclosing-module y
+has-interface boo
+symbol p
+***
+module-id x
+file-path /tmp/x.so
+module-type dynamic-native
+
+module-id y
+file-path /tmp/y.so
+module-type dynamic-native
