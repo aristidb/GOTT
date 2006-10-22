@@ -3,7 +3,8 @@
 /*
   testsoon.hpp: "Test soon" testing framework.
 
-  Copyright (C) 2006 Aristid Breitkreuz, Ronny Pfannschmidt and Benjamin Bykowski
+  Copyright (C) 2006 Aristid Breitkreuz, Ronny Pfannschmidt and 
+                     Benjamin Bykowski
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -40,8 +41,8 @@
 #include <boost/preprocessor/array/pop_front.hpp>
 #include <boost/preprocessor/array/data.hpp>
 #include <boost/preprocessor/array/size.hpp>
-#include <boost/preprocessor/control/if.hpp>
-#include <boost/preprocessor/control/expr_if.hpp>
+#include <boost/preprocessor/control/iif.hpp>
+#include <boost/preprocessor/control/expr_iif.hpp>
 #include <boost/preprocessor/facilities/empty.hpp>
 #include <boost/preprocessor/comparison/equal.hpp>
 
@@ -111,7 +112,8 @@ public:
     (void)info;
     (void)sequence_key;
   }
-  virtual void failure(test_info const &info, test_failure const &, string const &sequence_key) = 0;
+  virtual void failure(test_info const &info, test_failure const &failure, 
+                       string const &sequence_key) = 0;
   virtual ~test_reporter() {}
 };
 
@@ -211,7 +213,8 @@ public:
 };
 
 struct failure_info {
-  failure_info(test_info const &test, test_failure const &failure, string const &value)
+  failure_info(test_info const &test, test_failure const &failure, 
+               string const &value)
     : ptest(&test), failure(failure), value(value) {}
 
   test_info const *ptest;
@@ -223,14 +226,6 @@ class default_reporter : public test_reporter {
 public:
   typedef stream_class stream;
   default_reporter(stream &out = DEFAULT_STREAM) : out(out) {}
-  void tell_test(test_info const &it, char const *state) {
-    out << '"' << it.name << "\", "
-        << '"' << *it.parent << "\", "
-        << it.file << ", "
-        << it.line << ", "
-        //<< (void*)it.function << " " //DAS hier stört -pedantic 
-        << state << std::endl;
-  }
   void before_tests(test_group const &group) {
     out << group << " : ";
     out.flush();
@@ -437,7 +432,8 @@ private:
 /**
  * Declare a test (positional). You do not want to use this directly.
  * @param name The name of the test (quoted).
- * @param fixture A tuple consisting of whether to use a fixture and a fixture class.
+ * @param fixture A tuple consisting of whether to use a fixture and a fixture 
+ *             class.
  */
 #define PTEST(name, fixture, group_fixture, generator) \
   TESTSOON_PTEST1( \
@@ -453,31 +449,47 @@ private:
  * Declare a test (optional name only).
  * @param name The name of the test (not quoted).
  */
-#define TEST(name) PTEST(#name, (0, ~), 0, (0, ()))
+#define TEST(name) \
+  PTEST(#name, (0, ~), 0, (0, ()))
 
 /**
  * Declare a test with fixture.
  * @param name The name of the test (not quoted).
  * @param fixture_class The fixture class to use.
  */
-#define FTEST(name, fixture_class) PTEST(#name, (1, fixture_class), 0, (0, ()))
+#define FTEST(name, fixture_class) \
+  PTEST(#name, (1, fixture_class), 0, (0, ()))
 
 /**
  * Declare a test with default group fixture, named group_fixture.
  * @param name The name of the test (not quoted).
  */
-#define GFTEST(name) PTEST(#name, (0, ~), 1, (0, ()))
+#define GFTEST(name) \
+  PTEST(#name, (0, ~), 1, (0, ()))
 
 #ifndef IN_DOXYGEN
 
-#define TESTSOON_TEST_PARAM(has_fixture, fixture_class, has_group_fixture, has_generator, generator_class) \
-  BOOST_PP_EXPR_IF(has_fixture, (fixture_class &fixture)) \
-  BOOST_PP_EXPR_IF(has_group_fixture, (group_fixture_t &group_fixture)) \
-  BOOST_PP_EXPR_IF(has_generator, (generator_class::const_reference value)) \
-  BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, (::testsoon::test_failure &testsoon_failure)) \
+#define TESTSOON_TEST_PARAM( \
+    has_fixture, \
+    fixture_class, \
+    has_group_fixture, \
+    has_generator, \
+    generator_class) \
+  BOOST_PP_EXPR_IIF(has_fixture, (fixture_class &fixture)) \
+  BOOST_PP_EXPR_IIF(has_group_fixture, (group_fixture_t &group_fixture)) \
+  BOOST_PP_EXPR_IIF(has_generator, (generator_class::const_reference value)) \
+  BOOST_PP_EXPR_IIF(TESTSOON_NO_EXCEPTIONS, \
+    (::testsoon::test_failure &testsoon_failure)) \
   (int)
 
-#define TESTSOON_PTEST1(name, test_class, has_fixture, fixture_class, group_fixture, has_generator, generator_seq) \
+#define TESTSOON_PTEST1( \
+    name, \
+    test_class, \
+    has_fixture, \
+    fixture_class, \
+    group_fixture, \
+    has_generator, \
+    generator_seq) \
   TESTSOON_PTEST2( \
     name, test_class, has_fixture, fixture_class, \
     BOOST_PP_SEQ_ENUM( \
@@ -490,40 +502,57 @@ private:
     BOOST_PP_ARRAY_POP_FRONT(BOOST_PP_SEQ_TO_ARRAY(generator_seq)) \
   )
 
-#define TESTSOON_PTEST2(name, test_class, has_fixture, fixture_class, test_param, has_group_fixture, has_generator, generator_class, generator_param)\
+#define TESTSOON_PTEST2(\
+    name, \
+    test_class, \
+    has_fixture, \
+    fixture_class, \
+    test_param, \
+    has_group_fixture, \
+    has_generator, \
+    generator_class, \
+    generator_param) \
   namespace { \
     struct test_class \
     : public ::testsoon::test_info { \
       test_class () : ::testsoon::test_info( \
             test_group(__FILE__), name, __FILE__, __LINE__) {} \
       void run(::testsoon::test_reporter &reporter) const { \
-        BOOST_PP_EXPR_IF(has_fixture, fixture_class fixture;) \
-        BOOST_PP_EXPR_IF(has_group_fixture, group_fixture_t group_fixture;) \
-        BOOST_PP_EXPR_IF(has_generator, \
+        BOOST_PP_EXPR_IIF(has_fixture, fixture_class fixture;) \
+        BOOST_PP_EXPR_IIF(has_group_fixture, group_fixture_t group_fixture;) \
+        BOOST_PP_EXPR_IIF(has_generator, \
         generator_class gen \
-          BOOST_PP_IF( \
+          BOOST_PP_IIF( \
             BOOST_PP_EQUAL(BOOST_PP_ARRAY_SIZE(generator_param), 0), \
             BOOST_PP_EMPTY(), \
             BOOST_PP_ARRAY_DATA(generator_param)); \
-        for (generator_class::iterator i = gen.begin(); i != gen.end(); ++i)) { \
-          BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, ::testsoon::test_failure state;) \
+        for (generator_class::iterator i = gen.begin(); i != gen.end(); ++i)) {\
+          BOOST_PP_EXPR_IIF(TESTSOON_NO_EXCEPTIONS, \
+          ::testsoon::test_failure state;) \
+          \
           ::testsoon::string key \
-            BOOST_PP_EXPR_IF(has_generator, (::testsoon::object_to_string(*i))); \
-          BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, try {) \
+            BOOST_PP_EXPR_IIF( \
+              has_generator, \
+              (::testsoon::object_to_string(*i))); \
+          BOOST_PP_EXPR_IIF(TESTSOON_EXCEPTIONS, try {) \
             do_test( \
               BOOST_PP_SEQ_ENUM( \
-                BOOST_PP_EXPR_IF(has_fixture, (fixture)) \
-                BOOST_PP_EXPR_IF(has_group_fixture, (group_fixture)) \
-                BOOST_PP_EXPR_IF(has_generator, (*i)) \
-                BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, (state)) \
+                BOOST_PP_EXPR_IIF(has_fixture, (fixture)) \
+                BOOST_PP_EXPR_IIF(has_group_fixture, (group_fixture)) \
+                BOOST_PP_EXPR_IIF(has_generator, (*i)) \
+                BOOST_PP_EXPR_IIF(TESTSOON_NO_EXCEPTIONS, (state)) \
                 (0) \
               ) \
             ); \
-          BOOST_PP_EXPR_IF(TESTSOON_NO_EXCEPTIONS, if (!state.is_failure())) \
+          BOOST_PP_EXPR_IIF(TESTSOON_NO_EXCEPTIONS, if (!state.is_failure())) \
             reporter.success(*this, key); \
-          BOOST_PP_IF(TESTSOON_NO_EXCEPTIONS, else, } catch (::testsoon::test_failure const &state) {) \
+          BOOST_PP_IIF( \
+            TESTSOON_NO_EXCEPTIONS, \
+            else, \
+            } catch (::testsoon::test_failure const &state) { \
+          ) \
             reporter.failure(*this, state, key); \
-          BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, }) \
+          BOOST_PP_EXPR_IIF(TESTSOON_EXCEPTIONS, }) \
         } \
       } \
       void do_test(test_param) const; \
@@ -593,21 +622,22 @@ private:
   PTEST x
 
 #define TESTSOON_FAIL(msg, data) \
-  BOOST_PP_IF( \
+  BOOST_PP_IIF( \
     TESTSOON_EXCEPTIONS, \
     throw , \
     testsoon_failure =) \
     ::testsoon::test_failure(msg, __LINE__, data); \
-  BOOST_PP_EXPR_IF( \
+  BOOST_PP_EXPR_IIF( \
     TESTSOON_NO_EXCEPTIONS, \
     return;)
 
 #define TESTSOON_ENCLOSURE(x) \
   do { \
-    BOOST_PP_EXPR_IF(TESTSOON_EXCEPTIONS, ::testsoon::test_failure testsoon_failure;) \
+    BOOST_PP_EXPR_IIF(TESTSOON_EXCEPTIONS, \
+      ::testsoon::test_failure testsoon_failure;) \
     x; \
     if (testsoon_failure.is_failure()) \
-    BOOST_PP_IF(TESTSOON_EXCEPTIONS, \
+    BOOST_PP_IIF(TESTSOON_EXCEPTIONS, \
       throw testsoon_failure, \
       return \
       ); \
@@ -631,7 +661,8 @@ private:
  */
 #define TESTSOON_Equals(a, b) \
   TESTSOON_ENCLOSURE( \
-    ::testsoon::check_equals(a, b, "not equal: " #a " and " #b, __LINE__, testsoon_failure); \
+    ::testsoon::check_equals(a, b, \
+    "not equal: " #a " and " #b, __LINE__, testsoon_failure); \
   )
 
 #define Equals(a, b) TESTSOON_Equals(a, b)
@@ -653,7 +684,8 @@ private:
 			if ( \
         ::testsoon::string(w) != ::testsoon::string() && \
         ::testsoon::string(e.what()) != ::testsoon::string((w))) \
-				TESTSOON_FAIL("throwed " #t " with wrong message", ::testsoon::string_vector()); \
+				TESTSOON_FAIL("throwed " #t " with wrong message", \
+          ::testsoon::string_vector()); \
 		} \
 	} while (0)
 #else
