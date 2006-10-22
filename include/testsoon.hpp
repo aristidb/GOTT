@@ -3,7 +3,7 @@
 /*
   testsoon.hpp: "Test soon" testing framework.
 
-  Copyright (C) 2006 Aristid Breitkreuz and Ronny Pfannschmidt
+  Copyright (C) 2006 Aristid Breitkreuz, Ronny Pfannschmidt and Benjamin Bykowski
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,7 +23,7 @@
 
   Aristid Breitkreuz aribrei@arcor.de
   Ronny Pfannschmidt Ronny.Pfannschmidt@gmx.de
-
+  Benjamin Bykowski bennybyko@gmx.de
 */
 
 #ifndef TESTSOON_HPP
@@ -210,6 +210,15 @@ public:
   bool is_failure() { return line; }
 };
 
+struct failure_info {
+  failure_info(test_info const &test, test_failure const &failure, string const &value)
+    : ptest(&test), failure(failure), value(value) {}
+
+  test_info const *ptest;
+  test_failure failure;
+  string value;
+};
+
 class default_reporter : public test_reporter {
 public:
   typedef stream_class stream;
@@ -240,11 +249,48 @@ public:
       out << '<' << k << '>';
     out << ']';
     out.flush();
+    reports.push_back(failure_info(i, x, k));
   }
   void stop() {
+    write_report();
   }
+
 private:
   stream &out;
+
+  typedef std::vector<failure_info> failure_vector;
+  failure_vector reports;
+
+  void write_report() {
+    for (failure_vector::const_iterator it = reports.begin();
+        it != reports.end();
+        ++it)
+      write_report_entry(*it);
+  }
+
+  void write_report_entry(failure_info const &info) {
+    out << "\nError occured in test ";
+    if (info.ptest->name != string())
+      out << '"' << info.ptest->name << "\" ";
+    out << "in " << *info.ptest->parent
+        << " on line " << info.ptest->line
+        << " in check on line " << info.failure.line;
+    if (info.value != string())
+      out << " with value: \n\t" << info.value;
+    out << ".\nProblem: " << info.failure.message << '\n';
+
+    if (!info.failure.data.empty()) {
+      string_vector::const_iterator iter;
+
+      out << "Data:\n";
+      for (string_vector::const_iterator it = info.failure.data.begin();
+           it != info.failure.data.end();
+           ++it) {
+        out << "\t" << *it << '\n';
+      }
+    }
+    out.flush();
+  }
 };
 
 #ifndef IN_DOXYGEN
