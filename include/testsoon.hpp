@@ -277,11 +277,11 @@ private:
         << " in check on line " << info.failure.line;
     if (info.value != string())
       out << " with value: \n\t" << info.value;
-    out << ".\nProblem: " << info.failure.message << '\n';
+    else
+      out << '.';
+    out << "\nProblem: " << info.failure.message << '\n';
 
     if (!info.failure.data.empty()) {
-      string_vector::const_iterator iter;
-
       out << "Data:\n";
       for (string_vector::const_iterator it = info.failure.data.begin();
            it != info.failure.data.end();
