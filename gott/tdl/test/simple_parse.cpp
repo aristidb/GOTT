@@ -425,3 +425,25 @@ GFTEST() {
   Check(!"not throwed");
 }
 
+GFTEST(delim block) {
+  std::istringstream data("`xyz\n  muh\nkuh\nxyz\nxyz");
+  group_fixture.parse(data);
+  B();
+    D();
+      N("  muh\nkuh");
+      N("xyz");
+    U();
+  E();
+  CMP();
+}
+
+GFTEST(unclosed delim block) {
+  std::istringstream data("`delim\n\n");
+  try {
+    group_fixture.parse(data);
+  } catch (tdl::tdl_error const &m) {
+    Equals(m.module(), "TDL parser");
+    return;
+  }
+  Check(!"not throwed");
+}

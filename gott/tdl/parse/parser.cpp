@@ -106,6 +106,7 @@ class exec_parse {
   void normal_line(string const &);
   bool empty_line();
   void block();
+  void delim_block(string const &);
   
   void get_indent();
   void restore_indent(unsigned, unsigned);
@@ -210,7 +211,11 @@ void exec_parse::normal_line(string const &s) {
   
     if (*unread.begin() == '`') {
       started_document = true;
-      block();
+      ++unread.Begin;
+      if (unread.empty())
+        block();
+      else
+        delim_block(unread);
       break;
     }
     
@@ -287,6 +292,27 @@ void exec_parse::block() {
   parse.node(str);
 
   restore_indent(ind + 1, old_indent);
+}
+
+
+void exec_parse::delim_block(string const &delim) {
+  gott::string_buffer str;
+  bool first = true;
+  while (stream) {
+    if (!read_line())
+      break;
+    if (current_line == delim) {
+      parse.node(str);
+      return;
+    }
+    ln.start_line();
+    if (!first)
+      str += '\n';
+    else
+      first = false;
+    str += current_line;
+  }
+  throw tdl::tdl_error("TDL parser", "open block");
 }
 
 void exec_parse::skip_whitespace(string::utf8_range &unread) {
@@ -411,3 +437,4 @@ void exec_parse::restore_indent(unsigned ind, unsigned old) {
   buff_indent = ind;
   indent = old;
 }
+
