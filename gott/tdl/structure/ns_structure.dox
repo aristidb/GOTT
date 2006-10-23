@@ -1,0 +1,4 @@
+/**
+\namespace tdl::structure
+Library for TDL & TDL Schema compatible data structures.
+*/

@@ -1,0 +1,4 @@
+/**
+\namespace gott::notify_fs
+Change-notifications for the file system.
+*/

@@ -1,0 +1,12 @@
+#
+#
+
+Import('env')
+
+#tut_env = env.Copy()
+
+#tut_env.Append(CCFLAGS=['-I../../gott/util/tut/'])
+
+#tut_env.Program('tut_0.cpp')
+
+print "Tut example does not work anymore"

@@ -1,0 +1,15 @@
+#
+#
+
+Import('env')
+
+x11_env = env.Copy()
+
+x11_env.ParseConfig('pkg-config x11 --libs')
+x11_env.ParseConfig('pkg-config x11 --cflags')
+x11_env.ParseConfig('pkg-config xdamage --libs')
+x11_env.ParseConfig('pkg-config xdamage --cflags')
+
+x11_env.Append(CCFLAGS='-std=c99')
+
+x11_env.Program('xdamage0.c')

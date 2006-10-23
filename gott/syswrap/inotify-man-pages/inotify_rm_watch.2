@@ -1,0 +1,64 @@
+.\" man2/inotify_rm_watch.2 - inotify_rm_watch man page
+.\"
+.\" Copyright (C) 2005 Robert Love
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\"
+.\" 2005-07-19 Robert Love <rlove@rlove.org> - initial version
+.\"
+.TH INOTIFY_RM_WATCH 2 2005-07-19 "Linux" "Linux Programmer's Manual"
+.SH NAME
+inotify_rm_watch \- remove an existing watch from an inotify instance
+.SH SYNOPSIS
+.B #include <inotify.h>
+.sp
+.BI "int inotify_rm_watch(int" fd ", __u32 " wd );
+.SH DESCRIPTION
+.B inotify_rm_watch
+removes the watch associated with the watch descriptor
+.I wd
+from the inotify instance associated with the file descriptor
+.IR fd .
+.SH "RETURN VALUE"
+On success,
+.B inotify_rm_watch
+returns zero, or negative one if an error occurred (in which case,
+.I errno
+is set appropriately).
+.SH ERRORS
+.TP
+.B EBADF
+. I fd
+is not a valid file descriptor
+.TP
+.B EMFILE
+The user limit on the total number of inotify instances has been reached.
+.TP
+.B EINVAL
+The watch descriptor
+.I wd
+is not valid.
+.SH "HISTORY"
+Inotify was merged into the 2.6.13 Linux kernel.
+.SH "SEE ALSO"
+.BR inotify_init (2),
+.BR inotify_add_watch (2), and
+.BR read (2).

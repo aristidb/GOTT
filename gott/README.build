@@ -1,0 +1,2 @@
+source setup_libpath.sh
+scons # scons -h for help about build options

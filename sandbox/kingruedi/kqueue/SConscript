@@ -1,0 +1,8 @@
+#
+#
+
+Import('env')
+
+kqueue_env = env.Copy()
+
+kqueue_env.Program('kqueue-file.c')
