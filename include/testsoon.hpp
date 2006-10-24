@@ -222,37 +222,42 @@ struct failure_info {
   string value;
 };
 
-class default_reporter : public test_reporter {
+class simple_reporter : public test_reporter {
 public:
   typedef stream_class stream;
-  default_reporter(stream &out = DEFAULT_STREAM) : out(out) {}
+  simple_reporter(stream &out = DEFAULT_STREAM) : out(out) {}
   void before_tests(test_group const &group) {
     out << group << " : ";
     out.flush();
   }
+
   void after_tests(test_group const &) {
     out << '\n';
     out.flush();
   }
+
   void success(test_info const &, string const &){
     out << '.';
     out.flush();
   }
+
   void failure(test_info const &i, test_failure const &x, string const &k) {
     out << "[F=" << i.line << '.' << x.line;
     if (k != string())
       out << '<' << k << '>';
     out << ']';
     out.flush();
-    reports.push_back(failure_info(i, x, k));
-  }
-  void stop() {
-    write_report();
   }
 
-private:
+protected:
   stream &out;
+};
 
+class default_reporter : public simple_reporter {
+  public:  
+  default_reporter(stream &out = DEFAULT_STREAM) : simple_reporter(out) {}
+
+  protected:
   typedef std::vector<failure_info> failure_vector;
   failure_vector reports;
 
@@ -286,6 +291,15 @@ private:
     }
     out.flush();
   }
+  void failure(test_info const &i, test_failure const &x, string const &k) {
+    simple_reporter::failure(i,x,k);
+    reports.push_back(failure_info(i, x, k));
+  }
+
+  void stop() {
+    write_report();
+  }
+
 };
 
 #ifndef IN_DOXYGEN
