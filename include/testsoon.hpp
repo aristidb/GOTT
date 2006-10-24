@@ -253,19 +253,25 @@ protected:
   stream &out;
 };
 
-class default_reporter : public simple_reporter {
+class concise_reporter : public simple_reporter {
   public:  
-  default_reporter(stream &out = DEFAULT_STREAM) : simple_reporter(out) {}
+  concise_reporter(stream &out = DEFAULT_STREAM) : simple_reporter(out), suc(0) {}
 
   protected:
   typedef std::vector<failure_info> failure_vector;
   failure_vector reports;
-
+  
+  int suc;
+  
   void write_report() {
     for (failure_vector::const_iterator it = reports.begin();
         it != reports.end();
         ++it)
       write_report_entry(*it);
+    size_t fails = reports.size();
+    out << std::endl << fails + suc << " Tests, " 
+        << suc << " succeeded, "
+        << fails << " failed." << std::endl;
   }
 
   void write_report_entry(failure_info const &info) {
@@ -290,9 +296,15 @@ class default_reporter : public simple_reporter {
       }
     }
     out.flush();
+  } 
+
+  void success(test_info const &i, string const &k) {
+    simple_reporter::success(i, k);
+    ++suc;
   }
+    
   void failure(test_info const &i, test_failure const &x, string const &k) {
-    simple_reporter::failure(i,x,k);
+    simple_reporter::failure(i, x, k);
     reports.push_back(failure_info(i, x, k));
   }
 
@@ -301,6 +313,8 @@ class default_reporter : public simple_reporter {
   }
 
 };
+
+typedef concise_reporter default_reporter;
 
 #ifndef IN_DOXYGEN
 
