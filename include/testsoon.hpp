@@ -255,10 +255,11 @@ protected:
 };
 
 class concise_reporter : public simple_reporter {
-  public:  
-  concise_reporter(stream &out = DEFAULT_STREAM) : simple_reporter(out), suc(0) {}
+public:  
+  concise_reporter(stream &out = DEFAULT_STREAM) 
+  : simple_reporter(out), suc(0) {}
 
-  protected:
+private:
   typedef std::vector<failure_info> failure_vector;
   failure_vector reports;
   
@@ -312,7 +313,6 @@ class concise_reporter : public simple_reporter {
   void stop() {
     write_report();
   }
-
 };
 
 typedef concise_reporter default_reporter;
