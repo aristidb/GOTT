@@ -2,7 +2,7 @@ import glob
 files = glob.glob("src/*.cpp")
 
 flags = [ "-Wall", "-W", "-O3" ]
-flags += [ "-g" ]
+#flags += [ "-g" ]
 
 env = Environment(CPPPATH = [ "#include" ])
 env.Program("example",

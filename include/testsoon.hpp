@@ -45,6 +45,7 @@
 #include <boost/preprocessor/control/expr_iif.hpp>
 #include <boost/preprocessor/facilities/empty.hpp>
 #include <boost/preprocessor/comparison/equal.hpp>
+#include <boost/preprocessor/punctuation/comma_if.hpp>
 
 #ifndef NO_STDLIB
 #include <string>
@@ -503,12 +504,12 @@ private:
     has_group_fixture, \
     has_generator, \
     generator_class) \
-  BOOST_PP_EXPR_IIF(has_fixture, (fixture_class &fixture)) \
-  BOOST_PP_EXPR_IIF(has_group_fixture, (group_fixture_t &group_fixture)) \
-  BOOST_PP_EXPR_IIF(has_generator, (generator_class::const_reference value)) \
-  BOOST_PP_EXPR_IIF(TESTSOON_NO_EXCEPTIONS, \
-    (::testsoon::test_failure &testsoon_failure)) \
-  (int)
+  BOOST_PP_IIF(has_fixture, fixture_class &fixture, int), \
+  BOOST_PP_IIF(has_group_fixture, group_fixture_t &group_fixture, int), \
+  BOOST_PP_IIF(has_generator, generator_class::const_reference value, int), \
+  BOOST_PP_IIF(TESTSOON_NO_EXCEPTIONS, \
+    ::testsoon::test_failure &testsoon_failure, \
+    int) \
 
 #define TESTSOON_PTEST1( \
     name, \
@@ -520,10 +521,9 @@ private:
     generator_seq) \
   TESTSOON_PTEST2( \
     name, test_class, has_fixture, fixture_class, \
-    BOOST_PP_SEQ_ENUM( \
-      TESTSOON_TEST_PARAM( \
-        has_fixture, fixture_class, group_fixture, \
-        has_generator, BOOST_PP_SEQ_HEAD(generator_seq))), \
+    TESTSOON_TEST_PARAM( \
+      has_fixture, fixture_class, group_fixture, \
+      has_generator, BOOST_PP_SEQ_HEAD(generator_seq)), \
     group_fixture, \
     has_generator, \
     BOOST_PP_SEQ_HEAD(generator_seq), \
@@ -564,13 +564,10 @@ private:
               (::testsoon::object_to_string(*i))); \
           BOOST_PP_EXPR_IIF(TESTSOON_EXCEPTIONS, try {) \
             do_test( \
-              BOOST_PP_SEQ_ENUM( \
-                BOOST_PP_EXPR_IIF(has_fixture, (fixture)) \
-                BOOST_PP_EXPR_IIF(has_group_fixture, (group_fixture)) \
-                BOOST_PP_EXPR_IIF(has_generator, (*i)) \
-                BOOST_PP_EXPR_IIF(TESTSOON_NO_EXCEPTIONS, (state)) \
-                (0) \
-              ) \
+                BOOST_PP_IIF(has_fixture, fixture, 0), \
+                BOOST_PP_IIF(has_group_fixture, group_fixture, 0), \
+                BOOST_PP_IIF(has_generator, *i, 0), \
+                BOOST_PP_IIF(TESTSOON_NO_EXCEPTIONS, state, 0) \
             ); \
           BOOST_PP_EXPR_IIF(TESTSOON_NO_EXCEPTIONS, if (!state.is_failure())) \
             reporter.success(*this, key); \
