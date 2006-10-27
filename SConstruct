@@ -1,6 +1,7 @@
 import glob
 files = glob.glob("src/*.cpp")
 
+#flags = []
 flags = [ "-Wall", "-W", "-O3" ]
 #flags += [ "-g" ]
 

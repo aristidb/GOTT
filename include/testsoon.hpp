@@ -498,6 +498,12 @@ private:
 
 #ifndef IN_DOXYGEN
 
+#if TESTSOON_NO_EXCEPTIONS
+#define TESTSOON_FAILURE_P ::testsoon::test_failure &testsoon_failure
+#else
+#define TESTSOON_FAILURE_P int
+#endif
+
 #define TESTSOON_TEST_PARAM( \
     has_fixture, \
     fixture_class, \
@@ -507,9 +513,7 @@ private:
   BOOST_PP_IIF(has_fixture, fixture_class &fixture, int), \
   BOOST_PP_IIF(has_group_fixture, group_fixture_t &group_fixture, int), \
   BOOST_PP_IIF(has_generator, generator_class::const_reference value, int), \
-  BOOST_PP_IIF(TESTSOON_NO_EXCEPTIONS, \
-    ::testsoon::test_failure &testsoon_failure, \
-    int) \
+  TESTSOON_FAILURE_P
 
 #define TESTSOON_PTEST1( \
     name, \
@@ -529,6 +533,28 @@ private:
     BOOST_PP_SEQ_HEAD(generator_seq), \
     BOOST_PP_ARRAY_POP_FRONT(BOOST_PP_SEQ_TO_ARRAY(generator_seq)) \
   )
+
+#if TESTSOON_EXCEPTIONS
+
+#define TESTSOON_TESTRUN(x) \
+  try { \
+    x; \
+    reporter.success(*this, key); \
+  } catch (::testsoon::test_failure const &state) { \
+    reporter.failure(*this, state, key); \
+  }
+
+#else
+
+#define TESTSOON_TESTRUN(x) \
+  ::testsoon::test_failure state; \
+  x; \
+  if (!state.is_failure()) \
+    reporter.success(*this, key); \
+  else \
+    reporter.failure(*this, state, key);
+
+#endif
 
 #define TESTSOON_PTEST2(\
     name, \
@@ -555,29 +581,18 @@ private:
             BOOST_PP_EMPTY(), \
             BOOST_PP_ARRAY_DATA(generator_param)); \
         for (generator_class::iterator i = gen.begin(); i != gen.end(); ++i)) {\
-          BOOST_PP_EXPR_IIF(TESTSOON_NO_EXCEPTIONS, \
-          ::testsoon::test_failure state;) \
-          \
           ::testsoon::string key \
             BOOST_PP_EXPR_IIF( \
               has_generator, \
               (::testsoon::object_to_string(*i))); \
-          BOOST_PP_EXPR_IIF(TESTSOON_EXCEPTIONS, try {) \
+          TESTSOON_TESTRUN( \
             do_test( \
                 BOOST_PP_IIF(has_fixture, fixture, 0), \
                 BOOST_PP_IIF(has_group_fixture, group_fixture, 0), \
                 BOOST_PP_IIF(has_generator, *i, 0), \
                 BOOST_PP_IIF(TESTSOON_NO_EXCEPTIONS, state, 0) \
-            ); \
-          BOOST_PP_EXPR_IIF(TESTSOON_NO_EXCEPTIONS, if (!state.is_failure())) \
-            reporter.success(*this, key); \
-          BOOST_PP_IIF( \
-            TESTSOON_NO_EXCEPTIONS, \
-            else, \
-            } catch (::testsoon::test_failure const &state) { \
+            ) \
           ) \
-            reporter.failure(*this, state, key); \
-          BOOST_PP_EXPR_IIF(TESTSOON_EXCEPTIONS, }) \
         } \
       } \
       void do_test(test_param) const; \
@@ -646,28 +661,33 @@ private:
 #define TESTSOON_PARAM_INVOKEx(x) \
   PTEST x
 
+#if TESTSOON_EXCEPTIONS
+
 #define TESTSOON_FAIL(msg, data) \
-  BOOST_PP_IIF( \
-    TESTSOON_EXCEPTIONS, \
-    throw , \
-    testsoon_failure =) \
-    ::testsoon::test_failure(msg, __LINE__, data); \
-  BOOST_PP_EXPR_IIF( \
-    TESTSOON_NO_EXCEPTIONS, \
-    return;)
+    throw ::testsoon::test_failure(msg, __LINE__, data);
 
 #define TESTSOON_ENCLOSURE(x) \
   do { \
-    BOOST_PP_EXPR_IIF(TESTSOON_EXCEPTIONS, \
-      ::testsoon::test_failure testsoon_failure;) \
+    ::testsoon::test_failure testsoon_failure; \
     x; \
     if (testsoon_failure.is_failure()) \
-    BOOST_PP_IIF(TESTSOON_EXCEPTIONS, \
-      throw testsoon_failure, \
-      return \
-      ); \
+      throw testsoon_failure; \
   } while (false)
 
+#else //TESTSOON_NO_EXCEPTIONS
+
+#define TESTSOON_FAIL(msg, data) \
+  testsoon_failure = ::testsoon::test_failure(msg, __LINE__, data); \
+  return;
+
+#define TESTSOON_ENCLOSURE(x) \
+  do { \
+    x; \
+    if (testsoon_failure.is_failure()) \
+      return; \
+  } while (false)
+
+#endif
 
 #endif //IN_DOXY
 
