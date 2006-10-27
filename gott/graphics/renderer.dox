@@ -454,6 +454,8 @@ The connection between the text inside the button labels and the text property o
 created during initialisation. So the Button widget uses the lookup information stored inside the widget_graphics object
 to find the right position in the tree, and adds a link to the text property. 
 
+Stereotypes exist to save memory. The problem that I see is that possibly necessary proxy objects may easily eat any advantage.
+
   We could now start to define object classes that define properties provided 
   by widgets, like text, toggle states, scalar values.... 
 
