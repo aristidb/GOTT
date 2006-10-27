@@ -1,0 +1,74 @@
+.\" man2/inotify_add_watch.2 - inotify_add_watch man page
+.\"
+.\" Copyright (C) 2005 Robert Love
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\"
+.\" 2005-07-19 Robert Love <rlove@rlove.org> - initial version
+.\"
+.TH INOTIFY_ADD_WATCH 2 2005-07-19 "Linux" "Linux Programmer's Manual"
+.SH NAME
+inotify_add_watch \- add a watch to an initialized inotify instance
+.SH SYNOPSIS
+.B #include <inotify.h>
+.sp
+.BI "int inotify_add_watch(int " fd ", const char * " path ", __u32 " mask );
+.SH DESCRIPTION
+.B inotify_add_watch
+adds a watch on the file at pathname
+.I path
+to the inotify instance mapped by the file descriptor
+.I fd
+with the event mask given by the bitmask
+.IR mask .
+.SH "RETURN VALUE"
+On success,
+.B inotify_add_watch
+returns a new file descriptor, or negative one if an error occurred (in which
+case,
+.I errno
+is set appropriately).
+.SH ERRORS
+.TP
+.B EBADF
+The given file descriptor is not valid.
+.TP
+.B EINVAL
+The given event mask contains no legal events.
+.TP
+.B ENOMEM
+Insufficient kernel memory was available.
+.TP
+.B ENOSPC
+The user limit on the total number of inotify watches was reached or the
+kernel failed to allocate a needed resource.
+.B EACCESS
+Read access to the given file is not permitted.
+.B EFAULT
+.I path
+points outside of the process's accessible address space.
+.B
+.SH "HISTORY"
+Inotify was merged into the 2.6.13 Linux kernel.
+.SH "SEE ALSO"
+.BR inotify_init (2),
+.BR inotify_rm_watch (2), and
+.BR read (2).

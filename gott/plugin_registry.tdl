@@ -1,0 +1,53 @@
+# tdl
+
+plugin ""
+interface tdl::resource
+enclosing-module tdl::schema_lang
+symbol plugin_lang_repatcher
+
+plugin ""
+interface tdl::resource
+enclosing-module gott::configuration
+symbol plugin_tdl
+
+# notify_fs
+plugin gott::notify_fs::kqueue_factory
+interface gott::notify_fs::engine_factory
+enclosing-module gott::notify_fs::kqueue
+symbol kqueue_plugin
+
+plugin gott::notify_fs::inotify_factory
+interface gott::notify_fs::engine_factory
+enclosing-module gott::notify_fs::inotify
+symbol inotify_plugin
+
+# main_loop
+plugin gott::events::select_loop
+interface gott::events::main_loop
+enclosing-module gott::events::select_loop
+symbol plugin
+feature gott::events::fd_manager
+feature gott::events::timer_manager
+feature gott::events::inprocess_message_manager
+feature gott::events::signal_manager
+
+plugin gott::events::kqueue_loop
+interface gott::events::main_loop
+enclosing-module gott::events::kqueue_loop
+symbol plugin
+priority high
+feature gott::events::fd_manager
+feature gott::events::timer_manager
+feature gott::events::inprocess_message_manager
+feature gott::events::signal_manager
+
+plugin gott::events::epoll_loop
+interface gott::events::main_loop
+enclosing-module gott::events::epoll_loop
+symbol plugin
+priority high
+feature gott::events::fd_manager
+feature gott::events::timer_manager
+feature gott::events::inprocess_message_manager
+feature gott::events::signal_manager
+

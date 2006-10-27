@@ -1,0 +1,6 @@
+/**
+\namespace gott::thread
+Helper classes for comfortable threading in C++. These should be seen as a
+complement for <a href="http://www.boost.org/doc/html/threads.html">
+Boost.Threads</a>.
+*/
