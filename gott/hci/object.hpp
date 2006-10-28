@@ -108,8 +108,9 @@ public:
    * \param path The path to find.
    * \return The found object or 0.
    */
-  GOTT_LOCAL inline object const *find(path_type const &path) const {
-    return const_cast<object *>(this)->find(path);
+  GOTT_LOCAL inline 
+  object const *find(path_type const &path, size_type offset = 0) const {
+    return const_cast<object *>(this)->find(path, offset);
   }
 
   /**
@@ -234,15 +235,27 @@ public:
    * Get the depth-first "begin" iterator.
    * \param max_depth Depth limit.
    */
-  GOTT_LOCAL df_iterator depth_first_begin(size_type max_depth = npos) {
+  GOTT_LOCAL
+  df_iterator depth_first_begin(size_type max_depth = npos) {
     return df_iterator(this, max_depth);
   }
 
   /**
    * Get the depth-first "end" iterator.
    */
-  GOTT_LOCAL df_iterator depth_first_end() {
+  GOTT_LOCAL
+  df_iterator depth_first_end() {
     return df_iterator(this);
+  }
+
+  GOTT_LOCAL
+  const_df_iterator depth_first_begin(size_type max_depth = npos) const {
+    return const_df_iterator(this, max_depth);
+  }
+
+  GOTT_LOCAL
+  const_df_iterator depth_first_end() const {
+    return const_df_iterator(this);
   }
 };
 
