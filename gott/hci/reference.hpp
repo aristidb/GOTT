@@ -43,6 +43,9 @@
 
 namespace gott { namespace hci {
 
+/**
+ * A reference to another object.
+ */
 class GOTT_EXPORT reference : public object {
 public:
   /**

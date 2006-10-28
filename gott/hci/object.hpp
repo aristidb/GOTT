@@ -143,6 +143,9 @@ public:
   virtual bool next_child(path_element &current) const;
 
 public:
+  /**
+   * A depth first iterator with stored path in tree and optional depth limit.
+   */
   template<class Type>
   class GOTT_LOCAL basic_df_iterator
     : public boost::iterator_facade <
@@ -163,10 +166,16 @@ public:
     {}
 
   public:
+    /**
+     * Get the path of the current element.
+     */
     path_type const &get_path() const {
       return path;
     }
 
+    /**
+     * Skip all children and go to the next sibling.
+     */
     void next_sibling() {
       path_element no;
       do {
@@ -216,12 +225,22 @@ public:
   };
 
 public:
+  /// Depth-first iterator.
   typedef basic_df_iterator<object> df_iterator;
+  /// Constant depth-first iterator.
   typedef basic_df_iterator<object const> const_df_iterator;
 
+  /**
+   * Get the depth-first "begin" iterator.
+   * \param max_depth Depth limit.
+   */
   GOTT_LOCAL df_iterator depth_first_begin(size_type max_depth = npos) {
     return df_iterator(this, max_depth);
   }
+
+  /**
+   * Get the depth-first "end" iterator.
+   */
   GOTT_LOCAL df_iterator depth_first_end() {
     return df_iterator(this);
   }

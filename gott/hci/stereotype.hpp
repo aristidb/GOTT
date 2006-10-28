@@ -43,17 +43,55 @@
 
 namespace gott { namespace hci {
 
+/**
+ * A stereotype is an "incomplete object". It has to be bound to a %container
+ * object.
+ * \see gott::hci::bound_stereotype
+ */
 class GOTT_EXPORT stereotype {
 public:
+  /// Pure virtual destructor.
   virtual ~stereotype() = 0;
-  virtual void *load_domains(object const *container) const = 0;
-  virtual void unload_domains(void *domains) const = 0;
-  virtual void *fetch_domain(void *domains, QID const &id) const = 0;
+
+protected:
+  friend class bound_stereotype;
+
+  /**
+   * Load a context for domain-specific objects.
+   * \param container The %container object.
+   * \return The context.
+   */
+  virtual void *load_context(object const *container) const = 0;
+
+  /**
+   * Unload a context for domain-specific objects.
+   * \param context The context.
+   */
+  virtual void unload_context(void *context) const = 0;
+
+  /**
+   * Fetch a domain-specific object from a context.
+   * \param context The context.
+   * \param id The QID of the domain.
+   */
+  virtual void *fetch_domain(void *context, QID const &id) const = 0;
 };
 
+/**
+ * A stereotype bound to a %container object.
+ * \see gott::hci::stereotype
+ * \see gott::hci::object
+ */
 class GOTT_EXPORT bound_stereotype : public object {
 public:
+  /**
+   * Constructor.
+   * \param unbound The unbound stereotype.
+   * \param container The %container object.
+   */
   bound_stereotype(stereotype const *unbound, object const *container);
+
+  /// Destructor.
   ~bound_stereotype();
 
 private:
@@ -62,7 +100,7 @@ private:
 private:
   stereotype const *unbound;
   object const *container;
-  void *domains;
+  void *context;
 };
 
 }}

@@ -47,12 +47,12 @@ bound_stereotype::bound_stereotype(stereotype const *unbound,
                                    object const *container)
 : unbound(unbound),
   container(container),
-  domains(unbound->load_domains(container)) {}
+  context(unbound->load_context(container)) {}
 
 bound_stereotype::~bound_stereotype() {
-  unbound->unload_domains(domains);
+  unbound->unload_context(context);
 }
 
 void *bound_stereotype::domain_specific(QID const &id) {
-  return unbound->fetch_domain(domains, id);
+  return unbound->fetch_domain(context, id);
 }
