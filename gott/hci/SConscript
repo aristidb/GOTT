@@ -38,4 +38,4 @@
 
 Import('env')
 
-env.Program('hci_test', 'test/test.cpp')
+env.Program('hci_test', env.Glob('test/*.cpp'))

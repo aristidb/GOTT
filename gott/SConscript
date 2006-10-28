@@ -104,6 +104,7 @@ env = env.Copy()
 env.Append(LIBS = ['gott_ui'])
 
 libobj_hci = env.Glob('hci/*.cpp')
+libobj_hci += env.Glob('format/*.cpp')
 env.SharedLibrary('gott_hci', libobj_hci)
 env = env.Copy()
 env.Append(LIBS = ['gott_hci'])
