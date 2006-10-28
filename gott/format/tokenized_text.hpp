@@ -12,7 +12,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Human Computer Interaction Library.
+ * The Original Code is Formatting.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
@@ -36,43 +36,27 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <testsoon.hpp>
-#include <gott/format/plaintext.hpp>
-#include <gott/format/text.hpp>
-#include <gott/format/tokenized_text.hpp>
+#ifndef GOTT_FORMAT_TOKENIZED_TEXT_HPP
+#define GOTT_FORMAT_TOKENIZED_TEXT_HPP
 
-using namespace gott::format;
+#include "plaintext.hpp"
+#include <gott/hci/container.hpp>
 
-TEST_GROUP(text) {
+namespace gott { namespace format {
 
-TEST(simple) {
-  text t("hallo");
-  Equals(make_plaintext(t), "hallo");
-}
+class GOTT_EXPORT tokenized_text
+: public gott::hci::container, plaintext {
+public:
+  GOTT_LOCAL tokenized_text(string const &delimiter) : delimiter(delimiter) {}
+  ~tokenized_text();
 
-TEST(tokenized) {
-  tokenized_text t(", ");
-  t.add(new text("Hallo"));
-  t.add(new text("Welt!"));
-  Equals(make_plaintext(t), "Hallo, Welt!");
-}
+private:
+  GOTT_LOCAL void *domain_specific(QID const &);
+  string render() const;
 
-TEST(nested tokenized) {
-  tokenized_text *inner = new tokenized_text("-");
-  inner->add(new text("Super"));
-  inner->add(new text("Duper"));
-  inner->add(new text("C++"));
-  inner->add(new text("Dingsie"));
+  string delimiter;
+};
 
-  tokenized_text outer(" ");
-  outer.add(new text("Wer"));
-  outer.add(new text("ist"));
-  outer.add(new text("das"));
-  outer.add(inner);
-  outer.add(new text("?"));
+}}
 
-  // excuse the space before the question mark, please
-  Equals(make_plaintext(outer), "Wer ist das Super-Duper-C++-Dingsie ?");
-}
-
-}
+#endif

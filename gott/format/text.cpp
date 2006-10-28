@@ -12,7 +12,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Human Computer Interaction Library.
+ * The Original Code is Formatting.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
@@ -36,43 +36,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <testsoon.hpp>
-#include <gott/format/plaintext.hpp>
-#include <gott/format/text.hpp>
-#include <gott/format/tokenized_text.hpp>
+#include "text.hpp"
+#include <gott/properties/concrete_property.hpp>
 
-using namespace gott::format;
+using gott::format::text;
+using gott::string;
+using namespace gott::properties;
 
-TEST_GROUP(text) {
+class text::impl {
+public:
+  impl(string const &contents) : contents(contents) {}
+  concrete_property<string> contents;
+};
 
-TEST(simple) {
-  text t("hallo");
-  Equals(make_plaintext(t), "hallo");
-}
+text::text(string const &contents) : p(new impl(contents)) {}
+text::text(text const &o) 
+: gott::hci::object(), plaintext(), p(new impl(*o.p)) {}
+text::~text() {}
 
-TEST(tokenized) {
-  tokenized_text t(", ");
-  t.add(new text("Hallo"));
-  t.add(new text("Welt!"));
-  Equals(make_plaintext(t), "Hallo, Welt!");
-}
+property<string> &text::contents() { return p->contents; }
 
-TEST(nested tokenized) {
-  tokenized_text *inner = new tokenized_text("-");
-  inner->add(new text("Super"));
-  inner->add(new text("Duper"));
-  inner->add(new text("C++"));
-  inner->add(new text("Dingsie"));
+string text::render() const { return contents().get(); }
 
-  tokenized_text outer(" ");
-  outer.add(new text("Wer"));
-  outer.add(new text("ist"));
-  outer.add(new text("das"));
-  outer.add(inner);
-  outer.add(new text("?"));
-
-  // excuse the space before the question mark, please
-  Equals(make_plaintext(outer), "Wer ist das Super-Duper-C++-Dingsie ?");
-}
-
+void *text::domain_specific(QID const &domain) {
+  if (domain == plaintext::qid)
+    return static_cast<plaintext *>(this);
+  return object::domain_specific(domain);
 }

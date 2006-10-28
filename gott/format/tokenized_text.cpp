@@ -12,7 +12,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Human Computer Interaction Library.
+ * The Original Code is Formatting.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
@@ -36,43 +36,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <testsoon.hpp>
-#include <gott/format/plaintext.hpp>
-#include <gott/format/text.hpp>
-#include <gott/format/tokenized_text.hpp>
+#include "tokenized_text.hpp"
+#include <gott/string/buffer.hpp>
 
-using namespace gott::format;
+using gott::format::tokenized_text;
+using gott::hci::container;
 
-TEST_GROUP(text) {
+tokenized_text::~tokenized_text() {}
 
-TEST(simple) {
-  text t("hallo");
-  Equals(make_plaintext(t), "hallo");
+void *tokenized_text::domain_specific(QID const &domain) {
+  if (domain == plaintext::qid)
+    return static_cast<plaintext *>(this);
+  return container::domain_specific(domain);
 }
 
-TEST(tokenized) {
-  tokenized_text t(", ");
-  t.add(new text("Hallo"));
-  t.add(new text("Welt!"));
-  Equals(make_plaintext(t), "Hallo, Welt!");
-}
-
-TEST(nested tokenized) {
-  tokenized_text *inner = new tokenized_text("-");
-  inner->add(new text("Super"));
-  inner->add(new text("Duper"));
-  inner->add(new text("C++"));
-  inner->add(new text("Dingsie"));
-
-  tokenized_text outer(" ");
-  outer.add(new text("Wer"));
-  outer.add(new text("ist"));
-  outer.add(new text("das"));
-  outer.add(inner);
-  outer.add(new text("?"));
-
-  // excuse the space before the question mark, please
-  Equals(make_plaintext(outer), "Wer ist das Super-Duper-C++-Dingsie ?");
-}
-
+gott::string tokenized_text::render() const {
+  string_buffer result;
+  const_df_iterator it = ++depth_first_begin(1); // immediate children
+  const_df_iterator end = depth_first_end();
+  if (it != end) {
+    result += it->domain_specific<plaintext>()->render();
+    while (++it != end) {
+      result += delimiter;
+      result += it->domain_specific<plaintext>()->render();
+    }
+  }
+  return result;
 }

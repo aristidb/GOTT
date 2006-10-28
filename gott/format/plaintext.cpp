@@ -12,7 +12,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Human Computer Interaction Library.
+ * The Original Code is Formatting.
  *
  * The Initial Developer of the Original Code is
  * Aristid Breitkreuz (aribrei@arcor.de).
@@ -36,43 +36,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <testsoon.hpp>
-#include <gott/format/plaintext.hpp>
-#include <gott/format/text.hpp>
-#include <gott/format/tokenized_text.hpp>
+#include "plaintext.hpp"
 
-using namespace gott::format;
+using gott::format::plaintext;
 
-TEST_GROUP(text) {
+gott::QID const plaintext::qid("gott::format::plaintext");
 
-TEST(simple) {
-  text t("hallo");
-  Equals(make_plaintext(t), "hallo");
-}
+plaintext::~plaintext() {}
 
-TEST(tokenized) {
-  tokenized_text t(", ");
-  t.add(new text("Hallo"));
-  t.add(new text("Welt!"));
-  Equals(make_plaintext(t), "Hallo, Welt!");
-}
-
-TEST(nested tokenized) {
-  tokenized_text *inner = new tokenized_text("-");
-  inner->add(new text("Super"));
-  inner->add(new text("Duper"));
-  inner->add(new text("C++"));
-  inner->add(new text("Dingsie"));
-
-  tokenized_text outer(" ");
-  outer.add(new text("Wer"));
-  outer.add(new text("ist"));
-  outer.add(new text("das"));
-  outer.add(inner);
-  outer.add(new text("?"));
-
-  // excuse the space before the question mark, please
-  Equals(make_plaintext(outer), "Wer ist das Super-Duper-C++-Dingsie ?");
-}
-
+gott::string gott::format::make_plaintext(gott::hci::object const &obj) {
+  return obj.domain_specific<plaintext>()->render();  
 }
