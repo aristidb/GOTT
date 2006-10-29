@@ -37,10 +37,12 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include <testsoon.hpp>
+#include <gott/hci/reference.hpp>
 #include <gott/format/plaintext.hpp>
 #include <gott/format/text.hpp>
 #include <gott/format/tokenized_text.hpp>
 
+using gott::hci::reference;
 using namespace gott::format;
 
 TEST_GROUP(text) {
@@ -95,6 +97,20 @@ TEST(inner change) {
 
   t1->contents().set("a");
   Equals(rend.get(), "a;2");
+}
+
+TEST(reference) {
+  tokenized_text outer("#");
+  text inner("x");
+  outer.add(new reference(&inner));
+  outer.add(new reference(&inner));
+  outer.add(new reference(&inner));
+  
+  plaintext_renderer rend(outer);
+  Equals(rend.get(), "x#x#x");
+
+  inner.contents().set("y");
+  Equals(rend.get(), "y#y#y");
 }
 
 }

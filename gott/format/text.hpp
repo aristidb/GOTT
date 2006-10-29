@@ -47,13 +47,28 @@
 
 namespace gott { namespace format {
 
+/**
+ * Text entity. Contains a simple UTF-8 encoded string. Can be rendered with
+ * gott::format::plaintext_renderer.
+ */
 class GOTT_EXPORT text : public hci::object, plaintext {
 public:
+  /**
+   * Constructor.
+   * \param contents The initial contents of this entity.
+   */
   text(string const &contents);
+
+  /// Copy-constructor.
   text(text const &other);
+
+  /// Destructor.
   ~text();
 
+  /// Access the contents.
   properties::property<string> &contents();
+
+  /// Access the contents.
   properties::property<string> const &contents() const {
     return const_cast<text *>(this)->contents();
   }

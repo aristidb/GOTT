@@ -45,29 +45,52 @@
 
 namespace gott { namespace format {
 
+/**
+ * Baseclass / accessclass for plaintext entities. Usually used from
+ * gott::hci::object::domain_specific().
+ */
 class GOTT_EXPORT plaintext {
 public:
+  /// The QID of the class.
   static QID const qid;
 
+  /// Render freshly to a string.
   virtual string render() const = 0;
+
+  /// Signal emitted when rendering must be done again.
   virtual boost::signal<void ()> &on_invalidate() const = 0;
+
+  /// Destructor.
   virtual ~plaintext() = 0;
 };
 
+/**
+ * Renderer for plain text. Takes a gott::hci::object and makes text from it.
+ */
 class plaintext_renderer {
 public:
+  /**
+   * Constructor.
+   * \param obj The object to render.
+   */
   GOTT_EXPORT
   plaintext_renderer(gott::hci::object const &obj);
 
-  GOTT_EXPORT void invalidate();
-
+  /// Access the rendered string.
   string const &get() const { return cache; }
 
 private:
+  void invalidate();
+
   plaintext const *obj;
   string cache;
 };
 
+/**
+ * Convenience interface to plaintext_renderer if you need to render only once.
+ * \param obj The object to render.
+ * \return The rendering result.
+ */
 inline string make_plaintext(gott::hci::object const &obj) {
   plaintext_renderer rend(obj);
   return rend.get();

@@ -44,10 +44,21 @@
 
 namespace gott { namespace format {
 
+/**
+ * Tokenized text. Contains a number of plaintext entities.
+ * Entities are delimited by a delimiter string.
+ * Can be rendered with gott::format::plaintext_renderer.
+ */
 class GOTT_EXPORT tokenized_text
 : public gott::hci::container, plaintext {
 public:
+  /**
+   * Constructor.
+   * \param delimiter The delimiter string.
+   */
   GOTT_LOCAL tokenized_text(string const &delimiter) : delimiter(delimiter) {}
+
+  /// Destructor.
   ~tokenized_text();
 
 private:
