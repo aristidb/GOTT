@@ -41,6 +41,7 @@
 
 #include <gott/hci/object.hpp>
 #include <gott/string/qid.hpp>
+#include <boost/signal.hpp>
 
 namespace gott { namespace format {
 
@@ -49,10 +50,28 @@ public:
   static QID const qid;
 
   virtual string render() const = 0;
+  virtual boost::signal<void ()> &on_invalidate() const = 0;
   virtual ~plaintext() = 0;
 };
 
-GOTT_EXPORT string make_plaintext(gott::hci::object const &);
+class plaintext_renderer {
+public:
+  GOTT_EXPORT
+  plaintext_renderer(gott::hci::object const &obj);
+
+  GOTT_EXPORT void invalidate();
+
+  string const &get() const { return cache; }
+
+private:
+  plaintext const *obj;
+  string cache;
+};
+
+inline string make_plaintext(gott::hci::object const &obj) {
+  plaintext_renderer rend(obj);
+  return rend.get();
+}
 
 }}
 

@@ -38,6 +38,7 @@
 
 #include "text.hpp"
 #include <gott/properties/concrete_property.hpp>
+#include <gott/properties/signal_notification.hpp>
 
 using gott::format::text;
 using gott::string;
@@ -46,7 +47,7 @@ using namespace gott::properties;
 class text::impl {
 public:
   impl(string const &contents) : contents(contents) {}
-  concrete_property<string> contents;
+  concrete_property<string, signal_notification> contents;
 };
 
 text::text(string const &contents) : p(new impl(contents)) {}
@@ -62,4 +63,8 @@ void *text::domain_specific(QID const &domain) {
   if (domain == plaintext::qid)
     return static_cast<plaintext *>(this);
   return object::domain_specific(domain);
+}
+
+boost::signal<void ()> &text::on_invalidate() const {
+  return p->contents.on_change();
 }

@@ -37,13 +37,26 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "plaintext.hpp"
+#include <gott/exceptions.hpp>
+#include <boost/bind.hpp>
 
 using gott::format::plaintext;
+using gott::format::plaintext_renderer;
 
 gott::QID const plaintext::qid("gott::format::plaintext");
 
 plaintext::~plaintext() {}
 
-gott::string gott::format::make_plaintext(gott::hci::object const &obj) {
-  return obj.domain_specific<plaintext>()->render();  
+plaintext_renderer::plaintext_renderer(gott::hci::object const &x)
+: obj(x.domain_specific<plaintext>()) {
+  if (!obj)
+    throw gott::user_error("non-plaintext object");
+  obj->on_invalidate().connect(
+    boost::bind(&plaintext_renderer::invalidate, this));
+  invalidate();
 }
+
+void plaintext_renderer::invalidate() {
+  cache = obj->render();
+}
+

@@ -70,6 +70,9 @@ public:
    */
   GOTT_LOCAL size_type size() const { return children.size(); }
 
+protected:
+  virtual void before_add(object *child);
+
 private:
   typedef boost::ptr_vector<object> vector;
   vector children;

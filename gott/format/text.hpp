@@ -60,8 +60,8 @@ public:
 
 private:
   GOTT_LOCAL void *domain_specific(QID const &);
-
   GOTT_LOCAL string render() const;
+  GOTT_LOCAL boost::signal<void ()> &on_invalidate() const;
 
   class impl;
   boost::scoped_ptr<impl> p;

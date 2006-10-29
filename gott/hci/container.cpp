@@ -46,8 +46,11 @@ container::container() {}
 container::~container() {}
 
 void container::add(object *child) {
+  before_add(child);
   children.push_back(child);
 }
+
+void container::before_add(object *child) {}
 
 object *container::find(object::path_type const &path, size_type offset) {
   if (path.size() <= offset)
@@ -75,3 +78,4 @@ bool container::first_child(path_element &current) const {
 bool container::next_child(path_element &current) const {
   return ++current < children.size();
 }
+

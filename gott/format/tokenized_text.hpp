@@ -52,9 +52,12 @@ public:
 
 private:
   GOTT_LOCAL void *domain_specific(QID const &);
-  string render() const;
+  GOTT_LOCAL string render() const;
+  GOTT_LOCAL boost::signal<void ()> &on_invalidate() const;
+  GOTT_LOCAL void before_add(object *);
 
   string delimiter;
+  mutable boost::signal<void ()> invalidate_;
 };
 
 }}

@@ -75,4 +75,26 @@ TEST(nested tokenized) {
   Equals(make_plaintext(outer), "Wer ist das Super-Duper-C++-Dingsie ?");
 }
 
+TEST(change) {
+  text t("old");
+  plaintext_renderer rend(t);
+  Equals(rend.get(), "old");
+  t.contents().set("new");
+  Equals(rend.get(), "new");
+}
+
+TEST(inner change) {
+  tokenized_text outer(";");
+  text *t1 = new text("1");
+  outer.add(t1);
+  text *t2 = new text("2");
+  outer.add(t2);
+
+  plaintext_renderer rend(outer);
+  Equals(rend.get(), "1;2");
+
+  t1->contents().set("a");
+  Equals(rend.get(), "a;2");
+}
+
 }

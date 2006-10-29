@@ -38,6 +38,8 @@
 
 #include "tokenized_text.hpp"
 #include <gott/string/buffer.hpp>
+#include <gott/exceptions.hpp>
+#include <boost/ref.hpp>
 
 using gott::format::tokenized_text;
 using gott::hci::container;
@@ -62,4 +64,15 @@ gott::string tokenized_text::render() const {
     }
   }
   return result;
+}
+
+boost::signal<void ()> &tokenized_text::on_invalidate() const {
+  return invalidate_;
+}
+
+void tokenized_text::before_add(object *child) {
+  plaintext *pt = child->domain_specific<plaintext>();
+  if (!pt)
+    throw gott::user_error("non-plaintext object");
+  pt->on_invalidate().connect(invalidate_);
 }
