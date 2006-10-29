@@ -42,6 +42,7 @@
 #include <gott/hci/object.hpp>
 #include <gott/string/qid.hpp>
 #include <boost/signal.hpp>
+#include <boost/optional.hpp>
 
 namespace gott { namespace format {
 
@@ -77,13 +78,13 @@ public:
   plaintext_renderer(gott::hci::object const &obj);
 
   /// Access the rendered string.
-  string const &get() const { return cache; }
+  GOTT_EXPORT string const &get();
 
 private:
   void invalidate();
 
   plaintext const *obj;
-  string cache;
+  boost::optional<string> cache;
 };
 
 /**

@@ -39,6 +39,7 @@
 #include "plaintext.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/bind.hpp>
+#include <boost/none.hpp>
 
 using gott::format::plaintext;
 using gott::format::plaintext_renderer;
@@ -53,10 +54,15 @@ plaintext_renderer::plaintext_renderer(gott::hci::object const &x)
     throw gott::user_error("non-plaintext object");
   obj->on_invalidate().connect(
     boost::bind(&plaintext_renderer::invalidate, this));
-  invalidate();
+  get();
 }
 
 void plaintext_renderer::invalidate() {
-  cache = obj->render();
+  cache = boost::none;
 }
 
+gott::string const &plaintext_renderer::get() {
+  if (!cache)
+    cache = obj->render();
+  return cache.get();
+}
