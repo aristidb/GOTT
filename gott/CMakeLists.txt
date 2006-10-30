@@ -16,7 +16,7 @@
 #
 # The Initial Developer of the Original Code is
 # Aristid Breitkreuz (aribrei@arcor.de).
-# Portions created by the Initial Developer are Copyright (C) 2005-2006
+# Portions created by the Initial Developer are Copyright (C) 2006
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s):
@@ -41,12 +41,7 @@ cmake_minimum_required(VERSION 2.4)
 
 # configuration -----------------------------------------------------
 
-include(CheckIncludeFile)
-check_include_file("unistd.h" HAS_UNISTD_H)
-
-if (HAS_UNISTD_H)
-	add_definitions(-DHAS_UNISTD_H)
-endif (HAS_UNISTD_H)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/buildconf)
 
 find_package(Boost REQUIRED)
 find_package(X11 REQUIRED)
@@ -54,16 +49,17 @@ find_package(X11 REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS} ${X11_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS} ${X11_LIBRARY_DIRS})
 
+include_directories(${PROJECT_SOURCE_DIR}/..)
+include_directories(${PROJECT_SOURCE_DIR}/../ext/testsoon/include)
+
+include(PlatformBasic)
+include(PlatformHeaders)
+include(GccVisibility)
+
+set(CMAKE_SHARED_MODULE_PREFIX )
+set(CMAKE_SHARED_MODULE_SUFFIX .plugin)
+
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=8)
-
-include_directories(.. ../ext/testsoon/include)
-
-if (UNIX)
-  exec_program("uname -s" OUTPUT_VARIABLE KERNEL)
-  if (KERNEL STREQUAL Linux)
-    set (LINUX 1)
-  endif (KERNEL STREQUAL Linux)
-endif (UNIX)
 
 # targets -----------------------------------------------------------
 
@@ -171,3 +167,59 @@ target_link_libraries(throttled_yes gott_system)
 # EXECUTABLE just_windows
 add_executable(just_windows examples/just_windows.cpp)
 target_link_libraries(just_windows gott_ui)
+
+# PLUGIN tdl_builtins
+file(GLOB src_tdl_builtins
+  tdl/schema/types/*.cpp
+  tdl/structure/repatchers/*.cpp
+)
+#add_library(tdl_builtins MODULE ${src_tdl_builtins})
+add_library(tdl/tdl_builtins MODULE ${src_tdl_builtins})
+
+# PLUGIN tdl_schema_lang
+file(GLOB src_tdl_schema_lang
+  tdl/schema_lang/types/*.cpp
+)
+#add_library(tdl_schema_lang MODULE ${src_tdl_schema_lang})
+add_library(tdl/tdl_schema_lang MODULE ${src_tdl_schema_lang})
+
+# PLUGIN notify_fs_kqueue
+if (HAS_KQUEUE)
+  file(GLOB src_notify_fs_kqueue
+    notify_fs/kqueue/*.cpp
+  )
+  #add_library(notify_fs_kqueue MODULE ${src_notify_fs_kqueue})
+  add_library(notify_fs/notify_kqueue MODULE ${src_notify_fs_kqueue})
+endif (HAS_KQUEUE)
+
+# PLUGIN notify_fs_inotify
+if (HAS_INOTIFY)
+  file(GLOB src_notify_fs_inotify
+    notify_fs/inotify/*.cpp
+  )
+  #add_library(notify_fs_inotify MODULE ${src_notify_fs_kqueue})
+  add_library(notify_fs/notify_inotify MODULE ${src_notify_fs_inotify})
+endif (HAS_INOTIFY)
+
+# PLUGIN configuration
+file(GLOB src_configuration
+  configuration/*.cpp
+)
+#add_library(configuration MODULE ${src_configuration})
+add_library(configuration/config MODULE ${src_configuration})
+
+# PLUGIN events_kqueue_loop
+if (HAS_KQUEUE)
+  #add_library(events_kqueue_loop MODULE events/loops/kqueue_loop.cpp)
+  add_library(events/loops/kqueue_loop MODULE events/loops/kqueue_loop.cpp)
+endif (HAS_KQUEUE)
+
+# PLUGIN events_epoll_loop
+if (HAS_EPOLL)
+  #add_library(events_epoll_loop MODULE events/loops/epoll_loop.cpp)
+  add_library(events/loops/epoll_loop MODULE events/loops/epoll_loop.cpp)
+endif (HAS_EPOLL)
+
+# PLUGIN events_select_loop
+#add_library(events_select_loop MODULE events/loops/select_loop.cpp)
+add_library(events/loops/select_loop MODULE events/loops/select_loop.cpp)
