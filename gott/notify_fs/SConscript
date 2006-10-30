@@ -37,7 +37,6 @@
 #
 # ***** END LICENSE BLOCK *****
 
-import glob
 Import('env')
 
 if env['SYS_INOTIFY'] == 1:
@@ -46,4 +45,4 @@ if env['SYS_INOTIFY'] == 1:
 if env['SYS_KQUEUE'] == 1:
   env.LoadableModule('notify_kqueue', env.Glob('kqueue/*.cpp'))
 
-env.Program('test', 'test.cpp')
+env.Program('notify_test', 'test/test.cpp')

@@ -44,7 +44,6 @@ libobj = env.Glob('string/*.cpp')
 libobj += ['exceptions.cpp', 'xany/xany.cpp']
 
 libobj_plugin = env.Glob('plugin/*.cpp')
-libobj_plugin.remove('plugin/test.cpp')
 libobj += libobj_plugin
 
 libobj_syswrap = env.Glob('syswrap/*.cpp')
@@ -81,11 +80,9 @@ env.Append(LIBS = ['gott_core'])
 libobj_system = []
 
 libobj_events = env.Glob('events/*.cpp')
-libobj_events.remove('events/mq_loop_test.cpp')
 libobj_system += libobj_events
 
 libobj_notify_fs = env.Glob('notify_fs/*.cpp')
-libobj_notify_fs.remove('notify_fs/test.cpp')
 libobj_system += libobj_notify_fs
 
 env.SharedLibrary('gott_system', libobj_system)
