@@ -36,8 +36,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "watch.hpp"
-#include "notification_engine.hpp"
+#include <gott/notify_fs/watch.hpp>
+#include <gott/notify_fs/notification_engine.hpp>
 #include <gott/events/main_loop.hpp>
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/quit_manager.hpp>

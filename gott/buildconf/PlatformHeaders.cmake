@@ -45,12 +45,3 @@ if (HAS_UNISTD_H)
 endif (HAS_UNISTD_H)
 
 check_include_file("sys/epoll.h" HAS_EPOLL)
-
-if (HAS_EPOLL)
-  set(BUILD_EPOLL 1
-    CACHE BOOL "Build epoll(4) support")
-  if (BUILD_EPOLL)
-    Message("epoll(4) active")
-    add_definitions(-DBUILD_EPOLL)
-  endif (BUILD_EPOLL)
-endif (HAS_EPOLL)

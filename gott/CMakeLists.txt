@@ -55,6 +55,7 @@ include_directories(${PROJECT_SOURCE_DIR}/../ext/testsoon/include)
 
 include(PlatformBasic)
 include(PlatformHeaders)
+include(PlatformExtra)
 include(GccVisibility)
 
 set(CMAKE_SHARED_MODULE_PREFIX )
@@ -194,6 +195,13 @@ target_link_libraries(syswrap_test gott_core)
 add_executable(transformations graphics/test/transformations.cpp)
 target_link_libraries(transformations gott_graphics)
 
+# EXECUTABLE notify_test
+file(GLOB src_notify_test
+  notify_fs/test/*.cpp
+)
+add_executable(notify_test ${src_notify_test})
+target_link_libraries(notify_test gott_system)
+
 # PLUGIN tdl_builtins
 file(GLOB src_tdl_builtins
   tdl/schema/types/*.cpp
@@ -223,7 +231,7 @@ if (BUILD_INOTIFY)
   file(GLOB src_notify_fs_inotify
     notify_fs/inotify/*.cpp
   )
-  add_library(notify_fs_inotify MODULE ${src_notify_fs_kqueue})
+  add_library(notify_fs_inotify MODULE ${src_notify_fs_inotify})
   #add_library(notify_fs/notify_inotify MODULE ${src_notify_fs_inotify})
 endif (BUILD_INOTIFY)
 
