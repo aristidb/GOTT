@@ -306,7 +306,7 @@ void metadata_manager::load_core() {
 
   if (!loaded) {
     // just add the metadata necessary for reading metadata from files
-    module_descriptor tdl_builtins("tdl/tdl_builtins.plugin");
+    module_descriptor tdl_builtins("tdl_builtins.plugin");
     add_module(
         tdl_builtins,
         module_information("tdl::builtins"),

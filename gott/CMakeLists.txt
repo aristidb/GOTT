@@ -56,7 +56,6 @@ include_directories(${PROJECT_SOURCE_DIR}/../ext/testsoon/include)
 include(PlatformBasic)
 include(PlatformHeaders)
 include(GccVisibility)
-include(BoostLib)
 
 set(CMAKE_SHARED_MODULE_PREFIX )
 set(CMAKE_SHARED_MODULE_SUFFIX .plugin)
