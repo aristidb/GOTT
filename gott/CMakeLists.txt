@@ -87,7 +87,8 @@ if (UNIX)
     gott_core
     boost_thread${Boost_SUFFIX}
     boost_signals${Boost_SUFFIX}
-    dl)
+    dl
+  )
 endif (UNIX)
 
 # LIBRARY gott_system
@@ -174,6 +175,24 @@ target_link_libraries(throttled_yes gott_system)
 # EXECUTABLE just_windows
 add_executable(just_windows examples/just_windows.cpp)
 target_link_libraries(just_windows gott_ui)
+
+# EXECUTABLE test_repatcher
+add_executable(test_repatcher tdl/schema_lang/playground/test_repatcher.cpp)
+target_link_libraries(test_repatcher gott_core)
+
+# EXECUTABLE mq_test
+add_executable(mq_test thread/mq_test.cpp)
+if (UNIX)
+  target_link_libraries(mq_test boost_thread${Boost_SUFFIX})
+endif (UNIX)
+
+# EXECUTABLE syswrap_test
+add_executable(syswrap_test syswrap/test.cpp)
+target_link_libraries(syswrap_test gott_core)
+
+# EXECUTABLE transformations
+add_executable(transformations graphics/test/transformations.cpp)
+target_link_libraries(transformations gott_graphics)
 
 # PLUGIN tdl_builtins
 file(GLOB src_tdl_builtins
