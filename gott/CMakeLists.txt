@@ -44,6 +44,7 @@ cmake_minimum_required(VERSION 2.4)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/buildconf)
 
 find_package(Boost REQUIRED)
+set(Boost_SUFFIX "" CACHE STRING "Boost library suffix")
 find_package(X11 REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS} ${X11_INCLUDE_DIRS})
@@ -55,6 +56,7 @@ include_directories(${PROJECT_SOURCE_DIR}/../ext/testsoon/include)
 include(PlatformBasic)
 include(PlatformHeaders)
 include(GccVisibility)
+include(BoostLib)
 
 set(CMAKE_SHARED_MODULE_PREFIX )
 set(CMAKE_SHARED_MODULE_SUFFIX .plugin)
@@ -81,7 +83,13 @@ endif (UNIX)
 set(syswrap ${syswrap_portable} ${syswrap_unix} ${syswrap_linux})
 
 add_library(gott_core SHARED ${src_core} ${syswrap})
-target_link_libraries(gott_core boost_thread boost_signals dl)
+if (UNIX)
+  target_link_libraries(
+    gott_core
+    boost_thread${Boost_SUFFIX}
+    boost_signals${Boost_SUFFIX}
+    dl)
+endif (UNIX)
 
 # LIBRARY gott_system
 file(GLOB src_system
@@ -173,53 +181,53 @@ file(GLOB src_tdl_builtins
   tdl/schema/types/*.cpp
   tdl/structure/repatchers/*.cpp
 )
-#add_library(tdl_builtins MODULE ${src_tdl_builtins})
-add_library(tdl/tdl_builtins MODULE ${src_tdl_builtins})
+add_library(tdl_builtins MODULE ${src_tdl_builtins})
+#add_library(tdl/tdl_builtins MODULE ${src_tdl_builtins})
 
 # PLUGIN tdl_schema_lang
 file(GLOB src_tdl_schema_lang
   tdl/schema_lang/types/*.cpp
 )
-#add_library(tdl_schema_lang MODULE ${src_tdl_schema_lang})
-add_library(tdl/tdl_schema_lang MODULE ${src_tdl_schema_lang})
+add_library(tdl_schema_lang MODULE ${src_tdl_schema_lang})
+#add_library(tdl/tdl_schema_lang MODULE ${src_tdl_schema_lang})
 
 # PLUGIN notify_fs_kqueue
-if (HAS_KQUEUE)
+if (BUILD_KQUEUE)
   file(GLOB src_notify_fs_kqueue
     notify_fs/kqueue/*.cpp
   )
-  #add_library(notify_fs_kqueue MODULE ${src_notify_fs_kqueue})
-  add_library(notify_fs/notify_kqueue MODULE ${src_notify_fs_kqueue})
-endif (HAS_KQUEUE)
+  add_library(notify_fs_kqueue MODULE ${src_notify_fs_kqueue})
+  #add_library(notify_fs/notify_kqueue MODULE ${src_notify_fs_kqueue})
+endif (BUILD_KQUEUE)
 
 # PLUGIN notify_fs_inotify
-if (HAS_INOTIFY)
+if (BUILD_INOTIFY)
   file(GLOB src_notify_fs_inotify
     notify_fs/inotify/*.cpp
   )
-  #add_library(notify_fs_inotify MODULE ${src_notify_fs_kqueue})
-  add_library(notify_fs/notify_inotify MODULE ${src_notify_fs_inotify})
-endif (HAS_INOTIFY)
+  add_library(notify_fs_inotify MODULE ${src_notify_fs_kqueue})
+  #add_library(notify_fs/notify_inotify MODULE ${src_notify_fs_inotify})
+endif (BUILD_INOTIFY)
 
 # PLUGIN configuration
 file(GLOB src_configuration
   configuration/*.cpp
 )
-#add_library(configuration MODULE ${src_configuration})
-add_library(configuration/config MODULE ${src_configuration})
+add_library(configuration MODULE ${src_configuration})
+#add_library(configuration/config MODULE ${src_configuration})
 
 # PLUGIN events_kqueue_loop
-if (HAS_KQUEUE)
-  #add_library(events_kqueue_loop MODULE events/loops/kqueue_loop.cpp)
-  add_library(events/loops/kqueue_loop MODULE events/loops/kqueue_loop.cpp)
-endif (HAS_KQUEUE)
+if (BUILD_KQUEUE)
+  add_library(events_kqueue_loop MODULE events/loops/kqueue_loop.cpp)
+  #add_library(events/loops/kqueue_loop MODULE events/loops/kqueue_loop.cpp)
+endif (BUILD_KQUEUE)
 
 # PLUGIN events_epoll_loop
-if (HAS_EPOLL)
-  #add_library(events_epoll_loop MODULE events/loops/epoll_loop.cpp)
-  add_library(events/loops/epoll_loop MODULE events/loops/epoll_loop.cpp)
-endif (HAS_EPOLL)
+if (BUILD_EPOLL)
+  add_library(events_epoll_loop MODULE events/loops/epoll_loop.cpp)
+  #add_library(events/loops/epoll_loop MODULE events/loops/epoll_loop.cpp)
+endif (BUILD_EPOLL)
 
 # PLUGIN events_select_loop
-#add_library(events_select_loop MODULE events/loops/select_loop.cpp)
-add_library(events/loops/select_loop MODULE events/loops/select_loop.cpp)
+add_library(events_select_loop MODULE events/loops/select_loop.cpp)
+#add_library(events/loops/select_loop MODULE events/loops/select_loop.cpp)

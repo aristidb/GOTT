@@ -37,8 +37,13 @@
 # ***** END LICENSE BLOCK *****
 
 if (UNIX)
-  exec_program("uname -s" OUTPUT_VARIABLE KERNEL)
-  if (KERNEL STREQUAL Linux)
+  if (CMAKE_SYSTEM_NAME STREQUAL Linux)
     set (LINUX 1)
-  endif (KERNEL STREQUAL Linux)
+  endif (CMAKE_SYSTEM_NAME STREQUAL Linux)
+  if (CMAKE_SYSTEM_NAME MATCHES BSD)
+    set (BSD 1)
+  endif (CMAKE_SYSTEM_NAME MATCHES BSD)
+  if (APPLE)
+    set (BSD 1)
+  endif (APPLE)
 endif (UNIX)
