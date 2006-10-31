@@ -74,7 +74,7 @@ file(GLOB src_core
 )
 set(syswrap_portable syswrap/clocks.cpp syswrap/errno.cpp)
 if (UNIX)
-  file(GLOB syswrap_unix syswrap/*_unix.cpp)
+  file(GLOB syswrap_unix syswrap/*_unix*.cpp)
   if (LINUX)
     file(GLOB syswrap_linux syswrap/*_linux.cpp)
   endif (LINUX)
