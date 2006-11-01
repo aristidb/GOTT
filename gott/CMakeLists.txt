@@ -202,20 +202,22 @@ file(GLOB src_notify_test
 add_executable(notify_test ${src_notify_test})
 target_link_libraries(notify_test gott_system)
 
+add_custom_target(plugins)
+
 # PLUGIN tdl_builtins
 file(GLOB src_tdl_builtins
   tdl/schema/types/*.cpp
   tdl/structure/repatchers/*.cpp
 )
 add_library(tdl_builtins MODULE ${src_tdl_builtins})
-#add_library(tdl/tdl_builtins MODULE ${src_tdl_builtins})
+add_dependencies(plugins tdl_builtins)
 
 # PLUGIN tdl_schema_lang
 file(GLOB src_tdl_schema_lang
   tdl/schema_lang/types/*.cpp
 )
 add_library(tdl_schema_lang MODULE ${src_tdl_schema_lang})
-#add_library(tdl/tdl_schema_lang MODULE ${src_tdl_schema_lang})
+add_dependencies(plugins tdl_schema_lang)
 
 # PLUGIN notify_fs_kqueue
 if (BUILD_KQUEUE)
@@ -223,7 +225,7 @@ if (BUILD_KQUEUE)
     notify_fs/kqueue/*.cpp
   )
   add_library(notify_fs_kqueue MODULE ${src_notify_fs_kqueue})
-  #add_library(notify_fs/notify_kqueue MODULE ${src_notify_fs_kqueue})
+  add_dependencies(plugins notify_fs_kqueue)
 endif (BUILD_KQUEUE)
 
 # PLUGIN notify_fs_inotify
@@ -232,7 +234,7 @@ if (BUILD_INOTIFY)
     notify_fs/inotify/*.cpp
   )
   add_library(notify_fs_inotify MODULE ${src_notify_fs_inotify})
-  #add_library(notify_fs/notify_inotify MODULE ${src_notify_fs_inotify})
+  add_dependencies(plugins notify_fs_inotify)
 endif (BUILD_INOTIFY)
 
 # PLUGIN configuration
@@ -240,20 +242,20 @@ file(GLOB src_configuration
   configuration/*.cpp
 )
 add_library(configuration MODULE ${src_configuration})
-#add_library(configuration/config MODULE ${src_configuration})
+add_dependencies(plugins configuration)
 
 # PLUGIN events_kqueue_loop
 if (BUILD_KQUEUE)
   add_library(events_kqueue_loop MODULE events/loops/kqueue_loop.cpp)
-  #add_library(events/loops/kqueue_loop MODULE events/loops/kqueue_loop.cpp)
+  add_dependencies(plugins events_kqueue_loop)
 endif (BUILD_KQUEUE)
 
 # PLUGIN events_epoll_loop
 if (BUILD_EPOLL)
   add_library(events_epoll_loop MODULE events/loops/epoll_loop.cpp)
-  #add_library(events/loops/epoll_loop MODULE events/loops/epoll_loop.cpp)
+  add_dependencies(plugins events_epoll_loop)
 endif (BUILD_EPOLL)
 
 # PLUGIN events_select_loop
 add_library(events_select_loop MODULE events/loops/select_loop.cpp)
-#add_library(events/loops/select_loop MODULE events/loops/select_loop.cpp)
+add_dependencies(plugins events_select_loop)
