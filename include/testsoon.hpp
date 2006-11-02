@@ -86,6 +86,7 @@ inline string object_to_string(string const &object) {
 
 #endif
 
+#ifndef IN_DOXYGEN
 #if defined(__EXCEPTIONS) || defined(_CPPUNWIND)
 #define TESTSOON_EXCEPTIONS 1
 #define TESTSOON_NO_EXCEPTIONS 0
@@ -93,6 +94,12 @@ inline string object_to_string(string const &object) {
 #define TESTSOON_EXCEPTIONS 0
 #define TESTSOON_NO_EXCEPTIONS 1
 #endif
+#endif
+
+class test_reporter;
+class test_info;
+class test_group;
+class test_failure;
 
 /**
  * Base class for reporters.
@@ -117,11 +124,6 @@ public:
 };
 
 #ifndef IN_DOXYGEN
-
-class test_reporter;
-class test_info;
-class test_group;
-class test_failure;
 
 class node {
 public:
