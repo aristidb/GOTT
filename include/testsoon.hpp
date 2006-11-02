@@ -94,16 +94,14 @@ inline string object_to_string(string const &object) {
 #define TESTSOON_NO_EXCEPTIONS 1
 #endif
 
-#ifndef IN_DOXYGEN
-
-class test_reporter;
-class test_info;
-class test_group;
-class test_failure;
-
+/**
+ * Base class for reporters.
+ */
 class test_reporter {
 public:
+  /// Indicates the start of a whole test run.
   virtual void start() {}
+  /// Indicates the end of a whole test run.
   virtual void stop() {}
   virtual void begin_group(test_group const &group) { (void)group; }
   virtual void end_group(test_group const &group) { (void)group; }
@@ -117,6 +115,13 @@ public:
                        string const &sequence_key) = 0;
   virtual ~test_reporter() {}
 };
+
+#ifndef IN_DOXYGEN
+
+class test_reporter;
+class test_info;
+class test_group;
+class test_failure;
 
 class node {
 public:
@@ -802,9 +807,10 @@ test_group(::testsoon::string const &filename) {
  * See @ref faq.
  *
  * @page tutorial Tutorial
- * This is a tutorial.
+ * "This is a tutorial."
  *
  * @page faq Frequently Asked Questions (FAQ)
+ * "This is a FAQ."
  */
 
 #endif
