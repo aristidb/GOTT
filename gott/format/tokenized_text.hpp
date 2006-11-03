@@ -41,6 +41,7 @@
 
 #include "plaintext.hpp"
 #include <gott/hci/container.hpp>
+#include <boost/optional.hpp>
 
 namespace gott { namespace format {
 
@@ -56,7 +57,7 @@ public:
    * Constructor.
    * \param delimiter The delimiter string.
    */
-  GOTT_LOCAL tokenized_text(string const &delimiter) : delimiter(delimiter) {}
+  tokenized_text(string const &delimiter);
 
   /// Destructor.
   ~tokenized_text();
@@ -69,6 +70,8 @@ private:
 
   string delimiter;
   mutable boost::signal<void ()> invalidate_;
+
+  mutable boost::optional<string> cache;
 };
 
 }}

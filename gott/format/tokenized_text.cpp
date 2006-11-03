@@ -39,10 +39,17 @@
 #include "tokenized_text.hpp"
 #include <gott/string/buffer.hpp>
 #include <gott/exceptions.hpp>
-#include <boost/ref.hpp>
+#include <boost/none.hpp>
+#include <boost/lambda/lambda.hpp>
 
 using gott::format::tokenized_text;
 using gott::hci::container;
+
+tokenized_text::tokenized_text(string const &delimiter)
+: delimiter(delimiter) {
+  using namespace boost::lambda;
+  invalidate_.connect(var(cache) = boost::none);
+}
 
 tokenized_text::~tokenized_text() {}
 
@@ -53,17 +60,20 @@ void *tokenized_text::domain_specific(QID const &domain) {
 }
 
 gott::string tokenized_text::render() const {
-  string_buffer result;
-  const_df_iterator it = ++depth_first_begin(1); // immediate children
-  const_df_iterator end = depth_first_end();
-  if (it != end) {
-    result += it->domain_specific<plaintext>()->render();
-    while (++it != end) {
-      result += delimiter;
+  if (!cache) {
+    string_buffer result;
+    const_df_iterator it = ++depth_first_begin(1); // immediate children
+    const_df_iterator end = depth_first_end();
+    if (it != end) {
       result += it->domain_specific<plaintext>()->render();
+      while (++it != end) {
+        result += delimiter;
+        result += it->domain_specific<plaintext>()->render();
+      }
     }
+    cache = result;
   }
-  return result;
+  return cache.get();
 }
 
 boost::signal<void ()> &tokenized_text::on_invalidate() const {
