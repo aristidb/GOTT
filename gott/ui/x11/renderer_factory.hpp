@@ -53,7 +53,6 @@ namespace gott{namespace ui{namespace x11{
   {
     public:
       static QID const qid;
-      renderer_factory();
       virtual Visual* visual( ::Window rootX11WindowHandle, ::Display * display, int screen ) = 0; 
       virtual int depth( ::Window rootX11WindowHandle, ::Display * display, int screen ) = 0; 
       virtual gott::graphics::renderer * renderer( ::Window x11WindowHandle, ::Display * display, int screen ) = 0; 

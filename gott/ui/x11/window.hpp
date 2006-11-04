@@ -50,8 +50,6 @@
 #include <gott/properties/signal_notification.hpp>
 
 namespace gott{namespace ui{namespace x11{
-namespace detail { struct agg_buffer; }
-
 
 /**
  * \brief x11 window class. 

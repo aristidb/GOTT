@@ -38,9 +38,12 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "gl_factory.hpp"
+#include <gott/plugin/plugin_builder.hpp>
 
 using gott::ui::x11::gl_factory; 
 using gott::graphics::renderer; 
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(gott_ui_x11_gl_factory, gott::ui::x11::gl_factory)
 
 gl_factory::~gl_factory()
 {
