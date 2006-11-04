@@ -108,7 +108,7 @@ public:
   unsigned bad;
 private:
   typedef bool (statistics::*bool_type)() const;
-  bool do_not_compare_implicit_bool() const;
+  bool do_not_compare_implicit_bool() const { return false; }
 public:
   operator bool_type() const {
     return bad == 0 ? &statistics::do_not_compare_implicit_bool : 0;
