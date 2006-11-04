@@ -106,6 +106,13 @@ public:
   statistics() : good(0), bad(0) {}
   unsigned good;
   unsigned bad;
+private:
+  typedef void (statistics::*bool_type)();
+  void dummy();
+public:
+  operator bool_type() const {
+    return bad == 0 ? &statistics::dummy : 0;
+  }
 };
 
 /**
