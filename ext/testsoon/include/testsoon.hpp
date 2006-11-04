@@ -86,6 +86,7 @@ inline string object_to_string(string const &object) {
 
 #endif
 
+#ifndef IN_DOXYGEN
 #if defined(__EXCEPTIONS) || defined(_CPPUNWIND)
 #define TESTSOON_EXCEPTIONS 1
 #define TESTSOON_NO_EXCEPTIONS 0
@@ -93,21 +94,43 @@ inline string object_to_string(string const &object) {
 #define TESTSOON_EXCEPTIONS 0
 #define TESTSOON_NO_EXCEPTIONS 1
 #endif
-
-#ifndef IN_DOXYGEN
+#endif
 
 class test_reporter;
 class test_info;
 class test_group;
 class test_failure;
 
+class statistics {
+public:
+  statistics() : good(0), bad(0) {}
+  unsigned good;
+  unsigned bad;
+private:
+  typedef void (statistics::*bool_type)();
+  void dummy();
+public:
+  operator bool_type() const {
+    return bad == 0 ? &statistics::dummy : 0;
+  }
+};
+
+/**
+ * Base class for reporters.
+ */
 class test_reporter {
 public:
+  /// Indicates the start of a whole test run.
   virtual void start() {}
+  /// Indicates the end of a whole test run.
   virtual void stop() {}
+  /// Indicates the start of a test group.
   virtual void begin_group(test_group const &group) { (void)group; }
+  /// Indicates the end of a test group.
   virtual void end_group(test_group const &group) { (void)group; }
+  /// Indicates that the next event will be success() or failure().
   virtual void before_tests(test_group const &group) { (void)group; }
+  /// Indicates that the next event will not be success() or failure().
   virtual void after_tests(test_group const &group) { (void)group; }
   virtual void success(test_info const &info, string const &sequence_key) {
     (void)info;
@@ -115,13 +138,16 @@ public:
   }
   virtual void failure(test_info const &info, test_failure const &failure, 
                        string const &sequence_key) = 0;
+  virtual void stats(statistics const &stat) { (void)stat; }
   virtual ~test_reporter() {}
 };
+
+#ifndef IN_DOXYGEN
 
 class node {
 public:
   node(test_group *, string const &, bool = false);
-  virtual void run(test_reporter &) const = 0;
+  virtual void run(test_reporter &, statistics &) const = 0;
   virtual ~node() {}
 
   test_group const * const parent;
@@ -146,7 +172,7 @@ public:
   
   void add(node *, bool);
 
-  void run(test_reporter &rep) const;
+  void run(test_reporter &, statistics &) const;
 
 private:
   node *child;
@@ -173,10 +199,16 @@ inline void node::print(stream_class &out) const {
 class test_holder : public test_group {
 public:
   test_holder() : test_group(0, string()) {}
-  void run(test_reporter &rep) {
+  statistics run(test_reporter &rep) {
+    statistics stats;
+    run(rep, stats);
+    return stats;
+  }
+  void run(test_reporter &rep, statistics &stats) {
     rep.start();
-    test_group::run(rep);
+    test_group::run(rep, stats);
     rep.stop();
+    rep.stats(stats);
   }
 };
 
@@ -255,24 +287,28 @@ protected:
 };
 
 class concise_reporter : public simple_reporter {
-  public:  
-  concise_reporter(stream &out = DEFAULT_STREAM) : simple_reporter(out), suc(0) {}
+public:  
+  concise_reporter(stream &out = DEFAULT_STREAM) 
+  : simple_reporter(out) {}
 
-  protected:
+private:
   typedef std::vector<failure_info> failure_vector;
   failure_vector reports;
   
-  int suc;
+  void stats(statistics const &x) {
+    out << (x.good + x.bad) << " tests, "
+        << x.good << " succeeded, "
+        << x.bad << " failed.\n";
+    out.flush();
+  }
   
   void write_report() {
     for (failure_vector::const_iterator it = reports.begin();
         it != reports.end();
         ++it)
       write_report_entry(*it);
-    size_t fails = reports.size();
-    out << std::endl << fails + suc << " Tests, " 
-        << suc << " succeeded, "
-        << fails << " failed." << std::endl;
+    out << '\n';
+    out.flush();
   }
 
   void write_report_entry(failure_info const &info) {
@@ -301,7 +337,6 @@ class concise_reporter : public simple_reporter {
 
   void success(test_info const &i, string const &k) {
     simple_reporter::success(i, k);
-    ++suc;
   }
     
   void failure(test_info const &i, test_failure const &x, string const &k) {
@@ -312,7 +347,6 @@ class concise_reporter : public simple_reporter {
   void stop() {
     write_report();
   }
-
 };
 
 typedef concise_reporter default_reporter;
@@ -331,16 +365,16 @@ inline void test_group::add(node *nchild, bool is_test) {
   }
 }
 
-inline void test_group::run(test_reporter &rep) const {
+inline void test_group::run(test_reporter &rep, statistics &stats) const {
   rep.begin_group(*this);
   if (test) {
     rep.before_tests(*this);
     for (node *it = test; it; it = it->next)
-      it->run(rep);
+      it->run(rep, stats);
     rep.after_tests(*this);
   }
   for (node *it = child; it; it = it->next)
-    it->run(rep);
+    it->run(rep, stats);
   rep.end_group(*this);
 }
 
@@ -424,8 +458,6 @@ private:
   value_type a;
   value_type b;
 };
-
-
 
 /**
  * Add this macro to exactly one source file to ensure proper instantiation.
@@ -540,8 +572,10 @@ private:
   try { \
     x; \
     reporter.success(*this, key); \
+    ++stats.good; \
   } catch (::testsoon::test_failure const &state) { \
     reporter.failure(*this, state, key); \
+    ++stats.bad; \
   }
 
 #else
@@ -549,10 +583,13 @@ private:
 #define TESTSOON_TESTRUN(x) \
   ::testsoon::test_failure state; \
   x; \
-  if (!state.is_failure()) \
+  if (!state.is_failure()) { \
     reporter.success(*this, key); \
-  else \
-    reporter.failure(*this, state, key);
+    ++stats.good; \
+  } else { \
+    reporter.failure(*this, state, key); \
+    ++stats.bad; \
+  }
 
 #endif
 
@@ -571,7 +608,10 @@ private:
     : public ::testsoon::test_info { \
       test_class () : ::testsoon::test_info( \
             test_group(__FILE__), name, __FILE__, __LINE__) {} \
-      void run(::testsoon::test_reporter &reporter) const { \
+      void run( \
+          ::testsoon::test_reporter &reporter, \
+          ::testsoon::statistics &stats \
+      ) const { \
         BOOST_PP_EXPR_IIF(has_fixture, fixture_class fixture;) \
         BOOST_PP_EXPR_IIF(has_group_fixture, group_fixture_t group_fixture;) \
         BOOST_PP_EXPR_IIF(has_generator, \
@@ -802,9 +842,10 @@ test_group(::testsoon::string const &filename) {
  * See @ref faq.
  *
  * @page tutorial Tutorial
- * This is a tutorial.
+ * "This is a tutorial."
  *
  * @page faq Frequently Asked Questions (FAQ)
+ * "This is a FAQ."
  */
 
 #endif
