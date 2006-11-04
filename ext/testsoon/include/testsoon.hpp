@@ -107,13 +107,26 @@ public:
   unsigned good;
   unsigned bad;
 private:
-  typedef void (statistics::*bool_type)();
-  void dummy();
+  typedef bool (statistics::*bool_type)() const;
+  bool do_not_compare_implicit_bool() const { return false; }
 public:
   operator bool_type() const {
-    return bad == 0 ? &statistics::dummy : 0;
+    return bad == 0 ? &statistics::do_not_compare_implicit_bool : 0;
   }
 };
+
+template<class T> bool operator==(statistics const &x, T const &) {
+  return x.do_not_compare_implicit_bool();
+}
+template<class T> bool operator!=(statistics const &x, T const &) {
+  return x.do_not_compare_implicit_bool();
+}
+template<class T> bool operator==(T const &, statistics const &x) {
+  return x.do_not_compare_implicit_bool();
+}
+template<class T> bool operator!=(T const &, statistics const &x) {
+  return x.do_not_compare_implicit_bool();
+}
 
 /**
  * Base class for reporters.
