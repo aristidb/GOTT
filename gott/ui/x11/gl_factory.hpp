@@ -1,4 +1,5 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -12,10 +13,10 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Non-immediate Graphics Library.
+ * The Original Code is a user interface abstraction library.
  *
  * The Initial Developer of the Original Code is
- * Andreas Pokorny (andreas.pokorny@gmail.com).
+ * Andreas Pokorny (andreas.pokorny@gmail.com)
  * Portions created by the Initial Developer are Copyright (C) 2005
  * the Initial Developer. All Rights Reserved.
  *
@@ -36,27 +37,22 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_GRAPHICS_RENDERER_HPP_INCLUDED
-#define GOTT_GRAPHICS_RENDERER_HPP_INCLUDED
+#ifndef GOTT_UI_X11_GL_FACTORY_HPP_INCLUDED
+#define GOTT_UI_X11_GL_FACTORY_HPP_INCLUDED
 
-namespace gott{ namespace graphics{
+#include <gott/ui/x11/renderer_factory.hpp>
 
-  /**
-   * For details look at \ref graphics_renderer documentaton.
-   */
-class renderer
-{
-  public:
-   /* void update_display( region const& ); 
-    void resize( region const& ); 
+namespace gott{namespace ui{namespace x11{
+  class gl_factory : public renderer_factory 
+  {
+    public:
+      virtual Visual* visual( ::Window rootX11WindowHandle, ::Display * display, int screen ); 
+      virtual int depth( ::Window x11WindowHandle, ::Display * display, int screen ); 
+      virtual gott::graphics::renderer * renderer( ::Window x11WindowHandle, ::Display * display, int screen ); 
+      virtual ~gl_factory();
+  };
+}}}
 
-    void invalidate( graphics::object * );
-    */
-    //
-    virtual ~renderer();
-};
+#endif
 
-}}
-
-#endif 
 

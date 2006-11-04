@@ -1,4 +1,5 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -12,10 +13,10 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Non-immediate Graphics Library.
+ * The Original Code is a user interface abstraction library.
  *
  * The Initial Developer of the Original Code is
- * Andreas Pokorny (andreas.pokorny@gmail.com).
+ * Andreas Pokorny (andreas.pokorny@gmail.com)
  * Portions created by the Initial Developer are Copyright (C) 2005
  * the Initial Developer. All Rights Reserved.
  *
@@ -36,27 +37,26 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_GRAPHICS_RENDERER_HPP_INCLUDED
-#define GOTT_GRAPHICS_RENDERER_HPP_INCLUDED
+#include "gl_factory.hpp"
 
-namespace gott{ namespace graphics{
+using gott::ui::x11::gl_factory; 
+using gott::graphics::renderer; 
 
-  /**
-   * For details look at \ref graphics_renderer documentaton.
-   */
-class renderer
+gl_factory::~gl_factory()
 {
-  public:
-   /* void update_display( region const& ); 
-    void resize( region const& ); 
+}
 
-    void invalidate( graphics::object * );
-    */
-    //
-    virtual ~renderer();
-};
+::Visual* gl_factory::visual( ::Window rootX11WindowHandle, ::Display * display, int screen )
+{
+  return 0;
+}
 
-}}
+renderer * gl_factory::renderer( ::Window x11WindowHandle, ::Display * display, int screen )
+{
+  return 0;
+}
 
-#endif 
+int gl_factory::depth( ::Window rootX11WindowHandle, ::Display * display, int screen )
+{
+}
 
