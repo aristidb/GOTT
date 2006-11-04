@@ -38,6 +38,7 @@
 
 project(GOTT)
 cmake_minimum_required(VERSION 2.4)
+enable_language(CXX)
 
 # configuration -----------------------------------------------------
 
@@ -166,7 +167,7 @@ add_executable(pongbar_loop examples/pongbar_loop.cpp)
 target_link_libraries(pongbar_loop gott_system)
 
 # EXECUTABLE producer_consumer1
-add_executable(producer_consumer1 examples/producer_consumer1)
+add_executable(producer_consumer1 examples/producer_consumer1.cpp)
 target_link_libraries(producer_consumer1 gott_core)
 
 # EXECUTABLE throttled_yes
