@@ -78,8 +78,9 @@ TEST_REGISTRY
 int main() {
   std::cout << "TESTS:\n";
   testsoon::default_reporter rep;
-  testsoon::tests().run(rep);
+  bool good = testsoon::tests().run(rep);
   std::cout << "INFO:\n";
   INFO(sizeof(object));
   INFO(sizeof(container));
+  return !good;
 }

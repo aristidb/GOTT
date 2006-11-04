@@ -43,5 +43,5 @@ TEST_REGISTRY
 int main() {
   using namespace testsoon;
   default_reporter rep;
-  tests().run(rep);
+  return !tests().run(rep);
 }
