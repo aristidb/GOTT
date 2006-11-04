@@ -187,7 +187,11 @@
   We now have to define the layout of our graphics object tree. There are several 
   possibilities for each of the render model domains. Suggestions are welcome. 
 
+  \section graphics_objects_discussion_normal Normal 
+  
   \subsection Requirements:
+  This is not a formal requirements list just, just an informal list of ideas or important features. Concrete
+  requirements can be deduced from these features wishes.. todo: s/RQ/F/ 
    - RQ_TreePath - tree path support: It must be easy to find a child object using a path data structure
    - RQ_RefWB - optional reference to a widget behavior: controls the sub nodes relevant for the concept of the widget
    - RQ_RefTB - optional reference to a theme behavior: controls special sub nodes defined by the theme. It seems like
@@ -214,6 +218,20 @@
       To allow the user or theme writers to change general aspects of themes, and maybe to reuse existing nodes it
       should be possible to refer to certain objects in the tree. E.g. one could have named color nodes. 
       At this point the tree might turn into a directed acyclic graph
+   - RQ_RenderStateChange - explicit change of the rendererstate
+      To change the state of a rendere a container object is created, which has an explicit member that changes
+      the state. Think of special containers that define the color of the "pen" ~ i hate the concept..
+      or the region the following render objects might affect... 
+
+
+
+  \section graphics_objects_discussion_with_stereotypes Fun with Stereotypes
+  This section remains for further investigation. The idea presented here might be 
+  a good model to support theme editors, or a future system for systems with memory
+  constraints. 
+
+  \subsection Requirements:
+   There is only one additional requirement to the stuff described above.
    - RQ_Stereotype - graphical appearance should be defined as stereotypes - extension of RQ_ObjRef 
       A stereotype is an incomplete or complete description of a widget. The missing parts, if any, can be the current
       state of the object or some missing graphical objects. Lets call these missing parts overloaded properties. 

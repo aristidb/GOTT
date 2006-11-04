@@ -87,7 +87,7 @@ public:
   plugin_handle()
     : plugin_handle_base(with_interface<Interface>()),
       p(cast(get_base())) {
-    if (!p) fail_interface();
+    if (!p) fail_interface("Ey what happened");
   }
 
   /**

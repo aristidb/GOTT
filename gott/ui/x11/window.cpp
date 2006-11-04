@@ -44,7 +44,11 @@
 #include <boost/lambda/lambda.hpp> 
 #include <boost/lambda/bind.hpp> 
 #include <boost/lambda/construct.hpp> 
+#include <gott/plugin.hpp>
 #include <gott/ui/x11/window.hpp> 
+#include <gott/ui/x11/renderer_factory.hpp> 
+
+using namespace gott::plugin;
 
 namespace gott{namespace ui{namespace x11{
 namespace {
@@ -84,111 +88,120 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 {
 
   ::Window root_window = RootWindow( context->get_display(), context->get_screen() );
-  context->register_window( this );
 
-  std::pair<Visual *, int> vis_info = std::pair<Visual*,int>(DefaultVisual(context->get_display(),context->get_screen()),DefaultDepth(context->get_display(), context->get_screen()));//detail::pick_visual( context->get_display(), context->get_screen() );
-  {
-    XSetWindowAttributes	attributes;
-    unsigned int attributes_mask =  CWBorderPixel | CWColormap | CWEventMask ;
-    // init the colormap
-    attributes.colormap = XCreateColormap( context->get_display(), root_window,
-        vis_info.first, AllocNone );
-
-    attributes.border_pixel = 0;
-
-    attributes.event_mask = ExposureMask | StructureNotifyMask; 
-    if( flags & window_flags::MouseEvents ) 
-      attributes.event_mask |= 
-        PointerMotionMask 
-        | FocusChangeMask 
-        | ButtonPressMask 
-        | ButtonReleaseMask;
-
-    if( flags & window_flags::KeyEvents ) 
-      attributes.event_mask |= 
-        FocusChangeMask 
-        | KeyPressMask 
-        | KeyReleaseMask;
-
-
-    if( ! flags & window_flags::Decoration )     {
-      attributes_mask |= CWOverrideRedirect;
-      attributes.override_redirect = true;
-    }
-
-    if( flags & window_flags::ToolTip || flags & window_flags::Splash  ) {
-      attributes.save_under = true ;
-      attributes_mask |= CWSaveUnder;
-    }
-
-
-    // create the physical window
-    handle = XCreateWindow( 
-        context->get_display()
-        , root_window
-        , position.left
-        , position.top 
-        , position.width 
-        , position.height 
-        , 0 // border?
-        , vis_info.second
-        , InputOutput
-        , vis_info.first
-        , attributes_mask
-        , &attributes );
-  }
-
-  if( handle == None )
-    throw std::runtime_error("no window handle");
-  ///////////////
-
-  // not exception safe!
-
-  flags_.set( flags );
-
-
-  size_t num_p = 4;
-  protocols[0] = context->get_atom("WM_DELETE_WINDOW");
-  protocols[1] = context->get_atom("WM_TAKE_FOCUS");
-  protocols[2] = context->get_atom("_NET_WM_PING");
-  protocols[3] = context->get_atom("_NET_WM_CONTEXT_HELP");
-
-  XSetWMProtocols( context->get_display(), handle, protocols, num_p);
-
-  // set _NET_WM_PID - to allow the wm to kill the application providing the window
-  long curr_pid = getpid();
-  change_property(
-      context->get_atom("_NET_WM_PID")
-      , XA_CARDINAL
-      , 32
-      , reinterpret_cast<unsigned char *>(&curr_pid)
-      , 1
-      );
-
-
- /* if( parent == 0 )
-    change_property(
-        context->get_atom("WM_CLIENT_LEADER")
-        , XA_WINDOW, 32
-        , reinterpret_cast<unsigned char *>(&X11->wm_client_leader), 1);*/
-//////////////////
-  
-  title_.set(title);
-
-  // Wait for Map events? 
-        
-        // flag this window as open
-        flags |= window_flags::Open;
-  
-  region_.set(position);
-
-  context->register_window( this );
+  plugin_handle<gott::ui::x11::renderer_factory> ren_factory; 
+  /** \todo   in the future we could add user controlled plugin features here, and load
+   all plugins with matching features. Maybe ordering by "should-have" features
+   and take the first renderer_factory that works  and also forward requirements to the 
+   renderer_factory. 
+   */
  
-  if( flags & window_flags::Visible )
-    visibility_.set(true);
-  XFlush( context->get_display() );
+  if( ren_factory.get() )
+  {
+    Visual * vis = ren_factory->visual( RootWindow( context->get_display(), context->get_screen() ), context->get_display(), context->get_screen() );
+    int depth = ren_factory->depth( RootWindow( context->get_display(), context->get_screen() ), context->get_display(), context->get_screen() ); // 
 
-  invalidate_area( rect(0,0,position.width, position.height ) );
+    {
+      XSetWindowAttributes	attributes;
+      unsigned int attributes_mask =  CWBorderPixel | CWColormap | CWEventMask ;
+      // init the colormap
+      attributes.colormap = XCreateColormap( context->get_display(), root_window,
+          vis, AllocNone );
+
+      attributes.border_pixel = 0;
+
+      attributes.event_mask = ExposureMask | StructureNotifyMask; 
+      if( flags & window_flags::MouseEvents ) 
+        attributes.event_mask |= 
+          PointerMotionMask 
+          | FocusChangeMask 
+          | ButtonPressMask 
+          | ButtonReleaseMask;
+
+      if( flags & window_flags::KeyEvents ) 
+        attributes.event_mask |= 
+          FocusChangeMask 
+          | KeyPressMask 
+          | KeyReleaseMask;
+
+
+      if( ! flags & window_flags::Decoration )     {
+        attributes_mask |= CWOverrideRedirect;
+        attributes.override_redirect = true;
+      }
+
+      if( flags & window_flags::ToolTip || flags & window_flags::Splash  ) {
+        attributes.save_under = true ;
+        attributes_mask |= CWSaveUnder;
+      }
+
+
+      // create the physical window
+      handle = XCreateWindow( 
+          context->get_display()
+          , root_window
+          , position.left
+          , position.top 
+          , position.width 
+          , position.height 
+          , 0 // border?
+          , depth
+          , InputOutput
+          , vis
+          , attributes_mask
+          , &attributes );
+    }
+
+    if( handle == None )
+      throw std::runtime_error("no window handle");
+    ///////////////
+
+    // not exception safe!
+
+    flags_.set( flags );
+
+
+    size_t num_p = 4;
+    protocols[0] = context->get_atom("WM_DELETE_WINDOW");
+    protocols[1] = context->get_atom("WM_TAKE_FOCUS");
+    protocols[2] = context->get_atom("_NET_WM_PING");
+    protocols[3] = context->get_atom("_NET_WM_CONTEXT_HELP");
+
+    XSetWMProtocols( context->get_display(), handle, protocols, num_p);
+
+    // set _NET_WM_PID - to allow the wm to kill the application providing the window
+    long curr_pid = getpid();
+    change_property(
+        context->get_atom("_NET_WM_PID")
+        , XA_CARDINAL
+        , 32
+        , reinterpret_cast<unsigned char *>(&curr_pid)
+        , 1
+        );
+
+
+    /* if( parent == 0 )
+       change_property(
+       context->get_atom("WM_CLIENT_LEADER")
+       , XA_WINDOW, 32
+       , reinterpret_cast<unsigned char *>(&X11->wm_client_leader), 1);*/
+    //////////////////
+
+    title_.set(title);
+
+    // flag this window as open
+    flags |= window_flags::Open;
+
+    region_.set(position);
+
+    context->register_window( this );
+
+    if( flags & window_flags::Visible )
+      visibility_.set(true);
+    XFlush( context->get_display() );
+
+    invalidate_area( rect(0,0,position.width, position.height ) );
+  }
 }
 
 /**

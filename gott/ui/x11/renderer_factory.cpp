@@ -1,4 +1,5 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -12,10 +13,10 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is A Non-immediate Graphics Library.
+ * The Original Code is a user interface abstraction library.
  *
  * The Initial Developer of the Original Code is
- * Andreas Pokorny (andreas.pokorny@gmail.com).
+ * Andreas Pokorny (andreas.pokorny@gmail.com)
  * Portions created by the Initial Developer are Copyright (C) 2005
  * the Initial Developer. All Rights Reserved.
  *
@@ -35,28 +36,10 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+#include "renderer_factory.hpp"
 
-#ifndef GOTT_GRAPHICS_RENDERER_HPP_INCLUDED
-#define GOTT_GRAPHICS_RENDERER_HPP_INCLUDED
+gott::QID const gott::ui::x11::renderer_factory::qid("gott::ui::x11::renderer_factory");
 
-namespace gott{ namespace graphics{
-
-  /**
-   * For details look at \ref graphics_renderer documentaton.
-   */
-class renderer
-{
-  public:
-   /* void update_display( region const& ); 
-    void resize( region const& ); 
-
-    void invalidate( graphics::object * );
-    */
-    //
-    virtual ~renderer();
-};
-
-}}
-
-#endif 
+gott::ui::x11::renderer_factory::~renderer_factory()
+{}
 
