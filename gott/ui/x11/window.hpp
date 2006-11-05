@@ -45,6 +45,7 @@
 
 #include <gott/ui/window_base.hpp>
 #include <gott/ui/x11/uicontext.hpp>
+#include <gott/graphics/renderer.hpp>
 #include <gott/properties/concrete_property.hpp>
 #include <gott/properties/external_storage.hpp>
 #include <gott/properties/signal_notification.hpp>
@@ -57,11 +58,31 @@ namespace gott{namespace ui{namespace x11{
 class GOTT_EXPORT window : public gott::ui::window_base {
   private:
     friend class uicontext;
-    gott::properties::concrete_property<rect,gott::properties::signal_notification,gott::properties::external_storage<rect> > region_;
-    gott::properties::concrete_property<gott::string,gott::properties::signal_notification,gott::properties::external_storage<gott::string> > title_;
-    gott::properties::concrete_property<bool,gott::properties::signal_notification,gott::properties::external_storage<bool> > visibility_;
-    gott::properties::concrete_property<flags_type,gott::properties::signal_notification,gott::properties::external_storage<flags_type> > flags_;
+    gott::properties::concrete_property<
+      rect
+      , gott::properties::signal_notification
+      , gott::properties::external_storage<rect> 
+      > region_;
+
+    gott::properties::concrete_property<
+      gott::string
+      , gott::properties::signal_notification
+      , gott::properties::external_storage<gott::string> 
+      > title_;
+
+    gott::properties::concrete_property<
+      bool
+      , gott::properties::signal_notification 
+      , gott::properties::external_storage<bool> 
+      > visibility_;
+
+    gott::properties::concrete_property<
+      flags_type
+      , gott::properties::signal_notification
+      , gott::properties::external_storage<flags_type> 
+      > flags_;
     Window handle;
+    boost::scoped_ptr<gott::graphics::renderer> renderer_;
 
     rect last_region, invalid_area;
     bool mapped_state;

@@ -95,7 +95,7 @@ glx_resource::glx_resource( GLXFBConfig config, ::Display *display
   : window_(0), context_(0), display_(display)
 {
   window_ = glXCreateWindow( display, config, windowHandle, 0 );
-  context_ = glXCreateNewContext( display, config, GLX_RGBA, 0, true );
+  context_ = glXCreateNewContext( display, config, GLX_RGBA_TYPE, 0, 1 );
 }
 
 glx_resource::~glx_resource()

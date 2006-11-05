@@ -159,6 +159,8 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 
     flags_.set( flags );
 
+    renderer_.reset( ren_factory->renderer( handle, context->get_display(), context->get_screen() ) );
+
 
     size_t num_p = 4;
     protocols[0] = context->get_atom("WM_DELETE_WINDOW");
