@@ -13,7 +13,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is a user interface abstraction library.
+ * The Original Code is an OpenGL based renderer.
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
@@ -37,48 +37,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "gl_factory.hpp"
-#include <GL/glx.h>
-#include <gott/plugin/plugin_builder.hpp>
-#include <gott/exceptions.hpp>
+#ifndef GOTT_GRAPHICS_GL_RENDERER_HPP_INCLUDED
+#define GOTT_GRAPHICS_GL_RENDERER_HPP_INCLUDED 
 
-using gott::ui::x11::gl_factory; 
-using gott::graphics::renderer; 
+#include <boost/scoped_ptr.hpp>
+#include <gott/visibility.hpp>
+#include <gott/graphics/renderer.hpp>
+#include <gott/graphics/gl/context.hpp>
 
-GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(gott_ui_x11_gl_factory
-    , gott::ui::x11::gl_factory)
+namespace gott{namespace graphics{namespace gl{
 
-gl_factory::~gl_factory()
+/**
+ * OpenGL based implementation of the renderer. 
+ */
+class GOTT_EXPORT renderer
+  : public gott::graphics::renderer 
 {
-}
+  public:
+    renderer( gl::context * );
+  private:
+    boost::scoped_ptr<gl::context> context_;
+  
+};
 
-::Visual* gl_factory::visual( ::Window rootX11WindowHandle, ::Display * display
-    , int screen )
-{
-  int attributes[] = { GLX_RGBA, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8,
-    GLX_BLUE_SIZE, 8, GLX_ALPHA_SIZE, 8, GLX_DEPTH_SIZE, 16, 
-      GLX_DOUBLEBUFFER, True,  None};
-  XVisualInfo * vInfo = glXChooseVisual( display, screen, attributes );
-  if(! vInfo ) 
-    throw system_error("No X Visual for OpenGL found.");
-  return vInfo->visual;
-}
+}}}
 
-renderer * gl_factory::renderer( ::Window x11WindowHandle, ::Display * display
-    , int screen )
-{
-  return 0;
-}
-
-int gl_factory::depth( ::Window rootX11WindowHandle, ::Display * display
-    , int screen )
-{
-  int attributes[] = { GLX_RGBA, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8,
-    GLX_BLUE_SIZE, 8, GLX_ALPHA_SIZE, 8, GLX_DEPTH_SIZE, 16, 
-      GLX_DOUBLEBUFFER, True,  None};
-  XVisualInfo * vInfo = glXChooseVisual( display, screen, attributes );
-  if(! vInfo ) 
-    throw system_error("No X Visual for OpenGL found.");
-  return vInfo->depth;
-}
+#endif
 

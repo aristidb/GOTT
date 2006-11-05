@@ -13,7 +13,8 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is a user interface abstraction library.
+ * The Original Code is a gl wrapper as part of a general purpose graphics
+ * rendering library. 
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
@@ -37,41 +38,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <gott/visibility.hpp>
-#include <gott/string/qid.hpp>
-#include <gott/plugin/plugin_base.hpp>
-#include <gott/graphics/renderer.hpp>
+#include "context.hpp"
 
-#ifndef GOTT_UI_X11_RENDERER_FACTORY_HPP_INCLUDED
-#define GOTT_UI_X11_RENDERER_FACTORY_HPP_INCLUDED
+using gott::graphics::gl::context;
 
-namespace gott{namespace ui{namespace x11{
-
-class GOTT_EXPORT renderer_factory 
-  : public gott::plugin::plugin_base
+context::~context()
 {
-  public:
-    static QID const qid;
+}
 
-    /**
-     * \param[in] rootX11WindowHandle a root window handle of the screen
-     * \param[in] display a display pointer
-     * \param[in] screen the screen number to use
-     * \return a pointer to a visual info structure
-     */
-    virtual ::XVisualInfo* visual_info( ::Window rootX11WindowHandle
-        , ::Display * display, int screen ) = 0; 
-
-    /**
-     * Creates the renderer object.
-     */
-    virtual gott::graphics::renderer * renderer( ::Window x11WindowHandle
-        , ::Display * display, int screen ) = 0; 
-    virtual ~renderer_factory();
-};
-}}}
-
-#endif
 

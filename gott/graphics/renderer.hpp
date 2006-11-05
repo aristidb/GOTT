@@ -39,12 +39,14 @@
 #ifndef GOTT_GRAPHICS_RENDERER_HPP_INCLUDED
 #define GOTT_GRAPHICS_RENDERER_HPP_INCLUDED
 
+#include <gott/visibility.hpp>
+
 namespace gott{ namespace graphics{
 
   /**
    * For details look at \ref graphics_renderer documentaton.
    */
-class renderer
+class GOTT_EXPORT renderer
 {
   public:
    /* void update_display( region const& ); 

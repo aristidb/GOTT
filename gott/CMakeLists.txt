@@ -110,7 +110,9 @@ add_library(gott_graphics SHARED ${src_graphics})
 
 # LIBRARY gott_ui
 file(GLOB src_ui
-  ui/*.cpp ui/x11/*.cpp
+  ui/*.cpp 
+  ui/x11/window.cpp ui/x11/uicontext.cpp ui/x11/input.cpp
+  ui/x11/renderer_factory.cpp
 )
 add_library(gott_ui SHARED ${src_ui})
 target_link_libraries(gott_ui gott_system gott_graphics X11 ${OPENGL_LIBRARIES})
@@ -177,7 +179,7 @@ target_link_libraries(throttled_yes gott_system)
 
 # EXECUTABLE just_windows
 add_executable(just_windows examples/just_windows.cpp)
-target_link_libraries(just_windows gott_ui)
+target_link_libraries(just_windows gott_ui gott_graphics)
 
 # EXECUTABLE test_repatcher
 add_executable(test_repatcher tdl/schema_lang/playground/test_repatcher.cpp)
@@ -261,3 +263,12 @@ endif (BUILD_EPOLL)
 # PLUGIN events_select_loop
 add_library(events_select_loop MODULE events/loops/select_loop.cpp)
 add_dependencies(plugins events_select_loop)
+
+# PLUGIN graphics_glx_renderer
+file(GLOB src_graphics_glx_renderer
+  graphics/gl/*.cpp
+  ui/x11/glx_factory.cpp
+  )
+add_library(graphics_glx_renderer MODULE ${src_graphics_glx_renderer})
+add_dependencies(plugins graphics_glx_renderer)
+target_link_libraries(graphics_glx_renderer gott_graphics ${OPENGL_LIBRARIES})

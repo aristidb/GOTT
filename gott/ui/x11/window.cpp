@@ -98,15 +98,14 @@ window::window( uicontext& app, rect const& position, string const& title, std::
  
   if( ren_factory.get() )
   {
-    Visual * vis = ren_factory->visual( RootWindow( context->get_display(), context->get_screen() ), context->get_display(), context->get_screen() );
-    int depth = ren_factory->depth( RootWindow( context->get_display(), context->get_screen() ), context->get_display(), context->get_screen() ); // 
+    XVisualInfo * vInfo = ren_factory->visual_info( RootWindow( context->get_display(), context->get_screen() ), context->get_display(), context->get_screen() );
 
     {
       XSetWindowAttributes	attributes;
       unsigned int attributes_mask =  CWBorderPixel | CWColormap | CWEventMask ;
       // init the colormap
       attributes.colormap = XCreateColormap( context->get_display(), root_window,
-          vis, AllocNone );
+          vInfo->visual, AllocNone );
 
       attributes.border_pixel = 0;
 
@@ -145,9 +144,9 @@ window::window( uicontext& app, rect const& position, string const& title, std::
           , position.width 
           , position.height 
           , 0 // border?
-          , depth
+          , vInfo->depth
           , InputOutput
-          , vis
+          , vInfo->visual
           , attributes_mask
           , &attributes );
     }

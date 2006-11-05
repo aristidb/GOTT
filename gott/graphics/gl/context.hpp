@@ -13,7 +13,8 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is a user interface abstraction library.
+ * The Original Code is a gl wrapper as part of a general purpose graphics
+ * rendering library. 
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
@@ -37,22 +38,24 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_UI_X11_GL_FACTORY_HPP_INCLUDED
-#define GOTT_UI_X11_GL_FACTORY_HPP_INCLUDED
+#ifndef GOTT_GRAPHICS_GL_CONTEXT_HPP_INCLUDED
+#define GOTT_GRAPHICS_GL_CONTEXT_HPP_INCLUDED 
 
-#include <gott/ui/x11/renderer_factory.hpp>
+#include <gott/visibility.hpp>
 
-namespace gott{namespace ui{namespace x11{
-  class gl_factory : public renderer_factory 
-  {
-    public:
-      virtual Visual* visual( ::Window rootX11WindowHandle, ::Display * display, int screen ); 
-      virtual int depth( ::Window x11WindowHandle, ::Display * display, int screen ); 
-      virtual gott::graphics::renderer * renderer( ::Window x11WindowHandle, ::Display * display, int screen ); 
-      virtual ~gl_factory();
-  };
+namespace gott{namespace graphics{namespace gl{
+
+/**
+ * Wraps some of the aspects of an OpenGL rendering context.
+ */
+class GOTT_EXPORT context
+{
+  public:
+    virtual void make_current() = 0;
+    virtual ~context();
+};
+
 }}}
 
 #endif
-
 

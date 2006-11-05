@@ -37,41 +37,47 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <gott/visibility.hpp>
-#include <gott/string/qid.hpp>
-#include <gott/plugin/plugin_base.hpp>
-#include <gott/graphics/renderer.hpp>
+#ifndef GOTT_UI_X11_GL_FACTORY_HPP_INCLUDED
+#define GOTT_UI_X11_GL_FACTORY_HPP_INCLUDED
 
-#ifndef GOTT_UI_X11_RENDERER_FACTORY_HPP_INCLUDED
-#define GOTT_UI_X11_RENDERER_FACTORY_HPP_INCLUDED
+#include <GL/glx.h>
+#include <gott/ui/x11/renderer_factory.hpp>
+#include <gott/graphics/gl/context.hpp>
 
 namespace gott{namespace ui{namespace x11{
 
-class GOTT_EXPORT renderer_factory 
-  : public gott::plugin::plugin_base
+class glx_factory 
+  : public renderer_factory 
 {
   public:
-    static QID const qid;
-
-    /**
-     * \param[in] rootX11WindowHandle a root window handle of the screen
-     * \param[in] display a display pointer
-     * \param[in] screen the screen number to use
-     * \return a pointer to a visual info structure
-     */
     virtual ::XVisualInfo* visual_info( ::Window rootX11WindowHandle
-        , ::Display * display, int screen ) = 0; 
-
-    /**
-     * Creates the renderer object.
-     */
+        , ::Display * display, int screen ); 
     virtual gott::graphics::renderer * renderer( ::Window x11WindowHandle
-        , ::Display * display, int screen ) = 0; 
-    virtual ~renderer_factory();
+        , ::Display * display, int screen ); 
+    virtual ~glx_factory();
+  private:
+    ::GLXFBConfig fb_config( ::Display * display, int screen );
 };
+
+class glx_resource 
+  : public gott::graphics::gl::context
+{
+  public:
+    glx_resource( GLXFBConfig config, ::Display *display, ::Window windowHandle );
+    ~glx_resource();
+
+    void make_current();
+
+  private:
+    glx_resource( glx_resource const& cp );
+    glx_resource& operator=( glx_resource const& cp );
+    GLXWindow window_;
+    GLXContext context_;
+    ::Display *display_;
+};
+
 }}}
 
 #endif
+
 

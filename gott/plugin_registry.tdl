@@ -51,10 +51,10 @@ feature gott::events::timer_manager
 feature gott::events::inprocess_message_manager
 feature gott::events::signal_manager
 
-# ui x11
-plugin gott::ui::x11::gl_factory
+# glx
+plugin gott::ui::x11::glx_factory
 interface gott::ui::x11::renderer_factory 
-enclosing-module gott::ui::x11::renderer_factory
-symbol gott_ui_x11_gl_factory
+enclosing-module gott::graphics::glx_renderer
+symbol plugin
 priority high
 
