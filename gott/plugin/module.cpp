@@ -104,5 +104,7 @@ void *module::entity(gott::string const &symbol) {
 
 plugin_base *module::load_plugin(plugin_descriptor const &which) {
   plugin_builder *fun = function_cast<plugin_builder>(entity(which.symbol));
-  return fun();
+  plugin_base *p = fun();
+  p->p_enclosing = this;
+  return p;
 }

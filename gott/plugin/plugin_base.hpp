@@ -47,6 +47,7 @@ namespace plugin {
 
 class system_configuration;
 class plugin_configuration;
+class module;
 
 /**
  * Abstract base class for all plugins.
@@ -55,6 +56,15 @@ class GOTT_EXPORT plugin_base {
 public:
   /// Pure virtual destructor.
   virtual ~plugin_base() = 0;
+
+protected:
+  GOTT_LOCAL module &enclosing_module() const {
+    return *p_enclosing;
+  }
+
+private:
+  module *p_enclosing; 
+  friend class module;
 };
 
 }}
