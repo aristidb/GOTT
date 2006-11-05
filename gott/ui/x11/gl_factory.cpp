@@ -38,28 +38,47 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "gl_factory.hpp"
+#include <GL/glx.h>
 #include <gott/plugin/plugin_builder.hpp>
+#include <gott/exceptions.hpp>
 
 using gott::ui::x11::gl_factory; 
 using gott::graphics::renderer; 
 
-GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(gott_ui_x11_gl_factory, gott::ui::x11::gl_factory)
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(gott_ui_x11_gl_factory
+    , gott::ui::x11::gl_factory)
 
 gl_factory::~gl_factory()
 {
 }
 
-::Visual* gl_factory::visual( ::Window rootX11WindowHandle, ::Display * display, int screen )
+::Visual* gl_factory::visual( ::Window rootX11WindowHandle, ::Display * display
+    , int screen )
+{
+  int attributes[] = { GLX_RGBA, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8,
+    GLX_BLUE_SIZE, 8, GLX_ALPHA_SIZE, 8, GLX_DEPTH_SIZE, 16, 
+      GLX_DOUBLEBUFFER, True,  None};
+  XVisualInfo * vInfo = glXChooseVisual( display, screen, attributes );
+  if(! vInfo ) 
+    throw system_error("No X Visual for OpenGL found.");
+  return vInfo->visual;
+}
+
+renderer * gl_factory::renderer( ::Window x11WindowHandle, ::Display * display
+    , int screen )
 {
   return 0;
 }
 
-renderer * gl_factory::renderer( ::Window x11WindowHandle, ::Display * display, int screen )
+int gl_factory::depth( ::Window rootX11WindowHandle, ::Display * display
+    , int screen )
 {
-  return 0;
-}
-
-int gl_factory::depth( ::Window rootX11WindowHandle, ::Display * display, int screen )
-{
+  int attributes[] = { GLX_RGBA, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8,
+    GLX_BLUE_SIZE, 8, GLX_ALPHA_SIZE, 8, GLX_DEPTH_SIZE, 16, 
+      GLX_DOUBLEBUFFER, True,  None};
+  XVisualInfo * vInfo = glXChooseVisual( display, screen, attributes );
+  if(! vInfo ) 
+    throw system_error("No X Visual for OpenGL found.");
+  return vInfo->depth;
 }
 

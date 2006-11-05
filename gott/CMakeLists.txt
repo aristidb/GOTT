@@ -47,6 +47,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/buildconf)
 find_package(Boost REQUIRED)
 set(Boost_SUFFIX "" CACHE STRING "Boost library suffix")
 find_package(X11 REQUIRED)
+find_package(OpenGL REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS} ${X11_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS} ${X11_LIBRARY_DIRS})
@@ -112,7 +113,7 @@ file(GLOB src_ui
   ui/*.cpp ui/x11/*.cpp
 )
 add_library(gott_ui SHARED ${src_ui})
-target_link_libraries(gott_ui gott_system gott_graphics X11)
+target_link_libraries(gott_ui gott_system gott_graphics X11 ${OPENGL_LIBRARIES})
 
 # LIBRARY gott_hci
 file(GLOB src_hci
