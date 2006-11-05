@@ -46,7 +46,6 @@
 #include <boost/lambda/construct.hpp> 
 #include <gott/plugin.hpp>
 #include <gott/ui/x11/window.hpp> 
-#include <gott/ui/x11/renderer_factory.hpp> 
 
 using namespace gott::plugin;
 
@@ -89,16 +88,15 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 
   ::Window root_window = RootWindow( context->get_display(), context->get_screen() );
 
-  plugin_handle<gott::ui::x11::renderer_factory> ren_factory; 
-  /** \todo   in the future we could add user controlled plugin features here, and load
+  /** \todo   in the future we could add user controlled plugin features, and load
    all plugins with matching features. Maybe ordering by "should-have" features
    and take the first renderer_factory that works  and also forward requirements to the 
    renderer_factory. 
    */
  
-  if( ren_factory.get() )
+  if( ren_factory_.get() )
   {
-    XVisualInfo * vInfo = ren_factory->visual_info( RootWindow( context->get_display(), context->get_screen() ), context->get_display(), context->get_screen() );
+    XVisualInfo * vInfo = ren_factory_->visual_info( RootWindow( context->get_display(), context->get_screen() ), context->get_display(), context->get_screen() );
 
     {
       XSetWindowAttributes	attributes;
@@ -159,7 +157,7 @@ window::window( uicontext& app, rect const& position, string const& title, std::
 
     flags_.set( flags );
 
-    renderer_.reset( ren_factory->renderer( handle, context->get_display(), context->get_screen() ) );
+    renderer_.reset( ren_factory_->renderer( handle, context->get_display(), context->get_screen() ) );
 
 
     size_t num_p = 4;
@@ -202,6 +200,10 @@ window::window( uicontext& app, rect const& position, string const& title, std::
     XFlush( context->get_display() );
 
     invalidate_area( rect(0,0,position.width, position.height ) );
+  }
+  else 
+  {
+    throw internal_error("No X11 renderer factory plugin found.");
   }
 }
 

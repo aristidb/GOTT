@@ -45,7 +45,9 @@
 
 #include <gott/ui/window_base.hpp>
 #include <gott/ui/x11/uicontext.hpp>
+#include <gott/ui/x11/renderer_factory.hpp> 
 #include <gott/graphics/renderer.hpp>
+#include <gott/plugin/plugin_handle.hpp>
 #include <gott/properties/concrete_property.hpp>
 #include <gott/properties/external_storage.hpp>
 #include <gott/properties/signal_notification.hpp>
@@ -82,6 +84,7 @@ class GOTT_EXPORT window : public gott::ui::window_base {
       , gott::properties::external_storage<flags_type> 
       > flags_;
     Window handle;
+    gott::plugin::plugin_handle<gott::ui::x11::renderer_factory> ren_factory_;
     boost::scoped_ptr<gott::graphics::renderer> renderer_;
 
     rect last_region, invalid_area;
