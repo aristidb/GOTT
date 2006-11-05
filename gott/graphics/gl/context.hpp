@@ -48,7 +48,7 @@ namespace gott{namespace graphics{namespace gl{
 /**
  * Wraps some of the aspects of an OpenGL rendering context.
  */
-class GOTT_EXPORT context
+class context
 {
   public:
     virtual void make_current() = 0;

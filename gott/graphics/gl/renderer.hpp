@@ -50,7 +50,7 @@ namespace gott{namespace graphics{namespace gl{
 /**
  * OpenGL based implementation of the renderer. 
  */
-class GOTT_EXPORT renderer
+class renderer
   : public gott::graphics::renderer 
 {
   public:
