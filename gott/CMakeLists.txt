@@ -183,6 +183,11 @@ target_link_libraries(throttled_yes gott_system)
 add_executable(just_windows examples/just_windows.cpp)
 target_link_libraries(just_windows gott_ui gott_graphics)
 
+# EXECUTABLE just_curses
+add_executable(just_curses examples/just_curses.cpp)
+target_link_libraries(just_curses gott_ui gott_graphics)
+
+
 # EXECUTABLE test_repatcher
 add_executable(test_repatcher tdl/schema_lang/playground/test_repatcher.cpp)
 target_link_libraries(test_repatcher gott_core)
