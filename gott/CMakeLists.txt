@@ -48,6 +48,7 @@ find_package(Boost REQUIRED)
 set(Boost_SUFFIX "" CACHE STRING "Boost library suffix")
 find_package(X11 REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(Curses REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS} ${X11_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS} ${X11_LIBRARY_DIRS})
@@ -113,9 +114,10 @@ file(GLOB src_ui
   ui/*.cpp 
   ui/x11/window.cpp ui/x11/uicontext.cpp ui/x11/input.cpp
   ui/x11/renderer_factory.cpp
+  ui/ncurses/window.cpp ui/ncurses/uicontext.cpp 
 )
 add_library(gott_ui SHARED ${src_ui})
-target_link_libraries(gott_ui gott_system gott_graphics X11 ${OPENGL_LIBRARIES})
+target_link_libraries(gott_ui gott_system gott_graphics X11 ${CURSES_LIBRARIES} ${OPENGL_LIBRARIES})
 
 # LIBRARY gott_hci
 file(GLOB src_hci
