@@ -83,7 +83,7 @@ uicontext::uicontext(
 
   if (has_colors()) {
     start_color();
-    //use_default_colors();
+    use_default_colors();
 
     /*
      * Simple color assignment, often all we need.  Color pair 0 cannot

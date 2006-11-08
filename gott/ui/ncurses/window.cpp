@@ -107,9 +107,11 @@ window::window(
   if (flags & window_flags::Visible)
     visibility_.set(true);
 
-  ::attron(A_BOLD);
-  ::wprintw(window_, "Hi There %p!!!", this);
-  ::wrefresh(window_);
+  wattron(window_, A_BOLD);
+  wcolor_set(window_, 1, 0);
+  wprintw(window_, "Hi There %p!!!", this);
+  wattroff(window_, A_BOLD);
+  wrefresh(window_);
 
   invalidate_area(rect(0,0,position.width, position.height));
 }
