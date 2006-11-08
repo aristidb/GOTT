@@ -178,18 +178,20 @@ private:
 inline void slotcfg::cancel() { count = cancelled; }
 
 namespace {
+
 inline slotcfg one() { return slotcfg(); }
 inline slotcfg optional() { return slotcfg(slotcfg::optional); }
 inline slotcfg some() { return slotcfg(slotcfg::some); }
 inline slotcfg list() { return slotcfg(slotcfg::list); }
 
 inline slotcfg at_least(std::size_t n) { return slotcfg(slotcfg::minimum, n); }
-inline slotcfg no_more_than(std::size_t n){return slotcfg(slotcfg::maximum, n);}
+inline slotcfg no_more_than(std::size_t n){return slotcfg(slotcfg::maximum,n);}
 inline slotcfg exactly(std::size_t n) { return slotcfg(slotcfg::exactly, n); }
 
 inline slotcfg between(std::size_t min, std::size_t max) {
   return slotcfg(slotcfg::range, min, max);
 }
+
 }
 
 }}

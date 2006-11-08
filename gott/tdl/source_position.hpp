@@ -53,7 +53,7 @@ public:
       gott::string const &token = gott::string(),
       unsigned token_line = 0,
       unsigned token_column = 0
-      )
+)
     : file(file), line(line), column(column), token(token), 
     token_line(token_line), token_column(token_column) {}
 

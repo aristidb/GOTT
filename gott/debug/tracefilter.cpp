@@ -47,7 +47,7 @@ std::string tracefilter::operator () (clock_t requesttime) {
     if (filteroffset > 0) {
       clock_t rangebegin = requesttime - filteroffset;
       clock_t rangeend = requesttime;
-      if(rangebegin > tn->start && rangeend < tn->start)
+      if (rangebegin > tn->start && rangeend < tn->start)
         continue;
     }
     

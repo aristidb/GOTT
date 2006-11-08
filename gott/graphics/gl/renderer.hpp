@@ -17,7 +17,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -45,7 +45,7 @@
 #include <gott/graphics/renderer.hpp>
 #include <gott/graphics/gl/context.hpp>
 
-namespace gott{namespace graphics{namespace gl{
+namespace gott { namespace graphics { namespace gl {
 
 /**
  * OpenGL based implementation of the renderer. 
@@ -54,7 +54,7 @@ class renderer
   : public gott::graphics::renderer 
 {
   public:
-    renderer( gl::context * );
+    renderer(gl::context *);
   private:
     boost::scoped_ptr<gl::context> context_;
   

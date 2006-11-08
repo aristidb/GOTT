@@ -17,7 +17,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -44,33 +44,33 @@
 #include <gott/ui/x11/renderer_factory.hpp>
 #include <gott/graphics/gl/context.hpp>
 
-namespace gott{namespace ui{namespace x11{
+namespace gott { namespace ui { namespace x11 {
 
 class glx_factory 
   : public renderer_factory 
 {
   public:
-    virtual ::XVisualInfo* visual_info( ::Window rootX11WindowHandle
-        , ::Display * display, int screen ); 
-    virtual gott::graphics::renderer * renderer( ::Window x11WindowHandle
-        , ::Display * display, int screen ); 
+    virtual ::XVisualInfo* visual_info(::Window rootX11WindowHandle
+        , ::Display * display, int screen); 
+    virtual gott::graphics::renderer * renderer(::Window x11WindowHandle
+        , ::Display * display, int screen); 
     virtual ~glx_factory();
   private:
-    ::GLXFBConfig fb_config( ::Display * display, int screen );
+    ::GLXFBConfig fb_config(::Display * display, int screen);
 };
 
 class glx_resource 
   : public gott::graphics::gl::context
 {
   public:
-    glx_resource( GLXFBConfig config, ::Display *display, ::Window windowHandle );
+    glx_resource(GLXFBConfig config, ::Display *display, ::Window windowHandle);
     ~glx_resource();
 
     void make_current();
 
   private:
-    glx_resource( glx_resource const& cp );
-    glx_resource& operator=( glx_resource const& cp );
+    glx_resource(glx_resource const& cp);
+    glx_resource& operator=(glx_resource const& cp);
     GLXWindow window_;
     GLXContext context_;
     ::Display *display_;

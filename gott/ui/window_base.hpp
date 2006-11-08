@@ -1,6 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-#ifndef GOTT_UI_WINDOW_BASE_HPP_INCLUDED
-#define GOTT_UI_WINDOW_BASE_HPP_INCLUDED
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -38,6 +36,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_UI_WINDOW_BASE_HPP_INCLUDED
+#define GOTT_UI_WINDOW_BASE_HPP_INCLUDED
+
 #include <bitset>
 #include <gott/visibility.hpp>
 #include <gott/properties/property.hpp>
@@ -47,36 +48,40 @@
 
 // rendering system!
 
-namespace gott{namespace ui{
+namespace gott { namespace ui {
+
 class uicontext_base;
 
 /**
- * \brief window_flags contains a set of bitmask to specify properites of windows.
+ * \brief window_flags contains a set of bitmask to specify properties of
+ * windows.
  * Some flags might not be representable in the underlying system, 
  * so there is no gurantee these flags have any effects on the window.
  *
- * \todo gott::ui::window_flags needs revision, gott::ui::window_flags::Open is not required, and gott::ui::window_flags::Visible is
+ * \todo gott::ui::window_flags needs revision, gott::ui::window_flags::Open is
+ * not required, and gott::ui::window_flags::Visible is
  * handled by a different property, 
  */
 struct GOTT_LOCAL window_flags
 {
   enum {
-    Clear = 0 ///< no flags specified 
-      , Decoration  ///< Window decoration is enabled
-      , Fullscreen ///< Window takes the whole screen
-      , Visible = 4 ///< Window is visible
-      , KeyEvents = 1<<3 ///< Window receives key events
-      , MouseEvents = 1<<4 ///< Window receives mouse events
-      , Menu = 1<<5 ///< Menu window 
-      , Toolbar = 1<<6 ///< Window is / has? a tool bar window 
-      , Utility = 1<<7 ///< Utility window
-      , Dialog = 1<<8 ///< Dialog window
-      , Splash = 1<<9 ///< Window displays a splash screen
-      , Normal = 1<<10 ///< Normal window 
-      , Dock = 1<<11  ///< Window is a small dock application
-      , ToolTip = 1<<12 ///< Window displays a tool tip
-      , Open = 1<<13 ///< Window is open
-      , Defaults = (MouseEvents | KeyEvents | Visible | Decoration ) ///< Default window settings, receiving events and decoration
+    Clear = 0, ///< no flags specified 
+    Decoration,  ///< Window decoration is enabled
+    Fullscreen, ///< Window takes the whole screen
+    Visible = 4, ///< Window is visible
+    KeyEvents = 1<<3, ///< Window receives key events
+    MouseEvents = 1<<4, ///< Window receives mouse events
+    Menu = 1<<5, ///< Menu window 
+    Toolbar = 1<<6, ///< Window is / has? a tool bar window 
+    Utility = 1<<7, ///< Utility window
+    Dialog = 1<<8, ///< Dialog window
+    Splash = 1<<9, ///< Window displays a splash screen
+    Normal = 1<<10, ///< Normal window 
+    Dock = 1<<11,  ///< Window is a small dock application
+    ToolTip = 1<<12, ///< Window displays a tool tip
+    Open = 1<<13, ///< Window is open
+    Defaults = (MouseEvents | KeyEvents | Visible | Decoration) 
+        ///< Default window settings, receiving events and decoration
 
   };
 };
@@ -145,8 +150,8 @@ class GOTT_EXPORT window_base {
     /**
      * \brief draw signal 
      * The rendering system is currently directly coupled to antigrain.
-     * A correct slot only makes changes in the rectangular region defined by the 
-     * second parameter.
+     * A correct slot only makes changes in the rectangular region defined by 
+     * the second parameter.
      */
     //boost::signal2<void, agg::rendering_buffer&, rect const&>& on_draw();
     /// Both resize and move events will be handled by this signal
@@ -249,7 +254,7 @@ class GOTT_EXPORT window_base {
      * In most implementations the window is double buffered by default,
      * in the others this function might not have an effect.
      */
-    virtual void update_region( rect const& region ) = 0;
+    virtual void update_region(rect const& region) = 0;
 
     /**
      * \brief get the uicontext this window belongs to. 
@@ -284,7 +289,7 @@ class GOTT_EXPORT window_base {
      * Use this method to tell the system that a redraw should take place as soon 
      * as possible. This method will not signal a draw event!
      */
-    virtual void invalidate_area( rect const& region ) = 0;
+    virtual void invalidate_area(rect const& region) = 0;
     //\}
 
     /**
@@ -296,12 +301,12 @@ class GOTT_EXPORT window_base {
     /**
      * \brief copy the contents of the buffer onto screen 
      */
-    //virtual void blit_buffer( coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32 ) = 0;
+    //virtual void blit_buffer(coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32) = 0;
 
     /**
      * \brief copy the contents described by source, from buffer to screen.
      */
-    //virtual void blit_rect( rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32 ) = 0;
+    //virtual void blit_rect(rect const& source, coord const& destination, agg::rendering_buffer const& buffer, pixel_format::type buf_format = pixel_format::rgba32) = 0;
 
     /**
      * \brief returns the screen buffer

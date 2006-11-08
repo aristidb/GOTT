@@ -125,8 +125,7 @@ private:
   bool play(ev::child_succeed const &) {
     matcher().out_structure().begin(matcher().where_out());
     matcher().out_structure().data(gott::Xany(
-          boost::shared_ptr<structure::repatcher>(
-            getter->result_alloc())));
+          boost::shared_ptr<structure::repatcher>(            getter->result_alloc())));
     matcher().out_structure().end();
     be_happy();
     return true;

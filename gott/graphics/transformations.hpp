@@ -56,7 +56,7 @@ public:
 
   /** 
    * Matrix-Constructor.
-   * \f[ \left( \begin{array}{ccc} 
+   * \f[ \left(\begin{array}{ccc} 
    * a & b & 0 \\ 
    * c & d & 0 \\ 
    * t_x & t_y & 1 \end{array} \right) \f]
@@ -113,7 +113,7 @@ public:
 
   /**
    * Multiply the current transformation matrix with another.
-   * \f[ \left( \begin{array}{ccc} 
+   * \f[ \left(\begin{array}{ccc} 
    * a & b & 0 \\ 
    * c & d & 0 \\ 
    * t_x & t_y & 1 \end{array} \right) \f]
@@ -122,7 +122,7 @@ public:
       number a, number b, 
       number c, number d,
       number t_x, number t_y
-  );
+);
 
   /**
    * Append other transformations.

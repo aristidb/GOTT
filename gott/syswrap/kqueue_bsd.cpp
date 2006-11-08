@@ -48,7 +48,7 @@ namespace gott {
 namespace kqueue {
   int create_bsd() {
     int fd = ::kqueue();
-    if(fd == -1)
+    if (fd == -1)
       throw_errno_exception();
     return fd;
   }
@@ -58,7 +58,7 @@ namespace kqueue {
         	   const struct timespec *timeout)
   {
     int n = ::kevent(kq, changelist, nchanges, eventlist, nevents, timeout);
-    if(n == -1)
+    if (n == -1)
       throw_errno_exception();
     return n;
   }

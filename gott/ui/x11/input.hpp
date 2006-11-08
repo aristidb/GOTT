@@ -1,7 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-#ifndef GOTT_UI_X11_INPUT_HPP_INCLUDED
-#define GOTT_UI_X11_INPUT_HPP_INCLUDED
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -19,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -39,6 +36,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_UI_X11_INPUT_HPP_INCLUDED
+#define GOTT_UI_X11_INPUT_HPP_INCLUDED
 
 #include <X11/Xdefs.h>
 #include <X11/X.h>
@@ -46,7 +45,7 @@
 
 #include <gott/ui/input.hpp>
 
-namespace gott{namespace ui{namespace x11{namespace detail{
+namespace gott { namespace ui { namespace x11 { namespace detail {
 
 /**
  * \brief Internal key translation structure. 
@@ -61,10 +60,10 @@ struct GOTT_LOCAL key_table
     key_table(key_table const&);
     key_table& operator=(key_table const&);
   public:
-    key_code translate_key( KeySym const& sym ) const;
+    key_code translate_key(KeySym const& sym) const;
     static key_table const & get_instance();
 };
 
-
 }}}}
+
 #endif

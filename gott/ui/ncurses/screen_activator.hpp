@@ -16,11 +16,12 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
  *  Andreas Pokorny (andreas.pokorny@gmail.com)
+ *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -40,25 +41,22 @@
 #define GOTT_UI_NCURSES_UICONTEXT_HPP_INCLUDED
 
 #include <gott/ui/ncurses/uicontext.hpp>
-namespace gott{namespace ui{namespace ncurses{
 
-/**
- */
-class screen_activator
-{
-  private:
-    SCREEN *old_;
-    screen_activator( screen_activator const& );
-    screen_activator& operator=( screen_activator const& );
-  public:
-    screen_activator( uicontext * context )
-      : old_( set_term( context->terminal_) )
-    {}
+namespace gott { namespace ui { namespace ncurses {
 
-    ~screen_activator()
-    {
-      set_term( old_ );
-    }
+class screen_activator {
+private:
+  SCREEN *old_;
+  screen_activator(screen_activator const &);
+  screen_activator &operator=(screen_activator const &);
+public:
+  screen_activator(uicontext *context)
+  : old_(set_term(context->terminal_))
+  {}
+
+  ~screen_activator() {
+    set_term(old_);
+  }
 };
 
 }}}

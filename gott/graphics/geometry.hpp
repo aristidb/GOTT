@@ -1,5 +1,3 @@
-#ifndef GOTT_UTIL_GEOMETRY_HPP_INCLUDED
-#define GOTT_UTIL_GEOMETRY_HPP_INCLUDED
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -37,25 +35,26 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_UTIL_GEOMETRY_HPP_INCLUDED
+#define GOTT_UTIL_GEOMETRY_HPP_INCLUDED
 
 #include <gott/visibility.hpp>
 #include <cstddef>
 
 // move into subdir if this file grows to much 
-namespace gott{
+namespace gott {
 
 /**
  * \brief Small coordinate structure.
  */
-struct coord
-{
+struct coord {
   coord() : x(0), y(0) {}
-  coord( int x_, int y_ ) : x(x_), y(y_){}
+  coord(int x_, int y_) : x(x_), y(y_) {}
   int x, y;
   inline coord& operator +=(coord const& r)  { x+=r.x;y+=r.y; return *this; }
 };
 
-inline coord operator +(coord const& l, coord const& r)  { 
+inline coord operator +(coord const& l, coord const& r) { 
   coord t(l); 
   t += r; 
   return t; 
@@ -68,7 +67,7 @@ struct rect
 {
   long left, top; 
   size_t width, height;
-  rect( long l, long t, size_t w, size_t h) 
+  rect(long l, long t, size_t w, size_t h) 
   : left(l), top(t), width(w), height(h) {}
 
   rect() 
@@ -77,7 +76,7 @@ struct rect
   /**
    * \returns true if coordinate is inside the rectangle.
    */
-  inline bool is_inside( coord const& c ) const{
+  inline bool is_inside(coord const& c) const {
     return c.x >= left && c.x <= left + long(width)  
       &&  c.y >= top && c.y <= top + long(height);
   }
@@ -85,12 +84,12 @@ struct rect
   /**
    * \brief Turns *this into a rectangle containing *this and other
    */
-  GOTT_EXPORT void add_region( rect const& other );
+  GOTT_EXPORT void add_region(rect const& other);
 
   /**
    * \brief Turns *this into a rectangle containing parts of *this that are not in other
    */
-  GOTT_EXPORT void subtract_region( rect const& other );
+  GOTT_EXPORT void subtract_region(rect const& other);
 
 
   /**
@@ -103,8 +102,8 @@ struct rect
 };
 
 inline rect operator+(rect r1, rect const &r2) { return r1 += r2; }
-inline bool operator== ( rect const& l, rect const& r) { return l.left==r.left && l.top == r.top && l.width==r.width && l.height == r.height;} 
-inline bool operator!= ( rect const& l, rect const& r) { return !(l==r);}
+inline bool operator== (rect const& l, rect const& r) { return l.left==r.left && l.top == r.top && l.width==r.width && l.height == r.height;} 
+inline bool operator!= (rect const& l, rect const& r) { return !(l==r);}
 
 }
 

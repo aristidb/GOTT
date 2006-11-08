@@ -38,7 +38,7 @@
 
 #include <gott/ui/x11/input.hpp>
 
-namespace gott{ namespace ui{ namespace x11{namespace detail{
+namespace gott { namespace ui { namespace x11 { namespace detail {
 
 key_table const& key_table::get_instance() 
 {
@@ -48,7 +48,7 @@ key_table const& key_table::get_instance()
 
 key_table::key_table()
 {
-  std::memset( t, 0, 2*256 );
+  std::memset(t, 0, 2*256);
 
   t[ 1 ][ int('a') ] = t[ 1 ][ int('A') ] = KeyA;
   t[ 1 ][ int('b') ] = t[ 1 ][ int('B') ] = KeyB;
@@ -167,12 +167,12 @@ key_table::key_table()
   t[ 0 ][XK_Mode_switch&0xFF] = KeyAlt_gr;
 }
 
-key_code key_table::translate_key( KeySym const& sym ) const
+key_code key_table::translate_key(KeySym const& sym) const
 {
-        if ( !sym )
+        if (!sym)
         	return NoKey;
 
-        switch ( sym>>8 )
+        switch (sym>>8)
         {
         	case 0x00:	// Latin 1
         	case 0x01:	// Latin 2
@@ -186,10 +186,10 @@ key_code key_table::translate_key( KeySym const& sym ) const
         	case 0x0A:	// Publishing
         	case 0x0C:	// Hebrew
         	case 0x0D:	// Thai
-        		return key_code( t[1][sym & 0xFF] );
+        		return key_code(t[1][sym & 0xFF]);
         	
         	case 0xFF:
-        		return key_code( t[0][sym & 0xFF] );
+        		return key_code(t[0][sym & 0xFF]);
 
         	default:
         		break;

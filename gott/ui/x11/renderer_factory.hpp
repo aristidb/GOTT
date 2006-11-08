@@ -17,7 +17,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -37,6 +37,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_UI_X11_RENDERER_FACTORY_HPP_INCLUDED
+#define GOTT_UI_X11_RENDERER_FACTORY_HPP_INCLUDED
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <gott/visibility.hpp>
@@ -44,10 +47,7 @@
 #include <gott/plugin/plugin_base.hpp>
 #include <gott/graphics/renderer.hpp>
 
-#ifndef GOTT_UI_X11_RENDERER_FACTORY_HPP_INCLUDED
-#define GOTT_UI_X11_RENDERER_FACTORY_HPP_INCLUDED
-
-namespace gott{namespace ui{namespace x11{
+namespace gott { namespace ui { namespace x11 {
 
 class GOTT_EXPORT renderer_factory 
   : public gott::plugin::plugin_base
@@ -61,16 +61,17 @@ class GOTT_EXPORT renderer_factory
      * \param[in] screen the screen number to use
      * \return a pointer to a visual info structure
      */
-    virtual ::XVisualInfo* visual_info( ::Window rootX11WindowHandle
-        , ::Display * display, int screen ) = 0; 
+    virtual ::XVisualInfo* visual_info(::Window rootX11WindowHandle
+        , ::Display * display, int screen) = 0; 
 
     /**
      * Creates the renderer object.
      */
-    virtual gott::graphics::renderer * renderer( ::Window x11WindowHandle
-        , ::Display * display, int screen ) = 0; 
+    virtual gott::graphics::renderer * renderer(::Window x11WindowHandle
+        , ::Display * display, int screen) = 0; 
     virtual ~renderer_factory();
 };
+
 }}}
 
 #endif

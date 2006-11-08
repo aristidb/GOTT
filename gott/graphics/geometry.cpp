@@ -40,42 +40,44 @@
 #include <utility>
 #include <algorithm>
 
-namespace gott{
+using gott::rect;
 
-void rect::add_region( rect const& other ) 
+void rect::add_region(rect const& other) 
 {
-  width = std::max( left + width, other.left + other.width);
-  left = std::min( left, other.left );
-  height = std::max( top + height, other.top + other.height);
-  top = std::min( top, other.top);
+  width = std::max(left + width, other.left + other.width);
+  left = std::min(left, other.left);
+  height = std::max(top + height, other.top + other.height);
+  top = std::min(top, other.top);
 }
 
-void rect::subtract_region( rect const& other ) {
-  if( left <= other.left && top <= other.top && left+width <= other.left+other.width && top+height <= other.top+other.height) 
+void rect::subtract_region(rect const& other) {
+  if (left <= other.left && top <= other.top &&
+      left+width <= other.left+other.width &&
+      top+height <= other.top+other.height) 
     left = top = width = height = 0 ;
   else {
-    if( other.left <= left && (other.left + other.width) >= (left + width) ) {
-      if( other.top <= top &&  (other.top+long(other.height)) >= top ){
+    if (other.left <= left && (other.left + other.width) >= (left + width)) {
+      if (other.top <= top &&  (other.top+long(other.height)) >= top) {
         long old_tp = top + long(height);
-        top = std::min( other.top + long(other.height), old_tp );
+        top = std::min(other.top + long(other.height), old_tp);
         height = old_tp - top;
       }
-      else if ( other.top + other.height > (top+height) && other.top <= (top+long(height))  ) 
-      {
+      else if (other.top + other.height > (top+height) &&
+          other.top <= (top+long(height))) {
         height = other.top - top;
       }
-    else if( other.top <= top
-        && (other.top + other.height) >= (top + height) ) {
-      if ( other.left <= left &&  (other.left+long(other.width)) >= left ){
+    else if (other.top <= top
+        && (other.top + other.height) >= (top + height)) {
+      if (other.left <= left &&  (other.left+long(other.width)) >= left) {
         long old_lw = left + long(width);
-        left = std::min( other.left+long(other.width), old_lw );
+        left = std::min(other.left+long(other.width), old_lw);
         width = old_lw - left;
       }
-      else if ( other.left+other.width> (left+width) && other.left <= (left+long(width))  ) 
+      else if (other.left+other.width> (left+width) &&
+          other.left <= (left+long(width))) 
         width = other.left-width;
       }
     }
   }
-}
 }
 

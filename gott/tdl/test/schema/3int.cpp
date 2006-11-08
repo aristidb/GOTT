@@ -63,8 +63,7 @@ stru::repatcher *int_r() {
 struct schema_3int : schema_basic {
   schema_3int() 
   : schema_basic(
-      rule_one("document", rule("node", schema::rule_attr(
-               schema::tag = "el",
+      rule_one("document", rule("node", schema::rule_attr(               schema::tag = "el",
                schema::repatcher = int_r(), 
                schema::outer = slotcfg(slotcfg::exactly, 3))))) {}
 };

@@ -1,7 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-#ifndef GOTT_UI_UICONTEXT_BASE_HPP_INCLUDED
-#define GOTT_UI_UICONTEXT_BASE_HPP_INCLUDED
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -19,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -39,11 +36,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_UI_UICONTEXT_BASE_HPP_INCLUDED
+#define GOTT_UI_UICONTEXT_BASE_HPP_INCLUDED
+
 #include <gott/visibility.hpp>
 #include <gott/ui/input.hpp>
 #include <gott/ui/window_base.hpp>
 
-namespace gott{ namespace ui{
+namespace gott { namespace ui {
 
 /**
  * \brief Base class for all user interface contexts. 
@@ -68,14 +68,14 @@ class GOTT_EXPORT uicontext_base {
      * Should be called by every window_base implementation right after 
      * successful construction.
      */
-    virtual void register_window( window_base * ref ) = 0;
+    virtual void register_window(window_base * ref) = 0;
     /**
      * \brief removes a window from the event dispatching system of the context.
      * Should be called by every window_base implementation right before 
      * destruction. After that all incoming events to this window shall be 
      * droped.
      */
-    virtual void remove_window( window_base *ref ) = 0;
+    virtual void remove_window(window_base *ref) = 0;
     //\}
 
 

@@ -16,11 +16,12 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
  *  Andreas Pokorny (andreas.pokorny@gmail.com)
+ *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -45,44 +46,47 @@
 #include <gott/events/fd_manager.hpp>
 #include <gott/ui/ncurses/screen_activator.hpp>
 
+using gott::ui::ncurses::uicontext;
 
-namespace gott{namespace ui{namespace ncurses{
-
-uicontext::uicontext( events::main_loop & loop, int outfd, int infd, char const* termtype ) 
-  : loop_(loop), outfd_(outfd), infd_(infd), terminal_(0)
+uicontext::uicontext(
+    events::main_loop &loop,
+    int outfd, int infd,
+    char const * termtype) 
+: loop_(loop), outfd_(outfd), infd_(infd), terminal_(0)
 {
-  terminal_ = newterm( const_cast<char*>(termtype), fdopen( outfd_, "a"), fdopen(infd_, "r") );
-  screen_activator( this );
+  terminal_ = newterm(
+      const_cast<char*>(termtype),
+      fdopen(outfd_, "a"),
+      fdopen(infd_, "r"));
 
-  if( ! terminal_ ) 
+  screen_activator(this);
+
+  if (!terminal_) 
     throw system_error("Terminal creation failed.");
 
   try { 
-    loop.feature<events::fd_manager>().add_fd( 
-        infd
-        , events::fd_manager::read
-        , boost::bind( &uicontext::process_read, this ) 
-        );
-  }
-  catch(std::exception &e ) {
+    loop.feature<events::fd_manager>().add_fd(
+        infd,
+        events::fd_manager::read,
+        boost::bind(&uicontext::process_read, this) 
+);
+  } catch(std::exception &e) {
     endwin();
-    delscreen( terminal_ );
+    delscreen(terminal_);
     throw e;
-  }catch(...) {
+  } catch(...) {
     endwin();
-    delscreen( terminal_ );
+    delscreen(terminal_);
     throw system_error("Unknown exception caught");
   }
 
-
-  ::keypad(stdscr, true ); // enable keyboard mapping 
+  ::keypad(stdscr, true); // enable keyboard mapping 
 
   nonl();         /* tell curses not to do NL->CR/NL on output */
   cbreak();       /* take input chars one at a time, no wait for \n */
   echo();         /* echo input - in color */
 
-  if (has_colors())
-  {
+  if (has_colors()) {
     start_color();
 
     /*
@@ -99,62 +103,57 @@ uicontext::uicontext( events::main_loop & loop, int outfd, int infd, char const*
     init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(7, COLOR_WHITE,   COLOR_BLACK);
   }
-
 }
 
-void uicontext::register_window( window_base * ref ){
+void uicontext::register_window(window_base *ref) {
   window *curseswin = dynamic_cast<window*>(ref);
-  if(curseswin)
-    windows_.push_back( curseswin );
+  if (curseswin)
+    windows_.push_back(curseswin);
   else {
     // do what?
   }
 }
 
-void uicontext::remove_window( window_base *ref ){
+void uicontext::remove_window(window_base *ref) {
   window *curseswin = dynamic_cast<window*>(ref);
-  if(curseswin) {
-    std::vector<gott::ui::ncurses::window*>::iterator it = find( windows_.begin(), windows_.end(), curseswin);
-    if( it != windows_.end()) 
-      windows_.erase( it );
-  }
-  else {
+  if (curseswin) {
+    std::vector<gott::ui::ncurses::window*>::iterator it =
+      find(windows_.begin(), windows_.end(), curseswin);
+    if (it != windows_.end())
+      windows_.erase(it);
+  } else {
     // do what?
   }
 
 }
 
-void uicontext::quit(){
+void uicontext::quit() {
 }
 
-int uicontext::get_output_descriptor() const{
+int uicontext::get_output_descriptor() const {
   return outfd_;
 }
 
-
-int uicontext::get_input_descriptor() const{
+int uicontext::get_input_descriptor() const {
   return infd_;
 }
 
-void uicontext::process_read(){
-
+void uicontext::process_read() {
 }
 
-void uicontext::process_exception(){
+void uicontext::process_exception() {
 }
 void uicontext::process_sigwinch()
 {
-  screen_activator( this );
+  screen_activator(this);
   endwin();
   refresh();
   // run repaint here.. 
 }
 
 uicontext::~uicontext() {
-  screen_activator( this );
+  screen_activator(this);
   endwin();
-  delscreen( terminal_ );
+  delscreen(terminal_);
 }
-
-}}}
 

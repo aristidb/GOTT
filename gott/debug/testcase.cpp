@@ -25,7 +25,7 @@
 
 int r2 (int i) {
   TRACEME;
-  if(i)
+  if (i)
     return r2(i - 1);
   return i;
 }

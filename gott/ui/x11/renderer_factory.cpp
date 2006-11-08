@@ -17,7 +17,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,9 +36,11 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+
 #include "renderer_factory.hpp"
 
-gott::QID const gott::ui::x11::renderer_factory::qid("gott::ui::x11::renderer_factory");
+gott::QID const gott::ui::x11::renderer_factory::qid(
+    "gott::ui::x11::renderer_factory");
 
 gott::ui::x11::renderer_factory::~renderer_factory()
 {}

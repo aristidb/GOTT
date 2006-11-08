@@ -66,7 +66,7 @@ class rule_t;
  *   structure::tree tr;
  *   schema::match m(cont.get());
  *   simple::parse(m, m.get_debug());
- * } catch ( &m) {
+ * } catch (&m) {
  *   std::wcout << m.what() << std::endl;
  * }
  * @endcode

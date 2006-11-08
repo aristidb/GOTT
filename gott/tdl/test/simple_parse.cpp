@@ -166,7 +166,7 @@ a\n\
   sum\n\
     7\n\
   -2\n"
-  );
+);
   group_fixture.parse(data);
   
   B();
@@ -203,7 +203,7 @@ type multi\n\
        $ list named plugin, list string\n\
        named sum integer (> 0)\n\
        $ list integer"
-  );
+);
   group_fixture.parse(data);
   B(); D();
     N("module"); D(); N("foo"); U();
@@ -281,7 +281,7 @@ a `\n\
   ahllo\n\
    du\n\
  pferd\n"
-  );
+);
   group_fixture.parse(data);
   B(); D();
     N("a"); N("b"); D(); 
@@ -302,7 +302,7 @@ a `\n\
   ahllo\n\
   du\n\
  pferd\n"
-  );
+);
   group_fixture.parse(data);
   B(); D();
     N("a"); 
@@ -320,7 +320,7 @@ a `\n\
    ahllo\n\
    du\n\
   pferd\n"
-  );
+);
   group_fixture.parse(data);
   B(); D();
     N("a"); 

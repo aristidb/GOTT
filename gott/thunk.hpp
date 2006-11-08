@@ -76,7 +76,7 @@ struct concrete_thunk_t;
 #define GOTT_REDEFINE_THUNK_CONTEXT(tag, context) \
   template<class Out, class In> \
   std::auto_ptr<thunk_t<Out> > tag(In data, context con = context()) { \
-    return std::auto_ptr<thunk_t<Out> >( \
+    return std::auto_ptr<thunk_t<Out> >(\
         new concrete_thunk_t<Out, In, context>(data, con)); \
   }
 

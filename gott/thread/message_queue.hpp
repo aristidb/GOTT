@@ -216,7 +216,7 @@ public:
    * \return Whether a message was removed.
    */
   template<class T>
-  bool pop_if(T func) {
+  bool pop_if (T func) {
     scoped_lock lock(monitor_lock);
 
     wait_for_data_u(lock);

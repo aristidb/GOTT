@@ -348,7 +348,7 @@ void metadata_manager::add_core_tdl_schema(
         interfaces,
         features,
         plugin_information::normal
-        ),
+),
       "core");
 }
 
@@ -367,7 +367,7 @@ void metadata_manager::add_core_tdl_repatcher(
         interfaces,
         features,
         plugin_information::normal
-        ),
+),
       "core");
 }
 
@@ -401,7 +401,7 @@ bool metadata_manager::enum_plugins(
       bool (
         plugin_descriptor const &plugin_descriptor,
         plugin_information const &info
-      ) > const &callback,
+) > const &callback,
       boost::optional<QID> const &/*plugin_id*/,
       boost::optional<QID> const &/*interface_id*/,
       set<QID> const &/*features*/,
@@ -424,7 +424,7 @@ bool metadata_manager::enum_modules(
       bool (
         module_descriptor const &descriptor,
         module_information const &info
-      )
+)
     > const &callback,
     boost::optional<QID> const &/*module_id*/) const {
   // send all (still ok) modules to the callback - until the callback returns

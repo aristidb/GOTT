@@ -68,17 +68,18 @@ using namespace gott::events;
 using namespace boost::posix_time;
 
 template<typename Array>
-  void fill_color_array( Array& array, std::vector<std::pair<float,agg::rgba8> > const& colours ) {
-    for( std::size_t i = 0; i < colours.size()-1; ++i ) {
+  void fill_color_array(Array& array, std::vector<std::pair<float,agg::rgba8> > const& colours) {
+    for(std::size_t i = 0; i < colours.size()-1; ++i) {
       unsigned bpos = unsigned(float(array.size()) * colours[i].first);
       unsigned epos = unsigned(float(array.size()) * colours[i+1].first);
-      for( std::size_t j = bpos; j != epos; ++j ){
-        array[j] = colours[i].second.gradient(colours[i+1].second, (j-bpos)/double(epos-bpos) );
+      for(std::size_t j = bpos; j != epos; ++j) {
+      for(std::size_t j = bpos; j != epos; ++j) {
+        array[j] = colours[i].second.gradient(colours[i+1].second, (j-bpos)/double(epos-bpos));
       }
     }
   }
 
-void draw(agg::rendering_buffer& buf, gott::rect const& r )
+void draw(agg::rendering_buffer& buf, gott::rect const& r)
 {
   std::cout << "Drawing (" << r.left << "," << r.top << ")(" << r.width << "," << r.height  << ")" << std::endl;
   typedef agg::pixfmt_rgba32 pixfmt_type;
@@ -161,14 +162,14 @@ void draw(agg::rendering_buffer& buf, gott::rect const& r )
   // rbase.clear(agg::rgba8(255, 255, 255));
 
   std::vector<std::pair<float, agg::rgba8> > colours;
-  colours.push_back( std::make_pair( 0.0f, agg::rgba8(255, 0, 0, 178)));
-  colours.push_back( std::make_pair( 0.2f, agg::rgba8(204, 51, 0, 127)));
-  colours.push_back( std::make_pair( 0.4f, agg::rgba8(153, 51, 51, 127)));
-  colours.push_back( std::make_pair( 0.6f, agg::rgba8(102, 102, 51, 127)));
-  colours.push_back( std::make_pair( 0.8f, agg::rgba8(51, 102, 102, 76)));
-  colours.push_back( std::make_pair( 1.0f, agg::rgba8(0, 153, 102, 51)));
+  colours.push_back(std::make_pair(0.0f, agg::rgba8(255, 0, 0, 178)));
+  colours.push_back(std::make_pair(0.2f, agg::rgba8(204, 51, 0, 127)));
+  colours.push_back(std::make_pair(0.4f, agg::rgba8(153, 51, 51, 127)));
+  colours.push_back(std::make_pair(0.6f, agg::rgba8(102, 102, 51, 127)));
+  colours.push_back(std::make_pair(0.8f, agg::rgba8(51, 102, 102, 76)));
+  colours.push_back(std::make_pair(1.0f, agg::rgba8(0, 153, 102, 51)));
 
-  fill_color_array( color_array, colours );
+  fill_color_array(color_array, colours);
 
   agg::ellipse ell(r.width / 2, r.height/2, r.width/2, r.height/2, 100);
   ras.add_path(ell);
@@ -176,37 +177,38 @@ void draw(agg::rendering_buffer& buf, gott::rect const& r )
   agg::render_scanlines(ras, sl, ren_gradient);
 }
 
-deadline_timer move_window( window *win ) {
+deadline_timer move_window(window *win) {
   gott::properties::read_write_reference<gott::rect> reg = win->region().read_write();
   std::cout <<"move_window from (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height << ")";
   reg->left += 80 - rand()%90;
   reg->top += 80 - rand()%90;
-  reg->left = std::max( 0L, reg->left );
-  reg->top = std::max( 0L, reg->top);
+  reg->left = std::max(0L, reg->left);
+  reg->top = std::max(0L, reg->top);
   std::cout <<"  to (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height <<  ")" << std::endl;
-  return deadline_timer( microsec_clock::universal_time() + seconds(6), boost::bind( &move_window, win) );
+  return deadline_timer(microsec_clock::universal_time() + seconds(6), boost::bind(&move_window, win));
 }
 
-deadline_timer resize_window( window *win ) {
+deadline_timer resize_window(window *win) {
   gott::properties::read_write_reference<gott::rect> reg = win->region().read_write();
   std::cout <<"resize_window (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height  << ")";
   reg->width = 10 + rand()%180;
   reg->height= 10 + rand()%180;
   std::cout <<"  to (" << reg->left << "," << reg->top << ")(" << reg->width << "," << reg->height << ")" << std::endl;
-  return deadline_timer( microsec_clock::universal_time() + seconds(10), boost::bind( &resize_window, win) );
+  return deadline_timer(microsec_clock::universal_time() + seconds(10), boost::bind(&resize_window, win));
 }
 
 
-int main(int, char **){
+int main(int, char **) {
+int main(int, char **) {
   std::srand(std::time(0));
   select_loop loop;
   uicontext con;
   {
-    window win( con, gott::rect( 30,30,123,230), gott::string("simple_x11.cpp title"), size_t(gott::ui::window_flags::Defaults) );
-    win.on_draw().connect( &draw );
-    loop.add_read_fd( con.get_descriptor(), boost::bind( &uicontext::process_read, &con ) );
-    loop.add_timer( deadline_timer( microsec_clock::universal_time() + seconds(10), boost::bind( &resize_window, &win ) ) );
-    loop.add_timer( deadline_timer( microsec_clock::universal_time() + seconds(7), boost::bind( &move_window, &win ) ) );
+    window win(con, gott::rect(30,30,123,230), gott::string("simple_x11.cpp title"), size_t(gott::ui::window_flags::Defaults));
+    win.on_draw().connect(&draw);
+    loop.add_read_fd(con.get_descriptor(), boost::bind(&uicontext::process_read, &con));
+    loop.add_timer(deadline_timer(microsec_clock::universal_time() + seconds(10), boost::bind(&resize_window, &win)));
+    loop.add_timer(deadline_timer(microsec_clock::universal_time() + seconds(7), boost::bind(&move_window, &win)));
     loop.on_signal(SIGINT).connect(boost::bind(&select_loop::quit, &loop));
     loop.run();
   }

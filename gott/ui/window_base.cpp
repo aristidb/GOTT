@@ -37,7 +37,11 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include <gott/ui/window_base.hpp>
-namespace gott{namespace ui{
+
+using gott::ui::window_base;
+using gott::ui::mouse_event;
+using gott::ui::key_event;
+using gott::rect;
 
 window_base::~window_base()
 {}
@@ -82,8 +86,4 @@ boost::signal1<void,key_event const&> & window_base::on_key()
 {
   return key_;
 }
-
-
-
-}}
 

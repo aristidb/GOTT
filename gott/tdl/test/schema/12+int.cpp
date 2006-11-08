@@ -64,8 +64,7 @@ stru::repatcher *int_r() {
 struct schema_12plus_int : schema_basic {
   schema_12plus_int() 
   : schema_basic(
-      rule_one("document", rule("node", rule_attr(
-               schema::tag = "el",
+      rule_one("document", rule("node", rule_attr(               schema::tag = "el",
                schema::repatcher = int_r(),
                schema::outer = schema::at_least(12)))))
   {}

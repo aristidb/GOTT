@@ -154,7 +154,7 @@ rule_attr_t rule_attr_with_named_params(Args const &args) {
       args[outer | slotcfg()],
       boost::shared_ptr<structure::repatcher const>(
         args[repatcher2 | static_cast<structure::repatcher *>(0)])
-  );
+);
 }
 
 }}

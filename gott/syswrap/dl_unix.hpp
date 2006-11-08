@@ -71,7 +71,7 @@ namespace gott {
  * \return a handle of the dynamic library
  * \throw gott::system_error
  */
-GOTT_EXPORT void* dlopen_unix( char const* filename, int flag );
+GOTT_EXPORT void* dlopen_unix(char const* filename, int flag);
 
 /**
  * Load a symbol from a dynamic library. See dlsym(3) for reference

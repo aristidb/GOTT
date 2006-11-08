@@ -1,6 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-#ifndef GOTT_UI_X11_WINDOW_HPP_INCLUDED
-#define GOTT_UI_X11_WINDOW_HPP_INCLUDED
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -38,6 +36,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_UI_X11_WINDOW_HPP_INCLUDED
+#define GOTT_UI_X11_WINDOW_HPP_INCLUDED
+
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -52,7 +53,7 @@
 #include <gott/properties/external_storage.hpp>
 #include <gott/properties/signal_notification.hpp>
 
-namespace gott{namespace ui{namespace x11{
+namespace gott { namespace ui { namespace x11 {
 
 /**
  * \brief x11 window class. 
@@ -98,13 +99,13 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     Atom protocols[4];
 
     rect get_region() const;
-    void set_region( rect const& r );
-    void handle_sys_resize( rect const& r );
+    void set_region(rect const& r);
+    void handle_sys_resize(rect const& r);
 
-    void set_title( gott::string const& str );
+    void set_title(gott::string const& str);
 
-    void map_window( bool new_state );
-    void set_window_type( flags_type const& fl );
+    void map_window(bool new_state);
+    void set_window_type(flags_type const& fl);
 
   public:
 
@@ -115,7 +116,7 @@ class GOTT_EXPORT window : public gott::ui::window_base {
      * \param[in] title a unicode string containing the title of the window
      * \param[in] flags a combination of ui::window_flags
      */
-    window( uicontext& app, rect const& position, string const& title, std::size_t flags );
+    window(uicontext& app, rect const& position, string const& title, std::size_t flags);
 
     rect_property_type& region();
     rect_property_type const& region() const;
@@ -136,14 +137,14 @@ class GOTT_EXPORT window : public gott::ui::window_base {
 
     void set_size_hints();
 
-    void update_region( rect const& region );
+    void update_region(rect const& region);
 
     uicontext* get_uicontext();
 
 
     bool needs_update() const;
     rect get_invalid_area() const;
-    void invalidate_area( rect const& region );
+    void invalidate_area(rect const& region);
 
 
 
@@ -159,12 +160,11 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     /**
      * \brief Sets a property 
      */
-    void change_property( Atom property, Atom type, int format, unsigned char *data, int nlements );
+    void change_property(Atom property, Atom type, int format, unsigned char *data, int nlements);
     //\}
 
     ~window();
 };
-
 
 }}}
 

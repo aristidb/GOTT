@@ -35,16 +35,19 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+
 #ifndef GOTT_SYSWRAP_FUNCTION_CAST_HPP
 #define GOTT_SYSWRAP_FUNCTION_CAST_HPP
-namespace gott{
+
+namespace gott {
+
 /**
  * Cast a symbol address to a function pointer. 
  * \param handle the address of the symbol
  * \return a function pointer
  */
 template<typename FType>
-GOTT_LOCAL inline FType* function_cast( void* handle )
+GOTT_LOCAL inline FType* function_cast(void* handle)
 { return (FType*)(handle); }
 
 }

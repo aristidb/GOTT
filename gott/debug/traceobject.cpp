@@ -32,7 +32,7 @@ tracenodes traceobject::tracedfuncs;
 traceobject::traceobject(std::string function,
                          std::string filename,
                          unsigned int line) {
-  if(!activefunc) {
+  if (!activefunc) {
     tracedfuncs.push_back(tracenodep(new tracenode("TRACEROOT", 
                                                "NOWHERE", 
                                                0, 0, 0,

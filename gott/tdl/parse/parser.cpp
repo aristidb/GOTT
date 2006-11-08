@@ -372,7 +372,6 @@ string exec_parse::read_paren(string::utf8_range &unread) {
   } balance;
 
   ++unread.Begin; // skip (
-
   for (; unread.filled() && !balance; ++unread.Begin) 
     balance(*unread.begin());
 

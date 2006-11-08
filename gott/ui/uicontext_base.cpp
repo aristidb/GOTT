@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,20 +35,18 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+
 #include <gott/ui/uicontext_base.hpp>
 
+using gott::ui::uicontext_base;
 
-namespace gott{namespace ui{
-
-gott::ui::key_state const& uicontext_base::get_key_state() const{
+gott::ui::key_state const& uicontext_base::get_key_state() const {
   return keys_;
 }
 
-gott::ui::mouse_state const& uicontext_base::get_mouse_state() const{
+gott::ui::mouse_state const& uicontext_base::get_mouse_state() const {
   return mouse_;
 }
 
-uicontext_base::~uicontext_base(){}
-
-}}
+uicontext_base::~uicontext_base() {}
 

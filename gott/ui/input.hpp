@@ -1,7 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-#ifndef GOTT_UI_INPUT_HPP_INCLUDED
-#define GOTT_UI_INPUT_HPP_INCLUDED
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -38,12 +35,15 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+
+#ifndef GOTT_UI_INPUT_HPP_INCLUDED
+#define GOTT_UI_INPUT_HPP_INCLUDED
+
 #include <gott/visibility.hpp>
 #include <gott/graphics/geometry.hpp>
 #include <vector>
 
-namespace gott{namespace ui{
-
+namespace gott { namespace ui {
 
 /**
  * \brief Preliminary class to represent the mouse state.
@@ -66,18 +66,18 @@ struct GOTT_LOCAL mouse_state
 
     GOTT_EXPORT mouse_state();
 
-    inline bool get_button( std::size_t index ) const { return buttons[index]==1; }
+    inline bool get_button(std::size_t index) const { return buttons[index]==1; }
     inline int get_x_axis() const { return primary.x; }
     inline int get_y_axis() const { return primary.y; }
     inline int get_z_axis() const { return secondary.x; }
     inline coord const& get_primary_position() const { return primary; }
     inline coord const& get_secondary_position() const { return secondary; }
 
-    inline void set_button( std::size_t index, bool state ) { buttons[index]=state; }
-    inline void update_primary_position( coord const& movement ) { primary += movement; }
-    inline void update_secondary_position( coord const& movement ) { secondary += movement; }
-    inline void set_primary_position( coord const& p ) { primary = p; }
-    inline void set_secondary_position( coord const& p ) { secondary = p; }
+    inline void set_button(std::size_t index, bool state) { buttons[index]=state; }
+    inline void update_primary_position(coord const& movement) { primary += movement; }
+    inline void update_secondary_position(coord const& movement) { secondary += movement; }
+    inline void set_primary_position(coord const& p) { primary = p; }
+    inline void set_secondary_position(coord const& p) { secondary = p; }
 };
 
 /**
@@ -91,9 +91,9 @@ struct GOTT_LOCAL mouse_event
   };
   event_type type;
 
-  mouse_event( coord const& p, coord const& s )
-  : type( Move ), primary(p), secondary(s) {}
-  mouse_event( event_type const& type, std::size_t index, coord const& p, coord const& s)
+  mouse_event(coord const& p, coord const& s)
+  : type(Move), primary(p), secondary(s) {}
+  mouse_event(event_type const& type, std::size_t index, coord const& p, coord const& s)
     : type(type), primary(p), secondary(s), button_index(index) {}
   // add a time stamp here?
   coord primary;
@@ -255,10 +255,10 @@ enum key_code {
  */
 struct GOTT_LOCAL key_event
 {
-  enum event_type{ Press, Release }; // Hold?
+  enum event_type { Press, Release }; // Hold?
   event_type type;
   key_code code; 
-  GOTT_EXPORT key_event( key_code code, event_type t );
+  GOTT_EXPORT key_event(key_code code, event_type t);
 };
 
 /**
@@ -270,10 +270,10 @@ struct GOTT_LOCAL key_state
     std::vector<unsigned char> keyboard;
   public:
     GOTT_EXPORT key_state();
-    inline bool get_state( key_code code ) const {return keyboard[code]&1; }
-    inline bool operator()( key_code code ) const {return keyboard[code]&1; }
-    inline void set( key_code code ) {keyboard[code]=1; }
-    inline void unset( key_code code ) {keyboard[code]=0; }
+    inline bool get_state(key_code code) const {return keyboard[code]&1; }
+    inline bool operator()(key_code code) const {return keyboard[code]&1; }
+    inline void set(key_code code) {keyboard[code]=1; }
+    inline void unset(key_code code) {keyboard[code]=0; }
 };
 
 

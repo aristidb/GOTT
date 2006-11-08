@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com).
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -41,7 +41,7 @@
 
 #include <gott/visibility.hpp>
 
-namespace gott{ namespace graphics{
+namespace gott { namespace graphics {
 
   /**
    * For details look at \ref graphics_renderer documentaton.
@@ -49,10 +49,10 @@ namespace gott{ namespace graphics{
 class GOTT_EXPORT renderer
 {
   public:
-   /* void update_display( region const& ); 
-    void resize( region const& ); 
+   /* void update_display(region const&); 
+    void resize(region const&); 
 
-    void invalidate( graphics::object * );
+    void invalidate(graphics::object *);
     */
     //
     virtual ~renderer();

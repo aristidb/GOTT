@@ -40,11 +40,12 @@
 
 #include <gott/ui/window_base.hpp>
 
-namespace gott{namespace ui{
+namespace gott { namespace ui {
 
 /**
  * \brief A generic API unaware window class
- * The generic window, unlike other GUI-Systems this window class allows migrating 
+ * The generic window, unlike other GUI-Systems this window class allows
+ * migrating 
  * a window from one context to another .. elaborate...
  */
 class GOTT_EXPORT window : public window_base  {
@@ -54,7 +55,7 @@ class GOTT_EXPORT window : public window_base  {
 
 
     void set_size_hints();
-    void update_region( rect const& region );
+    void update_region(rect const& region);
     uicontext* get_uicontext();
 
     ~window();

@@ -15,7 +15,7 @@
  * The Original Code is An Event Handling Class Library.
  *
  * The Initial Developer of the Original Code is
- * Andreas Pokorny (andreas.pokorny@gmail.com )
+ * Andreas Pokorny (andreas.pokorny@gmail.com)
  * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
@@ -47,7 +47,8 @@
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin, gott::events::select_loop)
 
-namespace gott{namespace events{
+namespace gott { namespace events {
+
 select_loop::select_loop() 
 : standard_timer_manager(this),
   message_mgr(this),
@@ -97,19 +98,19 @@ void select_loop::add_fd(int fd, unsigned mask,
     FD_SET(fd, &fd_sets.except_fds);
 }
 
-void select_loop::remove_fd( int fd ) {
-  callback_map::iterator it = callbacks.find( fd );
+void select_loop::remove_fd(int fd) {
+  callback_map::iterator it = callbacks.find(fd);
   if (it == callbacks.end())
     throw system_error("could not remove fd");
   if (wait_fds.count(fd) > 0)
     remove_waitable();
-  callbacks.erase( it );
+  callbacks.erase(it);
   FD_CLR(fd,&fd_sets.read_fds);
   FD_CLR(fd,&fd_sets.write_fds);
   FD_CLR(fd,&fd_sets.except_fds);
 }
 
-void select_loop::run(){
+void select_loop::run() {
   struct running_helper {
     bool &running_;
     running_helper(bool &running_)
@@ -150,22 +151,22 @@ void select_loop::run(){
         boost::function<void (unsigned)> > > call_t;
       call_t call;
 
-      for( callback_map::const_iterator it = callbacks.begin(), 
+      for(callback_map::const_iterator it = callbacks.begin(), 
           e = callbacks.end();
 	        num_fd && it!=callbacks.end();
 	        ++it) {
         unsigned mask = 0;
-        if( FD_ISSET( it->first, &fd_sets.read_fds ) ) {
+        if (FD_ISSET(it->first, &fd_sets.read_fds)) {
           mask |= fd_manager::read;
-          FD_CLR( it->first, &fd_sets.read_fds );
+          FD_CLR(it->first, &fd_sets.read_fds);
         }
-        if( FD_ISSET( it->first, &fd_sets.write_fds) ) {
+        if (FD_ISSET(it->first, &fd_sets.write_fds)) {
           mask |= fd_manager::write;
-          FD_CLR( it->first, &fd_sets.write_fds );
+          FD_CLR(it->first, &fd_sets.write_fds);
         }
-        if( FD_ISSET( it->first, &fd_sets.except_fds) ) {
+        if (FD_ISSET(it->first, &fd_sets.except_fds)) {
           mask |= fd_manager::exception;
-          FD_CLR( it->first, &fd_sets.except_fds );
+          FD_CLR(it->first, &fd_sets.except_fds);
         }
         if (mask) {
           --num_fd;
@@ -187,16 +188,16 @@ void select_loop::run(){
         throw;
     }
 
-    for( callback_map::const_iterator it = callbacks.begin(), 
+    for(callback_map::const_iterator it = callbacks.begin(), 
 	   e = callbacks.end();
          it!=e;
          ++it)  {
-      if( it->second.mask & fd_manager::write )
-        FD_SET( it->first, &fd_sets.write_fds );
-      if( it->second.mask & fd_manager::read )
-        FD_SET( it->first, &fd_sets.read_fds );
-      if( it->second.mask & fd_manager::exception )
-        FD_SET( it->first, &fd_sets.except_fds );
+      if (it->second.mask & fd_manager::write)
+        FD_SET(it->first, &fd_sets.write_fds);
+      if (it->second.mask & fd_manager::read)
+        FD_SET(it->first, &fd_sets.read_fds);
+      if (it->second.mask & fd_manager::exception)
+        FD_SET(it->first, &fd_sets.except_fds);
     }
 
     n = callbacks.rbegin()->first + 1;
@@ -213,7 +214,7 @@ bool select_loop::running() const {
 
 select_loop::~select_loop() {
   on_destroy()();
-  for( callback_map::const_iterator it = callbacks.begin(), e = callbacks.end();
+  for(callback_map::const_iterator it = callbacks.begin(), e = callbacks.end();
       it!=e;
       ++it)  {
     FD_CLR(it->first,&fd_sets.read_fds);

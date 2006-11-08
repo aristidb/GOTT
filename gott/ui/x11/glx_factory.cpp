@@ -17,7 +17,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -53,7 +53,7 @@ glx_factory::~glx_factory()
 {
 }
 
-::GLXFBConfig glx_factory::fb_config( ::Display * display, int screen )
+::GLXFBConfig glx_factory::fb_config(::Display * display, int screen)
 {
   // possible options could be 16bit vs 32bit, Stencil on/off, alpha on/off, 
   int attributes[] = { GLX_DRAWABLE_TYPE_SGIX, GLX_WINDOW_BIT_SGIX
@@ -63,50 +63,49 @@ glx_factory::~glx_factory()
 
   int size = 0;
 
-  GLXFBConfig * config = glXChooseFBConfig( display, screen, attributes, &size);
-  if( 0 == size ) 
+  GLXFBConfig * config = glXChooseFBConfig(display, screen, attributes, &size);
+  if (0 == size) 
     throw system_error("No X Visual for OpenGL found.");
 
   // fist best? config is chosen 
   return *config; 
 }
 
-::XVisualInfo* glx_factory::visual_info( ::Window rootX11WindowHandle
-    , ::Display * display, int screen )
+::XVisualInfo* glx_factory::visual_info(::Window rootX11WindowHandle
+    , ::Display * display, int screen)
 {
-  return glXGetVisualFromFBConfig( display, fb_config(display, screen) );
+  return glXGetVisualFromFBConfig(display, fb_config(display, screen));
 }
 
-renderer * glx_factory::renderer( ::Window x11WindowHandle, ::Display * display
-    , int screen )
+renderer * glx_factory::renderer(::Window x11WindowHandle, ::Display * display
+    , int screen)
 {
-  return new gott::graphics::gl::renderer( 
-      new glx_resource( 
-        fb_config( display, screen ) 
+  return new gott::graphics::gl::renderer(
+      new glx_resource(        fb_config(display, screen) 
         , display
         , x11WindowHandle 
-        ) 
-      ) ;
+) 
+) ;
 }
 
 
-glx_resource::glx_resource( GLXFBConfig config, ::Display *display
-    , ::Window windowHandle )
+glx_resource::glx_resource(GLXFBConfig config, ::Display *display
+    , ::Window windowHandle)
   : window_(0), context_(0), display_(display)
 {
-  window_ = glXCreateWindow( display, config, windowHandle, 0 );
-  context_ = glXCreateNewContext( display, config, GLX_RGBA_TYPE, 0, 1 );
+  window_ = glXCreateWindow(display, config, windowHandle, 0);
+  context_ = glXCreateNewContext(display, config, GLX_RGBA_TYPE, 0, 1);
 }
 
 glx_resource::~glx_resource()
 {
-  glXDestroyWindow( display_, window_ );
-  glXDestroyContext( display_, context_ );
+  glXDestroyWindow(display_, window_);
+  glXDestroyContext(display_, context_);
 
 }
 
 void glx_resource::make_current()
 {
-  if( ! glXMakeContextCurrent( display_, window_, window_, context_ ) )
-    throw gott::system_error( "Failure during make_current" );
+  if (! glXMakeContextCurrent(display_, window_, window_, context_))
+    throw gott::system_error("Failure during make_current");
 }

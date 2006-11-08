@@ -1,6 +1,5 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-#ifndef GOTT_UI_X11_WINDOW_HPP_INCLUDED
-#define GOTT_UI_X11_WINDOW_HPP_INCLUDED
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -18,11 +17,12 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
  *  Andreas Pokorny (andreas.pokorny@gmail.com)
+ *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -38,6 +38,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_UI_X11_WINDOW_HPP_INCLUDED
+#define GOTT_UI_X11_WINDOW_HPP_INCLUDED
+
 #include <gott/ui/window_base.hpp>
 #include <gott/ui/ncurses/uicontext.hpp>
 #include <gott/graphics/renderer.hpp>
@@ -45,7 +48,7 @@
 #include <gott/properties/external_storage.hpp>
 #include <gott/properties/signal_notification.hpp>
 
-namespace gott{namespace ui{namespace ncurses{
+namespace gott { namespace ui { namespace ncurses {
 
 /**
  * \brief ncurses window class. 
@@ -87,13 +90,13 @@ class GOTT_EXPORT window : public gott::ui::window_base {
     uicontext * context;
 
     rect get_region() const;
-    void set_region( rect const& r );
-    void handle_sys_resize( rect const& r );
+    void set_region(rect const& r);
+    void handle_sys_resize(rect const& r);
 
-    void set_title( gott::string const& str );
+    void set_title(gott::string const& str);
 
-    void map_window( bool new_state );
-    void set_window_type( flags_type const& fl );
+    void map_window(bool new_state);
+    void set_window_type(flags_type const& fl);
 
   public:
 
@@ -104,35 +107,35 @@ class GOTT_EXPORT window : public gott::ui::window_base {
      * \param[in] title a unicode string containing the title of the window
      * \param[in] flags a combination of ui::window_flags
      */
-    window( uicontext& app, rect const& position, string const& title, std::size_t flags );
+    window(uicontext &app, rect const &position, string const &title,
+        std::size_t flags);
 
-    rect_property_type& region();
-    rect_property_type const& region() const;
-    string_property_type & title(); 
-    string_property_type const& title() const;
+    rect_property_type &region();
+    rect_property_type const &region() const;
+    string_property_type &title(); 
+    string_property_type const &title() const;
 
-    toggle_property_type& visible(); 
-    toggle_property_type const& visible() const; 
+    toggle_property_type &visible(); 
+    toggle_property_type const &visible() const; 
 
 #if 0
-    // toggle_property_type& open(); 
-    // toggle_property_type const& open() const; 
+    toggle_property_type &open(); 
+    toggle_property_type const &open() const; 
 #endif
     
-    flags_property_type& flags(); 
+    flags_property_type &flags(); 
     flags_property_type const& flags() const; 
-
 
     void set_size_hints();
 
-    void update_region( rect const& region );
+    void update_region(rect const& region);
 
     uicontext* get_uicontext();
 
 
     bool needs_update() const;
     rect get_invalid_area() const;
-    void invalidate_area( rect const& region );
+    void invalidate_area(rect const& region);
 
 
 

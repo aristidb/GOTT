@@ -1,5 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -17,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,6 +35,7 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <iostream>
@@ -49,79 +49,86 @@
 #include <gott/ui/ncurses/window.hpp> 
 #include <gott/ui/ncurses/screen_activator.hpp> 
 
-
-namespace gott{namespace ui{namespace ncurses{
-
 using boost::bind;
 using boost::lambda::var;
 using boost::lambda::constructor;
-window::window( uicontext& app, rect const& position, string const& title, std::size_t flags ) 
-  : region_( gott::properties::external_storage<rect>( 
-        bind(&window::get_region, this) 
-        , bind(&window::set_region, this, _1 ) )  
-      )
-  , title_( gott::properties::external_storage<gott::string>(
-        var(title_string)
-        , bind(&window::set_title, this, _1 ) )
-      )
-  , visibility_( gott::properties::external_storage<bool>(
-        var(mapped_state)
-        , bind(&window::map_window, this,_1 ) )
-      )
-  , flags_( gott::properties::external_storage<flags_type>(
-        var(win_flags)
-        , bind(&window::set_window_type, this,_1) )
-      ) 
-  , window_(0)
-  , invalid_area(0,0,0,0)
-  , mapped_state(false)
-  , win_flags(0)
-  , context(&app)
+using gott::properties::external_storage;
+using gott::rect;
+using gott::ui::window_base;
+using gott::ui::ncurses::uicontext;
+using gott::ui::ncurses::window;
+
+window::window(
+    uicontext &app,
+    rect const &position,
+    string const &title,
+    std::size_t flags)
+: region_(external_storage<rect>(
+    bind(&window::get_region, this),
+    bind(&window::set_region, this, _1))),
+  title_(external_storage<gott::string>(
+    var(title_string),
+    bind(&window::set_title, this, _1))),
+  visibility_(external_storage<bool>(
+    var(mapped_state),
+    bind(&window::map_window, this,_1))),
+  flags_(external_storage<flags_type>(
+    var(win_flags),
+    bind(&window::set_window_type, this, _1))),
+  window_(0),
+  invalid_area(0,0,0,0),
+  mapped_state(false),
+  win_flags(0),
+  context(&app)
 {
+  screen_activator activator(context);
 
-  screen_activator activator( context );
-
-
-  flags_.set( flags );
+  flags_.set(flags);
 
   title_.set(title);
 
   // flag this window as open
   flags |= window_flags::Open;
 
-  window_ = ::newwin(position.width, position.height, position.left, position.top );
-  if( ! window_ )
+  window_ = ::newwin(
+    position.width,
+    position.height,
+    position.left,
+    position.top);
+
+  if (!window_)
     throw system_error("Could not create a window.");
 
   region_.set(position);
 
-  context->register_window( this );
+  context->register_window(this);
 
-  if( flags & window_flags::Visible )
+  if (flags & window_flags::Visible)
     visibility_.set(true);
 
   ::wprintw(window_, "Hi There !!!");
   ::wrefresh(window_);
 
-  invalidate_area( rect(0,0,position.width, position.height ) );
+  invalidate_area(rect(0,0,position.width, position.height));
 }
 
 /**
  * \brief handles the "read" part of the region property
  * \returns the area covered by the window 
  */
-rect window::get_region() const{
-  return rect( 0,0,0,0 );
+rect window::get_region() const {
+  return rect(0,0,0,0);
 }
 
 /**
  * \brief Called by gott::ncurses::uicontext to update the region 
  */
-void window::handle_sys_resize( rect const& region ){
-  if( region != last_region ) {
+void window::handle_sys_resize(rect const& region) {
+  if (region != last_region) {
     // resize 
-    if( region.width != last_region.width || region.height != last_region.height )
-      invalidate_area(rect ( 0,0, region.width, region.height ) );
+    if (region.width != last_region.width ||
+        region.height != last_region.height)
+      invalidate_area(rect (0,0, region.width, region.height));
     last_region = region;
   }
 }
@@ -135,14 +142,14 @@ void window::handle_sys_resize( rect const& region ){
  * The uicontext will tell the  window that the size actually 
  * changed. So we have to differ between these two resize ``events''.
  */
-void window::set_region( rect const& region ){
+void window::set_region(rect const& region) {
 }
 
 /**
  * Converts the string to a text property, and sets it as the 
  * X11 window manager title property. 
  */
-void window::set_title( gott::string const& str ){
+void window::set_title(gott::string const& str) {
   title_string = str;
  
 }
@@ -152,88 +159,71 @@ void window::set_title( gott::string const& str ){
  * \bug This code is pretty much untested, there is no evidence
  * whether these flags are really considered by the wm... 
  */
-void window::set_window_type( gott::ui::window_base::flags_type const& new_flags ){
+void window::set_window_type(window_base::flags_type const &new_flags) {
   
 }
 
-gott::ui::window_base::rect_property_type& window::region()
-{
+gott::ui::window_base::rect_property_type& window::region() {
   return region_;
 }
 
-gott::ui::window_base::rect_property_type const& window::region() const
-{
+gott::ui::window_base::rect_property_type const& window::region() const {
   return region_;
 }
 
-gott::ui::window_base::string_property_type & window::title()
-{
+gott::ui::window_base::string_property_type & window::title() {
   return title_;
 }
  
-gott::ui::window_base::string_property_type const& window::title() const
-{
+gott::ui::window_base::string_property_type const& window::title() const {
   return title_;
 }
 
 
-gott::ui::window_base::toggle_property_type& window::visible()
-{
+gott::ui::window_base::toggle_property_type& window::visible() {
   return visibility_;
 }
  
-gott::ui::window_base::toggle_property_type const& window::visible() const
-{
+gott::ui::window_base::toggle_property_type const& window::visible() const {
   return visibility_;
 }
  
-
-
-gott::ui::window_base::flags_property_type& window::flags()
-{
+gott::ui::window_base::flags_property_type& window::flags() {
   return flags_;
 }
  
-gott::ui::window_base::flags_property_type const& window::flags() const
-{
+gott::ui::window_base::flags_property_type const& window::flags() const {
   return flags_;
 }
  
-
-
-void window::set_size_hints(){
+void window::set_size_hints() {
 }
 
-void window::update_region( rect const& region ){
+void window::update_region(rect const& region) {
   
 }
 
-uicontext* window::get_uicontext(){
+uicontext* window::get_uicontext() {
   return context;
 }
 
-bool window::needs_update() const{
+bool window::needs_update() const {
   return invalid_area.width != 0 || invalid_area.height != 0;
 }
+
 rect window::get_invalid_area() const {
   return invalid_area;
 }
-void window::invalidate_area( rect const& region ){
+
+void window::invalidate_area(rect const& region) {
   invalid_area.add_region(region);
 }
 
-void window::map_window( bool newstate ) 
-{
+void window::map_window(bool newstate) {
 }
 
-
-window::~window()
-{
-  screen_activator activator( context );
+window::~window() {
+  screen_activator activator(context);
   ::delwin(window_);
 }
-
-
-
-}}}
 

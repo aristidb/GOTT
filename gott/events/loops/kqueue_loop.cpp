@@ -114,7 +114,7 @@ namespace events {
 
   sigc::signal1<void, int> &kqueue_loop::on_signal(int sig) {
     impl::map_sig_hnd::iterator i = p->signals.find(sig);
-    if(i == p->signals.end()) {
+    if (i == p->signals.end()) {
       struct kevent n;
       EV_SET(&n, sig, EVFILT_SIGNAL, EV_ADD | EV_ENABLE, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
@@ -136,18 +136,18 @@ namespace events {
         		   boost::function<void (unsigned)> const &cb,
         		   bool wait)
   {
-    if(mask & fd_manager::read || mask & fd_manager::exception) {
+    if (mask & fd_manager::read || mask & fd_manager::exception) {
       struct kevent n;
       EV_SET(&n, fd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
-    if(mask & fd_manager::write) {
+    if (mask & fd_manager::write) {
       struct kevent n;
       EV_SET(&n, fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
 
-    if(wait)
+    if (wait)
       add_waitable();
 
     p->fd_callbacks.insert(std::make_pair(fd, impl::callback(mask, cb, wait)));
@@ -155,22 +155,22 @@ namespace events {
 
   void kqueue_loop::remove_fd(int fd) {
     impl::map_fd_cb::iterator i=p->fd_callbacks.find(fd);
-    if(i == p->fd_callbacks.end())
+    if (i == p->fd_callbacks.end())
       throw system_error("could not remove fd");
 
-    if(i->second.mask & fd_manager::read ||
+    if (i->second.mask & fd_manager::read ||
        i->second.mask & fd_manager::exception) {
       struct kevent n;
       EV_SET(&n, fd, EVFILT_READ, EV_DELETE, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
-    if(i->second.mask & fd_manager::write) {
+    if (i->second.mask & fd_manager::write) {
       struct kevent n;
       EV_SET(&n, fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
       kqueue::event_bsd(p->queue.access(), &n, 1, 0, 0, 0);
     }
 
-    if(i->second.wait)
+    if (i->second.wait)
       remove_waitable();
 
     p->fd_callbacks.erase(i);
@@ -179,19 +179,19 @@ namespace events {
   namespace {
     GOTT_LOCAL u_int ev_t2kqueue(unsigned mask) {
       u_int fflags = 0;
-      if(mask & notify_fs::file_delete)
+      if (mask & notify_fs::file_delete)
 	fflags |= NOTE_DELETE;
-      if(mask & notify_fs::file_move)
+      if (mask & notify_fs::file_move)
 	fflags |= NOTE_RENAME;
-      if(mask & notify_fs::file_modify)
+      if (mask & notify_fs::file_modify)
 	fflags |= NOTE_WRITE;
-      if(mask & notify_fs::file_attrib)
+      if (mask & notify_fs::file_attrib)
 	fflags |= NOTE_ATTRIB;
-      if(mask & notify_fs::file_access_revoke)
+      if (mask & notify_fs::file_access_revoke)
 	fflags |= NOTE_REVOKE;
-      if(mask & notify_fs::file_link)
+      if (mask & notify_fs::file_link)
 	fflags |= NOTE_LINK;
-      if(mask & notify_fs::file_extend)
+      if (mask & notify_fs::file_extend)
 	fflags |= NOTE_EXTEND;
       return fflags;
     }
@@ -207,7 +207,7 @@ namespace events {
 	   ev_t2kqueue(mask), 0, 0);
 
     p->notify_fs.insert(std::make_pair(fd, impl::callback(mask, cb, wait)));
-    if(wait)
+    if (wait)
       add_waitable();
 
     kqueue::event_bsd(p->queue.access(), &e, 1, 0, 0, 0);
@@ -215,14 +215,14 @@ namespace events {
 
   void kqueue_loop::unwatch_fd(int fd) {
     impl::map_fd_cb::iterator i = p->notify_fs.find(fd);
-    if(i == p->notify_fs.end())
+    if (i == p->notify_fs.end())
       return;
 
     struct kevent e;
     EV_SET(&e, fd, EVFILT_VNODE, EV_DELETE, ev_t2kqueue(i->second.mask), 0, 0);
     kqueue::event_bsd(p->queue.access(), &e, 1, 0, 0, 0);
 
-    if(i->second.wait)
+    if (i->second.wait)
       remove_waitable();
     p->notify_fs.erase(i);
   }
@@ -238,19 +238,19 @@ namespace events {
   namespace {
     GOTT_LOCAL unsigned kqueue2ev_t(u_int mask) {
       unsigned ev_t_ = 0;
-      if(mask & NOTE_DELETE)
+      if (mask & NOTE_DELETE)
 	ev_t_ |= notify_fs::file_delete;
-      if(mask & NOTE_RENAME)
+      if (mask & NOTE_RENAME)
 	ev_t_ |= notify_fs::file_move;
-      if(mask & NOTE_WRITE)
+      if (mask & NOTE_WRITE)
 	ev_t_ |= notify_fs::file_modify;
-      if(mask & NOTE_ATTRIB)
+      if (mask & NOTE_ATTRIB)
 	ev_t_ |= notify_fs::file_attrib;
-      if(mask & NOTE_REVOKE)
+      if (mask & NOTE_REVOKE)
 	ev_t_ |= notify_fs::file_access_revoke;
-      if(mask & NOTE_LINK)
+      if (mask & NOTE_LINK)
 	ev_t_ |= notify_fs::file_link;
-      if(mask & NOTE_EXTEND)
+      if (mask & NOTE_EXTEND)
 	ev_t_ |= notify_fs::file_extend;
       return ev_t_;
     }
@@ -282,27 +282,27 @@ namespace events {
       int n=kqueue::event_bsd(p->queue.access(), 0, 0, event_list, EVENTS_N,
         		      has_timers_mem ? &tm : 0x0); //FIXME: EINTR?
       for(int i=0; i<n; ++i) {        
-        if(event_list[i].filter == EVFILT_SIGNAL) {
+        if (event_list[i].filter == EVFILT_SIGNAL) {
           impl::map_sig_hnd::iterator j = p->signals.find(event_list[i].ident);
-          if(j != p->signals.end())
+          if (j != p->signals.end())
 	    j->second(event_list[i].ident);
         }
-	else if(event_list[i].filter == EVFILT_VNODE) {
+	else if (event_list[i].filter == EVFILT_VNODE) {
 	  impl::map_fd_cb::iterator j=p->notify_fs.find(event_list[i].ident);
-	  if(j == p->notify_fs.end())
+	  if (j == p->notify_fs.end())
 	    continue;
 	  j->second.call(kqueue2ev_t(event_list[i].fflags));
 	}
 	else {
 	  impl::map_fd_cb::iterator j=p->fd_callbacks.find(event_list[i].ident);
-	  if(j == p->fd_callbacks.end())
+	  if (j == p->fd_callbacks.end())
 	    continue;
-	  if(event_list[i].filter == EVFILT_READ) {
+	  if (event_list[i].filter == EVFILT_READ) {
 	     assert(j->second.mask & fd_manager::read ||
 		    j->second.mask & fd_manager::exception);
 	    j->second.call(fd_manager::read);
 	  }
-	  else if(event_list[i].filter == EVFILT_WRITE) {
+	  else if (event_list[i].filter == EVFILT_WRITE) {
 	    assert(j->second.mask & fd_manager::write);
 	    j->second.call(fd_manager::write);
 	  }

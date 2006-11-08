@@ -21,11 +21,11 @@ int main(int argc, char **argv) {
     with_feature<fd_manager>() && with_feature<quit_manager>());
   loop->feature<quit_manager>().enable_master();
  
-  ncurses::uicontext context( *loop, 0 );
-  ncurses::window w1( context, gott::rect(10,10,100,100), "10x10 -> w:90xh:90", window_flags::Defaults );
-  ncurses::window w2( context, gott::rect(150,50,200,100), "150x50 -> w:50xh:50", window_flags::Defaults );
+  ncurses::uicontext context(*loop, 0);
+  ncurses::window w1(context, gott::rect(10,10,100,100), "10x10 -> w:90xh:90", window_flags::Defaults);
+  ncurses::window w2(context, gott::rect(150,50,200,100), "150x50 -> w:50xh:50", window_flags::Defaults);
   
-  std::cout << "Starting main loop..." << std::endl;
+  //std::cout << "Starting main loop..." << std::endl;
   loop->run();
-  std::cout << "Quit gracefully." << std::endl;
+  //std::cout << "Quit gracefully." << std::endl;
 }

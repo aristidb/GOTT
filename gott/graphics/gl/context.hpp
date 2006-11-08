@@ -18,7 +18,7 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -43,7 +43,7 @@
 
 #include <gott/visibility.hpp>
 
-namespace gott{namespace graphics{namespace gl{
+namespace gott { namespace graphics { namespace gl {
 
 /**
  * Wraps some of the aspects of an OpenGL rendering context.

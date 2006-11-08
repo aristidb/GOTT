@@ -1,7 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-#ifndef GOTT_UI_X11_UICONTEXT_HPP_INCLUDED
-#define GOTT_UI_X11_UICONTEXT_HPP_INCLUDED
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -39,6 +36,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifndef GOTT_UI_X11_UICONTEXT_HPP_INCLUDED
+#define GOTT_UI_X11_UICONTEXT_HPP_INCLUDED
+
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -47,7 +47,7 @@
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/main_loop.hpp>
 
-namespace gott{namespace ui{namespace x11{
+namespace gott { namespace ui { namespace x11 {
 
 class window;
 /**
@@ -70,7 +70,7 @@ class GOTT_EXPORT uicontext : public uicontext_base {
      * \todo Focus handling not yet implemented
      * \todo window closing not yet resolved
      */
-    void process_event( window* win, XEvent& e );
+    void process_event(window* win, XEvent& e);
   public:
 
     /**
@@ -78,7 +78,7 @@ class GOTT_EXPORT uicontext : public uicontext_base {
      * If you omit the connection parameter, the default Display will be used to 
      * connect to the server.
      */
-    uicontext( events::main_loop & loop, const char * connection = 0 );
+    uicontext(events::main_loop & loop, const char * connection = 0);
 
     /**
      * \returns xlibs file descriptor to use in the select_loop main loop class
@@ -93,10 +93,10 @@ class GOTT_EXPORT uicontext : public uicontext_base {
     void process_exception();
     //\}
 
-    void register_window( window_base * ref );
-    void remove_window( window_base *ref );
+    void register_window(window_base * ref);
+    void remove_window(window_base *ref);
 
-    gott::ui::x11::window* find_window( Window handle );
+    gott::ui::x11::window* find_window(Window handle);
 
 
     /**
@@ -115,7 +115,7 @@ class GOTT_EXPORT uicontext : public uicontext_base {
      */
     Display* get_display();
     int get_screen() const;
-    Atom get_atom( const char* atom ) const;
+    Atom get_atom(const char* atom) const;
     //\}
 
 

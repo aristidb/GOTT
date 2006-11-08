@@ -15,7 +15,7 @@
  * The Original Code is An Event Handling Class Library.
  *
  * The Initial Developer of the Original Code is
- * Andreas Pokorny (andreas.pokorny@gmail.com )
+ * Andreas Pokorny (andreas.pokorny@gmail.com)
  * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
@@ -55,7 +55,7 @@
 #include "../selfpipe_message_manager.hpp"
 #include "../signal_manager.hpp"
 
-namespace gott{namespace events{
+namespace gott { namespace events {
 
 /**
  * A main_loop implementation that uses select to dispatch events.

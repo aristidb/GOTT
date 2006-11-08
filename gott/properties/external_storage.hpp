@@ -41,7 +41,8 @@
 
 #include <boost/function.hpp>
 
-namespace gott{namespace properties{
+namespace gott { namespace properties {
+
 /**
  * External storage policy. Gets and sets its function via a function/functor.
  * \param T The values' type.

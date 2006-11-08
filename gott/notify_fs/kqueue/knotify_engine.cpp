@@ -79,15 +79,15 @@ namespace notify_fs {
     // file_link -> NOTE_LINK
     // file_extend -> NOTE_EXTEND
 
-    if(event & file_access)
+    if (event & file_access)
       return false;
-    if(event & file_close_write)
+    if (event & file_close_write)
       return false;
-    if(event & file_close_nowrite)
+    if (event & file_close_nowrite)
       return false;
-    if(event & file_close)
+    if (event & file_close)
       return false;
-    if(event & file_open)
+    if (event & file_open)
       return false;
     /*
 FIXME: file_move is supported which is a composition of
@@ -95,19 +95,19 @@ FIXME: file_move is supported which is a composition of
       file_moved_to = 0x80,
 which are unsupported
     */
-    if(event & subfile_create)
+    if (event & subfile_create)
       return false;
-    if(event & subfile_delete)
+    if (event & subfile_delete)
       return false;
-    if(event & file_delete)
+    if (event & file_delete)
       return false;
-    if(event & extra_unmount)
+    if (event & extra_unmount)
       return false;
-    if(event & extra_queue_overflow)
+    if (event & extra_queue_overflow)
       return false;
-    if(event & exta_ignored)
+    if (event & exta_ignored)
       return false;
-    if(event & flag_directory)
+    if (event & flag_directory)
       return false;
     return true;
   }

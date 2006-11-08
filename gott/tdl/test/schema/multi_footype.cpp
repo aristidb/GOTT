@@ -121,7 +121,7 @@ GFTEST(reordered #1) {
       "     -1220\n"
       " plugin\n"
       "                     x,y,z\n"
-  );
+);
   nd_list c, p;
   p.push_back(S(Xany("x"), "plugin-data"));
   p.push_back(S(Xany("y"), "plugin-data"));
@@ -143,7 +143,7 @@ GFTEST(reordered #2) {
       "     -1220\n"
       " plugin\n"
       "                     x,y,z\n"
-  );
+);
   nd_list c, p;
   p.push_back(S(Xany("x"), "plugin-data"));
   p.push_back(S(Xany("y"), "plugin-data"));
@@ -168,7 +168,7 @@ GFTEST(reordered #3) {
       " plugin\n"
       "                     x,y,z\n"
       " -1234"
-  );
+);
   nd_list c, p;
   p.push_back(S(Xany("x"), "plugin-data"));
   p.push_back(S(Xany("y"), "plugin-data"));
