@@ -68,16 +68,11 @@ uicontext::uicontext(
     loop.feature<events::fd_manager>().add_fd(
         infd,
         events::fd_manager::read,
-        boost::bind(&uicontext::process_read, this) 
-);
-  } catch(std::exception &e) {
-    endwin();
-    delscreen(terminal_);
-    throw e;
+        boost::bind(&uicontext::process_read, this));
   } catch(...) {
     endwin();
     delscreen(terminal_);
-    throw system_error("Unknown exception caught");
+    throw;
   }
 
   ::keypad(stdscr, true); // enable keyboard mapping 
@@ -88,6 +83,7 @@ uicontext::uicontext(
 
   if (has_colors()) {
     start_color();
+    //use_default_colors();
 
     /*
      * Simple color assignment, often all we need.  Color pair 0 cannot
@@ -95,6 +91,15 @@ uicontext::uicontext(
      * pair as for the foreground color, though of course that is not
      * necessary:
      */
+#if 0
+    init_pair(1, COLOR_RED,     -1);
+    init_pair(2, COLOR_GREEN,   -1);
+    init_pair(3, COLOR_YELLOW,  -1);
+    init_pair(4, COLOR_BLUE,    -1);
+    init_pair(5, COLOR_CYAN,    -1);
+    init_pair(6, COLOR_MAGENTA, -1);
+    init_pair(7, COLOR_WHITE,   -1);
+#else
     init_pair(1, COLOR_RED,     COLOR_BLACK);
     init_pair(2, COLOR_GREEN,   COLOR_BLACK);
     init_pair(3, COLOR_YELLOW,  COLOR_BLACK);
@@ -102,6 +107,7 @@ uicontext::uicontext(
     init_pair(5, COLOR_CYAN,    COLOR_BLACK);
     init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(7, COLOR_WHITE,   COLOR_BLACK);
+#endif
   }
 }
 

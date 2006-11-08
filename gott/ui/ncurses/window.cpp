@@ -21,6 +21,7 @@
  *
  * Contributor(s):
  *  Andreas Pokorny (andreas.pokorny@gmail.com)
+ *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -106,23 +107,17 @@ window::window(
   if (flags & window_flags::Visible)
     visibility_.set(true);
 
-  ::wprintw(window_, "Hi There !!!");
+  ::attron(A_BOLD);
+  ::wprintw(window_, "Hi There %p!!!", this);
   ::wrefresh(window_);
 
   invalidate_area(rect(0,0,position.width, position.height));
 }
 
-/**
- * \brief handles the "read" part of the region property
- * \returns the area covered by the window 
- */
 rect window::get_region() const {
   return rect(0,0,0,0);
 }
 
-/**
- * \brief Called by gott::ncurses::uicontext to update the region 
- */
 void window::handle_sys_resize(rect const& region) {
   if (region != last_region) {
     // resize 
@@ -132,35 +127,15 @@ void window::handle_sys_resize(rect const& region) {
     last_region = region;
   }
 }
-/**
- * \brief forwards resize events to the system
- * If the user wants to resize the 
- * window he picks the propery and sets the new size, then 
- * xlib will send the resize event to the server/window manager. 
- * This resize request has to be processed there and returns
- * back as a ConfigureNotify. 
- * The uicontext will tell the  window that the size actually 
- * changed. So we have to differ between these two resize ``events''.
- */
+
 void window::set_region(rect const& region) {
 }
 
-/**
- * Converts the string to a text property, and sets it as the 
- * X11 window manager title property. 
- */
 void window::set_title(gott::string const& str) {
   title_string = str;
- 
 }
 
-/**
- * \brief update the hints for the window manager. 
- * \bug This code is pretty much untested, there is no evidence
- * whether these flags are really considered by the wm... 
- */
 void window::set_window_type(window_base::flags_type const &new_flags) {
-  
 }
 
 gott::ui::window_base::rect_property_type& window::region() {
@@ -200,7 +175,6 @@ void window::set_size_hints() {
 }
 
 void window::update_region(rect const& region) {
-  
 }
 
 uicontext* window::get_uicontext() {
