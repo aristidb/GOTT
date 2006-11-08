@@ -39,15 +39,16 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <iostream>
+#include <ncurses.h>
 #include <boost/bind.hpp> 
 #include <boost/cstdint.hpp> 
 #include <boost/lambda/lambda.hpp> 
 #include <boost/lambda/bind.hpp> 
 #include <boost/lambda/construct.hpp> 
-#include <gott/plugin.hpp>
+#include <gott/exceptions.hpp>
 #include <gott/ui/ncurses/window.hpp> 
+#include <gott/ui/ncurses/screen_activator.hpp> 
 
-using namespace gott::plugin;
 
 namespace gott{namespace ui{namespace ncurses{
 
@@ -71,11 +72,15 @@ window::window( uicontext& app, rect const& position, string const& title, std::
         var(win_flags)
         , bind(&window::set_window_type, this,_1) )
       ) 
+  , window_(0)
   , invalid_area(0,0,0,0)
   , mapped_state(false)
   , win_flags(0)
   , context(&app)
 {
+
+  screen_activator activator( context );
+
 
   flags_.set( flags );
 
@@ -84,6 +89,10 @@ window::window( uicontext& app, rect const& position, string const& title, std::
   // flag this window as open
   flags |= window_flags::Open;
 
+  window_ = ::newwin(position.width, position.height, position.left, position.top );
+  if( ! window_ )
+    throw system_error("Could not create a window.");
+
   region_.set(position);
 
   context->register_window( this );
@@ -91,7 +100,8 @@ window::window( uicontext& app, rect const& position, string const& title, std::
   if( flags & window_flags::Visible )
     visibility_.set(true);
 
-  ::refresh();
+  ::wprintw(window_, "Hi There !!!");
+  ::wrefresh(window_);
 
   invalidate_area( rect(0,0,position.width, position.height ) );
 }
@@ -219,6 +229,8 @@ void window::map_window( bool newstate )
 
 window::~window()
 {
+  screen_activator activator( context );
+  ::delwin(window_);
 }
 
 

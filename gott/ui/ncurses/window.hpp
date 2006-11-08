@@ -78,6 +78,7 @@ class GOTT_EXPORT window : public gott::ui::window_base {
       > flags_;
     boost::scoped_ptr<gott::graphics::renderer> renderer_;
 
+    WINDOW * window_;
     rect last_region, invalid_area;
     bool mapped_state;
     flags_type win_flags;
