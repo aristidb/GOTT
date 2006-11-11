@@ -112,8 +112,7 @@ add_library(gott_graphics SHARED ${src_graphics})
 # LIBRARY gott_ui
 file(GLOB src_ui
   ui/*.cpp 
-  ui/x11/window.cpp ui/x11/uicontext.cpp ui/x11/input.cpp
-  ui/x11/renderer_factory.cpp
+  ui/x11/*
   ui/ncurses/window.cpp ui/ncurses/uicontext.cpp 
 )
 add_library(gott_ui SHARED ${src_ui})
@@ -274,7 +273,7 @@ add_dependencies(plugins events_select_loop)
 # PLUGIN graphics_glx_renderer
 file(GLOB src_graphics_glx_renderer
   graphics/gl/*.cpp
-  ui/x11/glx_factory.cpp
+  graphics/gl/glx/glx_factory.cpp
   )
 add_library(graphics_glx_renderer MODULE ${src_graphics_glx_renderer})
 add_dependencies(plugins graphics_glx_renderer)

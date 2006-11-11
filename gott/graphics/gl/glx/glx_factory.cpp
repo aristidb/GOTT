@@ -56,10 +56,17 @@ glx_factory::~glx_factory()
 ::GLXFBConfig glx_factory::fb_config(::Display * display, int screen)
 {
   // possible options could be 16bit vs 32bit, Stencil on/off, alpha on/off, 
-  int attributes[] = { GLX_DRAWABLE_TYPE_SGIX, GLX_WINDOW_BIT_SGIX
-    , GLX_DOUBLEBUFFER, 1, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8
-      , GLX_BLUE_SIZE, 8, GLX_ALPHA_SIZE, 8, GLX_DEPTH_SIZE, 16
-      , GLX_DOUBLEBUFFER, True,  None};
+  int attributes[] = { 
+    GLX_DRAWABLE_TYPE_SGIX, GLX_WINDOW_BIT_SGIX
+      , GLX_DOUBLEBUFFER, 1
+      , GLX_RED_SIZE, 8
+      , GLX_GREEN_SIZE, 8
+      , GLX_BLUE_SIZE, 8
+      , GLX_ALPHA_SIZE, 8
+      , GLX_DEPTH_SIZE, 16
+      , GLX_DOUBLEBUFFER, True
+      , None
+  };
 
   int size = 0;
 
@@ -81,17 +88,18 @@ renderer * glx_factory::renderer(::Window x11WindowHandle, ::Display * display
     , int screen)
 {
   return new gott::graphics::gl::renderer(
-      new glx_resource(        fb_config(display, screen) 
+      new glx_resource( 
+        fb_config(display, screen) 
         , display
         , x11WindowHandle 
-) 
-) ;
+        ) 
+      ) ;
 }
 
 
 glx_resource::glx_resource(GLXFBConfig config, ::Display *display
     , ::Window windowHandle)
-  : window_(0), context_(0), display_(display)
+: window_(0), context_(0), display_(display)
 {
   window_ = glXCreateWindow(display, config, windowHandle, 0);
   context_ = glXCreateNewContext(display, config, GLX_RGBA_TYPE, 0, 1);
@@ -109,3 +117,4 @@ void glx_resource::make_current()
   if (! glXMakeContextCurrent(display_, window_, window_, context_))
     throw gott::system_error("Failure during make_current");
 }
+
