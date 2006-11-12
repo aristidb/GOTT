@@ -225,8 +225,12 @@ rect window::get_region() const {
 void window::handle_sys_resize(rect const& region) {
   if (region != last_region) {
     // resize 
-    if (region.width != last_region.width || region.height != last_region.height)
+    if (region.width != last_region.width 
+        || region.height != last_region.height) {
       invalidate_area(rect (0,0, region.width, region.height));
+      renderer_->resize( rect (0,0, region.width, region.height));
+    }
+
     last_region = region;
   }
 }
@@ -396,6 +400,7 @@ void window::set_size_hints() {
 }
 
 void window::update_region(rect const& region) {
+  renderer_->update_display( region ); 
 }
 
 uicontext* window::get_uicontext() {

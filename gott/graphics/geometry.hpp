@@ -40,8 +40,12 @@
 
 #include <gott/visibility.hpp>
 #include <cstddef>
+#include <iostream>
 
 // move into subdir if this file grows to much 
+//! \todo Reimplement these structure cleanly as soon as all 
+//! requirements are known, but update all users of this file, 
+//! before deletion!
 namespace gott {
 
 /**
@@ -104,6 +108,11 @@ struct rect
 inline rect operator+(rect r1, rect const &r2) { return r1 += r2; }
 inline bool operator== (rect const& l, rect const& r) { return l.left==r.left && l.top == r.top && l.width==r.width && l.height == r.height;} 
 inline bool operator!= (rect const& l, rect const& r) { return !(l==r);}
+
+inline std::ostream& operator << ( std::ostream& lhs, rect const &rhs )
+{
+  lhs << rhs.left << 'x' << rhs.top << "->"<< rhs.width << "," << rhs.height;
+}
 
 }
 

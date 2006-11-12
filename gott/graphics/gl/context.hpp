@@ -52,6 +52,7 @@ class context
 {
   public:
     virtual void make_current() = 0;
+    virtual void swap_buffers() = 0;
     virtual ~context();
 };
 

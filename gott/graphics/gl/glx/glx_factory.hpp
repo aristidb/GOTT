@@ -66,7 +66,8 @@ class glx_resource
     glx_resource(GLXFBConfig config, ::Display *display, ::Window windowHandle);
     ~glx_resource();
 
-    void make_current();
+    virtual void make_current();
+    virtual void swap_buffers();
 
   private:
     glx_resource(glx_resource const& cp);

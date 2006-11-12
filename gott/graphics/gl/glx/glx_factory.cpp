@@ -118,3 +118,8 @@ void glx_resource::make_current()
     throw gott::system_error("Failure during make_current");
 }
 
+void glx_resource::swap_buffers()
+{
+  glXSwapBuffers(display_, window_);
+}
+

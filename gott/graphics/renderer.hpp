@@ -40,6 +40,7 @@
 #define GOTT_GRAPHICS_RENDERER_HPP_INCLUDED
 
 #include <gott/visibility.hpp>
+#include <gott/graphics/geometry.hpp>
 
 namespace gott { namespace graphics {
 
@@ -49,10 +50,25 @@ namespace gott { namespace graphics {
 class GOTT_EXPORT renderer
 {
   public:
-   /* void update_display(region const&); 
-    void resize(region const&); 
+    /**
+     * Force a display update on a region.
+     *
+     * \param[in] invalidregion region that should be treated like an invalidated area 
+     * \todo replace rect with the not yet written region type
+     */
+    virtual void update_display(rect const& invalid_region ) = 0; 
 
-    void invalidate(graphics::object *);
+    /**
+     * Resize of the drawing area occured. 
+     *
+     * Usually only width and height is of interest. 
+     *
+     * \param[in] draw_area new draw area 
+     */
+    virtual void resize(rect const& draw_area ) = 0; 
+
+    /*
+     void invalidate(graphics::object *);
     */
     //
     virtual ~renderer();

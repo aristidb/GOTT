@@ -40,6 +40,9 @@
 #ifndef GOTT_GRAPHICS_GL_RENDERER_HPP_INCLUDED
 #define GOTT_GRAPHICS_GL_RENDERER_HPP_INCLUDED 
 
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glext.h>
 #include <boost/scoped_ptr.hpp>
 #include <gott/visibility.hpp>
 #include <gott/graphics/renderer.hpp>
@@ -55,6 +58,8 @@ class renderer
 {
   public:
     renderer(gl::context *);
+    virtual void update_display(rect const& invalid_region ); 
+    virtual void resize(rect const& draw_area ); 
   private:
     boost::scoped_ptr<gl::context> context_;
   
