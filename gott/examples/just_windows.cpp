@@ -22,8 +22,8 @@ int main(int argc, char **argv) {
   loop->feature<quit_manager>().enable_master();
  
   x11::uicontext context(*loop, 0);
-  x11::window w1(context, gott::rect(10,10,100,100), "10x10 -> w:90xh:90", window_flags::Defaults);
-  x11::window w2(context, gott::rect(150,50,200,100), "150x50 -> w:50xh:50", window_flags::Defaults);
+  x11::window w1(context, gott::rect(10,10,90,90), "10x10 -> w:90xh:90", window_flags::Defaults);
+  x11::window w2(context, gott::rect(150,50,50,50), "150x50 -> w:50xh:50", window_flags::Defaults);
   
   std::cout << "Starting main loop..." << std::endl;
   loop->run();

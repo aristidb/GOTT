@@ -25,8 +25,8 @@ int main(int argc, char **argv) {
   {
     ncurses::uicontext context(*loop, 0);
     reg = context.region().get();
-    ncurses::window w1(context, gott::rect(10,10,100,100), "10x10 -> w:90xh:90", window_flags::Defaults);
-    ncurses::window w2(context, gott::rect(150,50,200,100), "150x50 -> w:50xh:50", window_flags::Defaults);
+    ncurses::window w1(context, gott::rect(10,10,90,90), "10x10 -> w:90xh:90", window_flags::Defaults);
+    ncurses::window w2(context, gott::rect(150,50,50,50), "150x50 -> w:50xh:50", window_flags::Defaults);
 
     loop->run();
   }
