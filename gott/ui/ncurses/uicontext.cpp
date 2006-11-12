@@ -47,12 +47,20 @@
 #include <gott/ui/ncurses/screen_activator.hpp>
 
 using gott::ui::ncurses::uicontext;
+using gott::properties::external_storage;
+using boost::bind;
 
 uicontext::uicontext(
     events::main_loop &loop,
     int outfd, int infd,
     char const * termtype) 
-: loop_(loop), outfd_(outfd), infd_(infd), terminal_(0)
+: loop_(loop), outfd_(outfd)
+  , infd_(infd)
+  , terminal_(0)
+  , region_(external_storage<rect>(
+        bind(&uicontext::get_region, this)
+        ,  bind(&uicontext::set_region, this, _1))
+      )
 {
   terminal_ = newterm(
       const_cast<char*>(termtype),
@@ -111,8 +119,21 @@ uicontext::uicontext(
   }
 }
 
+gott::rect uicontext::get_region() const
+{
+  screen_activator(this);
+  return gott::rect(0,0, tigetnum("cols"), tigetnum("lines") );
+}
+
+void uicontext::set_region( rect const& newRegion )
+{
+}
+
+
 void uicontext::register_window(window_base *ref) {
+
   window *curseswin = dynamic_cast<window*>(ref);
+
   if (curseswin)
     windows_.push_back(curseswin);
   else {
@@ -121,16 +142,27 @@ void uicontext::register_window(window_base *ref) {
 }
 
 void uicontext::remove_window(window_base *ref) {
+
   window *curseswin = dynamic_cast<window*>(ref);
+
   if (curseswin) {
     std::vector<gott::ui::ncurses::window*>::iterator it =
       find(windows_.begin(), windows_.end(), curseswin);
+
     if (it != windows_.end())
       windows_.erase(it);
+
   } else {
     // do what?
   }
+}
 
+gott::ui::uicontext_base::rect_property_type& uicontext::region() {
+  return region_;
+}
+
+gott::ui::uicontext_base::rect_property_type const& uicontext::region() const {
+  return region_;
 }
 
 void uicontext::quit() {
@@ -152,14 +184,14 @@ void uicontext::process_exception() {
 void uicontext::process_sigwinch()
 {
   screen_activator(this);
-  endwin();
-  refresh();
+  ::endwin();
+  ::refresh();
   // run repaint here.. 
 }
 
 uicontext::~uicontext() {
   screen_activator(this);
-  endwin();
-  delscreen(terminal_);
+  ::endwin();
+  ::delscreen(terminal_);
 }
 

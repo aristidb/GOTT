@@ -40,6 +40,10 @@
 
 using gott::ui::uicontext_base;
 
+boost::signal1<void, gott::rect const&> & uicontext_base::on_resize() {
+  return resize_;
+}
+
 gott::ui::key_state const& uicontext_base::get_key_state() const {
   return keys_;
 }

@@ -46,10 +46,17 @@
 #include <gott/ui/x11/window.hpp>
 #include <gott/events/fd_manager.hpp>
 
+using boost::bind;
 namespace gott { namespace ui { namespace x11 {
 
 uicontext::uicontext(events::main_loop & loop,  const char * connection) 
-  : loop_(loop), display_(XOpenDisplay(connection)) 
+  : loop_(loop)
+    , display_(XOpenDisplay(connection)) 
+    , region_(gott::properties::external_storage<rect>(
+        bind(&uicontext::get_region, this) 
+        , bind(&uicontext::set_region, this, _1))  
+      )
+
 {
   if (display_ == 0) 
     throw system_error("Could not open the x11 connection");
@@ -74,7 +81,19 @@ uicontext::uicontext(events::main_loop & loop,  const char * connection)
     XCloseDisplay(display_);
     throw system_error("Unknown exception caught");
   }
+  //! \todo Query the availability of Extensions, e.g. XF86VidMode DGA?
 
+}
+
+rect uicontext::get_region() const {
+  XWindowAttributes attr;
+  XGetWindowAttributes(display_, RootWindow(display_, screen_), &attr);
+  return rect(attr.x, attr.y, attr.width,attr.height);
+}
+
+void uicontext::set_region( rect const& new_region ){
+  //! \todo Implement set_region based on the XFree86-VidMode Extension
+  // not yet implemented 
 }
 
 Display* uicontext::get_display() {
@@ -114,6 +133,14 @@ gott::ui::x11::window* uicontext::find_window(Window handle) {
     if (windows_[i]->get_handle() == handle) 
       return windows_[i];
   return 0;
+}
+
+gott::ui::uicontext_base::rect_property_type& uicontext::region() {
+  return region_;
+}
+
+gott::ui::uicontext_base::rect_property_type const& uicontext::region() const {
+  return region_;
 }
 
 void uicontext::quit() {

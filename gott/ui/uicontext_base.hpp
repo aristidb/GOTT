@@ -42,6 +42,7 @@
 #include <gott/visibility.hpp>
 #include <gott/ui/input.hpp>
 #include <gott/ui/window_base.hpp>
+#include <gott/graphics/geometry.hpp>
 
 namespace gott { namespace ui {
 
@@ -57,7 +58,15 @@ class GOTT_EXPORT uicontext_base {
     gott::ui::key_state keys_;
     gott::ui::mouse_state mouse_;
 
+    boost::signal1<void, rect const&> resize_;
   public:
+    typedef gott::properties::notifying_property<rect> rect_property_type;
+
+    /**
+     * Emits if the size of the user interface context changes. 
+     */
+    boost::signal1<void, rect const&>& on_resize();
+
 
     /**
      * \name window registration
@@ -85,6 +94,22 @@ class GOTT_EXPORT uicontext_base {
      * quit the current application if no other control loop is running. 
      */
     virtual void quit() = 0;
+
+
+   /**
+     * \name Context Region interface 
+     * \brief The region property may be used to access the position and size of a window. 
+     * The region property may be used to change the position and size of a user interface 
+     * context. In some systems this may be a read only property.
+     */
+    //\{
+    /**
+     * \returns a refernce to the region property with write access
+     */
+    virtual rect_property_type& region() = 0;
+    virtual rect_property_type const& region() const = 0;
+    //\}
+
 
 
     gott::ui::key_state const& get_key_state() const;

@@ -50,7 +50,7 @@ private:
   screen_activator(screen_activator const &);
   screen_activator &operator=(screen_activator const &);
 public:
-  screen_activator(uicontext *context)
+  screen_activator(uicontext const *context)
   : old_(set_term(context->terminal_))
   {}
 

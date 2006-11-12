@@ -45,6 +45,10 @@
 #include <gott/ui/window_base.hpp>
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/main_loop.hpp>
+#include <gott/properties/concrete_property.hpp>
+#include <gott/properties/external_storage.hpp>
+#include <gott/properties/signal_notification.hpp>
+
 
 namespace gott { namespace ui { namespace ncurses {
 
@@ -64,6 +68,15 @@ private:
   int outfd_, infd_;
   SCREEN *terminal_;
 
+  gott::properties::concrete_property<
+      rect
+      , gott::properties::signal_notification
+      , gott::properties::external_storage<rect> 
+      > region_;
+
+  rect get_region() const;
+  void set_region( rect const& newRegion );
+
 public:
   /**
    * \brief Opens a curses terminal. 
@@ -71,10 +84,10 @@ public:
    * of the user (if thats possible) and check ncurses how to support that. 
    */
   explicit uicontext(
-     events::main_loop &loop,
-     int outfd = 0, int infd = 1,
-     char const* termtype = 0
-);
+    events::main_loop &loop,
+    int outfd = 0, int infd = 1,
+    char const* termtype = 0
+    );
 
   /**
    * Returns the terminals input file descriptor to use in main loop.
@@ -101,6 +114,9 @@ public:
 
   void register_window(window_base *ref);
   void remove_window(window_base *ref);
+
+  rect_property_type& region();
+  rect_property_type const& region() const;
 
   /**
    * Terminate the context.

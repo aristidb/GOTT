@@ -67,19 +67,19 @@ window::window(uicontext& app, rect const& position, string const& title, std::s
   : region_(gott::properties::external_storage<rect>(
         bind(&window::get_region, this) 
         , bind(&window::set_region, this, _1))  
-)
+      )
   , title_(gott::properties::external_storage<gott::string>(
         var(title_string)
         , bind(&window::set_title, this, _1))
-)
+      )
   , visibility_(gott::properties::external_storage<bool>(
         var(mapped_state)
         , bind(&window::map_window, this,_1))
-)
+      )
   , flags_(gott::properties::external_storage<flags_type>(
         var(win_flags)
         , bind(&window::set_window_type, this,_1))
-) 
+      ) 
   , handle(0)
   , invalid_area(0,0,0,0)
   , mapped_state(false)

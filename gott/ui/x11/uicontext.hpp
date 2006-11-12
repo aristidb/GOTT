@@ -46,6 +46,10 @@
 #include <gott/ui/window_base.hpp>
 #include <gott/events/fd_manager.hpp>
 #include <gott/events/main_loop.hpp>
+#include <gott/properties/concrete_property.hpp>
+#include <gott/properties/external_storage.hpp>
+#include <gott/properties/signal_notification.hpp>
+
 
 namespace gott { namespace ui { namespace x11 {
 
@@ -64,6 +68,16 @@ class GOTT_EXPORT uicontext : public uicontext_base {
     Display * display_;
     int screen_; 
     Atom protocols_atom_;
+
+    gott::properties::concrete_property<
+      rect
+      , gott::properties::signal_notification
+      , gott::properties::external_storage<rect> 
+      > region_;
+
+    rect get_region() const;
+    void set_region( rect const& new_region );
+
     /**
      * \brief handles a window event.
      * \todo Test all uses of XSync and XFlush
@@ -98,6 +112,8 @@ class GOTT_EXPORT uicontext : public uicontext_base {
 
     gott::ui::x11::window* find_window(Window handle);
 
+    rect_property_type& region();
+    rect_property_type const& region() const;
 
     /**
      * \brief terminate the context.
