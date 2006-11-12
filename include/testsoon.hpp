@@ -201,12 +201,13 @@ inline node::node(test_group *parent=0,
 }
 
 inline void node::print(stream_class &out) const {
-  if (parent)
+  if (parent) {
     parent->print(out);
-  out << '/' << name;
-#if 0
-  out << '(' << typeid(*this).name() << ')';
-#endif
+    if (parent->parent)
+      out << '/' << name;
+    else
+      out << '"' << name << '"';
+  }
 }
 
 class test_holder : public test_group {
@@ -842,7 +843,7 @@ private:
 
 inline static ::testsoon::test_group *
 test_group(::testsoon::string const &filename) {
-  static ::testsoon::test_file file(&::testsoon::tests(), "(" + filename + ")");
+  static ::testsoon::test_file file(&::testsoon::tests(), filename);
   return &file;
 }
 
