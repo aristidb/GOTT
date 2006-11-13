@@ -57,7 +57,7 @@ void renderer::resize( gott::rect const& draw_area )
   glLoadIdentity();
   glViewport( 0, 0, draw_area.width, draw_area.height );
   glOrtho( 0, draw_area.width, 0, draw_area.height, -1, 1 );
-  glDisable( GL_DEPTH_TEST );
+  glEnable( GL_DEPTH_TEST );
   glDisable( GL_CULL_FACE );
 
 }
@@ -74,13 +74,13 @@ void renderer::update_display(rect const& invalid_region )
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
 
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
   glBegin( GL_QUADS );
     glColor3ub( 255,0,0); glVertex2i( 0, 0);
-    glColor3ub( 0,255,0); glVertex2i( 0, 100 );
+    glColor3ub( 0,255,0); glVertex2i( 0, 100);
     glColor3ub( 0,0,255); glVertex2i( 100, 100 );
-    glColor3ub( 255,0,255); glVertex2i( 100, 0 );
+    glColor3ub( 255,0,255); glVertex2i( 100, 0);
   glEnd();
 
   glFlush();
