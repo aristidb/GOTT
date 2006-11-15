@@ -361,8 +361,6 @@ private:
   }
 };
 
-typedef concise_reporter default_reporter;
-
 /*
  * XML reporter first try
  * <?xml version=1.0?>
@@ -385,36 +383,51 @@ typedef concise_reporter default_reporter;
 class xml_reporter : public test_reporter {
   public:
     typedef stream_class stream;
-    xml_reporter(stream &out = DEFAULT_STREAM) : out(out), indent(0) {}
+    xml_reporter(stream &out = DEFAULT_STREAM) : out(out), indent(1) {}
 
     void start() {
       out << "<?xml version=\"1.0\"?>\n";
       out << "<testsoon>\n";
     }
     void stop() {
-      out << "</testsoon\n";
+      out << "</testsoon>\n";
     }
 
     void begin_group(test_group const &group) {
-      print_ind();
-      ++indent;
-      out << "<group name=\"" << group.name << "\">\n";
+      if (group.parent) {
+        print_ind();
+        ++indent;
+        if (group.parent->parent)
+          out << "<group";
+        else
+          out << "<file";
+        out << " name=\"" << group.name << "\">\n";
+      }
     }
 
-    void end_group(test_group const &) {
-      --indent;
-      print_ind();
-      out << "</group>\n";
+    void end_group(test_group const &group) {
+      if (group.parent) {
+        --indent;
+        print_ind();
+        if (group.parent->parent)
+          out << "</group>\n";
+        else
+          out << "</file>\n";
+      }
     }
 
     void success(test_info const &i, string const &k) {
-      print_ind(); out << "<success line=\"" << i.line << "\" ";      
+      print_ind(); out << "<success line=\"" << i.line << "\"";      
       if (*i.name)
-        out << "name=\"" << i.name << "\" ";
+        out << " name=\"" << i.name << "\"";
       if (k.empty())
-        out << "/>\n";
+        out << " />\n";
       else {
-        out << "> <generator>" << k << "</generator> </success>\n";
+        out << ">\n";
+        ++indent;
+        print_ind(); out << "<generator>" << k << "</generator>\n";
+        --indent;
+        print_ind(); out << "</success>\n";
       }
     }
     
@@ -425,20 +438,25 @@ class xml_reporter : public test_reporter {
         out << " name=\"" << i.name << "\"";
       out << ">\n";
       ++indent;
-      
+
       print_ind(); out << "<problem>" << x.message << "</problem>\n";
-      print_ind(); out << "<rawdata>\n";
-      ++indent;
-      for (string_vector::const_iterator it = x.data.begin(); 
-          it != x.data.end();
-          ++it) {
-        print_ind();
-        out << "<item>" << *it << "</item>\n";
-      } 
-      --indent;
-      print_ind(); out << "</rawdata>\n";
-      print_ind(); out << "<generator>" << k << "</generator>\n";
-      
+      if (!x.data.empty()) {
+        print_ind(); out << "<rawdata>\n";
+        ++indent;
+        for (string_vector::const_iterator it = x.data.begin(); 
+            it != x.data.end();
+            ++it) {
+          print_ind();
+          out << "<item>" << *it << "</item>\n";
+        } 
+        --indent;
+        print_ind(); out << "</rawdata>\n";
+      }
+
+      if (!k.empty()) {
+        print_ind(); out << "<generator>" << k << "</generator>\n";
+      }
+
       --indent;
       print_ind(); out << "</failure>\n";
     } 
@@ -451,10 +469,10 @@ class xml_reporter : public test_reporter {
 
     stream &out;
     unsigned indent;
-    
-    struct group_xml {
-    };
 };
+
+typedef concise_reporter default_reporter;
+//typedef xml_reporter default_reporter;
 
 
 #ifndef IN_DOXYGEN
