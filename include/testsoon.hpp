@@ -159,12 +159,12 @@ public:
 
 class node {
 public:
-  node(test_group *, string const &, bool = false);
+  node(test_group *, char const * const, bool = false);
   virtual void run(test_reporter &, statistics &) const = 0;
   virtual ~node() {}
 
   test_group const * const parent;
-  string const name;
+  char const * const name;
 
   void print(stream_class &out) const;
 
@@ -180,7 +180,7 @@ inline stream_class &operator<<(stream_class &out, node const &n) {
 
 class test_group : public node {
 public:
-  test_group(test_group *parent, string const &name)
+  test_group(test_group *parent, char const *name)
     : node(parent, name), child(0) {}
   
   void add(node *, bool);
@@ -192,10 +192,8 @@ private:
   test_info *test;
 };
 
-inline node::node(test_group *parent=0,
-                  string const &name=string(),
-                  bool is_test)
-  : parent(parent), name(name), next(0) {
+inline node::node(test_group *parent, char const *name, bool is_test)
+: parent(parent), name(name), next(0) {
   if (parent)
     parent->add(this, is_test);
 }
@@ -212,7 +210,7 @@ inline void node::print(stream_class &out) const {
 
 class test_holder : public test_group {
 public:
-  test_holder() : test_group(0, string()) {}
+  test_holder() : test_group(0, "") {}
   statistics run(test_reporter &rep) {
     statistics stats;
     run(rep, stats);
@@ -228,17 +226,17 @@ public:
 
 class test_file : public test_group {
 public:
-  test_file(test_group *parent, string const &file)
+  test_file(test_group *parent, char const *file)
     : test_group(parent, file) {}
 };
 
 class test_info : public node {
 public:
   test_info(test_group *group,
-            string const &name, string const &file, unsigned line)
+            char const *name, char const *file, unsigned line)
   : node(group, name, true), file(file), line(line) {}
 
-  string const file;
+  char const *file;
   unsigned const line;
 };
 
@@ -247,12 +245,12 @@ public:
 class test_failure {
 public:
   test_failure() : line(0) {}
-  test_failure(string const &message,
+  test_failure(char const *message,
                unsigned line,
                string_vector const &data = string_vector())
     : message(message), line(line), data(data) {}
   ~test_failure() {}
-  string message;
+  char const *message;
   unsigned line;
   string_vector data;
 
@@ -496,7 +494,7 @@ private:
     } \
     namespace BOOST_PP_CAT(name, _testgroup) { \
       static ::testsoon::test_group * \
-      test_group(::testsoon::string const &) { \
+      test_group(char const *) { \
         static ::testsoon::test_group current( \
           BOOST_PP_CAT(name, _helper)::upper_test_group(), #name); \
         return &current; \
@@ -842,7 +840,7 @@ private:
 #ifndef IN_DOXYGEN
 
 inline static ::testsoon::test_group *
-test_group(::testsoon::string const &filename) {
+test_group(char const *filename) {
   static ::testsoon::test_file file(&::testsoon::tests(), filename);
   return &file;
 }
