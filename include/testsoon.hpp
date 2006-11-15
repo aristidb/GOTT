@@ -325,7 +325,7 @@ private:
 
   void write_report_entry(failure_info const &info) {
     out << "\nError occured in test ";
-    if (info.ptest->name != string())
+    if (*info.ptest->name)
       out << '"' << info.ptest->name << "\" ";
     out << "in " << *info.ptest->parent
         << " on line " << info.ptest->line
@@ -362,6 +362,100 @@ private:
 };
 
 typedef concise_reporter default_reporter;
+
+/*
+ * XML reporter first try
+ * <?xml version=1.0?>
+ * <testsoon>
+     <group name="file.cpp">
+       <group name="bla">
+         <success line="LINE"> <generator>7</generator> </success>
+         <failure line="LINE" name="TESTNAME">
+         <problem>PROBLEM</problem>
+         <rawdata>
+            <item>BLA</item>
+         </rawdata>
+           <generator>7</generator>
+ *       </failure>
+ *     </group>
+     </group>
+ * </testsoon>
+ */
+ 
+class xml_reporter : public test_reporter {
+  public:
+    typedef stream_class stream;
+    xml_reporter(stream &out = DEFAULT_STREAM) : out(out), indent(0) {}
+
+    void start() {
+      out << "<?xml version=\"1.0\"?>\n";
+      out << "<testsoon>\n";
+    }
+    void stop() {
+      out << "</testsoon\n";
+    }
+
+    void begin_group(test_group const &group) {
+      print_ind();
+      ++indent;
+      out << "<group name=\"" << group.name << "\">\n";
+    }
+
+    void end_group(test_group const &) {
+      --indent;
+      print_ind();
+      out << "</group>\n";
+    }
+
+    void success(test_info const &i, string const &k) {
+      print_ind(); out << "<success line=\"" << i.line << "\" ";      
+      if (*i.name)
+        out << "name=\"" << i.name << "\" ";
+      if (k.empty())
+        out << "/>\n";
+      else {
+        out << "> <generator>" << k << "</generator> </success>\n";
+      }
+    }
+    
+    void failure(test_info const &i, test_failure const &x, string const &k) {
+      print_ind();
+      out << "<failure line=\"" << i.line << "\"";
+      if (*i.name)
+        out << " name=\"" << i.name << "\"";
+      out << ">\n";
+      ++indent;
+      
+      print_ind(); out << "<problem>" << x.message << "</problem>\n";
+      print_ind(); out << "<rawdata>\n";
+      ++indent;
+      for (string_vector::const_iterator it = x.data.begin(); 
+          it != x.data.end();
+          ++it) {
+        print_ind();
+        out << "<item>" << *it << "</item>\n";
+      } 
+      --indent;
+      print_ind(); out << "</rawdata>\n";
+      print_ind(); out << "<generator>" << k << "</generator>\n";
+      
+      --indent;
+      print_ind(); out << "</failure>\n";
+    } 
+
+  private:
+    void print_ind() {
+      for (unsigned i = 0; i < indent; ++i)
+        out << "  ";
+    }
+
+    stream &out;
+    unsigned indent;
+    
+    struct group_xml {
+    };
+};
+
 
 #ifndef IN_DOXYGEN
 
