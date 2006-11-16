@@ -965,6 +965,12 @@ test_group(char const *filename) {
  * See @ref tutorial.
  * See @ref faq.
  *
+ * \htmlonly
+ * <a href="http://sourceforge.net/projects/testsoon">SF.NET Project Page</a>
+ *
+ * <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=180756&amp;type=7" width="210" height="62" border="0" alt="SourceForge.net Logo" /></a>
+ * \endhtmlonly
+ *
  * @page tutorial Tutorial
  * "This is a tutorial."
  *
