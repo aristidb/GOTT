@@ -45,6 +45,7 @@
 #include "spell.hpp"
 #include "promote.hpp"
 #include "operations_base.hpp"
+#include "type_nr.hpp"
 #include <gott/exceptions.hpp>
 #include <boost/type_traits.hpp>
 #include <cstddef>
@@ -174,6 +175,15 @@ public:
     place = static_cast<placeholder *>(p);
   }
 
+  /**
+   * Get a numeric identifier (running number) of the current type.
+   */
+  long type_number() const {
+    if (!place)
+      return -1;
+    return place->type_number();
+  }
+
 private:
   struct placeholder {
     virtual ~placeholder() {}
@@ -181,6 +191,7 @@ private:
     virtual std::type_info const &spelled_type() const = 0;
     virtual placeholder *clone() const = 0;
     virtual operations_base &get_operations() const = 0;
+    virtual long type_number() const = 0;
   };
 
   template<class T>
@@ -198,6 +209,9 @@ private:
     operations_base &get_operations() const {
       static operations<T> o;
       return o;
+    }
+    long type_number() const {
+      return type_nr<T>::value;
     }
 
     T value;
