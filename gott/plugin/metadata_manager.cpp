@@ -241,7 +241,7 @@ void metadata_manager::commit() {
   plugins.insert(plugins.end(), p->add_plugins.begin(), p->add_plugins.end());
 
   // remove all deduced features from all plugins
-  for (vector<whole_plugin>::iterator it = plugins.begin(); it != plugins.end();
+  for (vector<whole_plugin>::iterator it = plugins.begin(); it !=plugins.end();
       ++it) {
     map<QID, bool> &features = it->information.features;
     map<QID, bool>::iterator jt = features.begin();
@@ -397,16 +397,17 @@ void metadata_manager::load_standard() {
 }
 
 bool metadata_manager::enum_plugins(
-    boost::function<
-      bool (
-        plugin_descriptor const &plugin_descriptor,
-        plugin_information const &info
-) > const &callback,
+      boost::function<
+        bool (
+          plugin_descriptor const &plugin_descriptor,
+          plugin_information const &info
+        )
+      > const &callback,
       boost::optional<QID> const &/*plugin_id*/,
       boost::optional<QID> const &/*interface_id*/,
       set<QID> const &/*features*/,
       plugin_information::priority_t prio) const {
-  // send all (yeah that's ok) plugins with the correct priority to the callback
+  //send all (yeah that's ok) plugins with the correct priority to the callback
   // - until the callback returns false
   for (vector<whole_plugin>::iterator it = plugins.begin();
       it != plugins.end();
@@ -424,7 +425,7 @@ bool metadata_manager::enum_modules(
       bool (
         module_descriptor const &descriptor,
         module_information const &info
-)
+      )
     > const &callback,
     boost::optional<QID> const &/*module_id*/) const {
   // send all (still ok) modules to the callback - until the callback returns

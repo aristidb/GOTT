@@ -5,10 +5,10 @@
 
 cppdef = Split(ARGUMENTS.get('def', ''))
 cxx = ARGUMENTS.get('cxx', Environment()['CXX'])
-cflags = Split(ARGUMENTS.get('cflags', ''))
+cflags = Split(ARGUMENTS.get('cflags', '-g'))
 cflags += ['-I../../']
 
-release = int(ARGUMENTS.get('release', 1))
+release = int(ARGUMENTS.get('release', 0))
 if release:
 	debug = 0
 	optimize = 'full'
@@ -34,7 +34,7 @@ Export('env')
 
 #SConscript(dirs=['agg'])
 
-#SConscript(dirs=['bfd'])
+SConscript(dirs=['bfd'])
 
 #SConscript(dirs=['cairo'])
 
@@ -44,8 +44,8 @@ Export('env')
 
 #SConscript(dirs=['x11'])
 
-SConscript(dirs=['kqueue'])
+#SConscript(dirs=['kqueue'])
 
 #SConscript(dirs=['cppunit'])
 
-SConscript(dirs=['cxxtest'])
+#SConscript(dirs=['cxxtest'])

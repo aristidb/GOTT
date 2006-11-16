@@ -5,7 +5,7 @@
 
 namespace binary {
   namespace helper {
-    char const * const target="i486-pc-linux-gnu";
+    char const * const target= "default"; //"i486-pc-linux-gnu";
 
     /// ugly smart pointer for handling bfd handles
     class bfd_handle {

@@ -3,7 +3,7 @@
 
 Import('env')
 
-print "Warning: At the moment TARGET is set to 'i486-pc-linux-gnu'. This could produce trouble if you are running the examples on a different platform"
+#print "Warning: At the moment TARGET is set to 'i486-pc-linux-gnu'. This could produce trouble if you are running the examples on a different platform"
 
 libs = [ 'bfd', 'ffi' ]
 

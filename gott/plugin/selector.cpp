@@ -70,7 +70,7 @@ public:
     return true;
   }
 
-  bool check_module (module_information const &x) const {
+  bool check_module(module_information const &x) const {
     if (module_id && x.module_id != module_id.get())
       return false;
     return true;
@@ -145,8 +145,11 @@ selector::get_plugin() const {
       prio >= 0;
       --prio)
     if (man.enum_plugins(
-          if_then_else_return(            bind(&impl::check_plugin, p.get(), _2),
-            (var(result) = _1, false), true),
+          if_then_else_return(
+            bind(&impl::check_plugin, p.get(), _2),
+            (var(result) = _1, false),
+            true
+          ),
           p->plugin_id,
           p->interface_id,
           p->features,
@@ -179,10 +182,12 @@ selector::all_plugins() const {
       prio >= 0;
       --prio)
     man.enum_plugins(
-        (        if_then(          bind(&impl::check_plugin, p.get(), _2),
-          bind(&std::vector<plugin_descriptor>::push_back, &result, _1)),
-        true
-),
+        (
+          if_then(
+            bind(&impl::check_plugin, p.get(), _2),
+            bind(&std::vector<plugin_descriptor>::push_back, &result, _1)),
+          true
+        ),
         p->plugin_id,
         p->interface_id,
         p->features,

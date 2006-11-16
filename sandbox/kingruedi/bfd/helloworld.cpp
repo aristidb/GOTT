@@ -6,7 +6,7 @@
 
 namespace foo {
   void bar() {
-    std::cout << "Hello Wordl!\n";
+    std::cout << "Hello Wordl 777!\n";
   }
 }
 
