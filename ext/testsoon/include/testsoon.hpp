@@ -159,12 +159,12 @@ public:
 
 class node {
 public:
-  node(test_group *, string const &, bool = false);
+  node(test_group *, char const * const, bool = false);
   virtual void run(test_reporter &, statistics &) const = 0;
   virtual ~node() {}
 
   test_group const * const parent;
-  string const name;
+  char const * const name;
 
   void print(stream_class &out) const;
 
@@ -180,7 +180,7 @@ inline stream_class &operator<<(stream_class &out, node const &n) {
 
 class test_group : public node {
 public:
-  test_group(test_group *parent, string const &name)
+  test_group(test_group *parent, char const *name)
     : node(parent, name), child(0) {}
   
   void add(node *, bool);
@@ -192,26 +192,25 @@ private:
   test_info *test;
 };
 
-inline node::node(test_group *parent=0,
-                  string const &name=string(),
-                  bool is_test)
-  : parent(parent), name(name), next(0) {
+inline node::node(test_group *parent, char const *name, bool is_test)
+: parent(parent), name(name), next(0) {
   if (parent)
     parent->add(this, is_test);
 }
 
 inline void node::print(stream_class &out) const {
-  if (parent)
+  if (parent) {
     parent->print(out);
-  out << '/' << name;
-#if 0
-  out << '(' << typeid(*this).name() << ')';
-#endif
+    if (parent->parent)
+      out << '/' << name;
+    else
+      out << '"' << name << '"';
+  }
 }
 
 class test_holder : public test_group {
 public:
-  test_holder() : test_group(0, string()) {}
+  test_holder() : test_group(0, "") {}
   statistics run(test_reporter &rep) {
     statistics stats;
     run(rep, stats);
@@ -227,17 +226,17 @@ public:
 
 class test_file : public test_group {
 public:
-  test_file(test_group *parent, string const &file)
+  test_file(test_group *parent, char const *file)
     : test_group(parent, file) {}
 };
 
 class test_info : public node {
 public:
   test_info(test_group *group,
-            string const &name, string const &file, unsigned line)
+            char const *name, char const *file, unsigned line)
   : node(group, name, true), file(file), line(line) {}
 
-  string const file;
+  char const *file;
   unsigned const line;
 };
 
@@ -246,12 +245,12 @@ public:
 class test_failure {
 public:
   test_failure() : line(0) {}
-  test_failure(string const &message,
+  test_failure(char const *message,
                unsigned line,
                string_vector const &data = string_vector())
     : message(message), line(line), data(data) {}
   ~test_failure() {}
-  string message;
+  char const *message;
   unsigned line;
   string_vector data;
 
@@ -326,7 +325,7 @@ private:
 
   void write_report_entry(failure_info const &info) {
     out << "\nError occured in test ";
-    if (info.ptest->name != string())
+    if (*info.ptest->name)
       out << '"' << info.ptest->name << "\" ";
     out << "in " << *info.ptest->parent
         << " on line " << info.ptest->line
@@ -362,7 +361,119 @@ private:
   }
 };
 
+/*
+ * XML reporter first try
+ * <?xml version=1.0?>
+ * <testsoon>
+     <group name="file.cpp">
+       <group name="bla">
+         <success line="LINE"> <generator>7</generator> </success>
+         <failure line="LINE" name="TESTNAME">
+         <problem>PROBLEM</problem>
+         <rawdata>
+            <item>BLA</item>
+         </rawdata>
+           <generator>7</generator>
+ *       </failure>
+ *     </group>
+     </group>
+ * </testsoon>
+ */
+ 
+class xml_reporter : public test_reporter {
+  public:
+    typedef stream_class stream;
+    xml_reporter(stream &out = DEFAULT_STREAM) : out(out), indent(1) {}
+
+    void start() {
+      out << "<?xml version=\"1.0\"?>\n";
+      out << "<testsoon>\n";
+    }
+    void stop() {
+      out << "</testsoon>\n";
+    }
+
+    void begin_group(test_group const &group) {
+      if (group.parent) {
+        print_ind();
+        ++indent;
+        if (group.parent->parent)
+          out << "<group";
+        else
+          out << "<file";
+        out << " name=\"" << group.name << "\">\n";
+      }
+    }
+
+    void end_group(test_group const &group) {
+      if (group.parent) {
+        --indent;
+        print_ind();
+        if (group.parent->parent)
+          out << "</group>\n";
+        else
+          out << "</file>\n";
+      }
+    }
+
+    void success(test_info const &i, string const &k) {
+      print_ind(); out << "<success line=\"" << i.line << "\"";      
+      if (*i.name)
+        out << " name=\"" << i.name << "\"";
+      if (k.empty())
+        out << " />\n";
+      else {
+        out << ">\n";
+        ++indent;
+        print_ind(); out << "<generator>" << k << "</generator>\n";
+        --indent;
+        print_ind(); out << "</success>\n";
+      }
+    }
+    
+    void failure(test_info const &i, test_failure const &x, string const &k) {
+      print_ind();
+      out << "<failure line=\"" << i.line << "\"";
+      if (*i.name)
+        out << " name=\"" << i.name << "\"";
+      out << ">\n";
+      ++indent;
+
+      print_ind(); out << "<problem>" << x.message << "</problem>\n";
+      if (!x.data.empty()) {
+        print_ind(); out << "<rawdata>\n";
+        ++indent;
+        for (string_vector::const_iterator it = x.data.begin(); 
+            it != x.data.end();
+            ++it) {
+          print_ind();
+          out << "<item>" << *it << "</item>\n";
+        } 
+        --indent;
+        print_ind(); out << "</rawdata>\n";
+      }
+
+      if (!k.empty()) {
+        print_ind(); out << "<generator>" << k << "</generator>\n";
+      }
+
+      --indent;
+      print_ind(); out << "</failure>\n";
+    } 
+
+  private:
+    void print_ind() {
+      for (unsigned i = 0; i < indent; ++i)
+        out << "  ";
+    }
+
+    stream &out;
+    unsigned indent;
+};
+
 typedef concise_reporter default_reporter;
+//typedef xml_reporter default_reporter;
+
 
 #ifndef IN_DOXYGEN
 
@@ -495,7 +606,7 @@ private:
     } \
     namespace BOOST_PP_CAT(name, _testgroup) { \
       static ::testsoon::test_group * \
-      test_group(::testsoon::string const &) { \
+      test_group(char const *) { \
         static ::testsoon::test_group current( \
           BOOST_PP_CAT(name, _helper)::upper_test_group(), #name); \
         return &current; \
@@ -841,8 +952,8 @@ private:
 #ifndef IN_DOXYGEN
 
 inline static ::testsoon::test_group *
-test_group(::testsoon::string const &filename) {
-  static ::testsoon::test_file file(&::testsoon::tests(), "(" + filename + ")");
+test_group(char const *filename) {
+  static ::testsoon::test_file file(&::testsoon::tests(), filename);
   return &file;
 }
 
@@ -853,6 +964,12 @@ test_group(::testsoon::string const &filename) {
  * Explanation here.
  * See @ref tutorial.
  * See @ref faq.
+ *
+ * \htmlonly
+ * <a href="http://sourceforge.net/projects/testsoon">SF.NET Project Page</a>
+ *
+ * <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=180756&amp;type=7" width="210" height="62" border="0" alt="SourceForge.net Logo" /></a>
+ * \endhtmlonly
  *
  * @page tutorial Tutorial
  * "This is a tutorial."
