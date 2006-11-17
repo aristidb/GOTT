@@ -87,6 +87,12 @@ inline string object_to_string(string const &object) {
 #endif
 
 #ifndef IN_DOXYGEN
+class test_holder;
+#endif
+
+extern test_holder &tests();
+
+#ifndef IN_DOXYGEN
 #if defined(__EXCEPTIONS) || defined(_CPPUNWIND)
 #define TESTSOON_EXCEPTIONS 1
 #define TESTSOON_NO_EXCEPTIONS 0
@@ -417,7 +423,7 @@ class xml_reporter : public test_reporter {
     }
 
     void success(test_info const &i, string const &k) {
-      print_ind(); out << "<success line=\"" << i.line << "\"";      
+      print_ind() << "<success line=\"" << i.line << "\"";      
       if (*i.name)
         out << " name=\"" << i.name << "\"";
       if (k.empty())
@@ -425,48 +431,71 @@ class xml_reporter : public test_reporter {
       else {
         out << ">\n";
         ++indent;
-        print_ind(); out << "<generator>" << k << "</generator>\n";
+        print_ind() << "<generator>" << k << "</generator>\n";
         --indent;
-        print_ind(); out << "</success>\n";
+        print_ind() << "</success>\n";
       }
     }
     
     void failure(test_info const &i, test_failure const &x, string const &k) {
-      print_ind();
-      out << "<failure line=\"" << i.line << "\"";
+      print_ind() << "<failure line=\"" << i.line << "\"";
       if (*i.name)
         out << " name=\"" << i.name << "\"";
       out << ">\n";
       ++indent;
 
-      print_ind(); out << "<problem>" << x.message << "</problem>\n";
+      print_ind() << "<problem>" << x.message << "</problem>\n";
       if (!x.data.empty()) {
-        print_ind(); out << "<rawdata>\n";
+        print_ind() << "<rawdata>\n";
         ++indent;
         for (string_vector::const_iterator it = x.data.begin(); 
             it != x.data.end();
             ++it) {
-          print_ind();
-          out << "<item>" << *it << "</item>\n";
+          print_ind() << "<item>" << *it << "</item>\n";
         } 
         --indent;
-        print_ind(); out << "</rawdata>\n";
+        print_ind() << "</rawdata>\n";
       }
 
       if (!k.empty()) {
-        print_ind(); out << "<generator>" << k << "</generator>\n";
+        print_ind() << "<generator>" << k << "</generator>\n";
       }
 
       --indent;
-      print_ind(); out << "</failure>\n";
+      print_ind() << "</failure>\n";
     } 
 
   private:
-    void print_ind() {
+    stream_class &print_ind() {
       for (unsigned i = 0; i < indent; ++i)
         out << "  ";
+      return out;
     }
-
+    /*
+    string create_attribute(string const &name, string const &value) {
+      return string(" ") + name + "=\"" + value + "\"";
+    }
+    template<class T>
+    string create_attribute(string const &name, T const &value) {
+      return create_attribute(name, object_to_string(value));
+    }
+    
+    void open_tag(string const &tagname, string const &attributes, bool indent = true, bool newline = true) {
+      if (indent)
+        print_ind();
+      out << '<' << tagname << attributes << '>';
+      if (newline)
+      	out << '\n';
+    }
+    
+    void close_tag(string const &tagname, bool indent = true, bool newline = true) {
+      if (indent)
+        print_ind();
+      out << "</" << tagname << '>';
+      if (newline)
+      	out << '\n';
+    }
+    */
     stream &out;
     unsigned indent;
 };
@@ -501,8 +530,6 @@ inline void test_group::run(test_reporter &rep, statistics &stats) const {
     it->run(rep, stats);
   rep.end_group(*this);
 }
-
-extern test_holder &tests();
 
 template<class T, class U>
 inline void check_equals(T const &a, U const &b,
@@ -972,10 +999,116 @@ test_group(char const *filename) {
  * \endhtmlonly
  *
  * @page tutorial Tutorial
- * "This is a tutorial."
+ *
+ * @section tut_start Getting started
+ *
+ * Let's start quickly. We must test whether the compiler actually works
+ * decently! We do this by testing whether 1 is actually the same as 1.
+ *
+ * @code
+#include <testsoon.hpp>
+
+TEST(compiler_check) {
+  Equals(1, 1); // let's hope it works!!
+}
+
+TEST_REGISTRY;
+
+int main() {
+  testsoon::default_reporter rep;
+  testsoon::tests().run(rep);
+}
+@endcode
+ *
+ * In order to compile this ... important test, you first need to make sure that
+ * a recent testsoon.hpp is in your include path. It can be found in the
+ * include/ directory of the distribution. You may just copy it into your
+ * project folder. No other installation is required.
+ *
+ * If you compile and run this program, you should see something like this on
+ * your console:
+ * @verbatim
+"simple.cpp" : .
+
+1 tests, 1 succeeded, 0 failed.
+@endverbatim
+ *
+ * I guess this means that we can trust our compiler a little bit. Or so it
+ * seems. Seriously, this is our first successful test. Let me explain what
+ * the code above actually means. I shall do this by thoroughly commenting
+ * the code.
+ *
+ * @code
+// You really can guess why we do this.
+#include <testsoon.hpp>
+
+// Declare a simple test with name "compiler_check". Note that no quotes are
+// required here.
+TEST(compiler_check) {
+  // Check whether the two numbers are equal.
+  Equals(1, 1);
+}
+
+// This line is required _once_ per executable. It ensures that if the code
+// compiles, everything works smoothly. The principle here: no surprises.
+TEST_REGISTRY;
+
+int main() {
+  // Declare a reporter. The default_reporter should be a sensible setting.
+  // That's why it's the default.
+  testsoon::default_reporter rep;
+
+  // Run all tests.
+  testsoon::tests().run(rep);
+}
+@endcode
+ *
+ * So now let's play around and test something different: are 1 and 2 equal?
+ * Change the check as follows:
+ *
+ * @code
+Equals(1, 2);
+@endcode
+ *
+ * Now, the output should look like something like this:
+ *
+ * @verbatim
+"simple.cpp" : [F=3.4]
+
+Error occured in test "compiler_check" in "simple.cpp" on line 3 in check on line 4.
+Problem: not equal: 1 and 2
+Data:
+        1
+        2
+
+1 tests, 0 succeeded, 1 failed.
+@endverbatim
+ *
+ * Obviously, both numbers differ. Lets look at the first strange thing:
+ * "[F=3.4]". This little thing means that there was a failure in the test on
+ * line 3 (simple.cpp), to be exact the check on line 4 failed. (I used the
+ * version without comments.)
+ *
+ * The same information is represented below and with additional information.
+ * "Data" are the two parameter values to Equals. This is necessary because
+ * in other situations the "problem" might not be "not equal: 1 and 2" but
+ * "not equal: a and b" where a and b are variables. In this case, "data" would
+ * contain the values of both variables in (readable) string representation.
  *
  * @page faq Frequently Asked Questions (FAQ)
- * "This is a FAQ."
+ *
+ * <ol>
+ *
+ * <li><b>Does "Test soon" work when exceptions are disabled?</b>
+ * <p>
+ * Yes, it should be able to detect this automatically. When exceptions are
+ * disabled, all checks must be directly in the test and not in a helper
+ * function.
+ *
+ * If you have exception support, "Test soon" should be able to take advantage
+ * of this automatically.
+ * </p></li>
+ * </ol>
  */
 
 #endif
