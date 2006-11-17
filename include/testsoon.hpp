@@ -1108,6 +1108,19 @@ Data:
  * If you have exception support, "Test soon" should be able to take advantage
  * of this automatically.
  * </p></li>
+ *
+ * <li><b>Why do you use macros (so much)?</b>
+ * </li>
+ *
+ * <li><b>But macros are evil!!!</b>
+ * </li>
+ *
+ * <li><b>Where can I download "Test soon"?</b>
+ * </li>
+ *
+ * <li><b>What does the name mean?</b>
+ * </li>
+ *
  * </ol>
  */
 
