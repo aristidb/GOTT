@@ -1103,6 +1103,38 @@ Data:
  * "not equal: a and b" where a and b are variables. In this case, "data" would
  * contain the values of both variables in (readable) string representation.
  *
+ * @section tut_grouping Grouping
+ *
+ * Named tests are nice, of course. And grouping by files is practical, too.
+ * However, you might want to group tests deeper. Or you might be to lazy to
+ * create a new file for this new test group. Do not despair!
+ *
+ * @code
+TEST_GROUP(group_one) {
+  TEST() {
+    Check(!"unnamed test in group_one");
+  }
+
+  TEST(named) {
+    Check(!"named test in group_one");
+  }
+}
+
+TEST_GROUP(group_two) {
+  TEST() {
+    Check(!"only test in group_two");
+  }
+  TEST_GROUP(nested) {
+    TEST() {
+      Check(!"except if you count this test in a nested group");
+    }
+  }
+}
+@endcode
+ *
+ * The Checks will all fail because they are passed a false value. \c ! applied
+ * to a non-null pointer value is always \c false.
+ *
  * @page faq Frequently Asked Questions (FAQ)
  *
  * <ol>
