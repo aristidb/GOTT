@@ -996,17 +996,15 @@ test_group(char const *filename) {
  * The goal is to utilize the strengths of C++ while minimizing the impact of
  * its weaknesses.
  *
- * - @subpage tutorial
- * - @subpage faq
- * - @ref testsoon.hpp "Reference"
+ * @li @subpage tutorial
+ * @li @subpage faq
+ * @li @ref testsoon.hpp "Reference"
  *
- * \htmlonly
- * <a href="http://sourceforge.net/projects/testsoon">SF.NET Project Page</a>
- * <br>
- * <a href="http://sourceforge.net">
- * <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=180756&amp;type=7" width="210" height="62" border="0" alt="SourceForge.net Logo" />
- * </a>
- * \endhtmlonly
+ * @li <a href="http://sourceforge.net/projects/testsoon">SF.NET Project Page</a>
+ *
+ * @htmlonly
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=180756&amp;type=7" width="210" height="62" border="0" alt="SourceForge.net Logo" /></a>
+@endhtmlonly
  *
  * @page tutorial Tutorial
  *
