@@ -1135,6 +1135,41 @@ TEST_GROUP(group_two) {
  * The Checks will all fail because they are passed a false value. \c ! applied
  * to a non-null pointer value is always \c false.
  *
+ * \note "Test soon" uses namespaces for grouping, so your group names must
+ *       valid namespace names.
+ *
+ * @section tut_ext_syntax Extended syntax
+ *
+ * You already saw that you can define tests with the TEST macro. But there
+ * also is an alternative syntax which you can use, too. It has advantages
+ * that will become evident later.
+ *
+ * @code
+XTEST() {} // unnamed test
+XTEST((name, "my test")) {} // named test
+XTEST((n, "my other test")) {} // a named test, too
+XTEST((parameter1_name, parameter1_value) (parameter2_name, parameter2_value))
+  // illegal but demonstrates how to use multiple parameters
+ * @endcode
+ *
+ * #XTEST enables you to use named parameters. Some parameters have short and
+ * long names, like name, alias n. This syntax does not make much sense so far,
+ * but you will see how it is useful later.
+ *
+ * @section tut_fixtures Fixtures
+ *
+ * @subsection tut_explicit_fixtures Explicit fixtures
+ *
+ * TODO
+ *
+ * @subsection tut_group_fixtures Group fixtures
+ *
+ * TODO
+ *
+ * @section tut_generators Generators
+ *
+ * TODO
+ *
  * @page faq Frequently Asked Questions (FAQ)
  *
  * <ol>
