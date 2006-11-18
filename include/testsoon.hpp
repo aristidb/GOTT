@@ -1125,7 +1125,7 @@ Data:
  * should be part of the public interface.
  *
  * Note that \c #Equals etc. are macros, but you can use \c #TESTSOON_Equals
- * etc. instead and #undef the short names if you have conflicts. Depending on
+ * etc. instead and \#undef the short names if you have conflicts. Depending on
  * your naming convention, this will be more or less important.
  * </p></li>
  *
@@ -1164,7 +1164,7 @@ Data:
  * <li><b>Why don't you use a plain singleton instead of #TEST_REGISTRY?</b>
  * <p>
  * Because it might not work. Depending on your compiler, the tests might build
- * wihout any error message or warning but would not work. We considered two
+ * wihout any error message or warning but would not work. We considered three
  * alternatives:
  *
  * -# Put the singleton into a \c .cpp file. The problem: "Test soon" could no
