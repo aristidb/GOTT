@@ -362,7 +362,7 @@ private:
 };
 
 /*
- * XML reporter first try
+ * XML reporter first (not that beautiful) try
  * <?xml version=1.0?>
  * <testsoon>
      <group name="file.cpp">
@@ -380,6 +380,7 @@ private:
  * </testsoon>
  */
  
+
 class xml_reporter : public test_reporter {
   public:
     typedef stream_class stream;
@@ -467,6 +468,7 @@ class xml_reporter : public test_reporter {
         out << "  ";
     }
 
+    
     stream &out;
     unsigned indent;
 };
@@ -975,7 +977,11 @@ test_group(char const *filename) {
  * "This is a tutorial."
  *
  * @page faq Frequently Asked Questions (FAQ)
- * "This is a FAQ."
+ *
+ * \htmlonly
+ * <h2>Q: Why does testsoon use "evil dark preprocessor-hacks"? Would a singleton not also do the job and compile much faster?</h2>
+ * <em><h2>A:</h2> Because it would not be that easy useable that way. You couldn't use TESTSOON_REGISTRY; where ever you want and instead of just writing EQUALS(1, 2); you had to use constructs like testsoon::instance()->equal(group, 1, 2). We think that preventing things like those justifys those "evil macros". Besides we ensured that testsoon's macros do not trouble your project by wrapping them in a do{...}while(false) (without ";", that is also why you have to ttype ";" after calling a macro) statement.
+\endhtmlonly 
  */
 
 #endif
