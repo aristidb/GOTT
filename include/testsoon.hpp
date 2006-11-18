@@ -989,14 +989,23 @@ test_group(char const *filename) {
 
 /**
  * @mainpage
- * Explanation here.
- * See @ref tutorial.
- * See @ref faq.
+ *
+ * "Test soon" is a testing framework trying to enable you to write tests
+ * quickly, organize them easily and still being flexible.
+ *
+ * The goal is to utilize the strengths of C++ while minimizing the impact of
+ * its weaknesses.
+ *
+ * - @subpage tutorial
+ * - @subpage faq
+ * - @ref testsoon.hpp "Reference"
  *
  * \htmlonly
  * <a href="http://sourceforge.net/projects/testsoon">SF.NET Project Page</a>
- *
- * <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=180756&amp;type=7" width="210" height="62" border="0" alt="SourceForge.net Logo" /></a>
+ * <br>
+ * <a href="http://sourceforge.net">
+ * <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=180756&amp;type=7" width="210" height="62" border="0" alt="SourceForge.net Logo" />
+ * </a>
  * \endhtmlonly
  *
  * @page tutorial Tutorial
@@ -1111,16 +1120,64 @@ Data:
  * </p></li>
  *
  * <li><b>Why do you use macros (so much)?</b>
- * </li>
+ * <p>
+ * We believe that convenience is more important than purity. I have used
+ * testing frameworks without macros, so I know what I'm talking about. We
+ * believe that testing frameworks are one of the very few places where macros
+ * should be part of the public interface.
+ *
+ * Note that \c #Equals etc. are macros, but you can use \c #TESTSOON_Equals
+ * etc. instead and #undef the short names if you have conflicts. Depending on
+ * your naming convention, this will be more or less important.
+ * </p></li>
  *
  * <li><b>But macros are evil!!!</b>
- * </li>
+ * <p>
+ * Indeed. There is even a Guru-of-the-Week article about the blessings of
+ * the Win32 "Sleep" macro et al. However, if, after serious consideration,
+ * macros are the only convenient alternative, we should and will use them.
+ *
+ * Convenience is especially important in testing, as you won't write tests
+ * if it is not convenient. That's our experience. Other than that, we tried
+ * hard to reduce risks. Especially dangerously named macros also have longer
+ * names so you can \#undef the short version.
+ * </p></li>
  *
  * <li><b>Where can I download "Test soon"?</b>
- * </li>
+ * <p>
+ * See the
+ * <a href="http://sourceforge.net/project/showfiles.php?group_id=180756">
+ * Sourceforge.NET download site</a>.
+ * </p></li>
  *
  * <li><b>What does the name mean?</b>
- * </li>
+ * <p>
+ * Nice you ask. It's a promise. You will be able to test your code soon.
+ * Of course, no legal warranties or anything, but that's what we
+ * tried hard. Really hard - darkest magic we use inside.
+ * </p></li>
+ *
+ * <li><b>Why is "Test soon" organized as a single header?</b>
+ * <p>
+ * For ease of use. You can simply copy the header into your project directory.
+ * Or you can copy it to \c /usr/include. Whatever you prefer.
+ * </p></li>
+ *
+ * <li><b>Why don't you use a plain singleton instead of #TEST_REGISTRY?</b>
+ * <p>
+ * Because it might not work. Depending on your compiler, the tests might build
+ * wihout any error message or warning but would not work. We considered two
+ * alternatives:
+ *
+ * -# Put the singleton into a \c .cpp file. The problem: "Test soon" could no
+ *   longer be used as a single header file but would be a full-blown library.
+ *   We discarded that quickly.
+ * -# Require the user to write a variable / function definition.
+ * -# Require the user to write a simple \c #TEST_REGISTRY; somewhere.
+ *
+ * We chose the macro alternative because we considered it the simplest and
+ * most convenient.
+ * </p></li>
  *
  * </ol>
  */
