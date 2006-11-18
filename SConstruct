@@ -1,11 +1,14 @@
 import glob
 files = glob.glob("src/*.cpp")
 
-#flags = []
-flags = [ "-Wall", "-W", "-O3" ]
-#flags += [ "-g" ]
+boostpath= "/usr/local/include/boost-1_33_1"
 
-env = Environment(CPPPATH = [ "#include" ])
+include= boostpath
+
+
+flags = [ "-Wall", "-W", "-O2" ]
+
+env = Environment(CPPPATH = [ "#include", include])
 env.Program("example",
       files, 
       CXXFLAGS = flags + [ "-Werror" ])

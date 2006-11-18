@@ -368,7 +368,7 @@ private:
 };
 
 /*
- * XML reporter first try
+ * XML reporter first (not that beautiful) try
  * <?xml version=1.0?>
  * <testsoon>
      <group name="file.cpp">
@@ -386,6 +386,7 @@ private:
  * </testsoon>
  */
  
+
 class xml_reporter : public test_reporter {
   public:
     typedef stream_class stream;
