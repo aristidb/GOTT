@@ -1103,7 +1103,24 @@ Data:
  * "not equal: a and b" where a and b are variables. In this case, "data" would
  * contain the values of both variables in (readable) string representation.
  *
+ * @section tut_checks Standard checks
+ *
+ * TODO
+ *
  * @section tut_grouping Grouping
+ *
+ * @subsection tut_autogroup Automatic grouping
+ *
+ * Test soon supports automatic grouping by file name. You can place tests
+ * in any source file and the source file will automatically make up a group.
+ * You do not need to manually add a group for the file. Nor do you need to
+ * add a macro or some strange code somewhere in your file.
+ *
+ * In most circumstances you will structure a test executable like this:
+ * -# A runner executable containing \c #TEST_REGISTRY; and \c main().
+ * -# A hierarchy of test sources.
+ *
+ * @subsection tut_mangroup Manual grouping
  *
  * Named tests are nice, of course. And grouping by files is practical, too.
  * However, you might want to group tests deeper. Or you might be to lazy to
@@ -1242,6 +1259,54 @@ XTEST((parameter1_name, parameter1_value) (parameter2_name, parameter2_value))
  *
  * We chose the macro alternative because we considered it the simplest and
  * most convenient.
+ * </p></li>
+ *
+ * <li><b>Why is "Test soon" better?</b>
+ * <p>
+ * Because we are
+ * <ol>
+ * <li><i>technologically advanced.</i> We use bleeding edge techniques like
+ * preprocessor metaprogramming (yes) to ensure an optimal user experience.</li>
+ * <li><i>unbiased.</i> There is no existing and well-known testing framework
+ * that we like so we just have to be unbiased. We won't just copy.</li>
+ * <li><i>hating compromise.</i> We try to solve the full problem.
+ * </ol>
+ *
+ * As a consequence, you can write tests very quickly. You do not need to hassle
+ * with extremely complex template-subtemplate-specialization syntax. You do
+ * not need to care about test registration. There are generators, fixtures and
+ * other features to help you write your tests the way you imagine. And quite
+ * notably: You are not forced into a flat hierarchy. You can group as deep as
+ * you wish.
+ * </p></li>
+ *
+ * <li><b>Why didn't you model the successful xUnit family of testing
+ * frameworks?</b>
+ * <p>
+ * Because it is not designed for C++. xUnit was first implemented for
+ * Smalltalk. This language does not share much with C++ - other than the
+ * superficial label "OOP". Nor does Smalltalk shared much with Java / .NET.
+ * Yet it was ported to Java and .NET and was made usable with the help of
+ * reflection and, lately, annotations. Still, the whole model has some
+ * restrictions that do make sense in the context of those languages but does
+ * not make any sense for C++. So we just imagined what would be best and
+ * implemented it.
+ * </p></li>
+ *
+ * <li><b>"Test soon" lacks feature <i>XYZ</i>. It sucks!</b>
+ * <p>
+ * Help us implement it! Or maybe implement it even better than how "they" did.
+ * Maybe we'll even implement it without your help ;-).
+ * </p></li>
+ *
+ * <li><b>Does <i>anybody</i> actually <i>use</i> "Test soon"?</b>
+ * <p>
+ * Yes.
+ *
+ * The main developers have been using it in their other projects lately. We
+ * even converted tests for a ~37000 line codebase (with low coverage,
+ * admittedly) from two different frameworks to "Test soon". We did not regret
+ * the step so far.
  * </p></li>
  *
  * </ol>
