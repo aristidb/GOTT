@@ -51,10 +51,13 @@ Of course, no legal warranties or anything, but that's what we
 tried hard. Really hard - darkest magic we use inside.
 </p></li>
 
-<li><b>Why is "Test soon" organized as a single header?</b>
+<li><b>Why is "Test soon" (core) organized as a single header?</b>
 <p>
 For ease of use. You can simply copy the header into your project directory.
 Or you can copy it to \c /usr/include. Whatever you prefer.
+
+Recently we decided that some optional functionality should be split out into
+different headers so this doctrine is not fully valid anymore.
 </p></li>
 
 <li><b>Why don't you use a plain singleton instead of #TEST_REGISTRY?</b>
