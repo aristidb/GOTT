@@ -1,0 +1,126 @@
+/**
+@page faq Frequently Asked Questions (FAQ)
+
+<ol>
+
+<li><b>Does "Test soon" work when exceptions are disabled?</b>
+<p>
+Yes, it should be able to detect this automatically. When exceptions are
+disabled, all checks must be directly in the test and not in a helper
+function.
+
+If you have exception support, "Test soon" should be able to take advantage
+of this automatically.
+</p></li>
+
+<li><b>Why do you use macros (so much)?</b>
+<p>
+We believe that convenience is more important than purity. I have used
+testing frameworks without macros, so I know what I'm talking about. We
+believe that testing frameworks are one of the very few places where macros
+should be part of the public interface.
+
+Note that \c #Equals etc. are macros, but you can use \c #TESTSOON_Equals
+etc. instead and \#undef the short names if you have conflicts. Depending on
+your naming convention, this will be more or less important.
+</p></li>
+
+<li><b>But macros are evil!!!</b>
+<p>
+Indeed. There is even a Guru-of-the-Week article about the blessings of
+the Win32 "Sleep" macro et al. However, if, after serious consideration,
+macros are the only convenient alternative, we should and will use them.
+
+Convenience is especially important in testing, as you won't write tests
+if it is not convenient. That's our experience. Other than that, we tried
+hard to reduce risks. Especially dangerously named macros also have longer
+names so you can \#undef the short version.
+</p></li>
+
+<li><b>Where can I download "Test soon"?</b>
+<p>
+See the
+<a href="http://sourceforge.net/project/showfiles.php?group_id=180756">
+Sourceforge.NET download site</a>.
+</p></li>
+
+<li><b>What does the name mean?</b>
+<p>
+Nice you ask. It's a promise. You will be able to test your code soon.
+Of course, no legal warranties or anything, but that's what we
+tried hard. Really hard - darkest magic we use inside.
+</p></li>
+
+<li><b>Why is "Test soon" organized as a single header?</b>
+<p>
+For ease of use. You can simply copy the header into your project directory.
+Or you can copy it to \c /usr/include. Whatever you prefer.
+</p></li>
+
+<li><b>Why don't you use a plain singleton instead of #TEST_REGISTRY?</b>
+<p>
+Because it might not work. Depending on your compiler, the tests might build
+wihout any error message or warning but would not work. We considered three
+alternatives:
+
+-# Put the singleton into a \c .cpp file. The problem: "Test soon" could no
+longer be used as a single header file but would be a full-blown library.
+We discarded that quickly.
+-# Require the user to write a variable / function definition.
+-# Require the user to write a simple \c #TEST_REGISTRY; somewhere.
+
+We chose the macro alternative because we considered it the simplest and
+most convenient.
+</p></li>
+
+<li><b>Why is "Test soon" better?</b>
+<p>
+Because we are
+<ol>
+<li><i>technologically advanced.</i> We use bleeding edge techniques like
+preprocessor metaprogramming (yes) to ensure an optimal user experience.</li>
+<li><i>unbiased.</i> There is no existing and well-known testing framework
+that we like so we just have to be unbiased. We won't just copy.</li>
+<li><i>hating compromise.</i> We try to solve the full problem.
+</ol>
+
+As a consequence, you can write tests very quickly. You do not need to hassle
+with extremely complex template-subtemplate-specialization syntax. You do
+not need to care about test registration. There are generators, fixtures and
+other features to help you write your tests the way you imagine. And quite
+notably: You are not forced into a flat hierarchy. You can group as deep as
+you wish.
+</p></li>
+
+<li><b>Why didn't you model the successful xUnit family of testing
+frameworks?</b>
+<p>
+Because it is not designed for C++. xUnit was first implemented for
+Smalltalk. This language does not share much with C++ - other than the
+superficial label "OOP". Nor does Smalltalk shared much with Java / .NET.
+Yet it was ported to Java and .NET and was made usable with the help of
+reflection and, lately, annotations. Still, the whole model has some
+restrictions that do make sense in the context of those languages but does
+not make any sense for C++. So we just imagined what would be best and
+implemented it.
+</p></li>
+
+<li><b>"Test soon" lacks feature <i>XYZ</i>. It sucks!</b>
+<p>
+Help us implement it! Or maybe implement it even better than how "they" did.
+Maybe we'll even implement it without your help ;-).
+</p></li>
+
+<li><b>Does <i>anybody</i> actually <i>use</i> "Test soon"?</b>
+<p>
+Yes.
+
+The main developers have been using it in their other projects lately. We
+even converted tests for a ~37000 line codebase (with low coverage,
+admittedly) from two different frameworks to "Test soon". We did not regret
+the step so far.
+</p></li>
+
+</ol>
+*/
+
