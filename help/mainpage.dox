@@ -8,6 +8,7 @@ The goal is to utilize the strengths of C++ while minimizing the impact of
 its weaknesses.
 
 @li @subpage tutorial
+@li @subpage german_tutorial
 @li @subpage faq
 @li @ref testsoon.hpp "Reference"
 
