@@ -1,11 +1,11 @@
 /**
-@page german_tutorial Tutorial(German)
+@page german_tutorial Deutschsprachiges Tutorial (German)
 
-@section los_gehts Los geht's!
+@section los_gehts Erste Schritte
 
-Bevor wir mit den weiteren Beispielen fortfahren, muessen wir ersteinmal testen,
-ob der benutzte Compiler richtig mit Testsoon zusammenarbeitet. Das erreichen 
-wir indem wir einfach mit Testsoon testen, ob 1 gleich 1 ist.
+Bevor wir mit den weiteren Beispielen fortfahren, m&uuml;ssen wir zun&auml;chst
+testen, ob der benutzte Compiler richtig mit Testsoon zusammenarbeitet. Das
+erreichen wir, indem wir einfach mit Test soon testen, ob 1 gleich 1 ist.
 Und schon folgt der erste Code:
 
 @code
@@ -23,39 +23,38 @@ int main() {
 }
 @endcode
 
-\b ACHTUNG: Testsoon benoetigt Boost um zu kompilieren!
+\b ACHTUNG: Test soon benoetigt Boost um zu kompilieren! Siehe 
+  @ref requirements.
 
-
-Nach dem Kompilieren und ausfuehren des Programms, sollte es folgendes ausgeben:
+Nach dem Kompilieren und Ausf&uuml;hren des Programms, sollte es Folgendes
+ausgegeben haben:
 @verbatim
 "simple.cpp" : .
 
 1 tests, 1 succeeded, 0 failed.
 @endverbatim
 
-Wenn dem so ist, so arbeitet der Compiler vermutlich richtig mit Testsoon zusammen.
+Wenn dem so ist, hat alles geklappt.
 
-
-@section erste_schritte Erste Schritte mit Testsoon
-
-Jetzt ist man sicherlich auch daran interressiert, was der Code, den man jetzt
-brav kopiert hat ueberhaupt tut. Dazu nochmal der Code von oben, komplett kommentiert:
+Jetzt sind Sie sicherlich auch daran interessiert, was der Code, den Sie jetzt
+brav kopiert haben, &uuml;berhaupt macht. Dazu nochmal der Code von oben,
+erkl&auml;rend kommentiert:
 
 @code
-// Wenn diese Zeile nicht verstanden wird, sollte man sich (noch)einmal mit C++
-// vertraut machen...
+// Das sollte klar sein...
 #include <testsoon.hpp>
 
-// Hier wird ein Test mit Namen "compiler_check" erstellt. Es ist wichtig, dass 
-// er nicht(!) gequoted wird.
+// Hier wird ein Test mit Namen "compiler_check" erstellt. Es ist nicht noetig,
+// dass der Name gequoted (in "" eingeschlossen) wird.
 TEST(compiler_check) {
-  // Check whether the two numbers are equal.
+  // Pruefe, ob die beiden Zahlen gleich sind.
   Equals(1, 1);
 }
 
-// Diese Zeile muss in jedem Projekt, das Testsoon benutzt genau einmal vorkommen.
-// Sie ist sozusagen der "Anlasser" fuer Tetsoon. (Wo diese Zeile geschrieben wird,
-// ist egal, solange sie im Projekt bleibt)
+// Diese Zeile muss in jedem Projekt, das Testsoon benutzt genau einmal
+// vorkommen. Sie ist sozusagen der "Anlasser" fuer Tetsoon. (In welcher
+// Source-Datei diese Zeile geschrieben wird, ist egal, solange sie im Projekt
+// bleibt)
 TEST_REGISTRY;
 
 int main() {
@@ -63,31 +62,27 @@ int main() {
   // "default_reporter".
   testsoon::default_reporter rep;
 
-  // Testsoon fuehrt durch das Aufrufen dieser Funktion alle erstellten Tests durch.
-  // Uebergeben wird eine Instanz eines Reporters.
+  // Testsoon fuehrt durch das Aufrufen dieser Funktion alle erstellten Tests
+  // durch. Uebergeben wird eine Instanz eines Reporters.
   testsoon::tests().run(rep);
 }
 @endcode
 
-Moment! Wenn Testsoon so gemuetlich ist, warum muss man dann noch muehsam einen Reporter
-erstellen und diesen an \c testsoon::tests().run() uebergeben?
-Obwohl Testsoon sehr auf "Gemuetlichkeit" gegruendet ist, so sollten die Moeglichkeiten
-nicht darunter leiden.
-Moechte man zum Beispiel neben der Ausgabe des default_reporters noch eine andere
-Ausgabe haben, so kann man eine Instanz eines weiteren Reporters erstellen und diese an
-\c testsoon::tests().run() uebergeben.
+Moment! Wenn Test soon so bequem ist, warum muss man dann noch muehsam einen
+Reporter erstellen und diesen an \c testsoon::tests().run() uebergeben?
+Weil man eben auch unter Umst&auml;nden einen anderen Reporter nutzen
+m&ouml;chte.  M&ouml;chte man zum Beispiel XML-Ausgabe, kann man statt des
+default_reporters einfach den xml_reporter nutzen.
 
-
-\b Uebrigens: Testsoon bietet ein selbsterklaerendes reporter Interface, durch welches
-	die Moeglichkeit besteht auch leicht selbst einen an den eigenen Beduerfnissen
-	angepassten Reporter zu schreiben. Hierrauf komme ich spaeter im Tutorial
-	zurueck.
-
+\b Uebrigens: Testsoon bietet ein einfaches Reporter Interface, durch welches
+	die M&ouml;glichkeit besteht auch leicht selbst einen an den eigenen
+	Bed&uuml;rfnissen angepassten Reporter zu schreiben. Hierauf komme ich
+	spaeter im Tutorial zurueck.
 
 @subsection standard_checks Standard Checks
 
-Jetzt wollen wir es etwas interessanter werden lassen. Was passiert, wenn man Testsoon
-einen Test ausfuehren laesst, der nicht mit \c true abschliesst?
+Jetzt wollen wir es etwas interessanter werden lassen. Was passiert, wenn man
+Test soon einen Test ausfuehren laesst, der fehlschlägt?
 
 Dazu ersetzen wir ersteinmal die Zeile
 
@@ -116,21 +111,23 @@ Data:
 1 tests, 0 succeeded, 1 failed.
 @endverbatim
 
-Die erste Auffaelligkeit ist wohl, dass der einfache Punkt durch \c [F=3.4] ersetzt wurde.
-Beides sind Symbole die den Testverlauf eines Tests angeben, wobei der einfache Punkt fuer
-einen erfolgreichen, \c [F=3.4] fuer einen fehlgeschlagenen Test steht. Nebenbei zeigt 
-\c [F=3.4] , dass ein Test in der Zeile 4 fehlschlug, der zum ab der 3. Zeile deklarierten
-Testblock gehoert. Am Ende einer jeden Ausgabe stehen nocheinmal praezisere Informationen zu
-dem fehlgeschlagenen Test. Dort findet man neben einer kurzen Beschreibung des Problems
-auch die "rohen" uebergebenen Daten. Hier waren es zum Beispiel "1" und "2".
-
+Die erste Auff&auml;lligkeit ist wohl, dass der einfache Punkt durch \c [F=3.4]
+ersetzt wurde.  Beides sind Symbole die den Testverlauf eines Tests angeben,
+wobei der einfache Punkt fuer einen erfolgreichen, \c [F=3.4] fuer einen
+fehlgeschlagenen Test steht. Nebenbei zeigt \c [F=3.4] , dass ein Test in der
+Zeile 4 fehlschlug, der zum ab der 3. Zeile deklarierten Testblock gehoert.
+Am Ende einer jeden Ausgabe stehen nocheinmal praezisere Informationen zu dem
+fehlgeschlagenen Test. Dort findet man neben einer kurzen Beschreibung des
+Problems auch die "rohen" uebergebenen Daten. Hier waren es zum Beispiel "1"
+und "2".
 
 @subsection autogrouping Automatische Gruppenerstellung
 
-Dem aufmerksamen Leser mag vielleicht aufgefallen sein, dass ich vorhin \c "simple.cpp"
-in der Testsoonausgabe uebergangen habe. Es zeigt, dass die nachfolgenden Punkte bzw.
-[F=...]-Konstrukte zu der \e Gruppe \c simple.cpp gehoeren. Fuer die naechste Sektion ist
-zu beachten, dass Testsoon automatisch fuer jede Datei, die Tests enthaelt, eine Gruppe
+Dem aufmerksamen Leser mag vielleicht aufgefallen sein, dass ich vorhin
+\c "simple.cpp" in der Testsoonausgabe uebergangen habe. Es zeigt, dass die
+nachfolgenden Punkte bzw.  [F=...]-Konstrukte zu der \e Datei/Gruppe
+\c simple.cpp gehoeren. Fuer die n&auml;chste Sektion ist zu beachten, dass Test
+soon automatisch f&uuml;r jede Datei, die Tests enth&auml;lt, eine Gruppe
 erstellt und diese nach dem Dateinamen benennt.
 
 @subsection grouping Manuelle Gruppenerstellung
