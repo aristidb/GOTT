@@ -3,10 +3,8 @@
 
 @section los_gehts Los geht's!
 
-Bevor wir mit den weiteren Beispielen fortfahren, muessen wir ersteinmal testen,
-ob der benutzte Compiler richtig mit Testsoon zusammenarbeitet. Das erreichen 
-wir indem wir einfach mit Testsoon testen, ob 1 gleich 1 ist.
-Und schon folgt der erste Code:
+Fangen wir gleich mit dem ersten Code an, der uns den aufschlussreichen Test
+bietet, ob 1 denn gleich 1 ist:
 
 @code
 #include <testsoon.hpp>
@@ -78,7 +76,7 @@ Ausgabe haben, so kann man eine Instanz eines weiteren Reporters erstellen und d
 \c testsoon::tests().run() uebergeben.
 
 
-\b Uebrigens: Testsoon bietet ein selbsterklaerendes reporter Interface, durch welches
+\b Uebrigens: Testsoon bietet ein selbsterklaerendes Reporter Interface, durch welches
 	die Moeglichkeit besteht auch leicht selbst einen an den eigenen Beduerfnissen
 	angepassten Reporter zu schreiben. Hierrauf komme ich spaeter im Tutorial
 	zurueck.
@@ -135,7 +133,40 @@ erstellt und diese nach dem Dateinamen benennt.
 
 @subsection grouping Manuelle Gruppenerstellung
 
+Natuerlich ist das Erstellen neuer Gruppe nicht gleichbedeutend mit dem Erstellen neuer
+Dateien. Es ist mit Hilfe des Makros \c TEST_GROUP(name) moeglich neue Gruppen zu 
+erstellen. Diese neuen Gruppen werden der "Datei-Gruppe" (hier \c simple.cpp )
+untergeordnet.
+
+@code
+TEST_GROUP(Gruppe_Eins) {
+  TEST() {
+    Check(!"unbenannter Test in \"Gruppe_Eins\"");
+  }
+
+  TEST(Benannt) {
+    Check(!"Test \"Benannt\" in \"Gruppe_Eins\"");
+  }
+}
+
+TEST_GROUP(Gruppe_Zwei) {
+  TEST() {
+    Check(!"Ein Test in \"Gruppe_Zwei\"");
+  }
+  TEST_GROUP(Gruppe_Zwei_Eins) {
+    TEST() {
+      Check(!"Ein Test von \"Gruppe_Zwei_Eins\", die zu \"Gruppe_Zwei\" gehoert");
+    }
+  }
+}
+@endcode
+
+Nach dem Einfuegen in zum Beispiel \c simple.cpp, Kompilieren und erneutem Ausfuehren,
+sollten diese vier Tests fehlschlagen. (Wenn nicht klar sein sollte warum, achtet auf
+das "!" vor dem Check. Wie wir (hoffentlich) wissen negiert "!" einen Wert, sodass
+jeder nicht- \c false Wert zu eben diesem wird.
+
+@subsection ext_syntax "Extended Syntax"
+
 TO-DO
-
-
 **/
