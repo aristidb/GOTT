@@ -642,6 +642,7 @@ private:
     } \
     namespace BOOST_PP_CAT(name, _testgroup)
 
+#ifndef TESTSOON_DUMMY
 /**
  * Declare a test (positional). You do not want to use this directly.
  * @param name The name of the test (quoted).
@@ -657,6 +658,10 @@ private:
     group_fixture, \
     BOOST_PP_TUPLE_ELEM(2, 0, generator), \
     BOOST_PP_TUPLE_ELEM(2, 1, generator))
+#else
+#define PTEST(name, fixture, group_fixture, generator) \
+  static void BOOST_PP_CAT(dummy_, __LINE__) ()
+#endif
 
 /**
  * Declare a test (optional name only).
