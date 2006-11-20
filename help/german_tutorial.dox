@@ -3,10 +3,8 @@
 
 @section los_gehts Erste Schritte
 
-Bevor wir mit den weiteren Beispielen fortfahren, m&uuml;ssen wir zun&auml;chst
-testen, ob der benutzte Compiler richtig mit Testsoon zusammenarbeitet. Das
-erreichen wir, indem wir einfach mit Test soon testen, ob 1 gleich 1 ist.
-Und schon folgt der erste Code:
+Fangen wir gleich mit dem ersten Code an, der uns den aufschlussreichen Test
+bietet, ob 1 denn gleich 1 ist:
 
 @code
 #include <testsoon.hpp>
@@ -132,7 +130,42 @@ erstellt und diese nach dem Dateinamen benennt.
 
 @subsection grouping Manuelle Gruppenerstellung
 
+Natuerlich ist das Erstellen neuer Gruppe nicht gleichbedeutend mit dem Erstellen neuer
+Dateien. Es ist mit Hilfe des Makros \c TEST_GROUP(name) moeglich neue Gruppen zu 
+erstellen. Diese neuen Gruppen werden der "Datei-Gruppe" (hier \c simple.cpp )
+untergeordnet.
+
+@code
+TEST_GROUP(Gruppe_Eins) {
+  TEST() {
+    Check(!"unbenannter Test in \"Gruppe_Eins\"");
+  }
+
+  TEST(Benannt) {
+    Check(!"Test \"Benannt\" in \"Gruppe_Eins\"");
+  }
+}
+
+TEST_GROUP(Gruppe_Zwei) {
+  TEST() {
+    Check(!"Ein Test in \"Gruppe_Zwei\"");
+  }
+  TEST_GROUP(Gruppe_Zwei_Eins) {
+    TEST() {
+      Check(!"Ein Test von \"Gruppe_Zwei_Eins\", die zu \"Gruppe_Zwei\" gehoert");
+    }
+  }
+}
+@endcode
+
+Nach dem Einfuegen in zum Beispiel \c simple.cpp, Kompilieren und erneutem Ausfuehren,
+sollten diese vier Tests fehlschlagen. (Wenn nicht klar sein sollte warum, achtet auf
+das "!" vor dem Check. Wie wir (hoffentlich) wissen negiert "!" einen booleschen Wert,
+sodass jeder nicht- \c false Wert zu eben diesem wird.)
+Der Name einer Gruppe wird ebenfalls nicht in Anfuehrungszeichen gesetzt. Testsoon
+arbeitet intern mit "namespaces", um die Gruppen zu erstellen.
+
+@subsection ext_syntax "Extended Syntax"
+
 TO-DO
-
-
 **/
