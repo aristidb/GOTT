@@ -163,8 +163,10 @@ TEST_GROUP(Gruppe_Zwei) {
 
 Nach dem Einfuegen in zum Beispiel \c simple.cpp, Kompilieren und erneutem Ausfuehren,
 sollten diese vier Tests fehlschlagen. (Wenn nicht klar sein sollte warum, achtet auf
-das "!" vor dem Check. Wie wir (hoffentlich) wissen negiert "!" einen Wert, sodass
-jeder nicht- \c false Wert zu eben diesem wird.
+das "!" vor dem Check. Wie wir (hoffentlich) wissen negiert "!" einen booleschen Wert,
+sodass jeder nicht- \c false Wert zu eben diesem wird.)
+Der Name einer Gruppe wird ebenfalls nicht in Anfuehrungszeichen gesetzt. Testsoon
+arbeitet intern mit "namespaces", um die Gruppen zu erstellen.
 
 @subsection ext_syntax "Extended Syntax"
 
