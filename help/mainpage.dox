@@ -11,6 +11,7 @@ its weaknesses.
 @li @subpage german_tutorial
 @li @subpage faq
 @li @ref testsoon.hpp "Reference"
+@li @subpage requirements
 
 @li <a href="http://sourceforge.net/projects/testsoon">SF.NET Project Page</a>
 
