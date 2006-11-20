@@ -130,10 +130,10 @@ erstellt und diese nach dem Dateinamen benennt.
 
 @subsection grouping Manuelle Gruppenerstellung
 
-Natuerlich ist das Erstellen neuer Gruppe nicht gleichbedeutend mit dem Erstellen neuer
-Dateien. Es ist mit Hilfe des Makros \c TEST_GROUP(name) moeglich neue Gruppen zu 
-erstellen. Diese neuen Gruppen werden der "Datei-Gruppe" (hier \c simple.cpp )
-untergeordnet.
+Natuerlich ist das Erstellen neuer Gruppe nicht gleichbedeutend mit dem
+Erstellen neuer Dateien. Es ist mit Hilfe des Makros \c #TEST_GROUP(name)
+m&ouml;glich, neue Gruppen zu erstellen. Diese neuen Gruppen werden der
+"Datei-Gruppe" (hier z.B. "simple.cpp") untergeordnet.
 
 @code
 TEST_GROUP(Gruppe_Eins) {
@@ -158,12 +158,11 @@ TEST_GROUP(Gruppe_Zwei) {
 }
 @endcode
 
-Nach dem Einfuegen in zum Beispiel \c simple.cpp, Kompilieren und erneutem Ausfuehren,
-sollten diese vier Tests fehlschlagen. (Wenn nicht klar sein sollte warum, achtet auf
-das "!" vor dem Check. Wie wir (hoffentlich) wissen negiert "!" einen booleschen Wert,
-sodass jeder nicht- \c false Wert zu eben diesem wird.)
-Der Name einer Gruppe wird ebenfalls nicht in Anfuehrungszeichen gesetzt. Testsoon
-arbeitet intern mit "namespaces", um die Gruppen zu erstellen.
+Diese vier Tests sollten fehlschlagen. (Das liegt am "!" vor dem Check. "!"
+negiert einen booleschen Wert, sodass jeder nicht-\c false / \c 0 Wert zu
+\c false wird.)
+Der Name einer Gruppe wird ebenfalls nicht in Anfuehrungszeichen gesetzt.
+Test soon arbeitet intern mit namespaces, um die Gruppen zu erstellen.
 
 @subsection ext_syntax "Extended Syntax"
 
