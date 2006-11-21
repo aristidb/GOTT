@@ -180,7 +180,7 @@ public:
    */
   long type_number() const {
     if (!place)
-      return -1;
+      return 0;
     return place->type_number();
   }
 

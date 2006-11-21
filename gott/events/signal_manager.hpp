@@ -97,7 +97,6 @@ private:
   static void signal_handler(int sig) GOTT_LOCAL;
 
   void immediate_action(int sig);
-  void receive_message(gott::xany::Xany const &);
 
 private:
   class impl;

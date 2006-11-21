@@ -53,7 +53,7 @@ public:
 
   void send(gott::Xany const &) throw();
 
-  boost::signal<void (gott::Xany const &)> &on_receive();
+  boost::signal<void (gott::Xany const &)> &on_receive(long tnr);
 
 private:
   class impl;

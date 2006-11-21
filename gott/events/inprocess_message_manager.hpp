@@ -70,7 +70,33 @@ public:
   /**
    * Called whenever a message is sent.
    */
-  virtual boost::signal<void (gott::Xany const &)> &on_receive() = 0;
+  virtual boost::signal<void (gott::Xany const &)> &on_receive(long tnr=0) = 0;
+
+private:
+  template<class Type, class Slot>
+  struct GOTT_LOCAL helper {
+    Slot fun;
+    void operator() (gott::Xany const &msg) {
+      if (msg.compatible<Type>()) {
+        typename boost::unwrap_reference<Slot>::type &r = fun;
+        r(Xany_cast<Type>(msg));
+      }
+    }
+  };
+
+public:
+  template<class Type, class Slot>
+  GOTT_LOCAL
+  boost::signals::connection connect(Slot const &fun) {
+    helper<Type, Slot> h = { fun };
+    return on_receive(gott::xany::type_nr<Type>::value).connect(h);
+  }
+
+  template<class T>
+  GOTT_LOCAL
+  void send(T const &msg) {
+    send(Xany(msg));
+  }
 
 public:
   static inprocess_message_manager *get_for(main_loop &) { return 0; }
@@ -82,6 +108,5 @@ public:
  */
 class sigsafe_message_manager : public inprocess_message_manager {};
 
-}}
-
+}} 
 #endif

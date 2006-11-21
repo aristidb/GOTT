@@ -55,6 +55,9 @@ public:
   T &get() { return value_; }
   T const &get() const { return value_; }
 
+  operator T &() { return value_; }
+  operator T const &() const { return value_; }
+
   typedef typename op_traits<T>::equality_comparable equality_comparable;
   typedef typename op_traits<T>::printable printable;
 

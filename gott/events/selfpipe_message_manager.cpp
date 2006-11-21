@@ -40,6 +40,12 @@
 #include <gott/syswrap/pipe_unix.hpp>
 #include <gott/syswrap/read_write_unix.hpp>
 #include <boost/bind.hpp>
+#include <boost/optional.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/utility/in_place_factory.hpp>
+#include <boost/checked_delete.hpp>
+#include <algorithm>
+#include <vector>
 
 using gott::events::selfpipe_message_manager;
 using gott::Xany;
@@ -47,9 +53,14 @@ using gott::Xany;
 class selfpipe_message_manager::impl {
 public:
   impl(fd_manager *fdm) : fdm(fdm) {}
+  ~impl() {
+    std::for_each(signals.begin(), signals.end(),
+      &boost::checked_delete<boost::signal<void (Xany const &)> >);
+  }
   fd_manager *fdm;
   int selfpipe[2];
-  boost::signal<void (Xany const &)> on_receive_;
+  std::vector<boost::signal<void (Xany const &)> *>
+    signals;
 };
 
 selfpipe_message_manager::selfpipe_message_manager(fd_manager *fdm)
@@ -65,8 +76,12 @@ selfpipe_message_manager::~selfpipe_message_manager() {
   close(p->selfpipe[1]);
 }
 
-boost::signal<void (Xany const &)> &selfpipe_message_manager::on_receive() {
-  return p->on_receive_;
+boost::signal<void (Xany const &)> &
+selfpipe_message_manager::on_receive(long tnr) {
+  p->signals.resize(tnr + 1);
+  if (!p->signals[tnr])
+    p->signals[tnr] = new boost::signal<void (Xany const &)>;
+  return *p->signals[tnr];
 }
 
 void selfpipe_message_manager::notify_in() {
@@ -74,7 +89,7 @@ void selfpipe_message_manager::notify_in() {
   read_unix(p->selfpipe[0], data);
   Xany value;
   value.recreate(data[0]);
-  p->on_receive_(value);
+  on_receive(value.type_number())(value);
 }
 
 void selfpipe_message_manager::send(Xany const &value) throw() {

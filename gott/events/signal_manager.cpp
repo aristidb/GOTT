@@ -43,8 +43,8 @@
 #include <gott/xany/tagged_base.hpp>
 #include <boost/signal.hpp>
 #include <boost/signals/connection.hpp>
-#include <boost/bind.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/ref.hpp>
 #include <map>
 #include <signal.h>
 
@@ -65,12 +65,21 @@ public:
   boost::signals::scoped_connection mm_conn;
   typedef boost::ptr_map<int, boost::signal<void (int)> > handler_map_t;
   handler_map_t handlers;
+
+  void operator() (int sig) {
+    handlers[sig](sig);
+  }
 };
+
+namespace {
+  struct signal_msg : gott::xany::tagged_base<int> { 
+    signal_msg(int x) : gott::xany::tagged_base<int>(x) {}
+  };
+}
 
 standard_signal_manager::standard_signal_manager(sigsafe_message_manager *mm)
 : p(new impl(mm)) {
-  p->mm_conn = p->message_manager->on_receive().connect(
-      boost::bind(&standard_signal_manager::receive_message, this, _1));
+  p->mm_conn = p->message_manager->connect<signal_msg>(boost::ref(*p));
 }
 
 standard_signal_manager::~standard_signal_manager() {
@@ -127,19 +136,7 @@ void standard_signal_manager::signal_handler(int sig) {
   find(sig)->immediate_action(sig);
 }
 
-namespace {
-  struct signal_msg : gott::xany::tagged_base<int> { 
-    signal_msg(int x) : gott::xany::tagged_base<int>(x) {}
-  };
-}
-
 void standard_signal_manager::immediate_action(int sig) {
   p->message_manager->send(Xany(signal_msg(sig)));
 }
 
-void standard_signal_manager::receive_message(Xany const &m) {
-  if (m.compatible<signal_msg>()) {
-    int sig = xany::Xany_cast<signal_msg>(m).get();
-    p->handlers[sig](sig);
-  }
-}
