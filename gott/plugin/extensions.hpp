@@ -41,16 +41,30 @@
 
 #include <gott/string/qid.hpp>
 #include <boost/optional.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/none.hpp>
 
 namespace gott { namespace plugin {
 
-class GOTT_EXPORT extension_point {
-public:
+struct GOTT_EXPORT extension_point : boost::noncopyable {
   static boost::optional<extension_point &> find(QID const &id);
+
   extension_point(QID const &id);
   ~extension_point();
 
   QID const id;
+};
+
+template<class T>
+struct concrete_extension_point : extension_point {
+  concrete_extension_point() : extension_point(T::qid) {}
+
+  static boost::optional<T &> find() {
+    boost::optional<extension_point &> uncast(extension_point::find(T::qid));
+    if (uncast)
+      return *static_cast<T *>(&uncast.get());
+    return boost::none;
+  };
 };
 
 }}
