@@ -126,6 +126,9 @@ file(GLOB src_hci
 add_library(gott_hci SHARED ${src_hci})
 target_link_libraries(gott_hci gott_core)
 
+# EXECUTABLE find_metadata
+add_executable(find_metadata tools/find_metadata.cpp)
+
 # EXECUTABLE thunk_test
 add_executable(thunk_test thunk.cpp)
 target_link_libraries(thunk_test gott_core)

@@ -36,14 +36,36 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_HPP
-#define GOTT_PLUGIN_HPP
+#include <iostream>
+#include <fstream>
+#include <string>
 
-#include <gott/plugin/plugin_base.hpp>
-#include <gott/plugin/plugin_handle.hpp>
-#include <gott/plugin/multi_plugin.hpp>
-#include <gott/plugin/plugin_builder.hpp>
-#include <gott/plugin/metadata.hpp>
-#include <gott/plugin/selector.hpp>
+using namespace std;
 
-#endif
+char const begin[] = "GOTT PLUGIN METADATA BEGIN\n";
+string end = "GOTT PLUGIN METADATA END";
+
+int main(int argc, char **argv) {
+  while (--argc) {
+    char const *file = *++argv;
+    ifstream stream(file, ios::binary);
+    while (stream) {
+      stream.ignore(4096, '\n');
+      char const *p = begin;
+      char const *ep = begin + sizeof(begin) - 1;
+      while (stream && p != ep && *p == stream.peek()) {
+        ++p;
+        stream.get();
+      }
+      if (p == ep) { // found
+        string buf;
+        string cur;
+        while (getline(stream, cur) && cur != end) {
+          buf += cur;
+          buf += '\n';
+        }
+        cout << file << ":\n" << buf << "\n--------------\n";
+      }
+    }
+  }
+}

@@ -36,14 +36,19 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#ifndef GOTT_PLUGIN_HPP
-#define GOTT_PLUGIN_HPP
+#ifndef GOTT_PLUGIN_METADATA_HPP
+#define GOTT_PLUGIN_METADATA_HPP
 
-#include <gott/plugin/plugin_base.hpp>
-#include <gott/plugin/plugin_handle.hpp>
-#include <gott/plugin/multi_plugin.hpp>
-#include <gott/plugin/plugin_builder.hpp>
-#include <gott/plugin/metadata.hpp>
-#include <gott/plugin/selector.hpp>
+#include <boost/preprocessor/cat.hpp>
+#include <gott/visibility.hpp>
+
+#define GOTT_PLUGIN_METADATA(x) \
+  namespace { \
+  GOTT_EXPORT \
+  char BOOST_PP_CAT(gott_plugin_dummy_, __LINE__)[] = \
+    "\nGOTT PLUGIN METADATA BEGIN\n" \
+    x \
+    "\nGOTT PLUGIN METADATA END\n"; \
+  }
 
 #endif

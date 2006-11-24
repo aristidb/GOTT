@@ -45,6 +45,7 @@
 #include <gott/exceptions.hpp>
 #include <gott/syswrap/errno.hpp>
 #include <gott/plugin/plugin_builder.hpp>
+#include <gott/plugin/metadata.hpp>
 #include <errno.h>
 #include <set>
 #include <map>
@@ -57,6 +58,21 @@
 using gott::events::epoll_loop;
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin, epoll_loop)
+
+GOTT_PLUGIN_METADATA(
+"plugin gott::events::epoll_loop\n"
+"interface gott::events::main_loop\n"
+"enclosing-module gott::events::epoll_loop\n"
+"symbol plugin\n"
+"priority high\n"
+"feature gott::events::fd_manager\n"
+"feature gott::events::timer_manager\n"
+"feature gott::events::inprocess_message_manager\n"
+"feature gott::events::signal_manager\n\n"
+
+"module gott::events::epoll_loop\n"
+"file-path ??FILE??\n"
+)
 
 class epoll_loop::impl {
 public:
