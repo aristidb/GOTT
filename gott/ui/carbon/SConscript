@@ -1,4 +1,0 @@
-import glob
-
-Import('shrd')
-

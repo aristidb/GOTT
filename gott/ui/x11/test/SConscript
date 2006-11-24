@@ -1,5 +1,0 @@
-import glob
-
-Import('env')
-
-env.Program('simple_x11', 'simple_x11.cpp')
