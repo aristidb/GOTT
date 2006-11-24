@@ -57,6 +57,11 @@ using namespace boost::lambda;
 gott::QID const notification_engine::qid(
     "gott::notify_fs::notification_engine");
 
+GOTT_PLUGIN_METADATA(
+"deduced-feature gott::notify_fs::notification_engine\n"
+"- gott::events::fd_manager\n"
+)
+
 notification_engine::~notification_engine() {}
 
 namespace {

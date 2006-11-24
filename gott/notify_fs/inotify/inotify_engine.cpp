@@ -46,6 +46,7 @@
 #include <gott/syswrap/scoped_unix_file.hpp>
 #include <gott/exceptions.hpp>
 #include <gott/plugin/plugin_builder.hpp>
+#include <gott/plugin/metadata.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/scoped_array.hpp>
 #include <algorithm>
@@ -106,6 +107,16 @@ struct inotify_factory : engine_factory {
 }
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(inotify_plugin, inotify_factory)
+
+GOTT_PLUGIN_METADATA(
+"plugin gott::notify_fs::inotify_factory\n"
+"interface gott::notify_fs::engine_factory\n"
+"enclosing-module gott::notify_fs::inotify\n"
+"symbol inotify_plugin\n\n"
+
+"module gott::notify_fs::inotify\n"
+"file-path ??FILE??\n"
+)
 
 typedef boost::signal<void (gott::notify_fs::event const &)> sgnl;
 

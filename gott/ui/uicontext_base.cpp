@@ -53,4 +53,3 @@ gott::ui::mouse_state const& uicontext_base::get_mouse_state() const {
 }
 
 uicontext_base::~uicontext_base() {}
-

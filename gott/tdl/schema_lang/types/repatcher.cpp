@@ -142,5 +142,15 @@ private:
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin_lang_repatcher, concrete_type<xmatcher>)
 
+GOTT_PLUGIN_METADATA(
+"plugin \"\"\n"
+"interface tdl::resource\n"
+"enclosing-module tdl::schema_lang\n"
+"symbol plugin_lang_repatcher\n\n"
+
+"module tdl::schema_lang\n"
+"file-path ??FILE??\n"
+)
+
 gott::atom const xmatcher::id("tdl::schema_lang::repatcher");
 

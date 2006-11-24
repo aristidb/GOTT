@@ -380,19 +380,8 @@ void metadata_manager::load_standard() {
   static bool loaded;
   if (!loaded) {
     loaded = true;
-    // now read them
-    {
-      std::ifstream plugins("./plugin_registry.tdl");
-      update_resource(plugins, "./plugin_registry.tdl");
-    }
-    {
-      std::ifstream modules("./module_registry.tdl");
-      update_resource(modules, "./module_registry.tdl");
-    }
-    {
-      std::ifstream deduced_features("./deduced_features.tdl");
-      update_resource(deduced_features, "./deduced_features.tdl");
-    }
+    std::ifstream metadata("./metadata.tdl");
+    update_resource(metadata, "./metadata.tdl");
   }
 }
 

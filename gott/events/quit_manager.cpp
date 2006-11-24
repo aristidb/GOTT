@@ -41,11 +41,17 @@
 #include "signal_manager.hpp"
 #include <boost/lambda/bind.hpp>
 #include <signal.h>
+#include <gott/plugin/metadata.hpp>
 
 using namespace boost::lambda;
 using namespace gott::events;
 
 gott::QID const quit_manager::qid("gott::events::quit_manager");
+
+GOTT_PLUGIN_METADATA(
+"deduced-feature gott::events::quit_manager\n"
+"- gott::events::signal_manager, gott::events::inprocess_message_manager\n"
+)
 
 class quit_manager::impl {
 public:

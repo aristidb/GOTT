@@ -46,12 +46,28 @@
 #include <gott/notify_fs/event.hpp>
 
 #include <gott/plugin/plugin_builder.hpp>
+#include <gott/plugin/metadata.hpp>
 
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin, gott::events::kqueue_loop)
+
+GOTT_PLUGIN_METADATA(
+"plugin gott::events::kqueue_loop\n"
+"interface gott::events::main_loop\n"
+"enclosing-module gott::events::kqueue_loop\n"
+"symbol plugin\n"
+"priority high\n"
+"feature gott::events::fd_manager\n"
+"feature gott::events::timer_manager\n"
+"feature gott::events::inprocess_message_manager\n"
+"feature gott::events::signal_manager\n\n"
+
+"module gott::events::kqueue_loop\n"
+"file-path ??FILE??\n"
+)
 
 namespace gott {
 namespace events {

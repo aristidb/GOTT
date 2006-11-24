@@ -22,6 +22,7 @@
  *
  * Contributor(s):
  *  Andreas Pokorny (andreas.pokorny@gmail.com)
+ *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -40,6 +41,7 @@
 #include "glx_factory.hpp"
 #include <GL/glx.h>
 #include <gott/plugin/plugin_builder.hpp>
+#include <gott/plugin/metadata.hpp>
 #include <gott/exceptions.hpp>
 #include <gott/graphics/gl/renderer.hpp>
 
@@ -48,6 +50,17 @@ using gott::ui::x11::glx_resource;
 using gott::graphics::renderer; 
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin , gott::ui::x11::glx_factory)
+
+GOTT_PLUGIN_METADATA(
+"plugin gott::ui::x11::glx_factory\n"
+"interface gott::ui::x11::renderer_factory\n"
+"enclosing-module gott::graphics::glx_renderer\n"
+"symbol plugin\n"
+"priority high\n\n"
+
+"module gott::graphics::glx_renderer\n"
+"file-path ??FILE??\n"
+)
 
 glx_factory::~glx_factory()
 {

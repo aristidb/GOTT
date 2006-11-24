@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
           buf += cur;
           buf += '\n';
         }
-        cout << file << ":\n" << buf << "\n--------------\n";
+        cout << "# " << file << ":\n" << buf << "\n# --------------\n";
       }
     }
   }

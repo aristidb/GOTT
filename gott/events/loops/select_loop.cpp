@@ -41,11 +41,26 @@
 #include <gott/syswrap/select_unix.hpp>
 #include <gott/syswrap/errno.hpp>
 #include <gott/plugin/plugin_builder.hpp>
+#include <gott/plugin/metadata.hpp>
 #include <errno.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/utility/in_place_factory.hpp>
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin, gott::events::select_loop)
+
+GOTT_PLUGIN_METADATA(
+"plugin gott::events::select_loop\n"
+"interface gott::events::main_loop\n"
+"enclosing-module gott::events::select_loop\n"
+"symbol plugin\n"
+"feature gott::events::fd_manager\n"
+"feature gott::events::timer_manager\n"
+"feature gott::events::inprocess_message_manager\n"
+"feature gott::events::signal_manager\n"
+
+"module gott::events::select_loop\n"
+"file-path ??FILE??\n"
+)
 
 namespace gott { namespace events {
 

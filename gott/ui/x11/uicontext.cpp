@@ -45,6 +45,15 @@
 #include <gott/graphics/geometry.hpp>
 #include <gott/ui/x11/window.hpp>
 #include <gott/events/fd_manager.hpp>
+#include <gott/plugin/metadata.hpp>
+
+GOTT_PLUGIN_METADATA(
+"deduced-feature gott::ui::x11\n"
+"- gott::events::fd_manager\n\n"
+
+"deduced-feature gott::ui\n"
+"- gott::ui::x11\n"
+)
 
 using boost::bind;
 namespace gott { namespace ui { namespace x11 {
