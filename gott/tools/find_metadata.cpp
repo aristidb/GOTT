@@ -39,10 +39,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
 
-char const begin[] = "GOTT PLUGIN METADATA BEGIN\n";
+char const begin[] = "GOTT PLUGIN METADATA BEGIN";
 string end = "GOTT PLUGIN METADATA END";
 
 int main(int argc, char **argv) {
@@ -50,7 +51,7 @@ int main(int argc, char **argv) {
     char const *file = *++argv;
     ifstream stream(file, ios::binary);
     while (stream) {
-      stream.ignore(4096, '\n');
+      stream.ignore(8192, '\n');
       char const *p = begin;
       char const *ep = begin + sizeof(begin) - 1;
       while (stream && p != ep && *p == stream.peek()) {
@@ -61,6 +62,14 @@ int main(int argc, char **argv) {
         string buf;
         string cur;
         while (getline(stream, cur) && cur != end) {
+          char cwdb[8192];
+          string fname;
+          if (file[0] != '/') {
+            fname += getcwd(cwdb, sizeof(cwdb));
+            fname += '/';
+          }
+          fname += file;
+          boost::algorithm::replace_all(cur, "??FILE??", fname);
           buf += cur;
           buf += '\n';
         }
