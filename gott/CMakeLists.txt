@@ -215,7 +215,14 @@ file(GLOB src_notify_test
 add_executable(notify_test ${src_notify_test})
 target_link_libraries(notify_test gott_system)
 
-add_custom_target(plugins)
+add_custom_target(plugins ALL)
+add_custom_command(
+  TARGET plugins
+  POST_BUILD
+  COMMAND bash ./tools/local_metadata.sh
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  COMMENT "Generating metadata"
+)
 
 # PLUGIN tdl_builtins
 file(GLOB src_tdl_builtins
