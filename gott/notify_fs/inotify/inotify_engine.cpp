@@ -100,6 +100,11 @@ private:
 
 namespace {
 struct inotify_factory : engine_factory {
+  inotify_factory() {
+    // check for inotify support, plugin will be removed if not
+    gott::scoped_unix_file dummy(gott::inotify_init_linux());
+    (void)dummy;
+  }
   notification_engine *alloc(main_loop &loop) const {
     return new inotify_engine(loop);
   }
