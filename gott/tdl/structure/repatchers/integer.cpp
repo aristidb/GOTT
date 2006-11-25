@@ -67,9 +67,7 @@ repatch_integer::deferred_write(writable_structure &s) const {
     context(writable_structure &s) : simple_repatcher_context(s) {}
 
     void data(gott::xany::Xany const &x) {
-      if (x.compatible<long>())
-        target.data(x);
-      else if (x.compatible<string>()) {
+      if (x.compatible<string>()) {
         string input = gott::xany::Xany_cast<string>(x);
         long result;
         if (!is_integer(input, result))

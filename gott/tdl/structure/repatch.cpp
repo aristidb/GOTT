@@ -52,6 +52,10 @@ using gott::Xany;
 repatcher::repatcher() {}
 repatcher::~repatcher() {}
 
+writable_structure *repatcher::inverse(writable_structure &) const {
+  return 0;
+}
+
 simple_repatcher_context::~simple_repatcher_context() {}
 
 void simple_repatcher_context::begin(source_position const &w) {

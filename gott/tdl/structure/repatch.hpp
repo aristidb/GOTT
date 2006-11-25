@@ -63,6 +63,7 @@ public:
   virtual ~repatcher() = 0;
   virtual repatcher *clone() const = 0;
   virtual writable_structure *deferred_write(writable_structure &) const = 0;
+  virtual writable_structure *inverse(writable_structure &) const;
 };
 
 inline repatcher *new_clone(repatcher const &r) {
