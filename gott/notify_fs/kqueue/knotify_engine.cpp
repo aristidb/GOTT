@@ -60,11 +60,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(kqueue_plugin, knotify_factory)
 GOTT_PLUGIN_METADATA(
 "plugin gott::notify_fs::kqueue_factory\n"
 "interface gott::notify_fs::engine_factory\n"
-"enclosing-module gott::notify_fs::kqueue\n"
-"symbol kqueue_plugin\n\n"
-
-"module gott::notify_fs::kqueue\n"
-"file-path ??FILE??\n"
+"module-file ??FILE??\n"
+"symbol kqueue_plugin\n"
 )
 
 namespace gott {

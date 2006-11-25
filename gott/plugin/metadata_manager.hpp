@@ -154,7 +154,7 @@ public: //internal
         bool (
           plugin_descriptor const &plugin_descriptor,
           plugin_information const &info
-)
+        )
       > const &callback,
       boost::optional<QID> const &plugin_id,
       boost::optional<QID> const &interface_id,
@@ -173,7 +173,7 @@ public: //internal
         bool (
           module_descriptor const &descriptor,
           module_information const &info
-)
+        )
       > const &callback,
       boost::optional<QID> const &module_id) const;
 
@@ -201,6 +201,7 @@ public: //internal
   void add_plugin(
       plugin_descriptor const &desc,
       plugin_information const &info,
+      QID const &enclosing_module,
       string const &resource);
 
   /**

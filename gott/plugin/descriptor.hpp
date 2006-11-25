@@ -148,21 +148,16 @@ struct plugin_information {
    */
   explicit plugin_information(
       QID const &plugin_id,
-      QID const &enclosing_module,
       std::set<QID> const &interfaces,
       std::map<QID, bool> const &features,
       priority_t priority)
     : plugin_id(plugin_id),
-    enclosing_module(enclosing_module),
     interfaces(interfaces),
     features(features),
     priority(priority) {}
 
   /// The ID of the plugin.
   QID plugin_id;
-
-  /// The ID of the plugin's module.
-  QID enclosing_module;
 
   ///  The IDs of the plugin's supported interfaces.
   std::set<QID> interfaces;

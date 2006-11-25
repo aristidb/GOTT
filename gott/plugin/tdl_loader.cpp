@@ -81,6 +81,7 @@ struct adapter : writable_structure {
 
   plugin_descriptor plugin_desc;
   plugin_information plugin_info;
+  gott::QID enclosing_module;
 
   module_descriptor module_desc;
   module_information module_info;
@@ -99,7 +100,7 @@ struct adapter : writable_structure {
       module_info = module_information();
       module_dep.clear();
     } else if (Tag == "$plugin") {
-      manager.add_plugin(plugin_desc, plugin_info, resource);
+      manager.add_plugin(plugin_desc, plugin_info, enclosing_module, resource);
       plugin_desc = plugin_descriptor();
       plugin_info = plugin_information();
     } else if (Tag == "$deduced-feature") {
@@ -109,7 +110,9 @@ struct adapter : writable_structure {
     } else if (Tag == "plugin")
       plugin_info.plugin_id = _str();
     else if (Tag == "enclosing-module")
-      plugin_info.enclosing_module = _str();
+      enclosing_module = _str();
+    else if (Tag == "module-file")
+      plugin_desc.enclosing_module = module_descriptor(_str());
     else if (Tag == "interface")
       plugin_info.interfaces.insert(_str());
     else if (Tag == "feature")
@@ -200,8 +203,12 @@ void gott::plugin::detail::load_tdl_resource(
           (rule_one("named",
                     rule_attr(tag = "interface"),
                     inode))
-          (rule_one("named", rule_attr(tag = "enclosing-module"),
+          (rule("any", rule_attr(coat = false),
+          boost::assign::list_of
+            (rule_one("named", rule_attr(tag = "enclosing-module"),
                     inode))
+            (rule_one("named", rule_attr(tag = "module-file"),
+                    inode))))
           (rule_one("named", rule_attr(tag = "symbol"),
                     inode))
           (rule_one("named",

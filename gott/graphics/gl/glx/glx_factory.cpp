@@ -54,12 +54,9 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin , gott::ui::x11::glx_factory)
 GOTT_PLUGIN_METADATA(
 "plugin gott::ui::x11::glx_factory\n"
 "interface gott::ui::x11::renderer_factory\n"
-"enclosing-module gott::graphics::glx_renderer\n"
+"module-file ??FILE??\n"
 "symbol plugin\n"
-"priority high\n\n"
-
-"module gott::graphics::glx_renderer\n"
-"file-path ??FILE??\n"
+"priority high\n"
 )
 
 glx_factory::~glx_factory()

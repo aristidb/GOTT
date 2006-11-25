@@ -66,14 +66,17 @@ namespace {
     whole_plugin(
         plugin_descriptor const &descriptor,
         plugin_information const &information,
-        string const &resource)
+        string const &resource,
+        QID const &enclosing_module)
       : descriptor(descriptor),
       information(information),
-      resource(resource) {}
+      resource(resource),
+      enclosing_module(enclosing_module) {}
 
     plugin_descriptor descriptor;
     plugin_information information;
     string resource;
+    QID enclosing_module;
   };
 
   // need to store module_descriptor, module_information and the resource
@@ -228,15 +231,18 @@ void metadata_manager::commit() {
   // patching new plugins' module_descriptor entries
   for (vector<whole_plugin>::iterator it = p->add_plugins.begin();
       it != p->add_plugins.end();
-      ++it)
-    for (vector<whole_module>::iterator jt = modules.begin();
-        jt != modules.end();
-        ++jt)
-      if (jt->information.module_id == it->information.enclosing_module) {
-        it->descriptor.enclosing_module = jt->descriptor;
-        break;
-      }
-  
+      ++it) {
+    if (it->enclosing_module != QID() &&
+        it->descriptor.enclosing_module.file_path == string())
+      for (vector<whole_module>::iterator jt = modules.begin();
+          jt != modules.end();
+          ++jt)
+        if (jt->information.module_id == it->enclosing_module) {
+          it->descriptor.enclosing_module = jt->descriptor;
+          break;
+        }
+  }
+
   // adding new and patched plugins
   plugins.insert(plugins.end(), p->add_plugins.begin(), p->add_plugins.end());
 
@@ -344,11 +350,11 @@ void metadata_manager::add_core_tdl_schema(
       plugin_descriptor("plugin_schema_" + type, tdl_builtins),
       plugin_information(
         "",
-        "tdl::builtins",
         interfaces,
         features,
         plugin_information::normal
-),
+      ),
+      QID(),
       "core");
 }
 
@@ -363,11 +369,11 @@ void metadata_manager::add_core_tdl_repatcher(
       plugin_descriptor("plugin_repatcher_" + type, tdl_builtins),
       plugin_information(
         "",
-        "tdl::builtins",
         interfaces,
         features,
         plugin_information::normal
-),
+      ),
+      QID(),
       "core");
 }
 
@@ -456,8 +462,9 @@ void metadata_manager::remove_module(module_descriptor const &descriptor) {
 void metadata_manager::add_plugin(
     plugin_descriptor const &desc,
     plugin_information const &info,
+    QID const &enclosing,
     string const &resource) {
-  p->add_plugins.push_back(whole_plugin(desc, info, resource));
+  p->add_plugins.push_back(whole_plugin(desc, info, resource, enclosing));
 }
 
 void metadata_manager::add_module(

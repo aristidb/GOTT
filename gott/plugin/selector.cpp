@@ -62,8 +62,6 @@ public:
       return false;
     if (interface_id && x.interfaces.count(interface_id.get()) == 0)
       return false;
-    if (module_id && x.enclosing_module != module_id.get())
-      return false;
     if (!feature_includes(x.features.begin(), x.features.end(),
           features.begin(), features.end()))
       return false;
@@ -213,7 +211,8 @@ gott::plugin::module_descriptor selector::get_module() const {
   using namespace boost::lambda;
 
   man.enum_modules(
-      if_then_else_return(        bind(&impl::check_module, p.get(), _2),
+      if_then_else_return(
+        bind(&impl::check_module, p.get(), _2),
         (var(result) = _1, false),
         true),
       p->module_id);

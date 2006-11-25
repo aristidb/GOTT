@@ -116,11 +116,8 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(inotify_plugin, inotify_factory)
 GOTT_PLUGIN_METADATA(
 "plugin gott::notify_fs::inotify_factory\n"
 "interface gott::notify_fs::engine_factory\n"
-"enclosing-module gott::notify_fs::inotify\n"
+"module-file ??FILE??\n"
 "symbol inotify_plugin\n\n"
-
-"module gott::notify_fs::inotify\n"
-"file-path ??FILE??\n"
 )
 
 typedef boost::signal<void (gott::notify_fs::event const &)> sgnl;

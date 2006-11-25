@@ -57,16 +57,13 @@ GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin, gott::events::kqueue_loop)
 GOTT_PLUGIN_METADATA(
 "plugin gott::events::kqueue_loop\n"
 "interface gott::events::main_loop\n"
-"enclosing-module gott::events::kqueue_loop\n"
+"module-file ??FILE??\n"
 "symbol plugin\n"
 "priority high\n"
 "feature gott::events::fd_manager\n"
 "feature gott::events::timer_manager\n"
 "feature gott::events::inprocess_message_manager\n"
 "feature gott::events::signal_manager\n\n"
-
-"module gott::events::kqueue_loop\n"
-"file-path ??FILE??\n"
 )
 
 namespace gott {

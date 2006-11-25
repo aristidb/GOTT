@@ -63,7 +63,10 @@ public:
     // load dependencies
     {
       metadata_manager man;
-      module_information const &info = man.module_extra(which);
+      module_information info;
+      try {
+        info = man.module_extra(which);
+      } catch (system_error&) {}
       std::vector<module_descriptor> const &d = info.dependencies;
       for (std::vector<module_descriptor>::const_iterator it = d.begin();
           it != d.end();
