@@ -68,6 +68,14 @@ add_definitions(-DBOOST_PARAMETER_MAX_ARITY=8)
 
 # targets -----------------------------------------------------------
 
+# CONFIGURATION
+configure_file(
+  pathconf.hpp.in
+  pathconf.hpp
+  ESCAPE_QUOTES
+  @ONLY
+)
+
 # LIBRARY gott_core
 file(GLOB src_core
   exceptions.cpp xany/xany.cpp

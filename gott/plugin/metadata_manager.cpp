@@ -41,11 +41,13 @@
 #include <gott/exceptions.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/scoped_array.hpp>
 #include <vector>
 #include <set>
 #include <map>
 #include <fstream>
 #include <algorithm>
+#include <gott/pathconf.hpp>
 
 using namespace gott::plugin;
 using gott::string;
@@ -312,7 +314,7 @@ void metadata_manager::load_core() {
 
   if (!loaded) {
     // just add the metadata necessary for reading metadata from files
-    module_descriptor tdl_builtins("tdl_builtins.plugin");
+    module_descriptor tdl_builtins(prefix + string("tdl_builtins.plugin"));
     add_module(
         tdl_builtins,
         module_information("tdl::builtins"),
@@ -386,8 +388,10 @@ void metadata_manager::load_standard() {
   static bool loaded;
   if (!loaded) {
     loaded = true;
-    std::ifstream metadata("./metadata.tdl");
-    update_resource(metadata, "./metadata.tdl");
+    string path = prefix + string("metadata.tdl");
+    std::ifstream metadata(
+      boost::scoped_array<char>(path.c_string_alloc()).get());
+    update_resource(metadata, path);
   }
 }
 
