@@ -37,16 +37,20 @@
  * ***** END LICENSE BLOCK ***** */
 
 #include "../repatch.hpp"
+#include <gott/string/buffer.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <gott/xany.hpp>
+#include <gott/range_algo.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/optional.hpp>
 #include <boost/assign/list_of.hpp>
 
 using gott::string;
+using gott::Xany;
+using gott::Xany_cast;
 using namespace tdl::structure;
 using tdl::tdl_error;
 using tdl::source_position;
@@ -63,6 +67,7 @@ public:
   repatch_find_literal(type::location, gott::string const &);
   ~repatch_find_literal();
   writable_structure *deferred_write(writable_structure &) const;
+  writable_structure *inverse(writable_structure &) const;
 private:
   type::location loc;
   gott::string literal;
@@ -84,11 +89,11 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
     type::location loc;
     string literal;
 
-    void data(gott::xany::Xany const &x) {
+    void data(Xany const &x) {
       if (!x.compatible<string>())
         throw tdl_error("TDL Structure repatcher", 
             "find_literal needs string input");
-      string s = gott::xany::Xany_cast<string>(x);
+      string s = Xany_cast<string>(x);
       bool fail = true;
       switch (loc) {
       case type::start:
@@ -113,6 +118,44 @@ repatch_find_literal::deferred_write(writable_structure &target) const {
   return new context(loc, literal, target);
 }
 
+writable_structure *
+repatch_find_literal::inverse(writable_structure &target) const {
+  struct context : simple_repatcher_context {
+    context(type::location l, string s, writable_structure &t)
+    : simple_repatcher_context(t), loc(l), literal(s) {}
+
+    type::location loc;
+    gott::string_buffer literal;
+
+    void data(Xany const &x) {
+      if (!x.compatible<string>())
+        throw tdl_error("TDL Structure repatcher", 
+            "find_literal (reverse) needs string input");
+      using gott::string_buffer;
+      using gott::range;
+      using gott::copy;
+      string_buffer s = Xany_cast<string_buffer>(x);
+      if (s.size() < literal.size())
+        throw tdl_error("TDL Structure repatcher",
+            "find_literal (reverse) got too short input");
+      switch (loc) {
+      case type::start:
+        copy(range(literal), range(s.begin(), literal.size()));
+        break;
+      case type::end:
+        copy(range(literal), range(s.end() - literal.size(), s.end()));
+        break;
+      case type::whole:
+        s = literal;
+        break;
+      default: break;
+      }
+      target.data(Xany(s));
+    }
+  };
+  return new context(loc, literal, target);
+}
+
 namespace {
 class factory : public repatcher_getter_factory {
   struct getter : public repatcher_getter {
@@ -131,13 +174,13 @@ class factory : public repatcher_getter_factory {
       if (pos == outer) fail();
       pos = outer;
     }
-    void data(gott::xany::Xany const &x) {
+    void data(Xany const &x) {
       if (x.compatible<location>()) {
         if (loc) fail();
-        loc = gott::xany::Xany_cast<location>(x);
+        loc = Xany_cast<location>(x);
        } else if (x.compatible<string>()) {
         if (literal) fail();
-        literal = gott::xany::Xany_cast<string>(x);
+        literal = Xany_cast<string>(x);
       } else
         fail();
     }

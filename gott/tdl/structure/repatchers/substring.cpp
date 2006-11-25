@@ -41,13 +41,18 @@
 #include <gott/tdl/exceptions.hpp>
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/plugin/plugin_builder.hpp>
+#include <gott/string/buffer.hpp>
 #include <boost/optional.hpp>
 #include <boost/none.hpp>
 #include <boost/assign/list_of.hpp>
+#include <iostream>//FIXME
 
 using namespace tdl::structure;
 using tdl::tdl_error;
 using tdl::source_position;
+using gott::Xany;
+using gott::Xany_cast;
+using gott::string;
 
 namespace {
 
@@ -57,6 +62,7 @@ public:
   repatch_substring(long left, long right);
   ~repatch_substring();
   writable_structure *deferred_write(writable_structure &) const;
+  writable_structure *inverse(writable_structure &) const;
 private:
   long left, right;
 };
@@ -70,22 +76,22 @@ repatch_substring::repatch_substring(long l, long r) : left(l), right(r) {
 }
 repatch_substring::~repatch_substring() {}
 
-writable_structure *repatch_substring::deferred_write(
-    writable_structure &target) const {
+writable_structure *
+repatch_substring::deferred_write(writable_structure &target) const {
   struct context : simple_repatcher_context {
     long left, right;
     context(writable_structure &target, long l, long r) 
       : simple_repatcher_context(target), left(l), right(r) {}
-    void data(gott::xany::Xany const &x) {
-      if (!x.compatible<gott::string>())
+    void data(Xany const &x) {
+      if (!x.compatible<string>())
         throw tdl_error("TDL Structure repatcher",
             "substring needs input string");
-      gott::string s = gott::xany::Xany_cast<gott::string>(x);
+      string s = Xany_cast<string>(x);
       long len = s.length();
       if (left > len || right > len || right < -len)
         throw tdl_error("TDL Structure repatcher",
             "substring range out of input bounds");
-      gott::string::utf32_range in = s.as_utf32(), out;
+      string::utf32_range in = s.as_utf32(), out;
       if (right > 0) 
         out = offset(simply(in.begin()), left, right);
       else
@@ -93,10 +99,39 @@ writable_structure *repatch_substring::deferred_write(
       if (out.end() < out.begin())
         throw tdl_error("TDL Structure repatcher",
             "substring range out of input bounds");
-      target.data(gott::xany::Xany(gott::string(out)));
+      target.data(Xany(string(out)));
     }
   };
   return new context(target, left, right);
+}
+
+writable_structure *
+repatch_substring::inverse(writable_structure &target) const {
+  struct context : simple_repatcher_context {
+    string pre, post;
+    context(writable_structure &target, string const &pre, string const &post)
+      : simple_repatcher_context(target), pre(pre), post(post) {}
+    void data(Xany const &x) {
+      if (!x.compatible<string>())
+        throw tdl_error("TDL Structure repatcher",
+            "substring (reverse) needs input string");
+      target.data(Xany(pre + Xany_cast<string>(x) + post));
+    }
+  };
+  string pre, post;
+  if (left > 0) {
+    gott::string_buffer helper;
+    for (long i = 0; i < left; ++i)
+      helper += "?";
+    pre = helper;
+  }
+  if (right < 0) {
+    gott::string_buffer helper;
+    for (long i = 0; i < -right; ++i)
+      helper += "?";
+    post = helper;
+  }
+  return new context(target, pre, post);
 }
 
 namespace {
@@ -115,24 +150,24 @@ class factory : public repatcher_getter_factory {
         fail();
       pos = outer;
     }
-    void data(gott::xany::Xany const &x) {
+    void data(Xany const &x) {
       if (delayed)
         fail();
       switch (pos) {
       case p_left:
-        left = gott::xany::Xany_cast<long>(x);
+        left = Xany_cast<long>(x);
         break;
       case p_right:
-        right = gott::xany::Xany_cast<long>(x);
+        right = Xany_cast<long>(x);
         break;
       case inner:
-        delayed = gott::xany::Xany_cast<long>(x);
+        delayed = Xany_cast<long>(x);
         break;
       case outer:
         fail();
       }
     }
-    void add_tag(gott::string const &s) {
+    void add_tag(string const &s) {
       if (pos != inner)
         return;
       if (s == "left")

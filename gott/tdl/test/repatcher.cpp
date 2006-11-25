@@ -252,3 +252,88 @@ TEST() {
   Equals(stream.str(), "77");
 }
 
+TEST_GROUP(inverse) {
+
+TEST(nothing) {
+  repatch_nothing re;
+  std::ostringstream stream;
+  direct_print out(stream);
+  scoped_ptr<writable_structure> ind(re.inverse(out));
+  ind->begin();
+    ind->data(Xany("test"));
+  ind->end();
+
+  Equals(stream.str(), "test");
+}
+
+TEST(empty chain) {
+  repatcher_chain rec;
+  rec.push_back_alloc(new repatch_nothing);
+  rec.push_back_alloc(new repatch_nothing);
+  std::ostringstream stream;
+  direct_print out(stream);
+  scoped_ptr<writable_structure> ind(rec.inverse(out));
+  ind->begin();
+    ind->data(Xany("test"));
+  ind->end();
+
+  Equals(stream.str(), "test");
+}
+
+TEST(integer (poor)) {
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
+  re_g->begin();
+    re_g->data(Xany("integer"));
+  re_g->end();
+  scoped_ptr<repatcher> re(re_g->result_alloc());
+  std::ostringstream stream;
+  direct_print out(stream);
+  scoped_ptr<writable_structure> ind(re->inverse(out));
+  Check(ind);
+  ind->begin();
+    ind->data(Xany(-4));
+  ind->end();
+
+  Equals(stream.str(), "-4");
+}
+
+TEST(strip paren) {
+  std::ostringstream o;
+  direct_print out(o);
+  scoped_ptr<repatcher> re(strip_paren());
+  scoped_ptr<writable_structure> ind(re->inverse(out));
+  Check(ind);
+  ind->begin();
+    ind->data(Xany("hallo"));
+  ind->end();
+  Equals(o.str(), "(hallo)");
+}
+
+TEST(enumeration) {
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
+  re_g->begin();
+  re_g->data(Xany("enumeration"));
+  re_g->begin();
+  re_g->begin(); re_g->data(Xany("v1")); re_g->end();
+  re_g->begin(); re_g->data(Xany("v2")); re_g->end();
+  re_g->end();
+  re_g->end();
+  scoped_ptr<repatcher> re(re_g->result_alloc());
+
+  std::ostringstream stream;
+  direct_print out(stream);
+  scoped_ptr<writable_structure> ind(re->inverse(out));
+  Check(ind);
+
+  ind->begin();
+    ind->data(Xany(0));
+  ind->end();
+  ind->begin();
+    ind->data(Xany(1));
+  ind->end();
+
+  Equals(stream.str(), "v1\nv2");
+}
+
+}
+

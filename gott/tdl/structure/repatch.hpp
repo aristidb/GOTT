@@ -92,6 +92,7 @@ public:
   repatch_nothing();
   ~repatch_nothing();
   writable_structure *deferred_write(writable_structure &) const;
+  writable_structure *inverse(writable_structure &) const;
 };
 
 class GOTT_EXPORT repatcher_chain : public concrete_repatcher<repatcher_chain> {
@@ -102,6 +103,7 @@ public:
   void push_back(repatcher const &r);
   void push_back_alloc(repatcher *);
   writable_structure *deferred_write(writable_structure &) const;
+  writable_structure *inverse(writable_structure &) const;
 private:
   boost::ptr_vector<repatcher> el;
 };

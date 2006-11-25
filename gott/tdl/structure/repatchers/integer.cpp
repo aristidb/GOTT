@@ -41,11 +41,14 @@
 #include <gott/tdl/schema/rule.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <cctype>
+#include <sstream>
 
 using gott::string;
 using namespace tdl::structure;
 using tdl::tdl_error;
 using tdl::source_position;
+using gott::Xany;
+using gott::Xany_cast;
 
 namespace {
 
@@ -54,6 +57,7 @@ public:
   repatch_integer();
   ~repatch_integer();
   writable_structure *deferred_write(writable_structure &) const;
+  writable_structure *inverse(writable_structure &) const;
 };
   
 }
@@ -66,9 +70,9 @@ repatch_integer::deferred_write(writable_structure &s) const {
   struct context : simple_repatcher_context {
     context(writable_structure &s) : simple_repatcher_context(s) {}
 
-    void data(gott::xany::Xany const &x) {
+    void data(Xany const &x) {
       if (x.compatible<string>()) {
-        string input = gott::xany::Xany_cast<string>(x);
+        string input = Xany_cast<string>(x);
         long result;
         if (!is_integer(input, result))
           throw tdl_error("TDL Structure repatcher", "string is no integer");
@@ -106,6 +110,23 @@ repatch_integer::deferred_write(writable_structure &s) const {
 
       val *= sign;
       return true;
+    }
+  };
+  return new context(s);
+}
+
+writable_structure *
+repatch_integer::inverse(writable_structure &s) const {
+  struct context : simple_repatcher_context {
+    context(writable_structure &s) : simple_repatcher_context(s) {}
+
+    void data(Xany const &x) {
+      if (!x.compatible<long>())
+        throw tdl_error("TDL structure repatcher",
+          "input is no integer");
+      std::ostringstream stream;
+      stream << x;
+      target.data(Xany(stream.str()));
     }
   };
   return new context(s);

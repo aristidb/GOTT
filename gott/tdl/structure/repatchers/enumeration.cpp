@@ -48,6 +48,8 @@ using namespace tdl::structure;
 using tdl::tdl_error;
 using tdl::source_position;
 using gott::string;
+using gott::Xany;
+using gott::Xany_cast;
 
 namespace {
 
@@ -57,6 +59,7 @@ public:
   repatch_enumeration(std::vector<gott::string> const &);
   ~repatch_enumeration();
   writable_structure *deferred_write(writable_structure &) const;
+  writable_structure *inverse(writable_structure &) const;
 private:
   std::vector<gott::string> alternatives;
 };
@@ -79,16 +82,38 @@ repatch_enumeration::deferred_write(writable_structure &s) const {
     context(writable_structure &s, std::vector<string> const &a) 
     : simple_repatcher_context(s), alternatives(a) {}
 
-    void data(gott::xany::Xany const &x) {
+    void data(Xany const &x) {
       if (x.compatible<string>()) {
-        string input = gott::xany::Xany_cast<string>(x);
+        string input = Xany_cast<string>(x);
         std::vector<string>::const_iterator it;
         if ((it = find(range(alternatives), input)) == alternatives.end())
           throw tdl_error("TDL Structure repatcher", "not in enumeration");
-        target.data(gott::xany::Xany(long(it - alternatives.begin())));
+        target.data(Xany(long(it - alternatives.begin())));
       } else
         throw tdl_error("TDL Structure repatcher", 
             "enumeration needs input string");
+    }
+  };
+  return new context(s, alternatives);
+}
+
+writable_structure *
+repatch_enumeration::inverse(writable_structure &s) const {
+  struct context : simple_repatcher_context {
+    std::vector<string> const &alternatives;
+
+    context(writable_structure &s, std::vector<string> const &a) 
+    : simple_repatcher_context(s), alternatives(a) {}
+
+    void data(Xany const &x) {
+      if (x.compatible<long>()) {
+        long input = Xany_cast<long>(x);
+        if (input < 0 || input > long(alternatives.size()))
+          throw tdl_error("TDL Structure repatcher", "not in enumeration");
+        target.data(Xany(alternatives[input]));
+      } else
+        throw tdl_error("TDL Structure repatcher", 
+            "enumeration (reverse) needs input ID");
     }
   };
   return new context(s, alternatives);
@@ -108,9 +133,9 @@ class factory : public repatcher_getter_factory {
       if (!inner) fail();
       inner = false;
     }
-    void data(gott::xany::Xany const &x) {
+    void data(Xany const &x) {
       if (!inner) fail();
-      all_strings.push_back(gott::xany::Xany_cast<string>(x));
+      all_strings.push_back(Xany_cast<string>(x));
     }
     void add_tag(string const &) {}
     void fail() {

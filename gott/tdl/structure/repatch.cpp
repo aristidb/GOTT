@@ -48,6 +48,7 @@
 using namespace tdl::structure;
 using gott::string;
 using gott::Xany;
+using boost::ptr_vector;
 
 repatcher::repatcher() {}
 repatcher::~repatcher() {}
@@ -82,6 +83,11 @@ repatch_nothing::deferred_write(writable_structure &s) const {
   return new simple_repatcher_context(s);
 }
 
+writable_structure *
+repatch_nothing::inverse(writable_structure &s) const {
+  return new simple_repatcher_context(s);
+}
+
 repatcher_chain::repatcher_chain() {}
 repatcher_chain::~repatcher_chain() {}
 
@@ -99,8 +105,8 @@ void repatcher_chain::push_back_alloc(repatcher *r) {
 writable_structure *
 repatcher_chain::deferred_write(writable_structure &s) const {
   struct context : public writable_structure {
-    boost::ptr_vector<writable_structure> out;
-    context(boost::ptr_vector<repatcher> const &el, writable_structure &target){
+    ptr_vector<writable_structure> out;
+    context(ptr_vector<repatcher> const &el, writable_structure &target){
       out.reserve(el.size());
       int i = el.size() - 1;
       out.push_back(el[i].deferred_write(target));
@@ -116,6 +122,31 @@ repatcher_chain::deferred_write(writable_structure &s) const {
     return repatch_nothing().deferred_write(s);
   else
     return new context(el, s);
+}
+
+writable_structure *
+repatcher_chain::inverse(writable_structure &s) const {
+  struct context : public writable_structure {
+    ptr_vector<writable_structure> out;
+    context(ptr_vector<repatcher> const &el, writable_structure &target){
+      ptr_vector<repatcher>::const_iterator it = el.begin();
+      out.push_back(it->inverse(target));
+      while (++it != el.end())
+        out.push_back(it->inverse(out.back()));
+    }
+    void begin(source_position const &w) { out.back().begin(w); }
+    void end() { out.back().end(); }
+    void data(gott::xany::Xany const &x) { out.back().data(x); }
+    void add_tag(gott::string const &s) { out.back().add_tag(s); }
+  };
+  if (el.empty())
+    return repatch_nothing().inverse(s);
+  else
+    try {
+      return new context(el, s);
+    } catch (boost::bad_pointer&) {
+      return 0;
+    }
 }
 
 repatcher_getter::repatcher_getter() {}
