@@ -82,17 +82,15 @@ the advantage of being scalable and the producer need not be changed. So this
 is how a consumer could look like:
 \code
 struct helper_t {
-  int &num;
-  helper_t(int &num) : num(num) {}
-  bool operator() (int value) const {
+  int num;
+  bool operator() (int value) {
     num = value;
     return value >= 0;
   }
 };
-int num;
-helper_t helper(num);
-while (element_transfer.pop_if(helper))
-  print_safely(num * 2);
+helper_t helper;
+while (element_transfer.pop_if(boost::ref(helper)))
+  print_safely(helper.num * 2);
 \endcode
 \note
 All methods of gott::thread::message_queue taking functors as arguments take

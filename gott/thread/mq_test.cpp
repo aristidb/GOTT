@@ -75,11 +75,12 @@ void consumer() {
   cout << endl;
 
   mq.wait_for_all(
-    (      bind(&mq_t::push, ref(mq), _1 + 1), 
+    (
+      bind(&mq_t::push, ref(mq), _1 + 1), 
       cout << _1 << '\n'
-),
+    ),
     _1 != 5
-);
+  );
 
   cout << endl;
 
@@ -102,7 +103,8 @@ string tag(string s, string f) {
 
 void filter_consumer(string filter) {
   while (
-      sq.filter(        bind(&string_queue::push, ref(sq_out), bind(&tag, _1, filter)),
+      sq.filter(
+        bind(&string_queue::push, ref(sq_out), bind(&tag, _1, filter)),
         message_filter(
           bind(str_find, _1, "quit_" + filter, 0) != string::npos,
           bind(str_find, _1, filter, 0) != string::npos)))
@@ -110,8 +112,7 @@ void filter_consumer(string filter) {
 }
 
   struct helper_t {
-    int &value;
-    helper_t(int &value) : value(value) {}
+    int value;
     bool operator() (int num) {
       value = num;
       return false;
@@ -120,11 +121,10 @@ void filter_consumer(string filter) {
 
 int main() {
   {
-    int val;
-    helper_t helper(val);
+    helper_t helper;
     mq.push(100);
-    mq.pop_if (helper);
-    std::cout << 'X' << val << std::endl;
+    mq.pop_if(boost::ref(helper));
+    std::cout << 'X' << helper.value << std::endl;
   }
   
   boost::thread thrd(&consumer);

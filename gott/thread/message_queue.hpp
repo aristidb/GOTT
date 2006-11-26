@@ -45,6 +45,7 @@
 #include <boost/function.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/none.hpp>
+#include <boost/ref.hpp>
 #include <deque>
 #include <algorithm>
 
@@ -111,11 +112,13 @@ private:
       : functor(functor), predicate(predicate) {}
     Functor functor;
     Predicate predicate;
-    Result operator() (Message const &m) const {
-      Result result = predicate(m);
+    Result operator() (Message const &m) {
+      typename boost::unwrap_reference<Predicate>::type &pred = predicate;
+      Result result = pred(m);
       if (result != Success)
         return result;
-      functor(m);
+      typename boost::unwrap_reference<Functor>::type &fun = functor;
+      fun(m);
       return Success;
     }
   };
@@ -223,7 +226,8 @@ public:
 
     Message const &m = peek_u();
     lock.unlock();
-    bool result = func(m);
+    typename boost::unwrap_reference<T>::type &func_r = func;
+    bool result = func_r(m);
     lock.lock();
 
     if (result) {
@@ -331,7 +335,8 @@ public:
       slot_free_u();
 
       lock.unlock();
-      if (!func(m))
+      typename boost::unwrap_reference<T>::type &func_r = func;
+      if (!func_r(m))
         break;
       lock.lock();
     }
@@ -352,7 +357,8 @@ public:
       slot_free_u();
 
       lock.unlock();
-      func(m);
+      typename boost::unwrap_reference<T>::type &func_r = func;
+      func_r(m);
       lock.lock();
     }
   }
@@ -374,7 +380,8 @@ public:
       Message m = pop_u();
       slot_free_u();
       lock.unlock();
-      func(m);
+      typename boost::unwrap_reference<T>::type &func_r = func;
+      func_r(m);
       lock.lock();
     }
   }
@@ -396,7 +403,8 @@ public:
       Message m = pop_u();
       slot_free_u();
       lock.unlock();
-      if (!func(m))
+      typename boost::unwrap_reference<T>::type &func_r = func;
+      if (!func_r(m))
         break;
       lock.lock();
     }
@@ -434,7 +442,8 @@ private:
 
     typename std::deque<Message>::iterator it = queue.begin();
     while (it != queue.end()) {
-      message_filter_result result = func(*it);
+      typename boost::unwrap_reference<T>::type &func_r = func;
+      message_filter_result result = func_r(*it);
 
       if (result == message_quit) {
         queue.erase(it);
