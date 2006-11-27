@@ -126,12 +126,20 @@ inline bool operator==(plugin_descriptor const &l, plugin_descriptor const &r) {
 struct plugin_information {
   /// The priority of a plugin.
   enum priority_t { 
+    /// Very low priority.
+    very_low,
     /// Low priority.
     low,
+    /// Lower than normal priority.
+    lower,
     /// Normal priority.
     normal,
+    /// Higher than normal priority.
+    higher,
     /// High priority.
     high,
+    /// Very high priority.
+    very_high,
     /// A number 1 higher than the highest priority.
     N_PRIORITY };
 
