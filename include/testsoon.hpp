@@ -917,18 +917,18 @@ private:
  */
 #if TESTSOON_EXCEPTIONS
 #define TESTSOON_Throws(x, t, w) \
-	do { \
-		try { \
-			(x); \
-			TESTSOON_FAIL("not throwed " #t, ::testsoon::string_vector()); \
-		} catch (t &e) { \
-			if ( \
+  do { \
+    try { \
+      (x); \
+      TESTSOON_FAIL("not throwed " #t, ::testsoon::string_vector()); \
+    } catch (t &e) { \
+      if ( \
         ::testsoon::string(w) != ::testsoon::string() && \
         ::testsoon::string(e.what()) != ::testsoon::string((w))) \
-				TESTSOON_FAIL("throwed " #t " with wrong message", \
+        TESTSOON_FAIL("throwed " #t " with wrong message", \
           ::testsoon::string_vector(1, e.what())); \
-		} \
-	} while (0)
+    } \
+  } while (0)
 #else
 #define TESTSOON_Throws(x, t, w) \
   TESTSOON_Check(!"Throws check without exception support")
