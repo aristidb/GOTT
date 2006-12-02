@@ -1,0 +1,7 @@
+* time-limit, enforced time limit
+
+* specify tests by file / group / name / *
+
+*  self = restartable wrapper
+** reporters supporting restartable wrapper
+

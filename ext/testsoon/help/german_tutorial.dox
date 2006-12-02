@@ -1,0 +1,170 @@
+/**
+@page german_tutorial Deutschsprachiges Tutorial (German)
+
+@section los_gehts Erste Schritte
+
+Fangen wir gleich mit dem ersten Code an, der uns den aufschlussreichen Test
+bietet, ob 1 denn gleich 1 ist:
+
+@code
+#include <testsoon.hpp>
+
+TEST(compiler_check) {
+  Equals(1, 1); // Hoffen wir das Beste
+}
+
+TEST_REGISTRY;
+
+int main() {
+  testsoon::default_reporter rep;
+  testsoon::tests().run(rep);
+}
+@endcode
+
+\b ACHTUNG: Test soon benoetigt Boost um zu kompilieren! Siehe 
+  @ref requirements.
+
+Nach dem Kompilieren und Ausf&uuml;hren des Programms, sollte es Folgendes
+ausgegeben haben:
+@verbatim
+"simple.cpp" : .
+
+1 tests, 1 succeeded, 0 failed.
+@endverbatim
+
+Wenn dem so ist, hat alles geklappt.
+
+Jetzt sind Sie sicherlich auch daran interessiert, was der Code, den Sie jetzt
+brav kopiert haben, &uuml;berhaupt macht. Dazu nochmal der Code von oben,
+erkl&auml;rend kommentiert:
+
+@code
+// Das sollte klar sein...
+#include <testsoon.hpp>
+
+// Hier wird ein Test mit Namen "compiler_check" erstellt. Es ist nicht noetig,
+// dass der Name gequoted (in "" eingeschlossen) wird.
+TEST(compiler_check) {
+  // Pruefe, ob die beiden Zahlen gleich sind.
+  Equals(1, 1);
+}
+
+// Diese Zeile muss in jedem Projekt, das Testsoon benutzt genau einmal
+// vorkommen. Sie ist sozusagen der "Anlasser" fuer Tetsoon. (In welcher
+// Source-Datei diese Zeile geschrieben wird, ist egal, solange sie im Projekt
+// bleibt)
+TEST_REGISTRY;
+
+int main() {
+  // Hier wird eine Instanz eines Reporters erstellt. Wir verwenden den 
+  // "default_reporter".
+  testsoon::default_reporter rep;
+
+  // Testsoon fuehrt durch das Aufrufen dieser Funktion alle erstellten Tests
+  // durch. Uebergeben wird eine Instanz eines Reporters.
+  testsoon::tests().run(rep);
+}
+@endcode
+
+Moment! Wenn Test soon so bequem ist, warum muss man dann noch muehsam einen
+Reporter erstellen und diesen an \c testsoon::tests().run() uebergeben?
+Weil man eben auch unter Umst&auml;nden einen anderen Reporter nutzen
+m&ouml;chte.  M&ouml;chte man zum Beispiel XML-Ausgabe, kann man statt des
+default_reporters einfach den xml_reporter nutzen.
+
+\b Uebrigens: Testsoon bietet ein einfaches Reporter Interface, durch welches
+	die M&ouml;glichkeit besteht auch leicht selbst einen an den eigenen
+	Bed&uuml;rfnissen angepassten Reporter zu schreiben. Hierauf komme ich
+	spaeter im Tutorial zurueck.
+
+@subsection standard_checks Standard Checks
+
+Jetzt wollen wir es etwas interessanter werden lassen. Was passiert, wenn man
+Test soon einen Test ausfuehren laesst, der fehlschlägt?
+
+Dazu ersetzen wir ersteinmal die Zeile
+
+@code
+Equals(1, 1);
+@endcode
+
+durch
+
+@code
+Equals(1, 2);
+@endcode
+
+Danach kompilieren wir das Projekt erneut und fuehren das Programm aus.
+Die Ausgabe sollte danach der folgenden aehnlich sein.
+
+@verbatim
+"simple.cpp" : [F=3.4]
+
+Error occured in test "compiler_check" in "simple.cpp" on line 3 in check on line 4.
+Problem: not equal: 1 and 2
+Data:
+        1
+        2
+
+1 tests, 0 succeeded, 1 failed.
+@endverbatim
+
+Die erste Auff&auml;lligkeit ist wohl, dass der einfache Punkt durch \c [F=3.4]
+ersetzt wurde.  Beides sind Symbole die den Testverlauf eines Tests angeben,
+wobei der einfache Punkt fuer einen erfolgreichen, \c [F=3.4] fuer einen
+fehlgeschlagenen Test steht. Nebenbei zeigt \c [F=3.4] , dass ein Test in der
+Zeile 4 fehlschlug, der zum ab der 3. Zeile deklarierten Testblock gehoert.
+Am Ende einer jeden Ausgabe stehen nocheinmal praezisere Informationen zu dem
+fehlgeschlagenen Test. Dort findet man neben einer kurzen Beschreibung des
+Problems auch die "rohen" uebergebenen Daten. Hier waren es zum Beispiel "1"
+und "2".
+
+@subsection autogrouping Automatische Gruppenerstellung
+
+Dem aufmerksamen Leser mag vielleicht aufgefallen sein, dass ich vorhin
+\c "simple.cpp" in der Testsoonausgabe uebergangen habe. Es zeigt, dass die
+nachfolgenden Punkte bzw.  [F=...]-Konstrukte zu der \e Datei/Gruppe
+\c simple.cpp gehoeren. Fuer die n&auml;chste Sektion ist zu beachten, dass Test
+soon automatisch f&uuml;r jede Datei, die Tests enth&auml;lt, eine Gruppe
+erstellt und diese nach dem Dateinamen benennt.
+
+@subsection grouping Manuelle Gruppenerstellung
+
+Natuerlich ist das Erstellen neuer Gruppe nicht gleichbedeutend mit dem
+Erstellen neuer Dateien. Es ist mit Hilfe des Makros \c #TEST_GROUP(name)
+m&ouml;glich, neue Gruppen zu erstellen. Diese neuen Gruppen werden der
+"Datei-Gruppe" (hier z.B. "simple.cpp") untergeordnet.
+
+@code
+TEST_GROUP(Gruppe_Eins) {
+  TEST() {
+    Check(!"unbenannter Test in \"Gruppe_Eins\"");
+  }
+
+  TEST(Benannt) {
+    Check(!"Test \"Benannt\" in \"Gruppe_Eins\"");
+  }
+}
+
+TEST_GROUP(Gruppe_Zwei) {
+  TEST() {
+    Check(!"Ein Test in \"Gruppe_Zwei\"");
+  }
+  TEST_GROUP(Gruppe_Zwei_Eins) {
+    TEST() {
+      Check(!"Ein Test von \"Gruppe_Zwei_Eins\", die zu \"Gruppe_Zwei\" gehoert");
+    }
+  }
+}
+@endcode
+
+Diese vier Tests sollten fehlschlagen. (Das liegt am "!" vor dem Check. "!"
+negiert einen booleschen Wert, sodass jeder nicht-\c false / \c 0 Wert zu
+\c false wird.)
+Der Name einer Gruppe wird ebenfalls nicht in Anfuehrungszeichen gesetzt.
+Test soon arbeitet intern mit namespaces, um die Gruppen zu erstellen.
+
+@subsection ext_syntax "Extended Syntax"
+
+TO-DO
+**/

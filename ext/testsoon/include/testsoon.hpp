@@ -1,5 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-
 /*
   testsoon.hpp: "Test soon" testing framework.
 
@@ -85,6 +84,12 @@ inline string object_to_string(string const &object) {
 }
 
 #endif
+
+#ifndef IN_DOXYGEN
+class test_holder;
+#endif
+
+extern test_holder &tests();
 
 #ifndef IN_DOXYGEN
 #if defined(__EXCEPTIONS) || defined(_CPPUNWIND)
@@ -362,7 +367,7 @@ private:
 };
 
 /*
- * XML reporter first try
+ * XML reporter first (not that beautiful) try
  * <?xml version=1.0?>
  * <testsoon>
      <group name="file.cpp">
@@ -380,6 +385,7 @@ private:
  * </testsoon>
  */
  
+
 class xml_reporter : public test_reporter {
   public:
     typedef stream_class stream;
@@ -417,7 +423,7 @@ class xml_reporter : public test_reporter {
     }
 
     void success(test_info const &i, string const &k) {
-      print_ind(); out << "<success line=\"" << i.line << "\"";      
+      print_ind() << "<success line=\"" << i.line << "\"";      
       if (*i.name)
         out << " name=\"" << i.name << "\"";
       if (k.empty())
@@ -425,48 +431,71 @@ class xml_reporter : public test_reporter {
       else {
         out << ">\n";
         ++indent;
-        print_ind(); out << "<generator>" << k << "</generator>\n";
+        print_ind() << "<generator>" << k << "</generator>\n";
         --indent;
-        print_ind(); out << "</success>\n";
+        print_ind() << "</success>\n";
       }
     }
     
     void failure(test_info const &i, test_failure const &x, string const &k) {
-      print_ind();
-      out << "<failure line=\"" << i.line << "\"";
+      print_ind() << "<failure line=\"" << i.line << "\"";
       if (*i.name)
         out << " name=\"" << i.name << "\"";
       out << ">\n";
       ++indent;
 
-      print_ind(); out << "<problem>" << x.message << "</problem>\n";
+      print_ind() << "<problem>" << x.message << "</problem>\n";
       if (!x.data.empty()) {
-        print_ind(); out << "<rawdata>\n";
+        print_ind() << "<rawdata>\n";
         ++indent;
         for (string_vector::const_iterator it = x.data.begin(); 
             it != x.data.end();
             ++it) {
-          print_ind();
-          out << "<item>" << *it << "</item>\n";
+          print_ind() << "<item>" << *it << "</item>\n";
         } 
         --indent;
-        print_ind(); out << "</rawdata>\n";
+        print_ind() << "</rawdata>\n";
       }
 
       if (!k.empty()) {
-        print_ind(); out << "<generator>" << k << "</generator>\n";
+        print_ind() << "<generator>" << k << "</generator>\n";
       }
 
       --indent;
-      print_ind(); out << "</failure>\n";
+      print_ind() << "</failure>\n";
     } 
 
   private:
-    void print_ind() {
+    stream_class &print_ind() {
       for (unsigned i = 0; i < indent; ++i)
         out << "  ";
+      return out;
     }
-
+    /*
+    string create_attribute(string const &name, string const &value) {
+      return string(" ") + name + "=\"" + value + "\"";
+    }
+    template<class T>
+    string create_attribute(string const &name, T const &value) {
+      return create_attribute(name, object_to_string(value));
+    }
+    
+    void open_tag(string const &tagname, string const &attributes, bool indent = true, bool newline = true) {
+      if (indent)
+        print_ind();
+      out << '<' << tagname << attributes << '>';
+      if (newline)
+      	out << '\n';
+    }
+    
+    void close_tag(string const &tagname, bool indent = true, bool newline = true) {
+      if (indent)
+        print_ind();
+      out << "</" << tagname << '>';
+      if (newline)
+      	out << '\n';
+    }
+    */
     stream &out;
     unsigned indent;
 };
@@ -501,8 +530,6 @@ inline void test_group::run(test_reporter &rep, statistics &stats) const {
     it->run(rep, stats);
   rep.end_group(*this);
 }
-
-extern test_holder &tests();
 
 template<class T, class U>
 inline void check_equals(T const &a, U const &b,
@@ -614,6 +641,7 @@ private:
     } \
     namespace BOOST_PP_CAT(name, _testgroup)
 
+#ifndef TESTSOON_DUMMY
 /**
  * Declare a test (positional). You do not want to use this directly.
  * @param name The name of the test (quoted).
@@ -629,6 +657,10 @@ private:
     group_fixture, \
     BOOST_PP_TUPLE_ELEM(2, 0, generator), \
     BOOST_PP_TUPLE_ELEM(2, 1, generator))
+#else
+#define PTEST(name, fixture, group_fixture, generator) \
+  static void BOOST_PP_CAT(dummy_, __LINE__) ()
+#endif
 
 /**
  * Declare a test (optional name only).
@@ -894,7 +926,7 @@ private:
         ::testsoon::string(w) != ::testsoon::string() && \
         ::testsoon::string(e.what()) != ::testsoon::string((w))) \
 				TESTSOON_FAIL("throwed " #t " with wrong message", \
-          ::testsoon::string_vector()); \
+          ::testsoon::string_vector(1, e.what())); \
 		} \
 	} while (0)
 #else
@@ -958,24 +990,5 @@ test_group(char const *filename) {
 }
 
 #endif
-
-/**
- * @mainpage
- * Explanation here.
- * See @ref tutorial.
- * See @ref faq.
- *
- * \htmlonly
- * <a href="http://sourceforge.net/projects/testsoon">SF.NET Project Page</a>
- *
- * <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=180756&amp;type=7" width="210" height="62" border="0" alt="SourceForge.net Logo" /></a>
- * \endhtmlonly
- *
- * @page tutorial Tutorial
- * "This is a tutorial."
- *
- * @page faq Frequently Asked Questions (FAQ)
- * "This is a FAQ."
- */
 
 #endif
