@@ -1,5 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-
 /*
   testsoon.hpp: "Test soon" testing framework.
 
@@ -927,7 +926,7 @@ private:
         ::testsoon::string(w) != ::testsoon::string() && \
         ::testsoon::string(e.what()) != ::testsoon::string((w))) \
 				TESTSOON_FAIL("throwed " #t " with wrong message", \
-          ::testsoon::string_vector()); \
+          ::testsoon::string_vector(1, e.what())); \
 		} \
 	} while (0)
 #else
