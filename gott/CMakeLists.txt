@@ -177,6 +177,13 @@ file(GLOB src_tdl_unit_test
 add_executable(tdl_unit_test ${src_tdl_unit_test})
 target_link_libraries(tdl_unit_test gott_core)
 
+# EXECUTABLE tdl_schema_lang_test
+file(GLOB src_tdl_schema_lang_test
+  tdl/schema_lang/test/*.cpp
+)
+add_executable(tdl_schema_lang_test ${src_tdl_schema_lang_test})
+target_link_libraries(tdl_schema_lang_test gott_core)
+
 # EXECUTABLE pongbar_loop
 add_executable(pongbar_loop examples/pongbar_loop.cpp)
 target_link_libraries(pongbar_loop gott_system)
