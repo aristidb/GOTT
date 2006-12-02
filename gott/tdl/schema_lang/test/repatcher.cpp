@@ -43,13 +43,19 @@
 #include <gott/tdl/structure/revocable_adapter.hpp>
 #include <gott/tdl/structure/repatchable_adapter.hpp>
 #include <gott/tdl/structure/structure.hpp>
+#include <gott/tdl/structure/container.hpp>
+#include <gott/tdl/structure/print.hpp>
+#include <gott/tdl/structure/comfort.hpp>
 #include <gott/tdl/exceptions.hpp>
 #include <boost/shared_ptr.hpp>
 #include <sstream>
+#include <iostream>//FIXME
 
 using tdl::structure::writable_structure;
 using tdl::structure::repatcher;
+using tdl::structure::container;
 using gott::string;
+using gott::Xany;
 using boost::shared_ptr;
 
 namespace {
@@ -87,7 +93,8 @@ shared_ptr<repatcher> get_repatcher(string const &rep) {
   return acc_r.rep;
 }
 
-void perform(string const &rep, string const &data, writable_structure &out) {
+void perform(string const &rep, std::stringstream &data,
+             writable_structure &out) {
   shared_ptr<repatcher> got_rep = get_repatcher(rep);
   Check(got_rep);
 
@@ -97,54 +104,73 @@ void perform(string const &rep, string const &data, writable_structure &out) {
   using namespace tdl::schema;
   match m(
       rule_one("document",
-        rule_attr(tag = "doc", tdl::schema::repatcher = got_rep),
-        rule("node", rule_attr(tag = "E"))),
+        rule_attr(tdl::schema::repatcher = got_rep),
+        rule("node", rule_attr())),
       helper4);
-  std::stringstream data_stream;
-  data_stream << data;
-  m.parse(data_stream);
+  m.parse(data);
 }
 
 }
 
 TEST_GROUP(init) {
-  void check(string const &rep) {
-    shared_ptr<repatcher> got_rep;
-    Nothrows(got_rep = get_repatcher(rep), tdl::tdl_error&);
-    Check(got_rep);
+  TEST_GROUP(good) {
+    void check(string const &rep) {
+      shared_ptr<repatcher> got_rep;
+      Nothrows(got_rep = get_repatcher(rep), tdl::tdl_error&);
+      Check(got_rep);
+    }
+
+    TEST(empty) {
+      check("");
+    }
+
+    TEST(integer) {
+      check("integer");
+    }
+
+    TEST(substring) {
+      check("substring 1,1");
+    }
+
+    TEST(throw-away) {
+      check("throw-away");
+    }
+
+    TEST(find-literal) {
+      check("find-literal substring, foo");
+    }
   }
 
-  TEST(empty) {
-    check("");
-  }
+  TEST_GROUP(bad) {
+    void check(string const &rep) {
+      Throws(get_repatcher(rep), tdl::tdl_error, "");
+    }
 
-  TEST(integer) {
-    check("integer");
-  }
+    TEST(intxeger) {
+      check("intxeger");
+    }
 
-  TEST(substring) {
-    check("substring 1,1");
-  }
-
-  TEST(throw-away) {
-    check("throw-away");
-  }
-
-  TEST(find-literal) {
-    check("find-literal substring, foo");
+    TEST(integer params) {
+      check("integer 4");
+    }
   }
 }
 
-TEST_GROUP(bad) {
-  void check(string const &rep) {
-    Throws(get_repatcher(rep), tdl::tdl_error, "");
-  }
-
-  TEST(intxeger) {
-    check("intxeger");
-  }
-
-  TEST(integer params) {
-    check("integer 4");
+TEST_GROUP(perform) {
+  TEST_GROUP(good) {
+    XTEST((name, "integer")(gen, (testsoon::range_generator<int>)(-9)(9))) {
+      container cont;
+      std::stringstream data;
+      data << value;
+      Nothrows(perform("integer", data, cont), tdl::tdl_error&);
+      
+      container expected;
+      {
+        using namespace tdl::structure::cf;
+        C(S(Xany(value))).write_to(expected);
+      }
+      Equals(cont, expected);
+    }
   }
 }
+
