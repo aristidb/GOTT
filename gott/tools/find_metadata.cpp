@@ -40,6 +40,7 @@
 #include <fstream>
 #include <string>
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 
@@ -47,6 +48,8 @@ char const begin[] = "GOTT PLUGIN METADATA BEGIN";
 string end = "GOTT PLUGIN METADATA END";
 
 int main(int argc, char **argv) {
+  cout << "# AUTOMATICALLY GENERATED: UTC " <<
+    boost::posix_time::second_clock::universal_time() << endl;
   while (--argc) {
     char const *file = *++argv;
     ifstream stream(file, ios::binary);
