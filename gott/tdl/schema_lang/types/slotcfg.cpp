@@ -45,7 +45,6 @@
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/event.hpp>
 #include <boost/assign/list_of.hpp>
-#include <iostream>
 
 using namespace tdl::schema;
 using tdl::structure::writable_structure;

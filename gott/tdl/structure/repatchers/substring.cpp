@@ -45,7 +45,6 @@
 #include <boost/optional.hpp>
 #include <boost/none.hpp>
 #include <boost/assign/list_of.hpp>
-#include <iostream>//FIXME
 
 using namespace tdl::structure;
 using tdl::tdl_error;
