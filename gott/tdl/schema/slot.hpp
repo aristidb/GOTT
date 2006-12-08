@@ -43,6 +43,7 @@
 #include <boost/function.hpp>
 #include <boost/variant/variant.hpp>
 #include <boost/optional.hpp>
+#include <boost/mpl/bool.hpp>
 #include <utility>
 
 namespace tdl {
@@ -54,6 +55,9 @@ namespace schema {
  */
 class slotcfg {
 public:
+  typedef boost::mpl::false_ equality_comparable;
+  typedef boost::mpl::false_ printable;
+
   /// Simple modes (no parameter).
   enum simple_mode {
     /// Accept a single child

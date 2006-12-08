@@ -49,7 +49,6 @@
 #include <gott/tdl/exceptions.hpp>
 #include <boost/shared_ptr.hpp>
 #include <sstream>
-#include <iostream>//FIXME
 
 using tdl::structure::writable_structure;
 using tdl::structure::repatcher;
