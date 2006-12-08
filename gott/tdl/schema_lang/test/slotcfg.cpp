@@ -144,6 +144,10 @@ TEST_GROUP(good) {
   TEST(maximum 2) {
     check(":maximum 2", slotcfg::maximum, list_of(0)(1)(2), list_of(3)(4));
   }
+
+  TEST(range 2 / 3) {
+    check(":range 2,3", slotcfg::range, list_of(2)(3), list_of(0)(1)(4)(5));
+  }
 }
 
 TEST_GROUP(bad) {

@@ -67,19 +67,17 @@ struct rep_slot : tdl::structure::concrete_repatcher<rep_slot> {
       context(slotcfg *out) : out(out) {}
       slotcfg *out;
 
-      enum { simple, sized, sized_param } state;
+      enum { simple, sized, sized_param, range_param, range_param2 } state;
       slotcfg::sized_mode sized_mode;
+      unsigned range_param1;
 
       void begin(tdl::source_position const &) {
-        std::cout << "begin{\n";
       }
 
       void end() {
-        std::cout << "}end\n";
       }
 
       void data(Xany const &x) {
-        std::cout << "data: " << x << '\n';
         long v = gott::Xany_cast<long>(x);
         switch (state) {
         case simple:
@@ -92,15 +90,23 @@ struct rep_slot : tdl::structure::concrete_repatcher<rep_slot> {
         case sized_param:
           *out = slotcfg(sized_mode, v);
           break;
+        case range_param:
+          range_param1 = v;
+          state = range_param2;
+          break;
+        case range_param2:
+          *out = slotcfg(slotcfg::range, range_param1, v);
+          break;
         }
       }
 
       void add_tag(string const &s) {
         if (s == "simple")
           state = simple;
-        else
+        else if (s == "sized")
           state = sized;
-        std::cout << "tag: " << s << '\n';
+        else
+          state = range_param;
       }
     };
     return new context(out);
@@ -155,6 +161,21 @@ slotcfg::sized_mode make_sized(long in) {
   return table[in];
 }
 
+tdl::structure::repatcher *range_mode() {
+  boost::scoped_ptr<tdl::structure::repatcher_getter> g(
+    tdl::structure::repatcher_by_name());
+  g->begin();
+    g->data(Xany("enumeration"));
+    g->begin();
+      g->begin(); g->data(Xany(":range")); g->end();
+    g->end();
+  g->end();
+  g->begin();
+    g->data(Xany("throw-away"));
+  g->end();
+  return g->result_alloc();
+}
+
 tdl::structure::repatcher *integer() {
   boost::scoped_ptr<tdl::structure::repatcher_getter> g(
     tdl::structure::repatcher_by_name());
@@ -176,6 +197,15 @@ public:
           list_of
           (rule("node", rule_attr(repatcher = sized_modes())))
           (rule("node", rule_attr(repatcher = integer())))
+        ))
+        (rule("follow", rule_attr(tag = "range"),
+          list_of
+          (rule("node", rule_attr(repatcher = range_mode())))
+          (rule_one("list", rule_attr(),
+            rule("node",
+              rule_attr(repatcher = integer(), outer = exactly(2))
+            )
+          ))
         ))
       )
     );
