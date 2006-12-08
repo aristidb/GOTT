@@ -86,7 +86,8 @@ TEST_GROUP(good) {
       slotcfg::mode mode,
       std::vector<unsigned> const &good_count,
       std::vector<unsigned> const &bad_count) {
-    slotcfg cfg = get(desc);
+    slotcfg cfg;
+    Nothrows(cfg = get(desc), tdl::tdl_error&);
     Equals(cfg.get_mode(), mode);
     for (std::vector<unsigned>::const_iterator it = good_count.begin();
         it != good_count.end();
@@ -130,6 +131,18 @@ TEST_GROUP(good) {
 
   TEST(some) {
     check(":some", slotcfg::some, list_of(1)(2)(3), list_of(0));
+  }
+
+  TEST(exactly 5) {
+    check(":exactly 5", slotcfg::exactly, list_of(5), list_of(0)(4)(6)(7));
+  }
+
+  TEST(minimum 2) {
+    check(":minimum 2", slotcfg::minimum, list_of(2)(3)(4), list_of(0)(1));
+  }
+
+  TEST(maximum 2) {
+    check(":maximum 2", slotcfg::maximum, list_of(0)(1)(2), list_of(3)(4));
   }
 }
 

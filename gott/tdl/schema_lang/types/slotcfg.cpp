@@ -55,7 +55,8 @@ using std::vector;
 
 namespace {
 
-slotcfg::mode slotcfg_mode(long in);
+slotcfg::simple_mode make_simple(long in);
+slotcfg::sized_mode make_sized(long in);
 
 struct rep_slot : tdl::structure::concrete_repatcher<rep_slot> {
   rep_slot(slotcfg *out) : out(out) {}
@@ -66,65 +67,90 @@ struct rep_slot : tdl::structure::concrete_repatcher<rep_slot> {
       context(slotcfg *out) : out(out) {}
       slotcfg *out;
 
+      enum { simple, sized, sized_param } state;
+      slotcfg::sized_mode sized_mode;
+
       void begin(tdl::source_position const &) {
+        std::cout << "begin{\n";
       }
 
       void end() {
+        std::cout << "}end\n";
       }
 
       void data(Xany const &x) {
-        *out =
-        slotcfg(
-          static_cast<slotcfg::simple_mode>(
-            slotcfg_mode(
-              gott::Xany_cast<long>(
-                x
-              )
-            )
-          )
-        );
+        std::cout << "data: " << x << '\n';
+        long v = gott::Xany_cast<long>(x);
+        switch (state) {
+        case simple:
+          *out = slotcfg(make_simple(v));
+          break;
+        case sized:
+          sized_mode = make_sized(v);
+          state = sized_param;
+          break;
+        case sized_param:
+          *out = slotcfg(sized_mode, v);
+          break;
+        }
       }
 
       void add_tag(string const &s) {
+        if (s == "simple")
+          state = simple;
+        else
+          state = sized;
+        std::cout << "tag: " << s << '\n';
       }
     };
     return new context(out);
   }
 };
 
-tdl::structure::repatcher *modes() {
+tdl::structure::repatcher *simple_modes() {
   boost::scoped_ptr<tdl::structure::repatcher_getter> g(
     tdl::structure::repatcher_by_name());
   g->begin();
     g->data(Xany("enumeration"));
     g->begin();
-      g->begin(); g->data(Xany(":one")); g->end();       // 0
-      g->begin(); g->data(Xany(":optional")); g->end();  // 1
-      g->begin(); g->data(Xany(":some")); g->end();      // 2
-      g->begin(); g->data(Xany(":list")); g->end();      // 3
-
-      g->begin(); g->data(Xany(":minimum")); g->end();   // 4
-      g->begin(); g->data(Xany(":maximum")); g->end();   // 5
-      g->begin(); g->data(Xany(":exactly")); g->end();   // 6
-
-      g->begin(); g->data(Xany(":range")); g->end();     // 7
+      g->begin(); g->data(Xany(":one")); g->end();
+      g->begin(); g->data(Xany(":optional")); g->end();
+      g->begin(); g->data(Xany(":some")); g->end();
+      g->begin(); g->data(Xany(":list")); g->end();
     g->end();
   g->end();
   return g->result_alloc();
 }
 
-slotcfg::mode slotcfg_mode(long in) {
-  static slotcfg::mode const table[] = {
+slotcfg::simple_mode make_simple(long in) {
+  static slotcfg::simple_mode const table[] = {
     slotcfg::one,
     slotcfg::optional,
     slotcfg::some,
     slotcfg::list,
+  };
+  return table[in];
+}
 
+tdl::structure::repatcher *sized_modes() {
+  boost::scoped_ptr<tdl::structure::repatcher_getter> g(
+    tdl::structure::repatcher_by_name());
+  g->begin();
+    g->data(Xany("enumeration"));
+    g->begin();
+      g->begin(); g->data(Xany(":minimum")); g->end();
+      g->begin(); g->data(Xany(":maximum")); g->end();
+      g->begin(); g->data(Xany(":exactly")); g->end();
+    g->end();
+  g->end();
+  return g->result_alloc();
+}
+
+slotcfg::sized_mode make_sized(long in) {
+  static slotcfg::sized_mode const table[] = {
     slotcfg::minimum,
     slotcfg::maximum,
-    slotcfg::exactly,
-
-    slotcfg::range
+    slotcfg::exactly
   };
   return table[in];
 }
@@ -142,12 +168,15 @@ class xmatcher : public happy_once {
 public:
   xmatcher(rule_attr_t const &a, vector<rule_t> const &, match &m)
   : happy_once(a, m) {
+    using boost::assign::list_of;
     m.add(
-      rule("follow", rule_attr(repatcher = new rep_slot(&out)),
-        boost::assign::list_of
-        (rule("node", rule_attr(repatcher = modes())))
-        (rule_one("list", rule_attr(),
-          rule("node", rule_attr(repatcher = integer(), outer = list()))))
+      rule("any", rule_attr(repatcher2 = new rep_slot(&out)), list_of
+        (rule("node", rule_attr(tag = "simple", repatcher = simple_modes())))
+        (rule("follow", rule_attr(tag = "sized"),
+          list_of
+          (rule("node", rule_attr(repatcher = sized_modes())))
+          (rule("node", rule_attr(repatcher = integer())))
+        ))
       )
     );
   }
