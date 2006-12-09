@@ -36,76 +36,58 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include <testsoon.hpp>
+#include <gott/plugin.hpp>
+#include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/rule.hpp>
-#include <gott/tdl/schema/slot.hpp>
-#include <gott/tdl/structure/structure.hpp>
-#include <gott/tdl/structure/repatchable_adapter.hpp>
-#include <gott/tdl/structure/revocable_adapter.hpp>
-#include <gott/tdl/structure/container.hpp>
-#include <gott/tdl/exceptions.hpp>
-#include <boost/array.hpp>
-#include <sstream>
+#include <gott/tdl/schema/happy_once.hpp>
+#include <gott/tdl/schema/type.hpp>
+#include <gott/tdl/schema/rule_attr.hpp>
+#include <gott/tdl/schema/event.hpp>
+#include <boost/assign/list_of.hpp>
 
 using namespace tdl::schema;
+using tdl::structure::writable_structure;
+using gott::string;
+using gott::Xany;
+using std::vector;
 
 namespace {
 
-void match(std::istream &stream) {
-  tdl::structure::container out;
-  tdl::structure::repatchable_adapter2 helper3(out);
-  tdl::structure::revocable_adapter helper2(helper3);
-  tdl::structure::repatchable_adapter helper(helper2);
-  tdl::schema::match m(
-      rule_one("document", rule_attr(tag = "doc"),
-        rule("tdl::schema_lang::type", rule_attr(tag = "T"))),
-      helper);
-  m.parse(stream);
-}
-
-TEST_GROUP(valid) {
-  template<class T>
-  void check(T const &x) {
-    std::stringstream stream;
-    stream << x;
-    Nothrows(match(stream), tdl::tdl_error&);
+class xmatcher : public happy_once {
+public:
+  xmatcher(rule_attr_t const &a, vector<rule_t> const &, match &m)
+  : happy_once(a, m) {
   }
 
-  char const *types[] = {
-    "node",
-    "document",
-    "ordered",
-    "unordered",
-    "follow",
-    "any",
-    "list",
-    "named",
-    "tree"
-  };
-  char const **last_types = types + sizeof(types) / sizeof(types[0]);
+  static gott::atom const id;
 
-  XTEST(
-      (name, "simple")
-      (generator, (std::vector<char const *>)(types)(last_types))
-  ) {
-    check(value);
-  }
-}
+  static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &)
+  { return false; }
 
-TEST_GROUP(invalid) {
-  TEST(empty) {
-    std::stringstream stream;
-    Throws(match(stream), tdl::tdl_error,
-      "TDL Schema matcher: failed to match schema at 0:1 ()");
+  string name() const { return id.get_string(); }
+
+private:
+  bool play(ev::child_succeed const &) {
+    be_happy();
+    return true;
   }
 
-  TEST(shit) {
-    std::stringstream stream;
-    stream << "shit";
-    Throws(match(stream), tdl::tdl_error,
-      "TDL Schema matcher: failed to match schema at 1:1 (shit)");
-  }
-}
+  slotcfg out;
+};
 
 }
+
+GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin_lang_type, concrete_type<xmatcher>)
+
+GOTT_PLUGIN_METADATA(
+"plugin \"\"\n"
+"interface tdl::resource\n"
+"enclosing-module tdl::schema_lang\n"
+"symbol plugin_lang_type\n\n"
+
+"module tdl::schema_lang\n"
+"file-path ??FILE??\n"
+)
+
+gott::atom const xmatcher::id("tdl::schema_lang::type");
