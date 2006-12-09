@@ -142,6 +142,22 @@ TEST_GROUP(valid) {
       Nothrows(match(stream), tdl::tdl_error&);
     }
   }
+
+  TEST_GROUP(repatcher) {
+    char const *repatcher[] = {
+      "integer",
+      "substring 1,2",
+      "integer,throw-away"
+    };
+    char const **end_repatcher =
+      repatcher + sizeof(repatcher) / sizeof(repatcher[0]);
+
+    XTEST((generator, (std::vector<char const *>)(repatcher)(end_repatcher))) {
+      std::stringstream stream;
+      stream << ":repatch\n  " << value << "\n  node";
+      Nothrows(match(stream), tdl::tdl_error&);
+    }
+  }
 }
 
 TEST_GROUP(invalid) {
