@@ -126,6 +126,7 @@ bool slotcfg::prefix_optional() const {
   case maximum:
     return true;
 
+  case exactly:
   case minimum:
     return get<size_t>(type) == 0;
 
@@ -139,39 +140,3 @@ bool slotcfg::prefix_optional() const {
   return false;
 }
 
-namespace {
-  struct denull {
-    denull(slotcfg::callback const &c) : internal(c) {}
-    slotcfg::callback internal;
-
-    item::expect operator() (size_t i) const {
-      if (i == 0)
-        return item::need;
-      return internal(i);
-    }
-  };
-}
-
-slotcfg slotcfg::no_optional() const {
-  switch (m) {
-  case optional:
-    return slotcfg(one);
-  case list:
-    return slotcfg(some);
-  case maximum:
-    return slotcfg(range, 1, get<size_t>(type));
-
-  case minimum:
-    return slotcfg(minimum, !get<size_t>(type) ? 1 : get<size_t>(type));
-
-  case range:
-    if (get<pair<size_t, size_t> >(type).first == 0)
-      return slotcfg(range, 1, get<pair<size_t, size_t> >(type).second);
-    return *this;
-
-  case function:
-    return slotcfg(function, callback(denull(get<callback>(type))));
-  }
-
-  throw std::bad_exception();
-}

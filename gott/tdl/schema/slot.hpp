@@ -150,8 +150,7 @@ public:
 
   /// Whether the object accepts 0 children.
   bool prefix_optional() const GOTT_EXPORT;
-  /// A variant of the object that does not accept 0 children.
-  slotcfg no_optional() const GOTT_EXPORT;
+
   /// The mode the object is in.
   mode get_mode() const { return m; }
 
