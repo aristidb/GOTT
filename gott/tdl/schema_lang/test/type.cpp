@@ -113,6 +113,12 @@ TEST_GROUP(valid) {
       Nothrows(match(stream), tdl::tdl_error&);
     }
   }
+
+  TEST(named) {
+    std::stringstream stream;
+    stream << "named xyz, node";
+    Nothrows(match(stream), tdl::tdl_error&);
+  }
 }
 
 TEST_GROUP(invalid) {
@@ -130,26 +136,81 @@ TEST_GROUP(invalid) {
   }
 
   char const *no_children[] = {
-      "list",
-      "document",
+    "list",
+    "document",
 
-      "any",
-      "ordered",
-      "unordered",
-      "follow"
+    "any",
+    "ordered",
+    "unordered",
+    "follow",
+
+    "named"
   };
   char const **end_no_children =
     no_children + sizeof(no_children) / sizeof(no_children[0]);
+
   XTEST(
     (name, "no children")
     (generator, (std::vector<char const *>)(no_children)(end_no_children))
   ){
     std::stringstream stream;
     stream << value;
-    std::string problem =  
-      "TDL Schema matcher: failed to match schema at 1:1 (" +
-      std::string(value) + ")";
-    Throws(match(stream), tdl::tdl_error, problem.c_str());
+    Throws(match(stream), tdl::tdl_error, "");
+  }
+
+  char const *one_child[] = {
+    "node",
+    "tree",
+    "named"
+  };
+  char const **end_one_child =
+    one_child + sizeof(one_child) / sizeof(one_child[0]);
+
+  XTEST(
+    (name, "one child")
+    (generator, (std::vector<char const *>)(one_child)(end_one_child))
+  ){
+    std::stringstream stream;
+    stream << value << "\n  node";
+    Throws(match(stream), tdl::tdl_error, "");
+  }
+
+  char const *two_children[] = {
+    "node",
+    "tree",
+    "list"
+  };
+  char const **end_two_children =
+    two_children + sizeof(two_children) / sizeof(two_children[0]);
+
+  XTEST(
+    (name, "two children")
+    (generator, (std::vector<char const *>)(two_children)(end_two_children))
+  ){
+    std::stringstream stream;
+    stream << value << "\n  node\n  node";
+    Throws(match(stream), tdl::tdl_error, "");
+  }
+
+  char const *invalid_child[] = {
+    "node",
+    "tree",
+    "list",
+    "any",
+    "unordered",
+    "follow",
+    "named"
+  };
+  char const **end_invalid_child =
+    invalid_child + sizeof(invalid_child) / sizeof(invalid_child[0]);
+
+  XTEST(
+    (name, "invalid child")
+    (generator, (std::vector<char const *>)(invalid_child)(end_invalid_child))
+  ){
+    std::stringstream stream;
+    stream << value << "\n  xyz";
+    Throws(match(stream), tdl::tdl_error, "");
   }
 }
 
