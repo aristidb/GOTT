@@ -113,7 +113,7 @@ bool match_ordered::accept_empty(rule_attr_t const &,
   bool accept = true;
   for (std::vector<rule_t>::const_iterator it = children.begin(); 
        it != children.end(); ++it)
-    accept &= it->accept_empty();
+    accept &= it->attributes().outer().prefix_optional() || it->accept_empty();
   return accept;
 }
 

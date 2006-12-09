@@ -185,7 +185,7 @@ bool match_follow_ordered::search_insertible() const {
 item::expect match_follow_ordered::expectation() const {
   if (unhappy) 
     return need;
-  if (!search_insertible()) 
+  if (!search_insertible())
     return opened > 0 ? maybe : nothing;
   if (pos->rest_accept_empty)
     if (pos->slot.expectation() != need || pos->accept_empty) 
