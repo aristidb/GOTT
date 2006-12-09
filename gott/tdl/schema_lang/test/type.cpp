@@ -114,10 +114,33 @@ TEST_GROUP(valid) {
     }
   }
 
-  TEST(named) {
-    std::stringstream stream;
-    stream << "named xyz, node";
-    Nothrows(match(stream), tdl::tdl_error&);
+  TEST_GROUP(param) {
+    TEST(named) {
+      std::stringstream stream;
+      stream << "named xyz, node";
+      Nothrows(match(stream), tdl::tdl_error&);
+    }
+  }
+
+  TEST_GROUP(list) {
+    char const *slot[] = {
+      ":list",
+      ":some",
+      ":one",
+      ":optional",
+      ":exactly 1",
+      ":minimum 5",
+      ":maximum 3",
+      ":range 2,3",
+    };
+    char const **end_slot = slot + sizeof(slot) / sizeof(slot[0]);
+
+    XTEST((generator, (std::vector<char const *>)(slot)(end_slot))) {
+      std::stringstream stream;
+      stream << value << '\n';
+      stream << "  node";
+      Nothrows(match(stream), tdl::tdl_error&);
+    }
   }
 }
 

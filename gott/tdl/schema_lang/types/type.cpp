@@ -80,7 +80,16 @@ public:
     vector<rule_t> alternatives;
     make_rule helper = { alternatives };
     tdl::resource::list<type>(helper);
-    m.add(rule("any", rule_attr(coat = false), alternatives));
+    rule_t slotless_type = rule("any", rule_attr(tag = "type"), alternatives);
+    m.add(
+      rule("any", rule_attr(coat = false),
+        boost::assign::list_of
+        (rule_one("tdl::schema_lang::slotcfg",
+          rule_attr(tag = "slot", outer = optional()),
+          slotless_type))
+        (slotless_type)
+      )
+    );
   }
 
   static gott::atom const id;

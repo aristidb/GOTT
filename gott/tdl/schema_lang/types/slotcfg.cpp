@@ -45,6 +45,7 @@
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/event.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/assign/std/vector.hpp>
 
 using namespace tdl::schema;
 using tdl::structure::writable_structure;
@@ -186,26 +187,33 @@ tdl::structure::repatcher *integer() {
 
 class xmatcher : public happy_once {
 public:
-  xmatcher(rule_attr_t const &a, vector<rule_t> const &, match &m)
+  xmatcher(rule_attr_t const &a, vector<rule_t> const &c, match &m)
   : happy_once(a, m) {
-    using boost::assign::list_of;
+    using namespace boost::assign;
+    std::vector<rule_t> simple, sized, sized_param, range, range_param;
+
+    simple += 
+      rule("node", rule_attr(repatcher = simple_modes()));
+    simple.insert(simple.end(), c.begin(), c.end());
+
+    sized_param += rule("node", rule_attr(repatcher = integer()));
+    sized_param.insert(sized_param.end(), c.begin(), c.end());
+    sized +=
+      rule("node", rule_attr(repatcher = sized_modes())),
+      rule("ordered", rule_attr(), sized_param);
+
+    range_param +=
+      rule("node", rule_attr(repatcher = integer(), outer = exactly(2)));
+    range_param.insert(range_param.end(), c.begin(), c.end());
+    range +=
+      rule("node", rule_attr(repatcher = range_mode())),
+      rule("ordered", rule_attr(), range_param);
+
     m.add(
       rule("any", rule_attr(repatcher2 = new rep_slot(&out)), list_of
-        (rule("node", rule_attr(tag = "simple", repatcher = simple_modes())))
-        (rule("follow", rule_attr(tag = "sized"),
-          list_of
-          (rule("node", rule_attr(repatcher = sized_modes())))
-          (rule("node", rule_attr(repatcher = integer())))
-        ))
-        (rule("follow", rule_attr(tag = "range"),
-          list_of
-          (rule("node", rule_attr(repatcher = range_mode())))
-          (rule_one("list", rule_attr(),
-            rule("node",
-              rule_attr(repatcher = integer(), outer = exactly(2))
-            )
-          ))
-        ))
+        (rule("follow", rule_attr(tag = "simple"), simple))
+        (rule("follow", rule_attr(tag = "sized"), sized))
+        (rule("follow", rule_attr(tag = "range"), range))
       )
     );
   }
@@ -216,7 +224,7 @@ public:
   { return false; }
 
   static slotcfg n_parameters() { return exactly(0); }
-  static slotcfg n_children() { return exactly(0); }
+  static slotcfg n_children() { return optional(); }
 
   string name() const { return id.get_string(); }
 
