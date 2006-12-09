@@ -70,11 +70,46 @@ TEST_GROUP(valid) {
       "node",
       "tree"
     };
-    char const **last_types = types + sizeof(types) / sizeof(types[0]);
+    char const **end_types = types + sizeof(types) / sizeof(types[0]);
 
-    XTEST((generator, (std::vector<char const *>)(types)(last_types))) {
+    XTEST((generator, (std::vector<char const *>)(types)(end_types))) {
       std::stringstream stream;
       stream << value;
+      Nothrows(match(stream), tdl::tdl_error&);
+    }
+  }
+
+  TEST_GROUP(one_child) {
+    char const *types[] = {
+      "list",
+      "document",
+
+      "any",
+      "ordered",
+      "unordered",
+      "follow"
+    };
+    char const **end_types = types + sizeof(types) / sizeof(types[0]);
+
+    XTEST((generator, (std::vector<char const *>)(types)(end_types))) {
+      std::stringstream stream;
+      stream << value << "\n  node";
+      Nothrows(match(stream), tdl::tdl_error&);
+    }
+  }
+
+  TEST_GROUP(two_children) {
+    char const *types[] = {
+      "any",
+      "ordered",
+      "unordered",
+      "follow"
+    };
+    char const **end_types = types + sizeof(types) / sizeof(types[0]);
+
+    XTEST((generator, (std::vector<char const *>)(types)(end_types))) {
+      std::stringstream stream;
+      stream << value << "\n  node\n  node";
       Nothrows(match(stream), tdl::tdl_error&);
     }
   }
@@ -92,6 +127,29 @@ TEST_GROUP(invalid) {
     stream << "shit";
     Throws(match(stream), tdl::tdl_error,
       "TDL Schema matcher: failed to match schema at 1:1 (shit)");
+  }
+
+  char const *no_children[] = {
+      "list",
+      "document",
+
+      "any",
+      "ordered",
+      "unordered",
+      "follow"
+  };
+  char const **end_no_children =
+    no_children + sizeof(no_children) / sizeof(no_children[0]);
+  XTEST(
+    (name, "no children")
+    (generator, (std::vector<char const *>)(no_children)(end_no_children))
+  ){
+    std::stringstream stream;
+    stream << value;
+    std::string problem =  
+      "TDL Schema matcher: failed to match schema at 1:1 (" +
+      std::string(value) + ")";
+    Throws(match(stream), tdl::tdl_error, problem.c_str());
   }
 }
 
