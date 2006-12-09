@@ -77,7 +77,7 @@ slotcfg get(std::istream &desc) {
         rule("tdl::schema_lang::slotcfg", rule_attr(tag = "S"))),
       helper);
   m.parse(desc);
-  return acc.rep;  
+  return acc.rep;
 }
 
 TEST_GROUP(good) {
