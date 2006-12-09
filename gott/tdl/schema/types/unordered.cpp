@@ -66,6 +66,9 @@ public:
 
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &);
 
+  static slotcfg n_parameters() { return exactly(0); }
+  static slotcfg n_children() { return some(); }
+
   static gott::atom const id;
 
 private:

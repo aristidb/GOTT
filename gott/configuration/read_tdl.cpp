@@ -43,6 +43,7 @@
 #include <gott/tdl/schema/event.hpp>
 #include <gott/tdl/schema/match.hpp>
 #include <gott/tdl/schema/type.hpp>
+#include <gott/tdl/schema/slot.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <gott/plugin/metadata.hpp>
 #include <boost/algorithm/string.hpp>
@@ -71,13 +72,16 @@ public:
       std::vector<tdl::schema::rule_t> const &)
   { return true; }
 
+  static schema::slotcfg n_parameters() { return schema::exactly(0); }
+  static schema::slotcfg n_children() { return schema::some(); }
+
   static gott::atom id;
 
 private:
-  bool play(tdl::schema::ev::down const &);
-  bool play(tdl::schema::ev::up const &);
-  bool play(tdl::schema::ev::node const &);
-  bool play(tdl::schema::ev::child_succeed const &);
+  bool play(ev::down const &);
+  bool play(ev::up const &);
+  bool play(ev::node const &);
+  bool play(ev::child_succeed const &);
 
   expect expectation() const;
 

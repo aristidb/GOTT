@@ -40,6 +40,7 @@
 #include "../type.hpp"
 #include "../match.hpp"
 #include "../rule.hpp"
+#include "../slot.hpp"
 #include <gott/string/atom.hpp>
 #include <gott/plugin/plugin_builder.hpp>
 #include <cassert>
@@ -55,6 +56,9 @@ public:
   { return false; }
 
   static gott::atom const id;
+
+  static slotcfg n_parameters() { return exactly(0); }
+  static slotcfg n_children() { return exactly(0); }
   
 private:
   unsigned level;

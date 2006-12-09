@@ -43,6 +43,7 @@
 #include <gott/tdl/schema/type.hpp>
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/event.hpp>
+#include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/repatch.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -119,6 +120,9 @@ public:
   { return true; }
 
   static gott::atom const id;
+
+  static slotcfg n_parameters() { return exactly(0); }
+  static slotcfg n_children() { return exactly(0); }
 
 private:
   bool play(ev::child_succeed const &) {

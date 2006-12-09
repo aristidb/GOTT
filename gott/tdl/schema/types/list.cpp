@@ -58,6 +58,9 @@ public:
 
   static gott::atom const id;
 
+  static slotcfg n_parameters() { return exactly(0); }
+  static slotcfg n_children() { return exactly(1); }
+
 private:
   rule_t sub;
   positioning::id last;

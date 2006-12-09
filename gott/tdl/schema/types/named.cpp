@@ -42,6 +42,7 @@
 #include "../rule.hpp"
 #include "../rule_attr.hpp"
 #include "../happy_once.hpp"
+#include "../slot.hpp"
 #include <gott/plugin/plugin_builder.hpp>
 #include <gott/string/string.hpp>
 #include <gott/tdl/structure/repatch.hpp>
@@ -66,6 +67,9 @@ public:
 
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &) 
   { return false; }
+
+  static slotcfg n_parameters() { return exactly(1); }
+  static slotcfg n_children() { return exactly(1); }
 
   static gott::atom const id;
 

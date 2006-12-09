@@ -65,6 +65,9 @@ public:
   static bool accept_empty(rule_attr_t const &, std::vector<rule_t> const &)
   { return false; }
 
+  static slotcfg n_parameters() { return exactly(0); }
+  static slotcfg n_children() { return exactly(0); }
+
   string name() const { return id.get_string(); }
 
 private:

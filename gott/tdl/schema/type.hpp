@@ -46,10 +46,16 @@
 
 namespace tdl { namespace schema {
 
+class slotcfg;
+
 class GOTT_EXPORT type : public tdl::resource {
 public:
   gott::atom get_kind() const { return kind; }
   virtual abstract_rule get_abstract() const = 0;
+
+  virtual slotcfg parameters() const = 0;
+  virtual slotcfg children() const = 0;
+
   virtual ~type() = 0;
 
   static gott::atom const kind;
@@ -59,6 +65,14 @@ template<class T>
 class concrete_type : public type {
   abstract_rule get_abstract() const {
     return abstract_rule(&construct_item<T>, &T::accept_empty);
+  }
+
+  slotcfg parameters() const {
+    return T::n_parameters();
+  }
+
+  slotcfg children() const {
+    return T::n_children();
   }
 
   gott::atom get_id() const { return T::id; }
