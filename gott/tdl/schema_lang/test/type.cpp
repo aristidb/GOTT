@@ -65,31 +65,18 @@ void match(std::istream &stream) {
 }
 
 TEST_GROUP(valid) {
-  template<class T>
-  void check(T const &x) {
-    std::stringstream stream;
-    stream << x;
-    Nothrows(match(stream), tdl::tdl_error&);
-  }
+  TEST_GROUP(simple) {
+    char const *types[] = {
+      "node",
+      "tree"
+    };
+    char const **last_types = types + sizeof(types) / sizeof(types[0]);
 
-  char const *types[] = {
-    "node",
-    "document",
-    "ordered",
-    "unordered",
-    "follow",
-    "any",
-    "list",
-    "named",
-    "tree"
-  };
-  char const **last_types = types + sizeof(types) / sizeof(types[0]);
-
-  XTEST(
-      (name, "simple")
-      (generator, (std::vector<char const *>)(types)(last_types))
-  ) {
-    check(value);
+    XTEST((generator, (std::vector<char const *>)(types)(last_types))) {
+      std::stringstream stream;
+      stream << value;
+      Nothrows(match(stream), tdl::tdl_error&);
+    }
   }
 }
 

@@ -45,6 +45,7 @@
 #include <gott/tdl/schema/rule_attr.hpp>
 #include <gott/tdl/schema/event.hpp>
 #include <boost/assign/list_of.hpp>
+#include <iostream>
 
 using namespace tdl::schema;
 using tdl::structure::writable_structure;
@@ -54,10 +55,34 @@ using std::vector;
 
 namespace {
 
+struct make_rule {
+  vector<rule_t> &out;
+
+  void operator() (type const *tp) const {
+    std::cout << "add alternative: " << tp->get_id().get_string() << std::endl;
+    out.push_back(
+      rule_one("named",
+        rule_attr(tag = tp->get_id().get_string()),
+        rule("ordered", rule_attr(tag = "par"),
+          boost::assign::list_of
+          (rule("tree",
+            rule_attr(tag = "parameter", outer = tp->parameters())))
+          (rule("tdl::schema_lang::type",
+            rule_attr(tag = "child", outer = tp->children())))
+        )
+      )
+    );
+  }
+};
+
 class xmatcher : public happy_once {
 public:
   xmatcher(rule_attr_t const &a, vector<rule_t> const &, match &m)
   : happy_once(a, m) {
+    vector<rule_t> alternatives;
+    make_rule helper = { alternatives };
+    tdl::resource::list<type>(helper);
+    m.add(rule("any", rule_attr(coat = false), alternatives));
   }
 
   static gott::atom const id;
