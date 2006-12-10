@@ -15,11 +15,12 @@
  *
  * The Initial Developer of the Original Code is
  * Andreas Pokorny (andreas.pokorny@gmail.com)
- * Portions created by the Initial Developer are Copyright (C) 2005
+ * Portions created by the Initial Developer are Copyright (C) 2005-2006
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
  *  Andreas Pokorny (andreas.pokorny@gmail.com)
+ *  Aristid Breitkreuz (aribrei@arcor.de)
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -111,7 +112,7 @@ inline bool operator!= (rect const& l, rect const& r) { return !(l==r);}
 
 inline std::ostream& operator << ( std::ostream& lhs, rect const &rhs )
 {
-  lhs << rhs.left << 'x' << rhs.top << "->"<< rhs.width << "," << rhs.height;
+  return lhs << rhs.left << 'x' << rhs.top << "->"<< rhs.width << "," << rhs.height;
 }
 
 }
