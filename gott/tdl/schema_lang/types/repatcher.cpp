@@ -46,6 +46,7 @@
 #include <gott/tdl/schema/slot.hpp>
 #include <gott/tdl/structure/repatch.hpp>
 #include <boost/shared_ptr.hpp>
+#include <iostream>//FIXME
 
 using namespace tdl::schema;
 namespace structure = tdl::structure;
@@ -78,6 +79,8 @@ struct rep_rep : structure::concrete_repatcher<rep_rep> {
       repatcher_getter *helper;
 
       void begin(tdl::source_position const &w) {
+        std::cout << "repatcher.. begin: " << helper << ' ' << std::flush;
+        std::cout << typeid(*helper).name() << std::endl;
         helper->begin(w);
       }
 
@@ -142,6 +145,7 @@ private:
   rule_t param;
   boost::scoped_ptr<repatcher_getter> getter;
 };
+
 }
 
 GOTT_PLUGIN_MAKE_BUILDER_SIMPLE(plugin_lang_repatcher, concrete_type<xmatcher>)

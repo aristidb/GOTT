@@ -53,7 +53,7 @@
 #include <boost/ref.hpp>
 #include <cassert>
 
-//#define VERBOSE
+#define VERBOSE
 
 #ifdef VERBOSE
 #include <iostream>

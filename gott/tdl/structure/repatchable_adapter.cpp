@@ -42,7 +42,7 @@
 #include <vector>
 #include <cassert>
 
-//#define VERBOSE
+#define VERBOSE
 
 #ifdef VERBOSE
 #include <iostream>
@@ -112,7 +112,11 @@ void repatchable_adapter::add_tag(gott::string const &s) {
 
 void repatchable_adapter::data(gott::Xany const &x) {
 #ifdef VERBOSE
-  std::cout << "<repatchable_adapter:" << this << ">:data " << x << std::endl;
+  std::cout << "<repatchable_adapter:" << this << ">:data ";
+  try {
+    std::cout << x;
+  } catch (...) {}
+  std::cout << std::endl;
 #endif
   p->current().data(x);
 }
@@ -121,7 +125,7 @@ void repatchable_adapter::add_repatcher(
     boost::shared_ptr<repatcher const> const &x) {
 #ifdef VERBOSE
   std::cout << "<repatchable_adapter:" << this << ">:add_repatcher " <<
-    x.get() << std::endl;
+    x.get() << " : _Z" << typeid(*x.get()).name() << std::endl;
 #endif
   p->add(x);
 }
@@ -163,29 +167,32 @@ repatchable_adapter2::~repatchable_adapter2() {}
 
 void repatchable_adapter2::begin(tdl::source_position const &w) {
 #ifdef VERBOSE
-  std::cout << "<repatchable_adapter2:" << this << ">:begin" << std::endl;
+  std::cout << "<repatchable_adapter2:" << this << ">:begin" << " <> " << &p->current() << std::endl;
 #endif
   p->current().begin(w);
 }
 
 void repatchable_adapter2::end() {
 #ifdef VERBOSE
-  std::cout << "<repatchable_adapter2:" << this << ">:end" << std::endl;
+  std::cout << "<repatchable_adapter2:" << this << ">:end" << " <> " << &p->current() << std::endl;
 #endif
   p->current().end();
 }
 
 void repatchable_adapter2::add_tag(gott::string const &s) {
 #ifdef VERBOSE
-  std::cout << "<repatchable_adapter2:" << this << ">:add_tag " << s <<
-    std::endl;
+  std::cout << "<repatchable_adapter2:" << this << ">:add_tag " << s << " <> " << &p->current() << std::endl;
 #endif
   p->current().add_tag(s);
 }
 
 void repatchable_adapter2::data(gott::Xany const &x) {
 #ifdef VERBOSE
-  std::cout << "<repatchable_adapter2:" << this << ">:data " << x << std::endl;
+  std::cout << "<repatchable_adapter2:" << this << ">:data ";
+  try {
+    std::cout << x;
+  } catch (...) {}
+  std::cout << " <> " << &p->current() << std::endl;
 #endif
   p->current().data(x);
 }
@@ -194,7 +201,7 @@ void repatchable_adapter2::add_repatcher2(
     boost::shared_ptr<repatcher const> const &x) {
 #ifdef VERBOSE
   std::cout << "<repatchable_adapter2:" << this << ">:add_repatcher2 " <<
-    x.get() << std::endl;
+    x.get() << " : _Z" << typeid(*x.get()).name() << std::endl;
 #endif
   p->add(x);
 }

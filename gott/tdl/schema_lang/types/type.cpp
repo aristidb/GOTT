@@ -51,6 +51,7 @@ using tdl::structure::writable_structure;
 using gott::string;
 using gott::Xany;
 using std::vector;
+using boost::assign::list_of;
 
 namespace {
 
@@ -62,7 +63,7 @@ struct make_rule {
       rule_one("named",
         rule_attr(tag = tp->get_id().get_string()),
         rule("ordered", rule_attr(tag = "par"),
-          boost::assign::list_of
+          list_of
           (rule("tree",
             rule_attr(tag = "parameter", outer = tp->parameters())))
           (rule("tdl::schema_lang::type",
@@ -80,16 +81,26 @@ public:
     vector<rule_t> alternatives;
     make_rule helper = { alternatives };
     tdl::resource::list<type>(helper);
-    rule_t slotless_type = rule("any", rule_attr(tag = "type"), alternatives);
-    m.add(
-      rule("any", rule_attr(coat = false),
-        boost::assign::list_of
+    rule_t plain_type = rule("any", rule_attr(tag = "type"), alternatives);
+    rule_t repatchless_type =
+      rule("any", rule_attr(),
+        list_of
         (rule_one("tdl::schema_lang::slotcfg",
           rule_attr(tag = "slot", outer = optional()),
-          slotless_type))
-        (slotless_type)
-      )
-    );
+          plain_type))
+        (plain_type)
+      );
+    rule_t type =
+      rule("any", rule_attr(),
+        list_of
+        (rule_one("named", rule_attr(tag = ":repatch"),
+          rule("ordered", rule_attr(),
+            list_of
+            (rule("tdl::schema_lang::repatcher", rule_attr()))
+            (repatchless_type))))
+        (repatchless_type)
+      );
+    m.add(type);
   }
 
   static gott::atom const id;
