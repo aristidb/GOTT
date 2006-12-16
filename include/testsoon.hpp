@@ -568,7 +568,7 @@ inline void do_check2(F fun, T const &a, U const &b,
 
 #endif
 
-template <typename Type>
+template<typename Type>
 class range_generator {
 public:
   typedef Type value_type;
@@ -608,6 +608,27 @@ public:
 private:
   value_type a;
   value_type b;
+};
+
+template<typename Type>
+class array_generator {
+public:
+  typedef Type value_type;
+  typedef Type const &const_reference;
+  typedef Type const *const_pointer;
+  typedef const_pointer iterator;
+
+  template<int N>
+  array_generator(Type (&array)[N]) : a(array), b(array + N) {}
+
+  template<int N>
+  array_generator(Type const (&array)[N]) : a(array), b(array + N) {}
+
+  iterator begin() { return a; }
+  iterator end() { return b; }
+
+private:
+  const_pointer a, b;
 };
 
 /**
@@ -849,7 +870,6 @@ private:
 #define TESTSOON_PARAM__gf(x)             TESTSOON_PARAM__group_fixture(x)
 #define TESTSOON_PARAM__generator(x)      3, (1, x)
 #define TESTSOON_PARAM__gen(x)            TESTSOON_PARAM__generator(x)
-
 
 #define TESTSOON_PARAM_INITIAL \
   ("") ((0, ~)) (0) ((0, ()))

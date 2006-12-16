@@ -62,4 +62,10 @@ XTEST((gf, 1)) {
   Equals(typeid(group_fixture), typeid(group_fixture_t));
 }
 
+char const * const array[] = { "abc", "xyz" };
+
+XTEST((gen, (testsoon::array_generator<char const *>)(array))) {
+  Equals(value, "");
+}
+
 }}
