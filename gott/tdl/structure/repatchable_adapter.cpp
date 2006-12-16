@@ -42,7 +42,7 @@
 #include <vector>
 #include <cassert>
 
-#define VERBOSE
+//#define VERBOSE
 
 #ifdef VERBOSE
 #include <iostream>

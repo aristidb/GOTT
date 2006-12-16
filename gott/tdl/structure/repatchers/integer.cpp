@@ -82,6 +82,17 @@ repatch_integer::deferred_write(writable_structure &s) const {
             "input cannot be converted to integer");
     }
 
+    static unsigned digit(char ch) {
+      if (std::isdigit(ch))
+        return ch - '0';
+      if (std::isalpha(ch))
+        if (std::islower(ch))
+          return ch - 'a' + 10;
+        else
+          return ch - 'A' + 10;
+      return 36;
+    }
+
     bool is_integer(string const &s, long &val) {
       long sign = 1;
       val = 0;
@@ -98,11 +109,35 @@ repatch_integer::deferred_write(writable_structure &s) const {
           return false;
       }
   
-//    if (*it == L'0' && it[1] == L'x')
-//      return is_hex(it + 2, s.end(), v, sign)
+      unsigned base = 10;
 
-      for (; !rng.empty() && std::isdigit(*rng.begin()); ++rng.begin()) {
-        val = val * 10 + (*rng.begin() - '0');
+      if (rng.size() > 2) {
+        if (*rng.begin() == '0') {
+          ++rng.begin();
+          char ch = *rng.begin();
+          if (!std::isdigit(ch)) {
+            ++rng.Begin;
+            switch (ch) {
+            case 'B': case 'b':
+              base = 2; break;
+            case 'O': case 'o': case 'C': case 'c':
+              base = 8; break;
+            case 'D': case 'd':
+              base = 10; break;
+            case 'X': case 'x':
+              base = 16; break;
+            default:
+              return false;
+            }
+          }
+        }
+      }
+
+      for (; !rng.empty(); ++rng.begin()) {
+        unsigned d = digit(*rng.begin());
+        if (d >= base)
+          return false;
+        val = val * base + d;
       }
 
       if (!rng.empty())

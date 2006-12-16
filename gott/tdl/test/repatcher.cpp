@@ -252,6 +252,122 @@ TEST() {
   Equals(stream.str(), "77");
 }
 
+TEST_GROUP(integer_ext) {
+namespace {
+struct helper : writable_structure {
+  helper(long val) : val(val), found(false) {}
+  ~helper() {}
+
+  long const val;
+  bool found;
+
+  void begin(tdl::source_position const &) {}
+  void end() {}
+  void add_tag(gott::string const &) {}
+  void data(Xany const &x) {
+    Check(!found);
+    Equals(gott::Xany_cast<long>(x), val);
+    found = true;
+  }
+};
+
+void check(gott::string const &in, long val) {
+  scoped_ptr<repatcher_getter> re_g(repatcher_by_name());
+  re_g->begin();
+    re_g->data(Xany("integer"));
+  re_g->begin(); re_g->end();
+  re_g->end();
+  scoped_ptr<repatcher> re(re_g->result_alloc());
+
+  helper out(val);
+
+  scoped_ptr<writable_structure> ind(re->deferred_write(out));
+  Nothrows(ind->data(Xany(in)), tdl::tdl_error&);
+
+  Check(out.found);
+}
+
+void yeah(std::ostringstream &stream, long value) {
+  if (value < 0)
+    stream << -value;
+  else
+    stream << value;
+  Check(stream);
+  check(gott::string(stream.str(), gott::ascii), value);
+}
+
+typedef testsoon::range_generator<long> rng;
+}
+
+XTEST((name, "simple")(generator, (rng)(-20)(20))) {
+  std::ostringstream stream;
+  if (value < 0)
+    stream << '-';
+  yeah(stream, value);
+}
+
+XTEST((name, "dec")(generator, (rng)(-20)(20))) {
+  std::ostringstream stream;
+  if (value < 0)
+    stream << '-';
+  stream << "0d";
+  yeah(stream, value);
+}
+
+XTEST((name, "hex")(generator, (rng)(-20)(20))) {
+  std::ostringstream stream;
+  if (value < 0)
+    stream << '-';
+  stream << "0x" << std::hex;
+  yeah(stream, value);
+}
+
+XTEST((name, "oct")(generator, (rng)(-20)(20))) {
+  std::ostringstream stream;
+  if (value < 0)
+    stream << '-';
+  stream << "0c" << std::oct;
+  yeah(stream, value);
+}
+
+XTEST((name, "bin")(generator, (rng)(-20)(20))) {
+  std::ostringstream stream;
+  unsigned long val = value;
+  if (value < 0) {
+    stream << '-';
+    val = -value;
+  }
+  stream << "0b";
+  for (int i = 31; i >= 0; --i)
+    stream << ((val >> i) & 1);
+  Check(stream);
+  check(gott::string(stream.str(), gott::ascii), value);
+}
+
+XTEST((name, "bin2")(generator, (rng)(-20)(20))) {
+  std::ostringstream stream;
+  unsigned long val = value;
+  if (value < 0) {
+    stream << '-';
+    val = -value;
+  }
+  stream << "0b";
+  bool lead = true;
+  for (int i = 31; i >= 0; --i) {
+    bool x = (val >> i) & 1;
+    if (x)
+      lead = false;
+    if (!lead)
+      stream << x;
+  }
+  if (lead)
+    stream << '0';
+  Check(stream);
+  check(gott::string(stream.str(), gott::ascii), value);
+}
+
+}
+
 TEST_GROUP(inverse) {
 
 TEST(nothing) {
