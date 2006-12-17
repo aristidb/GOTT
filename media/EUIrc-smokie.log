@@ -1,0 +1,102 @@
+**** BEGINNE LOGBUCH UM Sun Dec 17 02:50:06 2006
+
+Dez 17 02:50:21 <Smikie>	dein flame über TDL find ich sehr cool.
+Dez 17 02:50:33 <Smokie>	kann ich mir kaum vorstellen
+Dez 17 02:50:55 <Smikie>	<Smokie> eine superdolle konfigsprache, ein steuerzeichen, das nahezu nicht mit der tastatur gedrückt werden kann gibt die ebene an
+Dez 17 02:51:04 <Smikie>	das ist zu surreal, als dass ich mich aufregen würde
+Dez 17 02:51:10 <Smokie>	;-)
+Dez 17 02:51:12 <Smikie>	<Smokie> referenzen innerhalb wie bei xml sind natürlich nciht möglich
+Dez 17 02:51:16 <Smokie>	gibts verweise über mehrere dateien?
+Dez 17 02:51:25 <Smikie>	seit wann hat XML das?
+Dez 17 02:51:31 <Smikie>	und TDL kennt kein Date-Konzept
+Dez 17 02:51:33 <Smikie>	+i
+Dez 17 02:51:34 <Smokie>	seit immer?
+Dez 17 02:51:42 <Smikie>	xlink?
+Dez 17 02:51:47 <Smikie>	das ist nicht "immer"
+Dez 17 02:52:03 <Smokie>	naja aber sehr lange inzwischen
+Dez 17 02:52:17 <Smikie>	davon abgesehen, dass niemand xlink nutzt
+Dez 17 02:52:37 <Smikie>	wäre es doch sehr nett, wenn du das gesagt hättest, als ich TDL erklärt habe
+Dez 17 02:52:47 <Smikie>	einfach schweigen um irgendwann zuzuschlagen
+Dez 17 02:52:53 <Smikie>	das ist niederträchtig
+Dez 17 02:53:08 <Smokie>	mir wurde TDL nicht erklärt, ich habe immer schon vom rad-neu-erfinden nix gehalten
+Dez 17 02:53:19 <Smokie>	was eine 100ste script-sprache (ganz unabhängig von xml) noch bringen soll weiß ich nicht
+Dez 17 02:53:56 <Smikie>	das rad-neu-erfinden argument wird viel zu oft gebracht
+Dez 17 02:54:08 <Smokie>	und es trifft jedesmal den kern
+Dez 17 02:54:09 <Smikie>	innovation erfordert erfindungen verdammt
+Dez 17 02:54:27 <Smokie>	erfindung != was bestehendes nochmal schreibe
+Dez 17 02:54:34 <Smikie>	tut TDL das?
+Dez 17 02:54:54 <Smokie>	wenns eine weitere config-data-abspeiucher-sprache ist: ganz klar ja
+Dez 17 02:55:02 <Smokie>	ich sehe die herausragenden das-ist-anders-punkte nicht
+Dez 17 02:55:16 <Smokie>	abgesehen davon, dass eure sprache niemand kennt und andere sprachen sehr verbreitet sind
+Dez 17 02:55:51 <Smikie>	" das-ist-anders-punkte"... im vergleich mit was?
+Dez 17 02:56:02 <Smikie>	ich kenne nur INI, XML und ad-hoc formate
+Dez 17 02:56:02 <Smokie>	zu bestehenden script-sprachen natürlich
+Dez 17 02:56:03 <Smokie>	am besten zu den weitverbreitesten
+Dez 17 02:56:10 <Smikie>	TDL ist KEIN script-sprache
+Dez 17 02:56:16 <Smokie>	ja du weißt was ich meine
+Dez 17 02:56:20 <Smokie>	markup languages
+Dez 17 02:56:26 <Smikie>	auch kein markup
+Dez 17 02:56:30 <Smikie>	markup ist für dokumente
+Dez 17 02:56:48 <Smikie>	die verwirrung von markup und daten ist einer der größten fehler, weswegen xml so unelegant geworden ist
+Dez 17 02:57:04 <Smokie>	versteh ich nicht
+Dez 17 02:57:06 <Smokie>	markup ist ja schön in den tags
+Dez 17 02:57:09 <Smokie>	und die daten innerhalb
+Dez 17 02:57:23 <Smokie>	aber egal: http://www.pault.com/xmlalternatives.html
+Dez 17 02:57:28 <Smokie>	warum nicht eine dieser sprachen
+Dez 17 02:57:39 <Smokie>	(achtung: sprachen wieder im sinne von ... )
+Dez 17 02:58:05 <Smikie>	nun, bevor ich TDL erfunden habe
+Dez 17 02:58:18 <Smikie>	habe ich mir einige xml-alternativen angeschaut
+Dez 17 02:58:27 <Smikie>	zunächst war ich ganz begeistert von YAML
+Dez 17 02:58:46 <Smikie>	habe aber festgestellt: es gibt nur parser für verdammte skriptsprachen wie ruby, python etc.
+Dez 17 02:58:59 <Smikie>	und das ganze modell ist nur auf skriptsprachen ausgelegt
+Dez 17 02:59:07 <Smikie>	das problem haben in der list übrigens die meisten
+Dez 17 02:59:42 <Smikie>	nun, ich gebe zu, ich habe mir nicht alle sprachen auf der seite angeguckt... vor allem auch weil ich die seite nicht kannte
+Dez 17 02:59:51 <Smikie>	aber was ich mir noch angeguckt habe: OGDL
+Dez 17 03:00:05 <Smikie>	nun, nachdem YAML ausgeschlossen war schien OGDL sehr gut zu sein
+Dez 17 03:00:34 <Smikie>	schließlich sind die gleichen dokumente genauso lesbar und doch einfacher
+Dez 17 03:01:03 <Smikie>	dann hab ich aber gemerkt, hoppla, die sprache hat ein problem
+Dez 17 03:01:10 <Smikie>	hat was mit klammern und kommas zu tun
+Dez 17 03:01:43 <Smikie>	außerdem ist der parser ziemlich scheiße (es gibt - in XML gesprochen - nur DOM, kein SAX)
+Dez 17 03:01:54 <Smikie>	dann habe ich einfach OGDL vereinfacht
+Dez 17 03:02:08 <Smikie>	und ein bisschen abgewandelt
+Dez 17 03:02:13 <Smikie>	und voila, low-level TDL
+Dez 17 03:02:31 <Smikie>	aber doch, TDL HAT etwas, das es BESSER macht!
+Dez 17 03:02:37 <Smikie>	schema.
+Dez 17 03:02:49 <Smikie>	schema ist nicht nur zum prüfen da
+Dez 17 03:02:56 <Smikie>	sondern auch zum gießen in datenstrukturen
+Dez 17 03:03:05 <Smokie>	und die merkmale vs. xml sind jetzt welche?
+Dez 17 03:03:07 <Smikie>	und zwar so, dass richtige statische sprachen damit umgehen können
+Dez 17 03:03:33 <Smikie>	ok, merkmale...
+Dez 17 03:03:53 <Smikie>	high-level datenmodell: beliebig
+Dez 17 03:04:31 <Smikie>	low-level datenmodell: simpler baum (nur nodes mit text, keine attribute etc.) als stream (push)
+Dez 17 03:04:52 <Smikie>	syntax: wesentlich weniger noise, dadurch optisch angenehmer und leichter zu lesen
+Dez 17 03:05:49 <Smikie>	der komplette handgeschriebene parser hat 532 zeilen, die sprache ist also auch nicht sonderlich komplex
+Dez 17 03:06:11 <Smikie>	wesentliche probleme mit einrückung gibt es nicht, da TABs verboten sind und das auch erkannt wird
+Dez 17 03:06:29 <Smikie>	reicht das als merkmalsliste erstmal?
+Dez 17 03:07:29 <Smokie>	außer vll "weniger noise" dafür aber auch "keine tabs" ist also mal kein unterschied zu xml, außer das es weniger kann
+Dez 17 03:08:03 <Smikie>	um fair zu bewerten musst du eine faire chance geben
+Dez 17 03:08:16 <Smikie>	wenn du willst, dass TDL verliert, verliert es auch.
+Dez 17 03:08:53 <Smokie>	das kann man natürlich tollerweise immer sagen
+Dez 17 03:09:09 <Smikie>	natürlich.
+Dez 17 03:09:31 <Smikie>	aber "außer ... ist es doch schlechter" kann man AUCH IMMER sagen.
+Dez 17 03:09:44 <Smokie>	nicht wenn es etwas hat was es mehr als XML kann
+Dez 17 03:09:50 <Smokie>	"ich kann select-queries ausführen"
+Dez 17 03:09:53 <Smokie>	wobei das in xml auch bald gehen wird
+Dez 17 03:10:09 <Smikie>	äh select-queries gehen nicht
+Dez 17 03:10:26 <Smikie>	in tdl
+Dez 17 03:10:34 <Smikie>	... weils noch niemand implementiert hat
+Dez 17 03:12:12 <Smikie>	was es mehr als xml kann? nun, man kann JEDES tdl-dokument auch als XML formulieren.
+Dez 17 03:12:21 <Smikie>	das ist dann aber keine sehr tolle syntax.
+Dez 17 03:13:19 <Smikie>	man bräuchte genau zwei tags: <node> und <value>, wobei in jedem <node> genau ein <value> vorkommt
+Dez 17 03:13:30 <Smikie>	und beliebig viele <node>s
+Dez 17 03:13:39 <Smikie>	das will aber keiner, oder?
+Dez 17 03:15:16 <Smikie>	"weniger kann" ist übrigens schlichtweg gelogen.
+Dez 17 03:15:25 <Smikie>	TDL eignet sich nicht für mixed-content.
+Dez 17 03:15:37 <Smikie>	aber dafür ist es auch nicht gemacht.
+Dez 17 03:15:47 <Smikie>	ansonsten glaube ich aber nicht, dass es reale nachteile hat.
+Dez 17 03:16:00 <Smikie>	OBWOHL es keine attribute hat
+Dez 17 03:16:26 <Smikie>	... dass ich soviel rede erklärt sich dadurch, dass du mich mit deinem flame wirklich getroffen hast :/
+Dez 17 03:18:40 <Smokie>	jo sry, ich schreib halt nie was neu wenn möglich
+Dez 17 03:18:47 <Smokie>	ihr werdet das schon hinbiegen
+Dez 17 03:18:47 <Smokie>	n8
+Dez 17 03:18:59 *	Smokie hat die Verbindung getrennt (Quit: )
