@@ -74,3 +74,10 @@ XTEST((gen, (testsoon::array_generator<char const *>)(array))) {
   Equals(value, "");
 }
 
+XTEST(
+    (name, "VALUES!!!")
+    (values, (int)(4)(7)(2))
+) {
+  Check(value && 0);
+}
+

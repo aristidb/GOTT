@@ -45,10 +45,11 @@
 #include <boost/preprocessor/facilities/empty.hpp>
 #include <boost/preprocessor/comparison/equal.hpp>
 #include <boost/preprocessor/punctuation/comma_if.hpp>
+#include <boost/assign/list_of.hpp>
 
 #ifndef NO_STDLIB
 #include <string>
-#include <iostream>//sollte das wirklich standard sein? aber zum debuggen gut
+#include <iostream>//FIXME?!
 #include <sstream>
 #include <vector>
 #include <typeinfo>
@@ -870,13 +871,27 @@ private:
 #define TESTSOON_PARAM__gf(x)             TESTSOON_PARAM__group_fixture(x)
 #define TESTSOON_PARAM__generator(x)      3, (1, x)
 #define TESTSOON_PARAM__gen(x)            TESTSOON_PARAM__generator(x)
-#define TESTSOON_PARAM__range(x) \
+
+#define TESTSOON_PARAM_SHORT_GENERATOR(n, x) \
   TESTSOON_PARAM__generator( \
-    (::testsoon::range_generator< \
+    (n < \
       BOOST_PP_TUPLE_ELEM(3, 0, x) \
     >) \
     (BOOST_PP_TUPLE_ELEM(3, 1, x)) \
     (BOOST_PP_TUPLE_ELEM(3, 2, x)) \
+  )
+
+#define TESTSOON_PARAM__range(x) \
+  TESTSOON_PARAM_SHORT_GENERATOR(::testsoon::range_generator, x)
+#define TESTSOON_PARAM__array(x) \
+  TESTSOON_PARAM_SHORT_GENERATOR(::testsoon::array_generator, x)
+#define TESTSOON_PARAM__values(x) \
+  TESTSOON_PARAM__generator( \
+    (std::vector<BOOST_PP_SEQ_HEAD(x)>) \
+    ( \
+      (boost::assign::list_of BOOST_PP_SEQ_TAIL(x)). \
+      operator std::vector<BOOST_PP_SEQ_HEAD(x)>() \
+    ) \
   )
 
 #define TESTSOON_PARAM_INITIAL \

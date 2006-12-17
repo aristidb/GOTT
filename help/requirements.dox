@@ -3,6 +3,6 @@
 
 To use "Test soon" you need:
 @li a C++ compiler,
-@li Boost.Preprocessor as found in 
+@li Boost.Preprocessor and Boost.Assign as found in 
     <a href="http://www.boost.org">Boost</a> 1.33.1.
 */
