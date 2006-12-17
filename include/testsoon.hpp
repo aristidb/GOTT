@@ -870,6 +870,14 @@ private:
 #define TESTSOON_PARAM__gf(x)             TESTSOON_PARAM__group_fixture(x)
 #define TESTSOON_PARAM__generator(x)      3, (1, x)
 #define TESTSOON_PARAM__gen(x)            TESTSOON_PARAM__generator(x)
+#define TESTSOON_PARAM__range(x) \
+  TESTSOON_PARAM__generator( \
+    (::testsoon::range_generator< \
+      BOOST_PP_TUPLE_ELEM(3, 0, x) \
+    >) \
+    (BOOST_PP_TUPLE_ELEM(3, 1, x)) \
+    (BOOST_PP_TUPLE_ELEM(3, 2, x)) \
+  )
 
 #define TESTSOON_PARAM_INITIAL \
   ("") ((0, ~)) (0) ((0, ()))
