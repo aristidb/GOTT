@@ -148,6 +148,14 @@ public:
   slotcfg(slotcfg const &o)
     : m(o.m), type(o.type), count(o.count) {}
 
+  /// Assignment.
+  slotcfg &operator=(slotcfg const &o) {
+    m = o.m;
+    type = o.type;
+    count = o.count;
+    return *this;
+  }
+
   /// Whether the object accepts 0 children.
   bool prefix_optional() const GOTT_EXPORT;
 

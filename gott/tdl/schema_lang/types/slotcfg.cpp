@@ -135,6 +135,8 @@ slotcfg::simple_mode make_simple(long in) {
     slotcfg::some,
     slotcfg::list,
   };
+  if (in < 0 || in > 3)
+    throw gott::internal_error("enumeration index out of bound");
   return table[in];
 }
 
@@ -158,6 +160,8 @@ slotcfg::sized_mode make_sized(long in) {
     slotcfg::maximum,
     slotcfg::exactly
   };
+  if (in < 0 || in > 2)
+    throw gott::internal_error("enumeration index out of bound");
   return table[in];
 }
 
