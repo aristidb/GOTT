@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Rüdiger Sonderfeld <kingruedi@c-plusplus.de>.
- * Portions created by the Initial Developer are Copyright (C) 2006
+ * Portions created by the Initial Developer are Copyright (C) 2006, 2007
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -94,7 +94,7 @@ class GOTT_EXPORT kqueue_loop
 
   GOTT_LOCAL void remove_fd(int fd);
 
-  GOTT_LOCAL sigc::signal1<void, int> &on_signal(int sig);
+  GOTT_LOCAL boost::signal<void (int)> &on_signal(int sig);
   
   GOTT_LOCAL void *do_feature(QID const &);
 

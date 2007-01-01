@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Rüdiger Sonderfeld <kingruedi@c-plusplus.de>.
- * Portions created by the Initial Developer are Copyright (C) 2006
+ * Portions created by the Initial Developer are Copyright (C) 2006, 2007
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -125,7 +125,7 @@ namespace events {
     return 0;
   }
 
-  sigc::signal1<void, int> &kqueue_loop::on_signal(int sig) {
+  boost::signal<void (int)> &kqueue_loop::on_signal(int sig) {
     impl::map_sig_hnd::iterator i = p->signals.find(sig);
     if (i == p->signals.end()) {
       struct kevent n;
