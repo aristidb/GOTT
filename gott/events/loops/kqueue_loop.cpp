@@ -90,14 +90,14 @@ namespace events {
     unsigned wait;
 
     // signal_manager
-    typedef std::map<int, sigc::signal1<void, int> > map_sig_hnd;
+    typedef std::map<int, boost::signal1<void (int)> > map_sig_hnd;
     map_sig_hnd signals;
 
     // notify fs
     map_fd_cb notify_fs;
 
     // main_loop
-    sigc::signal0<void, sigc::nil> on_idle;
+    boost::signal<void ()> on_idle;
 
     impl()
       : running(false),
@@ -240,7 +240,7 @@ namespace events {
     p->notify_fs.erase(i);
   }
 
-  sigc::signal0<void, sigc::nil> &kqueue_loop::on_idle() {
+  boost::signal<void ()> &kqueue_loop::on_idle() {
     return p->on_idle;
   }
 

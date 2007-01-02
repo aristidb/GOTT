@@ -72,7 +72,7 @@ class GOTT_EXPORT kqueue_loop
  private:
   GOTT_LOCAL void run();
   GOTT_LOCAL void quit_local();
-  GOTT_LOCAL sigc::signal0<void, sigc::nil>& on_idle();
+  GOTT_LOCAL boost::signal<void ()> &on_idle();
 
  public:
   // Interface for notify_fs
