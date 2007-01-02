@@ -90,7 +90,7 @@ namespace events {
     unsigned wait;
 
     // signal_manager
-    typedef std::map<int, boost::signal1<void (int)> > map_sig_hnd;
+    typedef std::map<int, boost::signal<void (int)> > map_sig_hnd;
     map_sig_hnd signals;
 
     // notify fs
@@ -113,7 +113,7 @@ namespace events {
   {}
 
   kqueue_loop::~kqueue_loop() {
-    on_destroy().emit();
+    on_destroy()();
   }
 
   void *kqueue_loop::do_feature(gott::QID const &qid) {
