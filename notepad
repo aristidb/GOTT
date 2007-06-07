@@ -1,0 +1,163 @@
+hier wörde ich tolle überlegungen anstellen k
+
+
+== Concepts ==
+
+namespace concepts {
+  struct container {
+    typedef mpl::vector0< > implies;
+  };
+  struct random_access_container {
+    typedef mpl::vector1<container> implies;
+    // ? struct interface;
+  };
+}
+
+namespace utils {
+  template<typename PolicyClass, typename Concept>
+  struct supports_concept { static bool const value; };
+  
+  template<typename PolicyList, typename Concept>
+  struct has_concept { static bool const value; };
+  
+  template<typename Concept>
+  struct demote_concept { typedef typename Concept::implies concepts; }; //<-?? :D
+  
+  template<typename Sequence>
+  struct resulting_concept { typedef struct concept; };
+  
+  template<typename Sequence>
+  struct check_concepts { };
+}
+
+struct policy_class {
+  template<typename Before, typename After>
+  struct policy : public Before { };
+  
+  typedef mpl::vector<X> concept;
+  typedef mpl::vector<X> require;        // concept muss in der Before-/After-Liste sein
+  typedef mpl::vector<X> require_before; // concept muss in der Before-Liste sein
+  typedef mpl::vector<X> require_after;  // concept muss in der After-Liste sein
+  typedef mpl::vector<X> demote_concepts; // falls das concept  vorhanden ist, wird es "demoted" (before/after?)
+};
+
+/*
+Erklärung zu demote:
+Es kann ja Konzepte geben, die vorherige Konzepte beschränken oder aufheben. zB wenn man etwas wie std::stack auf Basis eines arrays bauen wollte
+policy_holder<mpl::vector<type<int>, array, stack> > stack;
+dann ist das Konzept ja nicht mehr "Random-Access-Container". Bei einem std::stack wäre es ja noch nicht mal ein Container. Also muss std::stack sagen können: 
+ "Wenn ich komme, dann ist es kein Container mehr!"
+dafür das demote
+
+ah
+*/
+
+
+=Demote
+
+was soll passieren bei einer Situation ala (a -> b bedeutet Konzept a implies Konzept b)
+
+demote b, (a -> b -> c)
+
+soll c rauskommen oder soll es weiterhin a sein?
+
+a und b müssen raus und c ist nicht mehr implizit
+
+so? was meinst du mit implizit?
+
+naja nur a ist explizit oder? also direkt ein concept einer policy
+jo
+
+a muss ja raus (mitsamt policy??) ne nur das concept! wie soll das gehn? ich mein was bringt das? dann is vector kein container mehr oO hö?
+
+es geht um folgendes policy_holder<vector, stack> => concept entspricht nicht mehr container, sondern sequence
+
+die methoden sind aber weiterhin drin, gell?
+
+klar
+
+na toll
+
+
+
+dann hab ich einen container mit dem ich alles machen kann, darf es aber nicht
+:>
+
+jo :) bessere Idee?
+
+halt nee, wenn stack protected von Before ableitet...
+
+zB
+
+dann löscht stack alle concepts außer die, die es braucht.
+
+also meinst du brauchen wir kein demote? ??
+
+jo, nur delete - klingt doch gut? :)
+also delete auf alle die davor kommen außer die in require_*
+k?
+
+hmmm das wird jetzt alles sehr verworren. warum require*. ein stack hat ja ein require container. Außerdem hebt das protected ja alle raus
+
+require* weil ich nich darüber nachdenken wollte
+
+protected kann nur dinge before rausheben
+
+jo, dann sagen wir es gibt Policies die shadown alles was vorher passiert. also werden alle Konzepte die vorher kommen im Endkonzept gelöscht. Wow, das spart uns das ganze demote Zeugs, das wäre urhaarig geworden :D
+
+geiles wort, shadow. jo? :D
+
+indeed
+
+struct stack
+  typedef boost::mpl::true_ is_shadow_concept; <-- so?
+
+typedef void shadow; wäre schneller getippt :>
+
+typedef boost::mpl::true_ shadow; // an
+typedef boost::mpl::false_ shadow; //aus, optional
+//so?
+
+= 
+
+
+// zum glück hat mpl einen trick um rauszufinden ob ein typ ein typedef innen hat
+// das wird gut um nicht alles machen zu müssen
+// cool! Das ist echt echt praktisch. hatte gerade überlegt, wie man das vereinfachen könnte
+
+was sind die konsequenzen von require_concept?
+wird dann automatisch ein vector in die policy-list eingefügt, wenn einer das braucht und keins da is?
+
+Ich dachte eher an eine Fehlermeldung
+
+wäre aber auch cool aber potentiell problematisch. Vielleicht kann man das ja optional machen
+
+template<typename Concept>
+struct default_policies;
+
+template<>
+struct default_policies<random_access> {
+  typedef boost::mpl::vector1<vector> type;
+};
+
+wär das brauchbar?
+
+oder doch lieber Concept::default_policies?
+
+WIESO problematisch?
+
+weil es ja eher einen Fehler andeutet, wenn man etwas in der Liste vergisst *imho* das wäre so, als würde man std::vector<> automatisch auf int setzen oder so
+wobei natürlich default_policies gerade in Zeiten _ohne_ templ-typedef angenehm wären.
+
+naja eher gibt es inkompatible konzepte dachte ich
+
+policy_holder<vector<type<int>, stack> > stack;
+
+und das würde vector reinhauen
+das wäre doch wünschenswert
+
+r: wir können uns das ja noch überlegen. Mal schauen ob man das überhaupt einfach realisieren könnte
+r: Concept::default_policies wären definitiv ok. Schauen wir erst einmal
+
+cool typedef struct foo; ist legal auch ohne foo vorher hö? typedef struct foo bar; meinst du? nö ohne bar was macht das? es deklariert nen unvollständigen typen und setzt ein typedef drauf
+hmm die frage is in welchem scope der typ deklariert wird
