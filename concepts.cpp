@@ -14,6 +14,7 @@
 #include <boost/mpl/find_if.hpp>
 #include <boost/mpl/insert.hpp>
 #include <boost/mpl/insert_range.hpp>
+#include <boost/mpl/at.hpp>
 
 namespace mpl = boost::mpl;
 
@@ -244,7 +245,7 @@ namespace utils {
 
 
   namespace detail {
-    BOOST_MPL_HAS_XXX_TRAIT_DEF(implies);
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(implies)
 
     template<typename First, typename Last, typename Result>
     struct flatten {
@@ -299,7 +300,7 @@ namespace utils {
   };
 
   namespace detail {
-    BOOST_MPL_HAS_XXX_TRAIT_DEF(shadow);
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(shadow)
 
     template<typename Concept, bool x = has_shadow<Concept>::value>
     struct is_shadowing
@@ -413,12 +414,12 @@ namespace utils {
              bool empty = boost::mpl::empty<PolicySeq>::value >
     struct get_list_of_concepts {
       typedef typename concat<
-        typename PolicySeq::concept,
-        typename get_list_of_concepts<
-          typename boost::mpl::pop_front<PolicySeq>::type
+          typename boost::mpl::front<PolicySeq>::type::concept,
+          typename get_list_of_concepts<
+            typename boost::mpl::pop_front<PolicySeq>::type
           >::type
         >::type
-      type;
+        type;
     };
 
     template<typename PolicySeq>
@@ -435,6 +436,37 @@ namespace utils {
       >::type
     type;
   };
+
+// ----
+// create_vector from greatcontainer3
+  template<typename Sequence, int Size>
+  struct create_vector_impl;
+
+  template<typename Sequence>
+  struct create_vector {
+    typedef
+      typename create_vector_impl<Sequence, boost::mpl::size<Sequence>::value >::type
+      type;
+  };
+
+  #define ELEMENT_AT(z, n, t) \
+    BOOST_PP_COMMA_IF(n) \
+    typename boost::mpl::at_c<Sequence, n>::type
+
+  #define CREATE_VECTOR_IMPL(z, n, t) \
+    template<typename Sequence> \
+    struct create_vector_impl<Sequence, n> { \
+      typedef BOOST_PP_CAT(boost::mpl::vector, n)< \
+        BOOST_PP_REPEAT(n, ELEMENT_AT, ~) \
+      > type; \
+    };
+
+  BOOST_PP_REPEAT(20, CREATE_VECTOR_IMPL, ~)
+
+  #undef CREATE_VECTOR_IMPL
+  #undef ELEMENT_AT
+// ----
+
 }
 
 namespace tests {
@@ -474,8 +506,11 @@ namespace tests {
   }
 
   template<typename PolicySeq>
-  void resulting_concepts() {
-    std::cout << "resulting concepts: ";
+  void resulting_concept() {
+    typedef typename utils::resulting_concept<PolicySeq>::type result_;
+    typedef typename utils::create_vector<result_>::type result;
+    std::cout << "resulting concept: " << boost::mpl::size<result>::value;
+    std::cout << " _Z1x" << typeid(result).name() << '\n';
   }
 }
 
@@ -497,5 +532,7 @@ int main() {
 
   tests::flatten<mpl::vector2<bar, bar> >();
   tests::flatten<mpl::vector0< > >();
-  std::cout << "_Z1x" << typeid(utils::flatten<mpl::vector2<bar, bar> >::type).name() << '\n';
+  std::cout << "_Z1x" << typeid(utils::create_vector<utils::flatten<mpl::vector2<bar, bar> >::type>::type).name() << '\n';
+
+  tests::resulting_concept<mpl::vector2<policy1, policy3> >();
 }
