@@ -275,7 +275,6 @@ namespace utils {
           deref
         >::type with_deref;
 
-      typedef typename boost::mpl::next<First>::type next;
       typedef typename flatten<
           typename boost::mpl::next<First>::type,
           Last,
@@ -287,7 +286,19 @@ namespace utils {
     struct flatten<First, First, Result> {
       typedef Result type;
     };
+  }
 
+  template<typename Sequence>
+  struct flatten {
+    typedef typename detail::flatten<
+        typename boost::mpl::begin<Sequence>::type,
+        typename boost::mpl::end<Sequence>::type,
+        boost::mpl::vector0<>
+      >::type
+    type;
+  };
+
+  namespace detail {
     BOOST_MPL_HAS_XXX_TRAIT_DEF(shadow);
 
     template<typename Concept, bool x = has_shadow<Concept>::value>
@@ -415,16 +426,6 @@ namespace utils {
       typedef PolicySeq type;
     };
   }
-  template<typename Sequence>
-  struct flatten {
-    typedef typename detail::flatten<
-        typename boost::mpl::begin<Sequence>::type,
-        typename boost::mpl::end<Sequence>::type,
-        boost::mpl::vector0<>
-      >::type
-    type;
-  };
-  
   template<typename PolicySeq>
   struct resulting_concept {
     typedef typename flatten<
