@@ -1,4 +1,5 @@
 #include <iostream>
+#include <boost/mpl/size.hpp>
 
 #include <boost/static_assert.hpp>
 #include <boost/type_traits.hpp>//das kommt aber bitte nich in greatcontainer
@@ -37,6 +38,10 @@ namespace concepts {
   struct shads {
     typedef mpl::vector1<random_access_container> implies;
     typedef boost::mpl::true_ shadow;
+  };
+
+  struct implies_shads {
+    typedef mpl::vector1<shads> implies;
   };
 }
 using namespace concepts;
@@ -370,6 +375,40 @@ namespace utils {
     {
       typedef Sequence type;
     };
+
+    template<typename SeqA, typename SeqB,
+             bool empty = boost::mpl::empty<SeqA>::value>
+    struct concat {
+      typedef typename boost::mpl::push_front<
+        typename concat<
+          typename boost::mpl::pop_front<SeqA>::type,
+          SeqB
+        >::type,
+        typename boost::mpl::front<SeqA>::type
+        >::type type;
+    };
+
+    template<typename SeqA, typename SeqB>
+    struct concat<SeqA, SeqB, true> {
+      typedef SeqB type;
+    };
+
+    template<typename PolicySeq,
+             bool empty = boost::mpl::empty<PolicySeq>::value >
+    struct get_list_of_concepts {
+      typedef typename concat<
+        typename PolicySeq::concept,
+        typename get_list_of_concepts<
+          typename boost::mpl::pop_front<PolicySeq>::type
+          >::type
+        >::type
+      type;
+    };
+
+    template<typename PolicySeq>
+    struct get_list_of_concepts<PolicySeq, true> {
+      typedef PolicySeq type;
+    };
   }
   template<typename Sequence>
   struct flatten {
@@ -377,12 +416,18 @@ namespace utils {
         typename boost::mpl::begin<Sequence>::type,
         typename boost::mpl::end<Sequence>::type,
         boost::mpl::vector0<>
-      >::type type;
+      >::type
+    type;
   };
   
-  template<typename Sequence>
+  template<typename PolicySeq>
   struct resulting_concept {
-    typedef struct concept; // TODO (aber morgen erst :D)
+    typedef typename flatten<
+      typename details::do_shadowing<
+        typename details::get_list_of_concepts<PolicySeq>::type
+        >::type
+      >::type
+    type;
   };
 }
 
@@ -401,7 +446,12 @@ int main() {
             << ' ' // 1
             << '\n';
 
-  std::cout << typeid(utils::detail::do_shadowing<mpl::vector4<bar, foo, shads, baz> >::type).name()
+  typedef utils::detail::do_shadowing<mpl::vector4<bar, foo, implies_shads, baz> >::type
+    results;
+
+  std::cout << "shadowing: " << boost::mpl::size<results>::value << ' '
+            << boost::is_same<boost::mpl::front<results>::type,
+                              implies_shads>::value << ' '
             << '\n';
 
   //std::cout << "_Z1x" << typeid(utils::flatten<mpl::vector2<bar, bar> >::type).name() << '\n';
