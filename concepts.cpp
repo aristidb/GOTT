@@ -423,36 +423,73 @@ namespace utils {
   template<typename PolicySeq>
   struct resulting_concept {
     typedef typename flatten<
-      typename details::do_shadowing<
-        typename details::get_list_of_concepts<PolicySeq>::type
+      typename detail::do_shadowing<
+        typename detail::get_list_of_concepts<PolicySeq>::type
         >::type
       >::type
     type;
   };
 }
 
+namespace tests {
+  template<typename Seq, typename ShadowConcept>
+  void test_do_shadowing() {
+    typedef typename utils::detail::do_shadowing<Seq>::type results;
+
+    std::cout << "shadowing: " << boost::mpl::size<results>::value << '\n';
+    BOOST_STATIC_ASSERT((boost::is_same<
+                         typename boost::mpl::front<results>::type,
+                         ShadowConcept>::value));
+  }
+
+  template<typename Seq, typename Has, bool expect>
+  void has_concept() {
+    std::cout << "has_concept\n";
+    BOOST_STATIC_ASSERT((utils::has_concept<Seq, Has>::value == expect));
+  }
+
+  template<typename Policy, typename Concept, bool expect>
+  void supports_concept() {
+    std::cout << "supports_concept\n";
+    BOOST_STATIC_ASSERT((utils::supports_concept<Policy, Concept>::value
+                         == expect));
+  }
+
+  template<typename Seq, bool expect>
+  void check_concepts() {
+    std::cout << "check_concepts\n";
+    BOOST_STATIC_ASSERT((utils::check_concepts<Seq>::value == expect));
+  }
+
+  template<typename Seq>
+  void flatten() {
+    typedef typename utils::flatten<Seq>::type result;
+    std::cout << "flatten: " << boost::mpl::size<result>::value << '\n';
+  }
+
+  template<typename PolicySeq>
+  void resulting_concepts() {
+    std::cout << "resulting concepts: ";
+  }
+}
+
 int main() {
-  std::cout << utils::supports_concept<policy1, concepts::container>::value
-            << ' ' // 1
-            << utils::has_concept<mpl::vector2<policy3, policy1>,
-                                  concepts::container>::value
-            << ' ' // 1
-            << utils::has_concept<mpl::vector0<>, concepts::container>::value
-            << ' ' // 0
-            << utils::check_concepts<mpl::vector2<policy3, policy1> >::value
-            << ' ' // 0
-            << utils::check_concepts<mpl::vector0<> >::value << ' ' // 1
-            << utils::check_concepts<mpl::vector2<policy1, policy3> >::value
-            << ' ' // 1
-            << '\n';
+  tests::supports_concept<policy1, concepts::container, true>();
 
-  typedef utils::detail::do_shadowing<mpl::vector4<bar, foo, implies_shads, baz> >::type
-    results;
+  tests::has_concept<mpl::vector2<policy3, policy1>, concepts::container,
+    true>();
+  tests::has_concept<mpl::vector0<>, concepts::container, false>();
 
-  std::cout << "shadowing: " << boost::mpl::size<results>::value << ' '
-            << boost::is_same<boost::mpl::front<results>::type,
-                              implies_shads>::value << ' '
-            << '\n';
+  tests::check_concepts<mpl::vector2<policy3, policy1>, false>();
+  tests::check_concepts<mpl::vector0< >, true>();
+  tests::check_concepts<mpl::vector2<policy1, policy3>, true>();
 
+  tests::test_do_shadowing<mpl::vector4<bar, foo, shads, baz>, shads>();
+  tests::test_do_shadowing<mpl::vector4<bar, foo, implies_shads, baz>,
+    implies_shads>();
+  tests::test_do_shadowing<mpl::vector0< >, boost::mpl::void_>();
+
+  tests::flatten<mpl::vector2<bar, bar> >();
+  //tests::flatten<mpl::vector0< > >();
   //std::cout << "_Z1x" << typeid(utils::flatten<mpl::vector2<bar, bar> >::type).name() << '\n';
 }
