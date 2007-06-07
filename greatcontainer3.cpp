@@ -173,24 +173,52 @@ struct array {
     }
   };
 };
-struct simple_storage {  template<typename Before, typename After>  struct policy : public Before {  protected:    typename Before::value_type storage;  };};struct setter_interface {  template<typename Before, typename After>  struct policy : public Before {    void set(typename Before::value_type const &n) {
+
+struct simple_storage {
+  template<typename Before, typename After>
+  struct policy : public Before {
+  protected:
+    typename Before::value_type storage;
+  };
+};
+
+struct setter_interface {
+  template<typename Before, typename After>
+  struct policy : public Before {
+    void set(typename Before::value_type const &n) {
       Before::storage = n;
-    }  };};
+    }
+  };
+};
 
-struct getter_x2_interface {  template<typename Before, typename After>  struct policy : public Before {    typename Before::value_type get() const {
+struct getter_x2_interface {
+  template<typename Before, typename After>
+  struct policy : public Before {
+    typename Before::value_type get() const {
       return Before::storage * 2;
-    }  };};
+    }
+  };
+};
 
-struct getter_interface {  template<typename Before, typename After>  struct policy : public Before {    typename Before::value_type get() const {
+struct getter_interface {
+  template<typename Before, typename After>
+  struct policy : public Before {
+    typename Before::value_type get() const {
       //return Before::storage;
       return as_policy<getter_x2_interface>(*this).get() / 2;
-    }  };};int main() {
+    }
+  };
+};
+
+int main() {
   std::cout << "_Z6__type" << typeid(detail::combine<boost::mpl::vector2<type<int>, array> >::type).name() << '\n';
   policy_holder<boost::mpl::vector2<type<int>, array> > foo;
   foo.push_back(10);
 
   policy_holder<boost::mpl::vector5<type<int>, simple_storage, setter_interface, getter_interface, getter_x2_interface> > bar;
-  bar.set(99);  std::cout << bar.get() << '\n';
+
+  bar.set(99);
+  std::cout << bar.get() << '\n';
 
   std::cout << as_policy<getter_interface>(bar).get() << '\n';
   std::cout << as_policy<getter_interface>(as_policy<getter_x2_interface>(bar)).get() << '\n';
