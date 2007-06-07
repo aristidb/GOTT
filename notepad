@@ -161,3 +161,12 @@ r: Concept::default_policies wären definitiv ok. Schauen wir erst einmal
 
 cool typedef struct foo; ist legal auch ohne foo vorher hö? typedef struct foo bar; meinst du? nö ohne bar was macht das? es deklariert nen unvollständigen typen und setzt ein typedef drauf
 hmm die frage is in welchem scope der typ deklariert wird
+
+== Default Policies
+
+struct stack {
+  // rightay? jo
+  typedef boost::mpl::vector1<concepts::front_insertion_sequence> require_before;
+  typedef boost::mpl::map<boost::mpl::pair<concepts::front_insertion_sequence, vector> > default_policies; //ohje mpl maps sind aufwändig :/
+  // ...
+}

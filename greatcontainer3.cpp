@@ -1,29 +1,3 @@
-/*
-ich arbeite gerade an einem Concept-Modell (habe alle concepts hier in policy umgetauft :))
-
-Also eine Klasse gibt an, welche(s) Concept(e) sie genügt. zB
-
-struct array {
-  typedef concepts::random_access_container<concepts::interface> concept;
-  typedef boost::mpl::vector<concepts::storage, concepts::allocator> require;
-};
-
-struct getter_interface {
-  typedef concepts::interface concept;
-  typedef concepts::single_holder require; // require_before/require_after ?!
-};
-
-struct container_requirements {
-  typedef boost::mpl::vector<concepts::container, concepts::storage, concepts::interface> requirements;
-};
-
-typedef policy_holder<type<int>, array, pool_allocator, reserve<20> > int_array;
-
-BOOST_STATIC_ASSERT(meets_requirements<int_array, container_requirements>::value);
-
-dann könnte container einfach ein policy_holder sein, der das ASSERT bereits eingebaut hat.
-*/
-
 #ifndef PPTEST
 #include <iostream>
 #include <boost/mpl/vector.hpp>
