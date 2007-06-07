@@ -402,21 +402,13 @@ namespace utils {
       typedef Sequence type;
     };
 
-    template<typename SeqA, typename SeqB,
-             bool empty = boost::mpl::empty<SeqA>::value>
-    struct concat {
-      typedef typename boost::mpl::push_front<
-        typename concat<
-          typename boost::mpl::pop_front<SeqA>::type,
-          SeqB
-        >::type,
-        typename boost::mpl::front<SeqA>::type
-        >::type type;
-    };
-
     template<typename SeqA, typename SeqB>
-    struct concat<SeqA, SeqB, true> {
-      typedef SeqB type;
+    struct concat {
+      typedef typename boost::mpl::insert_range<
+          SeqA,
+          typename boost::mpl::end<SeqA>::type,
+          SeqB
+        >::type type;
     };
 
     template<typename PolicySeq,
