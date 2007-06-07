@@ -489,7 +489,7 @@ int main() {
     implies_shads>();
   tests::test_do_shadowing<mpl::vector0< >, boost::mpl::void_>();
 
-  tests::flatten<mpl::vector2<bar, bar> >();
+  //tests::flatten<mpl::vector2<bar, bar> >();
   //tests::flatten<mpl::vector0< > >();
   //std::cout << "_Z1x" << typeid(utils::flatten<mpl::vector2<bar, bar> >::type).name() << '\n';
 }
