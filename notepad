@@ -165,8 +165,55 @@ hmm die frage is in welchem scope der typ deklariert wird
 == Default Policies
 
 struct stack {
-  // rightay? jo
   typedef boost::mpl::vector1<concepts::front_insertion_sequence> require_before;
-  typedef boost::mpl::map<boost::mpl::pair<concepts::front_insertion_sequence, vector> > default_policies; //ohje mpl maps sind aufwändig :/
+  typedef boost::mpl::map<boost::mpl::pair<concepts::front_insertion_sequence, vector> > default_policies;
   // ...
 }
+
+mein Ansatz:
+handle_requirements( policy, policyseq )
+  for each concept in policy.require_before
+    if concept not in policyseq(before) then
+      add_before += concept -> default_policy
+    end
+  unique! add_before
+  policyseq(before) += add_before
+  
+  for each concept in policy.require_after
+    if concept not in policyseq(after) then
+      add_after += concept -> default_policy
+    end
+  unique! add_after
+  
+  
+  for each concept in policy.require
+    if concept not in policyseq then
+      add_require += concept -> default_policy
+    end
+  unique! add_after
+  require_glob += add_after
+  
+  for each newpolicy in policyseq(before)
+    handle_requirements( newpolicy, policyseq )
+  for each newpolicy in policyseq(after)
+    handle_requirements( newpolicy, policyseq )
+
+for each policy in policyseq
+  
+
+
+apply_default_policies: (pseudo-code)
+for_each(policy in policyseq)
+  apply require_before
+for_each(policy in policyseq)
+  apply require_after
+for_each(policy in policyseq)
+  add requirements to global requirements
+apply global requirements
+
+ergebnis: neue policy sequenz UND anzahl der einsetzungen
+
+potenzielles problem: requirements von eingefügten policies
+
+dumme lösung:
+  repeat until kein requirement eingefügt

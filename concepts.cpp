@@ -206,15 +206,16 @@ namespace utils {
         >::type type;
     };
   }
-
+  
   template<typename Sequence,
            typename Iterator = typename boost::mpl::begin<Sequence>::type>
   struct check_concepts;
-
-  template<typename Sequence, typename Iterator>
-  struct check_concepts_impl
-  {
-    typedef
+  
+  namespace detail {
+    template<typename Sequence, typename Iterator>
+    struct check_concepts_impl
+    {
+      typedef
       boost::mpl::and_<
         check_concepts<
           Sequence,
@@ -243,14 +244,16 @@ namespace utils {
         >
       >
       type;
-  };
+    };
+  }
 
-  template<typename Sequence, typename Iterator>
+  template<typename Sequence,
+           typename Iterator>
   struct check_concepts
   : boost::mpl::eval_if<
       boost::is_same<Iterator, typename boost::mpl::end<Sequence>::type>,
       boost::mpl::true_,
-      check_concepts_impl<Sequence, Iterator>
+      detail::check_concepts_impl<Sequence, Iterator>
     >::type
   { };
 
@@ -468,6 +471,68 @@ namespace utils {
   #undef ELEMENT_AT
 // ----
 
+  namespace detail {
+    template<
+      typename DefaultPolicies,
+      typename Concept,
+      typename Default =
+        typename boost::mpl::at<
+          DefaultPolicies,
+          Concept,
+          boost::mpl::void_
+        >::type
+    >
+    struct get_default {
+      typedef Default type;
+    };
+
+    template<typename DefaultPolicies, typename Concept>
+    struct get_default<DefaultPolicies, Concept, boost::mpl::void_>;
+
+    template<
+      typename Requirements,
+      typename Sequence,
+      typename DefaultPolicies
+      bool empty = boost::mpl::empty<Requirements>::value
+    >
+    struct apply_default_policies {
+      typedef boost::mpl::front<Requirements>::type requirement;
+      typedef typename apply_default_policies<
+          typename boost::mpl::pop_front<Requirements>::type,
+          Sequence,
+          DefaultPolicies
+        >::type next;
+
+      typedef typename boost::mpl::if_<
+          has_concept<
+            Sequence,
+            requirement
+          >,
+          next,
+          typename boost::mpl::push_front<
+            next,
+            typename get_default<
+              DefaultPolicies,
+              requirement
+            >::type
+          >::type
+        >::type type;
+    };
+
+    template<
+      typename Requirements,
+      typename Sequence,
+      typename DefaultPolicies
+    >
+    struct apply_default_policies<Requirements, Sequence, DefaultPolicies, true> {
+      typedef boost::mpl::vector0< > type;
+    };
+  }
+  
+  template<typename Seq>
+  struct apply_default_policies {
+    typedef struct type;
+  };
 }
 
 namespace tests {
