@@ -20,14 +20,12 @@ namespace mpl = boost::mpl;
 
 namespace concepts {
   struct container {
-    typedef mpl::vector0< > implies;
   };
   struct random_access_container {
     typedef mpl::vector1<container> implies;
   };
 
   struct foo { 
-    typedef mpl::vector0< > implies;
     typedef boost::mpl::false_ shadow;
   };
   struct bar {
@@ -97,16 +95,29 @@ struct policy_holder {
 };
 
 namespace utils {
-  namespace details {
+  namespace detail {
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(implies)
+
     template<typename PolicySeq, typename Concept,
              bool empty = mpl::empty<PolicySeq>::value>
     struct checker {
       typedef typename mpl::front<PolicySeq>::type checked_concept;
 
+      template<typename CheckedConcept, bool = has_implies<CheckedConcept>::value>
+      struct implies {
+        static bool const value =
+          checker<typename CheckedConcept::implies, Concept>::value;
+      };
+
+      template<typename CheckedConcept>
+      struct implies<CheckedConcept, false> {
+        static bool const value = false;
+      };
+
       static bool const value =
         boost::is_same<checked_concept, Concept>::value ?
         true :
-        ( checker<typename checked_concept::implies, Concept>::value ?
+        ( implies<checked_concept>::value ?
           true :
           checker<typename mpl::pop_front<PolicySeq>::type, Concept>::value);
     };
@@ -119,7 +130,7 @@ namespace utils {
 
   template<typename PolicyClass, typename Concept>
   struct supports_concept
-  : boost::integral_constant<bool, details::checker<typename PolicyClass::concept, Concept>::value> 
+  : boost::integral_constant<bool, detail::checker<typename PolicyClass::concept, Concept>::value> 
   {};
   
   template<typename PolicyList, typename Concept>
@@ -245,8 +256,6 @@ namespace utils {
 
 
   namespace detail {
-    BOOST_MPL_HAS_XXX_TRAIT_DEF(implies)
-
     template<typename First, typename Last, typename Result>
     struct flatten {
       typedef typename boost::mpl::deref<First>::type deref;
