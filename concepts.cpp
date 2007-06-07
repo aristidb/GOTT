@@ -270,17 +270,22 @@ namespace utils {
           >::type
         >::type with_implies;
       typedef typename boost::mpl::insert<
-          Result,
-          typename boost::mpl::end<Result>::type,
+          with_implies,
+          typename boost::mpl::end<with_implies>::type,
           deref
         >::type with_deref;
 
       typedef typename boost::mpl::next<First>::type next;
-      typedef typename boost::mpl::eval_if<
-          boost::is_same<next, Last>,
-          with_deref,
-          flatten<next, Last, with_deref>
+      typedef typename flatten<
+          typename boost::mpl::next<First>::type,
+          Last,
+          with_deref
         >::type type;
+    };
+
+    template<typename First, typename Result>
+    struct flatten<First, First, Result> {
+      typedef Result type;
     };
 
     BOOST_MPL_HAS_XXX_TRAIT_DEF(shadow);
@@ -489,7 +494,7 @@ int main() {
     implies_shads>();
   tests::test_do_shadowing<mpl::vector0< >, boost::mpl::void_>();
 
-  //tests::flatten<mpl::vector2<bar, bar> >();
-  //tests::flatten<mpl::vector0< > >();
-  //std::cout << "_Z1x" << typeid(utils::flatten<mpl::vector2<bar, bar> >::type).name() << '\n';
+  tests::flatten<mpl::vector2<bar, bar> >();
+  tests::flatten<mpl::vector0< > >();
+  std::cout << "_Z1x" << typeid(utils::flatten<mpl::vector2<bar, bar> >::type).name() << '\n';
 }
