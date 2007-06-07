@@ -472,6 +472,7 @@ namespace utils {
 // ----
 
   namespace detail {
+#if 0
     template<
       typename DefaultPolicies,
       typename Concept,
@@ -488,50 +489,25 @@ namespace utils {
 
     template<typename DefaultPolicies, typename Concept>
     struct get_default<DefaultPolicies, Concept, boost::mpl::void_>;
+#endif
 
-    template<
-      typename Requirements,
-      typename Sequence,
-      typename DefaultPolicies
-      bool empty = boost::mpl::empty<Requirements>::value
-    >
-    struct apply_default_policies {
-      typedef boost::mpl::front<Requirements>::type requirement;
-      typedef typename apply_default_policies<
-          typename boost::mpl::pop_front<Requirements>::type,
-          Sequence,
-          DefaultPolicies
-        >::type next;
-
-      typedef typename boost::mpl::if_<
-          has_concept<
-            Sequence,
-            requirement
-          >,
-          next,
-          typename boost::mpl::push_front<
-            next,
-            typename get_default<
-              DefaultPolicies,
-              requirement
-            >::type
-          >::type
-        >::type type;
-    };
-
-    template<
-      typename Requirements,
-      typename Sequence,
-      typename DefaultPolicies
-    >
-    struct apply_default_policies<Requirements, Sequence, DefaultPolicies, true> {
-      typedef boost::mpl::vector0< > type;
+    template<typename Seq>
+    struct add_default_policies_1 {
+      //FIXME
+      typedef Seq type;
+      static const int changes = 0;
     };
   }
-  
-  template<typename Seq>
+
+  template<typename Seq, int n = -1>
   struct apply_default_policies {
-    typedef struct type;
+    typedef detail::add_default_policies_1<Seq> iteration;
+    typedef typename apply_default_policies<typename iteration::type, iteration::changes>::type type;
+  };
+
+  template<typename Seq>
+  struct apply_default_policies<Seq, 0> {
+    typedef Seq type;
   };
 }
 
@@ -601,4 +577,6 @@ int main() {
   std::cout << "_Z1x" << typeid(utils::create_vector<utils::flatten<mpl::vector2<bar, bar> >::type>::type).name() << '\n';
 
   tests::resulting_concept<mpl::vector2<policy1, policy3> >();
+
+  std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<policy1, policy3> >::type).name() << '\n';
 }
