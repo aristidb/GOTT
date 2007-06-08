@@ -19,6 +19,47 @@
 
 namespace mpl = boost::mpl;
 
+namespace stl {
+  namespace concepts {
+    struct container { };
+    struct random_access_container {
+      typedef mpl::vector1<container> implies;
+    };
+
+    struct adapter { };
+    struct sequence { };
+
+    struct type_holder { };
+  }
+
+  struct vector {
+    template<typename Before, typename After>
+    struct policy : public Before { };
+
+    typedef mpl::vector1<concepts::container> concept;
+    typedef mpl::vector1<concepts::type_holder> require_before;
+  };
+
+  template<typename T>
+  struct type {
+    template<typename Before, typename After>
+    struct policy : public Before {
+      typedef T value_type; // ...
+    };
+
+    typedef mpl::vector1<concepts::type_holder> concept;
+  };
+
+  struct stack {
+    template<typename Before, typename After>
+    struct policy : protected Before { };
+
+    typedef mpl::vector2<concepts::sequence, concepts::adapter> concept;
+    typedef mpl::vector2<concepts::type_holder, concepts::container> require_before;
+    typedef boost::mpl::true_ shadow;
+  };
+}
+
 namespace concepts {
   struct container {
   };
@@ -45,6 +86,7 @@ namespace concepts {
   };
 }
 using namespace concepts;
+
 
 struct policy0 {
   template<typename Before, typename After>
@@ -680,8 +722,8 @@ int main() {
   std::cout << "_Z1x" << typeid(utils::create_vector<utils::flatten<mpl::vector2<bar, bar> >::type>::type).name() << '\n';
 
   tests::resulting_concept<mpl::vector2<policy1, policy3> >();
-  
-  std::cout << "_Z1x" << typeid(utils::detail::order_graph<mpl::vector2<policy1, policy3> >::type).name() << '\n';
+
+  std::cout << "_Z1x" << typeid(utils::detail::order_graph<mpl::vector3<stl::stack, stl::vector, stl::type<int> > >::type).name() << '\n';
 
   //std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<policy1, policy3> >::type).name() << '\n';
 }
