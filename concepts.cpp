@@ -519,7 +519,7 @@ namespace utils {
     template<
       typename Requirements,
       typename PolicySeq,
-      typename Policy,//<-?
+      typename Policy,
       typename Graph,
       template<typename, typename> class PairMaker,
       bool no_requirements_left = boost::mpl::empty<Requirements>::value

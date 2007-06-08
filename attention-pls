@@ -24,5 +24,74 @@ gleich behandeln könnte.
 Von der zusätzlichen Bequemlichkeit gar nicht zu sprechen.
 
 ---
+Chat Log:
+<MrN> ich habe eine sequenz X,Y,Z
+[22:07:15]  <MrN> für X weiß ich, Y und Z müssen davor
+[22:07:27]  <MrN> für Z weiß ich, Y muss danach
+[22:07:43]  <MrN> und die sequenz will ich jetzt quasi anpassen
+[22:07:51]  <MrN> was für nen algorithmus nimmt man am besten dafür?
+[22:08:20]  <Jester> das heißt, du hast ne teilordnung vorgegeben und willst die nun eine Sequenz finden, in der alle Teilordnungen korrekt wiedergegeben sind?
+[22:08:46]  <MrN> ja
+[22:09:13]  <Jester> topologische Sortierung wäre ein Stichwort, ich erklär's kurz
+[22:09:24]  <Jester> wir bauen nen Graphen, einen Knoten für jedes Element
+[22:09:27]  * dv (~dv@euirc-e144a4b3.adsl.highway.telekom.at) has joined #cpp
+[22:09:33]  * Stormbreaker (stormbreak@euirc-78b4f708.dip.tu-dresden.de) has joined #cpp
+[22:09:37]  <Jester> wenn gilt X vor Z, dann machen wir einen Pfeil von X zu Z
+[22:09:51]  <Jester> und das für alle Teilordnungen die vorgegeben sind
+[22:10:07]  <Jester> der entstandene Graph repräsentiert Deine Teilordnungen
+[22:10:16]  <Jester> Wenn der einen Kreis enthält, dann gibt's keine Lösung
+[22:10:29]  <Jester> ansonsten muß es Knoten geben, in die keine Kante reingeht
+[22:10:37]  <Jester> die kannste an den Anfang der Sequenz stellen
+[22:10:43]  <Jester> dann löschste die alle aus dem Graphen raus
+[22:10:52]  <Jester> dadurch haben wieder einige Knoten keinen Vorgänger mehr
+[22:10:58]  <Stormbreaker> Automatengraph?
+[22:11:07]  <Jester> die kommen dann als nächstes in die sequenz
+[22:11:17]  <Jester> das machste solange bis keine knoten mehr da sind
+[22:11:23]  <Jester> Stormbreaker: ne, topologische Sortierung
+[22:11:24]  <Stormbreaker> sequentieller automat: ohne speicherglieder
+[22:11:28]  <Stormbreaker> ahja..
+[22:11:41]  <Jester> MrN: halbwegs klar geworden?
+[22:11:46]  <MrN> mom war grad afk
+[22:11:49]  <Jester> boost::graph hat ne Implementierung dafür
+[22:11:56]  <ruediger> Jester: hört sich gut an
+[22:12:20]  <Jester> Graphen sind überall ;)
+[22:12:51]  <MrN> nein ich verstehs grad nicht, aber das macht nix, wenn ruediger es versteht :D
+[22:13:05]  <ruediger> MrN: ich weiß nur nicht wie wir das gut umesetzen können
+[22:13:12]  <MrN> die implementierung in boost.graph können wir schonmal nicht nehmen
+[22:13:15]  <ruediger> Jester: wir müssen das ganze nämlich in Metatemplates realisieren :D
+[22:13:24]  <Jester> http://de.wikipedia.org/wiki/Topologische_Sortierung
+[22:13:55]  <Jester> hm, sind eure elemente paarweise vergleichbar?
+[22:14:42]  <Jester> vermutlich nicht...
+[22:14:50]  <Jester> was wollt ihr denn machen?
+[22:15:00]  <MrN> wieso sollten sie nicht vergleichbar sein?
+[22:15:04]  <ruediger> was meinst du mit vergleichbar? Das man rausfinden kann ob der Knoten A vor Knoten B kommt?
+[22:15:13]  <Jester> ja genau
+[22:15:27]  <Jester> aber dann könntet ihr ja auch direkt sortieren ;)
+[22:15:36]  <MrN> ich habe auch nicht explizit "X muss vor Y kommen" sondern "etwas mit kriterium alpha muss vor Y kommen"
+[22:15:36]  <ruediger> kann man leider nicht
+[22:15:44]  <MrN> ob X alpha erfüllt ist leicht zu testen
+[22:16:08]  <Jester> hm, vielleicht kann man das aber trotzdem machen
+[22:16:26]  <Jester> einen Graphen kann man ja zum Beispiel als Adjazenzliste repräsentieren
+[22:16:34]  <Jester> eventuell kann man sowas mit mpl machen?
+[22:16:58]  <MrN> das war der plan.
+[22:17:08]  <ronny> damn
+[22:17:15]  <Jester> wird mit sicherheit sehr sehr heftig
+[22:17:24]  <MrN> jo aber dafür sehr sehr cool
+[22:17:25]  <MrN> :D
+[22:17:27]  <Jester> keine Ahnung, ob ein durchschnittlicher Compiler das packt
+[22:17:29]  <ronny> hab grade angefangen etch zu installieren, aber nachdem ich die gobe zusammenstellung für mein system gewählt habe ist das ganze bei 5% fertig hängen geblieben
+[22:17:39]  * diks13 (~diks@euirc-23057d08.dip0.t-ipconnect.de) has joined #cpp
+[22:18:14]  <Jester> was ist wenn ihr nen eher stupiden algo nehmt?
+[22:18:42]  <Jester> Nimm erste Element, prüfe ob es Bedingungen gibt, die verhindern dass es das erste ist. Wenn ja, dann behalte es, ansonsten gibt es aus
+[22:18:52]  <Jester> fahre mit dem nächsten Element der Sequenz fort
+[22:19:00]  <Jester> und das solange bis die sequenz leer ist
+[22:19:15]  <MrN> jo, die sequenzen werden eh selten über 15 elemente haben
+[22:19:26]  <Jester> wollte grad sagen, das ist ja eher klein
+[22:19:34]  <Jester> quadratische laufzeit halt
+[22:19:55]  <Jester> das dumme ist, dass die template vermutlich auch so tief instanziiert werden müssen
+[22:20:35]  <MrN> ich glaube wir sind vorerst froh um überhaupt eine implementierung
+[22:21:03]  <Jester> probiert doch das mal aus, klingt nicht ganz so knifflig
+[22:21:45]  <MrN> der algo hat den nachteil dass man in der mitte von einer sequenz elemente entfernen muss
+[22:22:08]  <ruediger> jo, so sollten wir es erstmal probieren. Ich glaube nicht, das eine Adjazenzliste zu generieren in Metatemplates so effizient geht
 
-compiler says (bitches about):
+da haben wir uns geirrt - war ja voll einfach ;)
