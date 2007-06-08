@@ -206,7 +206,7 @@ namespace utils {
         >::type type;
     };
   }
-  
+
   template<typename Sequence,
            typename Iterator = typename boost::mpl::begin<Sequence>::type>
   struct check_concepts;
@@ -470,45 +470,6 @@ namespace utils {
   #undef CREATE_VECTOR_IMPL
   #undef ELEMENT_AT
 // ----
-
-  namespace detail {
-#if 0
-    template<
-      typename DefaultPolicies,
-      typename Concept,
-      typename Default =
-        typename boost::mpl::at<
-          DefaultPolicies,
-          Concept,
-          boost::mpl::void_
-        >::type
-    >
-    struct get_default {
-      typedef Default type;
-    };
-
-    template<typename DefaultPolicies, typename Concept>
-    struct get_default<DefaultPolicies, Concept, boost::mpl::void_>;
-#endif
-
-    template<typename Seq>
-    struct add_default_policies_1 {
-      //FIXME
-      typedef Seq type;
-      static const int changes = 0;
-    };
-  }
-
-  template<typename Seq, int n = -1>
-  struct apply_default_policies {
-    typedef detail::add_default_policies_1<Seq> iteration;
-    typedef typename apply_default_policies<typename iteration::type, iteration::changes>::type type;
-  };
-
-  template<typename Seq>
-  struct apply_default_policies<Seq, 0> {
-    typedef Seq type;
-  };
 }
 
 namespace tests {
