@@ -441,6 +441,32 @@ namespace utils {
     type;
   };
 
+  namespace detail {
+    template<typename Policy>
+    struct get_pairs {
+      typedef struct pair;
+    };
+
+    template<
+      typename PolicySeq, // viel hübscher :P
+      typename Graph = boost::mpl::map0< >,
+      bool no_policies_left = boost::mpl::empty<PolicySeq>::value
+    >
+    struct order_graph {
+      typedef 
+    };
+
+    template<typename PolicySeq, typename Graph>
+    struct order_graph<PolicySeq, Graph, false> {
+      typedef Graph type;
+    };
+  }
+
+  template<typename PolicySeq>
+  struct reorder {
+    typedef boost::mpl::vector0<> type;
+  };
+
 // ----
 // create_vector from greatcontainer3
   template<typename Sequence, int Size>
