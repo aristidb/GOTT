@@ -594,6 +594,27 @@ namespace utils {
 
     template<
       typename PolicySeq,
+      typename Policy,
+      typename Graph,
+      bool has_require_after = has_require_after<Policy>::value
+    >
+    struct policy_graph_after {
+      typedef typename policy_graph<
+          typename Policy::require_after,
+          PolicySeq,
+          Policy,
+          Graph,
+          after_pair
+        >::type type;
+    };
+
+    template<typename PolicySeq, typename Policy, typename Graph>
+    struct policy_graph_after<PolicySeq, Policy, Graph, false> {
+      typedef Graph type;
+    };
+
+    template<
+      typename PolicySeq,
       typename Graph = boost::mpl::map0<>,
       bool = boost::mpl::empty<PolicySeq>::value
     >
@@ -606,7 +627,11 @@ namespace utils {
           Graph
         >::type before;
 
-      typedef before after;
+      typedef typename policy_graph_after<
+          PolicySeq,
+          policy,
+          before
+        >::type after;
 
       typedef typename order_graph<
           typename boost::mpl::pop_front<PolicySeq>::type,
