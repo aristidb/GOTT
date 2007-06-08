@@ -7,6 +7,7 @@
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/map.hpp>
+#include <boost/mpl/set.hpp>
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/empty.hpp>
 #include <boost/mpl/and.hpp>
@@ -524,7 +525,7 @@ namespace utils {
       template<typename, typename> class PairMaker,
       bool no_requirements_left = boost::mpl::empty<Requirements>::value
     >
-    struct policy_graph { // graph_helper? :E
+    struct policy_graph {
       typedef typename boost::mpl::insert<
           typename policy_graph<
             typename boost::mpl::pop_front<Requirements>::type,
@@ -647,7 +648,13 @@ namespace utils {
 
   template<typename PolicySeq>
   struct reorder {
-    typedef boost::mpl::vector0<> type;
+    typedef typename detail::order_graph<PolicySeq>::type graph;
+
+    typedef typename boost::mpl::insert_range<
+        boost::mpl::set0<>,
+        typename boost::mpl::begin<PolicySeq>::type,
+        typename boost::mpl::end<PolicySeq>::type
+      >::type policy_set;
   };
 
 // ----
