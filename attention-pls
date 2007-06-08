@@ -1,0 +1,24 @@
+Ich denke das bisherige Konzept für default_policies hat noch ein paar Probleme.
+
+Mir ist aufgefallen, dass eine allgemeine Verbesserung das Problem mindern würde
+- und einen hübscheren Algo für default_policies ermöglichen würde.
+
+Es soll nun folgendes gehen:
+
+policy_holder<vector2<stack, type<int> > >
+
+vector2<stack, type<int> >
+
+-> apply_default_policies
+
+vector3<stack, type<int>, vector>
+
+-> reorder
+
+vector3<type<int>, vector, stack>
+
+
+Das hätte den Vorteil, dass apply_default_policies alle drei Arten von require
+gleich behandeln könnte.
+
+Von der zusätzlichen Bequemlichkeit gar nicht zu sprechen.
