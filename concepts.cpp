@@ -6,6 +6,7 @@
 #include <boost/mpl/pop_front.hpp>
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/map.hpp>
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/empty.hpp>
 #include <boost/mpl/and.hpp>
@@ -442,22 +443,137 @@ namespace utils {
   };
 
   namespace detail {
-    template<typename Policy>
-    struct get_pairs {
-      typedef struct pair;
+    template<
+      typename PolicySeq,
+      typename Concept,
+      bool no_policies_left = boost::mpl::empty<PolicySeq>::value
+    >
+    struct get_matching_policy {
+      typedef typename boost::mpl::front<
+          PolicySeq
+         >::type front;
+      typedef typename boost::mpl::eval_if<
+          supports_concept<front, Concept>,
+          boost::mpl::identity<front>,
+          get_matching_policy<
+            typename boost::mpl::pop_front<
+              PolicySeq
+            >::type,
+            Concept
+          >
+        >::type type;
     };
 
     template<
-      typename PolicySeq, // viel hübscher :P
-      typename Graph = boost::mpl::map0< >,
-      bool no_policies_left = boost::mpl::empty<PolicySeq>::value
+      typename PolicySeq,
+      typename Concept
+    >
+    struct get_matching_policy<
+      PolicySeq,
+      Concept,
+      true
+    >;
+
+    template<
+      typename Requirements,
+      typename PolicySeq,
+      typename Policy,//<-?
+      typename Graph,
+      template<typename, typename> class PairMaker,
+      bool no_requirements_left = boost::mpl::empty<Requirements>::value
+    >
+    struct policy_graph { // graph_helper? :E
+      typedef typename boost::mpl::insert<
+          typename policy_graph<
+            typename boost::mpl::pop_front<Requirements>::type,
+            PolicySeq,
+            Policy,
+            Graph,
+            PairMaker
+          >::type,
+          typename PairMaker<
+            Policy,
+            typename get_matching_policy<
+              PolicySeq,
+              typename boost::mpl::front<Requirements>::type
+            >::type
+          >::type
+        >::type type;
+    };
+
+    template<
+      typename Requirements,
+      typename PolicySeq,
+      typename Policy,
+      typename Graph,
+      template<typename, typename> class PairMaker
+    >
+    struct policy_graph<
+      Requirements,
+      PolicySeq,
+      Policy,
+      Graph,
+      PairMaker,
+      true
+    > {
+      typedef Graph type;
+    };
+
+    template<typename From, typename To>
+    struct before_pair {
+      typedef boost::mpl::pair<From, To> type;
+    };
+
+    template<typename To, typename From>
+    struct after_pair {
+      typedef boost::mpl::pair<From, To> type;
+    };
+
+    template<
+      typename PolicySeq,
+      typename Policy,
+      typename Graph,
+      bool has_require_before = has_require_before<Policy>::value
+    >
+    struct policy_graph_before {
+      typedef typename policy_graph<
+          typename Policy::require_before,
+          PolicySeq,
+          Policy,
+          Graph,
+          before_pair
+        >::type type;
+    };
+
+    template<typename PolicySeq, typename Policy, typename Graph>
+    struct policy_graph_before<PolicySeq, Policy, Graph, false> {
+      typedef Graph type;
+    };
+
+    template<
+      typename PolicySeq,
+      typename Graph = boost::mpl::map0<>,
+      bool = boost::mpl::empty<PolicySeq>::value
     >
     struct order_graph {
-      typedef 
+      typedef typename boost::mpl::front<PolicySeq>::type policy;
+
+      typedef typename policy_graph_before<
+          PolicySeq,
+          policy,
+          Graph
+        >::type before;
+
+      typedef before after;
+
+      typedef typename order_graph<
+          typename boost::mpl::pop_front<PolicySeq>::type,
+          after
+        >::type type;
     };
 
     template<typename PolicySeq, typename Graph>
-    struct order_graph<PolicySeq, Graph, false> {
+    struct order_graph<PolicySeq, Graph, true> {
       typedef Graph type;
     };
   }
@@ -564,6 +680,8 @@ int main() {
   std::cout << "_Z1x" << typeid(utils::create_vector<utils::flatten<mpl::vector2<bar, bar> >::type>::type).name() << '\n';
 
   tests::resulting_concept<mpl::vector2<policy1, policy3> >();
+  
+  std::cout << "_Z1x" << typeid(utils::detail::order_graph<mpl::vector2<policy1, policy3> >::type).name() << '\n';
 
-  std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<policy1, policy3> >::type).name() << '\n';
+  //std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<policy1, policy3> >::type).name() << '\n';
 }
