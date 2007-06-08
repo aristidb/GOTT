@@ -17,6 +17,9 @@
 #include <boost/mpl/insert.hpp>
 #include <boost/mpl/insert_range.hpp>
 #include <boost/mpl/at.hpp>
+#include <boost/mpl/copy_if.hpp>
+#include <boost/mpl/inserter.hpp>
+#include <boost/mpl/not.hpp>
 
 namespace mpl = boost::mpl;
 
@@ -644,17 +647,79 @@ namespace utils {
     struct order_graph<PolicySeq, Graph, true> {
       typedef Graph type;
     };
+
+    template<
+      typename Q,
+      typename N,
+      typename Graph
+    >
+    struct next_level { //(5)
+      //TODO
+    };
+
+    template<
+      typename Q,
+      typename Graph,
+      typename Result = boost::mpl::vector0<>,
+      bool empty = boost::mpl::empty<Q>::value
+    >
+    struct reorder {  //(2)
+      //(3)
+      typedef typename boost::mpl::front<Q>::type n;
+      typedef typename boost::mpl::erase_key<Q, n>::type Q2;
+      //(4)
+      typedef typename boost::mpl::push_back<Result, n>::type output;
+      //(5)
+      typedef next_level<Q2, n, Graph> next;
+      //(2)
+      typedef typename reorder<
+          typename next::Q,
+          typename next::graph,
+          output
+        >::type type;
+    };
+
+    template<typename Q, typename Graph, typename Result>
+    struct reorder<Q, Graph, Result, true> { //(2)
+      BOOST_STATIC_ASSERT(boost::mpl::empty<Graph>::value); //(9,10)
+      typedef Result type;
+    };
   }
+
+  /*
+  Q := Set of all nodes with no incoming edges        //(1)
+  while Q is non-empty do                             //(2)
+      remove a node n from Q                          //(3)
+      output n                                        //(4)
+      for each node m with an edge e from n to m do   //(5)
+          remove edge e from the graph                //(6)
+          if m has no other incoming edges then       //(7)
+              insert m into Q                         //(8)
+  if graph has edges then                             //(9)
+      output error message (graph has a cycle)        //(10)
+  */
 
   template<typename PolicySeq>
   struct reorder {
     typedef typename detail::order_graph<PolicySeq>::type graph;
 
-    typedef typename boost::mpl::insert_range<
-        boost::mpl::set0<>,
-        typename boost::mpl::begin<PolicySeq>::type,
-        typename boost::mpl::end<PolicySeq>::type
-      >::type policy_set;
+    //(1)
+    typedef typename boost::mpl::copy_if<
+        PolicySeq,
+        boost::mpl::not_<
+          boost::mpl::has_key<
+            graph,
+            boost::mpl::_1
+          >
+        >,
+        boost::mpl::inserter<
+          boost::mpl::set0<>,
+          boost::mpl::insert<boost::mpl::_1, boost::mpl::_2>
+        >
+      >::type Q;
+
+    //(2)
+    typedef typename detail::reorder<Q, graph>::type type;
   };
 
 // ----
