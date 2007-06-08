@@ -74,13 +74,10 @@ Chat Log:
 [22:16:26]  <Jester> einen Graphen kann man ja zum Beispiel als Adjazenzliste repräsentieren
 [22:16:34]  <Jester> eventuell kann man sowas mit mpl machen?
 [22:16:58]  <MrN> das war der plan.
-[22:17:08]  <ronny> damn
 [22:17:15]  <Jester> wird mit sicherheit sehr sehr heftig
 [22:17:24]  <MrN> jo aber dafür sehr sehr cool
 [22:17:25]  <MrN> :D
 [22:17:27]  <Jester> keine Ahnung, ob ein durchschnittlicher Compiler das packt
-[22:17:29]  <ronny> hab grade angefangen etch zu installieren, aber nachdem ich die gobe zusammenstellung für mein system gewählt habe ist das ganze bei 5% fertig hängen geblieben
-[22:17:39]  * diks13 (~diks@euirc-23057d08.dip0.t-ipconnect.de) has joined #cpp
 [22:18:14]  <Jester> was ist wenn ihr nen eher stupiden algo nehmt?
 [22:18:42]  <Jester> Nimm erste Element, prüfe ob es Bedingungen gibt, die verhindern dass es das erste ist. Wenn ja, dann behalte es, ansonsten gibt es aus
 [22:18:52]  <Jester> fahre mit dem nächsten Element der Sequenz fort
@@ -95,3 +92,18 @@ Chat Log:
 [22:22:08]  <ruediger> jo, so sollten wir es erstmal probieren. Ich glaube nicht, das eine Adjazenzliste zu generieren in Metatemplates so effizient geht
 
 da haben wir uns geirrt - war ja voll einfach ;)
+
+--
+
+Q := Set of all nodes with no incoming edges
+while Q is non-empty do
+    remove a node n from Q
+    output n
+    for each node m with an edge e from n to m do
+        remove edge e from the graph
+        if m has no other incoming edges then
+            insert m into Q
+if graph has edges then
+    output error message (graph has a cycle)
+
+ist das machbar? - ja, nur wie :D
