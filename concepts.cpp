@@ -918,47 +918,24 @@ namespace utils {
       typedef boost::mpl::vector0< > type;
     };
 
-    namespace ERROR {
-      template<typename Policy, typename Concept>
-      struct DEFAULT_POLICY_NOT_FOUND;
-    }
-
     template<
       typename Policy,
       typename Concept,
       typename DefaultPolicy = typename Policy::default_policy
-      bool has = boost::mpl::has_key<DefaultPolicy, Concept>::value
     >
     struct default_policy {
+      BOOST_STATIC_ASSERT(boost::mpl::has_key<DefaultPolicy, Concept>::value);
       typedef typename boost::mpl::at<DefaultPolicy, Concept>::type type;
     };
-    
-    template<
-      typename Policy,
-      typename Concept,
-      typename DefaultPolicy
-    >
-    struct default_policy<Policy, Concept, DefaultPolicy, false>
-      : ERROR::DEFAULT_POLICY_NOT_FOUND<Policy, Concept>
-    { typedef boost::mpl::void_ type; };
 
-    template<
-      typename Policy,
-      typename Concept,
-      bool has = has_default_policy<Policy>::value
-    >
-    struct get_default_for {
-      //BOOST_STATIC_ASSERT(has_default_policy<Policy>::value);
-      typedef default_policy<Policy, Concept>::type type;
-    };
-    
     template<
       typename Policy,
       typename Concept
     >
-    struct get_default_for<Policy, Concept, false> 
-      : ERROR::DEFAULT_POLICY_NOT_FOUND<Policy, Concept>
-    { typedef boost::mpl::void_ type; };
+    struct get_default_for {
+      BOOST_STATIC_ASSERT(has_default_policy<Policy, Concept>::value);
+      typedef default_policy<Policy, Concept>::type type;
+    };
 
     template<
       template Policy,
