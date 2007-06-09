@@ -781,77 +781,83 @@ namespace utils {
     };
 
     template<
-      typename Q,
-      typename N,
-      typename Graph
-    >
-    struct next_level { //(5)
-      //TODO
-    };
-
-    template<
-      typename Q,
+      typename PolicySeq,
+      typename Policies,
       typename Graph,
       typename Result = boost::mpl::vector0<>,
-      bool empty = boost::mpl::empty<Q>::value
+      typename N = typename boost::mpl::find_if<
+          Policies,
+          boost::mpl::empty<
+            boost::mpl::at<
+              Graph,
+              boost::mpl::_1
+            >
+          >
+        >::type,
+      typename End = typename boost::mpl::end<Policies>::type
     >
-    struct reorder {  //(2)
-      //(3)
-      typedef typename boost::mpl::front<Q>::type n;
-      typedef typename boost::mpl::erase_key<Q, n>::type Q2;
-      //(4)
-      typedef typename boost::mpl::push_back<Result, n>::type output;
-      //(5)
-      typedef next_level<Q2, n, Graph> next;
-      //(2)
+    struct reorder {
+      typedef typename boost::mpl::push_back<
+          Result,
+          N
+        >::type next;
+      typedef typename reverse_graph<
+          typename boost::mpl::begin<Graph>::type,
+          typename boost::mpl::end<Graph>::type,
+          typename init_graph<PolicySeq>::type
+        >::type reverse;
+      typedef typename clean_graph<
+          typename boost::mpl::insert<
+            reverse,
+            boost::mpl::pair<
+              N,
+              boost::mpl::set0<>
+            >
+          >::type
+        >::type deconnect_N;
+      typedef typename reverse_graph<
+          typename boost::mpl::begin<deconnect_N>::type,
+          typename boost::mpl::end<deconnect_N>::type,
+          typename init_graph<PolicySeq>::type
+        >::type next_graph;
       typedef typename reorder<
-          typename next::Q,
-          typename next::graph,
-          output
+          PolicySeq,
+          typename boost::mpl::erase_key<
+            Policies,
+            N
+          >::type,
+          next_graph,
+          next
         >::type type;
     };
 
-    template<typename Q, typename Graph, typename Result>
-    struct reorder<Q, Graph, Result, true> { //(2)
-      BOOST_STATIC_ASSERT(boost::mpl::empty<Graph>::value); //(9,10)
+    template<
+      typename PolicySeq,
+      typename Policies,
+      typename Graph,
+      typename Result,
+      typename It
+    >
+    struct reorder<PolicySeq, Policies, Graph, Result, It, It> {
+      BOOST_STATIC_ASSERT(boost::mpl::empty<Graph>::value);
       typedef Result type;
     };
   }
 
   /*
-  Q := Set of all nodes with no incoming edges        //(1)
-  while Q is non-empty do                             //(2)
-      remove a node n from Q                          //(3)
-      output n                                        //(4)
-      for each node m with an edge e from n to m do   //(5)
-          remove edge e from the graph                //(6)
-          if m has no other incoming edges then       //(7)
-              insert m into Q                         //(8)
-  if graph has edges then                             //(9)
-      output error message (graph has a cycle)        //(10)
+  while (N = find node without incoming edge (Graph) )
+    output N
+    Graph = reverse<insert<reverse<Graph>, pair<N, set0<> > > > -- remove all edges E from N to M in Graph
   */
-
   template<typename PolicySeq>
   struct reorder {
+    typedef typename boost::mpl::insert_range<
+        boost::mpl::set0<>,
+        void,
+        PolicySeq
+      >::type policies;
     typedef typename detail::order_graph<PolicySeq>::type graph;
-
-    //(1)
-    typedef typename boost::mpl::copy_if<
-        PolicySeq,
-        boost::mpl::empty<
-          boost::mpl::at<
-            graph,
-            boost::mpl::_1
-          >
-        >,
-        boost::mpl::inserter<
-          boost::mpl::set0<>,
-          boost::mpl::insert<boost::mpl::_1, boost::mpl::_2>
-        >
-      >::type Q;
-
-    //(2)
-    typedef typename detail::reorder<Q, graph>::type type;
+    typedef typename detail::reorder<PolicySeq, policies, graph>::type type;
   };
 
 // ----
