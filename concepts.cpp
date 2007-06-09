@@ -258,7 +258,7 @@ namespace utils {
   template<typename Sequence,
            typename Iterator = typename boost::mpl::begin<Sequence>::type>
   struct check_concepts;
-  
+
   namespace detail {
     template<typename Sequence, typename Iterator>
     struct check_concepts_impl
@@ -649,6 +649,44 @@ namespace utils {
     };
 
     template<
+      typename Graph,
+      typename First = typename boost::mpl::begin<Graph>::type,
+      typename Last = typename boost::mpl::end<Graph>::type,
+      typename Result = boost::mpl::map0<>
+    >
+    struct clean_graph {
+      typedef typename boost::mpl::deref<First>::type::first key;
+      typedef typename boost::mpl::if_<
+          typename boost::mpl::has_key<
+            Result,
+            key
+          >::type,
+          Result,
+          typename boost::mpl::insert<
+            Result,
+            boost::mpl::pair<
+              key,
+              typename boost::mpl::at<
+                Graph,
+                key
+              >::type
+            >
+          >::type
+        >::type next;
+      typedef typename clean_graph<
+          Graph,
+          typename boost::mpl::next<First>::type,
+          Last,
+          next
+        >::type type;
+    };
+
+    template<typename Graph, typename First, typename Result>
+    struct clean_graph<Graph, First, First, Result> {
+      typedef Result type;
+    };
+
+    template<
       typename PolicySeq,
       typename Graph = typename init_graph<PolicySeq>::type,
       bool = boost::mpl::empty<PolicySeq>::value
@@ -676,7 +714,7 @@ namespace utils {
 
     template<typename PolicySeq, typename Graph>
     struct order_graph<PolicySeq, Graph, true> {
-      typedef Graph type;
+      typedef typename utils::detail::clean_graph<Graph>::type type;
     };
 
     template<
@@ -739,7 +777,7 @@ namespace utils {
 
     template<typename First, typename Result>
     struct reverse_graph<First, First, Result> {
-      typedef Result type;
+      typedef typename utils::detail::clean_graph<Result>::type type;
     };
 
     template<
@@ -913,27 +951,35 @@ int main() {
   std::cout << "_Z1x" << typeid(utils::create_vector<utils::flatten<mpl::vector2<bar, bar> >::type>::type).name() << '\n';
 
   tests::resulting_concept<mpl::vector2<policy1, policy3> >();
-  
+
   typedef mpl::vector3<stl::stack, stl::vector, stl::type<int> > c3;
   typedef utils::detail::order_graph<c3>::type graph;
-  typedef mpl::map3<
-      mpl::pair<stl::vector, mpl::set1<stl::type<int> > >
-      ,      mpl::pair<stl::stack, mpl::set2<stl::vector, stl::type<int> > >
-      ,      mpl::pair<stl::type<int>, mpl::set0<> >
-    > graph2;
+  typedef utils::detail::clean_graph<
+      mpl::map3<
+        mpl::pair<stl::vector, mpl::set1<stl::type<int> > >
+        ,      mpl::pair<stl::stack, mpl::set2<stl::vector, stl::type<int> > >
+        ,      mpl::pair<stl::type<int>, mpl::set0<> >
+      >
+    >::type graph2;
+  typedef utils::detail::init_graph<c3>::type ig;
+  typedef utils::detail::reverse_graph<
+      mpl::begin<graph>::type,
+      mpl::end<graph>::type,
+      ig
+    >::type rg;
+ typedef utils::detail::reverse_graph<
+      mpl::begin<graph2>::type,
+      mpl::end<graph2>::type,
+      ig
+    >::type rg2;
 
   std::cout << "_Z1a" << typeid(graph).name() << '\n';
-  std::cout << boost::mpl::size<graph>::value << '\n';
-  std::cout << "_Z1A" << typeid(utils::detail::reverse_graph<mpl::begin<graph>::type, mpl::end<graph>::type, mpl::map0<> >::type).name() << '\n';
-  std::cout << "_Z1B" << typeid(utils::detail::reverse_graph<mpl::begin<graph2>::type, mpl::end<graph2>::type, mpl::map0<> >::type).name() << '\n';
-  /*
-  stl::vector -> (stl::type<int>)
-  stl::stack -> (stl::vector, stl::type<int>)
-  stl::stack -> (stl::type<int>) --???
-  stl::stack -> ()
-  stl::vector -> ()
-  stl::type<int> -> ()
-  */
+  std::cout << "_Z1b" << typeid(graph2).name() << '\n';
+  std::cout << boost::mpl::size<graph>::value << ',' << boost::mpl::size<graph2>::value << '\n';
+  std::cout << "_Z1A" << typeid(rg).name() << '\n';
+  std::cout << "_Z1B" << typeid(rg2).name() << '\n';
+  std::cout << boost::mpl::size<rg>::value << ',' << boost::mpl::size<rg2>::value << '\n';
+
   //std::cout << "_Z1b" << typeid(utils::reorder<c3>::type).name() << '\n';
 
   //std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<policy1, policy3> >::type).name() << '\n';
