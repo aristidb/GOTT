@@ -112,7 +112,7 @@ skizze
 
 while (N = find node without incoming edge (Graph) )
   output N
-  remove all nodes M with an edge E from N to M in Graph # => as in: Graph = reverse<insert<reverse<Graph>, pair<N, set0<> > > >
+  Graph = reverse<insert<reverse<Graph>, pair<N, set0<> > > > -- remove all edges E from N to M in Graph
 if Graph has edges then
   pray to the lord (aka ruediger)
 

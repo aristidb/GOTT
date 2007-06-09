@@ -714,7 +714,7 @@ namespace utils {
 
     template<typename PolicySeq, typename Graph>
     struct order_graph<PolicySeq, Graph, true> {
-      typedef typename utils::detail::clean_graph<Graph>::type type;
+      typedef typename clean_graph<Graph>::type type;
     };
 
     template<
@@ -777,7 +777,7 @@ namespace utils {
 
     template<typename First, typename Result>
     struct reverse_graph<First, First, Result> {
-      typedef typename utils::detail::clean_graph<Result>::type type;
+      typedef typename clean_graph<Result>::type type;
     };
 
     template<
