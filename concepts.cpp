@@ -936,8 +936,19 @@ namespace utils {
       typename Concept
     >
     struct get_default_for {
-      BOOST_STATIC_ASSERT((has_default_policy<Policy, Concept>::value)); // das liegt hier dran. Weil er immernoch default_policy instanziier
+      BOOST_STATIC_ASSERT((has_default_policy<Policy, Concept>::value));
       typedef typename default_policy<Policy, Concept>::type type;
+    };
+
+    template<typename Seq, typename Policy, typename Requirement>
+    struct add_default {
+      typedef typename boost::mpl::push_back<
+          Seq,
+          typename get_default_for<
+            Policy,
+            Requirement
+          >::type
+        >::type type;
     };
 
     template<
@@ -961,13 +972,7 @@ namespace utils {
           requirement
         >,
         boost::mpl::identity<next_default>,
-        boost::mpl::push_back<
-          next_default,
-          get_default_for<
-            Policy,
-            requirement
-          >
-        >
+        add_default<next_default, Policy, requirement>
       >::type type;
     };
 
