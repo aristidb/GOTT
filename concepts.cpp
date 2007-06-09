@@ -737,8 +737,8 @@ namespace utils {
     //(1)
     typedef typename boost::mpl::copy_if<
         PolicySeq,
-        boost::mpl::not_<
-          boost::mpl::has_key<
+        boost::mpl::empty<
+          boost::mpl::at<
             graph,
             boost::mpl::_1
           >
@@ -850,8 +850,11 @@ int main() {
   std::cout << "_Z1x" << typeid(utils::create_vector<utils::flatten<mpl::vector2<bar, bar> >::type>::type).name() << '\n';
 
   tests::resulting_concept<mpl::vector2<policy1, policy3> >();
+  
+  typedef mpl::vector3<stl::stack, stl::vector, stl::type<int> > c3;
 
-  std::cout << "_Z1x" << typeid(utils::detail::order_graph<mpl::vector3<stl::stack, stl::vector, stl::type<int> > >::type).name() << '\n';
+  std::cout << "_Z1a" << typeid(utils::detail::order_graph<c3>::type).name() << '\n';
+  std::cout << boost::mpl::size<utils::detail::order_graph<c3>::type>::value << '\n';
   /*
   stl::vector -> (stl::type<int>)
   stl::stack -> (stl::vector, stl::type<int>)
@@ -860,6 +863,7 @@ int main() {
   stl::vector -> ()
   stl::type<int> -> ()
   */
+  //std::cout << "_Z1b" << typeid(utils::reorder<c3>::type).name() << '\n';
 
   //std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<policy1, policy3> >::type).name() << '\n';
 }
