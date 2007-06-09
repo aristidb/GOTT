@@ -785,7 +785,7 @@ namespace utils {
       typename Policies,
       typename Graph,
       typename Result = boost::mpl::vector0<>,
-      typename N = typename boost::mpl::find_if<
+      typename NIt = typename boost::mpl::find_if<
           Policies,
           boost::mpl::empty<
             boost::mpl::at<
@@ -797,6 +797,7 @@ namespace utils {
       typename End = typename boost::mpl::end<Policies>::type
     >
     struct reorder {
+      typedef typename boost::mpl::deref<NIt>::type N;
       typedef typename boost::mpl::push_back<
           Result,
           N
@@ -839,7 +840,22 @@ namespace utils {
       typename It
     >
     struct reorder<PolicySeq, Policies, Graph, Result, It, It> {
-      BOOST_STATIC_ASSERT(boost::mpl::empty<Graph>::value);
+      // check for cycles
+      BOOST_STATIC_ASSERT((
+        boost::is_same<
+          typename boost::mpl::find_if<
+            Graph,
+            boost::mpl::not_<
+              boost::mpl::empty<
+                boost::mpl::second<
+                  boost::mpl::_1
+                >
+              >
+            >
+          >::type,
+          typename boost::mpl::end<Graph>::type
+        >::value
+      ));
       typedef Result type;
     };
   }
@@ -851,10 +867,12 @@ namespace utils {
   */
   template<typename PolicySeq>
   struct reorder {
-    typedef typename boost::mpl::insert_range<
-        boost::mpl::set0<>,
-        void,
-        PolicySeq
+    typedef typename boost::mpl::copy<
+        PolicySeq,
+        boost::mpl::inserter<
+          boost::mpl::set0<>,
+          boost::mpl::insert<boost::mpl::_1, boost::mpl::_2>
+        >
       >::type policies;
     typedef typename detail::order_graph<PolicySeq>::type graph;
     typedef typename detail::reorder<PolicySeq, policies, graph>::type type;
@@ -986,7 +1004,7 @@ int main() {
   std::cout << "_Z1B" << typeid(rg2).name() << '\n';
   std::cout << boost::mpl::size<rg>::value << ',' << boost::mpl::size<rg2>::value << '\n';
 
-  //std::cout << "_Z1b" << typeid(utils::reorder<c3>::type).name() << '\n';
+  std::cout << "_Z1r" << typeid(utils::create_vector<utils::reorder<c3>::type>::type).name() << '\n';
 
   //std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<policy1, policy3> >::type).name() << '\n';
 }
