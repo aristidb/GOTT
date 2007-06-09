@@ -107,3 +107,15 @@ if graph has edges then
     output error message (graph has a cycle)
 
 ist das machbar? - ja, nur wie :D
+
+-- entziffern
+x(boost::mpl::m_item<stl::vector, 
+boost::mpl::s_item<stl::type<int>, boost::mpl::set0<mpl_::na> >, boost::mpl::m_item<stl::stack, boost::mpl::s_item<stl::vector, boost::mpl::s_item<stl::type<int>, boost::mpl::set0<mpl_::na> > >, boost::mpl::m_item<stl::stack, boost::mpl::s_item<stl::type<int>, boost::mpl::set0<mpl_::na> >, boost::mpl::m_item<stl::stack, boost::mpl::set0<mpl_::na>, boost::mpl::m_item<stl::vector, boost::mpl::set0<mpl_::na>, boost::mpl::m_item<stl::type<int>, boost::mpl::set0<mpl_::na>, boost::mpl::map0<mpl_::na> > > > > > >)
+
+map< pair<std::vector, set<stl::type<int> > >,
+     pair<stl::stack, set<stl::vector, stl::type<int> >>,
+     pair<stl::stack, set<stl::type<int> > >,
+     pair<stl::stack, set<>>,
+     pair<stl::vector, set<>>,
+     pair<stl::type<int>, set<>>>
+

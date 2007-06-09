@@ -20,6 +20,7 @@
 #include <boost/mpl/copy_if.hpp>
 #include <boost/mpl/inserter.hpp>
 #include <boost/mpl/not.hpp>
+#include <boost/mpl/erase_key.hpp>
 
 namespace mpl = boost::mpl;
 
@@ -529,21 +530,30 @@ namespace utils {
       bool no_requirements_left = boost::mpl::empty<Requirements>::value
     >
     struct policy_graph {
-      typedef typename boost::mpl::insert<
-          typename policy_graph<
-            typename boost::mpl::pop_front<Requirements>::type,
+      typedef typename PairMaker<
+          Policy,
+          typename get_matching_policy<
             PolicySeq,
-            Policy,
-            Graph,
-            PairMaker
-          >::type,
-          typename PairMaker<
-            Policy,
-            typename get_matching_policy<
-              PolicySeq,
-              typename boost::mpl::front<Requirements>::type
-            >::type
+            typename boost::mpl::front<Requirements>::type
           >::type
+        >::type pair;
+      typedef boost::mpl::pair<
+          typename pair::first,
+          typename boost::mpl::insert<
+            typename boost::mpl::at<Graph, typename pair::first>::type,
+            typename pair::second
+          >::type
+        > real_pair;
+      typedef typename boost::mpl::insert<
+          Graph,
+          real_pair
+        >::type graph;
+      typedef typename policy_graph<
+          typename boost::mpl::pop_front<Requirements>::type,
+          PolicySeq,
+          Policy,
+          graph,
+          PairMaker
         >::type type;
     };
 
@@ -619,7 +629,28 @@ namespace utils {
 
     template<
       typename PolicySeq,
-      typename Graph = boost::mpl::map0<>,
+      bool empty = boost::mpl::empty<PolicySeq>::value
+    >
+    struct init_graph {
+      typedef typename boost::mpl::insert<
+          typename init_graph<
+            typename boost::mpl::pop_front<PolicySeq>::type
+          >::type,
+          boost::mpl::pair<
+            typename boost::mpl::front<PolicySeq>::type,
+            boost::mpl::set0<>
+          >
+        >::type type;
+    };
+
+    template<typename PolicySeq>
+    struct init_graph<PolicySeq, true> {
+      typedef boost::mpl::map0<> type;
+    };
+
+    template<
+      typename PolicySeq,
+      typename Graph = typename init_graph<PolicySeq>::type,
       bool = boost::mpl::empty<PolicySeq>::value
     >
     struct order_graph {
@@ -821,6 +852,14 @@ int main() {
   tests::resulting_concept<mpl::vector2<policy1, policy3> >();
 
   std::cout << "_Z1x" << typeid(utils::detail::order_graph<mpl::vector3<stl::stack, stl::vector, stl::type<int> > >::type).name() << '\n';
+  /*
+  stl::vector -> (stl::type<int>)
+  stl::stack -> (stl::vector, stl::type<int>)
+  stl::stack -> (stl::type<int>) --???
+  stl::stack -> ()
+  stl::vector -> ()
+  stl::type<int> -> ()
+  */
 
   //std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<policy1, policy3> >::type).name() << '\n';
 }
