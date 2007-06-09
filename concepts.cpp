@@ -61,6 +61,7 @@ namespace stl {
 
     typedef mpl::vector2<concepts::sequence, concepts::adapter> concept;
     typedef mpl::vector2<concepts::type_holder, concepts::container> require_before;
+    typedef mpl::map1<mpl::pair<concepts::container, vector> > default_policy;
     typedef boost::mpl::true_ shadow;
   };
 }
@@ -960,9 +961,9 @@ namespace utils {
           requirement
         >,
         next_default,
-        typename boost::mpl::insert<
+        typename boost::mpl::push_back<
           next_default,
-          typename get_default_for< // TODO
+          typename get_default_for< // TODO -rly?
             Policy,
             requirement
           >::type
@@ -988,12 +989,9 @@ namespace utils {
     template<
       typename PolicySeq,
       typename PolicyIter = typename boost::mpl::begin<PolicySeq>::type,
-      bool end = boost::is_same<
-          PolicyIter,
-          typename boost::mpl::end<PolicySeq>::type
-        >::value
+      typename End = typename boost::mpl::end<PolicySeq>::type
     >
-    struct apply_default_policies { // cool name it is!
+    struct apply_default_policies {
       typedef typename boost::mpl::deref<
         PolicyIter
       >::type policy;
@@ -1017,7 +1015,8 @@ namespace utils {
 
       typedef typename apply_default_policies<
         new_policy_seq,
-        typename boost::mpl::next<PolicyIter>::type
+        typename boost::mpl::next<PolicyIter>::type,//<-sollte das sich nicht eher auf new_policy_seq beziehen?
+        End
       >::type type;
     };
 
@@ -1025,7 +1024,7 @@ namespace utils {
       typename PolicySeq,
       typename PolicyIter
     >
-    struct apply_default_policies<PolicySeq, PolicyIter, true> {
+    struct apply_default_policies<PolicySeq, PolicyIter, PolicyIter> {
       typedef PolicySeq type;
     };
   }
@@ -1163,5 +1162,5 @@ int main() {
 
   std::cout << "_Z1r" << typeid(utils::create_vector<utils::reorder<c3>::type>::type).name() << '\n';
 
-  //std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<policy1, policy3> >::type).name() << '\n';
+  std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<stl::stack, stl::type<int> > >::type).name() << '\n';
 }
