@@ -988,13 +988,11 @@ namespace utils {
 
     template<
       typename PolicySeq,
-      typename PolicyIter = typename boost::mpl::begin<PolicySeq>::type,
-      typename End = typename boost::mpl::end<PolicySeq>::type
+      long i = 0,
+      long n = boost::mpl::size<PolicySeq>::value
     >
     struct apply_default_policies {
-      typedef typename boost::mpl::deref<
-        PolicyIter
-      >::type policy;
+      typedef typename boost::mpl::at_c<PolicySeq, i>::type policy;
 
       typedef typename concat<
         typename get_requirements_before<policy>::type,
@@ -1015,16 +1013,15 @@ namespace utils {
 
       typedef typename apply_default_policies<
         new_policy_seq,
-        typename boost::mpl::next<PolicyIter>::type,//<-sollte das sich nicht eher auf new_policy_seq beziehen?
-        End
+        i + 1
       >::type type;
     };
 
     template<
       typename PolicySeq,
-      typename PolicyIter
+      long n
     >
-    struct apply_default_policies<PolicySeq, PolicyIter, PolicyIter> {
+    struct apply_default_policies<PolicySeq, n, n> {
       typedef PolicySeq type;
     };
   }
