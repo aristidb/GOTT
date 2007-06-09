@@ -879,6 +879,8 @@ namespace utils {
   };
 
   namespace detail {
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(default_policy)
+
     template<
       typename Policy,
       bool has = has_require_before<Policy>::value
@@ -924,7 +926,7 @@ namespace utils {
       typename DefaultPolicy = typename Policy::default_policy
     >
     struct default_policy {
-      BOOST_STATIC_ASSERT(boost::mpl::has_key<DefaultPolicy, Concept>::value);
+      BOOST_STATIC_ASSERT((boost::mpl::has_key<DefaultPolicy, Concept>::value));
       typedef typename boost::mpl::at<DefaultPolicy, Concept>::type type;
     };
 
@@ -933,15 +935,15 @@ namespace utils {
       typename Concept
     >
     struct get_default_for {
-      BOOST_STATIC_ASSERT(has_default_policy<Policy, Concept>::value);
-      typedef default_policy<Policy, Concept>::type type;
+      BOOST_STATIC_ASSERT((has_default_policy<Policy, Concept>::value));
+      typedef typename default_policy<Policy, Concept>::type type;
     };
 
     template<
-      template Policy,
+      typename Policy,
       typename Requirements,
       typename PolicySeq,
-      bool no_requirements_left = boost::mpl::empty<requirements>::value
+      bool no_requirements_left = boost::mpl::empty<Requirements>::value
     >
     struct match_or_apply_default_policy {
       typedef typename boost::mpl::front<Requirements>::type requirement;
@@ -969,14 +971,14 @@ namespace utils {
     };
 
     template<
-      template Policy,
+      typename Policy,
       typename Requirements,
       typename PolicySeq
     >
     struct match_or_apply_default_policy<
-      template Policy,
-      typename Requirements,
-      typename PolicySeq,
+      Policy,
+      Requirements,
+      PolicySeq,
       true
     >
     {
@@ -987,11 +989,11 @@ namespace utils {
       typename PolicySeq,
       typename PolicyIter = typename boost::mpl::begin<PolicySeq>::type,
       bool end = boost::is_same<
-        PolicyIter,
-        typename boost::mpl::end<PolicySeq>::type
-      >::value
+          PolicyIter,
+          typename boost::mpl::end<PolicySeq>::type
+        >::value
     >
-    struct helper_monkey { // cool name it is!
+    struct apply_default_policies { // cool name it is!
       typedef typename boost::mpl::deref<
         PolicyIter
       >::type policy;
@@ -1005,16 +1007,16 @@ namespace utils {
       >::type requirements;
 
       typedef typename concat<
-        RequireSeq,
-        typename match_or_apply_default_policies<
+        PolicySeq,
+        typename match_or_apply_default_policy<
           policy,
           requirements,
           PolicySeq
         >::type
-      >::type new_require_seq;
+      >::type new_policy_seq;
 
-      typedef typename helper_monkey<
-        new_require_seq,
+      typedef typename apply_default_policies<
+        new_policy_seq,
         typename boost::mpl::next<PolicyIter>::type
       >::type type;
     };
@@ -1023,14 +1025,14 @@ namespace utils {
       typename PolicySeq,
       typename PolicyIter
     >
-    struct helper_monkey<PolicySeq, PolicyIter, true> {
+    struct apply_default_policies<PolicySeq, PolicyIter, true> {
       typedef PolicySeq type;
     };
   }
 
   template<typename PolicySeq>
   struct apply_default_policies {
-    typedef typename helper_monkey<PolicySeq>::type type;
+    typedef typename detail::apply_default_policies<PolicySeq>::type type;
   };
 
 // ----
