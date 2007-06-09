@@ -108,6 +108,14 @@ if graph has edges then
 
 ist das machbar? - ja, nur wie :D
 
+skizze
+
+while (N = find node without incoming edge (Graph) )
+  output N
+  remove all nodes M with an edge E from N to M in Graph # => as in: Graph = reverse<insert<reverse<Graph>, pair<N, set0<> > > >
+if Graph has edges then
+  pray to the lord (aka ruediger)
+
 -- entziffern
 x(boost::mpl::m_item<stl::vector, 
 boost::mpl::s_item<stl::type<int>, boost::mpl::set0<mpl_::na> >, boost::mpl::m_item<stl::stack, boost::mpl::s_item<stl::vector, boost::mpl::s_item<stl::type<int>, boost::mpl::set0<mpl_::na> > >, boost::mpl::m_item<stl::stack, boost::mpl::s_item<stl::type<int>, boost::mpl::set0<mpl_::na> >, boost::mpl::m_item<stl::stack, boost::mpl::set0<mpl_::na>, boost::mpl::m_item<stl::vector, boost::mpl::set0<mpl_::na>, boost::mpl::m_item<stl::type<int>, boost::mpl::set0<mpl_::na>, boost::mpl::map0<mpl_::na> > > > > > >)

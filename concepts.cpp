@@ -680,6 +680,69 @@ namespace utils {
     };
 
     template<
+      typename Result,
+      typename After,
+      typename First,
+      typename Last
+    >
+    struct add_edges {
+      typedef typename boost::mpl::deref<First>::type x;
+      typedef typename boost::mpl::if_<
+          typename boost::mpl::has_key<Result, x>::type,
+          typename boost::mpl::at<Result, x>::type,
+          boost::mpl::set0<>
+        >::type old;
+      typedef boost::mpl::pair<
+          x,
+          typename boost::mpl::insert<
+            old,
+            After
+          >::type
+        > new_pair;
+      typedef typename boost::mpl::insert<
+          Result,
+          new_pair
+        >::type new_result;
+      typedef typename add_edges<
+          new_result,
+          After,
+          typename boost::mpl::next<First>::type,
+          Last
+        >::type type;
+    };
+
+    template<typename Result, typename After, typename First>
+    struct add_edges<Result, After, First, First> {
+      typedef Result type;
+    };
+
+    template<
+      typename First,
+      typename Last,
+      typename Result
+    >
+    struct reverse_graph {
+      typedef typename boost::mpl::deref<First>::type x;
+      typedef typename x::first after;
+      typedef typename x::second before;
+      typedef typename reverse_graph<
+          typename boost::mpl::next<First>::type,
+          Last,
+          typename add_edges<
+            Result,
+            after,
+            typename boost::mpl::begin<before>::type,
+            typename boost::mpl::end<before>::type
+          >::type
+        >::type type;
+    };
+
+    template<typename First, typename Result>
+    struct reverse_graph<First, First, Result> {
+      typedef Result type;
+    };
+
+    template<
       typename Q,
       typename N,
       typename Graph
@@ -852,9 +915,17 @@ int main() {
   tests::resulting_concept<mpl::vector2<policy1, policy3> >();
   
   typedef mpl::vector3<stl::stack, stl::vector, stl::type<int> > c3;
+  typedef utils::detail::order_graph<c3>::type graph;
+  typedef mpl::map3<
+      mpl::pair<stl::vector, mpl::set1<stl::type<int> > >
+      ,      mpl::pair<stl::stack, mpl::set2<stl::vector, stl::type<int> > >
+      ,      mpl::pair<stl::type<int>, mpl::set0<> >
+    > graph2;
 
-  std::cout << "_Z1a" << typeid(utils::detail::order_graph<c3>::type).name() << '\n';
-  std::cout << boost::mpl::size<utils::detail::order_graph<c3>::type>::value << '\n';
+  std::cout << "_Z1a" << typeid(graph).name() << '\n';
+  std::cout << boost::mpl::size<graph>::value << '\n';
+  std::cout << "_Z1A" << typeid(utils::detail::reverse_graph<mpl::begin<graph>::type, mpl::end<graph>::type, mpl::map0<> >::type).name() << '\n';
+  std::cout << "_Z1B" << typeid(utils::detail::reverse_graph<mpl::begin<graph2>::type, mpl::end<graph2>::type, mpl::map0<> >::type).name() << '\n';
   /*
   stl::vector -> (stl::type<int>)
   stl::stack -> (stl::vector, stl::type<int>)
