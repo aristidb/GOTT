@@ -878,6 +878,184 @@ namespace utils {
     typedef typename detail::reorder<PolicySeq, policies, graph>::type type;
   };
 
+  namespace detail {
+    template<
+      typename Policy,
+      bool has = has_require_before<Policy>::value
+    >
+    struct get_requirements_before {
+      typedef typename Policy::require_before type;
+    };
+
+    template<typename Policy>
+    struct get_requirements_before<Policy, false> {
+      typedef boost::mpl::vector0< > type;
+    };
+
+    template<
+      typename Policy,
+      bool has = has_require_after<Policy>::value
+    >
+    struct get_requirements_after {
+      typedef typename Policy::require_after type;
+    };
+
+    template<typename Policy>
+    struct get_requirements_after<Policy, false> {
+      typedef boost::mpl::vector0< > type;
+    };
+
+    template<
+      typename Policy,
+      bool has = has_require<Policy>::value
+    >
+    struct get_requirements {
+      typedef typename Policy::require type;
+    };
+
+    template<typename Policy>
+    struct get_requirements<Policy, false> {
+      typedef boost::mpl::vector0< > type;
+    };
+
+    namespace ERROR {
+      template<typename Policy, typename Concept>
+      struct DEFAULT_POLICY_NOT_FOUND;
+    }
+
+    template<
+      typename Policy,
+      typename Concept,
+      typename DefaultPolicy = typename Policy::default_policy
+      bool has = boost::mpl::has_key<DefaultPolicy, Concept>::value
+    >
+    struct default_policy {
+      typedef typename boost::mpl::at<DefaultPolicy, Concept>::type type;
+    };
+    
+    template<
+      typename Policy,
+      typename Concept,
+      typename DefaultPolicy
+    >
+    struct default_policy<Policy, Concept, DefaultPolicy, false>
+      : ERROR::DEFAULT_POLICY_NOT_FOUND<Policy, Concept>
+    { typedef boost::mpl::void_ type; };
+
+    template<
+      typename Policy,
+      typename Concept,
+      bool has = has_default_policy<Policy>::value
+    >
+    struct get_default_for {
+      //BOOST_STATIC_ASSERT(has_default_policy<Policy>::value);
+      typedef default_policy<Policy, Concept>::type type;
+    };
+    
+    template<
+      typename Policy,
+      typename Concept
+    >
+    struct get_default_for<Policy, Concept, false> 
+      : ERROR::DEFAULT_POLICY_NOT_FOUND<Policy, Concept>
+    { typedef boost::mpl::void_ type; };
+
+    template<
+      template Policy,
+      typename Requirements,
+      typename PolicySeq,
+      bool no_requirements_left = boost::mpl::empty<requirements>::value
+    >
+    struct match_or_apply_default_policy {
+      typedef typename boost::mpl::front<Requirements>::type requirement;
+      typedef typename boost::mpl::pop_front<Requirements>::type requ_seq;
+
+      typedef typename match_or_apply_default_policy<
+        Policy,
+        requ_seq,
+        PolicySeq
+      >::type next_default;
+      typedef typename boost::mpl::if_<
+        has_concept<
+          PolicySeq,
+          requirement
+        >,
+        next_default,
+        typename boost::mpl::insert<
+          next_default,
+          typename get_default_for< // TODO
+            Policy,
+            requirement
+          >::type
+        >::type 
+      >::type type;
+    };
+
+    template<
+      template Policy,
+      typename Requirements,
+      typename PolicySeq
+    >
+    struct match_or_apply_default_policy<
+      template Policy,
+      typename Requirements,
+      typename PolicySeq,
+      true
+    >
+    {
+      typedef boost::mpl::vector0< > type;
+    };
+
+    template<
+      typename PolicySeq,
+      typename PolicyIter = typename boost::mpl::begin<PolicySeq>::type,
+      bool end = boost::is_same<
+        PolicyIter,
+        typename boost::mpl::end<PolicySeq>::type
+      >::value
+    >
+    struct helper_monkey { // cool name it is!
+      typedef typename boost::mpl::deref<
+        PolicyIter
+      >::type policy;
+
+      typedef typename concat<
+        typename get_requirements_before<policy>::type,
+        typename concat<
+          typename get_requirements_after<policy>::type,
+          typename get_requirements<policy>::type
+        >::type
+      >::type requirements;
+
+      typedef typename concat<
+        RequireSeq,
+        typename match_or_apply_default_policies<
+          policy,
+          requirements,
+          PolicySeq
+        >::type
+      >::type new_require_seq;
+
+      typedef typename helper_monkey<
+        new_require_seq,
+        typename boost::mpl::next<PolicyIter>::type
+      >::type type;
+    };
+
+    template<
+      typename PolicySeq,
+      typename PolicyIter
+    >
+    struct helper_monkey<PolicySeq, PolicyIter, true> {
+      typedef PolicySeq type;
+    };
+  }
+
+  template<typename PolicySeq>
+  struct apply_default_policies {
+    typedef typename helper_monkey<PolicySeq>::type type;
+  };
+
 // ----
 // create_vector from greatcontainer3
   template<typename Sequence, int Size>
