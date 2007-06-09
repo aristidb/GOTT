@@ -936,7 +936,7 @@ namespace utils {
       typename Concept
     >
     struct get_default_for {
-      BOOST_STATIC_ASSERT((has_default_policy<Policy, Concept>::value));
+      BOOST_STATIC_ASSERT((has_default_policy<Policy, Concept>::value)); // das liegt hier dran. Weil er immernoch default_policy instanziier
       typedef typename default_policy<Policy, Concept>::type type;
     };
 
@@ -955,19 +955,19 @@ namespace utils {
         requ_seq,
         PolicySeq
       >::type next_default;
-      typedef typename boost::mpl::if_<
+      typedef typename boost::mpl::eval_if<
         has_concept<
           PolicySeq,
           requirement
         >,
-        next_default,
-        typename boost::mpl::push_back<
+        boost::mpl::identity<next_default>,
+        boost::mpl::push_back<
           next_default,
-          typename get_default_for< // TODO -rly?
+          get_default_for<
             Policy,
             requirement
-          >::type
-        >::type 
+          >
+        >
       >::type type;
     };
 
@@ -1159,5 +1159,5 @@ int main() {
 
   std::cout << "_Z1r" << typeid(utils::create_vector<utils::reorder<c3>::type>::type).name() << '\n';
 
-  std::cout << "_Z1x" << typeid(utils::apply_default_policies<mpl::vector2<stl::stack, stl::type<int> > >::type).name() << '\n';
+  std::cout << "_Z1x" << typeid(utils::create_vector<utils::apply_default_policies<mpl::vector2<stl::stack, stl::type<int> > >::type>::type).name() << '\n';
 }
